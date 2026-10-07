@@ -1,38 +1,11 @@
 #include "common.h"
 #include "stage.h"
-extern AnimFrame D_800A5088[];
-extern AnimFrame D_800A50D8[];
+extern AnimFrame updateTileAnimsFrames0[];
+extern AnimFrame updateTileAnimsFrames1[];
 
 #include "common/step_looping_animation.inc.c"
 
-/* Sets the frame of the map objects from two animations, which run once per record */
-void updateTileAnims(StageTileAnims *task) {
-    StageTile *tile;
-
-    switch (task->state) {
-    case TASK_INIT:
-    default:
-        task->anims[0].index = 0;
-        task->anims[0].timer = D_800A5088[0].duration;
-        task->anims[1].index = 0;
-        task->anims[1].timer = D_800A50D8[0].duration;
-        task->nextState(task);
-        break;
-    case TASK_RUN:
-        for (tile = FIELDSTG_state.objects; tile->unk2 != 0; tile++) {
-            if (tile->anim == 1) {
-                tile->frame = stepLoopingAnimation(&task->anims[0], D_800A5088, 0);
-            }
-            if (tile->anim == 2) {
-                tile->frame = stepLoopingAnimation(&task->anims[1], D_800A50D8, 0);
-            }
-        }
-        break;
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
+#include "common/update_tile_anims2.inc.c"
 
 void *createTileAnims(void) {
     return createTask(updateTileAnims, 0x58, 0);
@@ -61,7 +34,7 @@ void setupStage(void) {
     FIELDSTG_state.music = MUSIC(5, 0);
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= 0x14 && GAME.progress < 0x18) {
         FIELDSTG_state.soundBank = 0x1F;
@@ -73,14 +46,14 @@ void setupStage(void) {
     }
 }
 
-AnimFrame D_800A5088[] = {
+AnimFrame updateTileAnimsFrames0[] = {
     { 50, 18 }, { 44, 6 }, { 50, 60 }, { 44, 6 },
     { 45, 6 }, { 46, 6 }, { 44, 6 }, { 51, 78 },
     { 44, 6 }, { 45, 6 }, { 46, 6 }, { 44, 6 },
     { 52, 60 }, { 44, 6 }, { 52, 18 }, { 44, 6 },
     { 45, 6 }, { 46, 6 }, { 44, 6 }, { 255, 0 },
 };
-AnimFrame D_800A50D8[] = {
+AnimFrame updateTileAnimsFrames1[] = {
     { 56, 60 }, { 47, 6 }, { 56, 18 }, { 47, 6 },
     { 48, 6 }, { 49, 6 }, { 47, 6 }, { 57, 78 },
     { 47, 6 }, { 48, 6 }, { 49, 6 }, { 47, 6 },

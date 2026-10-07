@@ -55,3 +55,27 @@ area3Battle6 = 0x800A6578;
 area3Battle7 = 0x800A6584;
 area3Battles = 0x800A6590;
 actor0 = 0x800A6640;
+
+// functions named by what calls them (tools/name_stage_funcs.py)
+updateFaller = 0x800A4E6C; // type:func
+createCommand816 = 0x800A50F4; // type:func
+createCommand817 = 0x800A5128; // type:func
+createCommand818 = 0x800A5160; // type:func
+createCommand819 = 0x800A5198; // type:func
+createCommand820 = 0x800A51D0; // type:func
+createCommand821 = 0x800A5208; // type:func
+createCommand822 = 0x800A5240; // type:func
+createCommand823 = 0x800A5278; // type:func
+createCommand824 = 0x800A52B0; // type:func
+createCommand825 = 0x800A52E8; // type:func
+updateMover = 0x800A541C; // type:func
+handleCommand811 = 0x800A5850; // type:func
+createCommand811 = 0x800A595C; // type:func
+createMover = 0x800A5990; // type:func
+updateScroller = 0x800A5B50; // type:func
+handleCommand812 = 0x800A5D4C; // type:func
+createScroller = 0x800A5D84; // type:func
+endEvent150 = 0x800A5EE0; // type:func
+
+// named by the function or table that uses them (tools/name_stage_uses.py)
+updateFallerParams = 0x800A620C;

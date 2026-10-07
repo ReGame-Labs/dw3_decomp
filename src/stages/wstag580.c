@@ -28,37 +28,37 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-void func_800A4DC8(void) {
+void endEvent440(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x3C), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x1F), 1);
 }
 
-void func_800A4E14(void) {
+void endEvent450(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x21), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x20), 1);
 }
 
-void func_800A4E60(void) {
+void endEvent470(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x34), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x22), 1);
 }
 
-void func_800A4EAC(void) {
+void endEvent480(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x35), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x23), 1);
 }
 
-void func_800A4EF8(void) {
+void endEvent490(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x36), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x24), 1);
 }
 
-void func_800A4F44(void) {
+void endEvent500(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x37), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x25), 1);
 }
 
-void func_800A4F90(void) {
+void endEvent520(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x38), 1);
 }
 
@@ -86,9 +86,9 @@ void setupStage(void) {
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
-    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -148,7 +148,7 @@ s16 script450[] = {
     0x102, 2, 0x1F0, 0x2B0, 7,
     0x100, 0x69, 0x339, 0x36C,
     0x101, 0x69, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x300, 0x3C,
     0x101, 0x323, 0x325, 2,
     0x300, 0x3C,
@@ -165,13 +165,13 @@ s16 script450[] = {
     0x302, 0x69,
     0x101, 0x69, 1, 5,
     0x300, 0x1E,
-    0x101, 0x32D, 0x34E, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HIDE_OBJECTS(1), 2,
     0x300, 0x1E,
     0x102, 0x69, 0x394, 0x35E, 5,
     0x302, 0x69,
     0x100, 0x69, 0, 0,
     0x101, 0x69, 1, 0,
-    0x101, 0x32D, 0x354, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHOW_OBJECTS(1), 2,
     0x300, 0x1E,
     0x200, 0, 1, 2, 3,
     0x301,
@@ -182,7 +182,7 @@ s16 script450[] = {
 };
 s16 script470[] = {
     0x102, 2, 0x280, 0x148, 5,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 5,
     0x300, 0x1E,
@@ -194,7 +194,7 @@ s16 script470[] = {
     0x300, 0x3C,
     0x100, 0x69, 0x33E, 0xD8,
     0x101, 0x69, 1, 1,
-    0x101, 0x32D, 0x34F, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HIDE_OBJECTS(2), 2,
     0x300, 0x3C,
     0x102, 0x69, 0x301, 0xF7, 1,
     0x302, 0x69,
@@ -225,7 +225,7 @@ s16 script470[] = {
     0x302, 0x69,
     0x100, 0x69, 0, 0,
     0x101, 0x69, 1, 0,
-    0x101, 0x32D, 0x355, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHOW_OBJECTS(2), 2,
     0x300, 0x3C,
     0x600, 0, 2,
     0x300, 0x3C,
@@ -235,7 +235,7 @@ s16 script480[] = {
     0x102, 2, 0x42F, 0x2B4, 6,
     0x100, 0x69, 0x4D9, 0x2C4,
     0x101, 0x69, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 6,
     0x101, 0x323, 0x325, 2,
@@ -250,13 +250,13 @@ s16 script480[] = {
     0x302, 0x69,
     0x101, 0x69, 1, 5,
     0x300, 0x1E,
-    0x101, 0x32D, 0x352, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HIDE_OBJECTS(5), 2,
     0x300, 0x1E,
     0x102, 0x69, 0x51F, 0x2B8, 5,
     0x302, 0x69,
     0x100, 0x69, 0, 0,
     0x101, 0x69, 1, 0,
-    0x101, 0x32D, 0x358, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHOW_OBJECTS(5), 2,
     0x300, 0x3C,
     0x200, 0, 1, 2, 1,
     0x301,
@@ -270,7 +270,7 @@ s16 script490[] = {
     0x102, 2, 0x4BA, 0x1DB, 5,
     0x100, 0x69, 0x3CC, 0x1C1,
     0x101, 0x69, 1, 5,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 5,
     0x101, 0x323, 0x325, 2,
@@ -283,14 +283,14 @@ s16 script490[] = {
     0x302, 0x69,
     0x101, 0x69, 1, 5,
     0x300, 0x1E,
-    0x101, 0x32D, 0x350, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HIDE_OBJECTS(3), 2,
     0x300, 0x1E,
     0x101, 2, 1, 3,
     0x102, 0x69, 0x440, 0x187, 5,
     0x302, 0x69,
     0x100, 0x69, 0, 0,
     0x101, 0x69, 1, 0,
-    0x101, 0x32D, 0x356, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHOW_OBJECTS(3), 2,
     0x300, 0x3C,
     0x200, 0, 1, 2, 1,
     0x301,
@@ -301,7 +301,7 @@ s16 script490[] = {
 };
 s16 script500[] = {
     0x102, 2, 0x27F, 0x1D9, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 0x323, 0x325, 2,
     0x300, 0x5A,
@@ -341,12 +341,12 @@ s16 script520[] = {
     0x101, 2, 1, 7,
     0x100, 0x69, 0xA9, 0x21B,
     0x101, 0x69, 1, 1,
-    0x101, 0x32D, 0x34D, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HIDE_OBJECTS(0), 2,
     0x300, 0x1E,
     0x102, 2, 0x105, 0x88, 7,
     0x302, 2,
     0x300, 0x1E,
-    0x101, 0x32D, 0x353, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHOW_OBJECTS(0), 2,
     0x300, 0x1E,
     0x102, 2, 0x129, 0x9A, 1,
     0x302, 2,
@@ -364,13 +364,13 @@ s16 script520[] = {
     0x302, 0x69,
     0x101, 0x69, 1, 3,
     0x300, 0x1E,
-    0x101, 0x32D, 0x351, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HIDE_OBJECTS(4), 2,
     0x300, 0x1E,
     0x102, 0x69, 0x56, 0x213, 3,
     0x302, 0x69,
     0x100, 0x69, 0, 0,
     0x101, 0x69, 1, 0,
-    0x101, 0x32D, 0x357, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHOW_OBJECTS(4), 2,
     0x300, 0x3C,
     0x600, 0, 2,
     0x300, 0x3C,
@@ -528,47 +528,47 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x24C, 0x228, 0x94, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x24E, 0x108, 0x174, 5, 0x65, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x24F, 0x108, 0x174, 5, 0x69, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x252, 0x2F8, 0x264, 3, 0x6B, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x250, 0x108, 0x174, 5, 0x67, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x252, 0x258, 0x24C, 5, 0x6A, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x251, 0x108, 0x174, 5, 0x66, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x252, 0x68, 0x20C, 3, 0x64, 0, 0 },
-    { { { SPECIAL(0x40), 1 }, { CODES_END, 0 } }, 1, 0x253, 0x278, 0xD4, 3, 0x68, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 6, 0x160, 0x80, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 6, 0x170, 0xE8, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 0xC, 0xDF, 0x142, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 0xC, 0xD2, 0x208, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 8, 0x2D0, 0x29A, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 8, 0x2C1, 0x322, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 8, 0x33E, 0x2D2, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 8, 0x330, 0x35A, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 8, 0x42E, 0x34A, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 8, 0x420, 0x3D2, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 5, 0x4B0, 0x25A, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 5, 0x4BE, 0x2AE, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 4, 5, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 4, 8, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 4, 7, 0, 0, 0, 0, 0, 0 },
-    { { { PROGRESS(0x11), 1 }, { FLAG(0x40, 0x21), 0 } }, 8, 0x1C2, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(2, 0xD), 1 }, { FLAG(0x40, 0x34), 0 } }, 8, 0x1D6, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(2, 0xE), 1 }, { FLAG(0x40, 0x35), 0 } }, 8, 0x1E0, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(2, 0xF), 1 }, { FLAG(0x40, 0x36), 0 } }, 8, 0x1EA, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(2, 0x10), 1 }, { FLAG(0x40, 0x37), 0 } }, 8, 0x1F4, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x24C, 0x228, 0x94, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x24E, 0x108, 0x174, 5, 0x65, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x24F, 0x108, 0x174, 5, 0x69, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x252, 0x2F8, 0x264, 3, 0x6B, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x250, 0x108, 0x174, 5, 0x67, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x252, 0x258, 0x24C, 5, 0x6A, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x251, 0x108, 0x174, 5, 0x66, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x252, 0x68, 0x20C, 3, 0x64, 0, 0 },
+    { { { SPECIAL(0x40), 1 }, { CODES_END, 0 } }, SLOT_EXIT, 0x253, 0x278, 0xD4, 3, 0x68, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0x160, 0x80, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0x170, 0xE8, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 0xC, 0xDF, 0x142, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 0xC, 0xD2, 0x208, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 8, 0x2D0, 0x29A, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 8, 0x2C1, 0x322, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 8, 0x33E, 0x2D2, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 8, 0x330, 0x35A, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 8, 0x42E, 0x34A, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 8, 0x420, 0x3D2, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 5, 0x4B0, 0x25A, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 5, 0x4BE, 0x2AE, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 5, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 8, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 7, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(0x11), 1 }, { FLAG(0x40, 0x21), 0 } }, SLOT_EVENT, 0x1C2, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG(2, 0xD), 1 }, { FLAG(0x40, 0x34), 0 } }, SLOT_EVENT, 0x1D6, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG(2, 0xE), 1 }, { FLAG(0x40, 0x35), 0 } }, SLOT_EVENT, 0x1E0, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG(2, 0xF), 1 }, { FLAG(0x40, 0x36), 0 } }, SLOT_EVENT, 0x1EA, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG(2, 0x10), 1 }, { FLAG(0x40, 0x37), 0 } }, SLOT_EVENT, 0x1F4, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 440, script440, EVENT_TEXT(6), NULL, func_800A4DC8 },
-    { 450, script450, EVENT_TEXT(0x16), NULL, func_800A4E14 },
-    { 470, script470, EVENT_TEXT(0x17), NULL, func_800A4E60 },
-    { 480, script480, EVENT_TEXT(0x18), NULL, func_800A4EAC },
-    { 490, script490, EVENT_TEXT(0x19), NULL, func_800A4EF8 },
-    { 500, script500, EVENT_TEXT(0x1A), NULL, func_800A4F44 },
-    { 520, script520, EVENT_TEXT(0x1B), NULL, func_800A4F90 },
+    { 440, script440, EVENT_TEXT(6), NULL, endEvent440 },
+    { 450, script450, EVENT_TEXT(0x16), NULL, endEvent450 },
+    { 470, script470, EVENT_TEXT(0x17), NULL, endEvent470 },
+    { 480, script480, EVENT_TEXT(0x18), NULL, endEvent480 },
+    { 490, script490, EVENT_TEXT(0x19), NULL, endEvent490 },
+    { 500, script500, EVENT_TEXT(0x1A), NULL, endEvent500 },
+    { 520, script520, EVENT_TEXT(0x1B), NULL, endEvent520 },
     { -1, NULL, 0, NULL, NULL },
 };

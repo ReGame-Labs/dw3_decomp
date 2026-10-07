@@ -32,7 +32,7 @@ names (`build/<version>/layout/`).
 empty in both versions. FIELDSTG's event and script command tables, which
 point into whichever stage is loaded, name the symbols of the stage each
 entry belongs to: `WSTAG260_script1320`, one of the story events' scripts,
-and `WSTAG780_func_800A5E50`, a function of the stage whose scripts run the
+and `WSTAG780_createCommand800`, a function of the stage whose scripts run the
 command. The list holds an address by where it is and what it holds, with the
 names after a `#`, so that a rename leaves it as it is. `make shiftcheck` warns about those that are fixed (and
 `tools/shiftcheck.py --strict` fails), which `tools/shiftcheck.py -v

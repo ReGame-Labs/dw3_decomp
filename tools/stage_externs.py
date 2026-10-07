@@ -5,8 +5,9 @@ Drops the declarations of a stage's own data and functions that nothing needs.
 data_to_c.py writes an extern for every datum of a stage before its code, but
 a datum or a function that is defined before every use of it needs no
 declaration. This keeps an extern or a prototype only where something (a
-function, or a table before the datum) uses the name before its definition,
-and drops copies of the same declaration.
+function, a table before the datum, or a src/stages/common file included
+before it) uses the name before its definition, and drops copies of the
+same declaration.
 It changes no bytes, and can be run again at any time:
 
     tools/stage_externs.py [src/stages/wstag200.c ...]
@@ -21,6 +22,16 @@ import sys
 EXTERN = re.compile(r"^extern\s+[^;=(]*?\b(\w+)\s*((?:\[[^\]]*\])*)\s*;\s*$")
 PROTOTYPE = re.compile(r"^(?:extern\s+)?(?!return\b)\w+[\w\s]*?[\s*]\**(\w+)\([^()]*\);\s*$")
 TOKEN = re.compile(r"\b\w+\b")
+INCLUDE = re.compile(r'^#include "(common/\w+\.inc\.c)"')
+
+
+def tokens(line):
+    """The names a line uses: an #include of src/stages/common uses the file's"""
+    m = INCLUDE.match(line)
+    if m:
+        with open(f"src/stages/{m.group(1)}") as f:
+            return TOKEN.findall(f.read())
+    return TOKEN.findall(line)
 
 
 def definition_line(lines, name):
@@ -56,7 +67,7 @@ def prune(text):
     for i, line in enumerate(lines):
         if i in extern_lines:
             continue
-        for tok in TOKEN.findall(line):
+        for tok in tokens(line):
             if tok in externs and tok not in first_use and definitions[tok] != i:
                 first_use[tok] = i
 

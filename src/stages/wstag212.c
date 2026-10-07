@@ -18,7 +18,7 @@ void func_800A4D80(StageTileEffect *task) {
 }
 
 /* Moves its records to (x, y) and animates them when the substate is set to 1 */
-void func_800A4DB8(StageTileEffect *task) {
+void updateTileEffect(StageTileEffect *task) {
     StageTile *tile;
     StageTile *t;
     s32 i;
@@ -94,7 +94,7 @@ void func_800A4DB8(StageTileEffect *task) {
 }
 
 /* Starts the effect at the place of map ID */
-void func_800A500C(StageTileEffect *task, s32 id) {
+void handleCommand810(StageTileEffect *task, s32 id) {
     s32 i;
 
     if (task != NULL) {
@@ -114,8 +114,8 @@ void func_800A500C(StageTileEffect *task, s32 id) {
     }
 }
 
-void *func_800A50C0(s32 arg) {
-    return createTaskWithId(func_800A4DB8, 0x70, 0, arg);
+void *createCommand810(s32 arg) {
+    return createTaskWithId(updateTileEffect, 0x70, 0, arg);
 }
 
 /* Creates the event object of the story so far, the first that applies */
@@ -165,17 +165,17 @@ void func_800A52FC(void) {
     GAME.progress = 3;
 }
 
-void func_800A530C(void) {
+void endEvent271(void) {
     FLAGS_00.applyAction(FLAG(0x40, 5), 1);
     FLAGS_00.applyAction(FLAG(0x40, 4), 1);
 }
 
-void func_800A5358(void) {
+void endEvent273(void) {
     GAME.progress = 12;
 }
 
 /* Clears flag 0x4005 and sets the story progress to 14 */
-void func_800A5368(void) {
+void endEvent352(void) {
     FLAGS_00.applyAction(FLAG(0x40, 5), 0);
     GAME.progress = 14;
 }
@@ -204,7 +204,7 @@ void setupStage(void) {
     FIELDSTG_state.music = MUSIC(0x43, 3);
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -303,7 +303,7 @@ s16 script10[] = {
     0x301,
     0x101, 0xC, 1, 2,
     0x300, 0x1E,
-    0x101, 0x32D, 0x338, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 1,
     0x300, 0x1E,
     0x101, 0x32A, 0x32F, 1,
     0x300, 0x1E,
@@ -335,7 +335,7 @@ s16 script10[] = {
     0x100, 0x42, 0x129, 0xFC,
     0x101, 0x42, 1, 7,
     0x300, 0x3C,
-    0x101, 0x32D, 0x339, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 1,
     0x300, 0x1E,
     0x200, 0, 0xB, 1, 1,
     0x101, 1, 7, 3,
@@ -518,7 +518,7 @@ s16 script11[] = {
     0x301,
     0x101, 0xC, 1, 2,
     0x300, 0x1E,
-    0x101, 0x32D, 0x338, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 1,
     0x300, 0x1E,
     0x101, 0x32A, 0x32F, 1,
     0x300, 0x1E,
@@ -550,7 +550,7 @@ s16 script11[] = {
     0x100, 0x41, 0x129, 0xFC,
     0x101, 0x41, 1, 7,
     0x300, 0x3C,
-    0x101, 0x32D, 0x339, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 1,
     0x300, 0x1E,
     0x200, 0, 0xB, 1, 1,
     0x101, 1, 7, 3,
@@ -733,7 +733,7 @@ s16 script12[] = {
     0x301,
     0x101, 0xC, 1, 2,
     0x300, 0x1E,
-    0x101, 0x32D, 0x338, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 1,
     0x300, 0x1E,
     0x101, 0x32A, 0x32F, 1,
     0x300, 0x1E,
@@ -765,7 +765,7 @@ s16 script12[] = {
     0x100, 0x42, 0x129, 0xFC,
     0x101, 0x42, 1, 7,
     0x300, 0x3C,
-    0x101, 0x32D, 0x339, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 1,
     0x300, 0x1E,
     0x200, 0, 0xB, 1, 1,
     0x101, 1, 7, 3,
@@ -885,7 +885,7 @@ s16 script271[] = {
     0x101, 0x36, 1, 4,
     0x100, 0x39, 0x16E, 0x144,
     0x101, 0x39, 1, 6,
-    0x101, 0x32D, 0x366, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_GAYALOOP, 1,
     0x300, 0x1E,
     0x102, 1, 0x68, 0x18C, 5,
     0x100, 0xB, 0x50, 0x198,
@@ -952,7 +952,7 @@ s16 script271[] = {
     0x102, 0x6C, 0xE6, 0xAA, 7,
     0x101, 0x6D, 1, 7,
     0x102, 0x6E, 0xBD, 0xA7, 7,
-    0x101, 0x32D, 0x367, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_GAYALOOP, 1,
     0x302, 0x6C,
     0x101, 0x6C, 1, 7,
     0x101, 0x6E, 1, 7,
@@ -1121,9 +1121,9 @@ s16 script352[] = {
     0x101, 2, 1, 1,
     0x100, 0xB, 0x150, 0xC0,
     0x101, 0xB, 1, 1,
-    0x101, 0x32D, 0x34F, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HIDE_OBJECTS(2), 2,
     0x300, 0x78,
-    0x101, 0x32D, 0x355, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHOW_OBJECTS(2), 2,
     0x300, 0x1E,
     0x200, 0, 1, 2, 0,
     0x101, 2, 7, 1,
@@ -1474,8 +1474,8 @@ FieldEvent stageEvents[] = {
     { 10, script10, EVENT_TEXT(3), NULL, func_800A52FC },
     { 11, script11, EVENT_TEXT(4), NULL, func_800A52FC },
     { 12, script12, EVENT_TEXT(5), NULL, func_800A52FC },
-    { 271, script271, EVENT_TEXT(0x18), NULL, func_800A530C },
-    { 273, script273, EVENT_TEXT(0x1A), NULL, func_800A5358 },
-    { 352, script352, EVENT_TEXT(0x20), NULL, func_800A5368 },
+    { 271, script271, EVENT_TEXT(0x18), NULL, endEvent271 },
+    { 273, script273, EVENT_TEXT(0x1A), NULL, endEvent273 },
+    { 352, script352, EVENT_TEXT(0x20), NULL, endEvent352 },
     { -1, NULL, 0, NULL, NULL },
 };

@@ -3,7 +3,7 @@
 extern s16 D_800A65B8[];
 
 /* Moves the two records and the player 0x7F up or down when an event sets TASK_DONE */
-void func_800A5DFC(StageTileLift *task) {
+void updateTileLift(StageTileLift *task) {
     StageTile *rec;
     StageTile *tile0;
     StageTile *tile1;
@@ -41,7 +41,7 @@ void func_800A5DFC(StageTileLift *task) {
     case TASK_DONE:
         tile0 = task->tiles[0];
         tile1 = task->tiles[1];
-        player = TASK_REGISTRY.funcs.find(5, -1, 0);
+        player = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
         switch (task->substate) {
         case 0:
         default:
@@ -129,8 +129,8 @@ void func_800A6218(StageTileLift *task, s32 id) {
     }
 }
 
-StageTileLift *func_800A628C(s32 id) {
-    StageTileLift *task = createTaskWithId(func_800A5DFC, sizeof(StageTileLift), 0, id);
+StageTileLift *createTileLift(s32 id) {
+    StageTileLift *task = createTaskWithId(updateTileLift, sizeof(StageTileLift), 0, id);
 
     if (FLAGS_00.checkCondition(FLAG(0x1C, 0x3D), 1)) {
         task->down = 1;
@@ -168,9 +168,9 @@ void setupStage(void) {
     FIELDSTG_state.music = MUSIC(0x42, 2);
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.spriteColor = stageColor;
-    FIELDSTG_map.setFile(0, 0x8FB0001);
-    FIELDSTG_map.setFile(1, 0x8FB0002);
-    FIELDSTG_map.setFile(7, 0x8FB0003);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8FB0001);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR1, 0x8FB0002);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x8FB0003);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -230,10 +230,10 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x271, 0x368, 0xF4, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x281, 0x2FE, 0xA5, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 6, 1, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 5, 8, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x271, 0x368, 0xF4, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x281, 0x2FE, 0xA5, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_MAP, 1, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DEPTH, 8, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

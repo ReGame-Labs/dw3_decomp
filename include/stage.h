@@ -52,21 +52,23 @@ typedef struct Anim8 {
         }                    \
     } while (0)
 
-/* A point of a list (what its six halfwords are isn't known yet) */
+/* Where an exit (StageSlot) leads: copyPlacePoints copies a place's points
+   to the stage's first slots, field by field */
 typedef struct StagePoint {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ u16 unk4;
-    /* 0x06 */ u16 unk6;
-    /* 0x08 */ u16 unk8;
-    /* 0x0A */ u16 unkA;
+    /* 0x00 */ u16 arg; /* the mode */
+    /* 0x02 */ u16 place;
+    /* 0x04 */ u16 placeArg;
+    /* 0x06 */ u16 x;
+    /* 0x08 */ u16 y;
+    /* 0x0A */ u16 dir;
     /* 0x0C */ struct StagePoint *next;
 } StagePoint;
 
-/* The points of the place two ids name (GAME's halfwords at 0x44 and 0x46) */
+/* The points of a place (GAME.place and GAME.placeArg, which the exit the
+   player came through set) */
 typedef struct StagePoints {
-    /* 0x00 */ s16 unk0;
-    /* 0x02 */ s16 unk2;
+    /* 0x00 */ s16 place;
+    /* 0x02 */ s16 placeArg;
     /* 0x04 */ StagePoint *points;
 } StagePoints;
 

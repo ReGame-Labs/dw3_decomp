@@ -18,13 +18,13 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, 0x8EB0001);
-    FIELDSTG_map.setFile(7, 0x8EB0002);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8EB0001);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x8EB0002);
     FIELDSTG_map.setFirstMap(0);
 }
 
 /* Shows the record with animation 1 and moves it and the player down a pixel a frame for 150 frames */
-void func_800A5F70(StageTileTimer *task) {
+void updateTileTimer(StageTileTimer *task) {
     StageTile *rec;
     StageTile *tile;
     StageActor *player;
@@ -44,7 +44,7 @@ void func_800A5F70(StageTileTimer *task) {
         break;
     case TASK_RUN:
         tile = task->tile;
-        player = TASK_REGISTRY.funcs.find(5, -1, 0);
+        player = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
         tile->y++;
         task->timer++;
         player->y += 0x100;
@@ -58,8 +58,8 @@ void func_800A5F70(StageTileTimer *task) {
     }
 }
 
-void *func_800A609C(s32 arg) {
-    return createTaskWithId(func_800A5F70, 0x58, 0, arg);
+void *createCommand854(s32 arg) {
+    return createTaskWithId(updateTileTimer, 0x58, 0, arg);
 }
 
 extern s16 script1606[];
@@ -125,7 +125,7 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x273, 0x200, 0x11C, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x273, 0x200, 0x11C, 1, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
@@ -139,7 +139,7 @@ FieldEvent stageEvents[] = {
 s16 script1606[] = {
     0x102, 2, 0x12F, 0x168, 3,
     0x101, 0x20, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 3,
     0x300, 0x1E,

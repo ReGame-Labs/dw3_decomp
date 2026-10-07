@@ -21,7 +21,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-void func_800A4D70(void) {
+void endEvent152(void) {
     GAME.progress = 7;
 }
 
@@ -51,8 +51,8 @@ void setupStage(void) {
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
         FIELDSTG_state.soundBank = 0x1F;
@@ -62,13 +62,13 @@ void setupStage(void) {
 
 s16 script144[] = {
     0x102, 2, 0x1BF, 0x120, 5,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 5,
     0x300, 0x1E,
-    0x101, 0x32D, 0x338, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 2,
     0x300, 0x78,
-    0x101, 0x32D, 0x339, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 2,
     0x300, 0x1E,
     0x200, 0, 1, 2, 4,
     0x301,
@@ -530,14 +530,14 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x233, 0x208, 0x9C, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x233, 0x208, 0x9C, 7, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 152, script152, EVENT_TEXT(6), NULL, func_800A4D70 },
+    { 152, script152, EVENT_TEXT(6), NULL, endEvent152 },
     { 144, script144, EVENT_TEXT(0x21), NULL, NULL },
     { -1, NULL, 0, NULL, NULL },
 };

@@ -1,6 +1,6 @@
 #include "common.h"
 #include "stage.h"
-extern StageSeqStep D_800A5690[4][4];
+extern StageSeqStep updateTileSeqsSteps[4][4];
 
 s32 stepTileAnimation(StageTileSeq *obj, AnimFrame *frames, s32 once, s32 depth) {
     AnimFrame *frame = &frames[obj->anim.index];
@@ -30,7 +30,7 @@ s32 stepTileAnimation(StageTileSeq *obj, AnimFrame *frames, s32 once, s32 depth)
     return frame->frame;
 }
 
-void func_800A4DC4(StageTileSeqs *task) {
+void updateTileSeqs(StageTileSeqs *task) {
     StageTile *rec;
     s32 n;
     StageTile *tile;
@@ -57,29 +57,29 @@ void func_800A4DC4(StageTileSeqs *task) {
         task->entries[2].seq = 1;
         task->entries[3].seq = 1;
         task->entries[0].anim.index = 0;
-        task->entries[0].anim.timer = D_800A5690[0][2].frames->duration;
+        task->entries[0].anim.timer = updateTileSeqsSteps[0][2].frames->duration;
         task->entries[1].anim.index = 0;
-        task->entries[1].anim.timer = D_800A5690[1][2].frames->duration;
+        task->entries[1].anim.timer = updateTileSeqsSteps[1][2].frames->duration;
         task->entries[2].anim.index = 0;
-        task->entries[2].anim.timer = D_800A5690[2][1].frames->duration;
+        task->entries[2].anim.timer = updateTileSeqsSteps[2][1].frames->duration;
         task->entries[3].anim.index = 0;
-        task->entries[3].anim.timer = D_800A5690[3][1].frames->duration;
+        task->entries[3].anim.timer = updateTileSeqsSteps[3][1].frames->duration;
         break;
     case TASK_RUN:
         for (i = 0; i < 4; i++) {
             tile = task->entries[i].tile;
             if (task->entries[i].seq != 0) {
-                frame = stepTileAnimation(&task->entries[i], D_800A5690[i][task->entries[i].seq].frames,
-                                      D_800A5690[i][task->entries[i].seq].once, 0);
+                frame = stepTileAnimation(&task->entries[i], updateTileSeqsSteps[i][task->entries[i].seq].frames,
+                                      updateTileSeqsSteps[i][task->entries[i].seq].once, 0);
                 switch (frame) {
                 case 0xFF:
-                    if (D_800A5690[i][task->entries[i].seq].next == 0) {
+                    if (updateTileSeqsSteps[i][task->entries[i].seq].next == 0) {
                         task->entries[i].seq = 0;
                         tile->visible = 0;
                     } else {
-                        task->entries[i].seq = D_800A5690[i][task->entries[i].seq].next;
+                        task->entries[i].seq = updateTileSeqsSteps[i][task->entries[i].seq].next;
                         task->entries[i].anim.index = 0;
-                        task->entries[i].anim.timer = D_800A5690[i][task->entries[i].seq].frames->duration;
+                        task->entries[i].anim.timer = updateTileSeqsSteps[i][task->entries[i].seq].frames->duration;
                     }
                     break;
                 case 0x12C:
@@ -105,8 +105,8 @@ void func_800A4DC4(StageTileSeqs *task) {
     }
 }
 
-void *func_800A5010(s32 arg) {
-    return createTaskWithId(func_800A4DC4, 0x80, 0, arg);
+void *createTileSeqs(s32 arg) {
+    return createTaskWithId(updateTileSeqs, 0x80, 0, arg);
 }
 
 /* Creates the event object of story progress 21 */
@@ -129,7 +129,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
-void func_800A5124(void) {
+void endEvent552(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x3D), 1);
     FLAGS_00.applyAction(ITEM(0, 0x191), 1);
 }
@@ -157,8 +157,8 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -243,7 +243,7 @@ s16 script552[] = {
     0x200, 0, 0xB, 0x67, 1,
     0x101, 0x67, 1, 5,
     0x301,
-    0x101, 0x32D, 0x34A, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON3, 2,
     0x300, 0x1E,
     0x300, 0x1E,
     0x200, 0, 0xC, 2, 2,
@@ -306,23 +306,23 @@ AnimFrame D_800A5608[] = {
     { 9, 12 }, { 10, 12 }, { 9, 12 }, { 8, 12 },
     { 255, 0 },
 };
-AnimFrame D_800A561C[] = {
+AnimFrame updateTileSeqsSteps_2[] = {
     { 0x12C, 90 }, { 0, 6 }, { 1, 6 }, { 2, 6 },
     { 3, 6 }, { 4, 6 }, { 3, 6 }, { 4, 6 },
     { 3, 6 }, { 4, 6 }, { 3, 6 }, { 2, 6 },
     { 1, 6 }, { 2, 6 }, { 1, 6 }, { 2, 6 },
     { 1, 6 }, { 255, 0x3E7 },
 };
-AnimFrame D_800A5664[] = {
+AnimFrame updateTileSeqsSteps_3[] = {
     { 0x12C, 108 }, { 50, 6 }, { 51, 6 }, { 52, 6 },
     { 53, 6 }, { 54, 6 }, { 56, 6 }, { 57, 6 },
     { 58, 6 }, { 59, 6 }, { 255, 0x3E7 },
 };
-StageSeqStep D_800A5690[4][4] = {
+StageSeqStep updateTileSeqsSteps[4][4] = {
     { { NULL, 0, 0 }, { D_800A5538, 0, 0 }, { D_800A555C, 1, 3 }, { D_800A55A8, 0, 0 } },
     { { NULL, 0, 0 }, { D_800A55CC, 0, 0 }, { D_800A55E0, 1, 3 }, { D_800A5608, 0, 0 } },
-    { { NULL, 0, 0 }, { D_800A561C, 1, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } },
-    { { NULL, 0, 0 }, { D_800A5664, 1, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } },
+    { { NULL, 0, 0 }, { updateTileSeqsSteps_2, 1, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } },
+    { { NULL, 0, 0 }, { updateTileSeqsSteps_3, 1, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } },
 };
 ActorImage stageImages[] = {
     { 0x200, 0x100, 0x21C, 0x1A6, 0x70, 0xA6, 0x230, 0x1FE },
@@ -421,15 +421,15 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x254, 0x2D4, 0xC4, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 5, 0x1D0, 0xF8, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 5, 0x1E0, 0x150, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x254, 0x2D4, 0xC4, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 5, 0x1D0, 0xF8, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 5, 0x1E0, 0x150, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 552, script552, EVENT_TEXT(0x18), NULL, func_800A5124 },
+    { 552, script552, EVENT_TEXT(0x18), NULL, endEvent552 },
     { -1, NULL, 0, NULL, NULL },
 };

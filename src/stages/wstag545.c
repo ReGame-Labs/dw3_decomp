@@ -1,9 +1,9 @@
 #include "common.h"
 #include "stage.h"
-extern AnimFrame D_800A5BE0[];
-extern AnimFrame D_800A5C18[];
-extern AnimFrame *D_800A5CA4[3];
-extern StageTileAtSpot D_800A5CB0[];
+extern AnimFrame updateTileAtFrames[];
+extern AnimFrame updateTileTaskFrames[];
+extern AnimFrame *updateTileSwitchFrames[3];
+extern StageTileAtSpot updateTileSwitchSpots[];
 
 /* Steps an animation, holding its last frame, and returns the frame */
 s32 func_800A4CDC(StageTileAnim *obj, AnimFrame *frames, s32 depth) {
@@ -31,7 +31,7 @@ s32 func_800A4CDC(StageTileAnim *obj, AnimFrame *frames, s32 depth) {
 }
 
 /* Moves the record with the given animation to (x, y); hidden while running, shown and animated when done */
-void func_800A4DE4(StageTileAt *task) {
+void updateTileAt(StageTileAt *task) {
     StageTile *rec;
     StageTile *tile;
 
@@ -40,7 +40,7 @@ void func_800A4DE4(StageTileAt *task) {
     default:
         task->nextState(task);
         task->obj.anim.index = 0;
-        task->obj.anim.timer = D_800A5BE0[0].duration;
+        task->obj.anim.timer = updateTileAtFrames[0].duration;
         for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
             if (rec->anim == task->anim) {
                 task->obj.tile = rec;
@@ -55,12 +55,12 @@ void func_800A4DE4(StageTileAt *task) {
     case TASK_DONE:
         if (task->substate == 0) {
             task->obj.anim.index = 0;
-            task->obj.anim.timer = D_800A5BE0[0].duration;
+            task->obj.anim.timer = updateTileAtFrames[0].duration;
             task->setSubstate(task, 1);
         }
         tile = task->obj.tile;
         tile->visible = 1;
-        tile->frame = func_800A4CDC(&task->obj, D_800A5BE0, 0);
+        tile->frame = func_800A4CDC(&task->obj, updateTileAtFrames, 0);
         break;
     case TASK_KILL:
         break;
@@ -68,8 +68,8 @@ void func_800A4DE4(StageTileAt *task) {
 }
 
 /* Creates a StageTileAt for the record with the given animation */
-StageTileAt *func_800A4F18(s32 anim, s32 x, s32 y) {
-    StageTileAt *task = createTask(func_800A4DE4, sizeof(StageTileAt), 0);
+StageTileAt *createTileAt(s32 anim, s32 x, s32 y) {
+    StageTileAt *task = createTask(updateTileAt, sizeof(StageTileAt), 0);
 
     task->anim = anim;
     task->x = x;
@@ -80,7 +80,7 @@ StageTileAt *func_800A4F18(s32 anim, s32 x, s32 y) {
 #include "common/step_animation_once.inc.c"
 
 /* Shows the record with animation 1 (frame 0x18); when done, animates it once with a sound and goes back to TASK_RUN */
-void func_800A5048(StageTileTask *task) {
+void updateTileTask(StageTileTask *task) {
     StageTile *rec;
     StageTile *shown;
     StageTile *tile;
@@ -91,7 +91,7 @@ void func_800A5048(StageTileTask *task) {
     default:
         task->nextState(task);
         task->obj.anim.index = 0;
-        task->obj.anim.timer = D_800A5C18[0].duration;
+        task->obj.anim.timer = updateTileTaskFrames[0].duration;
         for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
             if (rec->anim == 1) {
                 task->obj.tile = rec;
@@ -107,12 +107,12 @@ void func_800A5048(StageTileTask *task) {
     case TASK_DONE:
         if (task->substate == 0) {
             task->obj.anim.index = 0;
-            task->obj.anim.timer = D_800A5C18[0].duration;
+            task->obj.anim.timer = updateTileTaskFrames[0].duration;
             task->setSubstate(task, 1);
             SOUND.playSound(SOUND_FLOOR_LT);
         }
         tile = task->obj.tile;
-        frame = stepAnimationOnce(&task->obj, D_800A5C18, 0);
+        frame = stepAnimationOnce(&task->obj, updateTileTaskFrames, 0);
         if (frame == 0xFF) {
             task->setState(task, TASK_RUN);
             tile->clutRow = 9;
@@ -127,20 +127,20 @@ void func_800A5048(StageTileTask *task) {
     }
 }
 
-void func_800A51C8(StageTask *task, s32 id) {
+void handleCommand847(StageTask *task, s32 id) {
     if (task != NULL && id == 0x35A) {
         task->setState(task, TASK_DONE);
     }
 }
 
-void *func_800A5200(s32 arg) {
-    return createTaskWithId(func_800A5048, 0x58, 0, arg);
+void *createTileTask(s32 arg) {
+    return createTaskWithId(updateTileTask, 0x58, 0, arg);
 }
 
 #include "common/step_tile_animation.inc.c"
 
 /* Animates the record with animation 2 by substate and sets the child an event picked to TASK_DONE */
-void func_800A5350(StageTileSwitch *task, StageTileAts *children) {
+void updateTileSwitch(StageTileSwitch *task, StageTileAts *children) {
     StageTile *rec;
     StageTile *tile;
     s32 i;
@@ -151,12 +151,12 @@ void func_800A5350(StageTileSwitch *task, StageTileAts *children) {
         for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
             if (rec->anim == 2) {
                 task->obj.anim.index = 0;
-                task->obj.anim.timer = D_800A5CA4[0][0].duration;
+                task->obj.anim.timer = updateTileSwitchFrames[0][0].duration;
                 task->obj.tile = rec;
             }
         }
         for (i = 0; i < 5; i++) {
-            children->tiles[i] = func_800A4F18(D_800A5CB0[i].anim, D_800A5CB0[i].x, D_800A5CB0[i].y);
+            children->tiles[i] = createTileAt(updateTileSwitchSpots[i].anim, updateTileSwitchSpots[i].x, updateTileSwitchSpots[i].y);
         }
         task->silent = 0;
         task->spawn = 0;
@@ -171,11 +171,11 @@ void func_800A5350(StageTileSwitch *task, StageTileAts *children) {
         case 1:
             if (task->step == 0) {
                 task->obj.anim.index = 0;
-                task->obj.anim.timer = D_800A5CA4[0][0].duration;
+                task->obj.anim.timer = updateTileSwitchFrames[0][0].duration;
                 task->setStep(task, 1);
             }
             {
-                s32 frame = stepTileAnimation(&task->obj, D_800A5CA4[0], 1, 0);
+                s32 frame = stepTileAnimation(&task->obj, updateTileSwitchFrames[0], 1, 0);
 
                 tile->visible = 1;
                 if (frame == 0xFF) {
@@ -189,11 +189,11 @@ void func_800A5350(StageTileSwitch *task, StageTileAts *children) {
         case 3:
             if (task->step == 0) {
                 task->obj.anim.index = 0;
-                task->obj.anim.timer = D_800A5CA4[1][0].duration;
+                task->obj.anim.timer = updateTileSwitchFrames[1][0].duration;
                 task->setStep(task, 1);
             }
             {
-                s32 frame = stepTileAnimation(&task->obj, D_800A5CA4[1], 1, 0);
+                s32 frame = stepTileAnimation(&task->obj, updateTileSwitchFrames[1], 1, 0);
 
                 tile->visible = 1;
                 if (frame == 0xFF) {
@@ -207,12 +207,12 @@ void func_800A5350(StageTileSwitch *task, StageTileAts *children) {
         case 5:
             if (task->step == 0) {
                 task->obj.anim.index = 0;
-                task->obj.anim.timer = D_800A5CA4[2][0].duration;
+                task->obj.anim.timer = updateTileSwitchFrames[2][0].duration;
                 task->setStep(task, 1);
                 SOUND.playSound(SOUND_BULB_002);
             }
             {
-                s32 frame = stepTileAnimation(&task->obj, D_800A5CA4[2], 0, 0);
+                s32 frame = stepTileAnimation(&task->obj, updateTileSwitchFrames[2], 0, 0);
 
                 tile->visible = 1;
                 tile->frame = frame;
@@ -234,7 +234,7 @@ void func_800A5350(StageTileSwitch *task, StageTileAts *children) {
 }
 
 /* Events 0x35D to 0x364: animate the record (substates 1, 3, 5) or pick a child to set to TASK_DONE */
-void func_800A5644(void *arg, s32 id) {
+void handleCommand848(void *arg, s32 id) {
     StageTileSwitch *task = arg;
 
     if (task != NULL) {
@@ -271,9 +271,9 @@ void func_800A5644(void *arg, s32 id) {
     }
 }
 
-/* Creates the task of func_800A5350 with the given id */
-void *func_800A5758(s32 id) {
-    return createTaskWithId(func_800A5350, 0x60, 0x14, id);
+/* Creates the task of updateTileSwitch with the given id */
+void *createCommand848(s32 id) {
+    return createTaskWithId(updateTileSwitch, 0x60, 0x14, id);
 }
 
 /* Creates the stage object of flag 0x4051, and the event object of story progress 26 */
@@ -283,7 +283,7 @@ void updateStage(StageTask *task, void **children) {
     default:
         task->nextState(task);
         if (FLAGS_00.checkCondition(FLAG(0x40, 0x51), 0)) {
-            children[0] = func_800A5200(0x34F);
+            children[0] = createTileTask(0x34F);
         }
         if (GAME.progress == 0x1A && FLAGS_00.checkCondition(FLAG(0x40, 0x51), 1)) {
             children[2] = FIELDSTG_startEvent(0x2C7);
@@ -299,12 +299,12 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0xC
 #include "common/start_stage.inc.c"
 
-void func_800A58A4(void) {
+void endEvent710(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x51), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-void func_800A58F0(void) {
+void endEvent711(void) {
     GAME.progress = 27;
 }
 
@@ -334,15 +334,15 @@ void setupStage(void) {
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
-    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
 }
 
 s16 script710[] = {
     0x102, 2, 0x218, 0x1C4, 5,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x101, 0x350, 0x35C, 2,
     0x302, 2,
     0x101, 2, 1, 5,
@@ -350,10 +350,10 @@ s16 script710[] = {
     0x102, 2, 0x268, 0x19C, 5,
     0x302, 2,
     0x601, 0, 0x296, 0x184,
-    0x101, 0x32D, 0x372, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHAKE_CAMERA, 2,
     0x300, 0x1E,
     0x101, 0x323, 0x325, 2,
-    0x101, 0x32D, 0x369, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_DEMO_BGM, 2,
     0x300, 0x3C,
     0x101, 2, 1, 1,
     0x101, 0x323, 0x326, 2,
@@ -385,7 +385,7 @@ s16 script710[] = {
     0x300, 0x96,
     0x101, 0x350, 0x35E, 2,
     0x300, 0x12,
-    0x101, 0x32D, 0x373, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_CAMERA_SHAKE, 2,
     0x300, 0x2A,
     0x200, 0, 2, 2, 0,
     0x301,
@@ -418,32 +418,32 @@ s16 script711[] = {
     0x304, 0x245, 0x708, 0x20C, 3,
     0,
 };
-AnimFrame D_800A5BE0[] = {
+AnimFrame updateTileAtFrames[] = {
     { 11, 4 }, { 12, 4 }, { 13, 7 }, { 14, 9 },
     { 15, 10 }, { 16, 8 }, { 17, 4 }, { 18, 4 },
     { 19, 4 }, { 20, 4 }, { 21, 4 }, { 22, 4 },
     { 23, 100 }, { 255, 0 },
 };
-AnimFrame D_800A5C18[] = {
+AnimFrame updateTileTaskFrames[] = {
     { 9, 25 }, { 8, 4 }, { 7, 4 }, { 6, 4 },
     { 5, 4 }, { 4, 4 }, { 3, 6 }, { 2, 7 },
     { 1, 8 }, { 0, 8 }, { 1, 10 }, { 2, 10 },
     { 3, 10 }, { 4, 10 }, { 5, 10 }, { 6, 10 },
     { 7, 10 }, { 8, 10 }, { 255, 0x3E7 },
 };
-AnimFrame D_800A5C64[] = {
+AnimFrame updateTileSwitchFrames_0[] = {
     { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 },
     { 4, 4 }, { 5, 4 }, { 6, 4 }, { 7, 4 },
     { 8, 4 }, { 255, 0x3E7 },
 };
-AnimFrame D_800A5C8C[] = {
+AnimFrame updateTileSwitchFrames_1[] = {
     { 10, 4 }, { 9, 10 }, { 255, 0x3E7 },
 };
-AnimFrame D_800A5C98[] = {
+AnimFrame updateTileSwitchFrames_2[] = {
     { 10, 4 }, { 9, 4 }, { 255, 0 },
 };
-AnimFrame *D_800A5CA4[3] = { D_800A5C64, D_800A5C8C, D_800A5C98 };
-StageTileAtSpot D_800A5CB0[] = {
+AnimFrame *updateTileSwitchFrames[3] = { updateTileSwitchFrames_0, updateTileSwitchFrames_1, updateTileSwitchFrames_2 };
+StageTileAtSpot updateTileSwitchSpots[] = {
     { 0x288, 0x1D7, 3 },
     { 0x32F, 0x170, 4 },
     { 0x250, 0x11F, 5 },
@@ -569,18 +569,18 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x245, 0x708, 0x20C, 3, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x245, 0x708, 0x2DC, 3, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x245, 0x708, 0x3BC, 3, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x245, 0x708, 0x50E, 3, 0, 0, 0 },
-    { { { PROGRESS(0x1A), 1 }, { FLAG(0x40, 0x51), 0 } }, 8, 0x2C6, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x245, 0x708, 0x20C, 3, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x245, 0x708, 0x2DC, 3, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x245, 0x708, 0x3BC, 3, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x245, 0x708, 0x50E, 3, 0, 0, 0 },
+    { { { PROGRESS(0x1A), 1 }, { FLAG(0x40, 0x51), 0 } }, SLOT_EVENT, 0x2C6, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 710, script710, EVENT_TEXT(0x21), NULL, func_800A58A4 },
-    { 711, script711, EVENT_TEXT(0x1F), NULL, func_800A58F0 },
+    { 710, script710, EVENT_TEXT(0x21), NULL, endEvent710 },
+    { 711, script711, EVENT_TEXT(0x1F), NULL, endEvent711 },
     { -1, NULL, 0, NULL, NULL },
 };

@@ -1,7 +1,7 @@
 // names from the C of the modules this version builds (tools/version_symbols.py)
-func_800A4DC4 = 0x800A5F00; // type:func
-func_800A5010 = 0x800A614C; // type:func
-func_800A5124 = 0x800A6260; // type:func
+updateTileSeqs = 0x800A5F00; // type:func
+createTileSeqs = 0x800A614C; // type:func
+endEvent552 = 0x800A6260; // type:func
 script552 = 0x800A63A4;
 D_800A5538 = 0x800A667C;
 D_800A555C = 0x800A66A0;
@@ -9,9 +9,9 @@ D_800A55A8 = 0x800A66EC;
 D_800A55CC = 0x800A6710;
 D_800A55E0 = 0x800A6724;
 D_800A5608 = 0x800A674C;
-D_800A561C = 0x800A6760;
-D_800A5664 = 0x800A67A8;
-D_800A5690 = 0x800A67D4;
+updateTileSeqsSteps_2 = 0x800A6760;
+updateTileSeqsSteps_3 = 0x800A67A8;
+updateTileSeqsSteps = 0x800A67D4;
 stageImages = 0x800A6854;
 actor0Talks = 0x800A6934;
 actor1Talks = 0x800A694C;

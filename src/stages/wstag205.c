@@ -1,7 +1,7 @@
 #include "common.h"
 #include "stage.h"
 extern u8 *D_800A551C[];
-extern StageSpriteSpot D_800A5540[];
+extern StageSpriteSpot updateSpriteFieldSpots[];
 
 /* The sprites, which the versions number differently */
 #if VERSION_US
@@ -11,7 +11,7 @@ extern StageSpriteSpot D_800A5540[];
 #endif
 
 /* Plays the nine animations and draws the sprites of the table that are on screen */
-void func_800A4CA8(StageSpriteField *task) {
+void updateSpriteField(StageSpriteField *task) {
     SpriteDrawer drawer;
     RECT rect;
     Layer *layer;
@@ -24,7 +24,7 @@ void func_800A4CA8(StageSpriteField *task) {
         break;
     case TASK_RUN:
         initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x1002, 0xA);
+        drawer.setLayerId(FIELD_LAYER_MAP, 0xA);
         drawer.setTexture(0x140, 0x100);
         drawer.setAltClut(0, 0x1F0);
         for (i = 0; i < 9; i++) {
@@ -41,28 +41,28 @@ void func_800A4CA8(StageSpriteField *task) {
             }
             task->anims[i].frame = D_800A551C[i][task->anims[i].index * 2];
         }
-        layer = GFX.funcs.getLayer(0x1002);
+        layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
         layer->getViewRect(layer, &rect);
         rect.w += rect.x;
         rect.h += rect.y;
         for (i = 0;; i++) {
             s32 x, y;
 
-            if (D_800A5540[i].x == 0) {
+            if (updateSpriteFieldSpots[i].x == 0) {
                 break;
             }
-            x = D_800A5540[i].x;
-            y = D_800A5540[i].y;
+            x = updateSpriteFieldSpots[i].x;
+            y = updateSpriteFieldSpots[i].y;
             if (x < rect.x - 0x40 || rect.w + 0x40 < x || y < rect.y - 0x40 || rect.h + 0x40 < y) {
                 continue;
             }
-            if (!D_800A5540[i].flip) {
+            if (!updateSpriteFieldSpots[i].flip) {
                 drawer.setScale(0x1000, 0x1000, 0x1000);
             } else {
                 drawer.setPivot(x, y);
                 drawer.setScale(-0x1000, 0x1000, 0x1000);
             }
-            drawer.draw(FILE_CACHE.getEntry(SPRITES << 16), task->anims[D_800A5540[i].anim].frame, x, y);
+            drawer.draw(FILE_CACHE.getEntry(SPRITES << 16), task->anims[updateSpriteFieldSpots[i].anim].frame, x, y);
         }
         break;
     case TASK_DONE:
@@ -71,8 +71,8 @@ void func_800A4CA8(StageSpriteField *task) {
     }
 }
 
-void *func_800A4F74(void) {
-    return createTask(func_800A4CA8, 0xC8, 0);
+void *createSpriteField(void) {
+    return createTask(updateSpriteField, 0xC8, 0);
 }
 
 /* Creates the event object of progress 6 when flag 0x4006 is set and 0x4016 is not */
@@ -95,12 +95,12 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-void func_800A50B4(void) {
+void endEvent100(void) {
     FLAGS_00.applyAction(FLAG(0x40, 6), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-void func_800A5100(void) {
+void endEvent101(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x16), 1);
 }
 
@@ -132,8 +132,8 @@ void setupStage(void) {
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 2);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= 0x14 && GAME.progress < 0x18) {
         FIELDSTG_state.soundBank = 0x1F;
@@ -150,7 +150,7 @@ s16 script100[] = {
     0x102, 2, 0x28F, 0x11F, 5,
     0x100, 0x66, 0x317, 0xDC,
     0x101, 0x66, 1, 1,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 5,
     0x300, 6,
@@ -282,7 +282,7 @@ u8 *D_800A551C[] = {
     D_800A5508,
     D_800A5510,
 };
-StageSpriteSpot D_800A5540[] = {
+StageSpriteSpot updateSpriteFieldSpots[] = {
     { 40, 0x1A5, 0, 0 },
     { 56, 0x173, 0, 0 },
     { 143, 0x106, 0, 0 },
@@ -759,20 +759,20 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { SPECIAL(7), 0 }, { CODES_END, 0 } }, 1, 0x200, 0x60, 0x31C, 5, 0x64, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x21D, 0x5E2, 0xE0, 1, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, 0xA, 0x2E1, 0x1D0, 0x154, 7, 0, 2, 1 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, 0xA, 0x2E1, 0xE0, 0x110, 7, 0, 2, 1 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 3, 0x110, 0x100, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 3, 0x120, 0xC8, 0, 0, 0, 0 },
-    { { { PROGRESS(6), 1 }, { FLAG(0x40, 6), 0 } }, 8, 0x64, 0, 0, 0, 0, 0, 0 },
+    { { { SPECIAL(7), 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x200, 0x60, 0x31C, 5, 0x64, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x21D, 0x5E2, 0xE0, 1, 0, 0, 0 },
+    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E1, 0x1D0, 0x154, 7, 0, 2, 1 },
+    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E1, 0xE0, 0x110, 7, 0, 2, 1 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 3, 0x110, 0x100, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 3, 0x120, 0xC8, 0, 0, 0, 0 },
+    { { { PROGRESS(6), 1 }, { FLAG(0x40, 6), 0 } }, SLOT_EVENT, 0x64, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 100, script100, EVENT_TEXT(0x15), NULL, func_800A50B4 },
-    { 101, script101, EVENT_TEXT(0x16), NULL, func_800A5100 },
+    { 100, script100, EVENT_TEXT(0x15), NULL, endEvent100 },
+    { 101, script101, EVENT_TEXT(0x16), NULL, endEvent101 },
     { -1, NULL, 0, NULL, NULL },
 };

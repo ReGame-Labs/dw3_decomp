@@ -207,39 +207,38 @@ typedef struct StageTile {
    and SLOT_LAUNCH act as the player steps on them; the others show a balloon
    and wait for cross, and those up to SLOT_GAUGE only while the player faces
    them (FIELDSTG_findTrigger) */
-#define SLOT_EXIT 1 /* leaves for mode unkA at (unkC, unkE), facing unk10 */
+#define SLOT_EXIT 1 /* leaves for mode arg at (x, y), facing dir */
 #define SLOT_CLIMB_UP 2
 #define SLOT_CLIMB_DOWN 3
 #define SLOT_DROP 4
-#define SLOT_DEPTH 5 /* the player's depth, unkA */
-#define SLOT_MAP 6 /* the map the player is on, unkA (FieldMap.setMap) */
+#define SLOT_DEPTH 5 /* the player's depth, arg */
+#define SLOT_MAP 6 /* the map the player is on, arg (FieldMap.setMap) */
 #define SLOT_GAUGE 7 /* the gauge game */
-#define SLOT_EVENT 8 /* starts the event unkA */
-#define SLOT_WARP1 9 /* a warp (FieldWarp at unkA) with effect and cutscene 1 */
+#define SLOT_EVENT 8 /* starts the event arg */
+#define SLOT_WARP1 9 /* a warp (FieldWarp at arg) with effect and cutscene 1 */
 #define SLOT_WARP0 10 /* the same with effect and cutscene 0 */
 #define SLOT_SLIDE 11
 #define SLOT_STOP_SLIDE 12
 #define SLOT_LAUNCH 13 /* sends the player flying (FIELDSTG_launchActor) */
-#define SLOT_LAUNCH_OUT 14 /* the same, then leaves for mode unkA */
+#define SLOT_LAUNCH_OUT 14 /* the same, then leaves for mode arg */
 
 /*
  * What the player can trigger on a map (FIELDSTG_updateTriggers): a record
  * of the table at FieldState.slots, which ends with type 0,
- * where the points are copied to. The stages also fill unkA to unk16 by
- * name (copyPlacePoints, in src/stages/common), so those keep their offsets'
- * names until the stages are renamed with them.
+ * where the points are copied to. The stages fill arg to placeArg
+ * from their place points (copyPlacePoints, in src/stages/common).
  */
 typedef struct StageSlot {
     /* 0x00 */ u16 conditions[2][2]; /* flag code and value, or code 0xFFFF */
     /* 0x08 */ u16 type; /* SLOT_EXIT... */
-    /* 0x0A */ u16 unkA; /* by type: a mode, a depth, a map, an event or a height (in 16
-                            pixels, plus 1 for a climb); a warp's FieldWarp starts here */
-    /* 0x0C */ u16 unkC; /* x */
-    /* 0x0E */ u16 unkE; /* y */
-    /* 0x10 */ u16 unk10; /* the direction */
-    /* 0x12 */ u16 unk12; /* the animation of the map objects to hide, or 0 */
-    /* 0x14 */ u16 unk14; /* copied to GAME.place, the place (FieldBattles.id) */
-    /* 0x16 */ u16 unk16; /* copied to GAME.placeArg */
+    /* 0x0A */ u16 arg; /* by type: a mode, a depth, a map, an event or a height (in 16
+                           pixels, plus 1 for a climb); a warp's FieldWarp starts here */
+    /* 0x0C */ u16 x;
+    /* 0x0E */ u16 y;
+    /* 0x10 */ u16 dir;
+    /* 0x12 */ u16 hideAnim; /* the animation of the map objects to hide, or 0 */
+    /* 0x14 */ u16 place; /* copied to GAME.place, the place (FieldBattles.id) */
+    /* 0x16 */ u16 placeArg; /* copied to GAME.placeArg: with place, the next stage's place points */
 } StageSlot;
 
 /* A battle that can start on the field (see FIELDSTG_startEncounter) */

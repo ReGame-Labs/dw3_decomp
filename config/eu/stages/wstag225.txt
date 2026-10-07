@@ -1,10 +1,10 @@
 // names from the C of the modules this version builds (tools/version_symbols.py)
 func_800A4D7C = 0x800A5EB8; // type:func
-func_800A4DB4 = 0x800A5EF0; // type:func
-func_800A5038 = 0x800A6174; // type:func
-func_800A50A4 = 0x800A61E0; // type:func
-func_800A50D4 = 0x800A6210; // type:func
-func_800A51D4 = 0x800A6310; // type:func
+updateTileEffect = 0x800A5EF0; // type:func
+handleCommand815 = 0x800A6174; // type:func
+createCommand815 = 0x800A61E0; // type:func
+createTileEffect = 0x800A6210; // type:func
+endEvent5 = 0x800A6310; // type:func
 script5 = 0x800A6460;
 D_800A5444 = 0x800A6588;
 D_800A5458 = 0x800A659C;

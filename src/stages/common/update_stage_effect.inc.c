@@ -4,7 +4,7 @@
  * (effectFrames) above it once done, until it ends
  */
 void updateStageEffect(StageEffect *task) {
-    Layer *layer = GFX.funcs.getLayer(0x1002);
+    Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
     s32 done;
     s32 frame;
 

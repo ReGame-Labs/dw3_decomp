@@ -30,12 +30,12 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-void func_800A4EA8(void) {
+void endEvent180(void) {
     FLAGS_00.applyAction(FLAG(0x1A, 0x17), 1);
 }
 
 /* Sets the progress to 10 and applies flag action 0x800D */
-void func_800A4ED4(void) {
+void endEvent230(void) {
     GAME.progress = 10;
     FLAGS_00.applyAction(ITEM(0, 0xD), 1);
 }
@@ -65,8 +65,8 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 2);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -75,7 +75,7 @@ s16 script160[] = {
     0x102, 2, 0xB6, 0x113, 3,
     0x100, 0xC5, 0x76, 0x8C,
     0x101, 0xC5, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 3,
     0x300, 6,
@@ -114,7 +114,7 @@ s16 script180[] = {
     0x101, 2, 1, 5,
     0x100, 0xC5, 0x76, 0x8C,
     0x101, 0xC5, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x300, 0x1E,
     0x102, 2, 0xAF, 0x12F, 5,
     0x302, 2,
@@ -168,7 +168,7 @@ s16 script181[] = {
     0x101, 2, 1, 5,
     0x100, 0xC5, 0x67, 0x8C,
     0x101, 0xC5, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x300, 0x1E,
     0x102, 2, 0xAF, 0x12F, 5,
     0x302, 2,
@@ -199,7 +199,7 @@ s16 script190[] = {
     0x101, 2, 1, 5,
     0x100, 0xC5, 0x76, 0x8C,
     0x101, 0xC5, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x300, 0x1E,
     0x102, 2, 0xAF, 0x12F, 5,
     0x302, 2,
@@ -220,10 +220,10 @@ s16 script200[] = {
     0x101, 2, 1, 5,
     0x100, 0xC5, 0x76, 0x8C,
     0x101, 0xC5, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x300, 0x1E,
     0x102, 2, 0xAF, 0x12F, 5,
-    0x101, 0x32D, 1, 0,
+    0x101, FIELD_TASK_COMMANDS, 1, 0,
     0x302, 2,
     0x102, 2, 0xAF, 0x10F, 4,
     0x302, 2,
@@ -242,7 +242,7 @@ s16 script230[] = {
     0x101, 2, 1, 5,
     0x100, 0xC5, 0x67, 0x8C,
     0x101, 0xC5, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x300, 0x1E,
     0x102, 2, 0xAF, 0x12F, 5,
     0x302, 2,
@@ -287,7 +287,7 @@ s16 script230[] = {
     0x101, 0xC5, 1, 0,
     0x100, 0x13F, 0, 0,
     0x101, 0x13F, 1, 7,
-    0x101, 0x32D, 0x36D, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_MASK_SET, 2,
     0x300, 0x3C,
     0x200, 0, 7, 0x84, 0,
     0x301,
@@ -296,7 +296,7 @@ s16 script230[] = {
     0x300, 0x1E,
     0x200, 0, 8, 0x84, 0,
     0x301,
-    0x101, 0x32D, 0x34A, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON3, 2,
     0x300, 0x1E,
     0x200, 0, 9, 2, 3,
     0x301,
@@ -454,8 +454,8 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x237, 0x412, 0x1A4, 1, 0, 0, 0 },
-    { { { PROGRESS(7), 1 }, { CODES_END, 0 } }, 8, 0xA0, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x237, 0x412, 0x1A4, 1, 0, 0, 0 },
+    { { { PROGRESS(7), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0xA0, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
@@ -463,10 +463,10 @@ void (*stageFuncs[])(void) = {
 };
 FieldEvent stageEvents[] = {
     { 160, script160, EVENT_TEXT(7), NULL, NULL },
-    { 180, script180, EVENT_TEXT(0xA), NULL, func_800A4EA8 },
+    { 180, script180, EVENT_TEXT(0xA), NULL, endEvent180 },
     { 181, script181, EVENT_TEXT(0xB), NULL, NULL },
     { 190, script190, EVENT_TEXT(0xC), NULL, NULL },
     { 200, script200, EVENT_TEXT(0xD), NULL, NULL },
-    { 230, script230, EVENT_TEXT(0xE), NULL, func_800A4ED4 },
+    { 230, script230, EVENT_TEXT(0xE), NULL, endEvent230 },
     { -1, NULL, 0, NULL, NULL },
 };

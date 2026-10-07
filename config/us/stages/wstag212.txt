@@ -109,3 +109,11 @@ actor41 = 0x800A7700;
 actor42 = 0x800A7714;
 actor43 = 0x800A7728;
 actor44 = 0x800A773C;
+
+// functions named by what calls them (tools/name_stage_funcs.py)
+updateTileEffect = 0x800A4DB8; // type:func
+handleCommand810 = 0x800A500C; // type:func
+createCommand810 = 0x800A50C0; // type:func
+endEvent271 = 0x800A530C; // type:func
+endEvent273 = 0x800A5358; // type:func
+endEvent352 = 0x800A5368; // type:func

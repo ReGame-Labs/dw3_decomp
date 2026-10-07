@@ -11,7 +11,7 @@ extern s32 D_800A6DE8[];
 #endif
 
 /* A list of up to eight options that each open a message */
-void func_800A4D38(StageListMenu *task, StageListMenuChildren *children) {
+void updateListMenu(StageListMenu *task, StageListMenuChildren *children) {
     SpriteDrawer drawer;
     s32 prev;
     s32 i;
@@ -25,12 +25,12 @@ void func_800A4D38(StageListMenu *task, StageListMenuChildren *children) {
         task->tweens[0].duration = 10;
         task->tweens[1].duration = 10;
         for (i = 0; i < 8; i++) {
-            children->options[i] = createTextWindow(0x1002, 1, 0xBD, 0x21 + i * 14);
+            children->options[i] = createTextWindow(FIELD_LAYER_MAP, 1, 0xBD, 0x21 + i * 14);
             children->options[i]->setDepth(children->options[i], 1);
         }
-        children->cursor = createCursor(0x1002, 1, 0xAF, 0x21);
+        children->cursor = createCursor(FIELD_LAYER_MAP, 1, 0xAF, 0x21);
         children->cursor->setVisible(children->cursor, 0);
-        children->message = createTextWindow(0x1002, 1, 0x12, 0xB0);
+        children->message = createTextWindow(FIELD_LAYER_MAP, 1, 0x12, 0xB0);
         children->message->setLines(children->message, 3);
         task->count = 8;
         break;
@@ -135,7 +135,7 @@ void func_800A4D38(StageListMenu *task, StageListMenuChildren *children) {
             break;
         }
         initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x1002, 2);
+        drawer.setLayerId(FIELD_LAYER_MAP, 2);
         drawer.setTexture(0x140, 0);
         drawer.setFollowScroll(0);
         if (task->showArrow) {
@@ -173,8 +173,8 @@ void func_800A4D38(StageListMenu *task, StageListMenuChildren *children) {
     }
 }
 
-void *func_800A568C(void) {
-    return createTask(func_800A4D38, 0x84, 0x28);
+void *startEvent8(void) {
+    return createTask(updateListMenu, 0x84, 0x28);
 }
 
 /* A two-option menu: creates the event object of the chosen option */
@@ -191,12 +191,12 @@ void func_800A56B8(StageMenu *task, StageMenuChildren *children) {
         task->nextState(task);
         task->tween.duration = 10;
         for (i = 0; i < 2; i++) {
-            children->options[i] = createTextWindow(0x1002, 1, 0x1C, 0xBE + i * 14);
+            children->options[i] = createTextWindow(FIELD_LAYER_MAP, 1, 0x1C, 0xBE + i * 14);
             children->options[i]->setDepth(children->options[i], 1);
         }
-        children->cursor = createCursor(0x1002, 1, 0x12, 0xBE);
+        children->cursor = createCursor(FIELD_LAYER_MAP, 1, 0x12, 0xBE);
         children->cursor->setVisible(children->cursor, 0);
-        children->title = createTextWindow(0x1002, 1, 0x12, 0xB0);
+        children->title = createTextWindow(FIELD_LAYER_MAP, 1, 0x12, 0xB0);
         break;
     case TASK_RUN:
         switch (task->substate) {
@@ -269,7 +269,7 @@ void func_800A56B8(StageMenu *task, StageMenuChildren *children) {
             break;
         }
         initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x1002, 2);
+        drawer.setLayerId(FIELD_LAYER_MAP, 2);
         drawer.setTexture(0x140, 0);
         drawer.setFollowScroll(0);
         if (task->tween.value != 0) {
@@ -286,7 +286,7 @@ void func_800A56B8(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
-void *func_800A5C54(void) {
+void *startEvent9(void) {
     return createTask(func_800A56B8, 0x64, 0x14);
 }
 
@@ -304,12 +304,12 @@ void func_800A5C80(StageMenu *task, StageMenuChildren *children) {
         task->nextState(task);
         task->tween.duration = 10;
         for (i = 0; i < 2; i++) {
-            children->options[i] = createTextWindow(0x1002, 1, 0x1C, 0xBE + i * 14);
+            children->options[i] = createTextWindow(FIELD_LAYER_MAP, 1, 0x1C, 0xBE + i * 14);
             children->options[i]->setDepth(children->options[i], 1);
         }
-        children->cursor = createCursor(0x1002, 1, 0x12, 0xBE);
+        children->cursor = createCursor(FIELD_LAYER_MAP, 1, 0x12, 0xBE);
         children->cursor->setVisible(children->cursor, 0);
-        children->title = createTextWindow(0x1002, 1, 0x12, 0xB0);
+        children->title = createTextWindow(FIELD_LAYER_MAP, 1, 0x12, 0xB0);
         break;
     case TASK_RUN:
         switch (task->substate) {
@@ -382,7 +382,7 @@ void func_800A5C80(StageMenu *task, StageMenuChildren *children) {
             break;
         }
         initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x1002, 2);
+        drawer.setLayerId(FIELD_LAYER_MAP, 2);
         drawer.setTexture(0x140, 0);
         drawer.setFollowScroll(0);
         if (task->tween.value != 0) {
@@ -399,7 +399,7 @@ void func_800A5C80(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
-void *func_800A621C(void) {
+void *startEvent1510(void) {
     return createTask(func_800A5C80, 0x64, 0x14);
 }
 
@@ -430,13 +430,13 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-void func_800A636C(void) {
+void endEvent310(void) {
     FLAGS_00.applyAction(FLAG(0x40, 5), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0xB), 1);
 }
 
 /* Applies flag action 0x1C26 and sets the game progress to 24 */
-void func_800A63B8(void) {
+void endEvent685(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x26), 0);
     GAME.progress = 24;
 }
@@ -471,8 +471,8 @@ void setupStage(void) {
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= 0x14 && GAME.progress < 0x18) {
         FIELDSTG_state.soundBank = 0x1F;
@@ -528,7 +528,7 @@ s16 script20[] = {
     0x600, 1, 2,
     0x101, 2, 1, 1,
     0x101, 0x323, 0x325, 2,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x300, 0x3C,
     0x101, 0x323, 0x326, 2,
     0x300, 0x1E,
@@ -550,7 +550,7 @@ s16 script30[] = {
     0x600, 1, 2,
     0x101, 2, 1, 7,
     0x101, 0x323, 0x325, 2,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x300, 0x3C,
     0x101, 0x323, 0x326, 2,
     0x300, 0x1E,
@@ -575,7 +575,7 @@ s16 script58[] = {
     0x200, 0, 1, 0x20, 2,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x338, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 2,
     0x300, 0x1E,
     0x200, 0, 2, 2, 4,
     0x301,
@@ -586,7 +586,7 @@ s16 script58[] = {
     0x200, 0, 4, 2, 4,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x339, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 2,
     0x300, 0x1E,
     0x300, 0x1E,
     0x200, 0, 5, 0x20, 2,
@@ -640,11 +640,11 @@ s16 script310[] = {
     0x302, 0x6B,
     0x102, 0x6B, 0x14A, 0xC4, 5,
     0x302, 0x6B,
-    0x101, 0x32D, 0x34F, 0x6B,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HIDE_OBJECTS(2), 0x6B,
     0x300, 0xC,
     0x102, 0x6B, 0x18A, 0xA4, 5,
     0x302, 0x6B,
-    0x101, 0x32D, 0x355, 0x6B,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHOW_OBJECTS(2), 0x6B,
     0x300, 0x1E,
     0x600, 0, 0x6A,
     0x100, 0x6B, 0, 0,
@@ -692,7 +692,7 @@ s16 script330[] = {
 s16 script685[] = {
     0x100, 2, 0x18A, 0xA4,
     0x101, 2, 1, 1,
-    0x101, 0x32D, 0x34F, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HIDE_OBJECTS(2), 2,
     0x300, 0x1E,
     0x102, 2, 0x14A, 0xC4, 1,
     0x100, 0xB3, 0x18A, 0xA4,
@@ -703,7 +703,7 @@ s16 script685[] = {
     0x302, 0xB3,
     0x101, 2, 1, 5,
     0x101, 0xB3, 1, 1,
-    0x101, 0x32D, 0x355, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHOW_OBJECTS(2), 2,
     0x300, 6,
     0x102, 2, 0x11A, 0xDC, 1,
     0x102, 0xB3, 0x13A, 0xCC, 1,
@@ -812,7 +812,7 @@ s16 script685[] = {
     0x302, 2,
     0x102, 2, 0x9A, 0x170, 1,
     0x102, 0xB3, 0x18A, 0xA4, 5,
-    0x101, 0x32D, 0x34F, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HIDE_OBJECTS(2), 2,
     0x300, 0xC,
     0x304, 0x200, 0x3E8, 0xEC, 1,
     0,
@@ -1658,32 +1658,32 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x200, 0x3E8, 0xEC, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x206, 0x70, 0xF0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x207, 0x58, 0x1CC, 5, 0x64, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x208, 0x69, 0x134, 5, 0x65, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x214, 0x1F8, 0x2BC, 5, 0x66, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x217, 0x1D8, 0x1D4, 3, 0, 0, 0 },
-    { { { PROGRESS(2), 1 }, { CODES_END, 0 } }, 8, 0x14, 0, 0, 0, 0, 0, 0 },
-    { { { PROGRESS(2), 1 }, { CODES_END, 0 } }, 8, 0x1E, 0, 0, 0, 0, 0, 0 },
-    { { { PROGRESS(0xD), 1 }, { CODES_END, 0 } }, 8, 0x140, 0, 0, 0, 0, 0, 0 },
-    { { { PROGRESS(0xD), 1 }, { CODES_END, 0 } }, 8, 0x14A, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x200, 0x3E8, 0xEC, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x206, 0x70, 0xF0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x207, 0x58, 0x1CC, 5, 0x64, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x208, 0x69, 0x134, 5, 0x65, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x214, 0x1F8, 0x2BC, 5, 0x66, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x217, 0x1D8, 0x1D4, 3, 0, 0, 0 },
+    { { { PROGRESS(2), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x14, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(2), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x1E, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(0xD), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x140, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(0xD), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x14A, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageFuncs stageFuncs = { setupStage, startTween, updateTween };
 FieldEvent stageEvents[] = {
-    { 8, NULL, EVENT_TEXT(1), func_800A568C, NULL },
-    { 9, NULL, EVENT_TEXT(2), func_800A5C54, NULL },
+    { 8, NULL, EVENT_TEXT(1), startEvent8, NULL },
+    { 9, NULL, EVENT_TEXT(2), startEvent9, NULL },
     { 13, script13, EVENT_TEXT(6), NULL, NULL },
     { 14, script14, EVENT_TEXT(7), NULL, NULL },
     { 20, script20, EVENT_TEXT(8), NULL, NULL },
     { 30, script30, EVENT_TEXT(9), NULL, NULL },
     { 58, script58, EVENT_TEXT(0x12), NULL, NULL },
-    { 310, script310, EVENT_TEXT(0x1C), NULL, func_800A636C },
+    { 310, script310, EVENT_TEXT(0x1C), NULL, endEvent310 },
     { 320, script320, EVENT_TEXT(0x1D), NULL, NULL },
     { 330, script330, EVENT_TEXT(0x1E), NULL, NULL },
-    { 685, script685, EVENT_TEXT(0x22), NULL, func_800A63B8 },
-    { 1510, NULL, EVENT_TEXT(0x35), func_800A621C, NULL },
+    { 685, script685, EVENT_TEXT(0x22), NULL, endEvent685 },
+    { 1510, NULL, EVENT_TEXT(0x35), startEvent1510, NULL },
     { 1511, script1511, EVENT_TEXT(0x30), NULL, NULL },
     { -1, NULL, 0, NULL, NULL },
 };

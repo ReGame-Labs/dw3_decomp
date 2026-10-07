@@ -24,18 +24,18 @@ void updateStage(StageTask *task, void **children) {
 #include "common/start_stage.inc.c"
 
 /* Sets flags 0x404A, 0xC11 and 0x7401 */
-void func_800A4DF8(void) {
+void endEvent570(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x4A), 1);
     FLAGS_00.applyAction(FLAG(0xC, 0x11), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
-void func_800A4E58(void) {
+void endEvent571(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x4B), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(2), 1);
 }
 
-void func_800A4EA4(void) {
+void endEvent572(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x4C), 1);
 }
 
@@ -63,8 +63,8 @@ void setupStage(void) {
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= 0x14 && GAME.progress < 0x18) {
         FIELDSTG_state.soundBank = 0x1F;
@@ -130,7 +130,7 @@ s16 script349[] = {
     0x102, 0x6A, 0x3A8, 0xC4, 5,
     0x102, 0x14A, 0x3A8, 0xC4, 5,
     0x300, 0x1E,
-    0x101, 0x32D, 0x34D, 0x6A,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HIDE_OBJECTS(0), 0x6A,
     0x304, 0x218, 0x58, 0x18C, 5,
     0,
 };
@@ -138,7 +138,7 @@ s16 script570[] = {
     0x102, 2, 0x370, 0xE0, 3,
     0x100, 0x130, 0x3A1, 0xC9,
     0x101, 0x130, 1, 1,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 5,
     0x101, 0x323, 0x325, 0x130,
@@ -160,7 +160,7 @@ s16 script571[] = {
     0x100, 2, 0x370, 0xE0,
     0x101, 2, 1, 5,
     0x300, 0x5A,
-    0x101, 0x32D, 0x34D, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HIDE_OBJECTS(0), 2,
     0x300, 0x1E,
     0x100, 0x76, 0x3B9, 0xBD,
     0x101, 0x76, 1, 1,
@@ -221,7 +221,7 @@ s16 script572[] = {
     0x101, 2, 1, 5,
     0x100, 0x76, 0x389, 0xD5,
     0x101, 0x76, 1, 1,
-    0x101, 0x32D, 0x34D, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HIDE_OBJECTS(0), 2,
     0x300, 0x78,
     0x200, 0, 2, 0x76, 2,
     0x301,
@@ -231,7 +231,7 @@ s16 script572[] = {
     0x301,
     0x100, 0x76, 0, 0,
     0x101, 0x76, 1, 0,
-    0x101, 0x32D, 0x353, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHOW_OBJECTS(0), 2,
     0x300, 0x5A,
     0x200, 0, 1, 2, 3,
     0x301,
@@ -524,13 +524,13 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x205, 0x158, 0xA4, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x218, 0x56, 0x18A, 5, 0x64, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x203, 0xC8, 0x9C, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x214, 0x177, 0xBD, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x205, 0x372, 0x132, 7, 0, 0, 0 },
-    { { { PROGRESS(0x16), 1 }, { FLAG(0x40, 0x4A), 0 } }, 8, 0x23A, 0, 0, 0, 0, 0, 0 },
-    { { { PROGRESS(0xD), 1 }, { CODES_END, 0 } }, 8, 0x15D, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x205, 0x158, 0xA4, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x218, 0x56, 0x18A, 5, 0x64, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x203, 0xC8, 0x9C, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x214, 0x177, 0xBD, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x205, 0x372, 0x132, 7, 0, 0, 0 },
+    { { { PROGRESS(0x16), 1 }, { FLAG(0x40, 0x4A), 0 } }, SLOT_EVENT, 0x23A, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(0xD), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x15D, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
@@ -538,8 +538,8 @@ void (*stageFuncs[])(void) = {
 };
 FieldEvent stageEvents[] = {
     { 349, script349, EVENT_TEXT(3), NULL, NULL },
-    { 570, script570, EVENT_TEXT(7), NULL, func_800A4DF8 },
-    { 571, script571, EVENT_TEXT(8), NULL, func_800A4E58 },
-    { 572, script572, EVENT_TEXT(9), NULL, func_800A4EA4 },
+    { 570, script570, EVENT_TEXT(7), NULL, endEvent570 },
+    { 571, script571, EVENT_TEXT(8), NULL, endEvent571 },
+    { 572, script572, EVENT_TEXT(9), NULL, endEvent572 },
     { -1, NULL, 0, NULL, NULL },
 };

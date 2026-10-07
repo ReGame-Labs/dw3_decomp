@@ -1,7 +1,7 @@
 // names from the C of the modules this version builds (tools/version_symbols.py)
-D_800A5210 = 0x800A6354; // size:0x34
-D_800A5244 = 0x800A6388; // size:0x34
-D_800A5278 = 0x800A63BC; // size:0x30
+updateTileAnimsFrames0 = 0x800A6354; // size:0x34
+updateTileAnimsFrames1 = 0x800A6388; // size:0x34
+updateTileAnimsFrames2 = 0x800A63BC; // size:0x30
 D_800A52A8 = 0x800A63EC;
 D_800A52B8 = 0x800A63FC;
 D_800A52C8 = 0x800A640C;
