@@ -118,6 +118,7 @@ The prebuilt tools are x86 Linux binaries, so the image is `linux/amd64`.
 | `tools/split_version.py` | splits a version's executable and overlays into the USA version's files, from the pairs |
 | `tools/version_symbols.py` | names, at a version's addresses, what a USA C file uses, so that the version can build it |
 | `tools/rename.py` | renames a symbol in every version's symbol files, `src/` and `include/` |
+| `tools/rename_field.py` | renames a struct field in its definition and wherever the code uses it, from the command line or a spec file |
 | `tools/docker.sh` | runs a command in the Docker build environment |
 | `tools/version.py` | the version being worked on and its paths, for the other tools |
 | `tools/shiftcheck.py` | finds the addresses in the code and data that aren't symbols (`make shiftcheck`) |

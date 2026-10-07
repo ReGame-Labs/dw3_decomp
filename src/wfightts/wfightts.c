@@ -320,7 +320,7 @@ void WFIGHTTS_battleTest(BattleTest *task, BattleTestChildren *children) {
             break;
         }
         if (list) {
-            FIGHTSTG_battle.unkF4(0x1005, 1, WFIGHTTS_backPoints, WFIGHTTS_backColors);
+            FIGHTSTG_battle.drawBlendedQuad(0x1005, 1, WFIGHTTS_backPoints, WFIGHTTS_backColors);
         }
         if (PAD.getPressed(0) & (1 << PAD_SELECT)) {
             if (++WFIGHTTS_speedMode == 4) {
