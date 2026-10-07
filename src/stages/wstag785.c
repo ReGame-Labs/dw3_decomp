@@ -26,7 +26,7 @@ void func_800A4DC8(StageTileSet *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = D_800990B4.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
             switch (rec->anim) {
             case 1:
                 task->tiles[3] = rec;
@@ -276,21 +276,21 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #define STAGE_ARCHIVE 0x3E2
 #endif
 void setupStage(void) {
-    D_800990B4.textFile = STAGE_TEXT;
-    D_800990B4.mapFile = STAGE_FILE - 1;
-    D_800990B4.sheetEntry = STAGE_FILE << 16 | 1;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.imageFile = STAGE_ARCHIVE;
-    D_800990B4.start = (Vec2){0x15000, 0x18300};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 0x1B;
-    D_800990B4.music = 0x606C0000;
-    D_800990B4.actors = stageActors;
-    D_800990B4.startDir = 0;
-    D_800990B4.spriteColor = stageColor;
-    D_800990B4.events = stageEvents;
-    D_8009A70C.setFile(0, STAGE_FILE << 16);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE - 1;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16 | 1;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.imageFile = STAGE_ARCHIVE;
+    FIELDSTG_state.start = (Vec2){0x15000, 0x18300};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 0x1B;
+    FIELDSTG_state.music = 0x606C0000;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.spriteColor = stageColor;
+    FIELDSTG_state.events = stageEvents;
+    FIELDSTG_map.setFile(0, STAGE_FILE << 16);
+    FIELDSTG_map.setFirstMap(0);
 }
 
 extern u16 D_800A613C[];

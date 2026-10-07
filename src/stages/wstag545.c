@@ -44,7 +44,7 @@ void func_800A4DE4(StageTileAt *task) {
         task->nextState(task);
         task->obj.anim.index = 0;
         task->obj.anim.timer = D_800A5BE0[0].duration;
-        for (rec = D_800990B4.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
             if (rec->anim == task->anim) {
                 task->obj.tile = rec;
                 rec->x = task->x;
@@ -115,7 +115,7 @@ void func_800A5048(StageTileTask *task) {
         task->nextState(task);
         task->obj.anim.index = 0;
         task->obj.anim.timer = D_800A5C18[0].duration;
-        for (rec = D_800990B4.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
             if (rec->anim == 1) {
                 task->obj.tile = rec;
             }
@@ -197,7 +197,7 @@ void func_800A5350(StageTileSwitch *task, StageTileAts *children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = D_800990B4.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
             if (rec->anim == 2) {
                 task->obj.anim.index = 0;
                 task->obj.anim.timer = D_800A5CA4[0][0].duration;
@@ -369,24 +369,24 @@ void func_800A58F0(void) {
 #define STAGE_ARCHIVE 0x3DF
 #endif
 void setupStage(void) {
-    D_800990B4.textFile = STAGE_TEXT;
-    D_800990B4.mapFile = STAGE_FILE - 1;
-    D_800990B4.sheetEntry = STAGE_FILE << 16;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = STAGE_ARCHIVE;
-    D_800990B4.start = (Vec2){0x18800, 0x24600};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 0x13;
-    D_800990B4.music = 0x604C0000;
-    D_800990B4.actors = stageActors;
-    D_800990B4.battles = stageBattles;
-    D_800990B4.startDir = 0;
-    D_800990B4.events = stageEvents;
-    D_8009A70C.setFile(0, STAGE_FILE << 16 | 1);
-    D_8009A70C.setFile(7, STAGE_FILE << 16 | 2);
-    D_8009A70C.setFile(4, STAGE_FILE << 16 | 3);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE - 1;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = STAGE_ARCHIVE;
+    FIELDSTG_state.start = (Vec2){0x18800, 0x24600};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 0x13;
+    FIELDSTG_state.music = 0x604C0000;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.battles = stageBattles;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.events = stageEvents;
+    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFirstMap(0);
 }
 
 extern AnimFrame D_800A5C64[];

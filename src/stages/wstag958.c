@@ -10,22 +10,22 @@ void func_800A5E84(void) {
 }
 
 void setupStage(void) {
-    D_800990B4.textFile = LANGUAGE + 0xFD;
-    D_800990B4.mapFile = 0x221;
-    D_800990B4.sheetEntry = 0x92B0000;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = 0x92A;
-    D_800990B4.start = (Vec2){0x18300, 0x1E600};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 7;
-    D_800990B4.music = 0x601C0000;
-    D_800990B4.actors = stageActors;
-    D_800990B4.startDir = 0;
-    D_800990B4.events = stageEvents;
-    D_8009A70C.setFile(0, 0x92B0001);
-    D_8009A70C.setFile(7, 0x92B0002);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = LANGUAGE + 0xFD;
+    FIELDSTG_state.mapFile = 0x221;
+    FIELDSTG_state.sheetEntry = 0x92B0000;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = 0x92A;
+    FIELDSTG_state.start = (Vec2){0x18300, 0x1E600};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 7;
+    FIELDSTG_state.music = 0x601C0000;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.events = stageEvents;
+    FIELDSTG_map.setFile(0, 0x92B0001);
+    FIELDSTG_map.setFile(7, 0x92B0002);
+    FIELDSTG_map.setFirstMap(0);
 }
 
 void func_800A5E84();

@@ -6,7 +6,7 @@ startTween = 0x800A5A84; // type:func
 updateTween = 0x800A5B18; // type:func
 stageFuncs = 0x800A7620; // size:0xC
 
-// named by their use (D_800990B4, the field state, in setupStage)
+// named by their use (FIELDSTG_state, the field state, in setupStage)
 stageObjects = 0x800A7498;
 stageSlots = 0x800A75F0;
 stageImages = 0x800A5FE4;

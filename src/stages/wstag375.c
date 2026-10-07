@@ -93,29 +93,29 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #define STAGE_ARCHIVE 0x2D1
 #endif
 void setupStage(void) {
-    D_800990B4.textFile = STAGE_TEXT;
-    D_800990B4.mapFile = STAGE_FILE - 1;
-    D_800990B4.sheetEntry = STAGE_FILE << 16;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = STAGE_ARCHIVE;
-    D_800990B4.start = (Vec2){0x1AF00, 0x3B400};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 0xB;
-    D_800990B4.music = 0x602C0000;
-    D_800990B4.actors = stageActors;
-    D_800990B4.startDir = 0;
-    D_800990B4.spriteColor = stageColor;
-    D_800990B4.events = stageEvents;
-    D_8009A70C.setFile(0, STAGE_FILE << 16 | 1);
-    D_8009A70C.setFile(1, STAGE_FILE << 16 | 4);
-    D_8009A70C.setFile(7, STAGE_FILE << 16 | 2);
-    D_8009A70C.setFile(4, STAGE_FILE << 16 | 3);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE - 1;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = STAGE_ARCHIVE;
+    FIELDSTG_state.start = (Vec2){0x1AF00, 0x3B400};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 0xB;
+    FIELDSTG_state.music = 0x602C0000;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.spriteColor = stageColor;
+    FIELDSTG_state.events = stageEvents;
+    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(1, STAGE_FILE << 16 | 4);
+    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFirstMap(0);
     if (GAME.progress < 0xE) {
-        D_800990B4.battles = D_800A57C4;
+        FIELDSTG_state.battles = D_800A57C4;
     } else {
-        D_800990B4.battles = D_800A57E0;
+        FIELDSTG_state.battles = D_800A57E0;
     }
 }
 
@@ -826,6 +826,6 @@ void (*stageFuncs[])(void) = {
 FieldEvent stageEvents[] = {
     { 1260, D_800A5140, EVENT_TEXT(0x1B), NULL, func_800A4F38 },
     { 1261, D_800A51E0, EVENT_TEXT(0x1C), NULL, func_800A4F84 },
-    { 9000, NULL, 0, func_8008B258, NULL },
+    { 9000, NULL, 0, FIELDSTG_startEventBattle5, NULL },
     { -1, NULL, 0, NULL, NULL },
 };

@@ -7,23 +7,23 @@
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 void setupStage(void) {
-    D_800990B4.textFile = LANGUAGE + 0xFD;
-    D_800990B4.mapFile = 0x198;
-    D_800990B4.sheetEntry = 0x8E60003;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = 0x8E4;
-    D_800990B4.start = (Vec2){0x2DC00, 0xF200};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 4;
-    D_800990B4.music = 0x60100000;
-    D_800990B4.actors = stageActors;
-    D_800990B4.startDir = 0;
-    D_800990B4.spriteColor = stageColor;
-    D_800990B4.events = stageEvents;
-    D_8009A70C.setFile(0, 0x8E60004);
-    D_8009A70C.setFile(7, 0x8E60005);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = LANGUAGE + 0xFD;
+    FIELDSTG_state.mapFile = 0x198;
+    FIELDSTG_state.sheetEntry = 0x8E60003;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = 0x8E4;
+    FIELDSTG_state.start = (Vec2){0x2DC00, 0xF200};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 4;
+    FIELDSTG_state.music = 0x60100000;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.spriteColor = stageColor;
+    FIELDSTG_state.events = stageEvents;
+    FIELDSTG_map.setFile(0, 0x8E60004);
+    FIELDSTG_map.setFile(7, 0x8E60005);
+    FIELDSTG_map.setFirstMap(0);
 }
 
 extern u16 D_800A602C[];

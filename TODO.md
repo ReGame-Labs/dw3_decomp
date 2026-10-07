@@ -78,13 +78,13 @@ own.
   versions, its functions with the USA names
   (`config/eu/stages/<stage>.txt`): all 1,590 of the European stages'
   functions are C.
-- [x] The setup functions (the one that fills `D_800990B4` and loads the
+- [x] The setup functions (the one that fills `FIELDSTG_state` and loads the
   stage's text file) are C in both versions, from one C. The European
   scheduling needed the stores up to `0x1C` and the one to `0x44` to stay
   before the others while the constants rise to the top. The start
   position does it: written as a constructor, `unk2C = (Vec2){x, y}`, it
   makes GCC's `store_constructor` clobber the whole field (a `BLKmode`
-  `MEM`, which conflicts with every access to `D_800990B4`) before its two
+  `MEM`, which conflicts with every access to `FIELDSTG_state`) before its two
   stores, so the stores stay on their side of it and the constants don't.
   It gives the USA order too. The text file is `STAGE_TEXT`, the file and
   archive numbers `STAGE_FILE` and `STAGE_ARCHIVE`, the stage's own
@@ -145,11 +145,11 @@ compilers, are in the history.
   1,665 in the USA one (`STDWTITL`'s `libpress`, PsyQ, is splat's
   disassembly, out of the count).
 - [x] The overlays' last functions, each matched in a form `docs/status.md`
-  lists: FIELDSTG's `func_80091AA8` with its file check as an early exit in
+  lists: FIELDSTG's `FIELDSTG_selectMap` with its file check as an early exit in
   a `do`-`while (0)` with the file declared in it, FIGHTSTG's
   `func_8009C8EC` with a `const` pointer to the table of battle functions,
   STGDGLAB's `func_8008C234` with a BEC form (below), and FIELDSTG's
-  `func_80085EEC` with the y offset written as `scrollY` less its tile's
+  `FIELDSTG_pickViewTiles` with the y offset written as `scrollY` less its tile's
   start: the two reads of `scrollY` rank its load ahead of the x test in
   local-alloc, which was all that was left of its 24 diffs. The notes on
   what was tried before are in the history.
@@ -174,10 +174,11 @@ compilers, are in the history.
   original's case has no branch. Digimon World 2,
   BEC's too, has the same block in its task-state init cases
   (`Stg10_TitleUpdate`, `Stg20_ShopListUpdate`).
-  None of the three objects (`fieldstg_3.c`, `fightstg_6.c`,
-  `stgdglab_4.c`) builds with another compiler for the whole file
-  (`fightstg/r37/cc.sh`, results in `r37/cx/cc_*.txt`): GCC 2.7.2 (patched,
-  stock, with the second CSE pass), SN's 2.8.1, 2.95.2 and `-O1` leave
+  None of the three objects (`fieldstg_3.c`, now `event.c` to `start.c`
+  and `banner.c`'s first function, `fightstg_6.c` and `stgdglab_4.c`)
+  builds with another compiler for the whole file (`fightstg/r37/cc.sh`,
+  results in `r37/cx/cc_*.txt`): GCC 2.7.2 (patched, stock, with the
+  second CSE pass), SN's 2.8.1, 2.95.2 and `-O1` leave
   1 to 42 of each file's functions matching, and `-G8` loses 2 to 33.
   GCC 2.8.0 and the other `maspsx` versions (2.56, 2.79, 2.84) keep every
   other function but give the three the same diffs as 2.8.1.

@@ -1,7 +1,27 @@
-/* The fourth object of FIELDSTG.PRO (see fieldstg.c): its rodata starts at
-   0x800825CC (USA). */
+/* The area name banner, with the names of the area and the place. Its
+   rodata, at 0x800825CC (USA), starts FIELDSTG.PRO's fourth object (see
+   data/fieldstg.c). */
 
 #include "fieldstg.h"
+
+/* Opens the banner's windows with the names of the mode's area and place
+   (FIELDSTG_areaNames) */
+void FIELDSTG_showAreaName(Task *task, AreaNameWindows *windows) {
+    s16 mode = GAME.funcs.getMode();
+    s32 i;
+
+    for (i = 0; FIELDSTG_areaNames[i].mode != 0; i++) {
+        if (FIELDSTG_areaNames[i].mode == mode) {
+            windows->area = createTextWindow(FIELD_LAYER_BANNER, 1, 0x80, 0x1A);
+            windows->area->setString(windows->area, FILE_CACHE.load(TEXT_FILE(TEXT_AREA_NAMES)), FIELDSTG_areaNames[i].area);
+            windows->area->setTypeDelay(windows->area, 5);
+            windows->place = createTextWindow(FIELD_LAYER_BANNER, 1, 0x28, 0x44);
+            windows->place->setString(windows->place, FILE_CACHE.load(TEXT_FILE(TEXT_STAGE_NAMES)), FIELDSTG_areaNames[i].place);
+            windows->place->setTypeDelay(windows->place, 5);
+            break;
+        }
+    }
+}
 
 /* Stretches a box toward from-to along one axis. The match depends on each
    case having its own variables. */
@@ -82,6 +102,7 @@ void FIELDSTG_stretchBannerBox(AreaBanner *task, BannerBox *box) {
     }
 }
 
+/* Draws one of the banner's boxes, a flat quad of a color */
 void FIELDSTG_drawBannerBox(AreaBanner *task, u_long *ot, DVECTOR pos, DVECTOR size, s32 color) {
     POLY_F4 *poly = GFX.funcs.getPrim();
 
@@ -102,7 +123,7 @@ void FIELDSTG_drawBannerBox(AreaBanner *task, u_long *ot, DVECTOR pos, DVECTOR s
 
 /*
  * The area name banner: on state 0 it copies its ten boxes from FIELDSTG_bannerBoxes
- * and opens the area and place windows (func_80086D20); on state 1 the boxes
+ * and opens the area and place windows (FIELDSTG_showAreaName); on state 1 the boxes
  * appear and stretch in turn until both windows have finished; on state 2
  * it closes the layer's clip from the top and the bottom.
  */
@@ -120,7 +141,7 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
             for (j = 0; j < 10; j++) {
                 task->boxes[j] = FIELDSTG_bannerBoxes[j];
             }
-            func_80086D20((Task *)task, windows);
+            FIELDSTG_showAreaName((Task *)task, windows);
             task->nextState(task);
         } else {
             task->setState(task, 2);
@@ -164,7 +185,7 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
         }
         break;
     case 2:
-        layer = GFX.funcs.getLayer(0x1003);
+        layer = GFX.funcs.getLayer(FIELD_LAYER_BANNER);
         /* the match depends on the empty case 0 */
         switch (task->substate) {
         case 0:
@@ -193,11 +214,11 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
         }
         break;
     case 3:
-        D_800990B4.bannerShown = 0;
+        FIELDSTG_state.bannerShown = 0;
         break;
     }
     if (task->state >= 1 && task->state <= 2 && task->key1 != 0) {
-        Layer *top = GFX.funcs.getLayer(0x1003);
+        Layer *top = GFX.funcs.getLayer(FIELD_LAYER_BANNER);
 
         ot = (u_long *)top->getOtEntry(top, 1);
         for (i = 0; i < 10; i++) {
@@ -209,128 +230,11 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
     }
 }
 
+/* Creates the area name banner; the field waits while it shows */
 Task *FIELDSTG_createBanner(s32 arg0) {
-    Task *task = createTaskWithId(FIELDSTG_updateBanner, sizeof(AreaBanner), 8, 9);
+    Task *task = createTaskWithId(FIELDSTG_updateBanner, sizeof(AreaBanner), 8, FIELD_TASK_BANNER);
 
     task->key1 = arg0;
-    D_800990B4.bannerShown = 1;
+    FIELDSTG_state.bannerShown = 1;
     return task;
-}
-
-s32 FIELDSTG_stepBalloonAnim(Balloon *task) {
-    task->time -= GFX.funcs.getFrameTime();
-    if (task->time < 0) {
-        task->frame += 2;
-        if (FIELDSTG_triggerAnims[task->key2][task->frame] == 0xFF) {
-            task->frame = 0;
-        }
-        task->time = FIELDSTG_triggerAnims[task->key2][task->frame + 1];
-    }
-    return FIELDSTG_triggerAnims[task->key2][task->frame];
-}
-
-void FIELDSTG_drawBalloon(Balloon *task) {
-    SpriteDrawer sprite;
-    Point pos;
-    s32 frame;
-
-    pos.x = task->actor->tile.x;
-    pos.y = task->actor->tile.y - (task->actor->z >> 8);
-    initSpriteDrawer(&sprite);
-    sprite.setLayerId(0x1002, 1);
-    sprite.setTexture(0x200, 0x100);
-    if (task->substate == 2) {
-        frame = FIELDSTG_stepBalloonAnim(task);
-        sprite.draw(FILE_CACHE.getEntry(FIELD_SPRITES_FILE << 16), frame, pos.x, pos.y - 0x1B);
-    }
-    sprite.draw(FILE_CACHE.getEntry(FIELD_SPRITES_FILE << 16), task->pop >> 2, pos.x, pos.y - 0x1B);
-}
-
-void FIELDSTG_updateBalloon(Balloon *task) {
-    switch (task->state) {
-        default:
-        case 0:
-            if (task->actor == NULL) {
-                task->actor = TASK_REGISTRY.funcs.find(5, -1, 0);
-                if (task->actor == NULL) {
-                    break;
-                }
-            }
-            if (task->key1 == 0) {
-                task->popStart = 0xC8;
-                task->popOpen = 0xD4;
-                task->popEnd = 0xDC;
-            } else {
-                task->popStart = 0x104;
-                task->popOpen = 0x10C;
-                task->popEnd = 0x114;
-            }
-            if (task->key2 != 1) {
-                SOUND.playSound(0x40007);
-            }
-            task->nextState(task);
-            /* fallthrough */
-        case 1:
-            if (D_800990B4.innOpen != 0) {
-                break;
-            }
-            switch (task->substate) {
-                default:
-                case 0:
-                    task->pop = task->popStart;
-                    task->nextSubstate(task);
-                    /* fallthrough */
-                case 1:
-                    task->pop += GFX.funcs.getFrameTime();
-                    if (task->pop >= task->popOpen) {
-                        task->pop = task->popOpen;
-                        task->nextSubstate(task);
-                    }
-                    break;
-                case 2:
-                    break;
-            }
-            FIELDSTG_drawBalloon(task);
-            break;
-        case 2:
-            task->pop += GFX.funcs.getFrameTime();
-            if (task->pop >= task->popEnd) {
-                task->pop = task->popEnd;
-                task->setState(task, 3);
-            }
-            FIELDSTG_drawBalloon(task);
-            break;
-        case 3:
-            break;
-    }
-}
-
-Balloon *FIELDSTG_createBalloon(s32 kind, s32 anim, s32 id) {
-    Balloon *task = createTaskWithId(FIELDSTG_updateBalloon, sizeof(Balloon), 0, id);
-    task->key1 = kind;
-    task->key2 = anim;
-    return task;
-}
-
-void FIELDSTG_createPlayerBalloon(s32 id) {
-    FIELDSTG_createBalloon(0, 0, id);
-}
-
-void FIELDSTG_balloonCommand(Balloon *task, s32 command, s32 id) {
-    if (task != NULL) {
-        switch (command) {
-        case 0x325:
-            task->key2 = 0;
-            break;
-        case 0x327:
-            task->key2 = 1;
-            break;
-        case 0x326:
-            task->setState(task, 2);
-            break;
-        }
-        if (command == 0x325 || command == 0x327) {
-            task->actor = TASK_REGISTRY.funcs.find(5, id, -1);
-        }
-    }
 }

@@ -32,22 +32,22 @@ void func_800A5EC0(void) {
 }
 
 void setupStage(void) {
-    D_800990B4.textFile = LANGUAGE + 0xFD;
-    D_800990B4.mapFile = 0x19E;
-    D_800990B4.sheetEntry = 0x8E90000;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = 0x8E8;
-    D_800990B4.start = (Vec2){0xFD00, 0x17700};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 0x33;
-    D_800990B4.music = 0x60CC0000;
-    D_800990B4.actors = stageActors;
-    D_800990B4.startDir = 0;
-    D_800990B4.events = stageEvents;
-    D_8009A70C.setFile(0, 0x8E90001);
-    D_8009A70C.setFile(7, 0x8E90002);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = LANGUAGE + 0xFD;
+    FIELDSTG_state.mapFile = 0x19E;
+    FIELDSTG_state.sheetEntry = 0x8E90000;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = 0x8E8;
+    FIELDSTG_state.start = (Vec2){0xFD00, 0x17700};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 0x33;
+    FIELDSTG_state.music = 0x60CC0000;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.events = stageEvents;
+    FIELDSTG_map.setFile(0, 0x8E90001);
+    FIELDSTG_map.setFile(7, 0x8E90002);
+    FIELDSTG_map.setFirstMap(0);
 }
 
 s32 stepAnimationOnce(StageTileAnim *obj, AnimFrame *frames, s32 depth) {
@@ -106,7 +106,7 @@ void func_800A6110(StageTileEffect *task) {
             switch (task->step) {
             case 0:
                 i = 0;
-                for (rec = D_800990B4.objects; rec->unk2 != 0; rec++) {
+                for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
                     if (rec->anim >= 1 && rec->anim <= 3) {
                         task->anims[i].tile = rec;
                         rec->x = task->x;

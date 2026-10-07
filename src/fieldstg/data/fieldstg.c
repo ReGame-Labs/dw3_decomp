@@ -1,193 +1,21 @@
-/* The first object of FIELDSTG.PRO, and the overlay's data. FIELDSTG.PRO was
-   at least five objects: each one's jump tables are aligned to 8 from the
-   start of its own rodata, and the tables at 0x800824C4, 0x80082598,
-   0x800825CC and 0x800825E0 (USA) each start right where the one before
-   ends, 4 bytes past a multiple of 8 from the start of the object before, so
-   each one starts a new object. Where each object's code starts is only
-   known to be between the function with the last jump table of the object
-   before and the one with its first; the data is all here. */
+/*
+ * FIELDSTG.PRO's data, after its code: its tables point to each other, to
+ * FIELDSTG's functions and to the stage overlays'. The versions differ where
+ * #if says.
+ *
+ * FIELDSTG.PRO was at least five objects: each one's jump tables are aligned
+ * to 8 from the start of its own rodata, and the tables at 0x800824C4,
+ * 0x80082598, 0x800825CC and 0x800825E0 (USA) each start right where the one
+ * before ends, 4 bytes past a multiple of 8 from the start of the object
+ * before, so each one starts a new object (lift.c, event.c, banner.c and
+ * trigger.c). Where each object's code starts is only known to be between
+ * the function with the last jump table of the object before and the one
+ * with its first, and the data is all here; the files between are FIELDSTG's
+ * modules, cut where no jump table moves.
+ */
 
 #include "fieldstg.h"
 #include "stages.h"
-
-void func_80082F1C(Task *task) {
-    switch (task->state) {
-    case 0:
-    case 1:
-    default:
-        if (task->substate == 1) {
-            FIELDSTG_haltPartners();
-            task->setSubstate(task, 0);
-        }
-        break;
-    case 2:
-    case 3:
-        break;
-    }
-}
-
-/*
- * The field's commands (0x337 to 0x386) that the stage overlays send: the
- * field task's substate, map objects 100 to 105 hidden or shown, and
- * sounds, three of which are held to be keyed off later.
- */
-void func_80082F84(Task *task, s32 command) {
-    StageTile *object;
-    Task *field;
-    s32 n;
-
-    if (task == NULL) {
-        return;
-    }
-    n = 0;
-    if (command == 0x337) {
-        task->setSubstate(task, 1);
-    }
-    switch (command) {
-    case 0x34A:
-        n++;
-    case 0x339:
-        n++;
-    case 0x338:
-        n++;
-        field = TASK_REGISTRY.funcs.find(0x16, -1, -1);
-        field->setSubstate(field, n);
-        break;
-    }
-    switch (command) {
-    case 0x34D ... 0x352:
-        for (object = D_800990B4.objects; object->unk2 != 0; object++) {
-            if (object->anim == command - 0x2E9) {
-                object->visible = 0;
-            }
-        }
-        break;
-    case 0x353 ... 0x358:
-        for (object = D_800990B4.objects; object->unk2 != 0; object++) {
-            if (object->anim == command - 0x2EF) {
-                object->visible = 1;
-            }
-        }
-        break;
-    }
-    switch (command) {
-    case 0x372:
-        FIELDSTG_shakeCamera(1);
-        break;
-    case 0x373:
-        FIELDSTG_shakeCamera(0);
-        break;
-    }
-    if (command == 0x376) {
-        func_8008C23C();
-    }
-    switch (command) {
-    case 0x365:
-        SOUND.playSound(0xB80001);
-        break;
-    case 0x368:
-        SOUND.playSound(0x80E8383C);
-        break;
-    case 0x369:
-        SOUND.playSound(0x60040002);
-        break;
-    case 0x36A:
-        SOUND.playSound(0xA40006);
-        break;
-    case 0x36B:
-        SOUND.playSound(0x805458BD);
-        break;
-    case 0x36C:
-        SOUND.playSound(0x800410BD);
-        break;
-    case 0x36D:
-        SOUND.playSound(0x803C503C);
-        break;
-    case 0x36E:
-        SOUND.playSound(0x01100000);
-        break;
-    case 0x36F:
-        SOUND.playSound(0x01100002);
-        break;
-    case 0x374:
-        SOUND.playSound(0x700001);
-        break;
-    case 0x375:
-        SOUND.playSound(0x40015);
-        break;
-    case 0x377:
-        SOUND.playSound(0x8004113E);
-        break;
-    case 0x378:
-        SOUND.playSound(0x8110303C);
-        break;
-    case 0x379:
-        SOUND.playSound(0x81103240);
-        break;
-    case 0x37A:
-        SOUND.playSound(SOUND_TELEPORT);
-        break;
-    case 0x37C:
-        SOUND.playSound(0x440001);
-        break;
-    case 0x37D:
-        SOUND.playSound(0x340004);
-        break;
-    case 0x37E:
-        SOUND.playSound(0x40013);
-        break;
-    case 0x37F:
-        SOUND.playSound(0x800429BF);
-        break;
-    case 0x380:
-        SOUND.playSound(0x800430BD);
-        break;
-    case 0x381:
-        SOUND.playSound(0x80042DC7);
-        break;
-    case 0x383:
-        SOUND.playSound(0x8004103C);
-        break;
-    }
-    switch (command) {
-    case 0x366:
-        FIELDSTG_heldVoice = SOUND.playSound(0xA10C703C);
-        break;
-    case 0x370:
-        FIELDSTG_heldVoice = SOUND.playSound(0xA0045EC9);
-        break;
-    case 0x382:
-        FIELDSTG_heldVoice = SOUND.playSound(0xA054583C);
-        break;
-    case 0x384:
-        FIELDSTG_heldVoice = SOUND.playSound(0xA0042FCB);
-        break;
-    }
-    switch (command) {
-    case 0x367:
-        SOUND.keyOff(0xA10C703C, FIELDSTG_heldVoice);
-        break;
-    case 0x371:
-        SOUND.keyOff(0xA0045EC9, FIELDSTG_heldVoice);
-        break;
-    case 0x385:
-        SOUND.keyOff(0xA0042FCB, FIELDSTG_heldVoice);
-        break;
-    case 0x386:
-        SOUND.keyOff(0xA054583C, FIELDSTG_heldVoice);
-        break;
-    }
-}
-
-void func_80083470(void) {
-    createTaskWithId(func_80082F1C, sizeof(Task), 0, 0x32D);
-}
-
-/*
- * The field's data, after the code that uses it: its tables point to each
- * other and to the functions above (and to the stage overlay's, at fixed
- * addresses). The versions differ where #if says.
- */
 
 /* The encounters' enemies, one encounter's after another; the first, none,
    fills the places of the encounters with fewer than three */
@@ -2720,8 +2548,8 @@ StageSlot FIELDSTG_slots[] = {
     {{{0xFFFF, 0}, {0xFFFF, 0}}, 0, 0, 0, 0, 0, 0, 0, 0},
 };
 void (*FIELDSTG_initFuncs[])(void) = {FIELDSTG_setupField};
-void (*FIELDSTG_tweenStart)(Tween *tween, s32 in) = func_80091298;
-s32 (*FIELDSTG_tweenUpdate)(Tween *tween) = func_8009132C;
+void (*FIELDSTG_tweenStart)(Tween *tween, s32 in) = FIELDSTG_startTween;
+s32 (*FIELDSTG_tweenUpdate)(Tween *tween) = FIELDSTG_updateTween;
 /* The story events' text file, counted from TEXT_FILE(1) as FieldEvent.text is */
 #if VERSION_US
 #define STORY_TEXT_FILE 0x112
@@ -2737,71 +2565,71 @@ FieldEvent FIELDSTG_events[] = {
     {1325, WSTAG260_script1325, STORY_TEXT(0x41), NULL, NULL},
     {1331, WSTAG260_script1331, STORY_TEXT(0), NULL, NULL},
     {1332, NULL, 0, (void *)FIELDSTG_askChoice0, NULL},
-    {1333, WSTAG260_script1333, STORY_TEXT(1), NULL, func_80090864},
-    {1334, WSTAG260_script1334, STORY_TEXT(3), NULL, func_800908C4},
+    {1333, WSTAG260_script1333, STORY_TEXT(1), NULL, FIELDSTG_endChoice0Answer0},
+    {1334, WSTAG260_script1334, STORY_TEXT(3), NULL, FIELDSTG_endChoice0Answer1},
     {1336, WSTAG260_script1336, STORY_TEXT(4), NULL, NULL},
     {1337, NULL, 0, (void *)FIELDSTG_askChoice1, NULL},
-    {1338, WSTAG260_script1338, STORY_TEXT(6), NULL, func_800908F0},
-    {1339, WSTAG260_script1339, STORY_TEXT(7), NULL, func_80090950},
+    {1338, WSTAG260_script1338, STORY_TEXT(6), NULL, FIELDSTG_endChoice1Answer0},
+    {1339, WSTAG260_script1339, STORY_TEXT(7), NULL, FIELDSTG_endChoice1Answer1},
     {1341, WSTAG260_script1341, STORY_TEXT(8), NULL, NULL},
     {1342, NULL, 0, (void *)FIELDSTG_askChoice2, NULL},
-    {1343, WSTAG260_script1343, STORY_TEXT(0xA), NULL, func_8009097C},
-    {1344, WSTAG260_script1344, STORY_TEXT(0xB), NULL, func_800909DC},
+    {1343, WSTAG260_script1343, STORY_TEXT(0xA), NULL, FIELDSTG_endChoice2Answer0},
+    {1344, WSTAG260_script1344, STORY_TEXT(0xB), NULL, FIELDSTG_endChoice2Answer1},
     {1346, WSTAG260_script1346, STORY_TEXT(0xC), NULL, NULL},
     {1347, NULL, 0, (void *)FIELDSTG_askChoice3, NULL},
-    {1348, WSTAG260_script1348, STORY_TEXT(0xE), NULL, func_80090A08},
-    {1349, WSTAG260_script1349, STORY_TEXT(0xF), NULL, func_80090A68},
+    {1348, WSTAG260_script1348, STORY_TEXT(0xE), NULL, FIELDSTG_endChoice3Answer0},
+    {1349, WSTAG260_script1349, STORY_TEXT(0xF), NULL, FIELDSTG_endChoice3Answer1},
     {1351, WSTAG260_script1351, STORY_TEXT(0x10), NULL, NULL},
     {1352, NULL, 0, (void *)FIELDSTG_askChoice4, NULL},
-    {1353, WSTAG260_script1353, STORY_TEXT(0x12), NULL, func_80090A94},
-    {1354, WSTAG260_script1354, STORY_TEXT(0x13), NULL, func_80090AF4},
+    {1353, WSTAG260_script1353, STORY_TEXT(0x12), NULL, FIELDSTG_endChoice4Answer0},
+    {1354, WSTAG260_script1354, STORY_TEXT(0x13), NULL, FIELDSTG_endChoice4Answer1},
     {1356, WSTAG260_script1356, STORY_TEXT(0x14), NULL, NULL},
     {1357, NULL, 0, (void *)FIELDSTG_askChoice5, NULL},
-    {1358, WSTAG260_script1358, STORY_TEXT(0x16), NULL, func_80090B20},
-    {1359, WSTAG260_script1359, STORY_TEXT(0x17), NULL, func_80090B80},
+    {1358, WSTAG260_script1358, STORY_TEXT(0x16), NULL, FIELDSTG_endChoice5Answer0},
+    {1359, WSTAG260_script1359, STORY_TEXT(0x17), NULL, FIELDSTG_endChoice5Answer1},
     {1361, WSTAG260_script1361, STORY_TEXT(0x18), NULL, NULL},
     {1362, NULL, 0, (void *)FIELDSTG_askChoice6, NULL},
-    {1363, WSTAG260_script1363, STORY_TEXT(0x1A), NULL, func_80090BAC},
-    {1364, WSTAG260_script1364, STORY_TEXT(0x1B), NULL, func_80090C0C},
+    {1363, WSTAG260_script1363, STORY_TEXT(0x1A), NULL, FIELDSTG_endChoice6Answer0},
+    {1364, WSTAG260_script1364, STORY_TEXT(0x1B), NULL, FIELDSTG_endChoice6Answer1},
     {1366, WSTAG260_script1366, STORY_TEXT(0x1C), NULL, NULL},
     {1367, NULL, 0, (void *)FIELDSTG_askChoice7, NULL},
-    {1368, WSTAG260_script1368, STORY_TEXT(0x1E), NULL, func_80090C38},
-    {1369, WSTAG260_script1369, STORY_TEXT(0x1F), NULL, func_80090C98},
+    {1368, WSTAG260_script1368, STORY_TEXT(0x1E), NULL, FIELDSTG_endChoice7Answer0},
+    {1369, WSTAG260_script1369, STORY_TEXT(0x1F), NULL, FIELDSTG_endChoice7Answer1},
     {1371, WSTAG260_script1371, STORY_TEXT(0x20), NULL, NULL},
     {1372, NULL, 0, (void *)FIELDSTG_askChoice8, NULL},
-    {1373, WSTAG260_script1373, STORY_TEXT(0x22), NULL, func_80090CC4},
-    {1374, WSTAG260_script1374, STORY_TEXT(0x23), NULL, func_80090D24},
+    {1373, WSTAG260_script1373, STORY_TEXT(0x22), NULL, FIELDSTG_endChoice8Answer0},
+    {1374, WSTAG260_script1374, STORY_TEXT(0x23), NULL, FIELDSTG_endChoice8Answer1},
     {1376, WSTAG260_script1376, STORY_TEXT(0x24), NULL, NULL},
     {1377, NULL, 0, (void *)FIELDSTG_askChoice9, NULL},
-    {1378, WSTAG260_script1378, STORY_TEXT(0x26), NULL, func_80090D50},
-    {1379, WSTAG260_script1379, STORY_TEXT(0x27), NULL, func_80090DB0},
+    {1378, WSTAG260_script1378, STORY_TEXT(0x26), NULL, FIELDSTG_endChoice9Answer0},
+    {1379, WSTAG260_script1379, STORY_TEXT(0x27), NULL, FIELDSTG_endChoice9Answer1},
     {1381, WSTAG260_script1381, STORY_TEXT(0x28), NULL, NULL},
     {1382, NULL, 0, (void *)FIELDSTG_askChoice10, NULL},
-    {1383, WSTAG260_script1383, STORY_TEXT(0x2A), NULL, func_80090DDC},
-    {1384, WSTAG260_script1384, STORY_TEXT(0x2B), NULL, func_80090E3C},
+    {1383, WSTAG260_script1383, STORY_TEXT(0x2A), NULL, FIELDSTG_endChoice10Answer0},
+    {1384, WSTAG260_script1384, STORY_TEXT(0x2B), NULL, FIELDSTG_endChoice10Answer1},
     {1386, WSTAG260_script1386, STORY_TEXT(0x2C), NULL, NULL},
     {1387, NULL, 0, (void *)FIELDSTG_askChoice11, NULL},
-    {1388, WSTAG260_script1388, STORY_TEXT(0x2E), NULL, func_80090E68},
-    {1389, WSTAG260_script1389, STORY_TEXT(0x2F), NULL, func_80090EC8},
+    {1388, WSTAG260_script1388, STORY_TEXT(0x2E), NULL, FIELDSTG_endChoice11Answer0},
+    {1389, WSTAG260_script1389, STORY_TEXT(0x2F), NULL, FIELDSTG_endChoice11Answer1},
     {1391, WSTAG260_script1391, STORY_TEXT(0x30), NULL, NULL},
     {1392, NULL, 0, (void *)FIELDSTG_askChoice12, NULL},
-    {1393, WSTAG260_script1393, STORY_TEXT(0x32), NULL, func_80090EF4},
-    {1394, WSTAG260_script1394, STORY_TEXT(0x33), NULL, func_80090F54},
+    {1393, WSTAG260_script1393, STORY_TEXT(0x32), NULL, FIELDSTG_endChoice12Answer0},
+    {1394, WSTAG260_script1394, STORY_TEXT(0x33), NULL, FIELDSTG_endChoice12Answer1},
     {1396, WSTAG260_script1396, STORY_TEXT(0x34), NULL, NULL},
     {1397, NULL, 0, (void *)FIELDSTG_askChoice13, NULL},
-    {1398, WSTAG260_script1398, STORY_TEXT(0x36), NULL, func_80090F80},
-    {1399, WSTAG260_script1399, STORY_TEXT(0x37), NULL, func_80090FE0},
+    {1398, WSTAG260_script1398, STORY_TEXT(0x36), NULL, FIELDSTG_endChoice13Answer0},
+    {1399, WSTAG260_script1399, STORY_TEXT(0x37), NULL, FIELDSTG_endChoice13Answer1},
     {1401, WSTAG260_script1401, STORY_TEXT(0x38), NULL, NULL},
     {1402, NULL, 0, (void *)FIELDSTG_askChoice14, NULL},
-    {1403, WSTAG260_script1403, STORY_TEXT(0x3A), NULL, func_8009100C},
-    {1404, WSTAG260_script1404, STORY_TEXT(0x3B), NULL, func_8009106C},
+    {1403, WSTAG260_script1403, STORY_TEXT(0x3A), NULL, FIELDSTG_endChoice14Answer0},
+    {1404, WSTAG260_script1404, STORY_TEXT(0x3B), NULL, FIELDSTG_endChoice14Answer1},
     {1406, WSTAG260_script1406, STORY_TEXT(0x3C), NULL, NULL},
     {1407, NULL, 0, (void *)FIELDSTG_askChoice15, NULL},
-    {1408, WSTAG260_script1408, STORY_TEXT(0x3E), NULL, func_80091098},
-    {1409, WSTAG260_script1409, STORY_TEXT(0x3F), NULL, func_800910F8},
+    {1408, WSTAG260_script1408, STORY_TEXT(0x3E), NULL, FIELDSTG_endChoice15Answer0},
+    {1409, WSTAG260_script1409, STORY_TEXT(0x3F), NULL, FIELDSTG_endChoice15Answer1},
     {-1, NULL, 0, NULL, NULL},
 };
-FieldState D_800990B4 = {
+FieldState FIELDSTG_state = {
     0, 0, 0, 0,
     0, 0, 0, 0,
     0, 0, {0}, {0, 0},
@@ -3665,12 +3493,12 @@ StageEntry FIELDSTG_euStages[] = {
     {0, 0, 0},
 };
 #endif
-ScriptTimer FIELDSTG_scriptTimer = {0, 0, func_800914C0, FIELDSTG_findActor};
+ScriptTimer FIELDSTG_scriptTimer = {0, 0, FIELDSTG_resetScriptTimer, FIELDSTG_findActor};
 void (*FIELDSTG_scriptHelpers[])() = {
-    func_80091648, func_80091520, func_800915B0, func_800915FC,
+    FIELDSTG_toScreenPos, FIELDSTG_waitScriptTime, FIELDSTG_waitAnimDone, FIELDSTG_waitWalkDone,
     func_800916B4,
 };
-/* The script commands (func_800916E8), up to the first id 0. Most of their
+/* The script commands (FIELDSTG_findScriptCommand), up to the first id 0. Most of their
    functions are those of the stage whose event scripts run the command
    (include/stages.h), and they take different arguments */
 ScriptCommand FIELDSTG_scriptCommands[] = {
@@ -3687,7 +3515,7 @@ ScriptCommand FIELDSTG_scriptCommands[] = {
     {810, WSTAG212_func_800A50C0, WSTAG212_func_800A500C},
     {811, WSTAG415_func_800A595C, WSTAG415_func_800A5850},
     {812, 0, WSTAG415_func_800A5D4C},
-    {813, (void *)func_80083470, (void *)func_80082F84},
+    {813, (void *)FIELDSTG_startCommandTask, (void *)FIELDSTG_handleFieldCommand},
     {814, WSTAG680_func_800A5270, WSTAG680_func_800A5140},
     {815, WSTAG225_func_800A50A4, WSTAG225_func_800A5038},
     {816, WSTAG415_func_800A50F4, 0},
@@ -3733,9 +3561,9 @@ ScriptCommand FIELDSTG_scriptCommands[] = {
     {855, WSTAG925_func_800A639C, 0},
 #endif
     {0, 0, 0},
-    {0, 0, (void *)func_800917D8},
+    {0, 0, (void *)FIELDSTG_rollBattleSteps},
 };
-void (*FIELDSTG_checkBattle)() = func_80091910;
+void (*FIELDSTG_checkBattle)() = FIELDSTG_countBattleSteps;
 FieldBattleFuncs FIELDSTG_battleFuncs = {
     FIELDSTG_startEventBattle, FIELDSTG_startAreaBattle,
 };
@@ -3743,7 +3571,7 @@ s32 FIELDSTG_battleRates[] = {
     2000, 3, 4, 6,
     9, 18,
 };
-FieldMap D_8009A70C = {
+FieldMap FIELDSTG_map = {
     {0, 0, 0, 0, 0, 0, 0, 0},
     0,
     0,
@@ -3753,12 +3581,12 @@ FieldMap D_8009A70C = {
     NULL,
     NULL,
     NULL,
-    func_80091B78,
-    func_80091BC0,
-    func_80091F4C,
-    func_8009204C,
-    func_80091B90,
-    func_80091BB4,
+    FIELDSTG_setMapFile,
+    FIELDSTG_getMapCell,
+    FIELDSTG_getWalkStep,
+    FIELDSTG_getFlyStep,
+    FIELDSTG_setFirstMap,
+    FIELDSTG_setMap,
     FIELDSTG_isTileFree,
 };
 s32 FIELDSTG_boxFrame = -1;

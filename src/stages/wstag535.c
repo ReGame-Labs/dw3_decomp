@@ -42,24 +42,24 @@ void func_800A4DEC(void) {
 #define STAGE_ARCHIVE 0x3DE
 #endif
 void setupStage(void) {
-    D_800990B4.textFile = STAGE_TEXT;
-    D_800990B4.mapFile = STAGE_FILE - 1;
-    D_800990B4.sheetEntry = STAGE_FILE << 16 | 1;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = STAGE_ARCHIVE;
-    D_800990B4.start = (Vec2){0x19E00, 0x11300};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 0x11;
-    D_800990B4.music = 0x60440000;
-    D_800990B4.actors = stageActors;
-    D_800990B4.startDir = 0;
-    D_800990B4.battles = stageBattles;
-    D_800990B4.events = stageEvents;
-    D_8009A70C.setFile(0, STAGE_FILE << 16);
-    D_8009A70C.setFile(7, STAGE_FILE << 16 | 2);
-    D_8009A70C.setFile(4, STAGE_FILE << 16 | 3);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE - 1;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16 | 1;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = STAGE_ARCHIVE;
+    FIELDSTG_state.start = (Vec2){0x19E00, 0x11300};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 0x11;
+    FIELDSTG_state.music = 0x60440000;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.battles = stageBattles;
+    FIELDSTG_state.events = stageEvents;
+    FIELDSTG_map.setFile(0, STAGE_FILE << 16);
+    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFirstMap(0);
 }
 
 extern Battle D_800A50A4;
@@ -440,6 +440,6 @@ void (*stageFuncs[])(void) = {
 FieldEvent stageEvents[] = {
     { 1262, D_800A4F4C, EVENT_TEXT(0xC), NULL, func_800A4DA0 },
     { 1263, D_800A5000, EVENT_TEXT(0xD), NULL, func_800A4DEC },
-    { 9000, NULL, 0, func_8008B258, NULL },
+    { 9000, NULL, 0, FIELDSTG_startEventBattle5, NULL },
     { -1, NULL, 0, NULL, NULL },
 };

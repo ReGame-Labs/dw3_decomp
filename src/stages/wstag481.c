@@ -58,7 +58,7 @@ void func_800A4E48(StageTileCursors *task) {
         task->nextState(task);
         break;
     case TASK_RUN:
-        for (tile = D_800990B4.objects; tile->unk2 != 0; tile++) {
+        for (tile = FIELDSTG_state.objects; tile->unk2 != 0; tile++) {
             switch (tile->anim) {
             case 1:
                 func_800A4CBC(tile, D_800A5420[0], &task->cursors[0], 0);
@@ -105,7 +105,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-/* the color the setup copies to D_800990B4.spriteColor */
+/* the color the setup copies to FIELDSTG_state.spriteColor */
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0 };
 
 #if VERSION_US
@@ -116,24 +116,24 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0 };
 #define STAGE_FILE 0x5FB
 #endif
 void setupStage(void) {
-    D_800990B4.textFile = STAGE_TEXT;
-    D_800990B4.mapFile = STAGE_FILE - 1;
-    D_800990B4.sheetEntry = STAGE_FILE << 16;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = STAGE_FILE - 2;
-    D_800990B4.start = (Vec2){0x48600, 0xE600};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 0x11;
-    D_800990B4.music = 0x60440000;
-    D_800990B4.startDir = 0;
-    D_800990B4.spriteColor = stageColor;
-    D_800990B4.battles = stageBattles;
-    D_8009A70C.setFile(0, STAGE_FILE << 16 | 1);
-    D_8009A70C.setFile(1, STAGE_FILE << 16 | 3);
-    D_8009A70C.setFile(7, STAGE_FILE << 16 | 2);
-    D_8009A70C.setFile(4, STAGE_FILE << 16 | 4);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE - 1;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = STAGE_FILE - 2;
+    FIELDSTG_state.start = (Vec2){0x48600, 0xE600};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 0x11;
+    FIELDSTG_state.music = 0x60440000;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.spriteColor = stageColor;
+    FIELDSTG_state.battles = stageBattles;
+    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(1, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 4);
+    FIELDSTG_map.setFirstMap(0);
 }
 
 extern StageTileFrame D_800A5240[];

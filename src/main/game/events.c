@@ -493,7 +493,7 @@ void changeCard(s32 card, s32 add) {
 
 /* Actions 0x76 and 0x78: a card battle (mode 0x700) against an opponent */
 void startCardBattle(s32 opponent, s32 kind) {
-    func_8008AEB4(0x700, opponent * 2 + kind + 1, 0, 0, 0);
+    FIELDSTG_leaveField(0x700, opponent * 2 + kind + 1, 0, 0, 0);
 }
 
 /*
@@ -620,28 +620,28 @@ void applyAction(s32 code, s32 value) {
         changeItem(id, value);
     }
     if (group == 0x90) {
-        func_8008B2C4(id);
+        FIELDSTG_startListedEvent(id);
     }
     if (group == 0x92) {
         changeCard(id, value);
     }
     if (group == 0x94) {
-        func_8008AEB4(0xA00, id, 0, 0, 0);
+        FIELDSTG_leaveField(0xA00, id, 0, 0, 0);
     }
     if (group == 0x7A) {
         if ((u16)id < 30) {
-            func_8008AEB4(0xF00, (u16)id, 0, 0, 0);
+            FIELDSTG_leaveField(0xF00, (u16)id, 0, 0, 0);
         } else if ((u32)(id - 0x31) < 0x13 || (u32)(id - 0x46) < 5) {
-            func_8008AEB4(0x1300, (u16)id, 0, 0, 0);
+            FIELDSTG_leaveField(0x1300, (u16)id, 0, 0, 0);
         } else {
-            func_8008B320();
+            FIELDSTG_openInn();
         }
     }
     if (group == 0x7C) {
         if ((u16)id == 0) {
-            func_8008AEB4(0xD00, 0, 0, 0, 0);
+            FIELDSTG_leaveField(0xD00, 0, 0, 0, 0);
         } else if ((u16)id == 1) {
-            func_8008AEB4(0xB00, 0, 0, 0, 0);
+            FIELDSTG_leaveField(0xB00, 0, 0, 0, 0);
         }
     }
 }
