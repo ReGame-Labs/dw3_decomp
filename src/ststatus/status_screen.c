@@ -266,6 +266,8 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
     id = GAME.funcs.getPartyMember(screen->member);
     stats = GAME.funcs.getPartnerStats(id);
     GAME.funcs.computeStats(id, &now);
+    /* the six slots are saved and restored as one struct copy;
+       PartnerStats.equip is a plain array */
     saved = *(StatusEquip *)stats->equip;
     if (*(stats->equip + slot) != 0) {
         data = GET_ITEM[0](*(stats->equip + slot))->data;

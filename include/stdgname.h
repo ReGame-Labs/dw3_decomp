@@ -42,7 +42,7 @@ struct ScreenTask;
 /* A sprite of the partner menu, that opens by scaling */
 typedef struct MenuSprite {
     /* 0x00 */ s32 sprite; /* -1 ends the list */
-    /* 0x04 */ s32 unk4;
+    /* 0x04 */ s32 unk4; /* 10, or 5 for the last: nothing reads it */
     /* 0x08 */ s32 x;
     /* 0x0C */ s32 y;
     /* 0x10 */ s32 pivotX;
@@ -123,7 +123,7 @@ extern ScreenFuncs STDGNAME_funcs;
 extern TextStyle STDGNAME_menuStyle;
 
 /* stdgname.c */
-void STDGNAME_updateScene(Task *task, void **children);
+void STDGNAME_updateScene(Task *task, ScreenTask **screen);
 Task *STDGNAME_start(void);
 void STDGNAME_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
 void STDGNAME_drawFader(ScreenFade *task);

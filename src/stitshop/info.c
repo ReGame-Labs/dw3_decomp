@@ -5,8 +5,8 @@
 
 /* A partner's stats with its equipment, as main's computeStats gives them: the
    weapons' attack (6), the armor's defense (7) and the items' bonuses added, up
-   to 999, less the penalties (19 to 21) on stats 6, 7 and 10 */
-void STITSHOP_computeStats(s32 partner, s16 *out) {
+   to 999, less the penalties on stats 6, 7 and 10 */
+void STITSHOP_computeStats(s32 partner, ShopStatBlock *out) {
     s16 *equip;
     s32 i;
     s32 j;
@@ -19,64 +19,65 @@ void STITSHOP_computeStats(s32 partner, s16 *out) {
     GameState *save = &GAME;
     PartnerStats *d;
 
-    *(ShopStatBlock *)out = *(ShopStatBlock *)save->partners[partner].info.stats;
+    /* PartnerStats' stats[] and status[] (the penalties), as one block */
+    *out = *(ShopStatBlock *)save->partners[partner].info.stats;
     d = &GAME.partners[partner].info;
     equip = d->equip;
     for (i = 0; i < 6; i++) {
         if (equip[i] > 0) {
             info = GET_ITEM[0](equip[i]);
             type = info->type;
-            data = (ItemData *)info->data;
+            data = SHOP_ITEM_DATA(info);
             if (IS_WEAPON_TYPE(type)) {
-                out[6] += data->weapon.atk;
-                if (out[6] >= 1000) {
-                    out[6] = 999;
+                out->stats[6] += data->weapon.atk;
+                if (out->stats[6] >= 1000) {
+                    out->stats[6] = 999;
                 }
                 for (j = 0; j < 2; j++) {
                     stat = *(j + data->weapon.stats);
                     amount = data->weapon.amounts[j];
                     if (stat != 0) {
-                        STITSHOP_addStat(out, stat, (s16)amount);
+                        STITSHOP_addStat(out->stats, stat, (s16)amount);
                     }
                 }
             } else if (IS_ARMOR_TYPE(type)) {
-                out[7] += data->armor.def;
-                if (out[7] >= 1000) {
-                    out[7] = 999;
+                out->stats[7] += data->armor.def;
+                if (out->stats[7] >= 1000) {
+                    out->stats[7] = 999;
                 }
                 for (j = 0; j < 2; j++) {
                     stat = *(j + data->armor.stats);
                     amount = data->armor.amounts[j];
                     if (stat != 0) {
-                        STITSHOP_addStat(out, stat, (s16)amount);
+                        STITSHOP_addStat(out->stats, stat, (s16)amount);
                     }
                 }
             } else if (IS_ACCESSORY_TYPE(type)) {
                 stat = data->acc.stat;
                 amount = data->acc.amount;
                 if (stat != 0) {
-                    STITSHOP_addStat(out, stat, (s16)amount);
+                    STITSHOP_addStat(out->stats, stat, (s16)amount);
                 }
             } else {
                 continue;
             }
-            out[11] += data->weapon.unk0;
-            if (out[11] >= 1000) {
-                out[11] = 999;
+            out->stats[11] += data->weapon.unk0;
+            if (out->stats[11] >= 1000) {
+                out->stats[11] = 999;
             }
         }
     }
-    out[6] -= out[19];
-    if (out[6] < 0) {
-        out[6] = 0;
+    out->stats[6] -= out->penalties[0];
+    if (out->stats[6] < 0) {
+        out->stats[6] = 0;
     }
-    out[7] -= out[20];
-    if (out[7] < 0) {
-        out[7] = 0;
+    out->stats[7] -= out->penalties[1];
+    if (out->stats[7] < 0) {
+        out->stats[7] = 0;
     }
-    out[10] -= out[21];
-    if (out[10] < 0) {
-        out[10] = 0;
+    out->stats[10] -= out->penalties[2];
+    if (out->stats[10] < 0) {
+        out->stats[10] = 0;
     }
 }
 
@@ -116,9 +117,9 @@ void STITSHOP_showStat(ShopInfo *info, TextWindow *win, ShopStatRow *row) {
     s16 value;
 
     if (row->compare == 0) {
-        value = *(STITSHOP_stats[row->stat] + p->stats);
+        value = *(STITSHOP_stats[row->stat] + p->current.stats);
     } else {
-        value = *(STITSHOP_stats[row->stat] + p->newStats);
+        value = *(STITSHOP_stats[row->stat] + p->withItem.stats);
     }
     win->setNumber(win, 0, value);
     win->setRightAlign(win, 1);
@@ -140,17 +141,17 @@ void STITSHOP_colorStat(ShopInfo *info, TextWindow *win, ShopStatRow *row) {
     } else {
         penalty = -1;
     }
-    v[0] = *(STITSHOP_stats[row->stat] + p->stats);
+    v[0] = *(STITSHOP_stats[row->stat] + p->current.stats);
     if (row->compare == 0) {
-        if (penalty >= 0 && p->penalties[penalty] != 0) {
+        if (penalty >= 0 && p->current.penalties[penalty] != 0) {
             win->setPalette(win, PALETTE_PURPLE);
         } else {
             win->setPalette(win, PALETTE_WHITE);
         }
     } else {
-        v[1] = *(STITSHOP_stats[row->stat] + p->newStats);
+        v[1] = *(STITSHOP_stats[row->stat] + p->withItem.stats);
         if (v[0] == v[1]) {
-            if (penalty >= 0 && p->penalties[penalty] != 0) {
+            if (penalty >= 0 && p->current.penalties[penalty] != 0) {
                 win->setPalette(win, PALETTE_PURPLE);
             } else {
                 win->setPalette(win, PALETTE_WHITE);
@@ -173,8 +174,8 @@ void STITSHOP_showOtherChanges(ShopInfo *info, TextWindow **win, ShopStatRow *ro
 
     for (i = 0; i < 13; i++) {
         if (i != row->skip && (row->skip2 < 0 || i != row->skip2)) {
-            v[0] = *(STITSHOP_stats[i] + p->stats);
-            v[1] = *(STITSHOP_stats[i] + p->newStats);
+            v[0] = *(STITSHOP_stats[i] + p->current.stats);
+            v[1] = *(STITSHOP_stats[i] + p->withItem.stats);
             if (v[0] != v[1]) {
                 p->rows[n + 2] = i + 1;
                 win[n]->setNumber(win[n], 0, v[1]);
@@ -205,11 +206,12 @@ void STITSHOP_fillPartnerRows(ShopInfo *info, ShopInfoWindows *win, s32 member) 
     ShopPartnerInfo *p = &info->partners[member];
     ItemData *data;
 
+    /* the partner's equipment, kept as one block while the item is tried on */
     equip = *(ShopEquipSet *)stats->equip;
-    STITSHOP_computeStats(partner, p->stats);
+    STITSHOP_computeStats(partner, &p->current);
     p->slot = STITSHOP_funcs.compareEquip(partner, info->item);
     STITSHOP_funcs.equip(partner, p->slot, info->item, 0);
-    STITSHOP_computeStats(partner, p->newStats);
+    STITSHOP_computeStats(partner, &p->withItem);
     *(ShopEquipSet *)stats->equip = equip;
     p->changes = 2;
     switch (p->slot) {
@@ -302,7 +304,7 @@ void STITSHOP_fillPartnerRows(ShopInfo *info, ShopInfoWindows *win, s32 member) 
         STITSHOP_showStat(info, win->partners[member].changes[2], &row);
         STITSHOP_colorStat(info, win->partners[member].changes[2], &row);
         row.skip = 5;
-        data = (ItemData *)GET_ITEM[0](info->item)->data;
+        data = SHOP_ITEM_DATA(GET_ITEM[0](info->item));
         /* the row of the stat the accessory raises (7 raises them all and has
            none). The match depends on the range tests being written out: the
            inner one isn't merged with the outer one before cse */
@@ -311,9 +313,11 @@ void STITSHOP_fillPartnerRows(ShopInfo *info, ShopInfoWindows *win, s32 member) 
                 p->rows[1] = data->acc.stat;
             } else {
                 p->rows[1] = data->acc.stat - 1;
-            }            row.partner = member;
+            }
+            row.partner = member;
             row.stat = p->rows[1] - 1;
-            row.compare = 0;            STITSHOP_showStat(info, win->partners[member].changes[1], &row);
+            row.compare = 0;
+            STITSHOP_showStat(info, win->partners[member].changes[1], &row);
             STITSHOP_colorStat(info, win->partners[member].changes[1], &row);
             row.compare = 1;
             STITSHOP_showStat(info, win->partners[member].changes[3], &row);
@@ -425,7 +429,7 @@ void STITSHOP_showItemDesc(ShopInfo *info, ShopInfoWindows *win, s32 show) {
         win->desc->setString(win->desc, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_INFO)), info->item);
         item = GET_ITEM[0](info->item);
         if (item->type >= 2 && item->type < 14) {
-            data = (ItemData *)item->data;
+            data = SHOP_ITEM_DATA(item);
             win->kind->setString(win->kind, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), STITSHOP_kindStrings[data->weapon.kind]);
             return;
         }

@@ -17,10 +17,10 @@ void STGMCARD_slideInHeader(MemCardMenu *menu) {
 
 /* Selects `slot`, slides the slot picker's cursor into place and moves it to the slot;
    then the player picks one with left and right */
-void STGMCARD_startSlotPick(MemCardMenu *menu, s32 arg) {
+void STGMCARD_startSlotPick(MemCardMenu *menu, s32 slot) {
     STGMCARD_funcs.startLerp(&menu->lerps[2], 0, 0x2F, 8);
     menu->substate = 5;
-    STGMCARD_funcs.slot = arg;
+    STGMCARD_funcs.slot = slot;
     STGMCARD_funcs.prevSlot = 0;
 }
 

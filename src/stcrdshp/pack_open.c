@@ -282,11 +282,11 @@ void STCRDSHP_listPacks(CardPackOpen *open) {
     s32 count;
     s32 i;
 
-    count = ITEM_FUNCS->list(1, (u16 *)open->items);
+    count = ITEM_FUNCS->list(1, open->items.list);
     open->packCount = 0;
     for (i = 0; i < count; i++) {
-        if (ITEM_FUNCS->getCategory(open->items[i]) == 0x62) {
-            open->packs[open->packCount++] = open->items[i];
+        if (ITEM_FUNCS->getCategory(open->items.ids[i]) == CARD_PACK_CATEGORY) {
+            open->packs[open->packCount++] = open->items.ids[i];
         }
     }
     if (open->packCount != 0) {
@@ -426,7 +426,7 @@ void STCRDSHP_runPackOpen(CardPackOpen *open, CardPackOpenWindows *win) {
                 GAME.funcs.addCards(open->cards[i], 1);
             }
             GAME.items[pack]--;
-            win->grid = STCRDSHP_createGrid((Task *)open->shop, open->cards);
+            win->grid = STCRDSHP_createGrid(open->shop, open->cards);
             open->card = 0;
             STCRDSHP_funcs.startFade(&open->fades[3], 1);
             open->substate++;
@@ -537,7 +537,7 @@ void STCRDSHP_runPackOpen(CardPackOpen *open, CardPackOpenWindows *win) {
 }
 
 /* The update of the screen to open a pack */
-void STCRDSHP_updatePackOpen(CardPackOpen *open, void *win) {
+void STCRDSHP_updatePackOpen(CardPackOpen *open, CardPackOpenWindows *win) {
     switch (open->state) {
     case TASK_INIT:
     default:

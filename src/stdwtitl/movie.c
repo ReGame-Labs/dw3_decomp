@@ -156,7 +156,7 @@ void STDWTITL_tickMoviePlayer(MoviePlayerTask *task) {
         STDWTITL_imageBuffer1 = HEAP.alloc(0x4E00, 2);
         STDWTITL_vlcTable = HEAP.alloc(0x11000, 2);
         STDWTITL_initDecEnv(&STDWTITL_decEnv, 0, 0, 0, 416);
-        FILE_TABLE.getPos(STDWTITL_movieFile, 0, (u8 *)&task->loc);
+        FILE_TABLE.getPos(STDWTITL_movieFile, 0, &task->loc);
         STDWTITL_initStream(&task->loc, STDWTITL_onSliceDecoded);
         DecDCTvlcBuild(STDWTITL_vlcTable);
         STDWTITL_decodeNextFrame(&STDWTITL_decEnv);

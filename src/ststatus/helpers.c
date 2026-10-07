@@ -35,6 +35,8 @@ s32 STSTATUS_listEquipItems(u16 *out) {
     s32 count;
     u8 *data;
 
+    /* the lists are s16 because the code reads them signed; listItems
+       fills a u16 array */
     STSTATUS_data.itemCount = ITEM_FUNCS->list(2, (u16 *)STSTATUS_data.items);
     STSTATUS_data.item2Count = ITEM_FUNCS->list(3, (u16 *)STSTATUS_data.items2);
     count = 0;
@@ -62,6 +64,8 @@ s32 STSTATUS_listItemsOfKind(s32 kind, u16 *out) {
     s32 i;
     s32 count;
 
+    /* the lists are s16 because the code reads them signed; listItems
+       fills a u16 array */
     STSTATUS_data.itemCount = ITEM_FUNCS->list(2, (u16 *)STSTATUS_data.items);
     STSTATUS_data.item2Count = ITEM_FUNCS->list(3, (u16 *)STSTATUS_data.items2);
     count = 0;

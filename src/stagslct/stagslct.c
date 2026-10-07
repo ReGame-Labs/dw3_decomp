@@ -823,18 +823,20 @@ void STAGSLCT_zoomTitle(StageSelect *sel, StageSelectWindows *win) {
  * toggles BATTLE_SETUP.randomBattles (Select), starts the entry (Cross: scene 0x300
  * only sets GAME.progress) and, in the European version, cycles the language
  * (Start); L2/R2 change GAME.progress. Pad 2 changes the party's levels
- * (L1/R1) and unk32 (L2/R2), and BATTLE_SETUP.debugUpDown (up/down) and
+ * (L1/R1) and charisma (L2/R2), and BATTLE_SETUP.debugUpDown (up/down) and
  * debugLeftRight (right/left). TASK_KILL goes to the scene.
  */
 void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
+    /* the task calls (nextState, setState) go through task, the fields
+       through this view */
     StageSelect *sel = (StageSelect *)task;
     s32 i;
     s32 slot;
     s32 member;
     PartnerStats *stats;
     s32 levelStep;
-    s32 unk32Step;
-    s32 unk32;
+    s32 charismaStep;
+    s32 charisma;
     s32 level;
 
     switch (sel->state) {
@@ -870,7 +872,7 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
         }
         win->region = createTextWindow(SCREEN_LAYER, 1, 0x90, 0x20);
         win->progress = createTextWindow(SCREEN_LAYER, 1, 0xC0, 0x20);
-        win->unk8C = createTextWindow(SCREEN_LAYER, 1, 0xD0, 0xDC);
+        win->charisma = createTextWindow(SCREEN_LAYER, 1, 0xD0, 0xDC);
         win->level = createTextWindow(SCREEN_LAYER, 1, 0x100, 0xDC);
         win->randomBattles = createTextWindow(SCREEN_LAYER, 1, 0x10, 0xDC);
         win->randomBattles->setNumber(win->randomBattles, 0, BATTLE_SETUP.randomBattles);
@@ -945,9 +947,9 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
                 GAME.progress++;
             }
             win->progress->setNumber(win->progress, 0, GAME.progress);
-            unk32 = 0;
+            charisma = 0;
             level = 0;
-            unk32Step = 0;
+            charismaStep = 0;
             levelStep = 0;
             if (!PAD2_HELD(PAD_L1) && PAD2_PRESSED(PAD_R1)) {
                 levelStep = 1;
@@ -959,19 +961,19 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
                 levelStep = -10;
             }
             if (!PAD2_HELD(PAD_L2) && PAD2_PRESSED(PAD_R2)) {
-                unk32Step = 1;
+                charismaStep = 1;
             } else if (!PAD2_HELD(PAD_R2) && PAD2_PRESSED(PAD_L2)) {
-                unk32Step = -1;
+                charismaStep = -1;
             } else if (!PAD2_HELD(PAD_L2) && PAD2_REPEATED(PAD_R2)) {
-                unk32Step = 10;
+                charismaStep = 10;
             } else if (!PAD2_HELD(PAD_R2) && PAD2_REPEATED(PAD_L2)) {
-                unk32Step = -10;
+                charismaStep = -10;
             }
             for (slot = 0; slot < 3; slot++) {
                 member = GAME.funcs.getPartyMember(slot);
                 if (member >= 0) {
                     stats = GAME.funcs.getPartnerStats(member);
-                    stats->stats[11] += unk32Step;
+                    stats->stats[11] += charismaStep;
                     if (stats->stats[11] >= 1000) {
                         stats->stats[11] = 999;
                     }
@@ -986,12 +988,12 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
                         stats->stats[STAT_LEVEL] = 1;
                     }
                     if (slot == 0) {
-                        unk32 = stats->stats[11];
+                        charisma = stats->stats[11];
                         level = stats->stats[STAT_LEVEL];
                     }
                 }
             }
-            win->unk8C->setNumber(win->unk8C, 0, unk32);
+            win->charisma->setNumber(win->charisma, 0, charisma);
             win->level->setNumber(win->level, 0, level);
             if (PAD.getPressed(1) & (1 << PAD_UP)) {
                 if (BATTLE_SETUP.debugUpDown != 3) {

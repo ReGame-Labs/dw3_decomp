@@ -50,6 +50,7 @@ void STGTRAIN_freeFile(void) {
 /* The set's sprite bank, and the two values after its offsets */
 s32 STGTRAIN_readSetBank(TrainSetHeader *header, s32 set) {
     STGTRAIN_bankCursor.set = header;
+    /* the offsets count bytes from the file's start */
     STGTRAIN_state.sets[set].bank = (TrainSpriteBank *)(STGTRAIN_state.data + header->bank);
     STGTRAIN_bankCursor.w += *STGTRAIN_bankCursor.w + 1;
     STGTRAIN_state.sets[set].bankOffset = *STGTRAIN_bankCursor.w++;
@@ -64,6 +65,7 @@ s32 STGTRAIN_readSetAnims(TrainSetHeader *header, s32 set) {
     STGTRAIN_animCursor.set = header;
     for (i = 0; i < 6; i++) {
         if (STGTRAIN_animCursor.set->anims[i] != 0) {
+            /* an offset in bytes, as the bank's */
             STGTRAIN_state.sets[set].anims[i] = (TrainAnim *)(STGTRAIN_state.data + STGTRAIN_animCursor.set->anims[i]);
         } else {
             STGTRAIN_state.sets[set].anims[i] = NULL;
@@ -88,8 +90,9 @@ s32 STGTRAIN_readSetImages(TrainSetHeader *header, s32 set) {
 s32 STGTRAIN_readSet(s32 set) {
     if (STGTRAIN_state.data != NULL && set < 9) {
         STGTRAIN_state.sets[set].id = set;
-        STGTRAIN_setCursor.w = (s32 *)(STGTRAIN_state.data + set * 4);
-        STGTRAIN_setCursor.w = (s32 *)(STGTRAIN_state.data + *STGTRAIN_setCursor.w);
+        /* the file starts with the sets' offsets */
+        STGTRAIN_setCursor.bytes = STGTRAIN_state.data + set * sizeof(s32);
+        STGTRAIN_setCursor.bytes = STGTRAIN_state.data + *STGTRAIN_setCursor.w;
         if (STGTRAIN_setCursor.set->count == 0) {
             return 0;
         }
@@ -134,8 +137,9 @@ s32 STGTRAIN_loadSet(s32 set, s32 *pos) {
         STGTRAIN_state.sets[set].imageX[i] = x + i * 0x40;
         loader.setImagePos(x + i * 0x40, y);
         src = STGTRAIN_state.sets[set].images[i];
-        /* the match depends on the magic read before image is set: with
-           the copy right after the load, cse puts the load in image */
+        /* a TIM, or "RLEN" and a word, then the packed TIM: its first word
+           tells. The match depends on the magic read before image is set:
+           with the copy right after the load, cse puts the load in image */
         magic = *(s32 *)src;
         image = src;
         if (magic == 0x4E454C52) {
@@ -160,6 +164,7 @@ s32 STGTRAIN_loadSet(s32 set, s32 *pos) {
             }
             image = buf;
         }
+        /* the TIM's CLUT x, after its id, flags and CLUT block size */
         loader.setClutPos(clutX + *(s16 *)(image + 0xC), clutY);
         loader.load(image);
     }
@@ -177,9 +182,9 @@ s32 STGTRAIN_getFilePos(s32 index) {
     return STGTRAIN_files[index].y << 16 | STGTRAIN_files[index].x;
 }
 
-/* An entry of STGTRAIN_files's unkC */
-s32 STGTRAIN_getFileUnkC(s32 index) {
-    return STGTRAIN_files[index].unkC;
+/* Whether an entry of STGTRAIN_files draws its effect at the Digimon's depth */
+s32 STGTRAIN_getFileEffectSameDepth(s32 index) {
+    return STGTRAIN_files[index].effectSameDepth;
 }
 
 /* The sprite bank of an image set */
@@ -203,7 +208,7 @@ TrainAnim *STGTRAIN_getAnim(s32 set, s32 i) {
 }
 
 /* The trainings of a gym level, counting them */
-s32 *STGTRAIN_getGymTrainings(s32 index) {
+TrainEntry *STGTRAIN_getGymTrainings(s32 index) {
     s32 i;
 
     if (index < 1 || index > 14) {
@@ -211,23 +216,23 @@ s32 *STGTRAIN_getGymTrainings(s32 index) {
     }
     STGTRAIN_state.tableCount = 0;
     for (i = 0; i < 16; i++) {
-        if (STGTRAIN_gymTrainings[index][i][0] != 0) {
+        if (STGTRAIN_gymTrainings[index][i].id != 0) {
             STGTRAIN_state.tableCount++;
         }
     }
-    return STGTRAIN_gymTrainings[index][0];
+    return STGTRAIN_gymTrainings[index];
 }
 
 /* A training of a gym level, by its id */
-s32 *STGTRAIN_findGymTraining(s32 index, s32 id) {
+TrainEntry *STGTRAIN_findGymTraining(s32 index, s32 id) {
     s32 i;
 
     if (index < 1 || index > 14) {
         index = 0;
     }
     for (i = 0; i < 16; i++) {
-        if (STGTRAIN_gymTrainings[index][i][0] == id) {
-            return STGTRAIN_gymTrainings[index][i];
+        if (STGTRAIN_gymTrainings[index][i].id == id) {
+            return &STGTRAIN_gymTrainings[index][i];
         }
     }
     return NULL;
@@ -239,91 +244,91 @@ s32 *STGTRAIN_findGymTraining(s32 index, s32 id) {
 s32 STGTRAIN_intensityCosts[] = {
     1, 5, 10,
 };
-/* The trainings of each gym level, by STGTRAIN_findGymTraining: {id, ?}, 0 ends */
-s32 STGTRAIN_gymTrainings[14][16][2] = {
+/* The trainings of each gym level, by STGTRAIN_findGymTraining: {id, stat, other}, 0 ends */
+TrainEntry STGTRAIN_gymTrainings[14][16] = {
     {
-        {1, 1}, {2, 2}, {3, 3}, {4, 4},
-        {5, 5}, {0, 0}, {0, 0}, {0, 0},
-        {0, 0}, {0, 0}, {0, 0}, {0, 0},
-        {0, 0}, {0, 0}, {0, 0}, {0, 0},
+        {1, 1, 0}, {2, 2, 0}, {3, 3, 0}, {4, 4, 0},
+        {5, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
     },
     {
-        {1, 1}, {2, 2}, {3, 3}, {4, 4},
-        {5, 5}, {0, 0}, {0, 0}, {0, 0},
-        {6, 0x100008}, {7, 0x20009}, {8, 0x5000A}, {9, 0x1000B},
-        {10, 0x4000C}, {0, 0}, {0, 0}, {0, 0},
+        {1, 1, 0}, {2, 2, 0}, {3, 3, 0}, {4, 4, 0},
+        {5, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {6, 8, 16}, {7, 9, 2}, {8, 10, 5}, {9, 11, 1},
+        {10, 12, 4}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
     },
     {
-        {1, 1}, {2, 2}, {3, 3}, {4, 4},
-        {5, 5}, {0, 0}, {0, 0}, {0, 0},
-        {6, 0x100008}, {7, 0x20009}, {8, 0x5000A}, {9, 0x1000B},
-        {10, 0x4000C}, {12, 0x3000E}, {0, 0}, {0, 0},
+        {1, 1, 0}, {2, 2, 0}, {3, 3, 0}, {4, 4, 0},
+        {5, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {6, 8, 16}, {7, 9, 2}, {8, 10, 5}, {9, 11, 1},
+        {10, 12, 4}, {12, 14, 3}, {0, 0, 0}, {0, 0, 0},
     },
     {
-        {1, 1}, {2, 2}, {3, 3}, {4, 4},
-        {5, 5}, {0, 0}, {0, 0}, {0, 0},
-        {6, 0x100008}, {7, 0x20009}, {8, 0x5000A}, {9, 0x1000B},
-        {10, 0x4000C}, {11, 0xF000D}, {12, 0x3000E}, {0, 0},
+        {1, 1, 0}, {2, 2, 0}, {3, 3, 0}, {4, 4, 0},
+        {5, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {6, 8, 16}, {7, 9, 2}, {8, 10, 5}, {9, 11, 1},
+        {10, 12, 4}, {11, 13, 15}, {12, 14, 3}, {0, 0, 0},
     },
     {
-        {13, 1}, {14, 2}, {15, 3}, {16, 4},
-        {5, 5}, {0, 0}, {0, 0}, {0, 0},
-        {6, 0x100008}, {7, 0x20009}, {8, 0x5000A}, {9, 0x1000B},
-        {10, 0x4000C}, {11, 0xF000D}, {12, 0x3000E}, {0, 0},
+        {13, 1, 0}, {14, 2, 0}, {15, 3, 0}, {16, 4, 0},
+        {5, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {6, 8, 16}, {7, 9, 2}, {8, 10, 5}, {9, 11, 1},
+        {10, 12, 4}, {11, 13, 15}, {12, 14, 3}, {0, 0, 0},
     },
     {
-        {13, 1}, {14, 2}, {15, 3}, {16, 4},
-        {5, 5}, {0, 0}, {0, 0}, {0, 0},
-        {6, 0x100008}, {7, 0x20009}, {20, 0x5000A}, {9, 0x1000B},
-        {10, 0x4000C}, {11, 0xF000D}, {12, 0x3000E}, {0, 0},
+        {13, 1, 0}, {14, 2, 0}, {15, 3, 0}, {16, 4, 0},
+        {5, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {6, 8, 16}, {7, 9, 2}, {20, 10, 5}, {9, 11, 1},
+        {10, 12, 4}, {11, 13, 15}, {12, 14, 3}, {0, 0, 0},
     },
     {
-        {13, 1}, {14, 2}, {15, 3}, {16, 4},
-        {17, 5}, {0, 0}, {0, 0}, {0, 0},
-        {6, 0x100008}, {7, 0x20009}, {20, 0x5000A}, {9, 0x1000B},
-        {10, 0x4000C}, {11, 0xF000D}, {12, 0x3000E}, {0, 0},
+        {13, 1, 0}, {14, 2, 0}, {15, 3, 0}, {16, 4, 0},
+        {17, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {6, 8, 16}, {7, 9, 2}, {20, 10, 5}, {9, 11, 1},
+        {10, 12, 4}, {11, 13, 15}, {12, 14, 3}, {0, 0, 0},
     },
     {
-        {1, 1}, {2, 2}, {3, 3}, {4, 4},
-        {5, 5}, {0, 0}, {0, 0}, {0, 0},
-        {6, 0x100008}, {19, 0x20009}, {8, 0x5000A}, {9, 0x1000B},
-        {22, 0x4000C}, {11, 0xF000D}, {12, 0x3000E}, {0, 0},
+        {1, 1, 0}, {2, 2, 0}, {3, 3, 0}, {4, 4, 0},
+        {5, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {6, 8, 16}, {19, 9, 2}, {8, 10, 5}, {9, 11, 1},
+        {22, 12, 4}, {11, 13, 15}, {12, 14, 3}, {0, 0, 0},
     },
     {
-        {13, 1}, {14, 2}, {15, 3}, {16, 4},
-        {17, 5}, {0, 0}, {0, 0}, {0, 0},
-        {6, 0x100008}, {19, 0x20009}, {20, 0x5000A}, {9, 0x1000B},
-        {22, 0x4000C}, {11, 0xF000D}, {12, 0x3000E}, {0, 0},
+        {13, 1, 0}, {14, 2, 0}, {15, 3, 0}, {16, 4, 0},
+        {17, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {6, 8, 16}, {19, 9, 2}, {20, 10, 5}, {9, 11, 1},
+        {22, 12, 4}, {11, 13, 15}, {12, 14, 3}, {0, 0, 0},
     },
     {
-        {1, 1}, {2, 2}, {3, 3}, {4, 4},
-        {5, 5}, {0, 0}, {0, 0}, {0, 0},
-        {6, 0x100008}, {7, 0x20009}, {8, 0x5000A}, {21, 0x1000B},
-        {10, 0x4000C}, {23, 0xF000D}, {12, 0x3000E}, {0, 0},
+        {1, 1, 0}, {2, 2, 0}, {3, 3, 0}, {4, 4, 0},
+        {5, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {6, 8, 16}, {7, 9, 2}, {8, 10, 5}, {21, 11, 1},
+        {10, 12, 4}, {23, 13, 15}, {12, 14, 3}, {0, 0, 0},
     },
     {
-        {13, 1}, {14, 2}, {15, 3}, {16, 4},
-        {17, 5}, {0, 0}, {0, 0}, {0, 0},
-        {6, 0x100008}, {7, 0x20009}, {20, 0x5000A}, {21, 0x1000B},
-        {10, 0x4000C}, {23, 0xF000D}, {12, 0x3000E}, {0, 0},
+        {13, 1, 0}, {14, 2, 0}, {15, 3, 0}, {16, 4, 0},
+        {17, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {6, 8, 16}, {7, 9, 2}, {20, 10, 5}, {21, 11, 1},
+        {10, 12, 4}, {23, 13, 15}, {12, 14, 3}, {0, 0, 0},
     },
     {
-        {13, 1}, {14, 2}, {15, 3}, {16, 4},
-        {5, 5}, {0, 0}, {0, 0}, {0, 0},
-        {18, 0x100008}, {19, 0x20009}, {8, 0x5000A}, {21, 0x1000B},
-        {22, 0x4000C}, {23, 0xF000D}, {12, 0x3000E}, {0, 0},
+        {13, 1, 0}, {14, 2, 0}, {15, 3, 0}, {16, 4, 0},
+        {5, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {18, 8, 16}, {19, 9, 2}, {8, 10, 5}, {21, 11, 1},
+        {22, 12, 4}, {23, 13, 15}, {12, 14, 3}, {0, 0, 0},
     },
     {
-        {13, 1}, {14, 2}, {15, 3}, {16, 4},
-        {17, 5}, {0, 0}, {0, 0}, {0, 0},
-        {18, 0x100008}, {19, 0x20009}, {20, 0x5000A}, {21, 0x1000B},
-        {22, 0x4000C}, {23, 0xF000D}, {12, 0x3000E}, {0, 0},
+        {13, 1, 0}, {14, 2, 0}, {15, 3, 0}, {16, 4, 0},
+        {17, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {18, 8, 16}, {19, 9, 2}, {20, 10, 5}, {21, 11, 1},
+        {22, 12, 4}, {23, 13, 15}, {12, 14, 3}, {0, 0, 0},
     },
     {
-        {13, 1}, {14, 2}, {15, 3}, {16, 4},
-        {17, 5}, {0, 0}, {0, 0}, {0, 0},
-        {18, 0x100008}, {19, 0x20009}, {20, 0x5000A}, {21, 0x1000B},
-        {22, 0x4000C}, {23, 0xF000D}, {24, 0x3000E}, {0, 0},
+        {13, 1, 0}, {14, 2, 0}, {15, 3, 0}, {16, 4, 0},
+        {17, 5, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+        {18, 8, 16}, {19, 9, 2}, {20, 10, 5}, {21, 11, 1},
+        {22, 12, 4}, {23, 13, 15}, {24, 14, 3}, {0, 0, 0},
     },
 };
 /* The trainings: their name and description in the text file, and the
@@ -418,7 +423,7 @@ TrainState STGTRAIN_state = {
     STGTRAIN_loadImages, STGTRAIN_startFade, STGTRAIN_updateFade, STGTRAIN_startLerp,
     STGTRAIN_updateLerp, STGTRAIN_requestFile, STGTRAIN_getFile, STGTRAIN_freeFile,
     STGTRAIN_readSet, STGTRAIN_loadSet, STGTRAIN_getFileId, STGTRAIN_getFilePos,
-    STGTRAIN_getFileUnkC, STGTRAIN_getBank, STGTRAIN_getBankOffset, STGTRAIN_getSetUnkC,
+    STGTRAIN_getFileEffectSameDepth, STGTRAIN_getBank, STGTRAIN_getBankOffset, STGTRAIN_getSetUnkC,
     STGTRAIN_getAnim, STGTRAIN_getGymTrainings, STGTRAIN_findGymTraining,
 };
 TrainCursor STGTRAIN_bankCursor = {NULL};

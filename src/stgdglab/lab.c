@@ -110,7 +110,8 @@ void STGDGLAB_updateLab(Lab *lab, LabChildren *children) {
 
 /* Lab.openMenu: opens the main menu's page again; 1 if the menu was running */
 s32 STGDGLAB_openLabMenu(Lab *lab) {
-    LabMenu *menu = ((LabChildren *)lab->children)->menu;
+    LabChildren *children = lab->children;
+    LabMenu *menu = children->menu;
 
     if (menu != NULL && menu->state == TASK_RUN) {
         menu->open(menu);
@@ -121,7 +122,8 @@ s32 STGDGLAB_openLabMenu(Lab *lab) {
 
 /* Lab.closeMenu: closes the main menu's page; 1 if the menu was running */
 s32 STGDGLAB_closeLabMenu(Lab *lab) {
-    LabMenu *menu = ((LabChildren *)lab->children)->menu;
+    LabChildren *children = lab->children;
+    LabMenu *menu = children->menu;
 
     if (menu != NULL && menu->state == TASK_RUN) {
         menu->close(menu);
@@ -132,7 +134,8 @@ s32 STGDGLAB_closeLabMenu(Lab *lab) {
 
 /* Lab.menuOpen: 1 when the main menu's task is running (its page not fading) */
 s32 STGDGLAB_labMenuRunning(Lab *lab) {
-    LabMenu *menu = ((LabChildren *)lab->children)->menu;
+    LabChildren *children = lab->children;
+    LabMenu *menu = children->menu;
 
     if (menu != NULL && menu->state == TASK_RUN) {
         return 1;
@@ -216,7 +219,7 @@ s32 STGDGLAB_getItemSprite(s32 id) {
 
 /* The third value (b) of a recipe's id in STGDGLAB_entries, 0 for an id not
    there; LabFuncs.getB, which nothing in the overlay calls */
-s32 func_8008EC48(s32 id) {
+s32 STGDGLAB_getItemB(s32 id) {
     s32 i;
 
     for (i = 0; STGDGLAB_entries[i].id != 0; i++) {
@@ -255,7 +258,7 @@ s32 STGDGLAB_layout[] = {
     23,
 };
 /* The items of the recipes, up to id 0: their sprite (STGDGLAB_getItemSprite) and
-   func_8008EC48's value */
+   STGDGLAB_getItemB's value */
 LabEntry STGDGLAB_entries[] = {
     { 0x017F, 0x0002, 0x010C },
     { 0x0181, 0x0004, 0x011D },
@@ -613,6 +616,6 @@ LabData STGDGLAB_data = {
     },
     {
         STGDGLAB_loadFiles, STGDGLAB_filesLoading, STGDGLAB_startFade, STGDGLAB_updateFade,
-        STGDGLAB_startLerp, STGDGLAB_updateLerp, STGDGLAB_getItemSprite, func_8008EC48,
+        STGDGLAB_startLerp, STGDGLAB_updateLerp, STGDGLAB_getItemSprite, STGDGLAB_getItemB,
     },
 };

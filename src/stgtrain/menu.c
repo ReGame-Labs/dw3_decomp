@@ -301,7 +301,7 @@ void STGTRAIN_runMenu(TrainMenu *menu, TextWindow **win) {
  * the gym's table (the trainings it has), with the cursor on the last one.
  */
 void STGTRAIN_updateMenu(TrainMenu *menu, TextWindow **win) {
-    s32 *table;
+    TrainEntry *table;
     s32 i;
     s32 page;
     s32 row;
@@ -333,54 +333,54 @@ void STGTRAIN_updateMenu(TrainMenu *menu, TextWindow **win) {
             }
         }
         for (i = 0; i < 16; i++) {
-            switch (table[i * 2]) {
+            switch (table[i].id) {
             case 1:
             case 13:
-                menu->trainings[0][0] = table[i * 2];
+                menu->trainings[0][0] = table[i].id;
                 break;
             case 2:
             case 14:
-                menu->trainings[0][1] = table[i * 2];
+                menu->trainings[0][1] = table[i].id;
                 break;
             case 3:
             case 15:
-                menu->trainings[0][2] = table[i * 2];
+                menu->trainings[0][2] = table[i].id;
                 break;
             case 4:
             case 16:
-                menu->trainings[0][4] = table[i * 2];
+                menu->trainings[0][4] = table[i].id;
                 break;
             case 5:
             case 17:
-                menu->trainings[0][5] = table[i * 2];
+                menu->trainings[0][5] = table[i].id;
                 break;
             case 6:
             case 18:
-                menu->trainings[1][0] = table[i * 2];
+                menu->trainings[1][0] = table[i].id;
                 break;
             case 7:
             case 19:
-                menu->trainings[1][1] = table[i * 2];
+                menu->trainings[1][1] = table[i].id;
                 break;
             case 8:
             case 20:
-                menu->trainings[1][2] = table[i * 2];
+                menu->trainings[1][2] = table[i].id;
                 break;
             case 9:
             case 21:
-                menu->trainings[1][3] = table[i * 2];
+                menu->trainings[1][3] = table[i].id;
                 break;
             case 10:
             case 22:
-                menu->trainings[1][5] = table[i * 2];
+                menu->trainings[1][5] = table[i].id;
                 break;
             case 11:
             case 23:
-                menu->trainings[1][6] = table[i * 2];
+                menu->trainings[1][6] = table[i].id;
                 break;
             case 12:
             case 24:
-                menu->trainings[1][7] = table[i * 2];
+                menu->trainings[1][7] = table[i].id;
                 break;
             }
         }

@@ -180,6 +180,7 @@ s32 STSTATUS_itemInfoFaded(ItemScreen *screen) {
 /* Uses the chosen item on the chosen party member */
 void STSTATUS_useItem(ItemScreen *screen, ItemScreenWindows *windows) {
     s32 amount = 0;
+    /* ItemInfo.data is bytes for every kind of item; a usable item's are its effect */
     StatusItemEffect *effect = (StatusItemEffect *)GET_ITEM[0](screen->item)->data;
     PartnerStats *stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(screen->member));
     StatusStatItem *entry;

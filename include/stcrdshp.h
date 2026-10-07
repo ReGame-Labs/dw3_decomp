@@ -9,6 +9,8 @@
 
 /* The name of this overlay's copy of a function of src/menu_common/ */
 #define OVL_NAME(name) STCRDSHP_##name
+/* The card grid that src/menu_common's hide_cards and update_hiding take */
+#define CARD_GRID CardPackGrid
 
 /* A card pack: the item and the six lists of 16 cards its slots draw from */
 typedef struct CardPack {
@@ -18,6 +20,9 @@ typedef struct CardPack {
 
 /* The cards are drawn from 315 ids (1-314) */
 #define CARD_PACK_IDS 315
+
+/* getItemCategory's value for the card packs (the item type 28) */
+#define CARD_PACK_CATEGORY 0x62
 
 /* The sprite sheet of the screen, the shop's textures and the card data
    (five files, as STCRDABM loads them) */
@@ -34,20 +39,20 @@ typedef struct CardPack {
 /* Draws the six cards drawn from a pack, and turns them over */
 typedef struct CardPackGrid {
     TASK_HEADER(CardPackGrid);
-    /* 0x50 */ Task *owner;
+    /* 0x50 */ struct CardShop *owner; /* never read */
     /* 0x54 */ s32 layer;
     /* 0x58 */ s32 depth;
-    /* 0x5C */ s32 unk5C;
-    /* 0x60 */ s32 unk60;
+    /* 0x5C */ s32 unk5C; /* unused (in STCRDABM's grid: the page's first card) */
+    /* 0x60 */ s32 unk60; /* unused (in STCRDABM's grid: the page being turned's) */
     /* 0x64 */ s32 shown;  /* cards drawn */
     /* 0x68 */ s32 turned; /* slots turned so far */
     /* 0x6C */ s32 time;
     /* 0x70 */ s32 frame;
-    /* 0x74 */ s32 unk74;
-    /* 0x78 */ s32 unk78;
+    /* 0x74 */ s32 unk74; /* unused */
+    /* 0x78 */ s32 unk78; /* unused */
     /* 0x7C */ s32 cards[6];
     /* 0x94 */ s32 prevCards[6]; /* the cards being turned */
-    /* 0xAC */ u8 unkAC[0x10];
+    /* 0xAC */ u8 unkAC[0x10]; /* unused */
     /* 0xBC */ void (*setCards)(struct CardPackGrid *grid, s32 *cards);
     /* 0xC0 */ void (*hide)(struct CardPackGrid *grid);
 } CardPackGrid;
@@ -71,6 +76,13 @@ typedef struct CardShopTitle {
     /* 0x4 */ s32 title; /* string of file 0x95 */
 } CardShopTitle;
 
+/* The bag's items: listItems fills them unsigned, the shop reads the ids
+   signed */
+typedef union CardShopBag {
+    u16 list[0x194]; /* listItems' */
+    s16 ids[0x194];
+} CardShopBag;
+
 /* The card shop's main task (STCRDSHP_createShop): buy cards, open packs
    or go to the item shop */
 typedef struct CardShop {
@@ -83,7 +95,7 @@ typedef struct CardShop {
     /* 0x064 */ s32 title;
     /* 0x068 */ s32 toItemShop;
     /* 0x06C */ s32 cursor;
-    /* 0x070 */ s16 items[0x194]; /* the bag's, to look for packs */
+    /* 0x070 */ CardShopBag items; /* the bag's, to look for packs */
     /* 0x398 */ PanelAnim fades[3];
     /* 0x3C8 */ void (*showMoney)(struct CardShop *shop);
 } CardShop;
@@ -120,8 +132,8 @@ typedef struct CardPackOpen {
     /* 0x094 */ s32 glowTime;
     /* 0x098 */ s16 packs[0x194]; /* the bag's card packs */
     /* 0x3C0 */ s32 packCount;
-    /* 0x3C4 */ s16 items[0x194]; /* the bag's items */
-    /* 0x6EC */ s32 unk6EC;
+    /* 0x3C4 */ CardShopBag items; /* the bag's items */
+    /* 0x6EC */ s32 unk6EC; /* unused */
     /* 0x6F0 */ PanelAnim fades[4];
 } CardPackOpen;
 
@@ -215,7 +227,7 @@ void STCRDSHP_showPackCard(CardPackOpen *open, CardPackOpenWindows *win, s32 sho
 void STCRDSHP_drawPackOpen(CardPackOpen *open);
 void STCRDSHP_listPacks(CardPackOpen *open);
 void STCRDSHP_runPackOpen(CardPackOpen *open, CardPackOpenWindows *win);
-void STCRDSHP_updatePackOpen(CardPackOpen *open, void *win);
+void STCRDSHP_updatePackOpen(CardPackOpen *open, CardPackOpenWindows *win);
 CardPackOpen *STCRDSHP_createPackOpen(CardShop *shop);
 
 /* fader.c */
@@ -232,7 +244,7 @@ void STCRDSHP_drawCards(CardPackGrid *grid, s32 previous);
 void STCRDSHP_drawTurningSlots(CardPackGrid *grid);
 void STCRDSHP_updateHiding(CardPackGrid *grid);
 void STCRDSHP_updateGrid(CardPackGrid *grid);
-CardPackGrid *STCRDSHP_createGrid(Task *owner, s32 *cards);
+CardPackGrid *STCRDSHP_createGrid(CardShop *owner, s32 *cards);
 
 /* buy.c */
 void STCRDSHP_createBuyWindows(CardShopBuy *buy, CardShopBuyWindows *win);
@@ -243,7 +255,7 @@ void STCRDSHP_updateBuy(CardShopBuy *buy, CardShopBuyWindows *win);
 CardShopBuy *STCRDSHP_createBuy(CardShop *shop, s32 shopId);
 
 /* stcrdshp.c */
-void STCRDSHP_updateScene(Task *task, Task **children);
+void STCRDSHP_updateScene(Task *task, CardShop **child);
 Task *STCRDSHP_start(void);
 
 /* shop.c */

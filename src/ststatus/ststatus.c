@@ -9,38 +9,13 @@
 
 #include "ststatus.h"
 
-/* The mode's scene task: sets up the display and a black layer, then creates the
-   mode's main task (STSTATUS_createMenu) */
-void STSTATUS_updateScene(Task *task, Task **children) {
-    RECT rect;
-    Layer *layer;
-
-    switch (task->state) {
-    case TASK_INIT:
-    default:
-        GFX.funcs.reset();
-        GFX.funcs.allocPrimBuffers(0x14000);
-        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
-        rect.x = 0;
-        rect.y = 0;
-        rect.w = 0x140;
-        rect.h = 0xF0;
-        layer = GFX.funcs.createLayer(&rect, 3, SCREEN_LAYER);
-        layer->setBgColor(layer, 0, 0, 0);
-        children[0] = (Task *)STSTATUS_createMenu();
-        task->nextState(task);
-        break;
-    case TASK_RUN:
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
-
-/* Starts the mode: creates its scene task */
-Task *STSTATUS_start(void) {
-    return createTask(STSTATUS_updateScene, sizeof(Task), 4);
-}
+#define SCENE_TASK Task
+#define SCENE_CHILD FieldMenuScreen
+#define SCENE_CREATE OVL_NAME(createMenu)
+#define SCENE_PRIM_BUFFERS 0x14000
+#define SCENE_OT_SHIFT 3
+#include "../menu_common/update_scene.inc.c"
+#include "../menu_common/start.inc.c"
 
 /* Creates the windows of a screen with the party's pages */
 void STSTATUS_createCardWindows(PartyScreen *screen, PartyScreenWindows *windows) {

@@ -130,7 +130,10 @@ typedef struct DeckRow {
 } DeckRow;
 
 typedef struct DeckScreenChildren {
-    /* 0x00 */ NameEntry *name; /* or the DeckEditor */
+    /* 0x00 */ union {
+        DeckEditor *editor;
+        NameEntry *name; /* renaming */
+    } child; /* NULL once it is gone */
     /* 0x04 */ TextWindow *title;
     /* 0x08 */ DeckRow rows[3];
     /* 0x5C */ TextWindow *options[2];
@@ -157,7 +160,7 @@ typedef struct DeckScreen {
 } DeckScreen;
 
 /* stcrddek.c */
-void STCRDDEK_updateScene(Task *task, Task **children);
+void STCRDDEK_updateScene(Task *task, DeckScreen **child);
 Task *STCRDDEK_start(void);
 void STCRDDEK_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
 void STCRDDEK_drawFader(ScreenFade *task);

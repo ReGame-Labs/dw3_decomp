@@ -9,6 +9,8 @@
 
 /* The name of this overlay's copy of a function of src/menu_common/ */
 #define OVL_NAME(name) STCRDABM_##name
+/* The card grid that src/menu_common's hide_cards and update_hiding take */
+#define CARD_GRID CardAlbumGrid
 
 #define CARD_COUNT 315
 #define ALBUM_PAGE_CARDS 12
@@ -106,6 +108,6 @@ void STCRDABM_drawCards(CardAlbumGrid *grid, s32 previous);
 s32 STCRDABM_pageHasCards(CardAlbumGrid *grid);
 void STCRDABM_showCardInfo(CardAlbum *album, CardAlbumWindows *win, s32 show);
 void STCRDABM_drawAlbum(CardAlbum *album);
-Task *STCRDABM_createAlbum(void);
+CardAlbum *STCRDABM_createAlbum(void);
 
 #endif /* STCRDABM_H */

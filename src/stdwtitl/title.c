@@ -171,7 +171,7 @@ void STDWTITL_tickTitle(TitleTask *task, TitleChildren *children) {
 }
 
 /* Creates the title screen (task), under its title loader parent */
-TitleTask *STDWTITL_startTitleTask(Task *parent) {
+TitleTask *STDWTITL_startTitleTask(TitleLoaderTask *parent) {
     TitleTask *task = createTask(STDWTITL_tickTitle, sizeof(TitleTask), sizeof(TitleChildren));
 
     task->layerId = STDWTITL_TITLE_LAYER;

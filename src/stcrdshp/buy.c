@@ -404,7 +404,7 @@ void STCRDSHP_updateBuy(CardShopBuy *buy, CardShopBuyWindows *win) {
         extra = pages != 0;
         pages = buy->count / 6 + extra;
         buy->pages = pages;
-        win->grid = STCRDSHP_createGrid((Task *)buy->shop, buy->cards);
+        win->grid = STCRDSHP_createGrid(buy->shop, buy->cards);
         STCRDSHP_createBuyWindows(buy, win);
         buy->fades[0].duration = 10;
         buy->fades[1].duration = 10;

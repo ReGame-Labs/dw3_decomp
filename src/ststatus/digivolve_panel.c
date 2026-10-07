@@ -109,7 +109,7 @@ void STSTATUS_showDigivolveChoices(DigivolvePanel *panel, DigivolvePanelWindows 
    or hides them */
 void STSTATUS_showDigivolveStats(DigivolvePanel *panel, DigivolvePanelWindows *windows, s32 show) {
     PartnerTotals totals;
-    StatusPartnerEntry entry;
+    PartnerEntry entry;
     DigimonData *data;
     s32 id;
     s32 slot;
@@ -157,9 +157,9 @@ void STSTATUS_showDigivolveStats(DigivolvePanel *panel, DigivolvePanelWindows *w
                 windows->list[i]->setRightAlign(windows->list[i], 1);
             }
             for (i = 0; i < 6; i++) {
-                tech = entry.techs[i];
+                tech = entry.skills[i];
                 if (tech != 0) {
-                    windows->values[i]->setString(windows->values[i], FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), tech & 0x1FFF);
+                    windows->values[i]->setString(windows->values[i], FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), tech & SKILL_ID);
                     if (tech & 0x8000) {
                         windows->values[i]->setPalette(windows->values[i], PALETTE_YELLOW);
                     } else if (tech & 0x4000) {
@@ -251,7 +251,7 @@ void STSTATUS_scrollTechList(DigivolvePanel *panel, DigivolvePanelWindows *windo
 
 /* Shows the cost of the technique under the list's cursor */
 void STSTATUS_showTechCost(DigivolvePanel *panel, DigivolvePanelWindows *windows, s32 show) {
-    StatusPartnerEntry entry;
+    PartnerEntry entry;
     DigimonData *data;
     s32 id;
     s32 tech;
@@ -260,7 +260,7 @@ void STSTATUS_showTechCost(DigivolvePanel *panel, DigivolvePanelWindows *windows
         id = GAME.funcs.getPartyMember(panel->member);
         if (panel->fromEntry) {
             GAME.funcs.getPartnerEntry(id, panel->slots[panel->slot], &entry);
-            tech = entry.techs[panel->tech] & 0x1FFF;
+            tech = entry.skills[panel->tech] & SKILL_ID;
             if (tech > 0) {
                 windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_INFO)), tech);
                 windows->mpLabel->setString(windows->mpLabel, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 3);
@@ -288,7 +288,7 @@ void STSTATUS_showTechCost(DigivolvePanel *panel, DigivolvePanelWindows *windows
 /* Draws the panel's frames, the technique icons and the help arrow */
 void STSTATUS_drawDigivolvePanel(DigivolvePanel *panel) {
     SpriteDrawer sprite;
-    StatusPartnerEntry entry;
+    PartnerEntry entry;
     DigimonData *data;
     s32 id;
     s32 tech;
@@ -327,7 +327,7 @@ void STSTATUS_drawDigivolvePanel(DigivolvePanel *panel) {
             if (panel->fromEntry) {
                 GAME.funcs.getPartnerEntry(id, panel->slots[panel->slot], &entry);
                 for (i = 0; i < 6; i++) {
-                    tech = entry.techs[i] & 0x1FFF;
+                    tech = entry.skills[i] & SKILL_ID;
                     if (tech != 0) {
                         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), TECHS[tech - 1].icon + 0x37, 0xB6,
                                     panel->scroll.value + 0x88 + i * 14);
@@ -385,7 +385,7 @@ void STSTATUS_drawDigivolvePanel(DigivolvePanel *panel) {
 /* The panel's update: picks a slot, then shows its entry's techniques or
    makes the battle start as it */
 void STSTATUS_runDigivolvePanel(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
-    StatusPartnerEntry entry;
+    PartnerEntry entry;
     Partner *partner;
     DigimonData *data;
     /* the cursors' old rows: the match depends on cases 4 and 13 having
@@ -614,7 +614,7 @@ void STSTATUS_runDigivolvePanel(DigivolvePanel *panel, DigivolvePanelWindows *wi
             panel->tech = -1;
             panel->techCount = 0;
             for (i = 0; i < 6; i++) {
-                if (entry.techs[i] & 0x1FFF) {
+                if (entry.skills[i] & SKILL_ID) {
                     panel->techCount++;
                     if (panel->tech == -1) {
                         panel->tech = i;
@@ -644,7 +644,7 @@ void STSTATUS_runDigivolvePanel(DigivolvePanel *panel, DigivolvePanelWindows *wi
                         panel->tech = old;
                         break;
                     }
-                } while ((entry.techs[panel->tech] & 0x1FFF) <= 0);
+                } while ((entry.skills[panel->tech] & SKILL_ID) <= 0);
             } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
                 do {
                     panel->tech++;
@@ -652,7 +652,7 @@ void STSTATUS_runDigivolvePanel(DigivolvePanel *panel, DigivolvePanelWindows *wi
                         panel->tech = old;
                         break;
                     }
-                } while ((entry.techs[panel->tech] & 0x1FFF) <= 0);
+                } while ((entry.skills[panel->tech] & SKILL_ID) <= 0);
             }
             if (old != panel->tech) {
                 SOUND.playSound(SOUND_CURSOR);

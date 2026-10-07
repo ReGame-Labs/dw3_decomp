@@ -80,7 +80,7 @@ void STGMCARD_updateScreen(MemCardScreen *screen, MemCardScreenTasks *tasks) {
 
 /* Creates the screen's main task, with what it needs from the mode it was
    opened from and the one it was opened for */
-Task *STGMCARD_createScreen(void) {
+MemCardScreen *STGMCARD_createScreen(void) {
     MemCardScreen *screen = createTask(STGMCARD_updateScreen, sizeof(MemCardScreen), 8);
     s32 mode;
     s32 prev;
@@ -97,7 +97,7 @@ Task *STGMCARD_createScreen(void) {
     }
     screen->place = STGMCARD_places[mode];
     SOUND.loadBank(0x20);
-    return (Task *)screen;
+    return screen;
 }
 
 /* Loads the screen's images, gives the memory card's save file its title and icon,

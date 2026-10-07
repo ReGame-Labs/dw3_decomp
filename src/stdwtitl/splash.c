@@ -108,6 +108,6 @@ void STDWTITL_tickSplash(SplashTask *task) {
 }
 
 /* Creates the still screen (task) */
-Task *STDWTITL_startSplashTask(void) {
+SplashTask *STDWTITL_startSplashTask(void) {
     return createTask(STDWTITL_tickSplash, sizeof(SplashTask), 0);
 }

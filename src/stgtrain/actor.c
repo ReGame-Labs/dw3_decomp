@@ -54,7 +54,7 @@ void STGTRAIN_updateActor(TrainActor *actor, TrainActorSprites *sprites) {
                 sprites->effect->setPos(sprites->effect, x, y);
                 sprites->effect->setImagePos(sprites->effect, actor->pos[0], actor->pos[1]);
                 sprites->effect->setClutPos(sprites->effect, actor->pos[2], actor->pos[3]);
-                if (STGTRAIN_state.getFileUnkC(actor->file) == 0) {
+                if (STGTRAIN_state.getFileEffectSameDepth(actor->file) == 0) {
                     sprites->effect->setLayer(sprites->effect, actor->layerId, actor->depth - 1);
                 } else {
                     sprites->effect->setLayer(sprites->effect, actor->layerId, actor->depth);
