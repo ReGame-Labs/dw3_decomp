@@ -1,26 +1,46 @@
 #include "game.h"
 
+/* updateInnMenu's substates: each group runs in order, by substate++ */
+enum InnSubstate {
+    INN_OPEN_NAME, /* the inn's name and the money */
+    INN_OPEN_QUESTION,
+    INN_SHOW_QUESTION, /* the price and yes/no */
+    INN_CHOOSE,
+    INN_CLOSE_QUESTION = 10,
+    INN_WAIT_QUESTION_CLOSED,
+    INN_WAIT_NAME_CLOSED,
+    INN_PAY = 20, /* the jingle and the fade to black */
+    INN_SLEEP, /* pay and heal behind the black screen */
+    INN_WAKE,
+    INN_WAIT_AWAKE,
+    INN_NO_MONEY = 30, /* the "not enough money" message */
+    INN_NO_MONEY_WAIT,
+    INN_NO_MONEY_CLOSE,
+};
+
+/* Starts opening or closing a menu panel, with its sound */
 void innStartPanel(PanelAnim *panel, s32 open) {
     panel->active = 1;
     if (open) {
         SOUND.playSound(SOUND_MENU_OPEN);
         panel->level = 0;
-        panel->step = 0x1000 / panel->duration;
+        panel->step = ONE / panel->duration;
     } else {
         SOUND.playSound(SOUND_MENU_CLOSE);
-        panel->level = 0x1000;
-        panel->step = -((0x1000 / panel->duration) * 2);
+        panel->level = ONE;
+        panel->step = -((ONE / panel->duration) * 2);
     }
 }
 
+/* Moves a panel's level one frame on; 1 once it is fully open or closed */
 s32 innUpdatePanel(PanelAnim *panel) {
     if (!panel->active) {
         return 1;
     }
     panel->level += panel->step;
     if (panel->step > 0) {
-        if (panel->level > 0x1000) {
-            panel->level = 0x1000;
+        if (panel->level > ONE) {
+            panel->level = ONE;
             panel->active = 0;
             return 1;
         }
@@ -39,7 +59,7 @@ void healParty(void) {
     s32 j;
     s32 index;
 
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < PARTY_SIZE; i++) {
         index = GAME.funcs.getPartyMember(i);
         if (index >= 0) {
             p = GAME.funcs.getPartnerStats(index);
@@ -85,20 +105,19 @@ InnInfo INNS[] = {
 };
 
 /*
- * Substates: 0-3 open the panels and ask (price x party size), 10-12 close,
- * 20-23 pay, fade out, heal, play the jingle and fade back in, 30-32 the
- * "not enough money" message.
+ * The inn's menu (INN_*): open the panels and ask (price x party size), then
+ * close, pay and sleep, or show the "not enough money" message.
  */
 void updateInnMenu(Inn *task, InnChildren *data) {
     s32 prev;
 
     switch (task->substate) {
-    case 0:
+    case INN_OPEN_NAME:
     default:
         innStartPanel(&task->panels[0], 1);
         task->substate++;
         break;
-    case 1:
+    case INN_OPEN_QUESTION:
         if (innUpdatePanel(&task->panels[0])) {
             data->windows[0]->setString(data->windows[0], FILE_CACHE.load(TEXT_FILE(TEXT_INN_NAMES)), INNS[task->inn].string);
             data->windows[1]->setNumber(data->windows[1], 0, GAME.money);
@@ -108,7 +127,7 @@ void updateInnMenu(Inn *task, InnChildren *data) {
             task->substate++;
         }
         break;
-    case 2:
+    case INN_SHOW_QUESTION:
         if (innUpdatePanel(&task->panels[1])) {
             data->windows[3]->setString(data->windows[3], FILE_CACHE.load(TEXT_FILE(TEXT_INN_NAMES)), 0x11);
             data->windows[3]->setNumber(data->windows[3], 1, INNS[task->inn].price);
@@ -118,7 +137,7 @@ void updateInnMenu(Inn *task, InnChildren *data) {
             task->substate++;
         }
         break;
-    case 3:
+    case INN_CHOOSE:
         prev = task->choice;
         if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
             task->choice = 0;
@@ -133,19 +152,19 @@ void updateInnMenu(Inn *task, InnChildren *data) {
         if (PAD_PRESSED(PAD_CROSS)) {
             SOUND.playSound(SOUND_SELECT);
             if (task->choice != 0) {
-                task->substate = 10;
+                task->substate = INN_CLOSE_QUESTION;
             } else if (GAME.money >= INNS[task->inn].price * task->count) {
-                task->substate = 20;
+                task->substate = INN_PAY;
             } else {
-                task->substate = 10;
+                task->substate = INN_CLOSE_QUESTION;
                 task->step = 1;
             }
         } else if (PAD_PRESSED(PAD_TRIANGLE)) {
             SOUND.playSound(SOUND_MENU_CANCEL);
-            task->substate = 10;
+            task->substate = INN_CLOSE_QUESTION;
         }
         break;
-    case 10:
+    case INN_CLOSE_QUESTION:
         innStartPanel(&task->panels[1], 0);
         data->windows[3]->setVisible(data->windows[3], 0);
         data->windows[4]->setVisible(data->windows[4], 0);
@@ -153,11 +172,11 @@ void updateInnMenu(Inn *task, InnChildren *data) {
         data->cursor->setVisible(data->cursor, 0);
         task->substate++;
         break;
-    case 11:
+    case INN_WAIT_QUESTION_CLOSED:
         if (innUpdatePanel(&task->panels[1])) {
             if (task->step != 0) {
                 innStartPanel(&task->panels[2], 1);
-                task->substate = 30;
+                task->substate = INN_NO_MONEY;
             } else {
                 innStartPanel(&task->panels[0], 0);
                 data->windows[0]->setVisible(data->windows[0], 0);
@@ -167,21 +186,21 @@ void updateInnMenu(Inn *task, InnChildren *data) {
             }
         }
         break;
-    case 12:
+    case INN_WAIT_NAME_CLOSED:
         if (innUpdatePanel(&task->panels[0])) {
-            task->state = 3;
+            task->state = TASK_KILL;
         }
         break;
-    case 20:
+    case INN_PAY:
         task->music = SOUND.music;
         task->time = GFX.funcs.getTime();
-        SOUND.playSound(0x4004000D);
+        SOUND.playSound(SOUND_INN_JINGLE);
         data->fade = createScreenFade(task->layerId);
         data->fade->start(data->fade, 0, 0x14);
         task->substate++;
         break;
-    case 21:
-        if (data->fade->state == 2) {
+    case INN_SLEEP:
+        if (data->fade->state == TASK_DONE) {
             task->panels[0].level = 0;
             task->panels[1].level = 0;
             data->windows[0]->setVisible(data->windows[0], 0);
@@ -196,26 +215,26 @@ void updateInnMenu(Inn *task, InnChildren *data) {
             task->substate++;
         }
         break;
-    case 22:
+    case INN_WAKE:
         if (GFX.funcs.getTime() - task->time > 0xF0) {
             data->fade->start(data->fade, 1, 0x14);
             task->substate++;
         }
         break;
-    case 23:
-        if (data->fade->state == 2) {
+    case INN_WAIT_AWAKE:
+        if (data->fade->state == TASK_DONE) {
             SOUND.playSound(task->music);
-            task->state = 3;
+            task->state = TASK_KILL;
         }
         break;
-    case 30:
+    case INN_NO_MONEY:
         if (innUpdatePanel(&task->panels[2])) {
             data->windows[3]->setString(data->windows[3], FILE_CACHE.load(TEXT_FILE(TEXT_INN_NAMES)), 0x14);
             task->step = 0;
             task->substate++;
         }
         break;
-    case 31:
+    case INN_NO_MONEY_WAIT:
         if (PAD_PRESSED(PAD_CROSS)) {
             SOUND.playSound(SOUND_MENU_CONFIRM);
             data->windows[3]->setVisible(data->windows[3], 0);
@@ -223,15 +242,16 @@ void updateInnMenu(Inn *task, InnChildren *data) {
             task->substate++;
         }
         break;
-    case 32:
+    case INN_NO_MONEY_CLOSE:
         if (innUpdatePanel(&task->panels[2])) {
             innStartPanel(&task->panels[1], 1);
-            task->substate = 2;
+            task->substate = INN_SHOW_QUESTION;
         }
         break;
     }
 }
 
+/* The inn task: creates its windows, then runs the menu and draws the panels at their levels */
 void updateInn(Inn *task, InnChildren *data) {
     SpriteDrawer obj;
     s32 i;
@@ -239,7 +259,7 @@ void updateInn(Inn *task, InnChildren *data) {
     s32 id;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         task->nextState(task);
         id = GAME.funcs.getMode();
@@ -249,7 +269,7 @@ void updateInn(Inn *task, InnChildren *data) {
             }
         }
         task->inn = n;
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < PARTY_SIZE; i++) {
             if (GAME.funcs.getPartyMember(i) >= 0) {
                 task->count++;
             }
@@ -266,66 +286,68 @@ void updateInn(Inn *task, InnChildren *data) {
         task->panels[1].duration = 10;
         task->panels[2].duration = 10;
         break;
-    case 1:
+    case TASK_RUN:
         updateInnMenu(task, data);
         initSpriteDrawer(&obj);
         obj.setTexture(0x140, 0);
         obj.setLayerId(task->layerId, task->depth);
         obj.setFollowScroll(0);
         if (task->panels[0].level != 0) {
-            if (task->panels[0].level != 0x1000) {
-                obj.setScale(task->panels[0].level, 0x1000, 0x1000);
+            if (task->panels[0].level != ONE) {
+                obj.setScale(task->panels[0].level, ONE, ONE);
                 obj.setPivot(0x57, 0x19);
             }
             obj.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x41, 0x16, 0x12);
-            if (task->panels[0].level != 0x1000) {
+            if (task->panels[0].level != ONE) {
                 obj.setPivot(0x140, 0x18);
             }
             obj.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x42, 0xD6, 0xF);
         }
         if (task->panels[1].level != 0) {
-            if (task->panels[1].level != 0x1000) {
-                obj.setScale(task->panels[1].level, 0x1000, 0x1000);
+            if (task->panels[1].level != ONE) {
+                obj.setScale(task->panels[1].level, ONE, ONE);
                 obj.setPivot(0x140, 0x41);
             }
             obj.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x43, 0x4C, 0x2E);
-            if (task->panels[1].level != 0x1000) {
+            if (task->panels[1].level != ONE) {
                 obj.setPivot(0x140, 0x6D);
             }
             obj.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x44, 0xAF, 0x59);
         }
         if (task->panels[2].level != 0) {
-            if (task->panels[2].level != 0x1000) {
-                obj.setScale(task->panels[2].level, 0x1000, 0x1000);
+            if (task->panels[2].level != ONE) {
+                obj.setScale(task->panels[2].level, ONE, ONE);
                 obj.setPivot(0x140, 0x41);
             }
             obj.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x43, 0x4C, 0x2E);
         }
         break;
-    case 2:
-    case 3:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }
 
+/* Starts the inn of the current game mode on a layer */
 Inn *createInn(s32 layerId) {
-    Inn *task = createTask(updateInn, 0xA0, 0x20);
+    Inn *task = createTask(updateInn, 0xA0, sizeof(InnChildren));
 
     task->layerId = layerId;
     task->depth = 1;
     return task;
 }
 
+/* Starts fading the screen to black (fadeIn 0) or back, over `duration` frames */
 void screenFadeStart(ScreenFade *task, s32 fadeIn, s32 duration) {
     task->setState(task, TASK_RUN);
     task->substate = 1;
     task->fadeIn = fadeIn;
     if (fadeIn == 0) {
         task->level = 0;
-        task->levelStep = 0xFF00 / duration;
+        task->levelStep = FADE_LEVEL_MAX / duration;
     } else {
-        task->level = 0xFF00;
-        task->levelStep = -(0xFF00 / duration);
+        task->level = FADE_LEVEL_MAX;
+        task->levelStep = -(FADE_LEVEL_MAX / duration);
     }
 }
 
@@ -351,37 +373,39 @@ void drawScreenFade(ScreenFade *task) {
     GFX.funcs.setPrim(mode + 1);
 }
 
+/* Moves the fade one frame on and draws it; TASK_DONE at the end, still drawn */
 void updateScreenFade(ScreenFade *task) {
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         task->nextState(task);
         break;
-    case 1:
+    case TASK_RUN:
         if (task->substate == 0) {
             break;
         }
         task->level += task->levelStep;
         if (task->fadeIn == 0) {
-            if (task->level > 0xFF00) {
-                task->level = 0xFF00;
-                task->state = 2;
+            if (task->level > FADE_LEVEL_MAX) {
+                task->level = FADE_LEVEL_MAX;
+                task->state = TASK_DONE;
             }
         } else if (task->level < 0) {
             task->level = 0;
-            task->state = 2;
+            task->state = TASK_DONE;
         }
         /* fallthrough */
-    case 2:
+    case TASK_DONE:
         drawScreenFade(task);
         break;
-    case 3:
+    case TASK_KILL:
         break;
     }
 }
 
+/* A screen fade task on a layer, idle until started */
 ScreenFade *createScreenFade(s32 layerId) {
-    ScreenFade *task = createTask(updateScreenFade, 0x68, 0);
+    ScreenFade *task = createTask(updateScreenFade, sizeof(ScreenFade), 0);
 
     task->start = screenFadeStart;
     task->layerId = layerId;

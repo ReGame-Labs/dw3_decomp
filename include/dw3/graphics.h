@@ -31,9 +31,19 @@ typedef struct GfxFuncs {
     /* 0x3C */ s32 (*getFrameTime)(void);
 } GfxFuncs;
 
+/* The drawing layers GFX holds at most */
+#define LAYER_COUNT 30
+
+/*
+ * What a vsync adds to the 8.8 time counters: a frame of the 60 Hz game,
+ * or 1.2 of them at 50 Hz so that the game keeps its pace
+ */
+#define VSYNC_STEP_NTSC 0x100
+#define VSYNC_STEP_PAL 0x133
+
 /*
  * The graphics state: double-buffered display, the GPU packet buffers that
- * primitives are written to (getPrim/setPrim), and up to 30 drawing layers,
+ * primitives are written to (getPrim/setPrim), and up to LAYER_COUNT drawing layers,
  * each with its own ordering table, drawn in order by drawFrame.
  * Times are in vsyncs; the counters keep 8 fractional bits.
  */
@@ -52,8 +62,8 @@ typedef struct GfxState {
     /* 0x30 */ s32 dispBuffer;
     /* 0x34 */ s32 buffer; /* the one being drawn */
     /* 0x38 */ DISPENV disp[2];
-    /* 0x60 */ struct Layer *layers[30];
-    /* 0xD8 */ s32 layerIds[30];
+    /* 0x60 */ struct Layer *layers[LAYER_COUNT];
+    /* 0xD8 */ s32 layerIds[LAYER_COUNT];
     /* 0x150 */ GfxFuncs funcs;
 } GfxState;
 

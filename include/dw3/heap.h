@@ -8,12 +8,17 @@
 #include <libgte.h>
 #include <libgpu.h>
 
-/*
- * The heap: a doubly linked list of blocks from HEAP_START to 0x801FF000.
- * Every block has a tag: 0 free, 1 the end marker, 2 the current mode's
- * allocations (freed by main whenever the mode task ends), 3 the file cache,
- * 4 a locked block (lockMem).
- */
+/* The heap: a doubly linked list of blocks from HEAP_START to HEAP_END */
+#define HEAP_END 0x801FF000
+
+/* MemBlock.tag */
+#define MEM_FREE 0
+#define MEM_END 1 /* the marker that ends the list */
+#define MEM_MODE 2 /* the current mode's: freed by main whenever the mode task ends */
+#define MEM_FILE_CACHE 3
+#define MEM_LOCKED 4 /* kept across mode changes (lockMem) */
+
+/* The heap (HEAP) */
 typedef struct Heap {
     /* 0x00 */ s32 size;
     /* 0x04 */ struct MemBlock *first;
@@ -34,7 +39,7 @@ typedef struct Heap {
 typedef struct MemBlock {
     /* 0x0 */ struct MemBlock *prev;
     /* 0x4 */ struct MemBlock *next;
-    /* 0x8 */ s32 tag;
+    /* 0x8 */ s32 tag; /* MEM_* */
 } MemBlock;
 
 void zeroMem(void *dst, s32 size);

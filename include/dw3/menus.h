@@ -12,7 +12,7 @@
 #include "dw3/text.h"
 
 /*
- * Opens or closes a menu panel: level goes 0 -> 0x1000 in `duration` frames
+ * Opens or closes a menu panel: level goes 0 -> ONE in `duration` frames
  * (or back at twice the speed), and the panel is drawn scaled by it.
  */
 typedef struct PanelAnim {
@@ -22,15 +22,18 @@ typedef struct PanelAnim {
     s32 active;
 } PanelAnim;
 
+/* ScreenFade.level when the screen is black: 0xFF in 8.8 fixed point */
+#define FADE_LEVEL_MAX 0xFF00
+
 /* Fades the whole screen to black and back with a subtractive rectangle */
 typedef struct ScreenFade {
     TASK_HEADER(ScreenFade);
     /* 0x50 */ s32 layerId;
     /* 0x54 */ s32 depth;
     /* 0x58 */ s32 fadeIn; /* 0: to black */
-    /* 0x5C */ s32 level; /* 0-0xFF00 */
+    /* 0x5C */ s32 level; /* 0-FADE_LEVEL_MAX */
     /* 0x60 */ s32 levelStep;
-    /* 0x64 */ void (*start)(); /* (fade, fadeIn, frames); state 2 when done */
+    /* 0x64 */ void (*start)(struct ScreenFade *fade, s32 fadeIn, s32 frames); /* TASK_DONE when done */
 } ScreenFade;
 
 /* Moves a value towards a target in fixed point, as the menu overlays'

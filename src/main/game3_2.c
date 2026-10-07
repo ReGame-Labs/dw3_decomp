@@ -1,10 +1,11 @@
 #include "game.h"
 
+/* The index of Digimon `id` among a partner's entries, or -1 */
 s32 findPartnerEntry(s32 partner, s32 id) {
     s32 i;
 
-    for (i = 0; i < 44; i++) {
-        if (GAME.partners[partner].info.entries[i].id < 3) {
+    for (i = 0; i < PARTNER_ENTRY_COUNT; i++) {
+        if (GAME.partners[partner].info.entries[i].id < FIRST_ENTRY_ID) {
             continue;
         }
         if (GAME.partners[partner].info.entries[i].id == id) {
@@ -14,31 +15,33 @@ s32 findPartnerEntry(s32 partner, s32 id) {
     return -1;
 }
 
+/* Copies the ids of the Digimon a partner takes to battle; returns how many there are */
 s32 getPartnerSlots(s32 partner, s16 *out) {
     s32 i;
     s32 n;
     s32 index;
 
-    for (i = 0, n = 0; i < 3; i++) {
-        if (GAME.partners[partner].info.slots[i] >= 3) {
+    for (i = 0, n = 0; i < PARTNER_SLOT_COUNT; i++) {
+        if (GAME.partners[partner].info.slots[i] >= FIRST_ENTRY_ID) {
             index = findPartnerEntry(partner, GAME.partners[partner].info.slots[i]);
-            if (index >= 0 && GAME.partners[partner].info.entries[index].id >= 3) {
+            if (index >= 0 && GAME.partners[partner].info.entries[index].id >= FIRST_ENTRY_ID) {
                 out[n] = GAME.partners[partner].info.entries[index].id;
                 n++;
             }
         }
     }
-    for (i = n; i < 3; i++) {
+    for (i = n; i < PARTNER_SLOT_COUNT; i++) {
         out[i] = -1;
     }
     return n;
 }
 
+/* Picks the Digimon a partner takes to battle (-1 for ids it does not have) */
 void setPartnerSlots(s32 partner, s16 *ids) {
     s32 i;
     s32 index;
 
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < PARTNER_SLOT_COUNT; i++) {
         index = findPartnerEntry(partner, ids[i]);
         if (index >= 0) {
             GAME.partners[partner].info.slots[i] = GAME.partners[partner].info.entries[index].id;
@@ -48,24 +51,26 @@ void setPartnerSlots(s32 partner, s16 *ids) {
     }
 }
 
+/* Copies the ids of a partner's Digimon, zero-filled; returns how many there are */
 s32 listPartnerEntries(s32 partner, u16 *out) {
     s32 i;
     s32 n;
     s32 count;
 
-    for (n = i = 0; i < 44; i++) {
-        if (GAME.partners[partner].info.entries[i].id >= 3) {
+    for (n = i = 0; i < PARTNER_ENTRY_COUNT; i++) {
+        if (GAME.partners[partner].info.entries[i].id >= FIRST_ENTRY_ID) {
             out[n] = GAME.partners[partner].info.entries[i].id;
             n++;
         }
     }
     count = n;
-    for (; n < 44; n++) {
+    for (; n < PARTNER_ENTRY_COUNT; n++) {
         out[n] = 0;
     }
     return count;
 }
 
+/* Gives a partner Digimon `id` at level 1; 0 if it has it already or has no room */
 s32 addPartnerEntry(s32 partner, s32 id) {
     s32 i;
     s32 index;
@@ -73,7 +78,7 @@ s32 addPartnerEntry(s32 partner, s32 id) {
     if (findPartnerEntry(partner, id) != -1) {
         return 0;
     }
-    for (i = 0, index = -1; i < 44; i++) {
+    for (i = 0, index = -1; i < PARTNER_ENTRY_COUNT; i++) {
         if (GAME.partners[partner].info.entries[i].id == 0) {
             index = i;
             break;
@@ -88,6 +93,7 @@ s32 addPartnerEntry(s32 partner, s32 id) {
     return 1;
 }
 
+/* Copies a partner's Digimon `id`; returns its index, or -1 */
 s32 getPartnerEntry(s32 partner, s32 id, PartnerEntry *out) {
     s32 i = findPartnerEntry(partner, id);
 
@@ -97,6 +103,7 @@ s32 getPartnerEntry(s32 partner, s32 id, PartnerEntry *out) {
     return i;
 }
 
+/* Overwrites a partner's Digimon `id`; returns its index, or -1 */
 s32 setPartnerEntry(s32 partner, s32 id, PartnerEntry *in) {
     s32 i = findPartnerEntry(partner, id);
 
@@ -106,10 +113,12 @@ s32 setPartnerEntry(s32 partner, s32 id, PartnerEntry *in) {
     return i;
 }
 
+/* A partner's name, stats and Digimon */
 PartnerStats *getPartnerStats(s32 partner) {
     return &GAME.partners[partner].info;
 }
 
+/* Frees a heap block, merging it with the free blocks around it */
 void freeMem(void *ptr) {
     MemBlock *block = (MemBlock *)ptr - 1;
     MemBlock *prev;
@@ -118,12 +127,12 @@ void freeMem(void *ptr) {
     if (ptr != NULL) {
         prev = block->prev;
         next = block->next;
-        block->tag = 0;
-        if (next->tag == 0) {
+        block->tag = MEM_FREE;
+        if (next->tag == MEM_FREE) {
             block->next = next->next;
             next->next->prev = block;
         }
-        if (prev->tag == 0) {
+        if (prev->tag == MEM_FREE) {
             prev->next = block->next;
             block->next->prev = prev;
         }
@@ -134,33 +143,36 @@ void freeMem(void *ptr) {
 void heapNop(void) {
 }
 
+/* Frees every heap block with tag `tag` */
 void freeMemByTag(s32 tag) {
     MemBlock *block;
 
-    for (block = HEAP.first; block->tag != 1; block = block->next) {
+    for (block = HEAP.first; block->tag != MEM_END; block = block->next) {
         if (block->tag == tag) {
             freeMem(block + 1);
         }
     }
 }
 
+/* Makes the heap one free block from HEAP_START, followed by the end marker */
 void initHeap(void) {
     MemBlock *start;
     MemBlock *last;
 
-    HEAP.end = (MemBlock *)0x801FF000;
-    last = (MemBlock *)0x801FEFF4;
+    HEAP.end = (MemBlock *)HEAP_END;
+    last = (MemBlock *)HEAP_END - 1;
     start = HEAP_START;
     HEAP.first = start;
-    HEAP.size = (u8 *)0x801FF000 - (u8 *)start;
+    HEAP.size = (u8 *)HEAP_END - (u8 *)start;
     start->prev = start;
     start->next = last;
-    start->tag = 0;
+    start->tag = MEM_FREE;
     last->prev = start;
-    last->tag = 1;
+    last->tag = MEM_END;
     last->next = HEAP.end;
 }
 
+/* Clears `size` bytes, a word at a time when size is a multiple of 4 */
 void zeroMem(void *dst, s32 size) {
     s32 i;
 
@@ -180,6 +192,7 @@ void zeroMem(void *dst, s32 size) {
     }
 }
 
+/* Sets `count` bytes to `value` */
 void fillMem(s8 *dst, s8 value, s32 count) {
     s32 i;
 
@@ -197,15 +210,15 @@ void *tryAllocMem(u32 size, s32 tag) {
 
     size = (size + 3) >> 2 << 2;
     splitSize = size + 20;
-    for (b = HEAP.first; b->tag != 1; b = b->next) {
-        if (b->tag == 0) {
+    for (b = HEAP.first; b->tag != MEM_END; b = b->next) {
+        if (b->tag == MEM_FREE) {
             avail = (u8 *)b->next - (u8 *)b - sizeof(MemBlock);
             if (avail >= size) {
                 if (avail > splitSize) {
                     new = (MemBlock *)((u8 *)b + size + sizeof(MemBlock));
                     new->prev = b;
                     new->next = b->next;
-                    new->tag = 0;
+                    new->tag = MEM_FREE;
                     b->next->prev = new;
                     b->next = new;
                 }
@@ -227,7 +240,7 @@ void *tryAllocMemHigh(u32 size, s32 tag) {
     size = ((size + 3) >> 2 << 2) + sizeof(MemBlock);
     for (b = HEAP.end - 1; HEAP.first != b; b = b->prev) {
         prev = b->prev;
-        if (prev->tag == 0) {
+        if (prev->tag == MEM_FREE) {
             avail = (u8 *)b - (u8 *)prev;
             if (size == avail) {
                 new = prev;
@@ -265,6 +278,7 @@ void allocMemHigh(s32 size, s32 tag) {
     }
 }
 
+/* allocMem, cleared */
 void *allocMemZeroed(s32 size, s32 tag) {
     void *ret = allocMem(size, tag);
 
@@ -272,30 +286,32 @@ void *allocMemZeroed(s32 size, s32 tag) {
     return ret;
 }
 
-/* Keeps a block alive across mode changes (tag 4), or hands it back to tag 2 */
+/* Keeps a block alive across mode changes, or hands it back to the mode */
 void lockMem(void *ptr, s32 lock) {
     MemBlock *block = (MemBlock *)ptr - 1;
 
     if (lock) {
-        block->tag = 4;
+        block->tag = MEM_LOCKED;
     } else {
-        block->tag = 2;
+        block->tag = MEM_MODE;
     }
 }
 
+/* Forgets every registered task */
 void clearTaskRegistry(void) {
     s32 i;
 
-    for (i = 99; i >= 0; i--) {
+    for (i = TASK_REGISTRY_SIZE - 1; i >= 0; i--) {
         TASK_REGISTRY.tasks[i] = 0;
     }
 }
 
+/* Adds a task to the first free entry of the registry (ignored when it is full) */
 void registerTask(s32 task) {
     s32 i;
     s32 *p;
 
-    for (i = 0, p = TASK_REGISTRY.tasks; i < 100; i++, p++) {
+    for (i = 0, p = TASK_REGISTRY.tasks; i < TASK_REGISTRY_SIZE; i++, p++) {
         if (*p == 0) {
             *p = task;
             return;
@@ -303,11 +319,12 @@ void registerTask(s32 task) {
     }
 }
 
+/* Removes a task from the registry */
 void unregisterTask(s32 task) {
     s32 i;
     s32 *p;
 
-    for (i = 0, p = TASK_REGISTRY.tasks; i < 100; i++, p++) {
+    for (i = 0, p = TASK_REGISTRY.tasks; i < TASK_REGISTRY_SIZE; i++, p++) {
         if (*p == task) {
             *p = 0;
             return;
@@ -315,11 +332,12 @@ void unregisterTask(s32 task) {
     }
 }
 
+/* The next registered task that matches findTask's id and keys (-1 matches anything), or NULL */
 void *findNextTask(void) {
     s32 i;
     s32 *e;
 
-    for (i = TASK_REGISTRY.findNext; i < 100; i++) {
+    for (i = TASK_REGISTRY.findNext; i < TASK_REGISTRY_SIZE; i++) {
         e = (s32 *)TASK_REGISTRY.tasks[i];
         if (e != NULL && (TASK_REGISTRY.findId == -1 || e[0] == TASK_REGISTRY.findId) &&
             (TASK_REGISTRY.findKey1 == -1 || e[1] == TASK_REGISTRY.findKey1) &&
@@ -369,6 +387,7 @@ Task *executeTask(Task *task) {
     return task;
 }
 
+/* Runs a frame of each child of a task, dropping the ones that end */
 void runChildTasks(Task *task) {
     s32 count = task->childCount;
     s32 *children = task->children;
@@ -381,6 +400,7 @@ void runChildTasks(Task *task) {
     }
 }
 
+/* Runs a frame of a task and its children; returns it, or 0 once it is gone */
 s32 runTask(s32 task) {
     if (task != 0) {
         return (s32)executeTask((Task *)task);
@@ -388,6 +408,7 @@ s32 runTask(s32 task) {
     return 0;
 }
 
+/* Ends a task now: its last update and destroy run at once */
 void killTask(Task *task) {
     if (task != NULL) {
         task->setState(task, TASK_KILL);

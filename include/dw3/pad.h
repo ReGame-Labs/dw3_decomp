@@ -8,11 +8,14 @@
 #include <libgte.h>
 #include <libgpu.h>
 
-/* Random numbers from a table of 4096 (RANDOM_TABLE) */
+/* The entries of RANDOM_TABLE, each 0 to RANDOM_COUNT - 1 */
+#define RANDOM_COUNT 0x1000
+
+/* Random numbers, walked in order through RANDOM_TABLE */
 typedef struct Random {
     /* 0x0 */ s32 index; /* the entry returned last */
     /* 0x4 */ void (*seed)(s32 seed);
-    /* 0x8 */ s32 (*next)(void); /* 0-0xFFFF */
+    /* 0x8 */ s32 (*next)(void); /* 0 to RANDOM_COUNT - 1 */
 } Random;
 
 /*
@@ -53,13 +56,27 @@ typedef struct PadSlot {
 } PadSlot;
 
 /*
- * Controller input (PAD). flags: bits 0-7 analog mode of each port/slot,
- * 0x400000 demo playback, 0x800000 demo recording, 0x04000000 actuators
- * being aligned, 0x08000000 vibration ready, 0x20000000 PadStartCom done,
- * 0x40000000 initialised, 0x80000000 multitap.
- * A demo replays recorded pad data (34 bytes a frame, up to 0x707 frames)
- * instead of the pad, except for Start.
+ * PadState.flags: bits 0-7 hold the mode lock of each port/slot (lockPadMode),
+ * the rest are these.
  */
+#define PAD_FLAG_DEMO_PLAYBACK 0x00400000
+#define PAD_FLAG_DEMO_RECORDING 0x00800000
+#define PAD_FLAG_ALIGNING 0x04000000 /* PadSetActAlign sent, not yet stable */
+#define PAD_FLAG_VIBRATION 0x08000000 /* the actuators are aligned */
+#define PAD_FLAG_STARTED 0x20000000 /* PadStartCom done */
+#define PAD_FLAG_INITIALIZED 0x40000000
+#define PAD_FLAG_MULTITAP 0x80000000
+
+/* The bytes PadState keeps before its methods, which initPad clears */
+#define PAD_DATA_SIZE 0x3E0
+
+/*
+ * A demo replays recorded pad data (one raw buffer a frame, up to
+ * DEMO_FRAME_COUNT frames) instead of the pad, except for Start.
+ */
+#define DEMO_FRAME_COUNT 0x707
+
+/* Controller input (PAD) */
 typedef struct PadState {
     /* 0x000 */ s32 flags;
     /* 0x004 */ u8 buf[2][0x22];
@@ -74,7 +91,7 @@ typedef struct PadState {
     /* 0x3E4 */ void (*shutdown)();
     /* 0x3E8 */ void (*update)(); /* PAD_UPDATE */
     /* 0x3EC */ s32 (*setVibration)(u16 port, s32 motor, s16 time, u8 value);
-    /* 0x3F0 */ s32 (*setAnalogMode)();
+    /* 0x3F0 */ s32 (*lockMode)(s32 port, s32 lock);
     /* 0x3F4 */ s32 (*getPressed)(s32 pad);
     /* 0x3F8 */ s32 (*getHeld)(s32 pad);
     /* 0x3FC */ s32 (*getRepeated)(s32 pad);
@@ -101,12 +118,16 @@ void swapButtons(u16 port, s32 a, s32 b);
 void startPad(void);
 s32 pollPadState(u32 port);
 void stopPad(void);
-void initPad(s32, s32);
+void initPad(s32 multitap, s32 repeatRate);
 s32 setVibration(u16 port, s32 motor, s16 time, u8 value);
+s32 readPad(u16 port, u8 *data);
+void stopDemoRecording(void);
+s32 isDemoRecording(s32 pad);
+s32 alignActuators(u16 port);
 
 extern Random RANDOM;
 extern u8 DEFAULT_BUTTON_MAP[16];
 extern PadState PAD;
-extern u16 RANDOM_TABLE[0x1000];
+extern u16 RANDOM_TABLE[RANDOM_COUNT];
 
 #endif /* DW3_PAD_H */

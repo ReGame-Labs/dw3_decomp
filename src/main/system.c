@@ -1,19 +1,13 @@
 #include "game.h"
 #include <libgs.h>
 #include <libetc.h>
+#include <libsnd.h>
 
 /* -G8 unit: small variables defined here are reached through $gp */
 static u_char CD_MODE[8];
 static RECT BOOT_IMAGE_RECT;
 static void *ROOT_TASK;
 
-void func_8002DE28(s32);
-int CdInit(void);
-void SsInit(void);
-void MemCardInit(long val);
-void MemCardStart(void);
-int CdControl(u_char com, u_char *param, u_char *result);
-int CdControlB(u_char com, u_char *param, u_char *result);
 
 /* Starts opening (open != 0) or closing a panel */
 void startPanel(PanelAnim *panel, s32 open) {
@@ -95,6 +89,7 @@ void createFieldMenuWindows(FieldMenu *task, FieldMenuWindows *win) {
     }
 }
 
+/* Fills a party member's page of the field menu (name and five stats), or hides it */
 void showPartnerPage(void *menu, FieldMenuWindows *win, s32 page, s32 show) {
     PartnerTotals stats;
     PartnerStats *info;
@@ -536,6 +531,7 @@ DigimonData DIGIMON_DATA[55] = {
      {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, 1, 0, 1, 1, 0, 1, 1, {1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {0, 0, 0, 0, 0}, 0x37, {1, 0}},
 };
 
+/* The index in DIGIMON_DATA of Digimon `id` (the first 52 entries are searched), or -1 */
 s32 findDigimon(s32 id) {
     DigimonData *entry;
     s32 i;
@@ -548,6 +544,7 @@ s32 findDigimon(s32 id) {
     return -1;
 }
 
+/* The DIGIMON_DATA entry of Digimon `id`, or NULL */
 DigimonData *getDigimon(s32 id) {
     s32 index = findDigimon(id);
 
@@ -566,6 +563,7 @@ void clearBattleGauges(void) {
     }
 }
 
+/* The ITEMS entry of item `id` (from 1), or NULL */
 ItemInfo *getItem(s32 id) {
     if (id <= 0) {
         return NULL;
@@ -573,6 +571,7 @@ ItemInfo *getItem(s32 id) {
     return &ITEMS[id - 1];
 }
 
+/* The category of an item's type (ITEM_TYPE_CATEGORIES) */
 u8 getItemCategory(s32 id) {
     return ITEM_TYPE_CATEGORIES[getItem(id)->type];
 }
@@ -582,8 +581,10 @@ s32 isItemKind(s32 item, s32 kind) {
     return getItem(item)->unk8 == kind;
 }
 
-extern u16 *ITEM_LISTS[];
-
+/*
+ * Copies the items of ITEM_LISTS[type] the player has (with the top bit, equipped ones too);
+ * returns how many
+ */
 s32 listItems(s32 type, u16 *out) {
     s32 index;
     s32 all;
@@ -1812,7 +1813,7 @@ TechData TECHS[443] = {
 CdReader CD_READER = {
     0, 0, 0, 0, 0, NULL, {0}, 0, 0, 0, 0,
     isCdReading,
-    (void (*)(s32, s32, s32, void *, s32 *))readFile,
+    readFile,
 };
 
 /* The file cache */
@@ -3573,11 +3574,11 @@ FileTableFuncs FILE_TABLE = {
     getFilePos,
 };
 
-/* Checks that the sector just read is the next one (func_8002E268 = CdGetSector) */
+/* Checks that the sector just read is the next one */
 s32 cdCheckSector(void) {
     s32 pos;
 
-    func_8002E268(CD_SECTOR_HEADER, 3);
+    CdGetSector(CD_SECTOR_HEADER, 3);
     pos = CdPosToInt(CD_SECTOR_HEADER);
     if (pos == CD_READER.nextSector) {
         CD_READER.nextSector = pos + 1;
@@ -3586,14 +3587,18 @@ s32 cdCheckSector(void) {
     return -1;
 }
 
-/* CdReadyCallback: copies each sector as it arrives, pauses at the end */
-void cdReadyCallback(s32 status) {
-    if (status == 1) {
+/*
+ * The CdReadyCallback: copies each sector as it arrives, pauses at the end.
+ * The two callbacks take the status as an int, not CdlCB's u_char, which
+ * GCC would truncate on entry (more code), so they are registered with a cast.
+ */
+void cdReadyCallback(s32 status, u_char *result) {
+    if (status == CdlDataReady) {
         if (cdCheckSector() != 0) {
             goto error;
         }
-        func_8002E268((void *)CD_READER.dst, 0x200);
-        CD_READER.dst += 0x800;
+        CdGetSector(CD_READER.dst, CD_SECTOR_SIZE / sizeof(u_long));
+        CD_READER.dst += CD_SECTOR_SIZE;
         if (--CD_READER.sectorsLeft != 0) {
             return;
         }
@@ -3601,39 +3606,40 @@ void cdReadyCallback(s32 status) {
     error:
         CD_READER.sectorsLeft = -1;
     }
-    func_8002DE88(0);
-    CdControlF(9, 0);
+    CdReadyCallback(NULL);
+    CdControlF(CdlPause, 0);
 }
 
-/* CdSyncCallback: Setloc (2), Setmode 0xA0 (0xE), ReadN (6), Pause (9) */
-void cdSyncCallback(s32 status) {
+/* The CdSyncCallback: Setloc, Setmode (double speed, whole sectors), ReadN,
+   and CdlPause once the sectors are in */
+void cdSyncCallback(s32 status, u_char *result) {
     switch (status) {
-    case 5:
-        if (CD_READER.state == 4) {
-            CdControlF(9, 0);
+    case CdlDiskError:
+        if (CD_READER.state == CD_READ_SECTORS) {
+            CdControlF(CdlPause, 0);
         } else {
             startCdRead();
         }
         break;
-    case 2:
+    case CdlComplete:
         switch (CD_READER.state) {
-        case 1:
-            CD_MODE[0] = 0xA0;
-            CdControlF(0xE, CD_MODE);
+        case CD_READ_SETLOC:
+            CD_MODE[0] = CdlModeSpeed | CdlModeSize1;
+            CdControlF(CdlSetmode, CD_MODE);
             CD_READER.state++;
             break;
-        case 2:
-            func_8002DE88((s32)cdReadyCallback);
-            CdControlF(6, 0);
+        case CD_READ_SETMODE:
+            CdReadyCallback((CdlCB)cdReadyCallback);
+            CdControlF(CdlReadN, 0);
             CD_READER.state++;
             break;
-        case 3:
-            CD_READER.state = 4;
+        case CD_READ_READN:
+            CD_READER.state = CD_READ_SECTORS;
             break;
-        case 4:
-            func_8002DE68(0);
+        case CD_READ_SECTORS:
+            CdSyncCallback(NULL);
             if (CD_READER.sectorsLeft == 0) {
-                CD_READER.state = 0;
+                CD_READER.state = CD_READ_IDLE;
                 if (CD_READER.done != NULL) {
                     *CD_READER.done = 1;
                 }
@@ -3646,21 +3652,23 @@ void cdSyncCallback(s32 status) {
     }
 }
 
+/* Whether the CD reader is busy */
 s32 isCdReading(void) {
-    return CD_READER.state != 0;
+    return CD_READER.state != CD_READ_IDLE;
 }
 
+/* Starts the read readFile set up: seeks to its first sector */
 void startCdRead(void) {
-    CD_READER.state = 1;
+    CD_READER.state = CD_READ_SETLOC;
     CD_READER.nextSector = CD_READER.sector;
     CD_READER.dst = CD_READER.buffer;
     CD_READER.sectorsLeft = CD_READER.sectorCount;
-    func_8002DE68(cdSyncCallback);
-    CdControlF(2, CD_READER.loc);
+    CdSyncCallback((CdlCB)cdSyncCallback);
+    CdControlF(CdlSetloc, CD_READER.loc);
 }
 
 /* Starts reading `size` sectors (0: all) of a file into buffer; ignored while busy */
-void readFile(s32 file, s32 offset, s32 size, s32 buffer, s32 *done) {
+void readFile(s32 file, s32 offset, s32 size, void *buffer, s32 *done) {
     if (isCdReading() == 0) {
         CD_READER.file = file;
         CD_READER.offset = offset;
@@ -3680,11 +3688,12 @@ void readFile(s32 file, s32 offset, s32 size, s32 buffer, s32 *done) {
     }
 }
 
+/* The cache slot of a file, or NULL */
 FileSlot *findFileSlot(s32 file) {
     FileSlot *slot;
     s32 i;
 
-    for (slot = FILE_CACHE.slots, i = 0; i < 64; i++, slot++) {
+    for (slot = FILE_CACHE.slots, i = 0; i < FILE_CACHE_SLOTS; i++, slot++) {
         if (slot->file == file) {
             return slot;
         }
@@ -3692,11 +3701,12 @@ FileSlot *findFileSlot(s32 file) {
     return NULL;
 }
 
+/* A free cache slot, or NULL */
 FileSlot *findFreeFileSlot(void) {
     FileSlot *slot;
     s32 i;
 
-    for (slot = FILE_CACHE.slots, i = 0; i < 64; i++, slot++) {
+    for (slot = FILE_CACHE.slots, i = 0; i < FILE_CACHE_SLOTS; i++, slot++) {
         if (slot->file == 0) {
             return slot;
         }
@@ -3710,7 +3720,7 @@ s32 isFileLoading(s32 file) {
 
     if (slot != NULL) {
         slot->lastUsed = GFX.funcs.getTime();
-        if (slot->state == 3) {
+        if (slot->state == FILE_LOADED) {
             return 0;
         }
     } else {
@@ -3727,8 +3737,8 @@ FileSlot *findOldestFile(void) {
     s32 time = GFX.funcs.getTime();
     FileSlot *slot;
 
-    for (slot = FILE_CACHE.slots; i < 64; i++, slot++) {
-        if (slot->file != 0 && slot->state == 3 && time >= slot->lastUsed) {
+    for (slot = FILE_CACHE.slots; i < FILE_CACHE_SLOTS; i++, slot++) {
+        if (slot->file != 0 && slot->state == FILE_LOADED && time >= slot->lastUsed) {
             if (time != slot->lastUsed || FILE_TABLE.getSectorCount(slot->file) >= bestSize) {
                 bestSize = FILE_TABLE.getSectorCount(slot->file);
                 time = slot->lastUsed;
@@ -3739,6 +3749,7 @@ FileSlot *findOldestFile(void) {
     return best;
 }
 
+/* Frees the loaded file used least recently, to make room in the heap */
 void evictOldestFile(void) {
     FileSlot *slot = findOldestFile();
 
@@ -3747,9 +3758,10 @@ void evictOldestFile(void) {
     slot->data = NULL;
     slot->lastUsed = 0;
     slot->marked = 0;
-    slot->state = 0;
+    slot->state = FILE_FREE;
 }
 
+/* Queues a file for the cache (just marks it used when it is there) */
 void requestFile(s32 file) {
     FileSlot *slot = findFileSlot(file);
 
@@ -3759,13 +3771,14 @@ void requestFile(s32 file) {
     }
     slot = findFreeFileSlot();
     slot->file = file;
-    slot->data = HEAP.alloc(FILE_TABLE.getSectorCount(file) << 11, 3);
-    slot->state = 1;
+    slot->data = HEAP.alloc(FILE_TABLE.getSectorCount(file) * CD_SECTOR_SIZE, MEM_FILE_CACHE);
+    slot->state = FILE_QUEUED;
     slot->lastUsed = 0;
     slot->marked = 0;
     FILE_CACHE.pending = 1;
 }
 
+/* Starts reading the next queued file and marks the one read as loaded */
 void updateFileCache(void) {
     FileSlot *slot;
     s32 i;
@@ -3776,19 +3789,19 @@ void updateFileCache(void) {
         slot = FILE_CACHE.slots;
         reading = 0;
         busy = 0;
-        for (i = 0; i < 64; i++, slot++) {
+        for (i = 0; i < FILE_CACHE_SLOTS; i++, slot++) {
             if (slot->file != 0) {
                 switch (slot->state) {
-                case 2:
-                    slot->state = 3;
+                case FILE_READING:
+                    slot->state = FILE_LOADED;
                     busy = 1;
                     slot->lastUsed = GFX.funcs.getTime();
                     break;
-                case 1:
+                case FILE_QUEUED:
                     busy = 1;
                     if (!reading) {
                         CD_READER.read(slot->file, 0, 0, slot->data, NULL);
-                        slot->state = 2;
+                        slot->state = FILE_READING;
                         reading = busy;
                         slot->lastUsed = GFX.funcs.getTime();
                     }
@@ -3802,6 +3815,7 @@ void updateFileCache(void) {
     }
 }
 
+/* Reads a file into the cache before returning */
 void waitForFile(s32 file) {
     requestFile(file);
     do {
@@ -3813,7 +3827,7 @@ void waitForFile(s32 file) {
 s32 *loadFile(u32 file) {
     FileSlot *slot = findFileSlot(file);
 
-    if (slot != NULL && slot->state == 3) {
+    if (slot != NULL && slot->state == FILE_LOADED) {
         slot->lastUsed = GFX.funcs.getTime();
         return slot->data;
     }
@@ -3823,31 +3837,33 @@ s32 *loadFile(u32 file) {
     return findFileSlot(file)->data;
 }
 
+/* Drops a loaded file from the cache */
 void freeFile(s32 file) {
     FileSlot *slot = findFileSlot(file);
 
-    if (slot != NULL && slot->state == 3) {
+    if (slot != NULL && slot->state == FILE_LOADED) {
         HEAP.free(slot->data);
         slot->file = 0;
         slot->data = NULL;
         slot->lastUsed = 0;
         slot->marked = 0;
-        slot->state = 0;
+        slot->state = FILE_FREE;
     }
 }
 
+/* Drops every file from the cache */
 void freeAllFiles(void) {
     FileSlot *slot;
     s32 i;
 
-    for (slot = FILE_CACHE.slots, i = 0; i < 64; i++, slot++) {
+    for (slot = FILE_CACHE.slots, i = 0; i < FILE_CACHE_SLOTS; i++, slot++) {
         if (slot->file != 0) {
             HEAP.free(slot->data);
             slot->file = 0;
             slot->data = NULL;
             slot->lastUsed = 0;
             slot->marked = 0;
-            slot->state = 0;
+            slot->state = FILE_FREE;
         }
     }
 }
@@ -3858,17 +3874,17 @@ void freeFilesFrom(u32 addr) {
     s32 i;
     u32 end;
 
-    for (i = 0; i < 64; i++, slot++) {
+    for (i = 0; i < FILE_CACHE_SLOTS; i++, slot++) {
         if (slot->file != 0) {
             end = (u32)slot->data + 0x20;
-            end += FILE_TABLE.getSectorCount(slot->file) << 11;
+            end += FILE_TABLE.getSectorCount(slot->file) * CD_SECTOR_SIZE;
             if (end >= addr) {
                 HEAP.free(slot->data);
                 slot->file = 0;
                 slot->data = 0;
                 slot->lastUsed = 0;
                 slot->marked = 0;
-                slot->state = 0;
+                slot->state = FILE_FREE;
             }
         }
     }
@@ -3885,6 +3901,7 @@ s32 getFileEntry(u32 fileAndIndex) {
     return table[index] + (s32)table;
 }
 
+/* Entry `index` (the low 16 bits) of an archive already in memory */
 s32 getArchiveEntry(u32 index, s32 *archive) {
     return archive[index & 0xFFFF] + (s32)archive;
 }
@@ -3894,7 +3911,7 @@ void markCachedFiles(void) {
     FileSlot *slot;
     s32 i;
 
-    for (i = 0, slot = FILE_CACHE.slots; i < 64; i++, slot++) {
+    for (i = 0, slot = FILE_CACHE.slots; i < FILE_CACHE_SLOTS; i++, slot++) {
         if (slot->file == 0) {
             slot->marked = 0;
         } else {
@@ -3903,6 +3920,10 @@ void markCachedFiles(void) {
     }
 }
 
+/*
+ * Marks the files markCachedFiles saw as just used (the European version, 10 frames before), so
+ * they stay cached
+ */
 void touchMarkedFiles(void) {
     FileSlot *slot = FILE_CACHE.slots;
 #if VERSION_US
@@ -3912,7 +3933,7 @@ void touchMarkedFiles(void) {
 #endif
     s32 i;
 
-    for (i = 0; i < 64; i++, slot++) {
+    for (i = 0; i < FILE_CACHE_SLOTS; i++, slot++) {
         if (slot->file != 0 && slot->marked != 0) {
             slot->lastUsed = now;
             slot->marked = 0;
@@ -3920,22 +3941,27 @@ void touchMarkedFiles(void) {
     }
 }
 
+/* Whether the disc has file `file` */
 s32 fileExists(s32 file) {
     return FILE_SECTORS[file] != 0;
 }
 
+/* The sectors of a file */
 u16 getFileSectorCount(s32 file) {
     return FILE_SECTOR_COUNTS[file];
 }
 
+/* The first sector of a file */
 s32 getFileSector(s32 file) {
     return FILE_SECTORS[file];
 }
 
+/* The CdlLOC of sector `offset` of a file */
 void getFilePos(s32 file, s32 offset, void *pos) {
     CdIntToPos(FILE_SECTORS[file] + offset, pos);
 }
 
+/* Task method: goes to state `state`, from substate 0 */
 void taskSetState(Task *task, s32 state) {
     task->state = state;
     task->substate = 0;
@@ -3943,21 +3969,25 @@ void taskSetState(Task *task, s32 state) {
     task->counter = 0;
 }
 
+/* Task method: goes to substate `substate`, from step 0 */
 void taskSetSubstate(Task *task, s32 substate) {
     task->substate = substate;
     task->step = 0;
     task->counter = 0;
 }
 
+/* Task method: goes to step `step`, with its counter at 0 */
 void taskSetStep(Task *task, s32 step) {
     task->step = step;
     task->counter = 0;
 }
 
+/* Task method: sets the counter */
 void taskSetCounter(Task *task, s32 counter) {
     task->counter = counter;
 }
 
+/* Task method: goes to the next state, from substate 0 */
 void taskNextState(Task *task) {
     task->substate = 0;
     task->step = 0;
@@ -3965,17 +3995,20 @@ void taskNextState(Task *task) {
     task->state++;
 }
 
+/* Task method: goes to the next substate, from step 0 */
 void taskNextSubstate(Task *task) {
     task->step = 0;
     task->counter = 0;
     task->substate++;
 }
 
+/* Task method: goes to the next step, with its counter at 0 */
 void taskNextStep(Task *task) {
     task->counter = 0;
     task->step++;
 }
 
+/* Task method: counts one more */
 void taskTickCounter(Task *task) {
     task->counter++;
 }
@@ -4003,10 +4036,10 @@ void destroyTask(Task *task) {
  * childrenSize / 4 child tasks. A nonzero id also registers it (findTask).
  */
 void *createTaskWithId(void (*update)(), s32 size, s32 childrenSize, s32 id) {
-    Task *task = HEAP.allocZeroed(size, 2);
+    Task *task = HEAP.allocZeroed(size, MEM_MODE);
 
     if (childrenSize != 0) {
-        task->children = HEAP.allocZeroed(childrenSize, 2);
+        task->children = HEAP.allocZeroed(childrenSize, MEM_MODE);
         task->childCount = childrenSize / 4;
     }
     task->setState = taskSetState;
@@ -4026,10 +4059,12 @@ void *createTaskWithId(void (*update)(), s32 size, s32 childrenSize, s32 id) {
     return task;
 }
 
+/* createTaskWithId for a task nothing needs to find */
 void *createTask(void (*update)(), s32 size, s32 childrenSize) {
     return createTaskWithId(update, size, childrenSize, 0);
 }
 
+/* Starts the hardware, the libraries and the engine, then runs a frame per iteration */
 int main(void) {
     RECT rect;
     GsIMAGE tim;
@@ -4070,13 +4105,13 @@ int main(void) {
     VSync(0);
     SetDispMask(1);
     CdInit();
-    func_8002DE28(0);
+    CdSetDebug(0);
     SetGraphDebug(0);
-    param[0] = 0x80;
-    while (CdControl(0xE, param, 0) == 0) {
+    param[0] = CdlModeSpeed;
+    while (CdControl(CdlSetmode, param, 0) == 0) {
     }
     VSync(3);
-    CdControlB(9, 0, 0);
+    CdControlB(CdlPause, 0, 0);
     HEAP.init();
     SOUND.init();
     RANDOM.seed(0);
@@ -4093,7 +4128,7 @@ int main(void) {
             GFX.funcs.freePrimBuffers();
             GFX.funcs.reset();
             TASK_REGISTRY.funcs.clear();
-            HEAP.freeByTag(2);
+            HEAP.freeByTag(MEM_MODE);
             GAME.funcs.commitMode();
             ROOT_TASK = createModeTask();
         }
@@ -4106,6 +4141,7 @@ int main(void) {
     }
 }
 
+/* Starts libmcrd and sets up MEMCARD: the save file name and the section sizes */
 void initMemCard(void) {
     MemCardInit(0);
     MemCardStart();

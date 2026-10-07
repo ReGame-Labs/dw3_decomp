@@ -1,12 +1,58 @@
 #include "game.h"
+#include <libpad.h>
 
-/* Opens the pads (PadInitMtap or PadInitDirect); repeatRate 0 means 16 */
+/* The vsyncs a held button takes to repeat, unless initPad is told otherwise */
+#define DEFAULT_REPEAT_RATE 0x10
+
+/* PadInfoMode(InfoModeCurExID) of a DualShock in digital and analog mode */
+#define PAD_ID_DIGITAL 4
+#define PAD_ID_ANALOG 7
+
+/* The second byte of the raw buffer when a multitap answers */
+#define PAD_MULTITAP_ID 0x80
+
+/* PadSetMainMode's lock: the analog button may change the mode, or not */
+#define PAD_MODE_UNLOCKED 2
+#define PAD_MODE_LOCKED 3
+
+/* Raw bits of circle, cross and triangle, which readPadButtons rotates */
+#define RAW_TRIANGLE 12
+#define RAW_CIRCLE 13
+#define RAW_CROSS 14
+#define FACE_BUTTONS (1 << PAD_CIRCLE | 1 << PAD_CROSS | 1 << PAD_TRIANGLE)
+
+/* A stick at or below LOW, or at or above HIGH, also presses the d-pad */
+#define STICK_LOW 0x40
+#define STICK_HIGH 0xC0
+
+/* PadInfoMode(InfoModeCurExID) of a DualShock in digital and analog mode */
+#define PAD_ID_DIGITAL 4
+#define PAD_ID_ANALOG 7
+
+/* The second byte of the raw buffer when a multitap answers */
+#define PAD_MULTITAP_ID 0x80
+
+/* PadSetMainMode's lock: the analog button may change the mode, or not */
+#define PAD_MODE_UNLOCKED 2
+#define PAD_MODE_LOCKED 3
+
+/* Raw bits of circle, cross and triangle, which readPadButtons rotates */
+#define RAW_TRIANGLE 12
+#define RAW_CIRCLE 13
+#define RAW_CROSS 14
+#define FACE_BUTTONS (1 << PAD_CIRCLE | 1 << PAD_CROSS | 1 << PAD_TRIANGLE)
+
+/* A stick at or below LOW, or at or above HIGH, also presses the d-pad */
+#define STICK_LOW 0x40
+#define STICK_HIGH 0xC0
+
+/* Opens the pads (PadInitMtap or PadInitDirect); repeatRate 0 means DEFAULT_REPEAT_RATE */
 void initPad(s32 multitap, s32 repeatRate) {
     s32 i;
     s32 j;
     s16 count;
 
-    HEAP.zero(&PAD, 0x3E0);
+    HEAP.zero(&PAD, PAD_DATA_SIZE);
     HEAP.fill(PAD.act, 0xFF, sizeof(PAD.act));
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 4; j++) {
@@ -15,50 +61,48 @@ void initPad(s32 multitap, s32 repeatRate) {
     }
     if (multitap != 0) {
         PadInitMtap(PAD.buf[0], PAD.buf[1]);
-        PAD.flags |= 0x80000000;
+        PAD.flags |= PAD_FLAG_MULTITAP;
     } else {
         PadInitDirect(PAD.buf[0], PAD.buf[1]);
     }
     repeatRate &= 0x7F;
     PAD.repeatRate = (u8)repeatRate;
     count = (u8)repeatRate;
-    PAD.flags |= 0x40000000;
+    PAD.flags |= PAD_FLAG_INITIALIZED;
     if (count == 0) {
-        PAD.repeatRate = 0x10;
+        PAD.repeatRate = DEFAULT_REPEAT_RATE;
     }
     startPad();
 }
 
+/* Stops reading the pads and forgets every flag, so the next startPad opens them again */
 void shutdownPad(void) {
     stopPad();
     PAD.flags = 0;
 }
 
+/* Opens the pads with the defaults if needed, then starts reading them every vsync */
 void startPad(void) {
-    if (!(PAD.flags & 0x40000000)) {
-        initPad(0, 0x10);
+    if (!(PAD.flags & PAD_FLAG_INITIALIZED)) {
+        initPad(0, DEFAULT_REPEAT_RATE);
     }
-    if (!(PAD.flags & 0x20000000)) {
+    if (!(PAD.flags & PAD_FLAG_STARTED)) {
         PadStartCom();
-        PAD.flags |= 0x20000000;
+        PAD.flags |= PAD_FLAG_STARTED;
     }
 }
 
+/* Stops reading the pads every vsync */
 void stopPad(void) {
-    if (PAD.flags & 0x20000000) {
+    if (PAD.flags & PAD_FLAG_STARTED) {
         PadStopCom();
     }
-    PAD.flags &= ~0x20000000;
+    PAD.flags &= ~PAD_FLAG_STARTED;
 }
-
-int PadChkVsync(void);
-s32 readPad(u16 port, u8 *data);
-void stopDemoRecording(void);
-s32 isDemoRecording(s32 pad);
 
 /* Reads every pad, or the demo data while a demo plays */
 void updatePad(void) {
-    u8 *record = (u8 *)PAD.demoData + PAD.demoFrame * 34;
+    u8 *record = (u8 *)PAD.demoData + PAD.demoFrame * sizeof(PAD.buf[0]);
     s32 ret;
     s32 i;
     s32 j;
@@ -68,22 +112,22 @@ void updatePad(void) {
     if (ret != 1) {
         return;
     }
-    if (++PAD.demoFrame >= 0x707 && isDemoRecording(PAD.demoPad) == ret) {
+    if (++PAD.demoFrame >= DEMO_FRAME_COUNT && isDemoRecording(PAD.demoPad) == ret) {
         stopDemoRecording();
         return;
     }
     for (i = 0; i < 2; i++) {
         port = i * 16;
-        if (PAD.buf[i][1] == 0x80) {
+        if (PAD.buf[i][1] == PAD_MULTITAP_ID) {
             for (j = 0; j < 4; j++) {
-                if (PAD.flags & 0x400000) {
+                if (PAD.flags & PAD_FLAG_DEMO_PLAYBACK) {
                     readPadButtons((u8)port, &PAD.buf[i][2 + j * 8], record + 2 + j * 8);
                 } else {
                     readPad((u8)(port + j), &PAD.buf[i][2 + j * 8]);
                 }
             }
         } else {
-            if (PAD.flags & 0x400000) {
+            if (PAD.flags & PAD_FLAG_DEMO_PLAYBACK) {
                 readPadButtons((u8)port, PAD.buf[i], record);
             } else {
                 readPad((u8)port, PAD.buf[i]);
@@ -101,16 +145,16 @@ s32 setVibration(u16 port, s32 motor, s16 time, u8 value) {
     s32 pad;
 
     t = time;
-    if (!(PAD.flags & 0x08000000)) {
+    if (!(PAD.flags & PAD_FLAG_VIBRATION)) {
         return 0;
     }
     if (pollPadState(id) == 0) {
         return 0;
     }
-    mode = PadInfoMode(id, 2, 0);
+    mode = PadInfoMode(id, InfoModeCurExID, 0);
     pad = id >> 4;
     slot = &PAD.slots[pad][port & 3];
-    if (mode == 4 || mode == 7) {
+    if (mode == PAD_ID_DIGITAL || mode == PAD_ID_ANALOG) {
         PAD.act[pad][motor & 1] = value;
     } else {
         PAD.act[pad][0] = 0x40;
@@ -125,18 +169,22 @@ s32 setVibration(u16 port, s32 motor, s16 time, u8 value) {
     return 1;
 }
 
+/* The logical buttons newly pressed on pad 1 or 2 this frame */
 u16 getPadPressed(s32 pad) {
     return PAD.slots[pad][0].pressed;
 }
 
+/* The logical buttons held on pad 1 or 2 */
 u16 getPadHeld(s32 pad) {
     return PAD.slots[pad][0].held;
 }
 
+/* The logical buttons pressed on pad 1 or 2, repeating while held */
 u16 getPadRepeated(s32 pad) {
     return PAD.slots[pad][0].repeated;
 }
 
+/* Gives a pad slot the default button map, where button i is bit i */
 void resetButtonMap(u16 port) {
     s32 i;
 
@@ -145,6 +193,7 @@ void resetButtonMap(u16 port) {
     }
 }
 
+/* Swaps two logical buttons in a pad slot's button map */
 void swapButtons(u16 port, s32 a, s32 b) {
     u8 tmp = PAD.slots[(u8)port >> 4][port & 3].buttonMap[a];
 
@@ -152,20 +201,23 @@ void swapButtons(u16 port, s32 a, s32 b) {
     PAD.slots[(u8)port >> 4][port & 3].buttonMap[b] = tmp;
 }
 
+/* The bit that logical button `index` sets on pad 1 or 2 */
 u8 getButtonBit(s32 pad, s32 index) {
     return PAD.slots[pad][0].buttonMap[index];
 }
 
-/* Demo recording was left out of the release: these three are stubs */
+/* Demo recording was left out of the release: it never starts */
 s32 startDemoRecording(void) {
     return 0;
 }
 
+/* Does nothing: demo recording was left out */
 void stopDemoRecording(void) {
 }
 
+/* 1 while pad `pad` records a demo, -1 while another pad does, 0 otherwise (never set) */
 s32 isDemoRecording(s32 pad) {
-    if (PAD.flags & 0x800000) {
+    if (PAD.flags & PAD_FLAG_DEMO_RECORDING) {
         if (PAD.demoPad == pad) {
             return 1;
         }
@@ -174,10 +226,10 @@ s32 isDemoRecording(s32 pad) {
     return 0;
 }
 
-/* Replays `data` (34 bytes per frame) as the input of pad */
+/* Replays `data` (one raw buffer a frame) as the input of pad */
 s32 startDemoPlayback(s16 pad, s32 data) {
-    if (!(PAD.flags & 0xC00000)) {
-        PAD.flags |= 0x400000;
+    if (!(PAD.flags & (PAD_FLAG_DEMO_PLAYBACK | PAD_FLAG_DEMO_RECORDING))) {
+        PAD.flags |= PAD_FLAG_DEMO_PLAYBACK;
         if (PAD.demoData == 0) {
             PAD.demoPad = pad;
             PAD.demoData = data;
@@ -189,17 +241,19 @@ s32 startDemoPlayback(s16 pad, s32 data) {
     return 0;
 }
 
+/* Gives the pads back to the players */
 void stopDemoPlayback(void) {
-    if (PAD.flags & 0x400000) {
-        PAD.flags &= ~0x400000;
+    if (PAD.flags & PAD_FLAG_DEMO_PLAYBACK) {
+        PAD.flags &= ~PAD_FLAG_DEMO_PLAYBACK;
         PAD.demoData = 0;
         PAD.demoPad = 0;
         PAD.demoFrame = 0;
     }
 }
 
+/* 1 while pad `pad` replays a demo, -1 while another pad does, 0 otherwise */
 s32 isDemoPlaying(s32 pad) {
-    if (PAD.flags & 0x400000) {
+    if (PAD.flags & PAD_FLAG_DEMO_PLAYBACK) {
         if (PAD.demoPad == pad) {
             return 1;
         }
@@ -208,33 +262,36 @@ s32 isDemoPlaying(s32 pad) {
     return 0;
 }
 
-s32 PadGetState(s32 port);
-s32 alignActuators(u16 port);
-
+/*
+ * The libpad state of a port while it can be read (0 otherwise); a stable pad gets its actuators
+ * aligned
+ */
 s32 pollPadState(u32 port) {
     u32 p = port;
     u32 mask;
     s32 state = PadGetState(p & 0xFF);
 
     switch (state) {
-    case 0:
-    case 1:
-        mask = ~(((p >> 2) & 0x3C) | (p & 3)); PAD.flags = PAD.flags & mask & ~0xC000000;
+    case PadStateDiscon:
+    case PadStateFindPad:
+        /* meant to drop the slot's mode lock, but masks with the slot's
+           index rather than its bit */
+        mask = ~(((p >> 2) & 0x3C) | (p & 3)); PAD.flags = PAD.flags & mask & ~(PAD_FLAG_ALIGNING | PAD_FLAG_VIBRATION);
         return 0;
-    case 6:
-        if (!(PAD.flags & 0x8000000)) {
-            if (PAD.flags & 0x4000000) {
-                PAD.flags |= 0x8000000;
+    case PadStateStable:
+        if (!(PAD.flags & PAD_FLAG_VIBRATION)) {
+            if (PAD.flags & PAD_FLAG_ALIGNING) {
+                PAD.flags |= PAD_FLAG_VIBRATION;
             } else if (alignActuators(p & 0xFF)) {
-                PAD.flags |= 0x4000000;
+                PAD.flags |= PAD_FLAG_ALIGNING;
             }
         }
         return state;
-    case 2:
+    case PadStateFindCTP1:
         return state;
-    case 3:
-    case 4:
-    case 5:
+    case PadStateFindCTP2:
+    case PadStateReqInfo:
+    case PadStateExecCmd:
     default:
         return 0;
     }
@@ -243,7 +300,7 @@ s32 pollPadState(u32 port) {
 /* Builds held/pressed/repeated from the raw data (the demo record replaces all but Start) */
 void readPadButtons(s32 port, u8 *data, u8 *record) {
     u32 id = port & 0xFF;
-    s32 mode = PadInfoMode(id, 2, 0);
+    s32 mode = PadInfoMode(id, InfoModeCurExID, 0);
     u32 pad = (id >> 4) & 1;
     PadSlot *slot = &PAD.slots[(u8)pad][port & 3];
     s16 buttons;
@@ -251,9 +308,9 @@ void readPadButtons(s32 port, u8 *data, u8 *record) {
     u16 b;
     s16 circle, cross, triangle;
 
-    if ((PAD.flags & 0x400000) && PAD.demoPad == ((port & 3) | pad)) {
-        buttons = (~*(u16 *)(data + 2) & 8) | (~*(u16 *)(record + 2) & ~8);
-        if (mode == 7) {
+    if ((PAD.flags & PAD_FLAG_DEMO_PLAYBACK) && PAD.demoPad == ((port & 3) | pad)) {
+        buttons = (~*(u16 *)(data + 2) & 1 << PAD_START) | (~*(u16 *)(record + 2) & ~(1 << PAD_START));
+        if (mode == PAD_ID_ANALOG) {
             for (i = 0; i < 4; i++) {
                 slot->analog[i] = record[4 + i];
             }
@@ -261,55 +318,55 @@ void readPadButtons(s32 port, u8 *data, u8 *record) {
     } else {
 #if VERSION_US
         b = ~*(u16 *)(data + 2);
-        circle = (b >> 13) & 1;
-        cross = (b >> 14) & 1;
-        triangle = (b >> 12) & 1;
-        buttons = ~*(u16 *)(data + 2) & ~0x7000;
+        circle = (b >> RAW_CIRCLE) & 1;
+        cross = (b >> RAW_CROSS) & 1;
+        triangle = (b >> RAW_TRIANGLE) & 1;
+        buttons = ~*(u16 *)(data + 2) & ~FACE_BUTTONS;
         if (cross) {
-            buttons |= 0x2000;
+            buttons |= 1 << PAD_CROSS;
         }
         if (triangle) {
-            buttons |= 0x4000;
+            buttons |= 1 << PAD_TRIANGLE;
         }
         if (circle) {
-            buttons |= 0x1000;
+            buttons |= 1 << PAD_CIRCLE;
         }
 #elif VERSION_EU
         /* the Japanese language keeps the buttons as they are */
         buttons = ~*(u16 *)(data + 2);
         if (LANGUAGE != 0) {
             b = buttons;
-            circle = (b >> 13) & 1;
-            cross = (b >> 14) & 1;
-            triangle = (b >> 12) & 1;
-            buttons &= ~0x7000;
+            circle = (b >> RAW_CIRCLE) & 1;
+            cross = (b >> RAW_CROSS) & 1;
+            triangle = (b >> RAW_TRIANGLE) & 1;
+            buttons &= ~FACE_BUTTONS;
             if (cross) {
-                buttons |= 0x2000;
+                buttons |= 1 << PAD_CROSS;
             }
             if (triangle) {
-                buttons |= 0x4000;
+                buttons |= 1 << PAD_TRIANGLE;
             }
             if (circle) {
-                buttons |= 0x1000;
+                buttons |= 1 << PAD_CIRCLE;
             }
         }
 #endif
-        if (mode == 7) {
+        if (mode == PAD_ID_ANALOG) {
             for (i = 0; i < 4; i++) {
                 slot->analog[i] = data[4 + i];
             }
         }
     }
-    if (mode == 7) {
-        if (slot->analog[2] < 0x41) {
-            buttons |= 0x80;
-        } else if (slot->analog[2] >= 0xC0) {
-            buttons |= 0x20;
+    if (mode == PAD_ID_ANALOG) {
+        if (slot->analog[2] <= STICK_LOW) {
+            buttons |= 1 << PAD_LEFT;
+        } else if (slot->analog[2] >= STICK_HIGH) {
+            buttons |= 1 << PAD_RIGHT;
         }
-        if (slot->analog[3] < 0x41) {
-            buttons |= 0x10;
-        } else if (slot->analog[3] >= 0xC0) {
-            buttons |= 0x40;
+        if (slot->analog[3] <= STICK_LOW) {
+            buttons |= 1 << PAD_UP;
+        } else if (slot->analog[3] >= STICK_HIGH) {
+            buttons |= 1 << PAD_DOWN;
         }
     }
     i = 0;
@@ -341,6 +398,7 @@ void readPadButtons(s32 port, u8 *data, u8 *record) {
     slot->pressed = buttons & (b ^ buttons);
 }
 
+/* Reads one pad (vibration included), or clears its buttons when it is missing */
 s32 readPad(u16 port, u8 *data) {
     u8 id = port;
     s32 mode;
@@ -351,37 +409,39 @@ s32 readPad(u16 port, u8 *data) {
         PAD.slots[(id >> 4) & 1][port & 3].held = 0;
         return 0;
     }
-    mode = PadInfoMode(id & 0xFF, 2, 0);
-    if (mode == 4 || mode == 7) {
+    mode = PadInfoMode(id & 0xFF, InfoModeCurExID, 0);
+    if (mode == PAD_ID_DIGITAL || mode == PAD_ID_ANALOG) {
         updateVibration(id & 0xFF);
     }
     readPadButtons(id & 0xFF, data, 0);
     return 1;
 }
 
-s32 setAnalogMode(s32 port, s32 on) {
+/* Locks or unlocks the analog button of a DualShock, keeping its current mode */
+s32 lockPadMode(s32 port, s32 lock) {
     u32 id = port & 0xFF;
     s32 mode;
     s32 bit;
 
     if (pollPadState(id) != 0) {
-        mode = PadInfoMode(id, 2, 0);
-        if (mode == 4 || mode == 7) {
+        mode = PadInfoMode(id, InfoModeCurExID, 0);
+        if (mode == PAD_ID_DIGITAL || mode == PAD_ID_ANALOG) {
             bit = ((id >> 4) << 2) | (port & 3);
-            if (on != 0) {
+            if (lock != 0) {
                 PAD.flags |= 1 << bit;
-                PadSetMainMode(id, PadInfoMode(id, 3, 0), 3);
+                PadSetMainMode(id, PadInfoMode(id, InfoModeCurExOffs, 0), PAD_MODE_LOCKED);
             } else {
                 PAD.flags &= ~(1 << bit);
-                PadSetMainMode(id, PadInfoMode(id, 3, 0), 2);
+                PadSetMainMode(id, PadInfoMode(id, InfoModeCurExOffs, 0), PAD_MODE_UNLOCKED);
             }
-            PAD.flags &= 0xF3FFFFFF;
+            PAD.flags &= ~(PAD_FLAG_ALIGNING | PAD_FLAG_VIBRATION);
             return 1;
         }
     }
     return 0;
 }
 
+/* Sends a DualShock its actuator alignment, so setVibration can drive the motors */
 s32 alignActuators(u16 port) {
     u32 id = (u8)port;
     s32 count = PadInfoAct(id, -1, 0);
@@ -389,7 +449,7 @@ s32 alignActuators(u16 port) {
     s32 act;
 
     for (i = 0; i < count; i++) {
-        act = PadInfoAct(id, i, 2);
+        act = PadInfoAct(id, i, InfoActSub);
         if (act != 0) {
             PAD.act[id >> 4][i] = act & 1;
         }
@@ -397,6 +457,7 @@ s32 alignActuators(u16 port) {
     return PadSetActAlign(port & 0xFF, PAD.act[(port & 0xFF) >> 4]);
 }
 
+/* Counts down a pad's vibration timers and stops each motor whose time is up */
 void updateVibration(u16 port) {
     u8 id = port;
     s32 i;
@@ -413,12 +474,14 @@ void updateVibration(u16 port) {
     }
 }
 
-void seedRandom(s32 arg0) {
-    RANDOM.index = arg0 & 0xFFF;
+/* Starts random() at entry `seed` of RANDOM_TABLE */
+void seedRandom(s32 seed) {
+    RANDOM.index = seed & (RANDOM_COUNT - 1);
 }
 
+/* The next entry of RANDOM_TABLE, 0 to RANDOM_COUNT - 1 */
 u16 random(void) {
-    s32 index = (RANDOM.index + 1) & 0xFFF;
+    s32 index = (RANDOM.index + 1) & (RANDOM_COUNT - 1);
 
     RANDOM.index = index;
     return RANDOM_TABLE[index];
@@ -428,7 +491,7 @@ u16 random(void) {
    return a u16 or a u8, the methods an s32) */
 PadState PAD = {
     0, { { 0 } }, { { { 0 } } }, { { 0 } }, 0, 0, 0, 0, { 0 },
-    initPad, shutdownPad, updatePad, setVibration, setAnalogMode,
+    initPad, shutdownPad, updatePad, setVibration, lockPadMode,
     (s32 (*)(s32))getPadPressed, (s32 (*)(s32))getPadHeld, (s32 (*)(s32))getPadRepeated,
     resetButtonMap, swapButtons, (s32 (*)(s32, s32))getButtonBit,
     startDemoRecording, stopDemoRecording, isDemoRecording,
@@ -442,7 +505,7 @@ u8 DEFAULT_BUTTON_MAP[16] = {
 };
 
 /* The 4096 numbers random() walks through, 0-0xFFF */
-u16 RANDOM_TABLE[0x1000] = {
+u16 RANDOM_TABLE[RANDOM_COUNT] = {
     0x0C93, 0x0C60, 0x047F, 0x0C08, 0x0248, 0x00FE, 0x0B5A, 0x051D,
     0x0DBD, 0x0FFF, 0x03ED, 0x035C, 0x005C, 0x087A, 0x0CD4, 0x0180,
     0x09FF, 0x0039, 0x0183, 0x03B9, 0x0AEB, 0x088C, 0x0B07, 0x065B,

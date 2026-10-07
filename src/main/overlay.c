@@ -65,7 +65,7 @@ void loadModeOverlay(void) {
         OVERLAY_LOADER.subOverlay = -1;
         src = FILE_CACHE.load(MODE_OVERLAY_FILES[id]);
         dst = OVERLAY_ADDRESS;
-        memcpy(dst, src, FILE_TABLE.getSectorCount(MODE_OVERLAY_FILES[id]) << 11);
+        memcpy(dst, src, FILE_TABLE.getSectorCount(MODE_OVERLAY_FILES[id]) * CD_SECTOR_SIZE);
     }
 }
 
@@ -78,6 +78,6 @@ void loadSubOverlay(s32 id) {
         OVERLAY_LOADER.subOverlay = id;
         src = FILE_CACHE.load(id);
         dst = SUB_OVERLAY_ADDRESS;
-        memcpy(dst, src, FILE_TABLE.getSectorCount(id) << 11);
+        memcpy(dst, src, FILE_TABLE.getSectorCount(id) * CD_SECTOR_SIZE);
     }
 }

@@ -1,6 +1,7 @@
 #include "game.h"
 #include "field_map.h"
 
+/* Whether bit `index` of a bitset is set (set != 0) or clear (set 0) */
 s32 testBit(u8 *bits, s32 index, s32 set) {
     s32 byte = index >> 3;
     s32 mask = 1 << (index & 7);
@@ -11,6 +12,7 @@ s32 testBit(u8 *bits, s32 index, s32 set) {
     return (bits[byte] & mask) == 0;
 }
 
+/* Sets or clears bit `index` of a bitset */
 void setBit(u8 *bits, s32 index, s32 set) {
     s32 byte = index >> 3;
     s32 mask = 1 << (index & 7);
@@ -56,6 +58,10 @@ s32 checkItemSet(s32 op, s32 arg) {
     return ret;
 }
 
+/*
+ * Special conditions 0x10: tests partners (unlocked, in the party, levels) or unlocks one; the
+ * European version adds four
+ */
 s32 checkPartner(u32 op, s32 arg) {
     s32 result = 0;
     s32 i;
@@ -77,7 +83,7 @@ s32 checkPartner(u32 op, s32 arg) {
         }
         break;
     case 2:
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < PARTY_SIZE; i++) {
             if (GAME.funcs.getPartyMember(i) == arg) {
                 result = 1;
                 break;
@@ -95,7 +101,7 @@ s32 checkPartner(u32 op, s32 arg) {
         break;
     case 5:
         total = 0;
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < PARTY_SIZE; i++) {
             id = GAME.funcs.getPartyMember(i);
             if (id >= 0) {
                 total += GAME.funcs.getPartnerStats(id)->stats[STAT_LEVEL];
@@ -113,7 +119,7 @@ s32 checkPartner(u32 op, s32 arg) {
 #if VERSION_EU
     case 7:
         result = 1;
-        for (id = 0; id < 8; id++) {
+        for (id = 0; id < PARTNER_COUNT; id++) {
             if (GAME.partners[id].unlocked != 0 && GAME.partners[id].info.stats[STAT_LEVEL] < 0x2D) {
                 result = 0;
                 break;
@@ -121,7 +127,7 @@ s32 checkPartner(u32 op, s32 arg) {
         }
         break;
     case 8:
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < PARTY_SIZE; i++) {
             partner = GAME.funcs.getPartyMember(i);
             if (partner >= 0) {
                 GAME.partners[partner].info.stats[STAT_HP] = GAME.partners[partner].info.stats[STAT_MAX_HP];
@@ -142,6 +148,10 @@ s32 checkPartner(u32 op, s32 arg) {
     return result;
 }
 
+/*
+ * Special conditions 0x20: whether the player has MONEY_REQUIRED[item], or gives or takes an
+ * amount
+ */
 s32 checkMoney(s32 op, s32 item) {
     s32 ret = 0;
 
@@ -153,8 +163,8 @@ s32 checkMoney(s32 op, s32 item) {
         break;
     case 1:
         GAME.money += MONEY_GAINS[item];
-        if (GAME.money > 9999999) {
-            GAME.money = 9999999;
+        if (GAME.money > MONEY_MAX) {
+            GAME.money = MONEY_MAX;
         }
         break;
     case 2:
@@ -167,6 +177,7 @@ s32 checkMoney(s32 op, s32 item) {
     return ret;
 }
 
+/* Special conditions 0x30: whether GAME.progress is within PROGRESS_RANGES[index] */
 s32 checkProgressRange(s32 unused, s32 index) {
     s32 value = GAME.progress;
     s32 min = PROGRESS_RANGES[index][0];
@@ -179,6 +190,7 @@ s32 checkProgressRange(s32 unused, s32 index) {
     return ret;
 }
 
+/* Special conditions 0x40: how many of a run of event flags are set */
 #if VERSION_US
 s32 checkFlagCount(s32 unused, s32 mode) {
     s32 ret = 0;
@@ -213,6 +225,7 @@ s32 checkFlagCount(s32 unused, s32 mode) {
     return ret;
 }
 #elif VERSION_EU
+/* Special conditions 0x40: group 0 as in the USA version; group 1 whether four flags of group 0x10 are set */
 s32 checkFlagCount(s32 group, s32 mode) {
     s32 ret = 0;
     s32 on = 0;
@@ -266,6 +279,7 @@ s32 showActorIcon(s32 op, s32 arg) {
     return 1;
 }
 
+/* Runs SPECIAL_CONDITIONS entry `id`; whether its result equals `expected` */
 s32 checkSpecialCondition(s32 id, s32 expected) {
     u8 *p;
     s32 result = 0;
@@ -302,6 +316,7 @@ s32 checkSpecialCondition(s32 id, s32 expected) {
     return expected == result;
 }
 
+/* Conditions 0x60: whether GAME.progress is `value` (mode != 0) or not */
 s32 checkProgress(s32 value, s32 mode) {
     if (mode != 0) {
         if (GAME.progress == value) {
@@ -315,6 +330,10 @@ s32 checkProgress(s32 value, s32 mode) {
     return 0;
 }
 
+/*
+ * Conditions 0x80-0x8E: whether the player has item `index`, in the bag or equipped (mode != 0),
+ * or not
+ */
 s32 checkItem(s32 index, s32 mode) {
     if (mode != 0) {
         if (GAME.items[index] != 0 || GAME.equippedItems[index] != 0) {
@@ -328,6 +347,7 @@ s32 checkItem(s32 index, s32 mode) {
     return 0;
 }
 
+/* Conditions 0x92: whether the player has card `item` (have != 0) or not */
 s32 checkCard(s32 item, s32 have) {
     if (have != 0) {
         if (GAME.cards[item] != 0) {
@@ -341,15 +361,17 @@ s32 checkCard(s32 item, s32 have) {
     return 0;
 }
 
-extern s32 PARTY_STAT_THRESHOLDS[];
-
+/*
+ * Conditions 0x72: whether the party's total of battle stat 5 reaches PARTY_STAT_THRESHOLDS[index]
+ * (mode != 0) or not
+ */
 s32 checkPartyStat(s32 index, s32 mode) {
     PartnerTotals buf;
     s32 total = 0;
     s32 i;
     s32 id;
 
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < PARTY_SIZE; i++) {
         id = GAME.funcs.getPartyMember(i);
         if (id >= 0) {
             GAME.funcs.computeStats(id, &buf);
@@ -408,6 +430,7 @@ s32 checkWarpArg(s32 id, s32 arg1) {
     return 0;
 }
 
+/* Takes item `item` off a partner (one of type 7 empties slots 2 and 3 both); 1 if it had it */
 s32 unequipItem(s32 partner, s32 item) {
     PartnerStats *d = &GAME.partners[partner].info;
     u8 *info = GET_ITEM[0](item)->data;
@@ -428,6 +451,7 @@ s32 unequipItem(s32 partner, s32 item) {
     return 0;
 }
 
+/* Actions 0x80-0x8E: gives an item (up to 99) or takes one, from the bag or else off a partner */
 void changeItem(s32 item, s32 add) {
     s32 i;
 
@@ -440,12 +464,12 @@ void changeItem(s32 item, s32 add) {
             GAME.items[item] = 0;
         }
     } else if (GAME.equippedItems[item] != 0) {
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < PARTY_SIZE; i++) {
             if (unequipItem(GAME.funcs.getPartyMember(i), item) != 0) {
                 goto found;
             }
         }
-        for (i = 0; i < 8; i++) {
+        for (i = 0; i < PARTNER_COUNT; i++) {
             if (GAME.partners[i].unlocked >= 3 && unequipItem(i, item) != 0) {
                 break;
             }
@@ -455,6 +479,7 @@ void changeItem(s32 item, s32 add) {
     }
 }
 
+/* Actions 0x92: gives or takes a copy of a card */
 void changeCard(s32 card, s32 add) {
     if (add != 0) {
         GAME.funcs.addCards(card, 1);
@@ -634,6 +659,7 @@ s32 checkConditions(u16 *list) {
     return 1;
 }
 
+/* Runs every (code, value) action until 0xFFFF */
 void applyActions(u16 *list) {
     u16 a;
 
@@ -643,6 +669,10 @@ void applyActions(u16 *list) {
     }
 }
 
+/*
+ * On a mode change: clears the temporary flags if asked, and sets flags 0x10-0x12 after a card
+ * battle
+ */
 void updateModeFlags(void) {
     s32 i;
     u8 *p;
@@ -699,27 +729,33 @@ void commitMode(void) {
     }
 }
 
+/* The game mode before the current one */
 s32 getPrevMode(void) {
     return GAME.prevMode;
 }
 
+/* The current game mode */
 s32 getMode(void) {
     return GAME.mode;
 }
 
+/* The argument the current mode was requested with */
 s32 getModeArg(void) {
     return GAME.modeArg;
 }
 
+/* Asks for a mode change, applied when main recreates the mode task */
 void requestMode(s32 mode, s32 arg) {
     GAME.nextMode = mode;
     GAME.modeArg = arg;
 }
 
+/* Whether a mode change was requested */
 s32 isModeChangePending(void) {
     return GAME.nextMode != 0;
 }
 
+/* The new game's player name, deck names, starter deck and partners */
 void initNewGameData(void) {
     TextTools cls;
     s32 i;
@@ -733,11 +769,11 @@ void initNewGameData(void) {
     GAME.party[0] = -1;
     GAME.party[1] = -1;
     GAME.party[2] = -1;
-    for (j = 0; j < 3; j++) {
+    for (j = 0; j < DECK_COUNT; j++) {
         strcpy(GAME.decks[j].name, cls.getString(FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), j + 0x16));
     }
     GAME.funcs.giveStarterDeck();
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < PARTNER_COUNT; i++) {
         e = &DIGIMON_DATA[i];
         strcpy(GAME.partners[i].info.name, cls.getString(FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), e->nameId));
         GAME.partners[i].info.stats[STAT_LEVEL] = 1;
@@ -756,18 +792,20 @@ void initNewGameData(void) {
     }
 }
 
+/* The partner index of party member `index`, or -1 */
 s32 getPartyMember(u32 index) {
-    if (index >= 3) {
+    if (index >= PARTY_SIZE) {
         return -1;
     }
     return GAME.party[index];
 }
 
+/* Gives the party STARTER_PARTIES[set], unlocking its partners */
 void setParty(s32 set) {
     s32 i;
     u8 partner;
 
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < PARTY_SIZE; i++) {
         partner = STARTER_PARTIES[set][i];
         GAME.party[i] = partner;
         GAME.partners[partner].unlocked = partner + 3;
@@ -775,28 +813,31 @@ void setParty(s32 set) {
     GAME.partySet = set;
 }
 
+/* Gives `count` copies of a card (up to CARD_COPIES_MAX) and marks it seen */
 void addCards(s32 item, s32 count) {
     GAME.cardsSeen[item] = 1;
     GAME.cards[item] += count;
-    if (GAME.cards[item] >= 10) {
-        GAME.cards[item] = 9;
+    if (GAME.cards[item] > CARD_COPIES_MAX) {
+        GAME.cards[item] = CARD_COPIES_MAX;
     }
 }
 
+/* Gives the starter deck's cards and puts them in every deck */
 void giveStarterDeck(void) {
     s32 i;
     s32 j;
 
-    for (i = 0; i < 40; i++) {
+    for (i = 0; i < DECK_SIZE; i++) {
         addCards(STARTER_DECK[i], 1);
     }
-    for (j = 0; j < 3; j++) {
-        for (i = 0; i < 40; i++) {
+    for (j = 0; j < DECK_COUNT; j++) {
+        for (i = 0; i < DECK_SIZE; i++) {
             GAME.decks[j].cards[i] = STARTER_DECK[i];
         }
     }
 }
 
+/* Sets the play time to zero */
 void resetPlayTime(void) {
     GAME.playTimeMaxed = 0;
     GAME.playSeconds = 0;
@@ -805,6 +846,7 @@ void resetPlayTime(void) {
     GAME.playFrames = 0;
 }
 
+/* Turns the vsync-counted frames into seconds, minutes and hours, stopping at 999:59:59 */
 void updatePlayTime(void) {
     if ((GAME.playFrames >> 8) >= 60) {
         GAME.playFrames &= 0xFF;
@@ -823,13 +865,15 @@ void updatePlayTime(void) {
     }
 }
 
+/* The partner id of party member `index` (its unlocked value - 3), or -1 */
 s32 getPartyPartner(u32 index) {
-    if (index >= 3) {
+    if (index >= PARTY_SIZE) {
         return -1;
     }
     return GAME.partners[GAME.party[index]].unlocked - 3;
 }
 
+/* Sets a partner's stat, kept within 0-99 (level, TP), 0-9999 (HP, MP) or 0-999 */
 void setStat(s32 partner, u32 stat, s16 value) {
     PartnerStats *d = &GAME.partners[partner].info;
     s16 *p = d->stats;
@@ -855,6 +899,7 @@ void setStat(s32 partner, u32 stat, s16 value) {
     }
 }
 
+/* Adds to a partner's stat, kept within the same limits as setStat */
 void addStat(s32 partner, u32 stat, s32 delta) {
     PartnerStats *d = &GAME.partners[partner].info;
     s16 *stats = d->stats;
@@ -906,14 +951,6 @@ typedef union ItemData {
         /* 0x8 */ u8 stat;
     } acc;
 } ItemData;
-
-typedef struct Equip4 {
-    s16 v[4];
-} Equip4;
-extern Equip4 EQUIP_SETS[];
-extern s16 EQUIP_SET_BONUSES[][6];
-
-void addStatBonus(s16 *p, s32 stat, s32 delta);
 
 /* A partner's stats with its equipment (and its equipment set bonus) added */
 void computeStats(s32 partner, PartnerTotals *out) {
@@ -988,14 +1025,15 @@ void computeStats(s32 partner, PartnerTotals *out) {
     if (out->fields.battle[4] < 0) {
         out->fields.battle[4] = 0;
     }
-    if (equip[0] == EQUIP_SETS[partner].v[0] && equip[1] == EQUIP_SETS[partner].v[1] &&
-        equip[2] == EQUIP_SETS[partner].v[2] && equip[3] == EQUIP_SETS[partner].v[3]) {
+    if (equip[0] == EQUIP_SETS[partner].items[0] && equip[1] == EQUIP_SETS[partner].items[1] &&
+        equip[2] == EQUIP_SETS[partner].items[2] && equip[3] == EQUIP_SETS[partner].items[3]) {
         for (i = 0; i < 6; i++) {
             out->fields.battle[i] += EQUIP_SET_BONUSES[partner][i];
         }
     }
 }
 
+/* Adds an equipment bonus to a stat of computeStats' result (7 raises every battle stat) */
 void addStatBonus(s16 *p, s32 stat, s32 delta) {
     s32 i;
     s16 value;
@@ -1127,7 +1165,7 @@ u8 STARTER_PARTIES[][3] = {
 };
 
 /* The cards of giveStarterDeck's deck */
-s32 STARTER_DECK[40] = {
+s32 STARTER_DECK[DECK_SIZE] = {
     24, 24, 24, 45, 45, 50, 59, 60, 95, 99,
     100, 100, 102, 122, 138, 141, 141, 143, 145, 181,
     184, 185, 185, 188, 221, 224, 228, 230, 230, 230,
@@ -1135,7 +1173,7 @@ s32 STARTER_DECK[40] = {
 };
 
 /* Each partner's equipment set and what wearing it whole adds (computeStats) */
-Equip4 EQUIP_SETS[] = {
+EquipSet EQUIP_SETS[] = {
     { { 0x00F3, 0x010D, 0x0062, 0x011C } }, { { 0x00F2, 0x0102, 0x0070, 0x011D } },
     { { 0x00DE, 0x0100, 0x007C, 0x011A } }, { { 0x00F4, 0x010F, 0x00A3, 0x011E } },
     { { 0x00D3, 0x010C, 0x00CB, 0x0120 } }, { { 0x00F5, 0x010E, 0x0095, 0x011F } },

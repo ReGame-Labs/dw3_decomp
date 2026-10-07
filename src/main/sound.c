@@ -166,8 +166,8 @@ SoundFiles *SOUND_BANK_FILES[72] = {
 };
 
 /* Each slot's buffer for the VAB header and the SEPs, and its SPU address */
-s32 SOUND_HEAD_BUFFERS[3] = {(s32)SOUND_HEAD_BUFFER_0, (s32)SOUND_HEAD_BUFFER_1, (s32)SOUND_HEAD_BUFFER_2};
-s32 SOUND_SPU_ADDRS[3] = {0x1010, 0x49C10, 0x62410};
+s32 SOUND_HEAD_BUFFERS[SOUND_SLOT_COUNT] = {(s32)SOUND_HEAD_BUFFER_0, (s32)SOUND_HEAD_BUFFER_1, (s32)SOUND_HEAD_BUFFER_2};
+s32 SOUND_SPU_ADDRS[SOUND_SLOT_COUNT] = {0x1010, 0x49C10, 0x62410};
 
 /* rsin and rcos (libgte) read rsin_tbl[a - 0x800] and the like: their
    addresses before the table fall in seqTable */
@@ -194,7 +194,7 @@ SoundState SOUND = {
 s32 findSoundBank(s32 id) {
     s32 i;
 
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < SOUND_SLOT_COUNT; i++) {
         if (SOUND.banks[i].id == id) {
             return i;
         }
@@ -204,14 +204,14 @@ s32 findSoundBank(s32 id) {
 
 /* Plays a packed sound id (see dw3/sound.h); returns the voice of a key-on */
 s32 playSound(s32 packed) {
-    s32 id = (packed >> 18) & 0x7F;
-    u32 keyOn = (u32)packed >> 31;
-    s32 exclusive = (packed >> 30) & 1;
-    s32 prog = (packed >> 11) & 0x7F;
-    s32 tone = (packed >> 7) & 0xF;
-    s32 note = packed & 0x7F;
-    s32 seq = (packed >> 8) & 0xFF;
-    s32 sep = packed & 0xFF;
+    s32 id = SOUND_BANK(packed);
+    u32 keyOn = SOUND_IS_KEY_ON(packed);
+    s32 exclusive = SOUND_IS_EXCLUSIVE(packed);
+    s32 prog = SOUND_PROG(packed);
+    s32 tone = SOUND_TONE(packed);
+    s32 note = SOUND_NOTE(packed);
+    s32 seq = SOUND_SEQ(packed);
+    s32 sep = SOUND_SEP(packed);
     s32 slot = findSoundBank(id);
     s32 voice = -1;
 
@@ -229,11 +229,11 @@ s32 playSound(s32 packed) {
             SOUND.music = packed;
         }
         if (keyOn) {
-            voice = SsUtKeyOn(SOUND.banks[slot].vabId, prog, tone, note, 0, 0x7F, 0x7F);
+            voice = SsUtKeyOn(SOUND.banks[slot].vabId, prog, tone, note, 0, SOUND_VOLUME_MAX, SOUND_VOLUME_MAX);
         } else {
             id = sep;
             SsSepStop(SOUND.banks[slot].seqs[seq], id);
-            SsSepSetVol(SOUND.banks[slot].seqs[seq], id, 0x7F, 0x7F);
+            SsSepSetVol(SOUND.banks[slot].seqs[seq], id, SOUND_VOLUME_MAX, SOUND_VOLUME_MAX);
             SsSepPlay(SOUND.banks[slot].seqs[seq], id, 1, 1);
         }
         return voice;
@@ -241,17 +241,18 @@ s32 playSound(s32 packed) {
     return 0;
 }
 
+/* Stops every track of the loaded banks and every voice */
 void stopAllSounds(void) {
     s32 i;
     s32 j;
     s32 k;
     SoundBank *bank;
 
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < SOUND_SLOT_COUNT; i++) {
         bank = &SOUND.banks[i];
         if (bank->vabId != -1) {
             for (j = 0; j < bank->numSeqs; j++) {
-                for (k = 0; k < 16; k++) {
+                for (k = 0; k < SOUND_SEP_COUNT; k++) {
                     SsSepStop(bank->seqs[j], k);
                 }
             }
@@ -261,14 +262,15 @@ void stopAllSounds(void) {
     SOUND.music = 0;
 }
 
+/* Stops a sequence sound (key-on sounds are left alone) */
 void stopSound(s32 packed) {
-    s32 id = (packed >> 18) & 0x7F;
-    u32 stopped = (u32)packed >> 31;
-    s32 seq = (packed >> 8) & 0xFF;
-    s32 sep = packed & 0xFF;
+    s32 id = SOUND_BANK(packed);
+    u32 keyOn = SOUND_IS_KEY_ON(packed);
+    s32 seq = SOUND_SEQ(packed);
+    s32 sep = SOUND_SEP(packed);
     s32 slot = findSoundBank(id);
 
-    if (slot != -1 && !stopped) {
+    if (slot != -1 && !keyOn) {
         SsSepStop(SOUND.banks[slot].seqs[seq], sep);
         if (SOUND.music == packed) {
             SOUND.music = 0;
@@ -276,14 +278,15 @@ void stopSound(s32 packed) {
     }
 }
 
+/* Fades a sequence sound out over a second (key-on sounds are left alone) */
 void fadeOutSound(s32 packed) {
-    s32 id = (packed >> 18) & 0x7F;
-    u32 stopped = (u32)packed >> 31;
-    s32 seq = (packed >> 8) & 0xFF;
-    s32 sep = packed & 0xFF;
+    s32 id = SOUND_BANK(packed);
+    u32 keyOn = SOUND_IS_KEY_ON(packed);
+    s32 seq = SOUND_SEQ(packed);
+    s32 sep = SOUND_SEP(packed);
     s32 slot = findSoundBank(id);
 
-    if (slot != -1 && !stopped) {
+    if (slot != -1 && !keyOn) {
 #if VERSION_US
         SsSepSetDecrescendo(SOUND.banks[slot].seqs[seq], sep, 0x80, 0x3C);
 #elif VERSION_EU
@@ -296,10 +299,12 @@ void fadeOutSound(s32 packed) {
     }
 }
 
+/* Whether a bank is still being loaded */
 s32 isSoundLoading(void) {
-    return SOUND.loader.state != 0;
+    return SOUND.loader.state != SOUND_LOAD_IDLE;
 }
 
+/* Closes what slot `slot` holds and starts loading bank `id` into it */
 void loadSoundBankInto(s32 slot, s32 id) {
     SoundBank *bank = &SOUND.banks[slot];
     SoundLoader *loader = &SOUND.loader;
@@ -309,15 +314,15 @@ void loadSoundBankInto(s32 slot, s32 id) {
     bank->id = id;
     if (bank->vabId != -1) {
         for (i = 0; i < bank->numSeqs; i++) {
-            for (j = 0; j < 16; j++) {
+            for (j = 0; j < SOUND_SEP_COUNT; j++) {
                 SsSepStop(bank->seqs[i], j);
             }
-            func_80030198(bank->seqs[i]);
+            SsSepClose(bank->seqs[i]);
         }
         SsVabClose(bank->vabId);
         bank->vabId = -1;
     }
-    loader->state = 1;
+    loader->state = SOUND_LOAD_HEAD;
     loader->files = SOUND_BANK_FILES[id];
     loader->slot = slot;
     FILE_CACHE.request(loader->files->headFile);
@@ -348,15 +353,15 @@ void updateSoundLoading(void) {
     s32 j;
 
     switch (loader->state) {
-    case 0:
+    case SOUND_LOAD_IDLE:
         break;
-    case 1:
+    case SOUND_LOAD_HEAD:
         if (FILE_CACHE.isLoading(loader->files->headFile) != 0) {
             return;
         }
         src = (s32 *)FILE_CACHE.load(loader->files->headFile);
         dst = (s32 *)bank->headBuffer;
-        n = FILE_TABLE.getSectorCount(loader->files->headFile) << 9;
+        n = FILE_TABLE.getSectorCount(loader->files->headFile) * (CD_SECTOR_SIZE / sizeof(s32));
         for (j = 0; j < n; j++) {
             *dst++ = *src++;
         }
@@ -364,14 +369,14 @@ void updateSoundLoading(void) {
         bank->vabId = SsVabOpenHeadSticky(FILE_CACHE.getArchiveEntry(loader->files->vhIndex, bank->headBuffer), slot, bank->spuAddr);
         FILE_CACHE.request(loader->files->bodyFile);
         loader->state++;
-    case 2:
+    case SOUND_LOAD_BODY:
         if (FILE_CACHE.isLoading(loader->files->bodyFile) != 0) {
             return;
         }
         HEAP.lock(FILE_CACHE.load(loader->files->bodyFile), 1);
         bank->vabId = SsVabTransBody((unsigned char *)FILE_CACHE.getEntry(loader->files->bodyEntry), bank->vabId);
         loader->state++;
-    case 3:
+    case SOUND_LOAD_TRANSFER:
         if (SsVabTransCompleted(0) == 0) {
             return;
         }
@@ -379,22 +384,24 @@ void updateSoundLoading(void) {
         HEAP.lock(FILE_CACHE.load(loader->files->bodyFile), 0);
         FILE_CACHE.free(loader->files->bodyFile);
         for (; loader->files->seps[i] != 0; i++) {
-            bank->seqs[i] = SsSepOpen((unsigned long *)FILE_CACHE.getArchiveEntry(loader->files->seps[i], bank->headBuffer), bank->vabId, 16);
+            bank->seqs[i] = SsSepOpen((unsigned long *)FILE_CACHE.getArchiveEntry(loader->files->seps[i], bank->headBuffer), bank->vabId, SOUND_SEP_COUNT);
         }
         bank->numSeqs = i;
-        loader->state = 0;
+        loader->state = SOUND_LOAD_IDLE;
     }
 }
 
+/* Plays one note of a program from the bank in slot `slot`; returns the voice */
 short soundKeyOn(s32 slot, short prog, short note) {
-    return SsUtKeyOn(SOUND.banks[slot].vabId, prog, 0, note, 0, 0x7F, 0x7F);
+    return SsUtKeyOn(SOUND.banks[slot].vabId, prog, 0, note, 0, SOUND_VOLUME_MAX, SOUND_VOLUME_MAX);
 }
 
+/* Releases the voice that a key-on sound id started */
 void soundKeyOff(s32 packed, s16 voice) {
-    s32 id = (packed >> 18) & 0x7F;
-    s32 prog = (packed >> 11) & 0x7F;
-    s32 tone = (packed >> 7) & 0xF;
-    s32 note = packed & 0x7F;
+    s32 id = SOUND_BANK(packed);
+    s32 prog = SOUND_PROG(packed);
+    s32 tone = SOUND_TONE(packed);
+    s32 note = SOUND_NOTE(packed);
     s32 slot = findSoundBank(id);
 
     if (voice != -1 && slot != -1) {
@@ -402,34 +409,35 @@ void soundKeyOff(s32 packed, s16 voice) {
     }
 }
 
+/* Starts libsnd, gives each slot its buffers and loads the system sounds (bank 1) into slot 0 */
 void initSound(void) {
     s32 i;
 
     SsSetTableSize(SOUND.seqTable, 6, 16);
 #if VERSION_US
-    SsSetTickMode(0x1000);
+    SsSetTickMode(SS_NOTICK);
 #elif VERSION_EU
     if (NTSC_MODE) {
-        SsSetTickMode(0x1000);
+        SsSetTickMode(SS_NOTICK);
     } else {
-        SsSetTickMode(0x1032); /* SS_NOTICK, 50 ticks a second */
+        SsSetTickMode(SS_NOTICK | 50); /* 50 ticks a second */
     }
 #endif
     SsStart2();
-    SsSetMVol(0x7F, 0x7F);
+    SsSetMVol(SOUND_VOLUME_MAX, SOUND_VOLUME_MAX);
     SsSetSerialAttr(0, 0, 1);
-    SsSetSerialVol(0, 0x7F, 0x7F);
-    SsUtSetReverbType(3);
+    SsSetSerialVol(0, SOUND_VOLUME_MAX, SOUND_VOLUME_MAX);
+    SsUtSetReverbType(SS_REV_TYPE_STUDIO_B);
     SsUtSetReverbDepth(0, 0);
-    func_800345B8();
-    for (i = 0; i < 3; i++) {
+    SsUtReverbOn();
+    for (i = 0; i < SOUND_SLOT_COUNT; i++) {
         SOUND.banks[i].vabId = -1;
         SOUND.banks[i].numSeqs = 0;
         SOUND.banks[i].headBuffer = SOUND_HEAD_BUFFERS[i];
         SOUND.banks[i].spuAddr = SOUND_SPU_ADDRS[i];
     }
     SOUND.loader.slot = 0;
-    SOUND.loader.state = 0;
+    SOUND.loader.state = SOUND_LOAD_IDLE;
     SOUND.loader.files = NULL;
     loadSoundBankInto(0, 1);
     while (isSoundLoading() != 0) {
