@@ -216,8 +216,8 @@ void FIGHTSTG_lowerAttack(void) {
         return;
     }
     entry = &TECHS[FIGHTSTG_action.tech - 1];
-    FIGHTSTG_battleFuncs.changeBoost((u8)(SIDE_ENEMY - FIGHTSTG_action.side), FIGHTSTG_battle.active[1 - team], 0, -entry->effectPower);
-    FIGHTSTG_queueBoostEnd((u8)(SIDE_ENEMY - FIGHTSTG_action.side), FIGHTSTG_battle.active[1 - team], 0, FIGHTSTG_action.tech);
+    FIGHTSTG_battleFuncs.changeBoost(SIDE_ENEMY - FIGHTSTG_action.side, FIGHTSTG_battle.active[1 - team], 0, -entry->effectPower);
+    FIGHTSTG_queueBoostEnd(SIDE_ENEMY - FIGHTSTG_action.side, FIGHTSTG_battle.active[1 - team], 0, FIGHTSTG_action.tech);
     FIGHTSTG_action.effects[entry->effect] = entry->effectPower;
 }
 
@@ -227,8 +227,8 @@ void FIGHTSTG_lowerDefense(void) {
     s32 other = 1 - (FIGHTSTG_action.side != 0);
     TechData *entry = &TECHS[FIGHTSTG_action.tech - 1];
 
-    FIGHTSTG_battleFuncs.changeBoost((u8)(SIDE_ENEMY - FIGHTSTG_action.side), FIGHTSTG_battle.active[other], 1, -entry->effectPower);
-    FIGHTSTG_queueBoostEnd((u8)(SIDE_ENEMY - FIGHTSTG_action.side), FIGHTSTG_battle.active[other], 1, FIGHTSTG_action.tech);
+    FIGHTSTG_battleFuncs.changeBoost(SIDE_ENEMY - FIGHTSTG_action.side, FIGHTSTG_battle.active[other], 1, -entry->effectPower);
+    FIGHTSTG_queueBoostEnd(SIDE_ENEMY - FIGHTSTG_action.side, FIGHTSTG_battle.active[other], 1, FIGHTSTG_action.tech);
     FIGHTSTG_action.effects[entry->effect] = entry->effectPower;
 }
 
@@ -404,7 +404,7 @@ void FIGHTSTG_applyTechEffect(void) {
 void FIGHTSTG_startAction(u8 side, s32 tech) {
     TechData *entry;
 
-    HEAP.zero(&FIGHTSTG_action, 0x68);
+    HEAP.zero(&FIGHTSTG_action, BATTLE_ACTION_STATE_SIZE);
     entry = &TECHS[tech - 1];
     FIGHTSTG_action.side = side;
     FIGHTSTG_action.tech = tech;

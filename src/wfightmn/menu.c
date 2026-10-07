@@ -6,21 +6,122 @@
 
 #include "wfightmn.h"
 
-/* The battle menu's task: sets up the battle (its music, FIGHTSTG's tasks and
-   the fighters' models), then runs the menu (WFIGHTMN_runTurn), playing sound
-   0x60040000 once a partner is confused and the battle's music again after */
-void WFIGHTMN_updateMenu(BattleMenu *task, BattleMenuChildren *children) {
+/* Sets the battle's kind from the mode it came from and the battle: the
+   escape, UNK2, no-damage and final battles, or a normal one */
+static inline void setBattleKind(void) {
+    s32 mode;
+
+    mode = GAME.funcs.getPrevMode();
+    if (mode == 0x22D && BATTLE_SETUP.battle == 0x143) {
+        FIGHTSTG_battle.kind = BATTLE_KIND_ESCAPE;
+    } else if (mode == 0x23A && BATTLE_SETUP.battle == 0xB) {
+        FIGHTSTG_battle.kind = BATTLE_KIND_UNK2;
+    } else if (mode == 0x272 && BATTLE_SETUP.battle == 0x1E) {
+        FIGHTSTG_battle.kind = BATTLE_KIND_NO_DAMAGE;
+    } else if (BATTLE_SETUP.battle == 0x144) {
+        FIGHTSTG_battle.kind = BATTLE_KIND_FINAL;
+        FIGHTSTG_battle.weakened = 0;
+        FIGHTSTG_battle.hitCount = 0;
+        FIGHTSTG_battle.tech = 0;
+    } else {
+        FIGHTSTG_battle.kind = BATTLE_KIND_NORMAL;
+    }
+}
+
+/* Adds the partner's Digimon (its battle digivolution, but not after an
+   ambush) and the enemy, the partner weak when its HP is low */
+static inline void addFighters(BattleMenu *task, BattleMenuChildren *children) {
     s16 slots[4];
     s32 digimon;
     s32 partner;
-    s32 chance;
-    s32 mode;
-    BattleStats *stats;
     BattleFighter *unit;
+
+    partner = GAME.funcs.getPartyMember(0);
+    if (WFIGHTMN_rollAmbush() != 0) {
+        digimon = DIGIMON_DATA[partner].id;
+        task->counter = 1;
+    } else if (GAME.funcs.getPartnerSlots(partner, slots) > 0 && GAME.partners[partner].battleDigivolve != 0) {
+        digimon = GAME.partners[partner].battleDigivolve;
+    } else {
+        digimon = DIGIMON_DATA[partner].id;
+    }
+    children->models->add(children->models, 0, digimon, 1);
+    children->models->face(children->models, 0);
+    children->models->add(children->models, 0x10, BATTLE_SETUP.enemies[0].fighter, 1);
+    children->models->face(children->models, 0x10);
+    WFIGHTMN_initFighters(digimon);
+    unit = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+    if (unit->maxHp / 4 >= unit->hp) {
+        children->models->setIdleMotion(children->models, 0, 1);
+    }
+}
+
+/* Queues the first turns: the enemy's first after an ambush, with its
+   message, or by a roll on the fighters' speeds */
+static inline void queueFirstTurns(BattleMenu *task, BattleMenuChildren *children) {
+    BattleStats *stats;
+    s32 chance;
+
+    if (task->counter != 0) {
+        FIGHTSTG_queueEnemyTurn(0);
+        FIGHTSTG_queuePlayerTurn(FIGHTSTG_events.funcs.getDelay(0, 0) / 2);
+        children->task.message = FIGHTSTG_createMessage();
+        task->args[0] = 7;
+        children->task.message->show(children->task.message, 1, task->args);
+        task->step++;
+        FIGHTSTG_setPlayerTurnStep(1);
+    } else {
+        stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
+        chance = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1])->stats[BATTLE_STAT_SPEED] * 8 / stats->stats[BATTLE_STAT_SPEED];
+        if (RANDOM.next() % 128 < chance) {
+            FIGHTSTG_queueEnemyTurn(0);
+            FIGHTSTG_queuePlayerTurn(FIGHTSTG_events.funcs.getDelay(0, 0) / 2);
+            FIGHTSTG_setPlayerTurnStep(1);
+        } else {
+            FIGHTSTG_queuePlayerTurn(0);
+            FIGHTSTG_queueEnemyTurn(FIGHTSTG_events.funcs.getDelay(0, 0) / 2);
+        }
+        task->nextState(task);
+    }
+}
+
+/* Plays sound 0x60040000 once a partner is confused, and the battle's music
+   again once none is */
+static inline void switchConfusionMusic(BattleMenu *task) {
     BattleFighter *units;
     s32 found;
     s32 i;
 
+    units = FIGHTSTG_battle.fighters[0];
+    if (task->confusionSound == 0) {
+        for (i = 0; i < 3; i++) {
+            if (units[i].flags & FIGHTER_CONFUSED) {
+                SOUND.playSound(0x60040000);
+                task->confusionSound = 1;
+                break;
+            }
+        }
+    } else {
+        found = 0;
+        for (i = 0; i < 3; i++) {
+            if (units[i].flags & FIGHTER_CONFUSED) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            SOUND.playSound(BATTLE_SETUP.music);
+            task->confusionSound = 0;
+        }
+    }
+}
+
+/* The battle menu's task: sets up the battle (its music, FIGHTSTG's tasks,
+   setBattleKind, the fighters' models in addFighters and queueFirstTurns),
+   then runs the menu (WFIGHTMN_runTurn), playing sound 0x60040000 once a
+   partner is confused and the battle's music again after
+   (switchConfusionMusic) */
+void WFIGHTMN_updateMenu(BattleMenu *task, BattleMenuChildren *children) {
     switch (task->state) {
     case 0:
     default:
@@ -48,46 +149,15 @@ void WFIGHTMN_updateMenu(BattleMenu *task, BattleMenuChildren *children) {
             case 0:
             default:
                 children->commands = FIGHTSTG_startPlayerTurn();
-                children->camera = FIGHTSTG_createBattleCamera(0x1001);
+                children->camera = FIGHTSTG_createBattleCamera(BATTLE_LAYER_CAMERA);
                 children->stage = FIGHTSTG_createStage(BATTLE_SETUP.stage, 60);
                 children->models = FIGHTSTG_createModels();
-                children->lights = FIGHTSTG_createLights(0x1001);
+                children->lights = FIGHTSTG_createLights(BATTLE_LAYER_CAMERA);
                 task->nextStep(task);
                 break;
             case 1:
-                mode = GAME.funcs.getPrevMode();
-                if (mode == 0x22D && BATTLE_SETUP.battle == 0x143) {
-                    FIGHTSTG_battle.kind = BATTLE_KIND_ESCAPE;
-                } else if (mode == 0x23A && BATTLE_SETUP.battle == 0xB) {
-                    FIGHTSTG_battle.kind = BATTLE_KIND_UNK2;
-                } else if (mode == 0x272 && BATTLE_SETUP.battle == 0x1E) {
-                    FIGHTSTG_battle.kind = BATTLE_KIND_NO_DAMAGE;
-                } else if (BATTLE_SETUP.battle == 0x144) {
-                    FIGHTSTG_battle.kind = BATTLE_KIND_FINAL;
-                    FIGHTSTG_battle.weakened = 0;
-                    FIGHTSTG_battle.hitCount = 0;
-                    FIGHTSTG_battle.tech = 0;
-                } else {
-                    FIGHTSTG_battle.kind = BATTLE_KIND_NORMAL;
-                }
-                partner = GAME.funcs.getPartyMember(0);
-                if (WFIGHTMN_rollAmbush() != 0) {
-                    digimon = DIGIMON_DATA[partner].id;
-                    task->counter = 1;
-                } else if (GAME.funcs.getPartnerSlots(partner, slots) > 0 && GAME.partners[partner].battleDigivolve != 0) {
-                    digimon = GAME.partners[partner].battleDigivolve;
-                } else {
-                    digimon = DIGIMON_DATA[partner].id;
-                }
-                children->models->add(children->models, 0, digimon, 1);
-                children->models->face(children->models, 0);
-                children->models->add(children->models, 0x10, BATTLE_SETUP.enemies[0].fighter, 1);
-                children->models->face(children->models, 0x10);
-                WFIGHTMN_initFighters(digimon);
-                unit = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
-                if (unit->maxHp / 4 >= unit->hp) {
-                    children->models->setIdleMotion(children->models, 0, 1);
-                }
+                setBattleKind();
+                addFighters(task, children);
 #if VERSION_EU
                 GFX.frameTime = 1;
                 children->cameraMove.cameraShots = FIGHTSTG_startCameraShots();
@@ -113,27 +183,7 @@ void WFIGHTMN_updateMenu(BattleMenu *task, BattleMenuChildren *children) {
                 task->step++;
                 break;
             case 5:
-                if (task->counter != 0) {
-                    FIGHTSTG_queueEnemyTurn(0);
-                    FIGHTSTG_queuePlayerTurn(FIGHTSTG_events.funcs.getDelay(0, 0) / 2);
-                    children->task.message = FIGHTSTG_createMessage();
-                    task->args[0] = 7;
-                    children->task.message->show(children->task.message, 1, task->args);
-                    task->step++;
-                    FIGHTSTG_setPlayerTurnStep(1);
-                } else {
-                    stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-                    chance = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1])->stats[BATTLE_STAT_SPEED] * 8 / stats->stats[BATTLE_STAT_SPEED];
-                    if (RANDOM.next() % 128 < chance) {
-                        FIGHTSTG_queueEnemyTurn(0);
-                        FIGHTSTG_queuePlayerTurn(FIGHTSTG_events.funcs.getDelay(0, 0) / 2);
-                        FIGHTSTG_setPlayerTurnStep(1);
-                    } else {
-                        FIGHTSTG_queuePlayerTurn(0);
-                        FIGHTSTG_queueEnemyTurn(FIGHTSTG_events.funcs.getDelay(0, 0) / 2);
-                    }
-                    task->nextState(task);
-                }
+                queueFirstTurns(task, children);
                 WFIGHTMN_checkParty();
                 break;
             case 6:
@@ -147,28 +197,7 @@ void WFIGHTMN_updateMenu(BattleMenu *task, BattleMenuChildren *children) {
         break;
     case 1:
         WFIGHTMN_runTurn(task);
-        units = FIGHTSTG_battle.fighters[0];
-        if (task->confusionSound == 0) {
-            for (i = 0; i < 3; i++) {
-                if (units[i].flags & FIGHTER_CONFUSED) {
-                    SOUND.playSound(0x60040000);
-                    task->confusionSound = 1;
-                    break;
-                }
-            }
-        } else {
-            found = 0;
-            for (i = 0; i < 3; i++) {
-                if (units[i].flags & FIGHTER_CONFUSED) {
-                    found = 1;
-                    break;
-                }
-            }
-            if (!found) {
-                SOUND.playSound(BATTLE_SETUP.music);
-                task->confusionSound = 0;
-            }
-        }
+        switchConfusionMusic(task);
         break;
     case 2:
     case 3:
@@ -923,21 +952,119 @@ void WFIGHTMN_endBlast(BattleMenu *task, BattleMenuChildren *children) {
     }
 }
 
+/* Takes the fallen fighter's event off the queue, shows message 0x50 or
+   0x51 and clears its status, ending the partner's special */
+static inline void announceKnockOut(BattleMenu *task, BattleMenuChildren *children, QueuedEvent *action) {
+    BattleFighter *fighter;
+    s32 side;
+
+    /* the key is the event's first two args: args[0]'s low byte and args[1] */
+    FIGHTSTG_events.funcs.remove((EventKey *)&action->args[0]);
+    side = action->args[0] >> 4;
+    fighter = FIGHTSTG_battle.fighters[side] + FIGHTSTG_battle.active[side];
+    if (side == 0) {
+        if (fighter->special != 0) {
+            fighter->special = 0;
+#if VERSION_US
+            /* FIGHTSTG_queueSpecialEnd's event, built in the arguments */
+            task->args[0] = EVENT_SPECIAL_END;
+            task->args[1] = 1;
+            task->args[2] = 0;
+            task->args[3] = FIGHTSTG_battle.active[0];
+            FIGHTSTG_events.funcs.pushFirst((BattleEvent *)task->args);
+#elif VERSION_EU
+            FIGHTSTG_queueSpecialEnd();
+#endif
+        }
+        task->args[0] = 0x50;
+        task->args[1] = 0;
+    } else {
+        task->args[0] = 0x51;
+        task->args[1] = 0x10;
+    }
+    children->task.message->show(children->task.message, 2, task->args);
+    fighter->charge = 0;
+    fighter->flags = 0;
+    fighter->confusion = 0;
+    fighter->sleep = 0;
+    fighter->paralysis = 0;
+}
+
+/* With no fighter left on the side, ends the battle: lost (message 0x53)
+   or won (message 0x52, the partner's motion 0xD and, but in
+   BATTLE_KIND_FINAL_LAST, the win jingle) */
+static inline void endBattleOnKnockOut(BattleMenu *task, BattleMenuChildren *children, QueuedEvent *event) {
+    Models *models;
+
+    children->task.message = FIGHTSTG_createMessage();
+    if (event->args[0] == 0) {
+        FIGHTSTG_endBattle(BATTLE_LOST);
+        SOUND.playSound(0x60040008);
+        task->args[0] = 0x53;
+        task->setSubstate(task, 2);
+        children->cameraMove.cameraTurn = FIGHTSTG_startCameraTurn();
+    } else {
+        FIGHTSTG_endBattle(BATTLE_WON);
+        if (FIGHTSTG_battle.kind != BATTLE_KIND_FINAL_LAST) {
+            SOUND.playSound(SOUND_WIN_JINGLE);
+        }
+        task->args[0] = 0x52;
+        task->setSubstate(task, 0x18);
+        task->args[1] = GFX.funcs.getTime();
+        task->args[2] = 100;
+        models = TASK_REGISTRY.funcs.find(BATTLE_TASK_MODELS, -1, -1);
+        models->get(models, 0)->motion = 0xD;
+    }
+    children->task.message->show(children->task.message, 1, task->args);
+}
+
+/* In BATTLE_KIND_FINAL, brings in the enemy's second fighter in place of
+   the first, then lets the enemy's turn come at once */
+static inline void bringSecondEnemy(BattleMenu *task, BattleMenuChildren *children) {
+    s32 index;
+
+    switch (task->counter) {
+    case 0:
+    default:
+        if (children->task.task == NULL) {
+            FIGHTSTG_battle.kind = BATTLE_KIND_FINAL_SECOND;
+            FIGHTSTG_battle.active[1] = 1;
+            children->task.entrance = FIGHTSTG_startEntrance(FIGHTSTG_battle.fighters[1][1].id, 1, 0);
+            FIGHTSTG_battle.active[1] = 0;
+            task->counter++;
+        }
+        break;
+    case 1:
+        if (children->task.entrance->done != 0) {
+            FIGHTSTG_battle.fighters[1][0] = FIGHTSTG_battle.fighters[1][1];
+            FIGHTSTG_battle.active[1] = 0;
+            FIGHTSTG_battle.fighters[1][1].id = 0;
+            task->counter++;
+        }
+        break;
+    case 2:
+        index = FIGHTSTG_events.funcs.first(EVENT_ENEMY_TURN);
+        if (index >= 0) {
+            FIGHTSTG_events.events[index].time = 0;
+        }
+        task->setSubstate(task, 2);
+        break;
+    }
+}
+
 /* A fighter falls (?): case 0 takes its event off the queue, shows message
-   0x50 or 0x51 and clears its status; case 1 looks for the side's next
-   fighter standing. The player's side picks one (FIGHTSTG_setPlayerTurnStep(4)), the
-   enemy's brings in the first; with none left the battle ends (0x53 lost,
-   0x52 won). Case 5 brings in the enemy's second fighter in BATTLE_KIND_FINAL. */
+   0x50 or 0x51 and clears its status (announceKnockOut); case 1 looks for the
+   side's next fighter standing. The player's side picks one
+   (FIGHTSTG_setPlayerTurnStep(4)), the enemy's brings in the first; with none
+   left the battle ends (endBattleOnKnockOut: 0x53 lost, 0x52 won). Case 5
+   brings in the enemy's second fighter in BATTLE_KIND_FINAL
+   (bringSecondEnemy). */
 void WFIGHTMN_knockOut(BattleMenu *task, BattleMenuChildren *children) {
     QueuedEvent *action;
     QueuedEvent *event;
     BattleFighter *unit;
     BattleFighter *enemy;
-    BattleFighter *fighter;
-    s32 index;
     BattleTableEntry *entry;
-    Models *models;
-    s32 side;
     s32 slot;
     s32 i;
 
@@ -952,36 +1079,7 @@ void WFIGHTMN_knockOut(BattleMenu *task, BattleMenuChildren *children) {
             task->setStep(task, 5);
             return;
         }
-        /* the key is the event's first two args: args[0]'s low byte and args[1] */
-        FIGHTSTG_events.funcs.remove((EventKey *)&action->args[0]);
-        side = action->args[0] >> 4;
-        fighter = FIGHTSTG_battle.fighters[side] + FIGHTSTG_battle.active[side];
-        if (side == 0) {
-            if (fighter->special != 0) {
-                fighter->special = 0;
-#if VERSION_US
-                /* FIGHTSTG_queueSpecialEnd's event, built in the arguments */
-                task->args[0] = EVENT_SPECIAL_END;
-                task->args[1] = 1;
-                task->args[2] = 0;
-                task->args[3] = FIGHTSTG_battle.active[0];
-                FIGHTSTG_events.funcs.pushFirst((BattleEvent *)task->args);
-#elif VERSION_EU
-                FIGHTSTG_queueSpecialEnd();
-#endif
-            }
-            task->args[0] = 0x50;
-            task->args[1] = 0;
-        } else {
-            task->args[0] = 0x51;
-            task->args[1] = 0x10;
-        }
-        children->task.message->show(children->task.message, 2, task->args);
-        fighter->charge = 0;
-        fighter->flags = 0;
-        fighter->confusion = 0;
-        fighter->sleep = 0;
-        fighter->paralysis = 0;
+        announceKnockOut(task, children, action);
         task->step++;
         break;
     case 1:
@@ -1012,26 +1110,7 @@ void WFIGHTMN_knockOut(BattleMenu *task, BattleMenuChildren *children) {
                 }
                 break;
             }
-            children->task.message = FIGHTSTG_createMessage();
-            if (event->args[0] == 0) {
-                FIGHTSTG_endBattle(BATTLE_LOST);
-                SOUND.playSound(0x60040008);
-                task->args[0] = 0x53;
-                task->setSubstate(task, 2);
-                children->cameraMove.cameraTurn = FIGHTSTG_startCameraTurn();
-            } else {
-                FIGHTSTG_endBattle(BATTLE_WON);
-                if (FIGHTSTG_battle.kind != BATTLE_KIND_FINAL_LAST) {
-                    SOUND.playSound(SOUND_WIN_JINGLE);
-                }
-                task->args[0] = 0x52;
-                task->setSubstate(task, 0x18);
-                task->args[1] = GFX.funcs.getTime();
-                task->args[2] = 100;
-                models = TASK_REGISTRY.funcs.find(BATTLE_TASK_MODELS, -1, -1);
-                models->get(models, 0)->motion = 0xD;
-            }
-            children->task.message->show(children->task.message, 1, task->args);
+            endBattleOnKnockOut(task, children, event);
         }
         break;
     case 2:
@@ -1059,33 +1138,7 @@ void WFIGHTMN_knockOut(BattleMenu *task, BattleMenuChildren *children) {
         }
         break;
     case 5:
-        switch (task->counter) {
-        case 0:
-        default:
-            if (children->task.task == NULL) {
-                FIGHTSTG_battle.kind = BATTLE_KIND_FINAL_SECOND;
-                FIGHTSTG_battle.active[1] = 1;
-                children->task.entrance = FIGHTSTG_startEntrance(FIGHTSTG_battle.fighters[1][1].id, 1, 0);
-                FIGHTSTG_battle.active[1] = 0;
-                task->counter++;
-            }
-            break;
-        case 1:
-            if (children->task.entrance->done != 0) {
-                FIGHTSTG_battle.fighters[1][0] = FIGHTSTG_battle.fighters[1][1];
-                FIGHTSTG_battle.active[1] = 0;
-                FIGHTSTG_battle.fighters[1][1].id = 0;
-                task->counter++;
-            }
-            break;
-        case 2:
-            index = FIGHTSTG_events.funcs.first(EVENT_ENEMY_TURN);
-            if (index >= 0) {
-                FIGHTSTG_events.events[index].time = 0;
-            }
-            task->setSubstate(task, 2);
-            break;
-        }
+        bringSecondEnemy(task, children);
         break;
     }
 }

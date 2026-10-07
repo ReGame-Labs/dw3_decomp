@@ -10,6 +10,13 @@
 
 extern MATRIX IDENTITY_MATRIX; /* the root bone's parent (src/main/data/matrices.c) */
 
+/* A position or rotation, without the SVECTOR pad */
+typedef struct ShortVec3 {
+    /* 0x0 */ s16 x;
+    /* 0x2 */ s16 y;
+    /* 0x4 */ s16 z;
+} ShortVec3;
+
 /* Draws one bone of a Model (FIGHTSTG_createMesh), from the parts of an archive */
 typedef struct Mesh {
     TASK_HEADER(Mesh);
@@ -17,10 +24,10 @@ typedef struct Mesh {
     /* 0x54 */ s32 colorMode; /* Model.setColor's */
     /* 0x58 */ CVECTOR color;
     /* 0x5C */ void *archive;
-    /* 0x60 */ u8 *vertices; /* a count, then ShortVec3s */
-    /* 0x64 */ u8 *normals; /* a count, then ShortVec3s */
+    /* 0x60 */ ShortVec3 *vertices; /* the count in [0].x, then the vertices */
+    /* 0x64 */ ShortVec3 *normals; /* the count in [0].x, then the normals */
     /* 0x68 */ u8 *commands; /* see MeshDrawState */
-    /* 0x6C */ u8 *bounds; /* 9 ShortVec3 points (FIGHTSTG_isMeshOnScreen) */
+    /* 0x6C */ ShortVec3 *bounds; /* 9 points (FIGHTSTG_isMeshOnScreen) */
     /* 0x70 */ Vec2 texPos;
     /* 0x78 */ s32 *screen; /* where its vertices land on screen */
     /* 0x7C */ s32 *depth; /* and their depths in the ordering table */
@@ -37,8 +44,8 @@ typedef struct Mesh {
    indices when lit and its UVs when textured. 0xFF ends the commands. */
 typedef struct MeshDrawState {
     /* 0x00 */ s32 textured;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
+    /* 0x04 */ s32 unk4; /* the 0xB nibble: on the disc, 1 on the textured polygons that are not lit and 0 on those that are; nothing reads it */
+    /* 0x08 */ s32 unk8; /* the 0xA nibble: on the disc, 0 but in two effect meshes; nothing reads it */
     /* 0x0C */ s32 quad;
     /* 0x10 */ s32 lit;
     /* 0x14 */ s32 gouraud;
@@ -56,6 +63,7 @@ typedef struct MeshDrawState {
     /* 0x44 */ CVECTOR color[4];
     /* 0x54 */ union {
         void *ptr;
+        u_long *tag; /* the primitive's first word */
         POLY_FT3 *ft3;
         POLY_FT4 *ft4;
         POLY_GT3 *gt3;
@@ -67,7 +75,6 @@ typedef struct MeshDrawState {
     /* 0x68 */ u_long *ot;
     /* 0x6C */ u8 uv[4][2];
     /* 0x74 */ CVECTOR colors[4]; /* the polygon's vertex colors */
-    /* 0x84 */ s32 unk84;
 } MeshDrawState;
 
 /* One part of a Model: a mesh (Mesh) placed by a matrix relative to its
@@ -87,13 +94,6 @@ typedef struct ModelBone {
     /* 0x74 */ SVECTOR prevRot;
     /* 0x7C */ SVECTOR prevScale;
 } ModelBone;
-
-/* A position or rotation, without the SVECTOR pad */
-typedef struct ShortVec3 {
-    /* 0x0 */ s16 x;
-    /* 0x2 */ s16 y;
-    /* 0x4 */ s16 z;
-} ShortVec3;
 
 /* What drives a Model, owned by whoever created it */
 typedef struct ModelControl {
@@ -133,7 +133,10 @@ typedef struct Model {
     TASK_HEADER(Model);
     /* 0x0050 */ s32 boneCount;
     /* 0x0054 */ ModelBone *bones;
-    /* 0x0058 */ SVECTOR move; /* moves the root bone, along its rotation */
+    /* 0x0058 */ union {
+        SVECTOR v; /* moves the root bone, along its rotation */
+        s32 xy; /* vx and vy as one word */
+    } move;
     /* 0x0060 */ s32 hasIdle; /* it goes back to its idle motion */
     /* 0x0064 */ ModelControl *control;
     /* 0x0068 */ Vec2 texPos; /* where its textures go in VRAM */
@@ -225,7 +228,7 @@ typedef struct FighterInfo {
     /* 0x08 */ s32 effects; /* its effect scripts' archive */
     /* 0x0C */ s32 face; /* its FaceRects: an offset in the fighters' file */
     /* 0x10 */ s16 distance; /* how far past 0x1400 from the middle it stands */
-    /* 0x12 */ u8 unk12[6];
+    /* 0x12 */ s16 unk12[3]; /* varied on the disc (as 0, 0x700, 0x100); nothing reads it */
     /* 0x18 */ s16 height;
     /* 0x1A */ ShortVec3 camPos[12]; /* the cameras that look at it; an enemy
                                         has 3 of each and then their count */
@@ -242,7 +245,7 @@ typedef struct FighterInfoEnemy {
     /* 0x08 */ s32 effects;
     /* 0x0C */ s32 face;
     /* 0x10 */ s16 distance;
-    /* 0x12 */ u8 unk12[6];
+    /* 0x12 */ s16 unk12[3];
     /* 0x18 */ s16 height;
     /* 0x1A */ ShortVec3 camPos[3];
     /* 0x2C */ ShortVec3 camRef[3];

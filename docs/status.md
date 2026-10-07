@@ -107,7 +107,7 @@ README's badge counts them: fake matches, then the other kinds together.
 | Fake matches | 0 | a comment that starts with `/* fake match:` and says what is forced and why |
 | BEC forms | 1 | a comment that starts with `/* BEC form:` and names the Digimon World 2 function with the same form |
 | Unused frame locals | 6 | `/* unused, but it is in the original stack frame */` |
-| Form-dependent matches | 177 | a comment that says the `match depends on` the form |
+| Form-dependent matches | 176 | a comment that says the `match depends on` the form |
 | Functions still in assembly | 0 | `INCLUDE_ASM` |
 
 - A fake match is the last resort: a form forced only for the code it makes,

@@ -87,7 +87,7 @@ void FIGHTSTG_updateFace(Face *task) {
         task->time += FIGHTSTG_battle.frames;
         frame = task->time % 18 / 6;
         layer = GFX.funcs.getLayer(SCREEN_LAYER);
-        ot = (u_long *)layer->getOtEntry(layer, 0);
+        ot = layer->getOtEntry(layer, 0);
         prim = GFX.funcs.getPrim();
         for (i = 0; i < 2; i++) {
             if (task->parts[i].used && task->parts[i].frame != eyes) {

@@ -60,7 +60,7 @@ Vec2 FIGHTSTG_fighterTexPos[] = {
 };
 
 /* Models.add: replaces the model registered as ID with FIGHTER's, in a free
-   slot with that slot's textures, drawn on layer 0x1004 when VISIBLE */
+   slot with that slot's textures, drawn on layer BATTLE_LAYER_MODELS when VISIBLE */
 void FIGHTSTG_addFighterModel(Models *task, s32 id, s32 fighter, s32 visible) {
     ModelsChildren *children = task->children;
     FighterInfo *info;
@@ -80,7 +80,7 @@ void FIGHTSTG_addFighterModel(Models *task, s32 id, s32 fighter, s32 visible) {
         task->controls[i].id = id;
         task->controls[i].layers[0].enabled = visible;
         task->controls[i].layers[0].wireframe = 0;
-        task->controls[i].layers[0].layerId = 0x1004;
+        task->controls[i].layers[0].layerId = BATTLE_LAYER_MODELS;
     }
 }
 

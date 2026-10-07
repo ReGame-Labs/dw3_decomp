@@ -576,57 +576,102 @@ void CARDGAME_dealHands(CardBattle *battle, CardScreen *screen) {
     }
 }
 
-/* The start of a card battle: deals six cards to each side, turns them over and counts their colours (a deck with fewer than six cards shows a message instead); 1 when it ends */
+/* Deals the next card of each side to its slot, and counts it off the deck
+   on the panels */
+static inline void dealNextCards(CardBattle *battle, CardScreen *screen) {
+    if (battle->effectStep.vars[0] < 6) {
+#if VERSION_US
+        screen->startMove(screen, battle->effectStep.vars[0], 20, battle->effectStep.vars[0] * 0x2900 + 0x1800, 0x9000);
+#elif VERSION_EU
+        screen->startMove(screen, battle->effectStep.vars[0], 20, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][0] + battle->effectStep.vars[0] * 0x2900, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][1]);
+#endif
+        screen->setSpriteScale(screen, battle->effectStep.vars[0], 0x1000, 0x1000);
+#if VERSION_US
+        screen->startMove(screen, battle->effectStep.vars[0] + 6, 20, battle->effectStep.vars[0] * 0x2900 + 0x1800, 0x3200);
+#elif VERSION_EU
+        screen->startMove(screen, battle->effectStep.vars[0] + 6, 20, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][2] + battle->effectStep.vars[0] * 0x2900, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][3]);
+#endif
+        screen->setSpriteScale(screen, battle->effectStep.vars[0] + 6, 0x1000, 0x1000);
+        battle->effectStep.vars[0]++;
+        battle->effectStep.vars[1]--;
+        battle->effectStep.vars[2]--;
+        screen->setPanelValue(screen, 0, CARD_PANEL_HAND, battle->effectStep.vars[0]);
+        screen->setPanelValue(screen, 1, CARD_PANEL_HAND, battle->effectStep.vars[0]);
+        screen->setPanelValue(screen, 0, CARD_PANEL_DECK, battle->effectStep.vars[1]);
+        screen->setPanelValue(screen, 1, CARD_PANEL_DECK, battle->effectStep.vars[2]);
+    }
+}
+
+/* Counts the colours of the next card of each side; the cards that add to
+   one blink */
+static inline void countNextColors(CardBattle *battle, CardScreen *screen) {
+    if (battle->effectStep.vars[0] < 6) {
+        if (CARDGAME_addColorCount(battle, screen, 0, battle->sides[0].pile.hand[battle->effectStep.vars[0]])) {
+            screen->startBlink(screen, battle->effectStep.vars[0]);
+        }
+        if (CARDGAME_addColorCount(battle, screen, 1, battle->sides[1].pile.hand[battle->effectStep.vars[0]])) {
+            screen->startBlink(screen, battle->effectStep.vars[0] + 6);
+        }
+        battle->effectStep.vars[0]++;
+    }
+}
+
+/* Starts the state of the battle start effectStep.nextState asks for */
+static inline void startDealState(CardBattle *battle, CardScreen *screen) {
+    switch (battle->effectStep.nextState) {
+    case 1:
+        screen->openPanels(screen);
+        break;
+    case 2:
+        CARDGAME_dealHands(battle, screen);
+        break;
+    case 3:
+    case 4:
+        battle->effectStep.time = 0;
+        battle->effectStep.vars[0] = 0;
+        battle->effectStep.vars[3] = 0;
+        break;
+    case 5:
+        battle->effectStep.time = 0;
+        battle->effectStep.vars[0] = 0;
+        battle->effectStep.vars[3] = 0;
+        screen->closePanels(screen);
+        break;
+    case 6:
+        screen->setPanelFlags(screen, 0x1000);
+        screen->openMessage(screen, 0x21, 0, 1, 1);
+        battle->effectStep.choice = 1;
+        break;
+    case 7:
+        SOUND.playSound(SOUND_WIN_JINGLE);
+        screen->setPanelFlags(screen, 0x2000);
+        screen->openMessage(screen, 0x22, 0, 1, 1);
+        battle->effectStep.choice = 2;
+        break;
+    case 9:
+        battle->effectStep.time = 0;
+        battle->effectStep.vars[0] = 0;
+        battle->effectStep.vars[3] = 0;
+        screen->closePanels(screen);
+        screen->closeMessage(screen);
+        break;
+    case 11:
+        screen->openMessage(screen, battle->prize, 0, 0, 3);
+        break;
+    case 8:
+    case 10:
+    case 12:
+        /* nothing to set up */
+        break;
+    }
+}
+
+/* The start of a card battle: deals six cards to each side (dealNextCards), turns them over and counts their colours (countNextColors) (a deck with fewer than six cards shows a message instead); 1 when it ends */
 s32 CARDGAME_stepStart(CardBattle *battle, CardScreen *screen) {
     s32 done = 0;
 
     if (battle->effectStep.nextState != 0) {
-        switch (battle->effectStep.nextState) {
-        case 1:
-            screen->openPanels(screen);
-            break;
-        case 2:
-            CARDGAME_dealHands(battle, screen);
-            break;
-        case 3:
-        case 4:
-            battle->effectStep.time = 0;
-            battle->effectStep.vars[0] = 0;
-            battle->effectStep.vars[3] = 0;
-            break;
-        case 5:
-            battle->effectStep.time = 0;
-            battle->effectStep.vars[0] = 0;
-            battle->effectStep.vars[3] = 0;
-            screen->closePanels(screen);
-            break;
-        case 6:
-            screen->setPanelFlags(screen, 0x1000);
-            screen->openMessage(screen, 0x21, 0, 1, 1);
-            battle->effectStep.choice = 1;
-            break;
-        case 7:
-            SOUND.playSound(SOUND_WIN_JINGLE);
-            screen->setPanelFlags(screen, 0x2000);
-            screen->openMessage(screen, 0x22, 0, 1, 1);
-            battle->effectStep.choice = 2;
-            break;
-        case 9:
-            battle->effectStep.time = 0;
-            battle->effectStep.vars[0] = 0;
-            battle->effectStep.vars[3] = 0;
-            screen->closePanels(screen);
-            screen->closeMessage(screen);
-            break;
-        case 11:
-            screen->openMessage(screen, battle->prize, 0, 0, 3);
-            break;
-        case 8:
-        case 10:
-        case 12:
-            /* nothing to set up */
-            break;
-        }
+        startDealState(battle, screen);
         battle->effectStep.state = battle->effectStep.nextState;
         battle->effectStep.nextState = 0;
     }
@@ -645,27 +690,7 @@ s32 CARDGAME_stepStart(CardBattle *battle, CardScreen *screen) {
         break;
     case 2:
         if (battle->effectStep.vars[3] >= 7) {
-            if (battle->effectStep.vars[0] < 6) {
-#if VERSION_US
-                screen->startMove(screen, battle->effectStep.vars[0], 20, battle->effectStep.vars[0] * 0x2900 + 0x1800, 0x9000);
-#elif VERSION_EU
-                screen->startMove(screen, battle->effectStep.vars[0], 20, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][0] + battle->effectStep.vars[0] * 0x2900, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][1]);
-#endif
-                screen->setSpriteScale(screen, battle->effectStep.vars[0], 0x1000, 0x1000);
-#if VERSION_US
-                screen->startMove(screen, battle->effectStep.vars[0] + 6, 20, battle->effectStep.vars[0] * 0x2900 + 0x1800, 0x3200);
-#elif VERSION_EU
-                screen->startMove(screen, battle->effectStep.vars[0] + 6, 20, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][2] + battle->effectStep.vars[0] * 0x2900, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][3]);
-#endif
-                screen->setSpriteScale(screen, battle->effectStep.vars[0] + 6, 0x1000, 0x1000);
-                battle->effectStep.vars[0]++;
-                battle->effectStep.vars[1]--;
-                battle->effectStep.vars[2]--;
-                screen->setPanelValue(screen, 0, CARD_PANEL_HAND, battle->effectStep.vars[0]);
-                screen->setPanelValue(screen, 1, CARD_PANEL_HAND, battle->effectStep.vars[0]);
-                screen->setPanelValue(screen, 0, CARD_PANEL_DECK, battle->effectStep.vars[1]);
-                screen->setPanelValue(screen, 1, CARD_PANEL_DECK, battle->effectStep.vars[2]);
-            }
+            dealNextCards(battle, screen);
             battle->effectStep.vars[3] -= 7;
         }
         if (battle->effectStep.time > 60) {
@@ -690,15 +715,7 @@ s32 CARDGAME_stepStart(CardBattle *battle, CardScreen *screen) {
         break;
     case 4:
         if (battle->effectStep.vars[3] >= 7) {
-            if (battle->effectStep.vars[0] < 6) {
-                if (CARDGAME_addColorCount(battle, screen, 0, battle->sides[0].pile.hand[battle->effectStep.vars[0]])) {
-                    screen->startBlink(screen, battle->effectStep.vars[0]);
-                }
-                if (CARDGAME_addColorCount(battle, screen, 1, battle->sides[1].pile.hand[battle->effectStep.vars[0]])) {
-                    screen->startBlink(screen, battle->effectStep.vars[0] + 6);
-                }
-                battle->effectStep.vars[0]++;
-            }
+            countNextColors(battle, screen);
             battle->effectStep.vars[3] -= 7;
         }
         if (battle->effectStep.time > 80) {

@@ -31,7 +31,7 @@ void FIGHTSTG_showDigivolveNames(DigivolveMenu *task) {
     }
     for (i = 0; i < task->count; i++) {
         if (windows[i + 1] == NULL) {
-            windows[i + 1] = createTextWindow(0x1005, 1, 0xBB, 0x92 + i * 0x13);
+            windows[i + 1] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0xBB, 0x92 + i * 0x13);
         }
         data = GET_DIGIMON(task->ids[i]);
         if (data != NULL) {

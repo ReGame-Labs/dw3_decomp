@@ -11,7 +11,7 @@ void FIGHTSTG_showConfusedCommands(ConfusedMenu *task) {
     if (w->lines[0] == NULL) {
         text = FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU));
         for (i = 0; i < 6; i++) {
-            w->lines[i] = createTextWindow(0x1005, 1, 0x24, i * 0x13 + 0x6D);
+            w->lines[i] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x24, i * 0x13 + 0x6D);
             w->lines[i]->setString(w->lines[i], text, FIGHTSTG_confusedLines[i] + 0x6B);
         }
     }
@@ -24,7 +24,7 @@ void FIGHTSTG_drawConfusedMessageBox(ConfusedMenu *task) {
     void *sheet;
 
     initSpriteDrawer(&drawer);
-    drawer.setLayerId(0x1005, 1);
+    drawer.setLayerId(BATTLE_LAYER_MENUS, 1);
     if (task->showArrow != 0) {
         if (GFX.funcs.getTime() - task->arrowTime >= 4) {
             task->arrowTime = GFX.funcs.getTime();
@@ -110,10 +110,10 @@ void FIGHTSTG_showConfusedMessage(ConfusedMenu *task, s32 index, s32 arg2) {
 
     task->started = 1;
     if (w->lines[0] == NULL) {
-        w->lines[0] = createTextWindow(0x1005, 1, 0x14, 0xC2);
+        w->lines[0] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x14, 0xC2);
     }
     if (w->lines[1] == NULL) {
-        w->lines[1] = createTextWindow(0x1005, 1, 0x14, 0xD0);
+        w->lines[1] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x14, 0xD0);
     }
     task->queue[0] = FIGHTSTG_confusedMessages[index][0];
     w->lines[0]->setString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x16);

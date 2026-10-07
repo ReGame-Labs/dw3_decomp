@@ -8,7 +8,7 @@ void FIGHTSTG_drawMessageBox(BattleMessageBox *task) {
     void *sheet;
 
     initSpriteDrawer(&drawer);
-    drawer.setLayerId(0x1005, 1);
+    drawer.setLayerId(BATTLE_LAYER_MENUS, 1);
     if (task->showArrow != 0) {
         if (GFX.funcs.getTime() - task->arrowTime >= 4) {
             task->arrowTime = GFX.funcs.getTime();
@@ -261,10 +261,10 @@ void FIGHTSTG_showMessage(BattleMessageBox *task, s32 type, s32 *data) {
 
     task->started = 1;
     if (w->lines[0] == NULL) {
-        w->lines[0] = createTextWindow(0x1005, 1, 0x14, 0xC2);
+        w->lines[0] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x14, 0xC2);
     }
     if (w->lines[1] == NULL) {
-        w->lines[1] = createTextWindow(0x1005, 1, 0x14, 0xD0);
+        w->lines[1] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x14, 0xD0);
     }
     task->shown = 0;
     switch (type) {

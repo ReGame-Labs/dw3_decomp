@@ -38,12 +38,12 @@ void FIGHTSTG_updateFader(ScreenFade *task) {
     }
 }
 
-/* Creates the screen fade, idle until started, on layer 0x1006 */
+/* Creates the screen fade, idle until started, on layer BATTLE_LAYER_FRONT */
 ScreenFade *FIGHTSTG_createFader(void) {
     ScreenFade *task = createTask(FIGHTSTG_updateFader, sizeof(ScreenFade), 0);
 
     task->start = FIGHTSTG_startFader;
-    task->layerId = 0x1006;
+    task->layerId = BATTLE_LAYER_FRONT;
     task->depth = 0;
     return task;
 }

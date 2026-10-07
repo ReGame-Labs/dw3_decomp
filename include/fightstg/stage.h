@@ -26,10 +26,10 @@ typedef struct FightStageInfo {
     /* 0x04 */ s32 motions;
     /* 0x08 */ s32 music; /* an index in FIGHTSTG_stageMusic, or -1 */
     /* 0x0C */ u8 bgColor[3];
-    /* 0x0F */ u8 unkF;
+    /* 0x0F */ u8 padF; /* 0 in every stage; nothing uses it */
     /* 0x10 */ u8 noBoundsBones[8]; /* bones given to the model's setBoneNoBoundsCheck, up to a 0 */
     /* 0x18 */ LightSet lights;
-    /* 0x54 */ s32 unk54;
+    /* 0x54 */ s32 pad54; /* 0 in every stage; nothing uses it */
 } FightStageInfo;
 
 /* The fight stage (FIGHTSTG_createStage), registered as BATTLE_TASK_STAGE: its model,

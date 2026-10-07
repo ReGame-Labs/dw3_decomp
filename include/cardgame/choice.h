@@ -24,7 +24,7 @@ struct CardMarker {
     /* 0x56 */ s16 y;
     /* 0x58 */ s16 scaleX;
     /* 0x5A */ s16 scaleY;
-    /* 0x5C */ u8 unk5C[6];
+    /* 0x5C */ u8 pad[6]; /* nothing uses it */
     /* 0x62 */ u8 phase; /* 0 opening, 1 open, 2 closing */
     /* 0x63 */ u8 fast; /* the blink's palette cycle */
     /* 0x64 */ s16 scaleTime;

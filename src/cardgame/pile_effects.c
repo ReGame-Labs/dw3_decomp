@@ -358,11 +358,81 @@ void CARDGAME_takeCardToHand(CardBattle *battle, CardScreen *screen, s32 side, s
     battle->effectStep.state = 1;
 }
 
-/* Moves the card just put in the hand into place, then takes card effectStep.choice out of the deck (or out of the used pile when which is 4) */
+/* Shows both sides' deck, hand and discard counts on their panels */
+static inline void showPileCounts(CardBattle *battle, CardScreen *screen) {
+    screen->setPanelValue(screen, 0, CARD_PANEL_DECK, battle->sides[0].pile.deckCount);
+    screen->setPanelValue(screen, 0, CARD_PANEL_HAND, battle->sides[0].pile.handCount);
+    screen->setPanelValue(screen, 0, CARD_PANEL_DISCARDS, battle->sides[0].pile.discardCount);
+    screen->setPanelValue(screen, 1, CARD_PANEL_DECK, battle->sides[1].pile.deckCount);
+    screen->setPanelValue(screen, 1, CARD_PANEL_HAND, battle->sides[1].pile.handCount);
+    screen->setPanelValue(screen, 1, CARD_PANEL_DISCARDS, battle->sides[1].pile.discardCount);
+}
+
+/* Takes card effectStep.choice out of side's used pile, shifting the cards
+   after it up */
+static inline void takeChosenDiscard(CardBattle *battle, s32 side) {
+    s32 i;
+
+    for (i = battle->effectStep.choice; i < battle->sides[side].pile.discardCount - 1; i++) {
+        battle->sides[side].pile.discards[i] = battle->sides[side].pile.discards[i + 1];
+    }
+    battle->sides[side].pile.discardCount--;
+}
+
+/* Takes card effectStep.choice out of side's deck (for the computer, a
+   reserve card goes from the bottom), shifting the cards above it down */
+static inline void takeChosenCard(CardBattle *battle, s32 side) {
+    s32 i;
+    s32 j;
+    s32 k;
+    s32 swap;
+
+    if (side == 0) {
+        for (j = battle->effectStep.choice; j >= battle->sides[0].pile.deckTop + 1; j--) {
+            battle->sides[0].pile.deck[j] = battle->sides[0].pile.deck[j - 1];
+        }
+    } else {
+        if (battle->effectStep.choice < battle->drawEnd) {
+            for (i = battle->effectStep.choice; i >= battle->sides[1].pile.deckTop + 1; i--) {
+                battle->sides[1].pile.deck[i] = battle->sides[1].pile.deck[i - 1];
+                battle->opponentDraws[i] = battle->opponentDraws[i - 1];
+            }
+        } else {
+            i = battle->effectStep.choice;
+            if (battle->opponentDraws[i].group == 7) {
+                for (; i >= battle->sides[1].pile.deckTop + 1; i--) {
+                    battle->sides[1].pile.deck[i] = battle->sides[1].pile.deck[i - 1];
+                    battle->opponentDraws[i] = battle->opponentDraws[i - 1];
+                }
+                battle->drawEnd++;
+                battle->reserveStart++;
+            } else {
+                swap = battle->sides[1].pile.deck[i];
+                battle->sides[1].pile.deck[i] = battle->sides[1].pile.deck[39];
+                battle->sides[1].pile.deck[39] = swap;
+                for (i = 39; i >= battle->sides[1].pile.deckTop + 1; i--) {
+                    battle->sides[1].pile.deck[i] = battle->sides[1].pile.deck[i - 1];
+                    battle->opponentDraws[i] = battle->opponentDraws[i - 1];
+                }
+                battle->drawEnd++;
+                battle->reserveStart++;
+            }
+        }
+        for (k = 39; k >= 0; k--) {
+            battle->opponentDraws[k].order = k;
+        }
+    }
+    battle->sides[side].pile.deckTop++;
+    battle->sides[side].pile.deckCount--;
+}
+
+/* Moves the card just put in the hand into place, then takes card
+   effectStep.choice out of the deck (takeChosenCard), or out of the used pile
+   when which is 4 (takeChosenDiscard) */
 s32 CARDGAME_drawFromDeck(CardBattle *battle, CardScreen *screen, s32 side, s32 which) {
     CardDrawer drawer;
     s32 done = 0;
-    /* the match depends on a variable of its own for most loops and states */
+    /* the match depends on a variable of its own for most states */
     s32 ready;
     s32 closed;
     s32 index;
@@ -370,10 +440,6 @@ s32 CARDGAME_drawFromDeck(CardBattle *battle, CardScreen *screen, s32 side, s32 
     s32 last;
     s32 card;
     s32 drawn;
-    s32 i;
-    s32 j;
-    s32 k;
-    s32 swap;
     s32 x;
 
     switch (battle->effectStep.state) {
@@ -397,50 +463,11 @@ s32 CARDGAME_drawFromDeck(CardBattle *battle, CardScreen *screen, s32 side, s32 
         index = battle->sides[side].pile.handCount - 1;
         if (screen->sprites[index].state == 1) {
             if (which == 4) {
-                for (i = battle->effectStep.choice; i < battle->sides[side].pile.discardCount - 1; i++) {
-                    battle->sides[side].pile.discards[i] = battle->sides[side].pile.discards[i + 1];
-                }
-                battle->sides[side].pile.discardCount--;
+                takeChosenDiscard(battle, side);
                 battle->effectStep.state = 4;
                 battle->effectStep.time = 45;
             } else {
-                if (side == 0) {
-                    for (j = battle->effectStep.choice; j >= battle->sides[0].pile.deckTop + 1; j--) {
-                        battle->sides[0].pile.deck[j] = battle->sides[0].pile.deck[j - 1];
-                    }
-                } else {
-                    if (battle->effectStep.choice < battle->drawEnd) {
-                        for (i = battle->effectStep.choice; i >= battle->sides[1].pile.deckTop + 1; i--) {
-                            battle->sides[1].pile.deck[i] = battle->sides[1].pile.deck[i - 1];
-                            battle->opponentDraws[i] = battle->opponentDraws[i - 1];
-                        }
-                    } else {
-                        i = battle->effectStep.choice;
-                        if (battle->opponentDraws[i].group == 7) {
-                            for (; i >= battle->sides[1].pile.deckTop + 1; i--) {
-                                battle->sides[1].pile.deck[i] = battle->sides[1].pile.deck[i - 1];
-                                battle->opponentDraws[i] = battle->opponentDraws[i - 1];
-                            }
-                            battle->drawEnd++;
-                            battle->reserveStart++;
-                        } else {
-                            swap = battle->sides[1].pile.deck[i];
-                            battle->sides[1].pile.deck[i] = battle->sides[1].pile.deck[39];
-                            battle->sides[1].pile.deck[39] = swap;
-                            for (i = 39; i >= battle->sides[1].pile.deckTop + 1; i--) {
-                                battle->sides[1].pile.deck[i] = battle->sides[1].pile.deck[i - 1];
-                                battle->opponentDraws[i] = battle->opponentDraws[i - 1];
-                            }
-                            battle->drawEnd++;
-                            battle->reserveStart++;
-                        }
-                    }
-                    for (k = 39; k >= 0; k--) {
-                        battle->opponentDraws[k].order = k;
-                    }
-                }
-                battle->sides[side].pile.deckTop++;
-                battle->sides[side].pile.deckCount--;
+                takeChosenCard(battle, side);
                 card = battle->sides[side].pile.hand[index];
                 initCardDrawer(&drawer);
                 drawer.setCard(battle->cards[card] + 1);
@@ -452,12 +479,7 @@ s32 CARDGAME_drawFromDeck(CardBattle *battle, CardScreen *screen, s32 side, s32 
                     battle->effectStep.time = 45;
                 }
             }
-            screen->setPanelValue(screen, 0, CARD_PANEL_DECK, battle->sides[0].pile.deckCount);
-            screen->setPanelValue(screen, 0, CARD_PANEL_HAND, battle->sides[0].pile.handCount);
-            screen->setPanelValue(screen, 0, CARD_PANEL_DISCARDS, battle->sides[0].pile.discardCount);
-            screen->setPanelValue(screen, 1, CARD_PANEL_DECK, battle->sides[1].pile.deckCount);
-            screen->setPanelValue(screen, 1, CARD_PANEL_HAND, battle->sides[1].pile.handCount);
-            screen->setPanelValue(screen, 1, CARD_PANEL_DISCARDS, battle->sides[1].pile.discardCount);
+            showPileCounts(battle, screen);
         }
         break;
     case 3:
@@ -673,21 +695,93 @@ void CARDGAME_drawMarkedCards(CardBattle *battle, CardScreen *screen, s32 side) 
     battle->effectStep.state = 1;
 }
 
-/* Moves the cards drawn into the hand (from effectStep.vars[4] on) into place one at a time, counting their colours and taking each flagged card (effectStep.marked) out of the deck */
+/* Goes on to the next drawn card, or once all are in place to the deck's
+   empty message or the wait before the panel closes */
+static inline void goToNextCard(CardBattle *battle, CardScreen *screen, s32 side) {
+    battle->effectStep.vars[0]++;
+    if (battle->effectStep.vars[0] < battle->sides[side].pile.handCount) {
+        battle->effectStep.state = 2;
+    } else if (battle->effectStep.flags != 0) {
+        screen->openMessage(screen, 0x35, 0, 0, side == 0 ? 2 : 0);
+        battle->effectStep.state = 5;
+    } else {
+        battle->effectStep.time = 45;
+        battle->effectStep.state = 8;
+    }
+}
+
+/* Takes the last marked card out of side's deck (for the computer, a reserve
+   card goes from the bottom), shifting the cards above it down */
+static inline void takeMarkedCard(CardBattle *battle, s32 side) {
+    s32 found;
+    /* the match depends on a loop variable of its own for most loops */
+    s32 i;
+    s32 j;
+    s32 m;
+    s32 n;
+    s32 swap;
+
+    for (i = 39, found = 0; i >= 0; i--) {
+        if (battle->effectStep.marked[i] != 0) {
+            found = 1;
+            break;
+        }
+    }
+    if (found) {
+        battle->effectStep.marked[i] = 0;
+        if (side == 0) {
+            for (m = i; m >= battle->sides[0].pile.deckTop + 1; m--) {
+                battle->sides[0].pile.deck[m] = battle->sides[0].pile.deck[m - 1];
+                battle->effectStep.marked[m] = battle->effectStep.marked[m - 1];
+            }
+        } else {
+            if (i < battle->drawEnd) {
+                for (j = i; j >= battle->sides[1].pile.deckTop + 1; j--) {
+                    battle->sides[1].pile.deck[j] = battle->sides[1].pile.deck[j - 1];
+                    battle->effectStep.marked[j] = battle->effectStep.marked[j - 1];
+                    battle->opponentDraws[j] = battle->opponentDraws[j - 1];
+                }
+            } else {
+                if (battle->opponentDraws[i].group == 7) {
+                    for (j = i; j >= battle->sides[1].pile.deckTop + 1; j--) {
+                        battle->sides[1].pile.deck[j] = battle->sides[1].pile.deck[j - 1];
+                        battle->effectStep.marked[j] = battle->effectStep.marked[j - 1];
+                        battle->opponentDraws[j] = battle->opponentDraws[j - 1];
+                    }
+                    battle->drawEnd++;
+                    battle->reserveStart++;
+                } else {
+                    swap = battle->sides[1].pile.deck[i];
+                    battle->sides[1].pile.deck[i] = battle->sides[1].pile.deck[39];
+                    battle->sides[1].pile.deck[39] = swap;
+                    for (j = 39; j >= battle->sides[1].pile.deckTop + 1; j--) {
+                        battle->sides[1].pile.deck[j] = battle->sides[1].pile.deck[j - 1];
+                        battle->effectStep.marked[j] = battle->effectStep.marked[j - 1];
+                        battle->opponentDraws[j] = battle->opponentDraws[j - 1];
+                    }
+                    battle->drawEnd++;
+                    battle->reserveStart++;
+                }
+            }
+            for (n = 39; n >= 0; n--) {
+                battle->opponentDraws[n].order = n;
+            }
+        }
+        battle->sides[side].pile.deckTop++;
+        battle->sides[side].pile.deckCount--;
+    }
+}
+
+/* Moves the cards drawn into the hand (from effectStep.vars[4] on) into place
+   one at a time (goToNextCard), counting their colours and taking each flagged
+   card (effectStep.marked) out of the deck (takeMarkedCard) */
 s32 CARDGAME_drawNewCards(CardBattle *battle, CardScreen *screen, s32 side) {
     CardDrawer drawer;
     s32 done = 0;
     s32 ready;
     s32 closed;
     s32 card;
-    s32 found;
-    /* the match depends on a loop variable of its own for most loops */
-    s32 i;
-    s32 j;
     s32 k;
-    s32 m;
-    s32 n;
-    s32 swap;
     s32 x;
 
     switch (battle->effectStep.state) {
@@ -735,80 +829,14 @@ s32 CARDGAME_drawNewCards(CardBattle *battle, CardScreen *screen, s32 side) {
                 screen->startBlink(screen, battle->effectStep.vars[0]);
                 battle->effectStep.state = 4;
             } else {
-                battle->effectStep.vars[0]++;
-                if (battle->effectStep.vars[0] < battle->sides[side].pile.handCount) {
-                    battle->effectStep.state = 2;
-                } else if (battle->effectStep.flags != 0) {
-                    screen->openMessage(screen, 0x35, 0, 0, side == 0 ? 2 : 0);
-                    battle->effectStep.state = 5;
-                } else {
-                    battle->effectStep.time = 45;
-                    battle->effectStep.state = 8;
-                }
+                goToNextCard(battle, screen, side);
             }
-            for (i = 39, found = 0; i >= 0; i--) {
-                if (battle->effectStep.marked[i] != 0) {
-                    found = 1;
-                    break;
-                }
-            }
-            if (found) {
-                battle->effectStep.marked[i] = 0;
-                if (side == 0) {
-                    for (m = i; m >= battle->sides[0].pile.deckTop + 1; m--) {
-                        battle->sides[0].pile.deck[m] = battle->sides[0].pile.deck[m - 1];
-                        battle->effectStep.marked[m] = battle->effectStep.marked[m - 1];
-                    }
-                } else {
-                    if (i < battle->drawEnd) {
-                        for (j = i; j >= battle->sides[1].pile.deckTop + 1; j--) {
-                            battle->sides[1].pile.deck[j] = battle->sides[1].pile.deck[j - 1];
-                            battle->effectStep.marked[j] = battle->effectStep.marked[j - 1];
-                            battle->opponentDraws[j] = battle->opponentDraws[j - 1];
-                        }
-                    } else {
-                        if (battle->opponentDraws[i].group == 7) {
-                            for (j = i; j >= battle->sides[1].pile.deckTop + 1; j--) {
-                                battle->sides[1].pile.deck[j] = battle->sides[1].pile.deck[j - 1];
-                                battle->effectStep.marked[j] = battle->effectStep.marked[j - 1];
-                                battle->opponentDraws[j] = battle->opponentDraws[j - 1];
-                            }
-                            battle->drawEnd++;
-                            battle->reserveStart++;
-                        } else {
-                            swap = battle->sides[1].pile.deck[i];
-                            battle->sides[1].pile.deck[i] = battle->sides[1].pile.deck[39];
-                            battle->sides[1].pile.deck[39] = swap;
-                            for (j = 39; j >= battle->sides[1].pile.deckTop + 1; j--) {
-                                battle->sides[1].pile.deck[j] = battle->sides[1].pile.deck[j - 1];
-                                battle->effectStep.marked[j] = battle->effectStep.marked[j - 1];
-                                battle->opponentDraws[j] = battle->opponentDraws[j - 1];
-                            }
-                            battle->drawEnd++;
-                            battle->reserveStart++;
-                        }
-                    }
-                    for (n = 39; n >= 0; n--) {
-                        battle->opponentDraws[n].order = n;
-                    }
-                }
-                battle->sides[side].pile.deckTop++;
-                battle->sides[side].pile.deckCount--;
-            }
+            takeMarkedCard(battle, side);
         }
         break;
     case 4:
         if (screen->sprites[battle->effectStep.vars[0]].state == 1) {
-            battle->effectStep.vars[0]++;
-            if (battle->effectStep.vars[0] < battle->sides[side].pile.handCount) {
-                battle->effectStep.state = 2;
-            } else if (battle->effectStep.flags != 0) {
-                screen->openMessage(screen, 0x35, 0, 0, side == 0 ? 2 : 0);
-                battle->effectStep.state = 5;
-            } else {
-                battle->effectStep.time = 45;
-                battle->effectStep.state = 8;
-            }
+            goToNextCard(battle, screen, side);
         }
         break;
     case 5:
@@ -829,12 +857,7 @@ s32 CARDGAME_drawNewCards(CardBattle *battle, CardScreen *screen, s32 side) {
         }
         break;
     case 8:
-        screen->setPanelValue(screen, 0, CARD_PANEL_DECK, battle->sides[0].pile.deckCount);
-        screen->setPanelValue(screen, 0, CARD_PANEL_HAND, battle->sides[0].pile.handCount);
-        screen->setPanelValue(screen, 0, CARD_PANEL_DISCARDS, battle->sides[0].pile.discardCount);
-        screen->setPanelValue(screen, 1, CARD_PANEL_DECK, battle->sides[1].pile.deckCount);
-        screen->setPanelValue(screen, 1, CARD_PANEL_HAND, battle->sides[1].pile.handCount);
-        screen->setPanelValue(screen, 1, CARD_PANEL_DISCARDS, battle->sides[1].pile.discardCount);
+        showPileCounts(battle, screen);
         battle->effectStep.time -= GFX.funcs.getFrameTime();
         if (battle->effectStep.time <= 0) {
             battle->effectStep.state = 9;

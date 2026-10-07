@@ -2,30 +2,7 @@
 
 /* Sets up the display and the battle test's layers */
 void WFIGHTTS_initLayers(void) {
-    Layer *layer;
-
-    GFX.funcs.reset();
-    GFX.funcs.allocPrimBuffers(0x19000);
-    GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
-    layer = GFX.funcs.createLayer(&WFIGHTTS_screen, 1, SCREEN_LAYER);
-    layer->setOffset(layer, 0xA0, 0x78);
-    layer = GFX.funcs.createLayer(&WFIGHTTS_screen, 1, 0x1001);
-    layer->setOffset(layer, 0xA0, 0x78);
-    layer->allocCallbacks(layer, 100);
-    layer = GFX.funcs.createLayer(&WFIGHTTS_screen, 8, 0x1002);
-    layer->setOffset(layer, WFIGHTTS_screen.w / 2, WFIGHTTS_screen.h / 2);
-    layer->allocCallbacks(layer, 40);
-    layer = GFX.funcs.createLayer(&WFIGHTTS_screen, 1, 0x1003);
-    layer->setOffset(layer, 0xA0, 0x78);
-    layer->allocCallbacks(layer, 100);
-    layer = GFX.funcs.createLayer(&WFIGHTTS_screen, 12, 0x1004);
-    layer->setOffset(layer, 0xA0, 0x78);
-    layer->allocCallbacks(layer, 100);
-    layer = GFX.funcs.createLayer(&WFIGHTTS_screen, 1, 0x1005);
-    layer->setOffset(layer, 0, 0);
-    layer = GFX.funcs.createLayer(&WFIGHTTS_screen, 1, 0x1006);
-    layer->setOffset(layer, 0, 0);
-    layer->allocCallbacks(layer, 5);
+    FIGHTSTG_CREATE_LAYERS(WFIGHTTS_screen, 5);
 }
 
 /* Loads the battle test's images into VRAM */
@@ -47,231 +24,326 @@ void WFIGHTTS_loadImages(void) {
     loader.loadArchive(FILE_CACHE.load(FILE_BATTLE_IMAGES_4));
 }
 
-/* The battle test: sets up the battle, then runs its pages. Page 0 plays
-   things on CROSS (back to the last list), R1, R2 and L2; the lists pick the
-   fighters, the camera, the stage, a motion and an effect. SELECT cycles
-   WFIGHTTS_speedMode and R2 with the pad moves the display */
+/* Frees the files, loads the sound bank and plays the music, loads the
+   images, then creates the battle's tasks and the mode's pair of fighters */
+static inline void setUpBattle(BattleTest *task, BattleTestChildren *children) {
+    s32 arg;
+
+    switch (task->substate) {
+    case 0:
+    default:
+        FILE_CACHE.freeAll();
+        WFIGHTTS_initLayers();
+        task->nextSubstate(task);
+    case 1:
+        switch (task->step) {
+        case 0:
+        default:
+            SOUND.loadBank(2);
+            task->nextStep(task);
+        case 1:
+            if (SOUND.isLoading() == 0) {
+                SOUND.playSound(0x60080000);
+                BATTLE_SETUP.music = 0x60080000;
+                task->nextSubstate(task);
+            }
+            break;
+        }
+        break;
+    case 2:
+        WFIGHTTS_loadImages();
+        task->nextSubstate(task);
+    case 3:
+        switch (task->step) {
+        case 0:
+        default:
+            children->commands = FIGHTSTG_startPlayerTurn();
+            children->camera = FIGHTSTG_createBattleCamera(BATTLE_LAYER_CAMERA);
+            children->stage = FIGHTSTG_createStage(BATTLE_SETUP.stage, 60);
+            children->models = FIGHTSTG_createModels();
+            children->lights = FIGHTSTG_createLights(BATTLE_LAYER_CAMERA);
+            task->nextStep(task);
+            break;
+        case 1:
+            arg = GAME.funcs.getModeArg();
+            children->models->add(children->models, 0, WFIGHTTS_fighters[arg][0], 1);
+            children->models->face(children->models, 0);
+            children->models->add(children->models, 0x10, WFIGHTTS_fighters[arg][1], 1);
+            children->models->face(children->models, 0x10);
+            children->camera->set(children->camera, children->camera->getEnemyView(children->camera));
+            FIGHTSTG_setPlayerTurnStep(0);
+            task->page = 1;
+            task->nextState(task);
+            break;
+        }
+        break;
+    }
+}
+
+/* Page 0: CROSS goes back to the last list, and R1, R2 and L2 play an
+   entrance, a Digimon change and a camera turn when nothing plays */
+static inline void runPlayPage(BattleTest *task, BattleTestChildren *children) {
+    s32 pressed;
+
+    switch (task->step) {
+    case 0:
+    default:
+        FIGHTSTG_setPlayerTurnStep(0);
+        task->nextStep(task);
+    case 1:
+        pressed = PAD.getPressed(0);
+        if (pressed & (1 << PAD_CROSS)) {
+            FIGHTSTG_setPlayerTurnStep(0);
+            task->setSubstate(task, task->page);
+        }
+        if ((pressed & (1 << PAD_R1)) && children->task.task == NULL) {
+            children->task.entrance = FIGHTSTG_startEntrance(0x94, 0, 0);
+        }
+        if ((pressed & (1 << PAD_R2)) && children->task.task == NULL) {
+            children->task.change = FIGHTSTG_startDigimonChange(0x3B, 0);
+        }
+        if ((pressed & (1 << PAD_L2)) && children->task.task == NULL) {
+            children->task.cameraTurn = FIGHTSTG_startCameraTurn();
+        }
+        break;
+    }
+}
+
+/* Page 1: the fighter list; L1 and R1 go to the next and previous lists,
+   and a fighter picked replaces the one of its side */
+static inline void runFighterList(BattleTest *task, BattleTestChildren *children) {
+    switch (task->step) {
+    case 0:
+    default:
+        task->page = 1;
+        children->fighters = WFIGHTTS_createFighterList(&task->side, &task->fighter);
+        task->nextStep(task);
+        break;
+    case 1:
+        if (PAD.getPressed(0) & (1 << PAD_L1)) {
+            task->setSubstate(task, 2);
+            children->fighters->setState(children->fighters, 3);
+        } else if (PAD.getPressed(0) & (1 << PAD_R1)) {
+            task->setSubstate(task, 5);
+            children->fighters->setState(children->fighters, 3);
+        } else if (children->fighters == NULL) {
+            if (task->side != -1) {
+                if (task->side == 0) {
+                    children->models->add(children->models, 0, task->fighter, 1);
+                    children->models->face(children->models, 0);
+                } else {
+                    children->models->add(children->models, 0x10, task->fighter, 1);
+                    children->models->face(children->models, 0x10);
+                }
+                children->camera->set(children->camera, children->camera->getEnemyView(children->camera));
+            }
+            task->setSubstate(task, 0);
+        }
+        break;
+    }
+}
+
+/* Page 2: the camera list; L1 and R1 go to the next and previous lists,
+   and a camera picked of a side's fighter fades the view to it */
+static inline void runCameraList(BattleTest *task, BattleTestChildren *children) {
+    FighterInfo *partner;
+    FighterInfoEnemy *enemy;
+
+    switch (task->step) {
+    case 0:
+    default:
+        task->page = 2;
+        children->cameras = WFIGHTTS_createCameraList(&task->side, &task->camera);
+        task->nextStep(task);
+        break;
+    case 1:
+        if (PAD.getPressed(0) & (1 << PAD_L1)) {
+            children->cameras->setState(children->cameras, 3);
+            task->setSubstate(task, 3);
+        } else if (PAD.getPressed(0) & (1 << PAD_R1)) {
+            children->cameras->setState(children->cameras, 3);
+            task->setSubstate(task, 1);
+        } else if (children->cameras == NULL) {
+            if (task->side != -1) {
+                if (task->side == 0) {
+                    partner = FIGHTSTG_fighterCache.funcs.getInfo(children->models->getFighter(children->models, 0));
+                    WFIGHTTS_partnerView.vpx = partner->camPos[task->camera].x;
+                    WFIGHTTS_partnerView.vpy = -partner->camPos[task->camera].y;
+                    WFIGHTTS_partnerView.vpz = -partner->camPos[task->camera].z;
+                    WFIGHTTS_partnerView.vrx = partner->camRef[task->camera].x;
+                    WFIGHTTS_partnerView.vry = -partner->camRef[task->camera].y;
+                    WFIGHTTS_partnerView.vrz = -partner->camRef[task->camera].z;
+                    WFIGHTTS_partnerView.rz = 0;
+                    WFIGHTTS_partnerView.proj = partner->camProj[task->camera];
+                    children->camera->fade(children->camera, 0, &WFIGHTTS_partnerView, 60);
+                } else {
+                    /* an enemy's info, with its 3 cameras */
+                    enemy = (FighterInfoEnemy *)FIGHTSTG_fighterCache.funcs.getInfo(children->models->getFighter(children->models, 0x10));
+                    WFIGHTTS_enemyView.vpx = enemy->camPos[task->camera].x;
+                    WFIGHTTS_enemyView.vpy = -enemy->camPos[task->camera].y;
+                    WFIGHTTS_enemyView.vpz = -enemy->camPos[task->camera].z;
+                    WFIGHTTS_enemyView.vrx = enemy->camRef[task->camera].x;
+                    WFIGHTTS_enemyView.vry = -enemy->camRef[task->camera].y;
+                    WFIGHTTS_enemyView.vrz = -enemy->camRef[task->camera].z;
+                    WFIGHTTS_enemyView.rz = 0;
+                    WFIGHTTS_enemyView.proj = enemy->camProj[task->camera];
+                    children->camera->fade(children->camera, 0, &WFIGHTTS_enemyView, 60);
+                }
+            }
+            task->setSubstate(task, 0);
+        }
+        break;
+    }
+}
+
+/* Page 3: the stage list; L1 and R1 go to the next and previous lists,
+   and a stage picked replaces the battle's */
+static inline void runStageList(BattleTest *task, BattleTestChildren *children) {
+    switch (task->step) {
+    case 0:
+    default:
+        task->page = 3;
+        children->stages = WFIGHTTS_createStageList(&task->stage);
+        task->nextStep(task);
+        break;
+    case 1:
+        if (PAD.getPressed(0) & (1 << PAD_L1)) {
+            children->stages->setState(children->stages, 3);
+            task->setSubstate(task, 4);
+        } else if (PAD.getPressed(0) & (1 << PAD_R1)) {
+            children->stages->setState(children->stages, 3);
+            task->setSubstate(task, 2);
+        } else if (children->stages == NULL) {
+            if (task->stage != -1) {
+                BATTLE_SETUP.stage = task->stage;
+                children->stage->setStage(children->stage, task->stage, 60, 60);
+            }
+            task->setSubstate(task, 0);
+        }
+        break;
+    }
+}
+
+/* Page 4: the motion list; L1 and R1 go to the next and previous lists,
+   and a motion picked is given to the fighter of its side */
+static inline void runMotionList(BattleTest *task, BattleTestChildren *children) {
+    switch (task->step) {
+    case 0:
+    default:
+        task->page = 4;
+        children->motions = WFIGHTTS_createMotionList(&task->side, &task->motion);
+        task->nextStep(task);
+        break;
+    case 1:
+        if (PAD.getPressed(0) & (1 << PAD_L1)) {
+            children->motions->setState(children->motions, 3);
+            task->setSubstate(task, 5);
+        } else if (PAD.getPressed(0) & (1 << PAD_R1)) {
+            children->motions->setState(children->motions, 3);
+            task->setSubstate(task, 3);
+        } else if (children->motions == NULL) {
+            /* match depends on the call in each branch */
+            if (task->side == -1) {
+                task->setSubstate(task, 0);
+            } else {
+                children->models->get(children->models, (task->side != 0) * 0x10)->motion = task->motion;
+                task->setSubstate(task, 0);
+            }
+        }
+        break;
+    }
+}
+
+/* Page 5 once its list is open: L1 and R1 go to the next and previous lists,
+   and an effect picked plays as a battle script of its side (0x12 as a hit
+   effect) */
+static inline void pickEffect(BattleTest *task, BattleTestChildren *children) {
+    if (PAD.getPressed(0) & (1 << PAD_L1)) {
+        children->effects->setState(children->effects, 3);
+        task->setSubstate(task, 1);
+    } else if (PAD.getPressed(0) & (1 << PAD_R1)) {
+        children->effects->setState(children->effects, 3);
+        task->setSubstate(task, 4);
+    } else if (children->effects == NULL) {
+        if (task->side == -1) {
+            task->setSubstate(task, 0);
+        } else {
+            if (task->effect != 0x12) {
+                children->task.script = FIGHTSTG_createBattleScript();
+                children->task.script->index = task->effect;
+                children->task.script->enemy = task->side;
+                children->task.script->hits[0] = 3;
+                children->task.script->hits[1] = 3;
+                children->task.script->hits[2] = 3;
+                children->task.script->hits[3] = 2;
+                children->task.script->stage = -1;
+                children->task.script->sound = 0x39;
+            } else {
+                children->task.hitEffect = FIGHTSTG_startHitEffect(1, 0);
+            }
+            task->nextStep(task);
+        }
+    }
+}
+
+/* With R2 held, the pad moves the display and START puts it back; without,
+   sets the normal display mode */
+static inline void moveDisplay(void) {
+    if (PAD_HELD(PAD_R2)) {
+        if (PAD_HELD(PAD_LEFT)) {
+            WFIGHTTS_displayX -= 10;
+        } else if (PAD_HELD(PAD_RIGHT)) {
+            WFIGHTTS_displayX += 10;
+        } else if (PAD_HELD(PAD_UP)) {
+            WFIGHTTS_displayY -= 10;
+        } else if (PAD_HELD(PAD_DOWN)) {
+            WFIGHTTS_displayY += 10;
+        } else if (PAD_PRESSED(PAD_START)) {
+            WFIGHTTS_displayY = 0;
+            WFIGHTTS_displayX = 0;
+        }
+        GFX.funcs.setDisplayArea(WFIGHTTS_displayX, WFIGHTTS_displayY, SCREEN_WIDTH, SCREEN_HEIGHT);
+    } else {
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
+    }
+}
+
+/* The battle test: sets up the battle (setUpBattle), then runs its pages.
+   Page 0 (runPlayPage) plays things on CROSS (back to the last list), R1, R2
+   and L2; the lists pick the fighters, the camera, the stage, a motion and an
+   effect (runFighterList, runCameraList, runStageList, runMotionList,
+   pickEffect). SELECT cycles WFIGHTTS_speedMode and R2 with the pad moves the
+   display (moveDisplay) */
 void WFIGHTTS_battleTest(BattleTest *task, BattleTestChildren *children) {
     CameraView unused; /* unused, but it is in the original stack frame */
     s32 list = 0;
-    s32 pressed;
-    s32 arg;
-    FighterInfo *partner;
-    FighterInfoEnemy *enemy;
 
     switch (task->state) {
     case 0:
     default:
-        switch (task->substate) {
-        case 0:
-        default:
-            FILE_CACHE.freeAll();
-            WFIGHTTS_initLayers();
-            task->nextSubstate(task);
-        case 1:
-            switch (task->step) {
-            case 0:
-            default:
-                SOUND.loadBank(2);
-                task->nextStep(task);
-            case 1:
-                if (SOUND.isLoading() == 0) {
-                    SOUND.playSound(0x60080000);
-                    BATTLE_SETUP.music = 0x60080000;
-                    task->nextSubstate(task);
-                }
-                break;
-            }
-            break;
-        case 2:
-            WFIGHTTS_loadImages();
-            task->nextSubstate(task);
-        case 3:
-            switch (task->step) {
-            case 0:
-            default:
-                children->commands = FIGHTSTG_startPlayerTurn();
-                children->camera = FIGHTSTG_createBattleCamera(0x1001);
-                children->stage = FIGHTSTG_createStage(BATTLE_SETUP.stage, 60);
-                children->models = FIGHTSTG_createModels();
-                children->lights = FIGHTSTG_createLights(0x1001);
-                task->nextStep(task);
-                break;
-            case 1:
-                arg = GAME.funcs.getModeArg();
-                children->models->add(children->models, 0, WFIGHTTS_fighters[arg][0], 1);
-                children->models->face(children->models, 0);
-                children->models->add(children->models, 0x10, WFIGHTTS_fighters[arg][1], 1);
-                children->models->face(children->models, 0x10);
-                children->camera->set(children->camera, children->camera->getEnemyView(children->camera));
-                FIGHTSTG_setPlayerTurnStep(0);
-                task->page = 1;
-                task->nextState(task);
-                break;
-            }
-            break;
-        }
+        setUpBattle(task, children);
         break;
     case 1:
         switch (task->substate) {
         case 0:
         default:
-            switch (task->step) {
-            case 0:
-            default:
-                FIGHTSTG_setPlayerTurnStep(0);
-                task->nextStep(task);
-            case 1:
-                pressed = PAD.getPressed(0);
-                if (pressed & (1 << PAD_CROSS)) {
-                    FIGHTSTG_setPlayerTurnStep(0);
-                    task->setSubstate(task, task->page);
-                }
-                if ((pressed & (1 << PAD_R1)) && children->task.task == NULL) {
-                    children->task.entrance = FIGHTSTG_startEntrance(0x94, 0, 0);
-                }
-                if ((pressed & (1 << PAD_R2)) && children->task.task == NULL) {
-                    children->task.change = FIGHTSTG_startDigimonChange(0x3B, 0);
-                }
-                if ((pressed & (1 << PAD_L2)) && children->task.task == NULL) {
-                    children->task.cameraTurn = FIGHTSTG_startCameraTurn();
-                }
-                break;
-            }
+            runPlayPage(task, children);
             break;
         case 1:
             list = 1;
-            switch (task->step) {
-            case 0:
-            default:
-                task->page = 1;
-                children->fighters = WFIGHTTS_createFighterList(&task->side, &task->fighter);
-                task->nextStep(task);
-                break;
-            case 1:
-                if (PAD.getPressed(0) & (1 << PAD_L1)) {
-                    task->setSubstate(task, 2);
-                    children->fighters->setState(children->fighters, 3);
-                } else if (PAD.getPressed(0) & (1 << PAD_R1)) {
-                    task->setSubstate(task, 5);
-                    children->fighters->setState(children->fighters, 3);
-                } else if (children->fighters == NULL) {
-                    if (task->side != -1) {
-                        if (task->side == 0) {
-                            children->models->add(children->models, 0, task->fighter, 1);
-                            children->models->face(children->models, 0);
-                        } else {
-                            children->models->add(children->models, 0x10, task->fighter, 1);
-                            children->models->face(children->models, 0x10);
-                        }
-                        children->camera->set(children->camera, children->camera->getEnemyView(children->camera));
-                    }
-                    task->setSubstate(task, 0);
-                }
-                break;
-            }
+            runFighterList(task, children);
             break;
         case 2:
             list = 1;
-            switch (task->step) {
-            case 0:
-            default:
-                task->page = 2;
-                children->cameras = WFIGHTTS_createCameraList(&task->side, &task->camera);
-                task->nextStep(task);
-                break;
-            case 1:
-                if (PAD.getPressed(0) & (1 << PAD_L1)) {
-                    children->cameras->setState(children->cameras, 3);
-                    task->setSubstate(task, 3);
-                } else if (PAD.getPressed(0) & (1 << PAD_R1)) {
-                    children->cameras->setState(children->cameras, 3);
-                    task->setSubstate(task, 1);
-                } else if (children->cameras == NULL) {
-                    if (task->side != -1) {
-                        if (task->side == 0) {
-                            partner = FIGHTSTG_fighterCache.funcs.getInfo(children->models->getFighter(children->models, 0));
-                            WFIGHTTS_partnerView.vpx = partner->camPos[task->camera].x;
-                            WFIGHTTS_partnerView.vpy = -partner->camPos[task->camera].y;
-                            WFIGHTTS_partnerView.vpz = -partner->camPos[task->camera].z;
-                            WFIGHTTS_partnerView.vrx = partner->camRef[task->camera].x;
-                            WFIGHTTS_partnerView.vry = -partner->camRef[task->camera].y;
-                            WFIGHTTS_partnerView.vrz = -partner->camRef[task->camera].z;
-                            WFIGHTTS_partnerView.rz = 0;
-                            WFIGHTTS_partnerView.proj = partner->camProj[task->camera];
-                            children->camera->fade(children->camera, 0, &WFIGHTTS_partnerView, 60);
-                        } else {
-                            /* an enemy's info, with its 3 cameras */
-                            enemy = (FighterInfoEnemy *)FIGHTSTG_fighterCache.funcs.getInfo(children->models->getFighter(children->models, 0x10));
-                            WFIGHTTS_enemyView.vpx = enemy->camPos[task->camera].x;
-                            WFIGHTTS_enemyView.vpy = -enemy->camPos[task->camera].y;
-                            WFIGHTTS_enemyView.vpz = -enemy->camPos[task->camera].z;
-                            WFIGHTTS_enemyView.vrx = enemy->camRef[task->camera].x;
-                            WFIGHTTS_enemyView.vry = -enemy->camRef[task->camera].y;
-                            WFIGHTTS_enemyView.vrz = -enemy->camRef[task->camera].z;
-                            WFIGHTTS_enemyView.rz = 0;
-                            WFIGHTTS_enemyView.proj = enemy->camProj[task->camera];
-                            children->camera->fade(children->camera, 0, &WFIGHTTS_enemyView, 60);
-                        }
-                    }
-                    task->setSubstate(task, 0);
-                }
-                break;
-            }
+            runCameraList(task, children);
             break;
         case 3:
             list = 1;
-            switch (task->step) {
-            case 0:
-            default:
-                task->page = 3;
-                children->stages = WFIGHTTS_createStageList(&task->stage);
-                task->nextStep(task);
-                break;
-            case 1:
-                if (PAD.getPressed(0) & (1 << PAD_L1)) {
-                    children->stages->setState(children->stages, 3);
-                    task->setSubstate(task, 4);
-                } else if (PAD.getPressed(0) & (1 << PAD_R1)) {
-                    children->stages->setState(children->stages, 3);
-                    task->setSubstate(task, 2);
-                } else if (children->stages == NULL) {
-                    if (task->stage != -1) {
-                        BATTLE_SETUP.stage = task->stage;
-                        children->stage->setStage(children->stage, task->stage, 60, 60);
-                    }
-                    task->setSubstate(task, 0);
-                }
-                break;
-            }
+            runStageList(task, children);
             break;
         case 4:
             list = 1;
-            switch (task->step) {
-            case 0:
-            default:
-                task->page = 4;
-                children->motions = WFIGHTTS_createMotionList(&task->side, &task->motion);
-                task->nextStep(task);
-                break;
-            case 1:
-                if (PAD.getPressed(0) & (1 << PAD_L1)) {
-                    children->motions->setState(children->motions, 3);
-                    task->setSubstate(task, 5);
-                } else if (PAD.getPressed(0) & (1 << PAD_R1)) {
-                    children->motions->setState(children->motions, 3);
-                    task->setSubstate(task, 3);
-                } else if (children->motions == NULL) {
-                    /* match depends on the call in each branch */
-                    if (task->side == -1) {
-                        task->setSubstate(task, 0);
-                    } else {
-                        children->models->get(children->models, (task->side != 0) * 0x10)->motion = task->motion;
-                        task->setSubstate(task, 0);
-                    }
-                }
-                break;
-            }
+            runMotionList(task, children);
             break;
         case 5:
             list = 1;
@@ -283,32 +355,7 @@ void WFIGHTTS_battleTest(BattleTest *task, BattleTestChildren *children) {
                 task->nextStep(task);
                 break;
             case 1:
-                if (PAD.getPressed(0) & (1 << PAD_L1)) {
-                    children->effects->setState(children->effects, 3);
-                    task->setSubstate(task, 1);
-                } else if (PAD.getPressed(0) & (1 << PAD_R1)) {
-                    children->effects->setState(children->effects, 3);
-                    task->setSubstate(task, 4);
-                } else if (children->effects == NULL) {
-                    if (task->side == -1) {
-                        task->setSubstate(task, 0);
-                    } else {
-                        if (task->effect != 0x12) {
-                            children->task.script = FIGHTSTG_createBattleScript();
-                            children->task.script->index = task->effect;
-                            children->task.script->enemy = task->side;
-                            children->task.script->hits[0] = 3;
-                            children->task.script->hits[1] = 3;
-                            children->task.script->hits[2] = 3;
-                            children->task.script->hits[3] = 2;
-                            children->task.script->stage = -1;
-                            children->task.script->sound = 0x39;
-                        } else {
-                            children->task.hitEffect = FIGHTSTG_startHitEffect(1, 0);
-                        }
-                        task->nextStep(task);
-                    }
-                }
+                pickEffect(task, children);
                 break;
             case 2:
                 list = 0;
@@ -320,7 +367,7 @@ void WFIGHTTS_battleTest(BattleTest *task, BattleTestChildren *children) {
             break;
         }
         if (list) {
-            FIGHTSTG_battle.drawBlendedQuad(0x1005, 1, WFIGHTTS_backPoints, WFIGHTTS_backColors);
+            FIGHTSTG_battle.drawBlendedQuad(BATTLE_LAYER_MENUS, 1, WFIGHTTS_backPoints, WFIGHTTS_backColors);
         }
         if (PAD.getPressed(0) & (1 << PAD_SELECT)) {
             if (++WFIGHTTS_speedMode == 4) {
@@ -328,23 +375,7 @@ void WFIGHTTS_battleTest(BattleTest *task, BattleTestChildren *children) {
             }
             FIGHTSTG_battle.setSpeed(WFIGHTTS_speedMode);
         }
-        if (PAD_HELD(PAD_R2)) {
-            if (PAD_HELD(PAD_LEFT)) {
-                WFIGHTTS_displayX -= 10;
-            } else if (PAD_HELD(PAD_RIGHT)) {
-                WFIGHTTS_displayX += 10;
-            } else if (PAD_HELD(PAD_UP)) {
-                WFIGHTTS_displayY -= 10;
-            } else if (PAD_HELD(PAD_DOWN)) {
-                WFIGHTTS_displayY += 10;
-            } else if (PAD_PRESSED(PAD_START)) {
-                WFIGHTTS_displayY = 0;
-                WFIGHTTS_displayX = 0;
-            }
-            GFX.funcs.setDisplayArea(WFIGHTTS_displayX, WFIGHTTS_displayY, SCREEN_WIDTH, SCREEN_HEIGHT);
-        } else {
-            GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
-        }
+        moveDisplay();
         break;
     case 2:
     case 3:
@@ -378,7 +409,7 @@ void WFIGHTTS_fighterList(BattleTestList *task, BattleTestWindows *windows) {
     default:
         for (i = 0; i < 2; i++) {
             for (j = 0; j < 14; j++) {
-                windows->windows[i][j] = createTextWindow(0x1005, 1, 0xB4 - i * 0xA0, 0x28 + j * 12);
+                windows->windows[i][j] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0xB4 - i * 0xA0, 0x28 + j * 12);
             }
         }
         task->nextState(task);
@@ -492,10 +523,10 @@ void WFIGHTTS_cameraList(BattleTestList *task, CameraListWindows *windows) {
     case 0:
     default:
         for (i = 0; i < 12; i++) {
-            windows->partner[i] = createTextWindow(0x1005, 1, 0xB4, 0x28 + i * 12);
+            windows->partner[i] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0xB4, 0x28 + i * 12);
         }
         for (i = 0; i < 3; i++) {
-            windows->enemy[i] = createTextWindow(0x1005, 1, 0x14, 0x28 + i * 12);
+            windows->enemy[i] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x14, 0x28 + i * 12);
         }
         task->nextState(task);
         break;
@@ -588,7 +619,7 @@ void WFIGHTTS_stageList(BattleTestStageList *task, TextWindow **windows) {
     case 0:
     default:
         for (n = 0; n < 14; n++) {
-            windows[n] = createTextWindow(0x1005, 1, 0xB4, 0x28 + n * 12);
+            windows[n] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0xB4, 0x28 + n * 12);
         }
         task->nextState(task);
         break;
@@ -697,7 +728,7 @@ void WFIGHTTS_motionList(BattleTestMotions *task, BattleTestWindows *windows) {
             }
             list->shown = n;
             for (j = 0; j < list->shown; j++) {
-                windows->windows[i][j] = createTextWindow(0x1005, 1, 0xB4 - i * 0xA0, 0x28 + j * 12);
+                windows->windows[i][j] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0xB4 - i * 0xA0, 0x28 + j * 12);
             }
         }
         task->nextState(task);
@@ -776,67 +807,90 @@ BattleTestMotions *WFIGHTTS_createMotionList(s32 *side, s32 *motion) {
     return task;
 }
 
-/* The effect list, like the motion list: CROSS sets the side and the
-   effect, on any but a fighter's "none". Match depends on the loop around
-   the pad handling, whose breaks leave it early */
-void WFIGHTTS_effectList(BattleTestEffects *task, BattleTestWindows *windows) {
+/* Fills both sides' lists with the effects their fighter has (only "none"
+   without any) and creates their windows */
+static inline void fillEffectLists(BattleTestEffects *task, BattleTestWindows *windows) {
     Models *models;
     BattleTestEffectList *list;
     s32 *effects;
-    s32 pressed;
-    s32 steps;
     s32 fighter;
-    s32 x; /* unused, but it is in the original stack frame */
     s32 n;
     s32 i;
-    s32 side;
     s32 j;
-    s32 k;
+
+    models = TASK_REGISTRY.funcs.find(BATTLE_TASK_MODELS, -1, -1);
+    for (i = 0; i < 2; i++) {
+        list = &task->lists[i];
+        fighter = models->getFighter(models, i * 16);
+        if (WFIGHTTS_effectCursors.fighter[i] != fighter) {
+            WFIGHTTS_effectCursors.fighter[i] = fighter;
+            WFIGHTTS_effectCursors.cursor[i] = 0;
+            WFIGHTTS_effectCursors.scroll[i] = 0;
+        }
+        FIGHTSTG_fighterCache.funcs.getInfo(fighter);
+        if (FIGHTSTG_fighterCache.partnerInfo->effects != 0) {
+            /* getEntry gives the entry's address as a number */
+            effects = FILE_CACHE.getEntry(FIGHTSTG_fighterCache.partnerInfo->effects);
+            if (effects[0] == 0) {
+                list->effects[0] = 0;
+                list->count = 1;
+                list->shown = 1;
+            } else {
+                list->count = 0;
+                for (j = 0; j < 0x13; j++) {
+                    if (effects[j] != 0) {
+                        list->effects[list->count] = j + 1;
+                        list->count++;
+                    }
+                }
+            }
+            n = list->count;
+            if (n >= 15) {
+                n = 14;
+            }
+            list->shown = n;
+        } else {
+            list->effects[0] = 0;
+            list->count = 1;
+            list->shown = 1;
+        }
+        for (j = 0; j < list->shown; j++) {
+            windows->windows[i][j] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0xB4 - i * 0xA0, 0x28 + j * 12);
+        }
+    }
+}
+
+/* Draws both sides' effect names, the one under the cursor blinking */
+static inline void drawEffectNames(BattleTestEffects *task, BattleTestWindows *windows) {
+    s32 side;
     s32 m;
+
+    for (side = 0; side < 2; side++) {
+        for (m = 0; m < task->lists[side].shown; m++) {
+            if (WFIGHTTS_effectCursors.side == side && WFIGHTTS_effectCursors.cursor[side] == m && (GFX.funcs.getTime() & 8)) {
+                windows->windows[side][m]->setVisible(windows->windows[side][m], 0);
+            } else {
+                windows->windows[side][m]->setVisible(windows->windows[side][m], 1);
+                windows->windows[side][m]->setText(windows->windows[side][m], WFIGHTTS_effectNames[task->lists[side].effects[m + WFIGHTTS_effectCursors.scroll[side]]]);
+            }
+        }
+    }
+}
+
+/* The effect list, like the motion list: fills its lists (fillEffectLists),
+   then CROSS sets the side and the effect, on any but a fighter's "none",
+   while the names are drawn (drawEffectNames). Match depends on the loop
+   around the pad handling, whose breaks leave it early */
+void WFIGHTTS_effectList(BattleTestEffects *task, BattleTestWindows *windows) {
+    s32 pressed;
+    s32 steps;
+    s32 x; /* unused, but it is in the original stack frame */
+    s32 k;
 
     switch (task->state) {
     case 0:
     default:
-        models = TASK_REGISTRY.funcs.find(BATTLE_TASK_MODELS, -1, -1);
-        for (i = 0; i < 2; i++) {
-            list = &task->lists[i];
-            fighter = models->getFighter(models, i * 16);
-            if (WFIGHTTS_effectCursors.fighter[i] != fighter) {
-                WFIGHTTS_effectCursors.fighter[i] = fighter;
-                WFIGHTTS_effectCursors.cursor[i] = 0;
-                WFIGHTTS_effectCursors.scroll[i] = 0;
-            }
-            FIGHTSTG_fighterCache.funcs.getInfo(fighter);
-            if (FIGHTSTG_fighterCache.partnerInfo->effects != 0) {
-                /* getEntry gives the entry's address as a number */
-                effects = FILE_CACHE.getEntry(FIGHTSTG_fighterCache.partnerInfo->effects);
-                if (effects[0] == 0) {
-                    list->effects[0] = 0;
-                    list->count = 1;
-                    list->shown = 1;
-                } else {
-                    list->count = 0;
-                    for (j = 0; j < 0x13; j++) {
-                        if (effects[j] != 0) {
-                            list->effects[list->count] = j + 1;
-                            list->count++;
-                        }
-                    }
-                }
-                n = list->count;
-                if (n >= 15) {
-                    n = 14;
-                }
-                list->shown = n;
-            } else {
-                list->effects[0] = 0;
-                list->count = 1;
-                list->shown = 1;
-            }
-            for (j = 0; j < list->shown; j++) {
-                windows->windows[i][j] = createTextWindow(0x1005, 1, 0xB4 - i * 0xA0, 0x28 + j * 12);
-            }
-        }
+        fillEffectLists(task, windows);
         task->nextState(task);
         break;
     case 1:
@@ -889,16 +943,7 @@ void WFIGHTTS_effectList(BattleTestEffects *task, BattleTestWindows *windows) {
             }
             break;
         }
-        for (side = 0; side < 2; side++) {
-            for (m = 0; m < task->lists[side].shown; m++) {
-                if (WFIGHTTS_effectCursors.side == side && WFIGHTTS_effectCursors.cursor[side] == m && (GFX.funcs.getTime() & 8)) {
-                    windows->windows[side][m]->setVisible(windows->windows[side][m], 0);
-                } else {
-                    windows->windows[side][m]->setVisible(windows->windows[side][m], 1);
-                    windows->windows[side][m]->setText(windows->windows[side][m], WFIGHTTS_effectNames[task->lists[side].effects[m + WFIGHTTS_effectCursors.scroll[side]]]);
-                }
-            }
-        }
+        drawEffectNames(task, windows);
         break;
     case TASK_DONE:
     case TASK_KILL:

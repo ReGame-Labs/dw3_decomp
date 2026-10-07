@@ -68,14 +68,14 @@ void FIGHTSTG_showFighterNames(HpDisplay *task, TextWindow **windows) {
 
     if (FIGHTSTG_battle.active[0] != task->shown[0]) {
         if (windows[0] == NULL) {
-            windows[0] = createTextWindow(0x1005, 1, 0xAE, 0x15);
+            windows[0] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0xAE, 0x15);
         }
         windows[0]->setString(windows[0], GAME.partners[GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0])].info.name, -1);
     }
     if (FIGHTSTG_battle.active[1] != task->shown[1]) {
         enemy = FIGHTSTG_battleTableFunc(BATTLE_SETUP.enemies[FIGHTSTG_battle.active[1]].fighter);
         if (windows[1] == NULL) {
-            windows[1] = createTextWindow(0x1005, 1, 0x11, 0x15);
+            windows[1] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x11, 0x15);
         }
         if (enemy != NULL) {
             windows[1]->setString(windows[1], FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), enemy->nameId);
@@ -136,19 +136,19 @@ void FIGHTSTG_drawHud(HpDisplay *task, TextWindow **windows) {
 
     sheet = FILE_CACHE.getEntry(FILE_BATTLE_MENU << 16);
     initSpriteDrawer(&drawer);
-    drawer.setLayerId(0x1005, 1);
+    drawer.setLayerId(BATTLE_LAYER_MENUS, 1);
     drawer.setTexture(0x200, 0);
     drawer.draw(sheet, 0, 8, 0xF);
     drawer.draw(sheet, 1, 0xA1, 0xF);
     FIGHTSTG_showFighterNames(task, windows);
     fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
     if (windows[4] == NULL) {
-        windows[4] = createTextWindow(0x1005, 3, 0x10B, 0x1A);
+        windows[4] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x10B, 0x1A);
     }
     windows[4]->setNumber(windows[4], 0, task->hp[0].value);
     windows[4]->setRightAlign(windows[4], 1);
     if (windows[3] == NULL) {
-        windows[3] = createTextWindow(0x1005, 3, 0x12E, 0x1A);
+        windows[3] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x12E, 0x1A);
     }
     windows[3]->setNumber(windows[3], 0, fighter->maxHp);
     windows[3]->setRightAlign(windows[3], 1);
@@ -178,7 +178,7 @@ void FIGHTSTG_drawHud(HpDisplay *task, TextWindow **windows) {
             colors[0] = colors[2] = FIGHTSTG_hpBarColors[2];
             colors[1] = colors[3] = FIGHTSTG_hpBarColors[3];
         }
-        FIGHTSTG_battle.drawQuad(0x1005, 1, FIGHTSTG_hpBars[i], colors);
+        FIGHTSTG_battle.drawQuad(BATTLE_LAYER_MENUS, 1, FIGHTSTG_hpBars[i], colors);
     }
     blink = (GFX.funcs.getTime() >> 2) & 3;
     member = GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]);
@@ -187,7 +187,7 @@ void FIGHTSTG_drawHud(HpDisplay *task, TextWindow **windows) {
         /* the match depends on storing [2] before [0] (the other order gives 2
            diffs) */
         FIGHTSTG_techGauge[2].vx = FIGHTSTG_techGauge[0].vx = BATTLE_SETUP.gauges[member] / 25 + 0x109;
-        FIGHTSTG_battle.drawQuad(0x1005, 1, FIGHTSTG_techGauge, FIGHTSTG_techGaugeColors);
+        FIGHTSTG_battle.drawQuad(BATTLE_LAYER_MENUS, 1, FIGHTSTG_techGauge, FIGHTSTG_techGaugeColors);
     }
     if (BATTLE_SETUP.gauges[member] < 1000) {
         drawer.draw(sheet, blink + 0x33, 0x109, 0x3E);
@@ -233,13 +233,13 @@ void FIGHTSTG_updateHud(HpDisplay *task, TextWindow **windows) {
         task->shown[1] = -1;
         task->shown[0] = -1;
         FIGHTSTG_showFighterNames(task, windows);
-        windows[2] = createTextWindow(0x1005, 3, 0x10C, 0x1A);
+        windows[2] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x10C, 0x1A);
         windows[2]->setString(windows[2], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x10);
         fighters = FIGHTSTG_battle.fighters;
-        windows[4] = createTextWindow(0x1005, 3, 0x10B, 0x1A);
+        windows[4] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x10B, 0x1A);
         windows[4]->setNumber(windows[4], 0, fighters[0][FIGHTSTG_battle.active[0]].hp);
         windows[4]->setRightAlign(windows[4], 1);
-        windows[3] = createTextWindow(0x1005, 3, 0x12E, 0x1A);
+        windows[3] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x12E, 0x1A);
         windows[3]->setNumber(windows[3], 0, fighters[0][FIGHTSTG_battle.active[0]].maxHp);
         windows[3]->setRightAlign(windows[3], 1);
         for (i = 0; i < 2; i++) {

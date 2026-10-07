@@ -27,7 +27,7 @@ void FIGHTSTG_projectPoint(Layer *layer, SVECTOR *pos, ShortVec3 *out) {
    depends on setSemiTrans inside the if and on poly moving on past it */
 void FIGHTSTG_drawShadedQuad(s32 layerId, s32 depth, DVECTOR *xy, CVECTOR *colors, s32 semi) {
     Layer *layer = GFX.funcs.getLayer(layerId);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, depth);
+    u_long *ot = layer->getOtEntry(layer, depth);
     POLY_G4 *poly = GFX.funcs.getPrim();
     DR_TPAGE *mode;
 

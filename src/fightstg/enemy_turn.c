@@ -63,18 +63,118 @@ s32 FIGHTSTG_pickEnemySwitch(EnemyTurn *task) {
     return -1;
 }
 
+/* In BATTLE_KIND_ESCAPE, the enemy flees once its HP is under a tenth;
+   otherwise its turn goes on to the next state. */
+static inline void fleeWhenWeak(EnemyTurn *task, BattleChild *children) {
+    if (FIGHTSTG_battle.kind == BATTLE_KIND_ESCAPE) {
+        BattleFighter *enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+
+        if (enemy->hp < (s16)(enemy->maxHp / 10)) {
+            children->message = FIGHTSTG_createMessage();
+            task->lines[0] = 0x5F;
+            task->lines[1] = 0x10;
+            children->message->show(children->message, 2, task->lines);
+            FIGHTSTG_endBattle(BATTLE_FLED);
+            task->substate++;
+        } else {
+            task->nextState(task);
+        }
+    } else {
+        task->nextState(task);
+    }
+}
+
+/* Shows the enemy's run-away event, if it has one, and clears it before its
+   turn goes on. */
+static inline void showRunAway(EnemyTurn *task, BattleChild *children) {
+    s32 index;
+
+    switch (task->step) {
+    case 0:
+    default:
+        index = FIGHTSTG_events.funcs.find(EVENT_RUN_AWAY, 0x10, FIGHTSTG_battle.active[1]);
+        if (index >= 0) {
+            children->message = FIGHTSTG_createMessage();
+            task->lines[0] = 0x60;
+            task->lines[1] = 0x10;
+            children->message->show(children->message, 2, task->lines);
+            FIGHTSTG_events.events[index].type = 0;
+            task->step++;
+        } else {
+            task->nextSubstate(task);
+        }
+        break;
+    case 1:
+        if (children->message == NULL) {
+            task->nextSubstate(task);
+        }
+        break;
+    }
+}
+
+/* Starts the enemy's attack (target 1) or technique TARGET, paying its MP,
+   or shows the message for an enemy without the MP for it. */
+static inline void useEnemyTech(EnemyTurn *task, BattleChild *children) {
+    BattleFighter *fighter;
+    TechData *tech;
+
+    if (task->target == 1) {
+        children->attack = FIGHTSTG_startFirstTech(0x10);
+    } else {
+        fighter = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+        tech = &TECHS[task->target - 1];
+        if (fighter->mp >= tech->mp) {
+            children->tech = FIGHTSTG_startTechAction(SIDE_ENEMY, task->target);
+            fighter->mp -= tech->mp;
+        } else {
+            children->message = FIGHTSTG_createMessage();
+            task->lines[0] = 0x8D;
+            task->lines[1] = 0x10;
+            children->message->show(children->message, 2, task->lines);
+        }
+    }
+}
+
+/* Says the name of the enemy that came in. */
+static inline void showEnemyName(EnemyTurn *task, BattleChild *children) {
+    BattleFighter *enemies = FIGHTSTG_battle.fighters[1];
+    BattleTableEntry *enemy = FIGHTSTG_battleTableFunc(enemies[FIGHTSTG_battle.active[1]].id);
+
+    children->message = FIGHTSTG_createMessage();
+    task->lines[0] = enemy->nameId;
+    children->message->show(children->message, 0xD, task->lines);
+}
+
+/* Picks the enemy to switch in (FIGHTSTG_pickEnemySwitch) and shows the
+   switch's message, or the one for no enemy to switch in. */
+static inline void switchEnemyOut(EnemyTurn *task, BattleChild *children) {
+    s32 pick = FIGHTSTG_pickEnemySwitch(task);
+
+    if (pick != -1) {
+        task->switchTo = pick;
+        children->message = FIGHTSTG_createMessage();
+        task->lines[0] = 0x4D;
+        children->message->show(children->message, 1, task->lines);
+        task->substate = 5;
+    } else {
+        children->message = FIGHTSTG_createMessage();
+        task->lines[0] = 0x8E;
+        task->lines[1] = 0x10;
+        children->message->show(children->message, 2, task->lines);
+        task->substate = 3;
+    }
+}
+
 /* The enemy's turn: a message when its HP is under a tenth, then one when it is asleep,
    paralyzed or confused, or else the first action of its battle table entry whose condition holds,
    and what its target makes it do: attack, a technique, a switch to another enemy
    (FIGHTSTG_pickEnemySwitch) or a message. The match depends on the goto into the confusion
-   branch, the case -1 next to default, and the enemies pointers of substates 4 and 5. */
+   branch, the case -1 next to default, and the enemies pointers of showEnemyName and
+   substate 5. */
 void FIGHTSTG_updateEnemyTurn(EnemyTurn *task, BattleChild *children) {
     BattleFighter *fighter;
     BattleTableEntry *entry;
-    TechData *tech;
     s32 message;
-    s32 index;
-    s32 pick;
     s32 i;
 
     switch (task->state) {
@@ -83,22 +183,7 @@ void FIGHTSTG_updateEnemyTurn(EnemyTurn *task, BattleChild *children) {
         switch (task->substate) {
         case 0:
         default:
-            if (FIGHTSTG_battle.kind == BATTLE_KIND_ESCAPE) {
-                BattleFighter *enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
-
-                if (enemy->hp < (s16)(enemy->maxHp / 10)) {
-                    children->message = FIGHTSTG_createMessage();
-                    task->lines[0] = 0x5F;
-                    task->lines[1] = 0x10;
-                    children->message->show(children->message, 2, task->lines);
-                    FIGHTSTG_endBattle(BATTLE_FLED);
-                    task->substate++;
-                } else {
-                    task->nextState(task);
-                }
-            } else {
-                task->nextState(task);
-            }
+            fleeWhenWeak(task, children);
             break;
         case 1:
             if (children->message == NULL) {
@@ -111,27 +196,7 @@ void FIGHTSTG_updateEnemyTurn(EnemyTurn *task, BattleChild *children) {
         switch (task->substate) {
         case 0:
         default:
-            switch (task->step) {
-            case 0:
-            default:
-                index = FIGHTSTG_events.funcs.find(EVENT_RUN_AWAY, 0x10, FIGHTSTG_battle.active[1]);
-                if (index >= 0) {
-                    children->message = FIGHTSTG_createMessage();
-                    task->lines[0] = 0x60;
-                    task->lines[1] = 0x10;
-                    children->message->show(children->message, 2, task->lines);
-                    FIGHTSTG_events.events[index].type = 0;
-                    task->step++;
-                } else {
-                    task->nextSubstate(task);
-                }
-                break;
-            case 1:
-                if (children->message == NULL) {
-                    task->nextSubstate(task);
-                }
-                break;
-            }
+            showRunAway(task, children);
             break;
         case 1:
             fighter = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
@@ -157,7 +222,7 @@ void FIGHTSTG_updateEnemyTurn(EnemyTurn *task, BattleChild *children) {
             }
             i = 0;
             entry = FIGHTSTG_battleTableFunc(fighter->id);
-            for (; i < 3; i++) {
+            for (; i < BATTLE_TABLE_FALLBACK; i++) {
                 if (FIGHTSTG_testEnemyCondition(entry->actions[i].condition, entry->actions[i].conditionArg) != 0) {
                     break;
                 }
@@ -167,21 +232,7 @@ void FIGHTSTG_updateEnemyTurn(EnemyTurn *task, BattleChild *children) {
             break;
         case 2:
             if (task->target > 0) {
-                if (task->target == 1) {
-                    children->attack = FIGHTSTG_startFirstTech(0x10);
-                } else {
-                    fighter = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
-                    tech = &TECHS[task->target - 1];
-                    if (fighter->mp >= tech->mp) {
-                        children->tech = FIGHTSTG_startTechAction(SIDE_ENEMY, task->target);
-                        fighter->mp -= tech->mp;
-                    } else {
-                        children->message = FIGHTSTG_createMessage();
-                        task->lines[0] = 0x8D;
-                        task->lines[1] = 0x10;
-                        children->message->show(children->message, 2, task->lines);
-                    }
-                }
+                useEnemyTech(task, children);
                 task->substate = 3;
             } else if (task->target < 0) {
                 switch (task->target) {
@@ -198,20 +249,7 @@ void FIGHTSTG_updateEnemyTurn(EnemyTurn *task, BattleChild *children) {
                 case -3:
                 case -4:
                 case -5:
-                    pick = FIGHTSTG_pickEnemySwitch(task);
-                    if (pick != -1) {
-                        task->switchTo = pick;
-                        children->message = FIGHTSTG_createMessage();
-                        task->lines[0] = 0x4D;
-                        children->message->show(children->message, 1, task->lines);
-                        task->substate = 5;
-                    } else {
-                        children->message = FIGHTSTG_createMessage();
-                        task->lines[0] = 0x8E;
-                        task->lines[1] = 0x10;
-                        children->message->show(children->message, 2, task->lines);
-                        task->substate = 3;
-                    }
+                    switchEnemyOut(task, children);
                     break;
                 }
             }
@@ -224,12 +262,7 @@ void FIGHTSTG_updateEnemyTurn(EnemyTurn *task, BattleChild *children) {
             break;
         case 4:
             if (children->message == NULL) {
-                BattleFighter *enemies = FIGHTSTG_battle.fighters[1];
-                BattleTableEntry *enemy = FIGHTSTG_battleTableFunc(enemies[FIGHTSTG_battle.active[1]].id);
-
-                children->message = FIGHTSTG_createMessage();
-                task->lines[0] = enemy->nameId;
-                children->message->show(children->message, 0xD, task->lines);
+                showEnemyName(task, children);
                 task->substate = 3;
             }
             break;

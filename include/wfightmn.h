@@ -21,7 +21,7 @@ typedef struct BattleMenu {
 /* The task that loads the battle menu's files (WFIGHTMN_createLoader) */
 typedef struct BattleLoader {
     TASK_HEADER(BattleLoader);
-    /* 0x50 */ s32 unk50; /* never used */
+    /* 0x50 */ s32 pad; /* nothing uses it */
 } BattleLoader;
 
 /* The battle menu's children */

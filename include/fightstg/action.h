@@ -80,7 +80,7 @@ typedef struct EnemyAttack {
     TASK_HEADER(EnemyAttack);
     /* 0x50 */ s32 lines[4]; /* FIGHTSTG_updateMessage's */
     /* 0x60 */ s32 resetIdleMotion; /* the weakness ended: WFIGHTMN_setIdleMotion once the technique starts */
-    /* 0x64 */ u8 unk64[0xC];
+    /* 0x64 */ u8 pad[0xC]; /* nothing uses it */
     /* 0x70 */ s32 tech; /* the technique */
     /* 0x74 */ s32 kind; /* 0 the enemy's technique, 1 another attack */
     /* 0x78 */ s32 noKnockout; /* don't knock the fighter out at 0 HP */
@@ -92,7 +92,7 @@ typedef struct ActionEvents {
     TASK_HEADER(ActionEvents);
     /* 0x50 */ u8 side; /* 0 or 0x10 */
     /* 0x54 */ s32 args[3];
-    /* 0x60 */ u8 unk60[0x14];
+    /* 0x60 */ u8 pad[0x14]; /* nothing uses it */
 } ActionEvents;
 
 /* A counterattack (FIGHTSTG_startCounterattack) */
@@ -105,7 +105,7 @@ typedef struct Counterattack {
     /* 0x7C */ s32 hit; /* whether the technique hits (FIGHTSTG_battleFuncs.rollHit) */
     /* 0x80 */ s32 damage;
     /* 0x84 */ s32 noKnockOutEvent; /* a knockout doesn't call FIGHTSTG_queueKnockOut */
-    /* 0x88 */ s32 unk88;
+    /* 0x88 */ s32 pad; /* nothing uses it */
 } Counterattack;
 
 /* FIGHTSTG_startOneHpTurn's task, BATTLE_KIND_FINAL_SECOND's enemy turn:

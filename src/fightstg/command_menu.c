@@ -14,7 +14,7 @@ void FIGHTSTG_showCommands(CommandMenu *task) {
     if (w->lines[0] == NULL) {
         text = FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU));
         for (i = 0; i < BATTLE_COMMAND_COUNT; i++) {
-            w->lines[i] = createTextWindow(0x1005, 1, 0x24, 0x6D + i * 0x13);
+            w->lines[i] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x24, 0x6D + i * 0x13);
             w->lines[i]->setString(w->lines[i], text, i + 1);
         }
         fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];

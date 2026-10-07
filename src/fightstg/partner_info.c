@@ -8,7 +8,7 @@ void FIGHTSTG_drawPageArrows(PartnerInfo *task) {
     void *sheet = FILE_CACHE.getEntry(FILE_BATTLE_MENU << 16);
 
     initSpriteDrawer(&drawer);
-    drawer.setLayerId(0x1005, 1);
+    drawer.setLayerId(BATTLE_LAYER_MENUS, 1);
     drawer.setTexture(0x200, 0);
     if (GFX.funcs.getTime() & 0x10) {
         drawer.draw(sheet, 0x1F, 0x18, 0xAB);
@@ -20,10 +20,10 @@ void FIGHTSTG_drawPageArrows(PartnerInfo *task) {
 void FIGHTSTG_showPageButtons(PartnerInfo *task, TextWindow **windows) {
     void *text = FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU));
 
-    windows[1] = createTextWindow(0x1005, 3, 0x22, 0xAB);
+    windows[1] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x22, 0xAB);
     windows[1]->setString(windows[1], text, 0x11);
     windows[1]->setPalette(windows[1], PALETTE_DARK_BLUE);
-    windows[2] = createTextWindow(0x1005, 3, 0x38, 0xAB);
+    windows[2] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x38, 0xAB);
     windows[2]->setString(windows[2], text, 0x12);
     windows[2]->setPalette(windows[2], PALETTE_DARK_BLUE);
 }
@@ -34,7 +34,7 @@ void FIGHTSTG_drawStatsFrame(PartnerInfo *task) {
     void *sheet;
 
     initSpriteDrawer(&drawer);
-    drawer.setLayerId(0x1005, 1);
+    drawer.setLayerId(BATTLE_LAYER_MENUS, 1);
     sheet = FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16);
     drawer.setTexture(0x140, 0);
     drawer.draw(sheet, 0x23, 0x18, 0x51);
@@ -68,7 +68,7 @@ void FIGHTSTG_showStats(PartnerInfo *task, TextWindow **windows) {
     s32 value;
 
     for (i = 0; i < 13; i++) {
-        windows[i + 5] = createTextWindow(0x1005, 1, FIGHTSTG_statLines[i].x, FIGHTSTG_statLines[i].y);
+        windows[i + 5] = createTextWindow(BATTLE_LAYER_MENUS, 1, FIGHTSTG_statLines[i].x, FIGHTSTG_statLines[i].y);
         value = *(task->stats + FIGHTSTG_statLines[i].stat);
         if (value >= 1000) {
             value = 999;
@@ -95,7 +95,7 @@ void FIGHTSTG_drawTechIcons(PartnerInfo *task) {
     s32 tech;
 
     initSpriteDrawer(&drawer);
-    drawer.setLayerId(0x1005, 1);
+    drawer.setLayerId(BATTLE_LAYER_MENUS, 1);
     sheet = FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16);
     drawer.setTexture(0x140, 0);
     for (i = 0; i < 6; i++) {
@@ -117,9 +117,9 @@ void FIGHTSTG_showTechs(PartnerInfo *task, TextWindow **windows) {
     s32 i;
     s32 tech;
 
-    windows[3] = createTextWindow(0x1005, 1, 0x5A, 0xA9);
+    windows[3] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x5A, 0xA9);
     windows[3]->setString(windows[3], text, 0x19);
-    windows[4] = createTextWindow(0x1005, 1, 0x93, 0xA9);
+    windows[4] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x93, 0xA9);
     if (task->level >= 0) {
         windows[4]->setNumber(windows[4], 0, task->level);
     } else {
@@ -127,7 +127,7 @@ void FIGHTSTG_showTechs(PartnerInfo *task, TextWindow **windows) {
     }
     windows[4]->setRightAlign(windows[4], 1);
     for (i = 0; i < 6; i++) {
-        windows[i + 18] = createTextWindow(0x1005, 1, 0x26, 0x51 + i * 0xE);
+        windows[i + 18] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x26, 0x51 + i * 0xE);
         tech = task->techs[i];
         if (tech != 0) {
             windows[i + 18]->setString(windows[i + 18], FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), tech & SKILL_ID);
