@@ -12,7 +12,7 @@ void FIELDSTG_showSpotHint(SpotHint *task) {
 
     switch (task->state) {
         default:
-        case 0:
+        case TASK_INIT:
             dx = task->from.x - task->to.x;
             if (dx < 0) {
                 dx = -dx;
@@ -33,22 +33,22 @@ void FIELDSTG_showSpotHint(SpotHint *task) {
             }
             task->nextState(task);
             /* fallthrough */
-        case 1:
+        case TASK_RUN:
             sprites = FILE_CACHE.getEntry(FIELD_SPRITES_FILE << 16 | 1);
             initSpriteDrawer(&sprite);
             sprite.setLayerId(FIELD_LAYER_MAP, 0);
-            sprite.setTexture(0x240, 0x100);
+            sprite.setTexture(FIELD_SPRITES2_X, FIELD_SPRITES_Y);
             sprite.setFollowScroll(0);
             sprite.setClutRow(task->time / task->speed % 10);
             sprite.draw(sprites, task->frame, 0xF8, 0xA8);
             sprite.draw(sprites, 0x4F, 0xF8, 0xA8);
             task->time += GFX.funcs.getFrameTime();
             if (task->time >= 0x78) {
-                task->setState(task, 3);
+                task->setState(task, TASK_KILL);
             }
             break;
-        case 2:
-        case 3:
+        case TASK_DONE:
+        case TASK_KILL:
             break;
     }
 }
@@ -83,13 +83,13 @@ void FIELDSTG_updateHiddenSpots(HiddenSpots *task, HiddenSpotsChildren *children
 
     switch (task->state) {
     default:
-    case 0:
+    case TASK_INIT:
         FILE_CACHE.request(FIELD_SEARCH_FILE);
         task->nextState(task);
         break;
-    case 1:
+    case TASK_RUN:
         break;
-    case 2:
+    case TASK_DONE:
         if (task->substate == 0) {
             children->effect = FIELDSTG_createSpotEffect(task->forEvent);
             task->nextSubstate(task);
@@ -122,7 +122,7 @@ void FIELDSTG_updateHiddenSpots(HiddenSpots *task, HiddenSpotsChildren *children
             time -= FIELDSTG_spotAnim[step][1];
             step++;
             if (FIELDSTG_spotAnim[step][0] == 0xFF) {
-                task->setState(task, 1);
+                task->setState(task, TASK_RUN);
                 return;
             }
             task->entries[task->selected].frame = FIELDSTG_spotAnim[step][0];
@@ -140,7 +140,7 @@ void FIELDSTG_updateHiddenSpots(HiddenSpots *task, HiddenSpotsChildren *children
             }
         }
         break;
-    case 3:
+    case TASK_KILL:
         if (task->entries != NULL) {
             HEAP.free(task->entries);
         }
@@ -215,7 +215,7 @@ void FIELDSTG_searchEventSpot(void) {
             if (task->entries[i].pos.x >= 1000) {
                 task->selected = i;
                 task->forEvent = 1;
-                task->setState(task, 2);
+                task->setState(task, TASK_DONE);
             }
         }
     }
@@ -225,9 +225,9 @@ void FIELDSTG_searchEventSpot(void) {
 void FIELDSTG_drawSpotEffect(SpotEffect *task, Layer *layer) {
     SpriteDrawer sprite;
 
-    if (task->state == 1) {
+    if (task->state == TASK_RUN) {
         initSpriteDrawer(&sprite);
-        sprite.setTexture(0x200, 0x100);
+        sprite.setTexture(FIELD_SPRITES_X, FIELD_SPRITES_Y);
         sprite.setLayer(layer, 4);
         sprite.draw(FILE_CACHE.getEntry(FIELD_SPRITES_FILE << 16), task->frame, task->x, task->y);
     }
@@ -243,7 +243,7 @@ void FIELDSTG_updateSpotEffect(SpotEffect *task) {
 
     switch (task->state) {
         default:
-        case 0:
+        case TASK_INIT:
             if (task->key1 != 0) {
                 actor = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, 0x11B, -1);
             } else {
@@ -257,9 +257,9 @@ void FIELDSTG_updateSpotEffect(SpotEffect *task) {
             task->dir = actor->dir;
             task->anim = FIELDSTG_dirAnims[task->dir];
             task->nextState(task);
-            SOUND.playSound(0x80045C44);
+            SOUND.playSound(SOUND_PLAYER08);
             /* fallthrough */
-        case 1:
+        case TASK_RUN:
             step = task->step;
             time = task->counter;
             time += GFX.funcs.getFrameTime();
@@ -268,7 +268,7 @@ void FIELDSTG_updateSpotEffect(SpotEffect *task) {
                 time -= anim[step * 2 + 1];
                 step++;
                 if (anim[step * 2] == 0xFF) {
-                    task->setState(task, 3);
+                    task->setState(task, TASK_KILL);
                     break;
                 }
                 task->frame = anim[step * 2];
@@ -279,8 +279,8 @@ void FIELDSTG_updateSpotEffect(SpotEffect *task) {
                 layer->addSortedCallback(layer, FIELDSTG_drawSpotEffect, task, task->y + FIELDSTG_dirDepths[task->dir], 0);
             }
             break;
-        case 2:
-        case 3:
+        case TASK_DONE:
+        case TASK_KILL:
             break;
     }
 }

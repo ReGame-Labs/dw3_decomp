@@ -7,8 +7,8 @@
 #include "fieldstg.h"
 
 /*
- * The field's battle transition: the screen breaks into 30 tiles that slide
- * off in a spiral (FIELDSTG_tileMoves, one move per counter step), then it
+ * The field's battle transition: the screen breaks into TRANSITION_COLUMNS by
+ * TRANSITION_ROWS tiles that slide off in a spiral (FIELDSTG_tileMoves, one move per counter step), then it
  * requests the battle's mode. The match depends on the move being an early
  * exit, a do-while (0) that breaks while the buffer is busy, with move
  * declared in it: the block's note stops stmt.c from rolling the exit test
@@ -33,26 +33,26 @@ void FIELDSTG_playBattleTransition(FieldTask *task, FieldChildren *fieldChildren
     switch (task->substate) {
     case 0:
         FILE_CACHE.markCached();
-        setRECT(&FIELDSTG_screenRect, 0, 0, 320, 240);
-        MoveImage(&FIELDSTG_screenRect, 0x280, 0);
+        setRECT(&FIELDSTG_screenRect, 0, 0, FIELD_SCREEN_WIDTH, FIELD_SCREEN_HEIGHT);
+        MoveImage(&FIELDSTG_screenRect, TRANSITION_IMAGE_X, 0);
         layer = GFX.funcs.getLayer(FIELD_LAYER_BACK);
         layer->setBgColor(layer, 0, 0, 0);
         layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
         layer->setBgColor(layer, 0, 0, 0);
         GAME.fieldMode = GAME.funcs.getMode();
-        GAME.fieldPos = ((Actor *)children[6])->pos;
-        GAME.fieldDir = ((Actor *)children[6])->dir;
-        for (row = 0; row < 6; row++) {
-            for (col = 0; col < 5; col++) {
-                FIELDSTG_tiles[col][row].x = col * 64;
-                FIELDSTG_tiles[col][row].y = row * 40;
+        GAME.fieldPos = fieldChildren->actors[0]->pos;
+        GAME.fieldDir = fieldChildren->actors[0]->dir;
+        for (row = 0; row < TRANSITION_ROWS; row++) {
+            for (col = 0; col < TRANSITION_COLUMNS; col++) {
+                FIELDSTG_tiles[col][row].x = col * TRANSITION_TILE_WIDTH;
+                FIELDSTG_tiles[col][row].y = row * TRANSITION_TILE_HEIGHT;
             }
         }
         SOUND.stopAll();
-        SOUND.playSound(0x40005);
+        SOUND.playSound(SOUND_ENCOUNTS);
         for (k = 0; k < task->childCount; k++) {
             if (*children != NULL) {
-                (*children)->setState(*children, 3);
+                (*children)->setState(*children, TASK_KILL);
             }
             children++;
         }
@@ -86,7 +86,7 @@ void FIELDSTG_playBattleTransition(FieldTask *task, FieldChildren *fieldChildren
         }
         layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
         ot = (u_long *)layer->getOtEntry(layer, 0);
-        speed = GFX.funcs.getFrameTime() * 40;
+        speed = GFX.funcs.getFrameTime() * TRANSITION_SPEED;
         do {
             TileMove *move = &FIELDSTG_tileMoves[task->counter];
 
@@ -101,58 +101,58 @@ void FIELDSTG_playBattleTransition(FieldTask *task, FieldChildren *fieldChildren
                     more = *move->value > move->limit;
                 }
                 if (!more) {
-                    *move->value = 0x200;
+                    *move->value = TRANSITION_GONE;
                     task->tickCounter(task);
                 }
             } else {
-                FIELDSTG_tiles[2][3].x = 0x200;
-                if (++task->step >= 0x10) {
-                    if (task->step < 0x1000) {
+                FIELDSTG_tiles[2][3].x = TRANSITION_GONE;
+                if (++task->step >= TRANSITION_WAIT) {
+                    if (task->step < TRANSITION_DONE) {
                         GAME.funcs.requestMode(task->nextMode, task->nextModeArg);
                     }
-                    task->step = 0x1000;
+                    task->step = TRANSITION_DONE;
                 }
             }
         } while (0);
-        if (task->step != 0x1000) {
+        if (task->step != TRANSITION_DONE) {
             poly = GFX.funcs.getPrim();
             setRGB0((POLY_F4 *)poly, 0x10, 0x10, 0x10);
             setPolyF4((POLY_F4 *)poly);
             setSemiTrans((POLY_F4 *)poly, 1);
             ((POLY_F4 *)poly)->x0 = 0;
-            ((POLY_F4 *)poly)->x1 = 320;
+            ((POLY_F4 *)poly)->x1 = FIELD_SCREEN_WIDTH;
             ((POLY_F4 *)poly)->x2 = 0;
-            ((POLY_F4 *)poly)->x3 = 320;
+            ((POLY_F4 *)poly)->x3 = FIELD_SCREEN_WIDTH;
             ((POLY_F4 *)poly)->y0 = 0;
             ((POLY_F4 *)poly)->y1 = 0;
-            ((POLY_F4 *)poly)->y2 = 240;
-            ((POLY_F4 *)poly)->y3 = 240;
+            ((POLY_F4 *)poly)->y2 = FIELD_SCREEN_HEIGHT;
+            ((POLY_F4 *)poly)->y3 = FIELD_SCREEN_HEIGHT;
             addPrim(ot, poly);
             poly = (POLY_FT4 *)((POLY_F4 *)poly + 1);
             setDrawTPage((DR_TPAGE *)poly, 0, 1, getTPage(0, 2, 320, 0));
             addPrim(ot, poly);
             poly = (POLY_FT4 *)((DR_TPAGE *)poly + 1);
-            for (i = 0; i < 6; i++) {
-                for (j = 0; j < 5; j++) {
-                    if (FIELDSTG_tiles[j][i].x != 0x200 && FIELDSTG_tiles[j][i].y != 0x200) {
+            for (i = 0; i < TRANSITION_ROWS; i++) {
+                for (j = 0; j < TRANSITION_COLUMNS; j++) {
+                    if (FIELDSTG_tiles[j][i].x != TRANSITION_GONE && FIELDSTG_tiles[j][i].y != TRANSITION_GONE) {
                         setPolyFT4(poly);
                         setSemiTrans(poly, 1);
                         setRGB0(poly, 0x80, 0x80, 0x80);
                         x = FIELDSTG_tiles[j][i].x;
                         poly->x0 = poly->x2 = x;
-                        poly->x1 = poly->x3 = x + 64;
+                        poly->x1 = poly->x3 = x + TRANSITION_TILE_WIDTH;
                         y = FIELDSTG_tiles[j][i].y;
                         poly->u0 = 0;
-                        poly->u1 = 64;
+                        poly->u1 = TRANSITION_TILE_WIDTH;
                         poly->u2 = 0;
-                        poly->u3 = 64;
-                        poly->v0 = i * 40;
-                        poly->v1 = i * 40;
-                        poly->v2 = i * 40 + 40;
-                        poly->v3 = i * 40 + 40;
+                        poly->u3 = TRANSITION_TILE_WIDTH;
+                        poly->v0 = i * TRANSITION_TILE_HEIGHT;
+                        poly->v1 = i * TRANSITION_TILE_HEIGHT;
+                        poly->v2 = i * TRANSITION_TILE_HEIGHT + TRANSITION_TILE_HEIGHT;
+                        poly->v3 = i * TRANSITION_TILE_HEIGHT + TRANSITION_TILE_HEIGHT;
                         poly->y0 = poly->y1 = y;
-                        poly->y2 = poly->y3 = y + 40;
-                        poly->tpage = getTPage(2, 0, 0x280 + j * 64, 0);
+                        poly->y2 = poly->y3 = y + TRANSITION_TILE_HEIGHT;
+                        poly->tpage = getTPage(2, 0, TRANSITION_IMAGE_X + j * TRANSITION_TILE_WIDTH, 0);
                         addPrim(ot, poly);
                         poly++;
                     }
@@ -188,9 +188,9 @@ void FIELDSTG_closeField(FieldTask *task, FieldChildren *children) {
         } else {
             task->centerOnPlayer = 0;
         }
-        task->width = 0x140;
+        task->width = FIELD_SCREEN_WIDTH;
         task->fade = 0;
-        task->height = 0xF0;
+        task->height = FIELD_SCREEN_HEIGHT;
         task->nextSubstate(task);
     case 1:
         layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
@@ -209,8 +209,8 @@ void FIELDSTG_closeField(FieldTask *task, FieldChildren *children) {
             clip.x = actor->tile.x - clip.x;
             clip.y = actor->tile.y - clip.y;
         } else {
-            clip.x = 0xA0;
-            clip.y = 0x78;
+            clip.x = FIELD_SCREEN_WIDTH / 2;
+            clip.y = FIELD_SCREEN_HEIGHT / 2;
         }
         clip.x -= task->width / 2;
         if (clip.x < 0) {
@@ -223,11 +223,11 @@ void FIELDSTG_closeField(FieldTask *task, FieldChildren *children) {
         layer->setClipPos(layer, clip.x, clip.y);
         width = task->width;
         height = task->height;
-        if (clip.x + width > 0x140) {
-            width = 0x140 - clip.x;
+        if (clip.x + width > FIELD_SCREEN_WIDTH) {
+            width = FIELD_SCREEN_WIDTH - clip.x;
         }
-        if (clip.y + height > 0xF0) {
-            height = 0xF0 - clip.y;
+        if (clip.y + height > FIELD_SCREEN_HEIGHT) {
+            height = FIELD_SCREEN_HEIGHT - clip.y;
         }
         layer->setClipSize(layer, width, height);
         FIELDSTG_drawCover(FIELD_LAYER_COVER, task->fade);
@@ -248,8 +248,8 @@ void FIELDSTG_closeField(FieldTask *task, FieldChildren *children) {
         }
         task->width += 8;
         layer->setClipPos(layer, task->width, task->height);
-        layer->setClipSize(layer, (0xA0 - task->width) * 2, (0x78 - task->height) * 2);
-        if (task->width > 0xA0) {
+        layer->setClipSize(layer, (FIELD_SCREEN_WIDTH / 2 - task->width) * 2, (FIELD_SCREEN_HEIGHT / 2 - task->height) * 2);
+        if (task->width > FIELD_SCREEN_WIDTH / 2) {
             GAME.funcs.requestMode(task->nextMode, task->nextModeArg);
             GAME.fieldMode = GAME.funcs.getMode();
             GAME.fieldPos = children->actors[0]->pos;
@@ -263,13 +263,13 @@ void FIELDSTG_closeField(FieldTask *task, FieldChildren *children) {
     }
 }
 
-/* Whether the mode is 0x22D or 0x2DE, whose field keeps the file cache and
-   doesn't take the high buffer */
+/* Whether the mode is FIELD_MODE_WSTAG415 or FIELD_MODE_WSTAG815, whose field
+   keeps the file cache and doesn't take the high buffer */
 s32 FIELDSTG_keepsFileCache(void) {
-    if (GAME.funcs.getMode() == 0x22D) {
+    if (GAME.funcs.getMode() == FIELD_MODE_WSTAG415) {
         return 1;
     }
-    return GAME.funcs.getMode() == 0x2DE;
+    return GAME.funcs.getMode() == FIELD_MODE_WSTAG815;
 }
 
 /*
@@ -294,7 +294,7 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
     s32 i;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         switch (task->substate) {
         case 0:
@@ -304,11 +304,11 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
             }
             GFX.funcs.reset();
             GFX.funcs.allocPrimBuffers(0x6400);
-            GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
+            GFX.funcs.setDisplayMode(FIELD_SCREEN_WIDTH, FIELD_SCREEN_HEIGHT, 0, 0);
             rect.x = 0;
             rect.y = 0;
-            rect.w = 0x140;
-            rect.h = 0xF0;
+            rect.w = FIELD_SCREEN_WIDTH;
+            rect.h = FIELD_SCREEN_HEIGHT;
             layer = GFX.funcs.createLayer(&rect, 1, FIELD_LAYER_BACK);
             layer->setBgColor(layer, 1, 1, 1);
             GFX.funcs.createLayer(&rect, 1, FIELD_LAYER_COVER);
@@ -332,8 +332,11 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
                 children->stage = FIELDSTG_state.stageInit(task);
             }
             FLAGS_00.updateModeFlags();
-            FLAGS_00.applyAction(GAME.funcs.getMode() + 0x1E00, 1);
+            FLAGS_00.applyAction(FIELD_VISITED_FLAG(GAME.funcs.getMode()), 1);
             mode = GAME.funcs.getPrevMode();
+            /* from other than a field (0x2xx, 0x3xx), STDWTITL (0xExx),
+               STPLNMET (0x500) or STAGSLCT (0x1500), the player comes back
+               where the field was left */
             if ((mode & 0xFF00) != 0x200 && (mode & 0xFF00) != 0x300 && (mode & 0xFF00) != 0xE00 &&
                 mode != 0x1500 && mode != 0x500) {
                 GAME.modeArg = -1;
@@ -409,16 +412,16 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
                     children->actors[0] = FIELDSTG_createActor(id, 0, 0, NULL);
                     break;
                 }
-                children->actors[0] = FIELDSTG_createActor(2, 0, 0, NULL);
+                children->actors[0] = FIELDSTG_createActor(FIELD_CHARACTER_PLAYER, 0, 0, NULL);
                 if (GAME.progress >= 3) {
                     if (GAME.funcs.getPartyPartner(0) >= 0) {
-                        children->actors[1] = FIELDSTG_createActor(GAME.funcs.getPartyPartner(0) + 3, 2, 1, NULL);
+                        children->actors[1] = FIELDSTG_createActor(GAME.funcs.getPartyPartner(0) + FIELD_CHARACTER_PARTNERS, 2, 1, NULL);
                     }
                     if (GAME.funcs.getPartyPartner(1) >= 0) {
-                        children->actors[2] = FIELDSTG_createActor(GAME.funcs.getPartyPartner(1) + 3, 4, 2, NULL);
+                        children->actors[2] = FIELDSTG_createActor(GAME.funcs.getPartyPartner(1) + FIELD_CHARACTER_PARTNERS, 4, 2, NULL);
                     }
                     if (GAME.funcs.getPartyPartner(2) >= 0) {
-                        children->actors[3] = FIELDSTG_createActor(GAME.funcs.getPartyPartner(2) + 3, 8, 3, NULL);
+                        children->actors[3] = FIELDSTG_createActor(GAME.funcs.getPartyPartner(2) + FIELD_CHARACTER_PARTNERS, 8, 3, NULL);
                     }
                 }
             } while (0);
@@ -463,20 +466,20 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
                     children->mapStreamer = FIELDSTG_createMapStreamer(FIELDSTG_state.mapFile);
                     task->nextStep(task);
                 case 1:
-                    if (children->mapStreamer->state == 1 && children->banner->state == 2) {
+                    if (children->mapStreamer->state == TASK_RUN && children->banner->state == TASK_DONE) {
                         children->banner->setSubstate(children->banner, 1);
                         task->nextState(task);
                     }
                     break;
                 }
-            } else if (children->banner->state == 2) {
+            } else if (children->banner->state == TASK_DONE) {
                 children->banner->setSubstate(children->banner, 1);
                 task->nextState(task);
             }
             break;
         }
         break;
-    case 1:
+    case TASK_RUN:
         switch (task->substate) {
         case 0:
         default:
@@ -516,7 +519,7 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
             case 0:
             default:
                 children->effect = FIELDSTG_createEffect(task->warpPos.x, task->warpPos.y, task->warpKind);
-                SOUND.playSound(0x40004);
+                SOUND.playSound(SOUND_DIGIMENT);
                 task->nextStep(task);
             case 1:
                 if (task->counter < 0x3C) {
@@ -527,26 +530,26 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
                 children->fade->start(children->fade, 0, 0x14);
                 task->nextStep(task);
             case 2:
-                if (children->fade->state == 2) {
+                if (children->fade->state == TASK_DONE) {
                     for (i = 0; i < 4; i++) {
                         if (children->actors[i] != NULL) {
-                            children->actors[i]->setState(children->actors[i], 3);
+                            children->actors[i]->setState(children->actors[i], TASK_KILL);
                         }
                     }
                     for (i = 0; i < 15; i++) {
                         if (children->npcs[i] != NULL) {
-                            children->npcs[i]->setState(children->npcs[i], 3);
+                            children->npcs[i]->setState(children->npcs[i], TASK_KILL);
                         }
                     }
-                    children->mapStreamer->setState(children->mapStreamer, 3);
-                    children->mapObjects->setState(children->mapObjects, 3);
+                    children->mapStreamer->setState(children->mapStreamer, TASK_KILL);
+                    children->mapObjects->setState(children->mapObjects, TASK_KILL);
                     children->cutscene = FIELDSTG_createCutsceneAnim(task->warpKind);
                     children->fade->start(children->fade, 1, 0x14);
                     task->nextStep(task);
                 }
                 break;
             case 3:
-                if (children->cutscene->state == 2) {
+                if (children->cutscene->state == TASK_DONE) {
                     GAME.unk44 = task->warp->place;
                     GAME.unk46 = task->warp->unkC;
                     FIELDSTG_leaveField(task->warp->mode, -1, task->warp->x << 8, task->warp->y << 8, task->warp->dir);
@@ -556,7 +559,7 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
             break;
         }
         break;
-    case 2:
+    case TASK_DONE:
         if (FIELDSTG_state.battleStarting != 0) {
             FIELDSTG_playBattleTransition(task, children);
             break;
@@ -568,19 +571,19 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
         }
         task->leaveDelay -= GFX.funcs.getFrameTime();
         break;
-    case 3:
+    case TASK_KILL:
         break;
     }
 }
 
 /* Creates the field's main task */
 Task *FIELDSTG_createField(void) {
-    return createTaskWithId(FIELDSTG_updateField, 0x80, 0x7C, FIELD_TASK_FIELD);
+    return createTaskWithId(FIELDSTG_updateField, sizeof(FieldTask), sizeof(FieldChildren), FIELD_TASK_FIELD);
 }
 
 /*
- * Leaves the field for a mode after a delay: the field task (id 7) goes to
- * state 2, which closes the field (FIELDSTG_closeField) and requests the
+ * Leaves the field for a mode after a delay: the field task
+ * (FIELD_TASK_FIELD) goes to TASK_DONE, which closes the field (FIELDSTG_closeField) and requests the
  * mode with its argument. The player comes back to the field at (x, y),
  * facing dir.
  */
@@ -591,7 +594,7 @@ void FIELDSTG_leaveFieldAfter(s32 mode, s32 arg, s32 x, s32 y, s32 dir, s32 dela
         task->nextMode = mode;
         task->nextModeArg = arg;
         task->leaveDelay = delay;
-        task->setState(task, 2);
+        task->setState(task, TASK_DONE);
         FIELDSTG_state.defaultStart.x = x;
         FIELDSTG_state.defaultStart.y = y;
         FIELDSTG_state.defaultStartDir = dir;
@@ -603,12 +606,24 @@ void FIELDSTG_leaveField(s32 mode, s32 arg, s32 x, s32 y, s32 dir) {
     FIELDSTG_leaveFieldAfter(mode, arg, x, y, dir, 0);
 }
 
+/* The prize of a battle, an item: the common one, or the rare one when the
+   roll is 0 */
+#define PICK_PRIZE(common, rare)                                              \
+    if (roll != 0) {                                                          \
+        BATTLE_SETUP.prize = common;                                          \
+    } else {                                                                  \
+        BATTLE_SETUP.prize = rare;                                            \
+    }
+
 /*
- * Starts encounter FIELDSTG_encounters[encounter]: the field task (id 7) goes to state 2
- * with mode 0x600, or 0xE0A (USA 0xE09) at GAME.progress 0x2B, and
- * BATTLE_SETUP takes the encounter's enemies and bytes. Enemies 0x1C9-0x1D0
- * always give an item (unk50), which the field mode and a roll pick: odd
- * ones (1 in 32 for the rarer item), even ones (1 in 16).
+ * Starts encounter FIELDSTG_encounters[encounter]: the field task
+ * (FIELD_TASK_FIELD) leaves for the battle (FIELD_MODE_BATTLE, after a movie in the chapter
+ * FIELD_PROGRESS_MOVIE_BATTLES), and BATTLE_SETUP takes the encounter's
+ * enemies and bytes. A battle led by one of the prize fighters always gives
+ * an item, which the field's stage (named in each case by the stage its mode
+ * loads, FIELDSTG_stages) and a roll pick: the rare item comes 1 in 32
+ * times for the odd fighters and 1 in 16 for the even ones. In the European
+ * version's extra chapter some stages give other items.
  */
 void FIELDSTG_startEncounter(s32 encounter) {
     FieldTask *task = TASK_REGISTRY.funcs.find(FIELD_TASK_FIELD, -1, -1);
@@ -620,19 +635,15 @@ void FIELDSTG_startEncounter(s32 encounter) {
     if (task != NULL) {
         FIELDSTG_state.busy = 1;
         FIELDSTG_state.battleStarting = 1;
-#if VERSION_EU
-        next = 0xE0A;
-#else
-        next = 0xE09;
-#endif
-        if (GAME.progress != 0x2B) {
-            next = 0x600;
+        next = FIELD_MODE_BATTLE_MOVIE;
+        if (GAME.progress != FIELD_PROGRESS_MOVIE_BATTLES) {
+            next = FIELD_MODE_BATTLE;
         }
         task->nextMode = next;
         task->nextModeArg = 0;
-        task->setState(task, 2);
+        task->setState(task, TASK_DONE);
         BATTLE_SETUP.battle = encounter;
-        BATTLE_SETUP.ambushChance = FIELDSTG_encounters[encounter].unkC;
+        BATTLE_SETUP.ambushChance = FIELDSTG_encounters[encounter].ambushChance;
         BATTLE_SETUP.unk3D = FIELDSTG_encounters[encounter].unkD;
         for (i = 0; i < 12; i++) {
             BATTLE_SETUP.unk3E[i] = FIELDSTG_encounters[encounter].unkE[i];
@@ -641,406 +652,240 @@ void FIELDSTG_startEncounter(s32 encounter) {
             BATTLE_SETUP.enemies[i] = *FIELDSTG_encounters[encounter].enemies[i];
         }
         BATTLE_SETUP.hasPrize = 0;
-        if ((u32)(BATTLE_SETUP.enemies[0].fighter - 0x1C9) < 8) {
+        if ((u32)(BATTLE_SETUP.enemies[0].fighter - FIELD_PRIZE_FIGHTERS) < FIELD_PRIZE_FIGHTER_COUNT) {
             BATTLE_SETUP.hasPrize = 1;
             mode = GAME.funcs.getMode();
             if (BATTLE_SETUP.enemies[0].fighter & 1) {
                 roll = RANDOM.next() & 0x1F;
                 switch (mode) {
-                case 0x21D:
+                case 0x21D: /* WSTAG330 */
                 default:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x177;
-                    } else {
-                        BATTLE_SETUP.prize = 0x186;
-                    }
+                    PICK_PRIZE(0x177, 0x186);
                     break;
-                case 0x22A:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x179;
-                    } else {
-                        BATTLE_SETUP.prize = 0x186;
-                    }
+                case 0x22A: /* WSTAG400 */
+                    PICK_PRIZE(0x179, 0x186);
                     break;
-                case 0x233:
-                case 0x235:
-                case 0x237:
-                case 0x23A:
-                case 0x23B:
-                case 0x23C:
-                case 0x24A:
-                case 0x24C:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x17A;
-                    } else {
-                        BATTLE_SETUP.prize = 0x187;
-                    }
+                case 0x233: /* WSTAG445 */
+                case 0x235: /* WSTAG455 */
+                case 0x237: /* WSTAG465 */
+                case 0x23A: /* WSTAG480 */
+                case 0x23B: /* WSTAG485 */
+                case 0x23C: /* WSTAG490 */
+                case 0x24A: /* WSTAG565 */
+                case 0x24C: /* WSTAG575 */
+                    PICK_PRIZE(0x17A, 0x187);
                     break;
 #if VERSION_EU
-                case 0x28C:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17C;
-                        } else {
-                            BATTLE_SETUP.prize = 0x187;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x17F;
-                    } else {
-                        BATTLE_SETUP.prize = 0x188;
+                case 0x28C: /* WSTAG331 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17C, 0x187);
+                    } else { /* WSTAG940 */
+                        PICK_PRIZE(0x17F, 0x188);
                     }
                     break;
-                case 0x28D:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17C;
-                        } else {
-                            BATTLE_SETUP.prize = 0x187;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x179;
-                    } else {
-                        BATTLE_SETUP.prize = 0x186;
+                case 0x28D: /* WSTAG336 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17C, 0x187);
+                    } else { /* WSTAG941 */
+                        PICK_PRIZE(0x179, 0x186);
                     }
                     break;
-                case 0x28E:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17C;
-                        } else {
-                            BATTLE_SETUP.prize = 0x187;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x178;
-                    } else {
-                        BATTLE_SETUP.prize = 0x186;
+                case 0x28E: /* WSTAG341 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17C, 0x187);
+                    } else { /* WSTAG942 */
+                        PICK_PRIZE(0x178, 0x186);
                     }
                     break;
-                case 0x28F:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17C;
-                        } else {
-                            BATTLE_SETUP.prize = 0x187;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x17E;
-                    } else {
-                        BATTLE_SETUP.prize = 0x188;
+                case 0x28F: /* WSTAG346 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17C, 0x187);
+                    } else { /* WSTAG943 */
+                        PICK_PRIZE(0x17E, 0x188);
                     }
                     break;
-                case 0x290:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17C;
-                        } else {
-                            BATTLE_SETUP.prize = 0x187;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x180;
-                    } else {
-                        BATTLE_SETUP.prize = 0x189;
+                case 0x290: /* WSTAG351 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17C, 0x187);
+                    } else { /* WSTAG944 */
+                        PICK_PRIZE(0x180, 0x189);
                     }
                     break;
-                case 0x291:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17C;
-                        } else {
-                            BATTLE_SETUP.prize = 0x187;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x181;
-                    } else {
-                        BATTLE_SETUP.prize = 0x189;
+                case 0x291: /* WSTAG356 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17C, 0x187);
+                    } else { /* WSTAG945 */
+                        PICK_PRIZE(0x181, 0x189);
                     }
                     break;
-                case 0x296:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17C;
-                        } else {
-                            BATTLE_SETUP.prize = 0x187;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x182;
-                    } else {
-                        BATTLE_SETUP.prize = 0x189;
+                case 0x296: /* WSTAG381 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17C, 0x187);
+                    } else { /* WSTAG950 */
+                        PICK_PRIZE(0x182, 0x189);
                     }
                     break;
-                case 0x298:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17C;
-                        } else {
-                            BATTLE_SETUP.prize = 0x187;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x183;
-                    } else {
-                        BATTLE_SETUP.prize = 0x18A;
+                case 0x298: /* WSTAG396 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17C, 0x187);
+                    } else { /* WSTAG952 */
+                        PICK_PRIZE(0x183, 0x18A);
                     }
                     break;
-                case 0x299:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17F;
-                        } else {
-                            BATTLE_SETUP.prize = 0x188;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x185;
-                    } else {
-                        BATTLE_SETUP.prize = 0x18A;
+                case 0x299: /* WSTAG401 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17F, 0x188);
+                    } else { /* WSTAG953 */
+                        PICK_PRIZE(0x185, 0x18A);
                     }
                     break;
 #else
-                case 0x28C:
-                case 0x28D:
-                case 0x28E:
-                case 0x28F:
-                case 0x290:
-                case 0x291:
-                case 0x296:
-                case 0x298:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x17C;
-                    } else {
-                        BATTLE_SETUP.prize = 0x187;
-                    }
+                case 0x28C: /* WSTAG331 */
+                case 0x28D: /* WSTAG336 */
+                case 0x28E: /* WSTAG341 */
+                case 0x28F: /* WSTAG346 */
+                case 0x290: /* WSTAG351 */
+                case 0x291: /* WSTAG356 */
+                case 0x296: /* WSTAG381 */
+                case 0x298: /* WSTAG396 */
+                    PICK_PRIZE(0x17C, 0x187);
                     break;
-                case 0x299:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x17F;
-                    } else {
-                        BATTLE_SETUP.prize = 0x188;
-                    }
+                case 0x299: /* WSTAG401 */
+                    PICK_PRIZE(0x17F, 0x188);
                     break;
 #endif
-                case 0x2A1:
-                case 0x2A3:
-                case 0x2A4:
-                case 0x2A7:
-                case 0x2A8:
-                case 0x2A9:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x180;
-                    } else {
-                        BATTLE_SETUP.prize = 0x189;
-                    }
+                case 0x2A1: /* WSTAG446 */
+                case 0x2A3: /* WSTAG456 */
+                case 0x2A4: /* WSTAG466 */
+                case 0x2A7: /* WSTAG481 */
+                case 0x2A8: /* WSTAG486 */
+                case 0x2A9: /* WSTAG491 */
+                    PICK_PRIZE(0x180, 0x189);
                     break;
-                case 0x261:
-                case 0x262:
-                case 0x265:
-                case 0x266:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x181;
-                    } else {
-                        BATTLE_SETUP.prize = 0x189;
-                    }
+                case 0x261: /* WSTAG690 */
+                case 0x262: /* WSTAG695 */
+                case 0x265: /* WSTAG710 */
+                case 0x266: /* WSTAG715 */
+                    PICK_PRIZE(0x181, 0x189);
                     break;
-                case 0x2B4:
-                case 0x2B6:
-                case 0x2C9:
-                case 0x2CA:
-                case 0x2CD:
-                case 0x2CE:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x184;
-                    } else {
-                        BATTLE_SETUP.prize = 0x18A;
-                    }
+                case 0x2B4: /* WSTAG566 */
+                case 0x2B6: /* WSTAG576 */
+                case 0x2C9: /* WSTAG691 */
+                case 0x2CA: /* WSTAG696 */
+                case 0x2CD: /* WSTAG711 */
+                case 0x2CE: /* WSTAG716 */
+                    PICK_PRIZE(0x184, 0x18A);
                     break;
                 }
             } else {
                 roll = RANDOM.next() & 0xF;
                 switch (mode) {
-                case 0x201:
+                case 0x201: /* WSTAG202 */
                 default:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x177;
-                    } else {
-                        BATTLE_SETUP.prize = 0x186;
-                    }
+                    PICK_PRIZE(0x177, 0x186);
                     break;
-                case 0x234:
-                case 0x235:
-                case 0x237:
-                case 0x23A:
-                case 0x23B:
-                case 0x23C:
-                case 0x23D:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x178;
-                    } else {
-                        BATTLE_SETUP.prize = 0x186;
-                    }
+                case 0x234: /* WSTAG450 */
+                case 0x235: /* WSTAG455 */
+                case 0x237: /* WSTAG465 */
+                case 0x23A: /* WSTAG480 */
+                case 0x23B: /* WSTAG485 */
+                case 0x23C: /* WSTAG490 */
+                case 0x23D: /* WSTAG495 */
+                    PICK_PRIZE(0x178, 0x186);
                     break;
-                case 0x247:
-                case 0x249:
-                case 0x24B:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x17B;
-                    } else {
-                        BATTLE_SETUP.prize = 0x187;
-                    }
+                case 0x247: /* WSTAG550 */
+                case 0x249: /* WSTAG560 */
+                case 0x24B: /* WSTAG570 */
+                    PICK_PRIZE(0x17B, 0x187);
                     break;
 #if VERSION_EU
-                case 0x271:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17D;
-                        } else {
-                            BATTLE_SETUP.prize = 0x188;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x177;
-                    } else {
-                        BATTLE_SETUP.prize = 0x186;
+                case 0x271: /* WSTAG203 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17D, 0x188);
+                    } else { /* WSTAG921 */
+                        PICK_PRIZE(0x177, 0x186);
                     }
                     break;
-                case 0x28C:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17D;
-                        } else {
-                            BATTLE_SETUP.prize = 0x188;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x17A;
-                    } else {
-                        BATTLE_SETUP.prize = 0x187;
+                case 0x28C: /* WSTAG331 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17D, 0x188);
+                    } else { /* WSTAG940 */
+                        PICK_PRIZE(0x17A, 0x187);
                     }
                     break;
-                case 0x28D:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17D;
-                        } else {
-                            BATTLE_SETUP.prize = 0x188;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x179;
-                    } else {
-                        BATTLE_SETUP.prize = 0x186;
+                case 0x28D: /* WSTAG336 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17D, 0x188);
+                    } else { /* WSTAG941 */
+                        PICK_PRIZE(0x179, 0x186);
                     }
                     break;
-                case 0x28E:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17D;
-                        } else {
-                            BATTLE_SETUP.prize = 0x188;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x178;
-                    } else {
-                        BATTLE_SETUP.prize = 0x186;
+                case 0x28E: /* WSTAG341 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17D, 0x188);
+                    } else { /* WSTAG942 */
+                        PICK_PRIZE(0x178, 0x186);
                     }
                     break;
-                case 0x28F:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17D;
-                        } else {
-                            BATTLE_SETUP.prize = 0x188;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x17B;
-                    } else {
-                        BATTLE_SETUP.prize = 0x187;
+                case 0x28F: /* WSTAG346 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17D, 0x188);
+                    } else { /* WSTAG943 */
+                        PICK_PRIZE(0x17B, 0x187);
                     }
                     break;
-                case 0x290:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17D;
-                        } else {
-                            BATTLE_SETUP.prize = 0x188;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x184;
-                    } else {
-                        BATTLE_SETUP.prize = 0x18A;
+                case 0x290: /* WSTAG351 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17D, 0x188);
+                    } else { /* WSTAG944 */
+                        PICK_PRIZE(0x184, 0x18A);
                     }
                     break;
-                case 0x296:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17D;
-                        } else {
-                            BATTLE_SETUP.prize = 0x188;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x17C;
-                    } else {
-                        BATTLE_SETUP.prize = 0x187;
+                case 0x296: /* WSTAG381 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17D, 0x188);
+                    } else { /* WSTAG950 */
+                        PICK_PRIZE(0x17C, 0x187);
                     }
                     break;
-                case 0x299:
-                    if (GAME.progress != 0x2D) {
-                        if (roll != 0) {
-                            BATTLE_SETUP.prize = 0x17D;
-                        } else {
-                            BATTLE_SETUP.prize = 0x188;
-                        }
-                    } else if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x17D;
-                    } else {
-                        BATTLE_SETUP.prize = 0x188;
+                case 0x299: /* WSTAG401 */
+                    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+                        PICK_PRIZE(0x17D, 0x188);
+                    } else { /* WSTAG953 */
+                        PICK_PRIZE(0x17D, 0x188);
                     }
                     break;
 #else
-                case 0x271:
-                case 0x28C:
-                case 0x28D:
-                case 0x28E:
-                case 0x28F:
-                case 0x290:
-                case 0x296:
-                case 0x299:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x17D;
-                    } else {
-                        BATTLE_SETUP.prize = 0x188;
-                    }
+                case 0x271: /* WSTAG203 */
+                case 0x28C: /* WSTAG331 */
+                case 0x28D: /* WSTAG336 */
+                case 0x28E: /* WSTAG341 */
+                case 0x28F: /* WSTAG346 */
+                case 0x290: /* WSTAG351 */
+                case 0x296: /* WSTAG381 */
+                case 0x299: /* WSTAG401 */
+                    PICK_PRIZE(0x17D, 0x188);
                     break;
 #endif
-                case 0x2A2:
-                case 0x2A3:
-                case 0x2A4:
-                case 0x2A7:
-                case 0x2A8:
-                case 0x2A9:
-                case 0x2AA:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x17E;
-                    } else {
-                        BATTLE_SETUP.prize = 0x188;
-                    }
+                case 0x2A2: /* WSTAG451 */
+                case 0x2A3: /* WSTAG456 */
+                case 0x2A4: /* WSTAG466 */
+                case 0x2A7: /* WSTAG481 */
+                case 0x2A8: /* WSTAG486 */
+                case 0x2A9: /* WSTAG491 */
+                case 0x2AA: /* WSTAG496 */
+                    PICK_PRIZE(0x17E, 0x188);
                     break;
-                case 0x266:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x182;
-                    } else {
-                        BATTLE_SETUP.prize = 0x189;
-                    }
+                case 0x266: /* WSTAG715 */
+                    PICK_PRIZE(0x182, 0x189);
                     break;
-                case 0x2B1:
-                case 0x2B3:
-                case 0x2B5:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x183;
-                    } else {
-                        BATTLE_SETUP.prize = 0x18A;
-                    }
+                case 0x2B1: /* WSTAG551 */
+                case 0x2B3: /* WSTAG561 */
+                case 0x2B5: /* WSTAG571 */
+                    PICK_PRIZE(0x183, 0x18A);
                     break;
-                case 0x2CE:
-                    if (roll != 0) {
-                        BATTLE_SETUP.prize = 0x185;
-                    } else {
-                        BATTLE_SETUP.prize = 0x18A;
-                    }
+                case 0x2CE: /* WSTAG716 */
+                    PICK_PRIZE(0x185, 0x18A);
                     break;
                 }
             }
@@ -1048,12 +893,14 @@ void FIELDSTG_startEncounter(s32 encounter) {
     }
 }
 
+#undef PICK_PRIZE
+
 /* Starts battle 5 of the fourth area: the end of the stages' events 9000 */
 void *FIELDSTG_startEventBattle5(void) {
     Battle *battle = FIELDSTG_state.battles->battles[3]->battles[5];
 
     FIELDSTG_startBattle(battle);
-    FLAGS_00.applyAction(0xF, 1);
+    FLAGS_00.applyAction(FIELD_FLAG_ENCOUNTERED, 1);
     return NULL;
 }
 

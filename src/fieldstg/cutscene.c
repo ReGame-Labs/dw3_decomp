@@ -12,7 +12,7 @@ void FIELDSTG_playCutsceneAnim(CutsceneAnim *task) {
     s32 loading;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         switch (task->substate) {
         case 0:
@@ -31,21 +31,21 @@ void FIELDSTG_playCutsceneAnim(CutsceneAnim *task) {
             }
             if (loading == 0) {
                 initTimLoader(&loader);
-                loader.setImagePos(0x280, 0);
-                loader.setClutPos(0, 0xF0);
+                loader.setImagePos(FIELD_CUTSCENE_X, 0);
+                loader.setClutPos(0, FIELD_CUTSCENE_CLUT_Y);
                 if (task->kind) {
                     loader.loadArchive(FILE_CACHE.getEntry(((FIELD_ANIM_FILE + 1) << 16) | 1));
-                    SOUND.playSound(0x40003);
+                    SOUND.playSound(SOUND_DIG_DEMO);
                 } else {
                     loader.loadArchive(FILE_CACHE.getEntry((FIELD_ANIM_FILE << 16) | 1));
-                    SOUND.playSound(0x40018);
+                    SOUND.playSound(SOUND_SUB_DEMO);
                 }
                 task->nextState(task);
             }
             break;
         }
         break;
-    case 1:
+    case TASK_RUN:
         if (task->kind == 0) {
             if (task->timer <= 0) {
                 task->index++;
@@ -55,16 +55,16 @@ void FIELDSTG_playCutsceneAnim(CutsceneAnim *task) {
                 task->timer -= GFX.funcs.getFrameTime();
             }
             if (task->frame == -1) {
-                task->setState(task, 2);
+                task->setState(task, TASK_DONE);
             }
         }
         break;
-    case 2:
-    case 3:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 
-    if (task->state == 1 || task->state == 2) {
+    if (task->state == TASK_RUN || task->state == TASK_DONE) {
         if (task->kind) {
             while (1) {
                 if (task->timer <= 0) {
@@ -96,20 +96,20 @@ void FIELDSTG_playCutsceneAnim(CutsceneAnim *task) {
             }
             task->counter += GFX.funcs.getFrameTime();
             if (task->counter > 0xA0) {
-                task->setState(task, 2);
+                task->setState(task, TASK_DONE);
             }
         }
         initSpriteDrawer(&drawer);
         drawer.setFollowScroll(0);
         drawer.setLayerId(FIELD_LAYER_MAP, 7);
-        drawer.setTexture(0x280, 0);
-        drawer.setAltClut(0, 0xF0);
+        drawer.setTexture(FIELD_CUTSCENE_X, 0);
+        drawer.setAltClut(0, FIELD_CUTSCENE_CLUT_Y);
         if (task->kind) {
             drawer.draw(FILE_CACHE.getEntry((FIELD_ANIM_FILE + 1) << 16), task->frame, 0, 0);
             if (task->frame2 != 0) {
                 drawer.draw(FILE_CACHE.getEntry((FIELD_ANIM_FILE + 1) << 16), task->frame2, 0, 0);
             }
-        } else if (task->state == 1) {
+        } else if (task->state == TASK_RUN) {
             drawer.draw(FILE_CACHE.getEntry(FIELD_ANIM_FILE << 16), task->frame, 0, 0);
         }
         if (task->kind) {

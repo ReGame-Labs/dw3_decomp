@@ -6,8 +6,8 @@
 #include "fieldstg.h"
 
 /* Whether a flying actor runs into the map at an offset from it: a cell that
-   isn't free, a floor (2 to 6) higher than it or a ceiling (18 to 22) lower
-   than it; then it steps back by offset */
+   isn't free, a wall higher than it or a ceiling lower than it (FLIGHT_WALL,
+   FLIGHT_CEILING); then it steps back by offset */
 s32 FIELDSTG_checkFlightProbe(Actor *actor, s32 x, s32 y, Point offset) {
     s32 blocked = 0;
     Point pos;
@@ -19,57 +19,57 @@ s32 FIELDSTG_checkFlightProbe(Actor *actor, s32 x, s32 y, Point offset) {
     if (cell != 0) {
         cell = FIELDSTG_map.getCell(GAME.unk26D8, &pos);
     }
-    if (actor->z != 0 && cell != 1) {
+    if (actor->z != 0 && cell != FLIGHT_OPEN) {
         switch (cell) {
-        case 2:
-            if (actor->z < 0x2000) {
+        case FLIGHT_WALL(2):
+            if (actor->z < FLIGHT_LEVEL(2)) {
                 cell = 0;
             }
             break;
-        case 3:
-            if (actor->z < 0x3000) {
+        case FLIGHT_WALL(3):
+            if (actor->z < FLIGHT_LEVEL(3)) {
                 cell = 0;
             }
             break;
-        case 4:
-            if (actor->z < 0x4000) {
+        case FLIGHT_WALL(4):
+            if (actor->z < FLIGHT_LEVEL(4)) {
                 cell = 0;
             }
             break;
-        case 5:
-            if (actor->z < 0x5000) {
+        case FLIGHT_WALL(5):
+            if (actor->z < FLIGHT_LEVEL(5)) {
                 cell = 0;
             }
             break;
-        case 6:
-            if (actor->z < 0x6000) {
+        case FLIGHT_WALL(6):
+            if (actor->z < FLIGHT_LEVEL(6)) {
                 cell = 0;
             }
             break;
         }
         switch (cell) {
-        case 18:
-            if (actor->z > 0x6000) {
+        case FLIGHT_CEILING(6):
+            if (actor->z > FLIGHT_LEVEL(6)) {
                 cell = 0;
             }
             break;
-        case 19:
-            if (actor->z > 0x5000) {
+        case FLIGHT_CEILING(5):
+            if (actor->z > FLIGHT_LEVEL(5)) {
                 cell = 0;
             }
             break;
-        case 20:
-            if (actor->z > 0x4000) {
+        case FLIGHT_CEILING(4):
+            if (actor->z > FLIGHT_LEVEL(4)) {
                 cell = 0;
             }
             break;
-        case 21:
-            if (actor->z > 0x3000) {
+        case FLIGHT_CEILING(3):
+            if (actor->z > FLIGHT_LEVEL(3)) {
                 cell = 0;
             }
             break;
-        case 22:
-            if (actor->z > 0x2000) {
+        case FLIGHT_CEILING(2):
+            if (actor->z > FLIGHT_LEVEL(2)) {
                 cell = 0;
             }
             break;
@@ -168,7 +168,7 @@ s32 FIELDSTG_talkToActorAt(Actor *actor, Point *pos) {
 
     target = FIELDSTG_findActorAt(pos);
     result = 0;
-    if (target != NULL && target->state == 1) {
+    if (target != NULL && target->state == TASK_RUN) {
         if (target->key1 != 0x180) {
             if (target->key1 != 0x181) {
                 if (target->key1 != 0x182) {
@@ -224,13 +224,13 @@ void FIELDSTG_controlFlight(Actor *actor) {
     if (FIELDSTG_state.innOpen != 0 || FIELDSTG_state.busy != 0 || FIELDSTG_state.battleStarting != 0) {
         return;
     }
-    if (pressed && actor->z < 0x2000) {
+    if (pressed && actor->z < FLIGHT_LEVEL(2)) {
         actor->getFacingTile(actor, &facing);
         if (FIELDSTG_talkToActorAt(actor, &facing)) {
             actor->zSpeed = 0;
             actor->speed = 0;
             if (actor->voice != -1) {
-                SOUND.keyOff(0xA0045F4A, actor->voice);
+                SOUND.keyOff(SOUND_SUB_MOVE, actor->voice);
                 actor->voice = -1;
             }
             return;
@@ -241,14 +241,14 @@ void FIELDSTG_controlFlight(Actor *actor) {
             actor->setSubstate(actor, ACTOR_FLY);
         }
         if (actor->voice == -1) {
-            actor->voice = SOUND.playSound(0xA0045F4A);
+            actor->voice = SOUND.playSound(SOUND_SUB_MOVE);
         }
     } else {
         if (actor->substate == ACTOR_FLY) {
             actor->setSubstate(actor, ACTOR_FLOAT);
         }
         if (actor->voice != -1) {
-            SOUND.keyOff(0xA0045F4A, actor->voice);
+            SOUND.keyOff(SOUND_SUB_MOVE, actor->voice);
             actor->voice = -1;
         }
     }
@@ -282,77 +282,77 @@ void FIELDSTG_controlFlight(Actor *actor) {
     actor->z += actor->zSpeed;
     if (actor->zSpeed > 4) {
         switch ((u8)cell) {
-        case 18:
-            if (actor->z > 0x6000) {
+        case FLIGHT_CEILING(6):
+            if (actor->z > FLIGHT_LEVEL(6)) {
                 stop = 1;
             }
             break;
-        case 19:
-            if (actor->z > 0x5000) {
+        case FLIGHT_CEILING(5):
+            if (actor->z > FLIGHT_LEVEL(5)) {
                 stop = 1;
             }
             break;
-        case 20:
-            if (actor->z > 0x4000) {
+        case FLIGHT_CEILING(4):
+            if (actor->z > FLIGHT_LEVEL(4)) {
                 stop = 1;
             }
             break;
-        case 21:
-            if (actor->z > 0x3000) {
+        case FLIGHT_CEILING(3):
+            if (actor->z > FLIGHT_LEVEL(3)) {
                 stop = 1;
             }
             break;
-        case 22:
-            if (actor->z > 0x2000) {
+        case FLIGHT_CEILING(2):
+            if (actor->z > FLIGHT_LEVEL(2)) {
                 stop = 1;
             }
             break;
         }
     } else {
         switch ((u8)cell) {
-        case 2:
-            if (actor->z < 0x2000) {
+        case FLIGHT_WALL(2):
+            if (actor->z < FLIGHT_LEVEL(2)) {
                 stop = 1;
-                height = 0x200C;
+                height = FLIGHT_LEVEL(2) + FLIGHT_LANDING;
             }
             break;
-        case 3:
-            if (actor->z < 0x3000) {
+        case FLIGHT_WALL(3):
+            if (actor->z < FLIGHT_LEVEL(3)) {
                 stop = 1;
-                height = 0x300C;
+                height = FLIGHT_LEVEL(3) + FLIGHT_LANDING;
             }
             break;
-        case 4:
-            if (actor->z < 0x4000) {
+        case FLIGHT_WALL(4):
+            if (actor->z < FLIGHT_LEVEL(4)) {
                 stop = 1;
-                height = 0x400C;
+                height = FLIGHT_LEVEL(4) + FLIGHT_LANDING;
             }
             break;
-        case 5:
-            if (actor->z < 0x5000) {
+        case FLIGHT_WALL(5):
+            if (actor->z < FLIGHT_LEVEL(5)) {
                 stop = 1;
-                height = 0x500C;
+                height = FLIGHT_LEVEL(5) + FLIGHT_LANDING;
             }
             break;
-        case 6:
-            if (actor->z < 0x6000) {
+        case FLIGHT_WALL(6):
+            if (actor->z < FLIGHT_LEVEL(6)) {
                 stop = 1;
-                height = 0x600C;
+                height = FLIGHT_LEVEL(6) + FLIGHT_LANDING;
             }
             break;
         }
     }
-    if (stop || actor->z > 0x7000 || actor->z < 0x1800) {
+    if (stop || actor->z > FLIGHT_Z_MAX || actor->z < FLIGHT_Z_MIN) {
         if (height != 0) {
             actor->z = height;
         }
         actor->zSpeed = 0;
     }
-    if (actor->z >= 0x7000) {
-        actor->z = 0x7000;
+    if (actor->z >= FLIGHT_Z_MAX) {
+        actor->z = FLIGHT_Z_MAX;
     }
-    if (actor->z <= 0x1800) {
-        actor->z = 0x1800;
+    if (actor->z <= FLIGHT_Z_MIN) {
+        actor->z = FLIGHT_Z_MIN;
     }
 }
 
@@ -372,20 +372,20 @@ void FIELDSTG_controlPlayer(Actor *actor) {
     s32 forced;
 
     if (FIELDSTG_state.innOpen == 0 && FIELDSTG_state.busy == 0 && FIELDSTG_state.battleStarting == 0) {
-        pad = (PAD.getHeld(0) >> 4) & 0xF;
-        pressed = (PAD.getPressed(0) & 0x2000) != 0;
-        forced = FLAGS_00.checkCondition(0x12, 1);
+        pad = (PAD.getHeld(0) >> PAD_UP) & 0xF;
+        pressed = (PAD.getPressed(0) & (1 << PAD_CROSS)) != 0;
+        forced = FLAGS_00.checkCondition(FIELD_FLAG_TALK_AHEAD, 1);
         if (pressed || forced) {
             actor->getFacingTile(actor, &pos);
             do {
-                if (FLAGS_00.checkCondition(0x8004, 1) && !forced && (obj = FIELDSTG_findHiddenSpot(&pos, 1)) != NULL) {
+                if (FLAGS_00.checkCondition(FIELD_SEARCH_ITEM, 1) && !forced && (obj = FIELDSTG_findHiddenSpot(&pos, 1)) != NULL) {
                     FIELDSTG_state.acting = 1;
                     actor->setSubstate(actor, ACTOR_SEARCH);
-                    obj->setState(obj, 2);
+                    obj->setState(obj, TASK_DONE);
                     break;
                 }
                 if (FIELDSTG_talkToActorAt(actor, &pos) && forced) {
-                    FLAGS_00.applyAction(0x12, 0);
+                    FLAGS_00.applyAction(FIELD_FLAG_TALK_AHEAD, 0);
                 }
             } while (0);
         } else {
@@ -432,22 +432,22 @@ void FIELDSTG_followLeader(Actor *actor) {
                 trail->steps[trail->head].x = leader->pos.x;
                 trail->steps[trail->head].y = leader->pos.y;
                 trail->steps[trail->head].dir = leader->dir;
-                trail->head = (trail->head + 1) & 0x3F;
+                trail->head = (trail->head + 1) & (TRAIL_STEPS - 1);
                 actor->pos.x = trail->steps[trail->tail].x;
                 actor->pos.y = trail->steps[trail->tail].y;
                 actor->dir = trail->steps[trail->tail].dir;
-                trail->tail = (trail->tail + 1) & 0x3F;
+                trail->tail = (trail->tail + 1) & (TRAIL_STEPS - 1);
                 break;
         }
         switch (leader->substate) {
-            case 2:
-            case 3:
-            case 5:
+            case ACTOR_WALK:
+            case ACTOR_RUN:
+            case ACTOR_WALK_OUT:
                 if (actor->substate != ACTOR_RUN) {
                     actor->setSubstate(actor, ACTOR_RUN);
                 }
                 break;
-            case 0x4F:
+            case ACTOR_SLIDE:
                 if (actor->substate != ACTOR_STAND) {
                     actor->setSubstate(actor, ACTOR_STAND);
                 }
@@ -462,12 +462,12 @@ void FIELDSTG_followLeader(Actor *actor) {
     }
 }
 
-/* A follower's update while its trail runs out: it finds the leader (task
-   5) if it has none, then each frame pushes two empty steps at the trail's
-   head and walks two steps from its tail. At x 0 it clears the trail and
-   drops this update. The match depends on the leader being read into a
-   variable before `trail` is set, which makes `trail` a copy of the
-   pointer the leader was loaded through. */
+/* A follower's update while its trail runs out: it finds the leader
+   (FIELD_TASK_ACTOR) if it has none, then each frame pushes two empty
+   steps at the trail's head and walks two steps from its tail. At x 0 it
+   clears the trail and drops this update. The match depends on the leader
+   being read into a variable before `trail` is set, which makes `trail` a
+   copy of the pointer the leader was loaded through. */
 void FIELDSTG_drainTrail(Actor *actor) {
     Trail *trail;
     Actor *leader;
@@ -483,17 +483,17 @@ void FIELDSTG_drainTrail(Actor *actor) {
             trail->steps[trail->head].x = 0;
             trail->steps[trail->head].y = 0;
             trail->steps[trail->head].dir = 0;
-            trail->head = (trail->head + 1) & 0x3F;
+            trail->head = (trail->head + 1) & (TRAIL_STEPS - 1);
             actor->pos.x = trail->steps[trail->tail].x;
             actor->pos.y = trail->steps[trail->tail].y;
             actor->dir = trail->steps[trail->tail].dir;
-            trail->tail = (trail->tail + 1) & 0x3F;
+            trail->tail = (trail->tail + 1) & (TRAIL_STEPS - 1);
         }
         if (actor->substate != ACTOR_RUN) {
             actor->setSubstate(actor, ACTOR_RUN);
         }
         if (actor->pos.x == 0) {
-            for (i = 0; i < 64; i++) {
+            for (i = 0; i < TRAIL_STEPS; i++) {
                 trail->steps[i].dir = 0;
                 trail->steps[i].x = 0;
                 trail->steps[i].y = 0;
@@ -746,7 +746,7 @@ void FIELDSTG_drawActor(void *arg, void *arg2) {
     FieldImage *shadow;
     s32 x;
 
-    if (actor->state == 1) {
+    if (actor->state == TASK_RUN) {
         ot = (u_long *)layer->getOtEntry(layer, actor->depth);
         pos = actor->tile;
         layer->getScroll(layer, &scroll);
@@ -954,17 +954,17 @@ void FIELDSTG_playStepSounds(Task *task, s32 arg1, s32 arg2) {
             if ((task->counter & 7) == 0) {
                 if (task->key1 != 0x146) {
                     if (task->key1 != 0x147) {
-                        SOUND.playSound(0x8004583C);
+                        SOUND.playSound(SOUND_PLAYER00);
                     }
                 } else if ((task->counter & 0x1F) == 0) {
-                    SOUND.playSound(0x80045FCB);
+                    SOUND.playSound(SOUND_DIG_MOVE);
                 }
                 if (arg2 != 0) {
                     FIELDSTG_checkBattle();
                 }
             }
         } else if ((task->counter & 0x1F) == 0) {
-            SOUND.playSound(0x8004583C);
+            SOUND.playSound(SOUND_PLAYER00);
         }
         task->counter++;
     }
@@ -974,7 +974,7 @@ void FIELDSTG_playStepSounds(Task *task, s32 arg1, s32 arg2) {
 void FIELDSTG_playClimbSounds(Task *task) {
     if (task->key2 == 0) {
         if ((task->counter & 0xF) == 0) {
-            SOUND.playSound(0x800458BD);
+            SOUND.playSound(SOUND_PLAYER01);
         }
         task->counter++;
     }
@@ -991,7 +991,9 @@ extern s16 FIELDSTG_talkVoice;
  * climbs and the drop from ACTOR_GET_OVER_EDGE to ACTOR_DROP (which shift it
  * by a tile, left or right by climbSide), the talk of ACTOR_TALK (the first
  * of the character's talks whose conditions hold) and the others up to
- * ACTOR_STOP_SLIDE. The match depends on the talks' loop testing both of its
+ * ACTOR_STOP_SLIDE. A treasure (characters 0x21, 0x4D to 0x57, 0x154 to 0x158
+ * and 0x15B, whose talks give an item) doesn't turn to its talker: it opens
+ * with TRESUREB, and goes away when the talk ends. The match depends on the talks' loop testing both of its
  * ends with a break at its top, and on the moves of a tile adding a choice of
  * two steps.
  */
@@ -1003,7 +1005,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
     Point move6;
     FieldTalk *talk;
     Actor *other;
-    s32 isX;
+    s32 isTreasure;
 
     switch (actor->substate) {
     case ACTOR_STAND:
@@ -1011,7 +1013,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         case 0:
         default:
             actor->hasShadow = 1;
-            FIELDSTG_setActorAnim(actor, 1);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_STAND);
             actor->nextStep(actor);
         case 1:
             break;
@@ -1022,7 +1024,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         case 0:
         default:
             actor->hasShadow = 1;
-            FIELDSTG_setActorAnim(actor, 4);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_WALK);
             actor->nextStep(actor);
         case 1:
             break;
@@ -1039,7 +1041,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         case 0:
         default:
             actor->hasShadow = 1;
-            FIELDSTG_setActorAnim(actor, 5);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_RUN);
             actor->nextStep(actor);
         case 1:
             break;
@@ -1050,7 +1052,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
             actor->pos.y += move3.y;
         }
         FIELDSTG_playStepSounds((Task *)actor, 1, 1);
-        if (GAME.funcs.getMode() != 0x22D && actor->key2 == 0) {
+        if (GAME.funcs.getMode() != FIELD_MODE_WSTAG415 && actor->key2 == 0) {
             FIELDSTG_checkFlightProbes(actor);
         }
         break;
@@ -1059,7 +1061,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         case 0:
         default:
             actor->hasShadow = 1;
-            FIELDSTG_setActorAnim(actor, 1);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_STAND);
             actor->nextStep(actor);
         case 1:
             break;
@@ -1080,7 +1082,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         case 0:
         default:
             actor->hasShadow = 1;
-            FIELDSTG_setActorAnim(actor, 4);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_WALK);
             actor->speed = 0;
             actor->nextStep(actor);
         case 1:
@@ -1089,15 +1091,15 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         actor->speed += 8;
 #if VERSION_EU
         if (NTSC_MODE != 0) {
-            if (actor->speed > 0x200) {
-                actor->speed = 0x200;
+            if (actor->speed > FLIGHT_SPEED_MAX) {
+                actor->speed = FLIGHT_SPEED_MAX;
             }
-        } else if (actor->speed > 0x266) {
-            actor->speed = 0x266;
+        } else if (actor->speed > FLIGHT_SPEED_MAX_PAL) {
+            actor->speed = FLIGHT_SPEED_MAX_PAL;
         }
 #else
-        if (actor->speed > 0x200) {
-            actor->speed = 0x200;
+        if (actor->speed > FLIGHT_SPEED_MAX) {
+            actor->speed = FLIGHT_SPEED_MAX;
         }
 #endif
         FIELDSTG_map.getFlyStep(&actor->tile, actor->speed, actor->dir, &move4);
@@ -1110,7 +1112,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         switch (actor->step) {
         case 0:
         default:
-            FIELDSTG_setActorAnim(actor, 6);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_STOP);
             actor->nextStep(actor);
         case 1:
             break;
@@ -1125,7 +1127,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         default:
             FIELDSTG_state.acting = 1;
             if (actor->flying == 0) {
-                FIELDSTG_setActorAnim(actor, 5);
+                FIELDSTG_setActorAnim(actor, ACTOR_ANIM_RUN);
             }
             actor->nextStep(actor);
         case 1:
@@ -1143,8 +1145,8 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         case 0:
         default:
             FIELDSTG_state.acting = 1;
-            FIELDSTG_setActorAnim(actor, 1);
-            FIELDSTG_talkVoice = SOUND.playSound(0xA064683C);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_STAND);
+            FIELDSTG_talkVoice = SOUND.playSound(SOUND_TRAP_ICE);
             actor->nextStep(actor);
         case 1:
             break;
@@ -1155,7 +1157,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         break;
     case ACTOR_STOP_SLIDE:
         if (actor->step == 0) {
-            SOUND.keyOff(0xA064683C, FIELDSTG_talkVoice);
+            SOUND.keyOff(SOUND_TRAP_ICE, FIELDSTG_talkVoice);
         }
         actor->step += GFX.funcs.getFrameTime();
         if (actor->step >= 0x1E) {
@@ -1168,7 +1170,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         switch (actor->step) {
         case 0:
         default:
-            FIELDSTG_setActorAnim(actor, 0x20);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_CLIMB);
             actor->nextStep(actor);
         case 1:
             break;
@@ -1178,7 +1180,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         switch (actor->step) {
         case 0:
         default:
-            FIELDSTG_setActorAnim(actor, 0x1A);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_CLIMB_UP);
             actor->nextStep(actor);
         case 1:
             break;
@@ -1195,7 +1197,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         switch (actor->step) {
         case 0:
         default:
-            FIELDSTG_setActorAnim(actor, 0x1B);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_CLIMB_DOWN);
             actor->nextStep(actor);
         case 1:
             break;
@@ -1212,7 +1214,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         switch (actor->step) {
         case 0:
         default:
-            FIELDSTG_setActorAnim(actor, 0x1C);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_GET_ON_WALL);
             actor->nextStep(actor);
         case 1:
             break;
@@ -1227,7 +1229,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         case 0:
         default:
             actor->hasShadow = 0;
-            FIELDSTG_setActorAnim(actor, 0x1E);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_GET_OVER_EDGE);
             actor->pos.x += actor->climbSide != 0 ? 0x1000 : -0x1000;
             actor->pos.y += 0x1800 + actor->wallHeight;
             FIELDSTG_followWithCamera(0, 2);
@@ -1248,7 +1250,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         switch (actor->step) {
         case 0:
         default:
-            FIELDSTG_setActorAnim(actor, 0x1F);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_CLIMB_OFF_BOTTOM);
             actor->nextStep(actor);
         case 1:
             break;
@@ -1266,7 +1268,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         case 0:
         default:
             actor->hasShadow = 0;
-            FIELDSTG_setActorAnim(actor, 0x1D);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_CLIMB_OFF_TOP);
             actor->nextStep(actor);
         case 1:
             break;
@@ -1274,7 +1276,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         if (actor->animDone != 0) {
             actor->setSubstate(actor, ACTOR_STAND);
             actor->hasShadow = 1;
-            FIELDSTG_setActorAnim(actor, 1);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_STAND);
             FIELDSTG_resumePartners();
             FIELDSTG_restorePlayerControl(actor);
             actor->pos.x += actor->climbSide != 0 ? -0x1000 : 0x1000;
@@ -1288,7 +1290,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         case 0:
         default:
             actor->hasShadow = 0;
-            FIELDSTG_setActorAnim(actor, 0x16);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_DROP_OFF);
             actor->pos.y += actor->wallHeight;
             actor->pos.x += actor->climbSide != 0 ? 0x1000 : -0x1000;
             actor->nextStep(actor);
@@ -1296,25 +1298,25 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
             if (actor->animDone == 0) {
                 break;
             }
-            FIELDSTG_setActorAnim(actor, 0x17);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_FALL);
             actor->nextStep(actor);
         case 2:
             actor->hasShadow = 1;
             actor->climbHeight -= 0x300;
-            if (actor->animSet == 0x17 && actor->wallHeight - actor->climbHeight > 0x1800) {
-                FIELDSTG_setActorAnim(actor, 0x18);
+            if (actor->animSet == ACTOR_ANIM_FALL && actor->wallHeight - actor->climbHeight > 0x1800) {
+                FIELDSTG_setActorAnim(actor, ACTOR_ANIM_FALL_FAR);
             }
             if (actor->climbHeight <= 0) {
                 actor->climbHeight = 0;
-                FIELDSTG_setActorAnim(actor, 0x19);
-                SOUND.playSound(0x8004593E);
+                FIELDSTG_setActorAnim(actor, ACTOR_ANIM_LAND);
+                SOUND.playSound(SOUND_PLAYER02);
                 actor->nextStep(actor);
             }
             break;
         case 3:
             if (actor->animDone != 0) {
                 actor->setSubstate(actor, ACTOR_STAND);
-                FIELDSTG_setActorAnim(actor, 1);
+                FIELDSTG_setActorAnim(actor, ACTOR_ANIM_STAND);
                 FIELDSTG_restorePlayerControl(actor);
                 FIELDSTG_resumePartners();
                 FIELDSTG_state.acting = 0;
@@ -1326,41 +1328,41 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         switch (actor->step) {
         case 0:
         default:
-            FIELDSTG_setActorAnim(actor, 0x11);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_GAUGE_START);
             actor->nextStep(actor);
         case 1:
             if (actor->animDone == 0) {
                 break;
             }
-            FIELDSTG_setActorAnim(actor, 0x13);
-            SOUND.playSound(0x80045CC5);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_GAUGE_PLAY);
+            SOUND.playSound(SOUND_PLAYER09);
             actor->nextStep(actor);
         case 2:
             if (actor->animDone == 0) {
                 break;
             }
-            FIELDSTG_setActorAnim(actor, 0x14);
-            SOUND.playSound(0x80045D46);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_GAUGE_WAIT);
+            SOUND.playSound(SOUND_PLAYER10);
             actor->nextStep(actor);
         case 3:
             if (children->action != NULL) {
                 break;
             }
             children->balloon = FIELDSTG_createBalloon(0, 1, 6);
-            FIELDSTG_setActorAnim(actor, 0x12);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_GAUGE_RESULT);
             actor->nextStep(actor);
         case 4:
             actor->counter += GFX.funcs.getFrameTime();
             if (actor->counter < 0x3C) {
                 break;
             }
-            children->balloon->setState(children->balloon, 2);
-            FIELDSTG_setActorAnim(actor, 0x15);
+            children->balloon->setState(children->balloon, TASK_DONE);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_GAUGE_END);
             actor->nextStep(actor);
         case 5:
             if (actor->animDone != 0) {
                 actor->setSubstate(actor, ACTOR_STAND);
-                FIELDSTG_setActorAnim(actor, 1);
+                FIELDSTG_setActorAnim(actor, ACTOR_ANIM_STAND);
                 FIELDSTG_restorePlayerControl(actor);
                 FIELDSTG_state.busy = 0;
             }
@@ -1372,23 +1374,23 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         case 0:
         default:
             actor->control = NULL;
-            FIELDSTG_setActorAnim(actor, 8);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_SEARCH);
             actor->nextStep(actor);
         case 1:
             break;
         }
         if (actor->animDone != 0) {
             actor->setSubstate(actor, ACTOR_STAND);
-            FIELDSTG_setActorAnim(actor, 1);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_STAND);
             FIELDSTG_restorePlayerControl(actor);
             FIELDSTG_state.acting = 0;
         }
         break;
     case ACTOR_TALK:
-        isX = 0;
+        isTreasure = 0;
         if (actor->key1 == 0x21 || (actor->key1 >= 0x4D && actor->key1 < 0x58) ||
             (actor->key1 >= 0x154 && actor->key1 < 0x159) || actor->key1 == 0x15B) {
-            isX = 1;
+            isTreasure = 1;
         }
         switch (actor->step) {
         case 0:
@@ -1404,26 +1406,26 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
                 talk++;
             }
             actor->talkActions = (s32)talk->actions;
-            if (!isX && actor->isLarge == 0) {
+            if (!isTreasure && actor->isLarge == 0) {
                 actor->dir = (actor->talkPartner->dir + 4) & 7;
             }
-            if (actor->animFile != 0 && !isX) {
+            if (actor->animFile != 0 && !isTreasure) {
                 children->speech = FIELDSTG_createTalk(actor, talk->unk8);
             } else {
                 children->speech = FIELDSTG_createTalk(actor->talkPartner, talk->unk8);
             }
-            if (isX) {
-                FIELDSTG_setActorAnim(actor, 0x41);
-                SOUND.playSound(0x80045DC7);
+            if (isTreasure) {
+                FIELDSTG_setActorAnim(actor, ACTOR_ANIM_OPEN);
+                SOUND.playSound(SOUND_TRESUREB);
             }
             actor->nextStep(actor);
             break;
         case 1:
             if (children->speech == NULL) {
-                if (!isX) {
+                if (!isTreasure) {
                     actor->setSubstate(actor, ACTOR_STAND);
                 } else {
-                    actor->setState(actor, 3);
+                    actor->setState(actor, TASK_KILL);
                 }
                 other = actor->talkPartner;
                 if (other->flying == 0) {
@@ -1447,14 +1449,14 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
             FIELDSTG_state.acting = 1;
 #endif
             actor->control = NULL;
-            FIELDSTG_setActorAnim(actor, 0x45);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_USE);
             actor->nextStep(actor);
         case 1:
             break;
         }
         if (actor->animDone != 0) {
             actor->setSubstate(actor, ACTOR_STAND);
-            FIELDSTG_setActorAnim(actor, 1);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_STAND);
             FIELDSTG_restorePlayerControl(actor);
 #if VERSION_EU
             FIELDSTG_state.acting = 0;
@@ -1469,8 +1471,8 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
                 actor->counter += GFX.funcs.getFrameTime();
                 break;
             }
-            FIELDSTG_setActorAnim(actor, 0x54);
-            SOUND.playSound(0x800446C9);
+            FIELDSTG_setActorAnim(actor, ACTOR_ANIM_USED);
+            SOUND.playSound(0x800446C9); /* COMEX113 */
 #if VERSION_EU
             switch (actor->key1) {
             case 0x148:
@@ -1500,7 +1502,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
                     break;
                 }
 #endif
-                actor->setState(actor, 3);
+                actor->setState(actor, TASK_KILL);
             }
             break;
         }

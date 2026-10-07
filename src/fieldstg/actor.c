@@ -39,13 +39,13 @@ void FIELDSTG_getFacingTile(Actor *actor, Point *out) {
 
 /* An actor's update: waits for its animation file (and gives the player its
    icon), then runs its control and its action, moves its tile and draws it
-   sorted by y; on state 3, frees its trail */
+   sorted by y; in TASK_KILL, frees its trail */
 void FIELDSTG_updateActor(Actor *actor, ActorChildren *children) {
     Layer *layer;
 
     switch (actor->state) {
         default:
-        case 0:
+        case TASK_INIT:
             if (actor->animFile == 0 || FILE_CACHE.isLoading(actor->animFile >> 16) == 0) {
                 if (actor->key2 == 0) {
                     children->icon = FIELDSTG_createActorIcon(actor);
@@ -53,7 +53,7 @@ void FIELDSTG_updateActor(Actor *actor, ActorChildren *children) {
                 actor->nextState(actor);
             }
             break;
-        case 1:
+        case TASK_RUN:
             if ((actor->key2 & 0xE) || FIELDSTG_state.bannerShown == 0) {
                 if (actor->control != NULL) {
                     actor->control(actor);
@@ -70,12 +70,12 @@ void FIELDSTG_updateActor(Actor *actor, ActorChildren *children) {
                 }
             }
             break;
-        case 2:
+        case TASK_DONE:
             break;
-        case 3:
+        case TASK_KILL:
             GAME.unk26EC = actor->z;
             if (actor->voice != -1) {
-                SOUND.keyOff(0xA0045F4A, actor->voice);
+                SOUND.keyOff(SOUND_SUB_MOVE, actor->voice);
             }
             if (actor->trail != NULL) {
                 HEAP.free(actor->trail);
@@ -85,8 +85,8 @@ void FIELDSTG_updateActor(Actor *actor, ActorChildren *children) {
 }
 
 /*
- * Creates a character (id 5): key1 is the character, key2 its kind (0 the
- * player, 2 to 8 a follower, the others the map's characters).
+ * Creates a character (FIELD_TASK_ACTOR): key1 is the character, key2 its
+ * kind (0 the player, 2 to 8 a follower, the others the map's characters).
  *
  * The match depends on kind holding getModeArg's result in the player's
  * branch, where kind is no longer needed: its second set keeps local-alloc
@@ -119,7 +119,7 @@ Actor *FIELDSTG_createActor(s32 key1, s32 kind, s32 image, FieldActorEntry *entr
     actor->getFacingTile = FIELDSTG_getFacingTile;
     actor->animFile = FIELDSTG_state.getFileEntry(key1);
     actor->halfWidth = FIELDSTG_state.getActorWidth(key1) >> 1;
-    actor->animSet = 1;
+    actor->animSet = ACTOR_ANIM_STAND;
     actor->dir = 1;
     actor->image = &FIELDSTG_state.images.actors[image + 2];
     actor->fieldImage = FIELDSTG_state.images.field;

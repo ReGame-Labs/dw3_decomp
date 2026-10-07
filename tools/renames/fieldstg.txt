@@ -90,6 +90,7 @@ func_80091520 FIELDSTG_waitScriptTime
 func_800915B0 FIELDSTG_waitAnimDone
 func_800915FC FIELDSTG_waitWalkDone
 func_80091648 FIELDSTG_toScreenPos
+func_800916B4 FIELDSTG_clearScriptFlag
 func_800916E8 FIELDSTG_findScriptCommand
 func_80091730 FIELDSTG_createScriptCommand
 func_80091774 FIELDSTG_handleScriptCommand

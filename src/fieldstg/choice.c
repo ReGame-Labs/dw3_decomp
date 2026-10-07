@@ -15,7 +15,7 @@ void FIELDSTG_runChoice(ChoiceTask *task, ChoiceChildren *children) {
     s32 k;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         task->nextState(task);
         task->tween.duration = 10;
@@ -27,7 +27,7 @@ void FIELDSTG_runChoice(ChoiceTask *task, ChoiceChildren *children) {
         children->cursor->setVisible(children->cursor, 0);
         children->title = createTextWindow(FIELD_LAYER_MAP, 1, 0x12, 0xB0);
         break;
-    case 1:
+    case TASK_RUN:
         switch (task->substate) {
         case 0:
         default:
@@ -72,7 +72,7 @@ void FIELDSTG_runChoice(ChoiceTask *task, ChoiceChildren *children) {
             break;
         case 4:
             if (children->event == NULL) {
-                task->state = 3;
+                task->state = TASK_KILL;
             }
             break;
         case 10:
@@ -92,7 +92,7 @@ void FIELDSTG_runChoice(ChoiceTask *task, ChoiceChildren *children) {
         }
         initSpriteDrawer(&drawer);
         drawer.setLayerId(FIELD_LAYER_MAP, 2);
-        drawer.setTexture(0x140, 0);
+        drawer.setTexture(FIELD_MENU_SPRITES_X, 0);
         drawer.setFollowScroll(0);
         if (task->tween.value != 0) {
             if (task->tween.value != 0x1000) {
@@ -102,8 +102,8 @@ void FIELDSTG_runChoice(ChoiceTask *task, ChoiceChildren *children) {
             drawer.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x45, 0, 0xAC);
         }
         break;
-    case 2:
-    case 3:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }

@@ -3496,7 +3496,7 @@ StageEntry FIELDSTG_euStages[] = {
 ScriptTimer FIELDSTG_scriptTimer = {0, 0, FIELDSTG_resetScriptTimer, FIELDSTG_findActor};
 void (*FIELDSTG_scriptHelpers[])() = {
     FIELDSTG_toScreenPos, FIELDSTG_waitScriptTime, FIELDSTG_waitAnimDone, FIELDSTG_waitWalkDone,
-    func_800916B4,
+    FIELDSTG_clearScriptFlag,
 };
 /* The script commands (FIELDSTG_findScriptCommand), up to the first id 0. Most of their
    functions are those of the stage whose event scripts run the command

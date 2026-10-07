@@ -7,9 +7,9 @@ void FIELDSTG_resetScriptTimer(void) {
     HEAP.zero(&FIELDSTG_scriptTimer, 8);
 }
 
-/* The actor with an id, or NULL */
-Actor *FIELDSTG_findActor(s32 arg0) {
-    return TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, arg0, -1);
+/* The actor of a character (Actor.key1), or NULL */
+Actor *FIELDSTG_findActor(s32 character) {
+    return TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, character, -1);
 }
 
 /* A script's wait: counts time down, then moves the script on */
@@ -54,14 +54,15 @@ void FIELDSTG_toScreenPos(Point *pos) {
     pos->y -= scroll.y;
 }
 
-/* Clears Actor.unk10C of the actor 1, or else 2 */
-void func_800916B4(void) {
+/* A script helper: clears the script flag of character 1, or else of
+   character 2 */
+void FIELDSTG_clearScriptFlag(void) {
     Actor *actor = FIELDSTG_findActor(1);
 
     if (actor == NULL) {
         actor = FIELDSTG_findActor(2);
     }
-    actor->unk10C = 0;
+    actor->scriptFlag = 0;
 }
 
 /* The script command id of FIELDSTG_scriptCommands, or NULL */

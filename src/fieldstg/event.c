@@ -59,11 +59,11 @@ s32 FIELDSTG_setEventPose(EventTask *task, s16 *op, EventChildren *children) {
 }
 
 /*
- * Runs an event: on state 0 it waits for the event's text file and the
- * field (task 7) and holds the characters; on state 1 it runs the script
+ * Runs an event: in TASK_INIT it waits for the event's text file and the
+ * field (FIELD_TASK_FIELD) and holds the characters; in TASK_RUN it runs the script
  * until a command waits (kind 0 ends it, 1 moves or turns a character, 2
  * opens a message box, 3 waits, 6 runs FIELDSTG_followWithCamera or FIELDSTG_pointCamera), or
- * without a script runs start's task until it ends; state 3 releases the
+ * without a script runs start's task until it ends; TASK_KILL releases the
  * characters and calls end. The match depends on next and actor being two
  * variables, and sub an s16.
  */
@@ -76,10 +76,10 @@ void FIELDSTG_runEvent(EventTask *task, EventChildren *children) {
     s32 i;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         if ((FIELDSTG_state.eventText == 0 || !FILE_CACHE.isLoading(FIELDSTG_state.eventText >> 16)) &&
-            ((Task *)TASK_REGISTRY.funcs.find(FIELD_TASK_FIELD, -1, -1))->state == 1) {
+            ((Task *)TASK_REGISTRY.funcs.find(FIELD_TASK_FIELD, -1, -1))->state == TASK_RUN) {
             next = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, -1);
             for (i = 0; next != NULL; next = TASK_REGISTRY.funcs.findNext()) {
                 actor = next;
@@ -94,7 +94,7 @@ void FIELDSTG_runEvent(EventTask *task, EventChildren *children) {
             task->nextState(task);
         }
         break;
-    case 1:
+    case TASK_RUN:
         if (task->pc != NULL) {
             pc = task->pc;
             running = 1;
@@ -103,7 +103,7 @@ void FIELDSTG_runEvent(EventTask *task, EventChildren *children) {
                 switch (*pc >> 8) {
                 case 0:
                 default:
-                    task->setState(task, 3);
+                    task->setState(task, TASK_KILL);
                     running = 0;
                     break;
                 case 1:
@@ -186,7 +186,7 @@ void FIELDSTG_runEvent(EventTask *task, EventChildren *children) {
                     case 4:
                         FIELDSTG_leaveField(pc[1], -1, pc[2] << 8, pc[3] << 8, pc[4]);
                         running = 0;
-                        task->setState(task, 2);
+                        task->setState(task, TASK_DONE);
                         break;
                     }
                     break;
@@ -215,14 +215,14 @@ void FIELDSTG_runEvent(EventTask *task, EventChildren *children) {
             task->nextSubstate(task);
         case 1:
             if (children->task == NULL) {
-                task->setState(task, 3);
+                task->setState(task, TASK_KILL);
             }
             break;
         }
         break;
-    case 2:
+    case TASK_DONE:
         break;
-    case 3:
+    case TASK_KILL:
         for (i = 0; i < 30; i++) {
             if (task->entries[i].id == 0) {
                 break;
@@ -259,7 +259,7 @@ EventTask *FIELDSTG_startEvent(s32 id) {
             FIELDSTG_state.busy = 1;
             if (id < 8000 || id >= 9000) {
                 other = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
-                if (other != NULL && other->state == 1) {
+                if (other != NULL && other->state == TASK_RUN) {
                     other->setSubstate(other, ACTOR_STAND);
                 }
             }
@@ -267,7 +267,7 @@ EventTask *FIELDSTG_startEvent(s32 id) {
         }
     }
     if (FIELDSTG_state.busy == 0) {
-        task->setState(task, 3);
+        task->setState(task, TASK_KILL);
     }
     return task;
 }

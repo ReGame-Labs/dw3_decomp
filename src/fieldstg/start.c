@@ -9,7 +9,7 @@ void FIELDSTG_updateRoot(Task *task, Task **children) {
 
     switch (task->state) {
         default:
-        case 0:
+        case TASK_INIT:
             mode = GAME.funcs.getMode();
             if (GAME.unk26D4 != mode) {
                 GAME.unk26D4 = mode;
@@ -23,9 +23,9 @@ void FIELDSTG_updateRoot(Task *task, Task **children) {
             children[0] = FIELDSTG_createField();
             task->nextState(task);
             break;
-        case 1:
-        case 2:
-        case 3:
+        case TASK_RUN:
+        case TASK_DONE:
+        case TASK_KILL:
             break;
     }
 }

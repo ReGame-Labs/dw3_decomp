@@ -1,6 +1,7 @@
-/* The commands the stage overlays send the field (0x337 to 0x386): the
-   field task's substates, map objects shown or hidden, the camera's shake
-   and sounds. The first object of FIELDSTG.PRO (see data/fieldstg.c). */
+/* The field commands (FIELD_COMMAND_*) that the stages' event scripts send
+   through script command 813: the partners halted, the player icon's
+   animations, map objects shown or hidden, the camera's shake and sounds.
+   The first object of FIELDSTG.PRO (see data/fieldstg.c). */
 
 #include "fieldstg.h"
 
@@ -8,169 +9,171 @@
    following */
 void FIELDSTG_updateCommandTask(Task *task) {
     switch (task->state) {
-    case 0:
-    case 1:
+    case TASK_INIT:
+    case TASK_RUN:
     default:
         if (task->substate == 1) {
             FIELDSTG_haltPartners();
             task->setSubstate(task, 0);
         }
         break;
-    case 2:
-    case 3:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }
 
 /*
- * The field's commands (0x337 to 0x386) that the stage overlays send: the
- * field task's substate, map objects 100 to 105 hidden or shown, and
- * sounds, three of which are held to be keyed off later.
+ * Runs a field command (FIELD_COMMAND_*) of an event script: halts the
+ * partners through the command task, sets the player icon's substate, hides
+ * or shows a group of map objects, shakes the camera, searches the event
+ * spot, or plays a sound; four sounds are held, to be keyed off by a later
+ * command.
  */
 void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
     StageTile *object;
-    Task *field;
+    Task *icon;
     s32 n;
 
     if (task == NULL) {
         return;
     }
     n = 0;
-    if (command == 0x337) {
+    if (command == FIELD_COMMAND_HALT_PARTNERS) {
         task->setSubstate(task, 1);
     }
     switch (command) {
-    case 0x34A:
+    case FIELD_COMMAND_ICON3:
         n++;
-    case 0x339:
+    case FIELD_COMMAND_ICON2:
         n++;
-    case 0x338:
+    case FIELD_COMMAND_ICON1:
         n++;
-        field = TASK_REGISTRY.funcs.find(FIELD_TASK_ICON, -1, -1);
-        field->setSubstate(field, n);
+        icon = TASK_REGISTRY.funcs.find(FIELD_TASK_ICON, -1, -1);
+        icon->setSubstate(icon, n);
         break;
     }
     switch (command) {
-    case 0x34D ... 0x352:
+    case FIELD_COMMAND_HIDE_OBJECTS(0) ... FIELD_COMMAND_HIDE_OBJECTS(FIELD_OBJECT_GROUPS - 1):
         for (object = FIELDSTG_state.objects; object->unk2 != 0; object++) {
-            if (object->anim == command - 0x2E9) {
+            if (object->anim == command - FIELD_COMMAND_HIDE_OBJECTS(0) + FIELD_OBJECT_GROUP_ANIM) {
                 object->visible = 0;
             }
         }
         break;
-    case 0x353 ... 0x358:
+    case FIELD_COMMAND_SHOW_OBJECTS(0) ... FIELD_COMMAND_SHOW_OBJECTS(FIELD_OBJECT_GROUPS - 1):
         for (object = FIELDSTG_state.objects; object->unk2 != 0; object++) {
-            if (object->anim == command - 0x2EF) {
+            if (object->anim == command - FIELD_COMMAND_SHOW_OBJECTS(0) + FIELD_OBJECT_GROUP_ANIM) {
                 object->visible = 1;
             }
         }
         break;
     }
     switch (command) {
-    case 0x372:
+    case FIELD_COMMAND_SHAKE_CAMERA:
         FIELDSTG_shakeCamera(1);
         break;
-    case 0x373:
+    case FIELD_COMMAND_STOP_CAMERA_SHAKE:
         FIELDSTG_shakeCamera(0);
         break;
     }
-    if (command == 0x376) {
+    if (command == FIELD_COMMAND_SEARCH_EVENT_SPOT) {
         FIELDSTG_searchEventSpot();
     }
     switch (command) {
-    case 0x365:
-        SOUND.playSound(0xB80001);
+    case FIELD_COMMAND_PLAY_INFO_SIG:
+        SOUND.playSound(SOUND_INFO_SIG);
         break;
-    case 0x368:
-        SOUND.playSound(0x80E8383C);
+    case FIELD_COMMAND_PLAY_WEAR_OFF:
+        SOUND.playSound(SOUND_WEAR_OFF);
         break;
-    case 0x369:
-        SOUND.playSound(0x60040002);
+    case FIELD_COMMAND_PLAY_DEMO_BGM:
+        SOUND.playSound(SOUND_DEMO_BGM);
         break;
-    case 0x36A:
+    case FIELD_COMMAND_PLAY_SE000002:
         SOUND.playSound(0xA40006);
         break;
-    case 0x36B:
-        SOUND.playSound(0x805458BD);
+    case FIELD_COMMAND_PLAY_BEAM_SHT:
+        SOUND.playSound(SOUND_BEAM_SHT);
         break;
-    case 0x36C:
+    case FIELD_COMMAND_PLAY_SWITCH02:
         SOUND.playSound(0x800410BD);
         break;
-    case 0x36D:
-        SOUND.playSound(0x803C503C);
+    case FIELD_COMMAND_PLAY_MASK_SET:
+        SOUND.playSound(SOUND_MASK_SET);
         break;
-    case 0x36E:
-        SOUND.playSound(0x01100000);
+    case FIELD_COMMAND_PLAY_BM_ERASE:
+        SOUND.playSound(SOUND_BM_ERASE);
         break;
-    case 0x36F:
-        SOUND.playSound(0x01100002);
+    case FIELD_COMMAND_PLAY_LD_ERASE:
+        SOUND.playSound(SOUND_LD_ERASE);
         break;
-    case 0x374:
-        SOUND.playSound(0x700001);
+    case FIELD_COMMAND_PLAY_TRAP_OFF:
+        SOUND.playSound(SOUND_TRAP_OFF);
         break;
-    case 0x375:
-        SOUND.playSound(0x40015);
+    case FIELD_COMMAND_PLAY_SAVEDEMO:
+        SOUND.playSound(SOUND_SAVEDEMO);
         break;
-    case 0x377:
+    case FIELD_COMMAND_PLAY_SWITCH03:
         SOUND.playSound(0x8004113E);
         break;
-    case 0x378:
-        SOUND.playSound(0x8110303C);
+    case FIELD_COMMAND_PLAY_SN_ENTRY:
+        SOUND.playSound(SOUND_SN_ENTRY);
         break;
-    case 0x379:
-        SOUND.playSound(0x81103240);
+    case FIELD_COMMAND_PLAY_SN_ERASE:
+        SOUND.playSound(SOUND_SN_ERASE);
         break;
-    case 0x37A:
+    case FIELD_COMMAND_PLAY_TELEPORT:
         SOUND.playSound(SOUND_TELEPORT);
         break;
-    case 0x37C:
-        SOUND.playSound(0x440001);
+    case FIELD_COMMAND_PLAY_BULB_003:
+        SOUND.playSound(SOUND_BULB_003);
         break;
-    case 0x37D:
+    case FIELD_COMMAND_PLAY_GONDRA_S:
         SOUND.playSound(0x340004);
         break;
-    case 0x37E:
-        SOUND.playSound(0x40013);
+    case FIELD_COMMAND_PLAY_PIYOPIYO:
+        SOUND.playSound(SOUND_PIYOPIYO);
         break;
-    case 0x37F:
+    case FIELD_COMMAND_PLAY_COMCD103:
         SOUND.playSound(0x800429BF);
         break;
-    case 0x380:
-        SOUND.playSound(0x800430BD);
+    case FIELD_COMMAND_PLAY_COMCD201:
+        SOUND.playSound(SOUND_COMCD201);
         break;
-    case 0x381:
-        SOUND.playSound(0x80042DC7);
+    case FIELD_COMMAND_PLAY_COMCD111:
+        SOUND.playSound(SOUND_COMCD111);
         break;
-    case 0x383:
+    case FIELD_COMMAND_PLAY_SWITCH01:
         SOUND.playSound(0x8004103C);
         break;
     }
     switch (command) {
-    case 0x366:
-        FIELDSTG_heldVoice = SOUND.playSound(0xA10C703C);
+    case FIELD_COMMAND_PLAY_GAYALOOP:
+        FIELDSTG_heldVoice = SOUND.playSound(SOUND_GAYALOOP);
         break;
-    case 0x370:
+    case FIELD_COMMAND_PLAY_PLAYER11:
         FIELDSTG_heldVoice = SOUND.playSound(0xA0045EC9);
         break;
-    case 0x382:
-        FIELDSTG_heldVoice = SOUND.playSound(0xA054583C);
+    case FIELD_COMMAND_PLAY_BEAM_HIT:
+        FIELDSTG_heldVoice = SOUND.playSound(SOUND_BEAM_HIT);
         break;
-    case 0x384:
+    case FIELD_COMMAND_PLAY_COMCD115:
         FIELDSTG_heldVoice = SOUND.playSound(0xA0042FCB);
         break;
     }
     switch (command) {
-    case 0x367:
-        SOUND.keyOff(0xA10C703C, FIELDSTG_heldVoice);
+    case FIELD_COMMAND_STOP_GAYALOOP:
+        SOUND.keyOff(SOUND_GAYALOOP, FIELDSTG_heldVoice);
         break;
-    case 0x371:
+    case FIELD_COMMAND_STOP_PLAYER11:
         SOUND.keyOff(0xA0045EC9, FIELDSTG_heldVoice);
         break;
-    case 0x385:
+    case FIELD_COMMAND_STOP_COMCD115:
         SOUND.keyOff(0xA0042FCB, FIELDSTG_heldVoice);
         break;
-    case 0x386:
-        SOUND.keyOff(0xA054583C, FIELDSTG_heldVoice);
+    case FIELD_COMMAND_STOP_BEAM_HIT:
+        SOUND.keyOff(SOUND_BEAM_HIT, FIELDSTG_heldVoice);
         break;
     }
 }
@@ -178,5 +181,5 @@ void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
 /* Creates the task of script command 813 (the create of
    FIELDSTG_scriptCommands) */
 void FIELDSTG_startCommandTask(void) {
-    createTaskWithId(FIELDSTG_updateCommandTask, sizeof(Task), 0, 0x32D);
+    createTaskWithId(FIELDSTG_updateCommandTask, sizeof(Task), 0, FIELD_TASK_COMMANDS);
 }
