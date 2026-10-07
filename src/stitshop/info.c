@@ -4,8 +4,9 @@
 #include "stitshop.h"
 
 /* A partner's stats with its equipment, as main's computeStats gives them: the
-   weapons' attack (6), the armor's defense (7) and the items' bonuses added, up
-   to 999, less the penalties on stats 6, 7 and 10 */
+   weapons' attack (STAT_STRENGTH), the armor's defense (STAT_DEFENSE) and the
+   items' bonuses added, up to 999, less the penalties on STAT_STRENGTH,
+   STAT_DEFENSE and STAT_SPEED */
 void STITSHOP_computeStats(s32 partner, ShopStatBlock *out) {
     s16 *equip;
     s32 i;
@@ -89,23 +90,23 @@ void STITSHOP_addStat(s16 *p, s32 stat, s32 delta) {
 
     if (stat == 7) {
         for (i = 0; i < 6; i++) {
-            value = p[i + 6] + delta;
-            p[i + 6] = value;
+            value = p[STAT_STRENGTH + i] + delta;
+            p[STAT_STRENGTH + i] = value;
             if (value >= 1000) {
-                p[i + 6] = 999;
+                p[STAT_STRENGTH + i] = 999;
             }
         }
     } else if (stat - 1 < 6U) {
-        value = p[stat + 5] + delta;
-        p[stat + 5] = value;
+        value = p[STAT_STRENGTH - 1 + stat] + delta;
+        p[STAT_STRENGTH - 1 + stat] = value;
         if (value >= 1000) {
-            p[stat + 5] = 999;
+            p[STAT_STRENGTH - 1 + stat] = 999;
         }
     } else if (stat - 8 < 7U) {
-        value = p[stat + 4] + delta;
-        p[stat + 4] = value;
+        value = p[STAT_RESISTS - 8 + stat] + delta;
+        p[STAT_RESISTS - 8 + stat] = value;
         if (value >= 1000) {
-            p[stat + 4] = 999;
+            p[STAT_RESISTS - 8 + stat] = 999;
         }
     }
 }
@@ -126,7 +127,8 @@ void STITSHOP_showStat(ShopInfo *info, TextWindow *win, ShopStatRow *row) {
 }
 
 /* Colors a row's stat: palette 1 when the item would raise it, 5 when it would
-   lower it, else 6 when a penalty lowers it (stats 6, 7 and 10), 0 otherwise */
+   lower it, else 6 when a penalty lowers it (STAT_STRENGTH, STAT_DEFENSE and
+   STAT_SPEED), 0 otherwise */
 void STITSHOP_colorStat(ShopInfo *info, TextWindow *win, ShopStatRow *row) {
     ShopPartnerInfo *p = &info->partners[row->partner];
     s32 penalty;
@@ -516,6 +518,86 @@ void STITSHOP_drawStatsPage(ShopInfo *info, ShopInfoWindows *win) {
     }
 }
 
+/* Once the item's panel (and the page hint's, for equipment) has opened: shows
+   the item's rows and the hint to turn the page, and opens the description's
+   panel */
+static inline void STITSHOP_openBuyInfo(ShopInfo *info, ShopInfoWindows *win) {
+    if (info->hasStats) {
+        STITSHOP_funcs.updateFade(&info->panels[1]);
+    }
+    if (STITSHOP_funcs.updateFade(&info->panels[0])) {
+        STITSHOP_showItemRows(info, win, 1);
+        if (info->hasStats) {
+            win->pageHint->setString(win->pageHint, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), info->page + 10);
+        }
+        STITSHOP_funcs.startFade(&info->panels[2], 1);
+        info->substate++;
+    }
+}
+
+/* While the buying dialog asks to equip the item (info->nextSubstate): hides
+   the page hint and closes its panel, and the description when it is the page
+   shown */
+static inline void STITSHOP_hideBuyInfoPage(ShopInfo *info, ShopInfoWindows *win) {
+    info->shown = 0;
+    win->pageHint->setVisible(win->pageHint, 0);
+    STITSHOP_funcs.startFade(&info->panels[1], 0);
+    if (info->page == 0) {
+        STITSHOP_funcs.startFade(&info->panels[2], 0);
+        STITSHOP_showItemDesc(info, win, 0);
+    }
+    info->substate++;
+}
+
+/* Turning the page (info->turnPage): updates the page hint and closes the page
+   that was shown */
+static inline void STITSHOP_startInfoPageTurn(ShopInfo *info, ShopInfoWindows *win) {
+    win->pageHint->setString(win->pageHint, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), info->page + 10);
+    if (info->page == 0) {
+        STITSHOP_funcs.startFade(&info->panels[3], 0);
+        STITSHOP_showPartnerStats(info, win, 0);
+        info->substate = 15;
+    } else {
+        STITSHOP_funcs.startFade(&info->panels[2], 0);
+        STITSHOP_showItemDesc(info, win, 0);
+        info->substate = 11;
+    }
+}
+
+/* Closing (info->close): hides the item's rows, the page hint and the page
+   shown, and closes their panels */
+static inline void STITSHOP_closeBuyInfo(ShopInfo *info, ShopInfoWindows *win) {
+    STITSHOP_showItemRows(info, win, 0);
+    win->pageHint->setVisible(win->pageHint, 0);
+    STITSHOP_funcs.startFade(&info->panels[0], 0);
+    if (info->hasStats) {
+        STITSHOP_funcs.startFade(&info->panels[1], 0);
+    }
+    if (info->page == 0) {
+        STITSHOP_showItemDesc(info, win, 0);
+        STITSHOP_funcs.startFade(&info->panels[2], 0);
+    } else {
+        STITSHOP_showPartnerStats(info, win, 0);
+        STITSHOP_funcs.startFade(&info->panels[3], 0);
+    }
+    info->substate++;
+}
+
+/* Ends the details panel once its panels have closed */
+static inline void STITSHOP_endBuyInfo(ShopInfo *info, ShopInfoWindows *win) {
+    if (info->page == 0) {
+        STITSHOP_funcs.updateFade(&info->panels[2]);
+    } else {
+        STITSHOP_funcs.updateFade(&info->panels[3]);
+    }
+    if (info->hasStats) {
+        STITSHOP_funcs.updateFade(&info->panels[1]);
+    }
+    if (STITSHOP_funcs.updateFade(&info->panels[0])) {
+        info->state = TASK_KILL;
+    }
+}
+
 /* The details panel's states when buying: fades in its first page, turns
    between the pages (10-16), and fades out when closed (50) */
 void STITSHOP_runBuyInfo(ShopInfo *info, ShopInfoWindows *win) {
@@ -529,17 +611,7 @@ void STITSHOP_runBuyInfo(ShopInfo *info, ShopInfoWindows *win) {
         info->substate++;
         break;
     case 1:
-        if (info->hasStats) {
-            STITSHOP_funcs.updateFade(&info->panels[1]);
-        }
-        if (STITSHOP_funcs.updateFade(&info->panels[0])) {
-            STITSHOP_showItemRows(info, win, 1);
-            if (info->hasStats) {
-                win->pageHint->setString(win->pageHint, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), info->page + 10);
-            }
-            STITSHOP_funcs.startFade(&info->panels[2], 1);
-            info->substate++;
-        }
+        STITSHOP_openBuyInfo(info, win);
         break;
     case 2:
         if (STITSHOP_funcs.updateFade(&info->panels[2])) {
@@ -550,14 +622,7 @@ void STITSHOP_runBuyInfo(ShopInfo *info, ShopInfoWindows *win) {
     case 3:
         break;
     case 4:
-        info->shown = 0;
-        win->pageHint->setVisible(win->pageHint, 0);
-        STITSHOP_funcs.startFade(&info->panels[1], 0);
-        if (info->page == 0) {
-            STITSHOP_funcs.startFade(&info->panels[2], 0);
-            STITSHOP_showItemDesc(info, win, 0);
-        }
-        info->substate++;
+        STITSHOP_hideBuyInfoPage(info, win);
         break;
     case 5:
         STITSHOP_funcs.updateFade(&info->panels[2]);
@@ -604,16 +669,7 @@ void STITSHOP_runBuyInfo(ShopInfo *info, ShopInfoWindows *win) {
         }
         break;
     case 10:
-        win->pageHint->setString(win->pageHint, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), info->page + 10);
-        if (info->page == 0) {
-            STITSHOP_funcs.startFade(&info->panels[3], 0);
-            STITSHOP_showPartnerStats(info, win, 0);
-            info->substate = 15;
-        } else {
-            STITSHOP_funcs.startFade(&info->panels[2], 0);
-            STITSHOP_showItemDesc(info, win, 0);
-            info->substate = 11;
-        }
+        STITSHOP_startInfoPageTurn(info, win);
         break;
     case 11:
         if (STITSHOP_funcs.updateFade(&info->panels[2])) {
@@ -642,33 +698,10 @@ void STITSHOP_runBuyInfo(ShopInfo *info, ShopInfoWindows *win) {
         }
         break;
     case 50:
-        STITSHOP_showItemRows(info, win, 0);
-        win->pageHint->setVisible(win->pageHint, 0);
-        STITSHOP_funcs.startFade(&info->panels[0], 0);
-        if (info->hasStats) {
-            STITSHOP_funcs.startFade(&info->panels[1], 0);
-        }
-        if (info->page == 0) {
-            STITSHOP_showItemDesc(info, win, 0);
-            STITSHOP_funcs.startFade(&info->panels[2], 0);
-        } else {
-            STITSHOP_showPartnerStats(info, win, 0);
-            STITSHOP_funcs.startFade(&info->panels[3], 0);
-        }
-        info->substate++;
+        STITSHOP_closeBuyInfo(info, win);
         break;
     case 51:
-        if (info->page == 0) {
-            STITSHOP_funcs.updateFade(&info->panels[2]);
-        } else {
-            STITSHOP_funcs.updateFade(&info->panels[3]);
-        }
-        if (info->hasStats) {
-            STITSHOP_funcs.updateFade(&info->panels[1]);
-        }
-        if (STITSHOP_funcs.updateFade(&info->panels[0])) {
-            info->state = TASK_KILL;
-        }
+        STITSHOP_endBuyInfo(info, win);
         break;
     }
 }
@@ -800,7 +833,7 @@ void STITSHOP_setInfoItem(ShopInfo *info, s32 item, s32 quantity) {
 /* Closes the details panel (info->close), when it is open and idle */
 void STITSHOP_closeInfo(ShopInfo *info) {
     if (info->substate == 3) {
-        info->substate = 0x32;
+        info->substate = 50;
     }
 }
 

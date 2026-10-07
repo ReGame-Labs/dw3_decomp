@@ -1,13 +1,17 @@
 #ifndef STGDGLAB_H
 #define STGDGLAB_H
 
-/* STGDGLAB.PRO: the partners' digivolutions, it seems. Its main menu
-   (STGDGLAB_createMenu) opens one of three screens (STGDGLAB_screens): the
-   third checks the recipes of STGDGLAB_data (how many of a few ids are
-   needed) against the entries a partner has (listPartnerEntries), and the
-   second sets a partner's three slots (setPartnerSlots). On the way in it
-   packs the party (STGDGLAB_packParty) so that the members come first. Its
-   strings are in files 0x3A, 0x4F, 0x48, 0xA3 and 0x9C. */
+/* STGDGLAB.PRO: the Digimon Lab (MODE_DIGI_LAB; "デジモンラボ" in STAGSLCT's list
+   of scenes), where the partners' digivolutions are set. Its main menu
+   (STGDGLAB_createMenu) opens one of three screens (STGDGLAB_screens,
+   TEXT_DIGI_LAB strings 2-4): "Switch Digimon" swaps a party member with
+   another partner, "Digivolve" sets a partner's three slots
+   (setPartnerSlots) and loads its techniques, and "Digivolve Chart" checks
+   the recipes of STGDGLAB_data (how many of a few ids are needed) against
+   the entries a partner has (listPartnerEntries). On the way in it packs the
+   party (STGDGLAB_packParty) so that the members come first. Its strings are
+   in TEXT_DIGI_LAB, TEXT_DIGIMON_NAMES, TEXT_DIGIMON_INFO, TEXT_SKILL_NAMES
+   and TEXT_SKILL_INFO. */
 
 #include "game.h"
 
@@ -71,7 +75,7 @@ typedef struct LabPartyScreen {
                                 while the entry list is open */
     /* 0x060 */ s32 pick; /* into partners */
     /* 0x064 */ PanelAnim panels[5];
-    /* 0x0B4 */ u8 unkB4[0xC4 - 0xB4];
+    /* 0x0B4 */ u8 pad[0xC4 - 0xB4]; /* never read or written */
     /* 0x0C4 */ s32 animTime;
     /* 0x0C8 */ s32 blinkTime;
     /* 0x0CC */ s32 frames[3]; /* the party's animation frames */
@@ -99,7 +103,7 @@ typedef struct LabSlotScreen {
     /* 0x0B4 */ s32 layer;
     /* 0x0B8 */ s32 depth;
     /* 0x0BC */ s32 choice;
-    /* 0x0C0 */ u8 unkC0[0xC8 - 0xC0];
+    /* 0x0C0 */ u8 pad[0xC8 - 0xC0]; /* never read or written */
     /* 0x0C8 */ s32 picked; /* the list's cursor when an entry was picked */
     /* 0x0CC */ s16 slots[3]; /* getPartnerSlots */
     /* 0x0D2 */ s16 entries[45]; /* listPartnerEntries */
@@ -124,7 +128,7 @@ typedef struct LabRecipeScreen {
     /* 0x050 */ struct Lab *lab;
     /* 0x054 */ s32 layer;
     /* 0x058 */ s32 depth;
-    /* 0x05C */ s32 unk5C;
+    /* 0x05C */ s32 pad5C; /* never read or written */
     /* 0x060 */ s16 owned[44];
     /* 0x0B8 */ s32 ownedCount;
     /* 0x0BC */ s32 table; /* into STGDGLAB_data.recipes */
@@ -142,7 +146,7 @@ typedef struct LabRecipeScreen {
     /* 0x28C */ s32 clutRow;
     /* 0x290 */ s32 col;
     /* 0x294 */ s32 slot;
-    /* 0x298 */ s32 unk298;
+    /* 0x298 */ s32 pad298; /* never read or written */
 } LabRecipeScreen;
 
 typedef struct LabRecipeScreenWindows {
@@ -279,7 +283,7 @@ typedef struct LabEntry {
     /* 0x0 */ s16 id;
     /* 0x2 */ s16 sprite;
     /* 0x4 */ s16 b; /* 0x100-0x135, one per Digimon; only STGDGLAB_getItemB
-                        reads it, and nothing calls that */
+                        reads it, and nothing in src/ calls that (LabFuncs.getB) */
 } LabEntry;
 
 /* The lab's helpers (STGDGLAB_data.funcs) */

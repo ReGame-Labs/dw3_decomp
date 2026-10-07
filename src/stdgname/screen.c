@@ -97,7 +97,7 @@ void STDGNAME_updateScreen(ScreenTask *task, ScreenChildren *children) {
         STDGNAME_drawBackground(task);
         break;
     case TASK_DONE:
-        if (children->unkC == NULL) {
+        if (children->awaited == NULL) {
             task->setState(task, TASK_RUN);
         }
         STDGNAME_drawBackground(task);

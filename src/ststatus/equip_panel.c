@@ -244,17 +244,256 @@ void STSTATUS_drawEquipPanel(EquipPanel *panel) {
     }
 }
 
+/* Once the title's panel is in, shows the title and starts the slots' panel */
+static inline void STSTATUS_openEquipTitle(EquipPanel *panel, EquipPanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&panel->panels[0])) {
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x3F);
+        STSTATUS_data.funcs.startFade(&panel->panels[1], 1);
+        panel->substate++;
+    }
+}
+
+/* Once the slots' panel is in, shows the equipment and the slot cursor */
+static inline void STSTATUS_openEquipSlots(EquipPanel *panel, EquipPanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&panel->panels[1])) {
+        STSTATUS_showEquipment(panel, windows, 1);
+        windows->cursor->setVisible(windows->cursor, 1);
+        panel->substate++;
+    }
+}
+
+/* Choosing a slot: up and down move the cursor, cross lists the owned items
+   for the slot ("none" first, then those the partner can equip, then the
+   others), triangle closes the panel */
+static inline void STSTATUS_chooseEquipSlot(EquipPanel *panel, EquipPanelWindows *windows) {
+    s32 oldSlot;
+    s32 count;
+    s32 n;
+    s32 i;
+
+    oldSlot = panel->slot;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        panel->slot--;
+        if (panel->slot < 0) {
+            panel->slot = 0;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        panel->slot++;
+        if (panel->slot >= 6) {
+            panel->slot = 5;
+        }
+    }
+    if (oldSlot != panel->slot) {
+        SOUND.playSound(SOUND_CURSOR);
+        windows->cursor->setPos(windows->cursor, 0xA5, panel->slot * 14 + 0x31);
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        n = 1;
+        count = STSTATUS_data.funcs.listItems(STSTATUS_slotLists[panel->slot], panel->owned);
+        for (i = 0; i < count; i++) {
+            if (STSTATUS_data.funcs.canEquip(panel->partner, panel->slot, panel->owned[i])) {
+                panel->items[n++] = panel->owned[i];
+            }
+        }
+        for (i = 0; i < count; i++) {
+            if (!STSTATUS_data.funcs.canEquip(panel->partner, panel->slot, panel->owned[i])) {
+                panel->items[n++] = panel->owned[i];
+            }
+        }
+        panel->count = count + 1;
+        panel->items[0] = -1;
+        panel->substate = 10;
+    }
+    if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        panel->substate = 0x32;
+    }
+}
+
+/* Starts closing the slots' panel for the item list */
+static inline void STSTATUS_closeEquipSlots(EquipPanel *panel, EquipPanelWindows *windows) {
+    STSTATUS_data.funcs.startFade(&panel->panels[1], 0);
+    STSTATUS_showEquipment(panel, windows, 0);
+    windows->cursor->setVisible(windows->cursor, 0);
+    panel->cursor = 0;
+    panel->scroll = 0;
+    panel->substate++;
+}
+
+/* Once the title's panel is closed, starts the slot's item panel */
+static inline void STSTATUS_openSlotItem(EquipPanel *panel) {
+    if (STSTATUS_data.funcs.updateFade(&panel->panels[0])) {
+        STSTATUS_data.funcs.startFade(&panel->panels[3], 1);
+        panel->substate++;
+    }
+}
+
+/* Once the slot's item panel is in, shows the slot's item and starts the
+   list's panel */
+static inline void STSTATUS_openEquipList(EquipPanel *panel, EquipPanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&panel->panels[3])) {
+        panel->showSlot = 1;
+        STSTATUS_showSlotItem(panel, windows, 1);
+        STSTATUS_data.funcs.startFade(&panel->panels[2], 1);
+        panel->substate++;
+    }
+}
+
+/* Once the list's panel is in, shows the list, its cursor, the stats with
+   the slot emptied and, past 8 items, the scroll bar */
+static inline void STSTATUS_enterEquipList(EquipPanel *panel, EquipPanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&panel->panels[2])) {
+        STSTATUS_showEquipList(panel, windows, 1);
+        windows->listCursor->setPos(windows->listCursor, 0x89, 0x4B);
+        windows->listCursor->setVisible(windows->listCursor, 1);
+        panel->screen->previewStats(panel->screen, panel->slot, 0);
+        if (panel->count >= 9) {
+            windows->scrollBar = STSTATUS_createScrollBar();
+            windows->scrollBar->setX(windows->scrollBar, 0x125, 0xC);
+            windows->scrollBar->setRange(windows->scrollBar, 0x4E, 0xB3);
+            windows->scrollBar->setCount(windows->scrollBar, 8, panel->count);
+            windows->scrollBar->setPos(windows->scrollBar, 0);
+        }
+        panel->substate++;
+    }
+}
+
+/* Choosing the item: up and down move the cursor, L1 and R1 scroll a page,
+   the stats show the item's effect, cross equips it, triangle goes back */
+static inline void STSTATUS_chooseEquipItem(EquipPanel *panel, EquipPanelWindows *windows) {
+    s32 oldCursor;
+    s32 oldScroll;
+    s32 item;
+
+    oldCursor = panel->cursor;
+    oldScroll = panel->scroll;
+    if (panel->count >= 9) {
+        if ((!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) || (!PAD_HELD(PAD_R1) && PAD_REPEATED(PAD_L1))) {
+            panel->scroll -= 8;
+            if (panel->scroll < 0) {
+                panel->scroll = 0;
+            }
+        } else if ((!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) || (!PAD_HELD(PAD_L1) && PAD_REPEATED(PAD_R1))) {
+            panel->scroll += 8;
+            if (panel->scroll > panel->count - 8) {
+                panel->scroll = panel->count - 8;
+            }
+        }
+    }
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        panel->cursor--;
+        if (panel->cursor < 0) {
+            panel->cursor = 0;
+            panel->scroll--;
+            if (panel->scroll < 0) {
+                panel->scroll = 0;
+            }
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        if (panel->count < 8) {
+            panel->cursor++;
+            if (panel->cursor > panel->count - 1) {
+                panel->cursor = panel->count - 1;
+            }
+        } else {
+            panel->cursor++;
+            if (panel->cursor >= 8) {
+                panel->cursor = 7;
+                panel->scroll++;
+                if (panel->scroll > panel->count - 8) {
+                    panel->scroll = panel->count - 8;
+                }
+            }
+        }
+    }
+    if (oldCursor != panel->cursor) {
+        SOUND.playSound(SOUND_CURSOR);
+        windows->listCursor->setPos(windows->listCursor, 0x86, panel->cursor * 14 + 0x4B);
+#if VERSION_US
+        if (windows->scrollBar != NULL) {
+            windows->scrollBar->setPos(windows->scrollBar, panel->cursor + panel->scroll);
+        }
+#endif
+    }
+    if (oldScroll != panel->scroll) {
+        SOUND.playSound(SOUND_CURSOR);
+        STSTATUS_showEquipList(panel, windows, 1);
+        if (windows->scrollBar != NULL) {
+#if VERSION_US
+            /* the USA version's bar follows the chosen item, the European one the page */
+            windows->scrollBar->setPos(windows->scrollBar, panel->cursor + panel->scroll);
+#else
+            windows->scrollBar->setPos(windows->scrollBar, panel->scroll);
+#endif
+        }
+    }
+    item = panel->items[panel->cursor + panel->scroll];
+    if (oldCursor != panel->cursor || oldScroll != panel->scroll) {
+        if (STSTATUS_data.funcs.canEquip(panel->partner, panel->slot, item)) {
+            panel->screen->previewStats(panel->screen, panel->slot, item);
+        } else {
+            panel->screen->previewStats(panel->screen, -1, 0);
+        }
+        STSTATUS_showEquipItem(panel, windows, item);
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        if (STSTATUS_data.funcs.canEquip(panel->partner, panel->slot, item)) {
+            STSTATUS_data.funcs.equip(panel->partner, panel->slot, item);
+            panel->substate = 0x14;
+            panel->showSlot = 0;
+            panel->screen->previewStats(panel->screen, panel->slot, item);
+            if (windows->scrollBar != NULL) {
+                windows->scrollBar->state = 3;
+            }
+            SOUND.playSound(SOUND_SELECT);
+        }
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        panel->screen->previewStats(panel->screen, -1, 0);
+        panel->substate = 0x14;
+        panel->showSlot = 0;
+        if (windows->scrollBar != NULL) {
+            windows->scrollBar->state = 3;
+        }
+    }
+}
+
+/* Starts closing the list's panel */
+static inline void STSTATUS_closeEquipList(EquipPanel *panel, EquipPanelWindows *windows) {
+    STSTATUS_data.funcs.startFade(&panel->panels[2], 0);
+    STSTATUS_showEquipList(panel, windows, 0);
+    windows->listCursor->setVisible(windows->listCursor, 0);
+    panel->substate++;
+}
+
+/* Once the list's panel is closed, starts closing the slot's item panel */
+static inline void STSTATUS_closeSlotItem(EquipPanel *panel, EquipPanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&panel->panels[2])) {
+        STSTATUS_data.funcs.startFade(&panel->panels[3], 0);
+        STSTATUS_showSlotItem(panel, windows, 0);
+        panel->substate++;
+    }
+}
+
+/* Starts closing the panel: the slots' panel, the equipment and the cursor */
+static inline void STSTATUS_closeEquipPanel(EquipPanel *panel, EquipPanelWindows *windows) {
+    STSTATUS_data.funcs.startFade(&panel->panels[1], 0);
+    STSTATUS_showEquipment(panel, windows, 0);
+    windows->cursor->setVisible(windows->cursor, 0);
+    panel->substate++;
+}
+
+/* Once the slots' panel is closed, starts closing the title's panel */
+static inline void STSTATUS_closeEquipTitle(EquipPanel *panel, EquipPanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&panel->panels[1])) {
+        windows->title->setVisible(windows->title, 0);
+        STSTATUS_data.funcs.startFade(&panel->panels[0], 0);
+        panel->substate++;
+    }
+}
+
 /* The equipment panel's steps: a slot is chosen, then an item from the list
    of those that fit it, the ones the partner can equip first */
 void STSTATUS_runEquipPanel(EquipPanel *panel, EquipPanelWindows *windows) {
-    s32 oldSlot;
-    s32 oldCursor;
-    s32 oldScroll;
-    s32 count;
-    s32 n;
-    s32 item;
-    s32 i;
-
     switch (panel->substate) {
     case 0:
     default:
@@ -262,201 +501,34 @@ void STSTATUS_runEquipPanel(EquipPanel *panel, EquipPanelWindows *windows) {
         panel->substate++;
         break;
     case 1:
-        if (STSTATUS_data.funcs.updateFade(&panel->panels[0])) {
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x3F);
-            STSTATUS_data.funcs.startFade(&panel->panels[1], 1);
-            panel->substate++;
-        }
+        STSTATUS_openEquipTitle(panel, windows);
         break;
     case 2:
-        if (STSTATUS_data.funcs.updateFade(&panel->panels[1])) {
-            STSTATUS_showEquipment(panel, windows, 1);
-            windows->cursor->setVisible(windows->cursor, 1);
-            panel->substate++;
-        }
+        STSTATUS_openEquipSlots(panel, windows);
         break;
     case 3:
-        oldSlot = panel->slot;
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            panel->slot--;
-            if (panel->slot < 0) {
-                panel->slot = 0;
-            }
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            panel->slot++;
-            if (panel->slot >= 6) {
-                panel->slot = 5;
-            }
-        }
-        if (oldSlot != panel->slot) {
-            SOUND.playSound(SOUND_CURSOR);
-            windows->cursor->setPos(windows->cursor, 0xA5, panel->slot * 14 + 0x31);
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            n = 1;
-            /* owned is s16 because it is read signed; listItems fills a u16 array */
-            count = STSTATUS_data.funcs.listItems(STSTATUS_slotLists[panel->slot], (u16 *)panel->owned);
-            for (i = 0; i < count; i++) {
-                if (STSTATUS_data.funcs.canEquip(panel->partner, panel->slot, panel->owned[i])) {
-                    panel->items[n++] = panel->owned[i];
-                }
-            }
-            for (i = 0; i < count; i++) {
-                if (!STSTATUS_data.funcs.canEquip(panel->partner, panel->slot, panel->owned[i])) {
-                    panel->items[n++] = panel->owned[i];
-                }
-            }
-            panel->count = count + 1;
-            panel->items[0] = -1;
-            panel->substate = 10;
-        }
-        if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            panel->substate = 0x32;
-        }
+        STSTATUS_chooseEquipSlot(panel, windows);
         break;
     case 10:
-        STSTATUS_data.funcs.startFade(&panel->panels[1], 0);
-        STSTATUS_showEquipment(panel, windows, 0);
-        windows->cursor->setVisible(windows->cursor, 0);
-        panel->cursor = 0;
-        panel->scroll = 0;
-        panel->substate++;
+        STSTATUS_closeEquipSlots(panel, windows);
         break;
     case 12:
-        if (STSTATUS_data.funcs.updateFade(&panel->panels[0])) {
-            STSTATUS_data.funcs.startFade(&panel->panels[3], 1);
-            panel->substate++;
-        }
+        STSTATUS_openSlotItem(panel);
         break;
     case 13:
-        if (STSTATUS_data.funcs.updateFade(&panel->panels[3])) {
-            panel->showSlot = 1;
-            STSTATUS_showSlotItem(panel, windows, 1);
-            STSTATUS_data.funcs.startFade(&panel->panels[2], 1);
-            panel->substate++;
-        }
+        STSTATUS_openEquipList(panel, windows);
         break;
     case 14:
-        if (STSTATUS_data.funcs.updateFade(&panel->panels[2])) {
-            STSTATUS_showEquipList(panel, windows, 1);
-            windows->listCursor->setPos(windows->listCursor, 0x89, 0x4B);
-            windows->listCursor->setVisible(windows->listCursor, 1);
-            panel->screen->previewStats(panel->screen, panel->slot, 0);
-            if (panel->count >= 9) {
-                windows->scrollBar = STSTATUS_createScrollBar();
-                windows->scrollBar->setX(windows->scrollBar, 0x125, 0xC);
-                windows->scrollBar->setRange(windows->scrollBar, 0x4E, 0xB3);
-                windows->scrollBar->setCount(windows->scrollBar, 8, panel->count);
-                windows->scrollBar->setPos(windows->scrollBar, 0);
-            }
-            panel->substate++;
-        }
+        STSTATUS_enterEquipList(panel, windows);
         break;
     case 15:
-        oldCursor = panel->cursor;
-        oldScroll = panel->scroll;
-        if (panel->count >= 9) {
-            if ((!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) || (!PAD_HELD(PAD_R1) && PAD_REPEATED(PAD_L1))) {
-                panel->scroll -= 8;
-                if (panel->scroll < 0) {
-                    panel->scroll = 0;
-                }
-            } else if ((!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) || (!PAD_HELD(PAD_L1) && PAD_REPEATED(PAD_R1))) {
-                panel->scroll += 8;
-                if (panel->scroll > panel->count - 8) {
-                    panel->scroll = panel->count - 8;
-                }
-            }
-        }
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            panel->cursor--;
-            if (panel->cursor < 0) {
-                panel->cursor = 0;
-                panel->scroll--;
-                if (panel->scroll < 0) {
-                    panel->scroll = 0;
-                }
-            }
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            if (panel->count < 8) {
-                panel->cursor++;
-                if (panel->cursor > panel->count - 1) {
-                    panel->cursor = panel->count - 1;
-                }
-            } else {
-                panel->cursor++;
-                if (panel->cursor >= 8) {
-                    panel->cursor = 7;
-                    panel->scroll++;
-                    if (panel->scroll > panel->count - 8) {
-                        panel->scroll = panel->count - 8;
-                    }
-                }
-            }
-        }
-        if (oldCursor != panel->cursor) {
-            SOUND.playSound(SOUND_CURSOR);
-            windows->listCursor->setPos(windows->listCursor, 0x86, panel->cursor * 14 + 0x4B);
-#if VERSION_US
-            if (windows->scrollBar != NULL) {
-                windows->scrollBar->setPos(windows->scrollBar, panel->cursor + panel->scroll);
-            }
-#endif
-        }
-        if (oldScroll != panel->scroll) {
-            SOUND.playSound(SOUND_CURSOR);
-            STSTATUS_showEquipList(panel, windows, 1);
-            if (windows->scrollBar != NULL) {
-#if VERSION_US
-                /* the USA version's bar follows the chosen item, the European one the page */
-                windows->scrollBar->setPos(windows->scrollBar, panel->cursor + panel->scroll);
-#else
-                windows->scrollBar->setPos(windows->scrollBar, panel->scroll);
-#endif
-            }
-        }
-        item = panel->items[panel->cursor + panel->scroll];
-        if (oldCursor != panel->cursor || oldScroll != panel->scroll) {
-            if (STSTATUS_data.funcs.canEquip(panel->partner, panel->slot, item)) {
-                panel->screen->previewStats(panel->screen, panel->slot, item);
-            } else {
-                panel->screen->previewStats(panel->screen, -1, 0);
-            }
-            STSTATUS_showEquipItem(panel, windows, item);
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            if (STSTATUS_data.funcs.canEquip(panel->partner, panel->slot, item)) {
-                STSTATUS_data.funcs.equip(panel->partner, panel->slot, item);
-                panel->substate = 0x14;
-                panel->showSlot = 0;
-                panel->screen->previewStats(panel->screen, panel->slot, item);
-                if (windows->scrollBar != NULL) {
-                    windows->scrollBar->state = 3;
-                }
-                SOUND.playSound(SOUND_SELECT);
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            panel->screen->previewStats(panel->screen, -1, 0);
-            panel->substate = 0x14;
-            panel->showSlot = 0;
-            if (windows->scrollBar != NULL) {
-                windows->scrollBar->state = 3;
-            }
-        }
+        STSTATUS_chooseEquipItem(panel, windows);
         break;
     case 0x14:
-        STSTATUS_data.funcs.startFade(&panel->panels[2], 0);
-        STSTATUS_showEquipList(panel, windows, 0);
-        windows->listCursor->setVisible(windows->listCursor, 0);
-        panel->substate++;
+        STSTATUS_closeEquipList(panel, windows);
         break;
     case 0x15:
-        if (STSTATUS_data.funcs.updateFade(&panel->panels[2])) {
-            STSTATUS_data.funcs.startFade(&panel->panels[3], 0);
-            STSTATUS_showSlotItem(panel, windows, 0);
-            panel->substate++;
-        }
+        STSTATUS_closeSlotItem(panel, windows);
         break;
     case 0x16:
         if (STSTATUS_data.funcs.updateFade(&panel->panels[3])) {
@@ -464,18 +536,11 @@ void STSTATUS_runEquipPanel(EquipPanel *panel, EquipPanelWindows *windows) {
         }
         break;
     case 0x32:
-        STSTATUS_data.funcs.startFade(&panel->panels[1], 0);
-        STSTATUS_showEquipment(panel, windows, 0);
-        windows->cursor->setVisible(windows->cursor, 0);
-        panel->substate++;
+        STSTATUS_closeEquipPanel(panel, windows);
         break;
     case 11:
     case 0x33:
-        if (STSTATUS_data.funcs.updateFade(&panel->panels[1])) {
-            windows->title->setVisible(windows->title, 0);
-            STSTATUS_data.funcs.startFade(&panel->panels[0], 0);
-            panel->substate++;
-        }
+        STSTATUS_closeEquipTitle(panel, windows);
         break;
     case 0x34:
         if (STSTATUS_data.funcs.updateFade(&panel->panels[0])) {

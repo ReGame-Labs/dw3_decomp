@@ -303,7 +303,7 @@ void STITSHOP_startItemList(ShopItemList *list) {
 /* Closes the list (list->close): hides the cursor and fades it out */
 void STITSHOP_closeItemList(ShopItemList *list) {
     list->setState(list, TASK_RUN);
-    list->substate = 0x32;
+    list->substate = 50;
     STITSHOP_showListCursor(list, 0);
 }
 

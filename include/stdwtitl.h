@@ -82,7 +82,7 @@ typedef struct SplashTask {
 typedef struct DecEnv {
     /* 0x00 */ u_long *vlcbuf[2];
     /* 0x08 */ s32 vlcid;
-    /* 0x0C */ u_short *imgbuf[2];
+    /* 0x0C */ u_long *imgbuf[2]; /* 16-bit pixels, as words for DecDCTout and LoadImage */
     /* 0x14 */ s32 imgid;
     /* 0x18 */ RECT rect[2];
     /* 0x28 */ s32 rectid;
@@ -128,7 +128,7 @@ typedef struct LogoTask {
     /* 0x58 */ LogoAnim anims[2];
     /* 0x68 */ s32 layerId;
     /* 0x6C */ s32 depth;
-    /* 0x70 */ u8 unk70[8];
+    /* 0x70 */ u8 pad[8]; /* never read or written */
     /* 0x78 */ void (*show)(struct LogoTask *task);
 } LogoTask;
 
@@ -141,7 +141,7 @@ typedef struct GlintTask {
     /* 0x5C */ s32 lit;
     /* 0x60 */ s32 layerId;
     /* 0x64 */ s32 depth;
-    /* 0x68 */ u8 unk68[8];
+    /* 0x68 */ u8 pad[8]; /* never read or written */
     /* 0x70 */ void (*show)(struct GlintTask *task);
 } GlintTask;
 
@@ -154,7 +154,7 @@ typedef struct SlideTask {
     /* 0x5C */ s32 y;
     /* 0x60 */ s32 layerId;
     /* 0x64 */ s32 depth;
-    /* 0x68 */ u8 unk68[8];
+    /* 0x68 */ u8 pad[8]; /* never read or written */
     /* 0x70 */ void (*show)(struct SlideTask *task);
 } SlideTask;
 
@@ -162,7 +162,7 @@ typedef struct SlideTask {
 typedef struct MenuOption {
     /* 0x0 */ s32 x;
     /* 0x4 */ s32 y;
-    /* 0x8 */ u8 unk8[8];
+    /* 0x8 */ u8 pad[8]; /* never read or written */
 } MenuOption;
 
 typedef struct MenuTask {
@@ -175,10 +175,10 @@ typedef struct MenuTask {
     /* 0x59 */ u8 blink;
     /* 0x5A */ s16 selection; /* 0, 1: the options, 2: "PRESS START" */
     /* 0x5C */ MenuOption options[2];
-    /* 0x7C */ u8 unk7C[0x10];
+    /* 0x7C */ u8 pad7C[0x10]; /* never read or written */
     /* 0x8C */ s32 layerId;
     /* 0x90 */ s32 depth;
-    /* 0x94 */ u8 unk94[8];
+    /* 0x94 */ u8 pad94[8]; /* never read or written */
     /* 0x9C */ void (*show)(struct MenuTask *task);
     /* 0xA0 */ void (*reset)(struct MenuTask *task);
     /* 0xA4 */ s32 (*getChoice)(struct MenuTask *task);
@@ -220,7 +220,7 @@ typedef struct BackgroundTask {
     /* 0x78 */ Point16 pos7;
     /* 0x7C */ s32 layerId;
     /* 0x80 */ s32 depth;
-    /* 0x84 */ u8 unk84[0x10];
+    /* 0x84 */ u8 pad[0x10]; /* never read or written */
     /* 0x94 */ void (*animate)(struct BackgroundTask *task);
 } BackgroundTask;
 
@@ -247,7 +247,7 @@ typedef struct TitleTask {
     /* 0x58 */ s32 choice;
     /* 0x5C */ s32 layerId;
     /* 0x60 */ s32 depth;
-    /* 0x64 */ u8 unk64[0xD8];
+    /* 0x64 */ u8 pad[0xD8]; /* never read or written */
 } TitleTask;
 
 typedef struct TitleImages {
@@ -304,8 +304,8 @@ extern u_long *STDWTITL_ringBuffer;
 extern u_short *STDWTITL_vlcTable;
 extern u_long *STDWTITL_vlcBuffer0;
 extern u_long *STDWTITL_vlcBuffer1;
-extern u_short *STDWTITL_imageBuffer0;
-extern u_short *STDWTITL_imageBuffer1;
+extern u_long *STDWTITL_imageBuffer0;
+extern u_long *STDWTITL_imageBuffer1;
 extern s32 STDWTITL_movieEnded;
 extern s32 STDWTITL_movieFile;
 extern u32 STDWTITL_movieEndFrame;

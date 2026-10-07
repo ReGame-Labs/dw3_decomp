@@ -4,24 +4,24 @@
 
 /* Creates the screen's windows and its cursor */
 void STCRDSHP_createBuyWindows(CardShopBuy *buy, CardShopBuyWindows *win) {
-    win->windows[0] = createTextWindow(buy->layer, 1, 0x88, 0x80);
-    win->windows[1] = createTextWindow(buy->layer, 1, 0x115, 0x80);
-    win->windows[2] = createTextWindow(buy->layer, 1, 0x126, 0x80);
-    win->windows[3] = createTextWindow(buy->layer, 1, 0x115, 0xA6);
-    win->windows[4] = createTextWindow(buy->layer, 1, 0x12C, 0xA6);
-    win->windows[5] = createTextWindow(buy->layer, 1, 0x50, 0x97);
-    win->windows[6] = createTextWindow(buy->layer, 1, 0xCE, 0x97);
-    win->windows[7] = createTextWindow(buy->layer, 1, 0xF0, 0x97);
-    win->windows[8] = createTextWindow(buy->layer, 1, 0xCE, 0xA4);
-    win->windows[9] = createTextWindow(buy->layer, 1, 0xF0, 0xA4);
-    win->windows[11] = createTextWindow(buy->layer, 3, 0x117, 0xC7);
-    win->windows[10] = createTextWindow(buy->layer, 3, 0x11A, 0xC7);
-    win->windows[12] = createTextWindow(buy->layer, 1, 0x12, 0x67);
-    win->windows[13] = createTextWindow(buy->layer, 1, 0x121, 0x67);
-    win->windows[13]->setDepth(win->windows[13], buy->depth);
-    win->windows[14] = createTextWindow(buy->layer, 1, 0x9A, 0x39);
-    win->windows[15] = createTextWindow(buy->layer, 1, 0xC5, 0x56);
-    win->windows[16] = createTextWindow(buy->layer, 1, 0xC5, 0x66);
+    win->name = createTextWindow(buy->layer, 1, 0x88, 0x80);
+    win->pointsLabel = createTextWindow(buy->layer, 1, 0x115, 0x80);
+    win->points = createTextWindow(buy->layer, 1, 0x126, 0x80);
+    win->countLabel = createTextWindow(buy->layer, 1, 0x115, 0xA6);
+    win->count = createTextWindow(buy->layer, 1, 0x12C, 0xA6);
+    win->text = createTextWindow(buy->layer, 1, 0x50, 0x97);
+    win->apLabel = createTextWindow(buy->layer, 1, 0xCE, 0x97);
+    win->ap = createTextWindow(buy->layer, 1, 0xF0, 0x97);
+    win->hpLabel = createTextWindow(buy->layer, 1, 0xCE, 0xA4);
+    win->hp = createTextWindow(buy->layer, 1, 0xF0, 0xA4);
+    win->price = createTextWindow(buy->layer, 3, 0x117, 0xC7);
+    win->priceLabel = createTextWindow(buy->layer, 3, 0x11A, 0xC7);
+    win->prev = createTextWindow(buy->layer, 1, 0x12, 0x67);
+    win->next = createTextWindow(buy->layer, 1, 0x121, 0x67);
+    win->next->setDepth(win->next, buy->depth);
+    win->message = createTextWindow(buy->layer, 1, 0x9A, 0x39);
+    win->yes = createTextWindow(buy->layer, 1, 0xC5, 0x56);
+    win->no = createTextWindow(buy->layer, 1, 0xC5, 0x66);
     win->cursor = createCursor(buy->layer, buy->depth - 3, 0xB8, 0x56);
     win->cursor->setVisible(win->cursor, 0);
 }
@@ -36,54 +36,54 @@ void STCRDSHP_showBuyCard(CardShopBuy *buy, CardShopBuyWindows *win, s32 show) {
     if (show) {
         initCardDrawer(&drawer);
         drawer.setCard(card);
-        win->windows[0]->setString(win->windows[0], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_NAMES)), card);
-        win->windows[10]->setString(win->windows[10], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 3);
-        win->windows[11]->setNumber(win->windows[11], 0, STCRDSHP_funcs.getPrice(card));
-        win->windows[11]->setRightAlign(win->windows[11], 1);
-        win->windows[3]->setString(win->windows[3], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 8);
-        win->windows[4]->setNumber(win->windows[4], 0, GAME.cards[card]);
-        win->windows[4]->setRightAlign(win->windows[4], 1);
+        win->name->setString(win->name, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_NAMES)), card);
+        win->priceLabel->setString(win->priceLabel, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 3);
+        win->price->setNumber(win->price, 0, STCRDSHP_funcs.getPrice(card));
+        win->price->setRightAlign(win->price, 1);
+        win->countLabel->setString(win->countLabel, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 8);
+        win->count->setNumber(win->count, 0, GAME.cards[card]);
+        win->count->setRightAlign(win->count, 1);
         if (drawer.getKind() != 0) {
-            win->windows[1]->setVisible(win->windows[1], 0);
-            win->windows[2]->setVisible(win->windows[2], 0);
-            win->windows[5]->setString(win->windows[5], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_EFFECTS)), card);
-            win->windows[6]->setVisible(win->windows[6], 0);
-            win->windows[7]->setVisible(win->windows[7], 0);
-            win->windows[8]->setVisible(win->windows[8], 0);
-            win->windows[9]->setVisible(win->windows[9], 0);
+            win->pointsLabel->setVisible(win->pointsLabel, 0);
+            win->points->setVisible(win->points, 0);
+            win->text->setString(win->text, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_EFFECTS)), card);
+            win->apLabel->setVisible(win->apLabel, 0);
+            win->ap->setVisible(win->ap, 0);
+            win->hpLabel->setVisible(win->hpLabel, 0);
+            win->hp->setVisible(win->hp, 0);
         } else {
-            win->windows[1]->setString(win->windows[1], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 8);
-            win->windows[2]->setNumber(win->windows[2], 0, drawer.card->points);
-            win->windows[2]->setRightAlign(win->windows[2], 1);
+            win->pointsLabel->setString(win->pointsLabel, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 8);
+            win->points->setNumber(win->points, 0, drawer.card->points);
+            win->points->setRightAlign(win->points, 1);
             if (card == 0x45 || card == 0x70 || card == 0x9B || card == 0xC6 || card == 0xF1) {
-                win->windows[5]->setString(win->windows[5], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_EFFECTS)), card);
-                win->windows[6]->setVisible(win->windows[6], 0);
-                win->windows[7]->setVisible(win->windows[7], 0);
-                win->windows[8]->setVisible(win->windows[8], 0);
-                win->windows[9]->setVisible(win->windows[9], 0);
+                win->text->setString(win->text, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_EFFECTS)), card);
+                win->apLabel->setVisible(win->apLabel, 0);
+                win->ap->setVisible(win->ap, 0);
+                win->hpLabel->setVisible(win->hpLabel, 0);
+                win->hp->setVisible(win->hp, 0);
             } else {
-                win->windows[5]->setVisible(win->windows[5], 0);
-                win->windows[6]->setString(win->windows[6], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0x11);
-                win->windows[7]->setNumber(win->windows[7], 0, drawer.card->ap);
-                win->windows[7]->setRightAlign(win->windows[7], 1);
-                win->windows[8]->setString(win->windows[8], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0x12);
-                win->windows[9]->setNumber(win->windows[9], 0, drawer.card->hp);
-                win->windows[9]->setRightAlign(win->windows[9], 1);
+                win->text->setVisible(win->text, 0);
+                win->apLabel->setString(win->apLabel, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0x11);
+                win->ap->setNumber(win->ap, 0, drawer.card->ap);
+                win->ap->setRightAlign(win->ap, 1);
+                win->hpLabel->setString(win->hpLabel, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0x12);
+                win->hp->setNumber(win->hp, 0, drawer.card->hp);
+                win->hp->setRightAlign(win->hp, 1);
             }
         }
     } else {
-        win->windows[0]->setVisible(win->windows[0], 0);
-        win->windows[10]->setVisible(win->windows[10], 0);
-        win->windows[11]->setVisible(win->windows[11], 0);
-        win->windows[3]->setVisible(win->windows[3], 0);
-        win->windows[4]->setVisible(win->windows[4], 0);
-        win->windows[1]->setVisible(win->windows[1], 0);
-        win->windows[2]->setVisible(win->windows[2], 0);
-        win->windows[5]->setVisible(win->windows[5], 0);
-        win->windows[6]->setVisible(win->windows[6], 0);
-        win->windows[7]->setVisible(win->windows[7], 0);
-        win->windows[8]->setVisible(win->windows[8], 0);
-        win->windows[9]->setVisible(win->windows[9], 0);
+        win->name->setVisible(win->name, 0);
+        win->priceLabel->setVisible(win->priceLabel, 0);
+        win->price->setVisible(win->price, 0);
+        win->countLabel->setVisible(win->countLabel, 0);
+        win->count->setVisible(win->count, 0);
+        win->pointsLabel->setVisible(win->pointsLabel, 0);
+        win->points->setVisible(win->points, 0);
+        win->text->setVisible(win->text, 0);
+        win->apLabel->setVisible(win->apLabel, 0);
+        win->ap->setVisible(win->ap, 0);
+        win->hpLabel->setVisible(win->hpLabel, 0);
+        win->hp->setVisible(win->hp, 0);
     }
 }
 
@@ -185,15 +185,184 @@ void STCRDSHP_drawBuy(CardShopBuy *buy) {
     }
 }
 
+/* Once the card's panel has opened: shows the cursor, the card under it and
+   the R1 arrow's label when there is a next page */
+static inline void STCRDSHP_openBuyCard(CardShopBuy *buy, CardShopBuyWindows *win) {
+    if (STCRDSHP_funcs.updateFade(&buy->fades[0])) {
+        buy->cursorShown = 1;
+        STCRDSHP_showBuyCard(buy, win, 1);
+        if (buy->pages >= 2) {
+            if (buy->page < buy->pages - 1) {
+                win->next->setString(win->next, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0xB);
+            } else {
+                win->next->setVisible(win->next, 0);
+            }
+        }
+        buy->substate++;
+    }
+}
+
+/* L1/R1 turn the page: the cursor goes back to its first card, the grid
+   lays out the page's cards and the arrows' labels show where there are more */
+static inline void STCRDSHP_turnBuyPage(CardShopBuy *buy, CardShopBuyWindows *win) {
+    s32 old;
+    s32 i;
+
+    old = buy->page;
+    if (!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) {
+        buy->page--;
+        if (buy->page < 0) {
+            buy->page = 0;
+        }
+    } else if (!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) {
+        buy->page++;
+        if (buy->page > buy->pages - 1) {
+            buy->page = buy->pages - 1;
+        }
+    }
+    if (old != buy->page) {
+        SOUND.playSound(SOUND_MENU_MOVE);
+        buy->cursorShown = 0;
+        buy->column = 0;
+        for (i = 0; i < 6; i++) {
+            buy->cards[i] = buy->stock->cards[buy->page * 6 + i];
+        }
+        win->grid->setCards(win->grid, buy->cards);
+        if (buy->pages >= 2) {
+            if (buy->page > 0) {
+                win->prev->setString(win->prev, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0xA);
+            } else {
+                win->prev->setVisible(win->prev, 0);
+            }
+            if (buy->page < buy->pages - 1) {
+                win->next->setString(win->next, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0xB);
+            } else {
+                win->next->setVisible(win->next, 0);
+            }
+        }
+        buy->substate = 1;
+    }
+}
+
+/* The cursor on the page's cards: left/right move it (only onto a card), L1/R1
+   turn the page and lay out its cards; cross asks to buy the card, unless the
+   money is short or the player has 9 of it (a message), triangle leaves */
+static inline void STCRDSHP_chooseBuyCard(CardShopBuy *buy, CardShopBuyWindows *win) {
+    CardDrawer drawer;
+    s32 old;
+
+    old = buy->column;
+    if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
+        buy->column--;
+        if (buy->column < 0) {
+            buy->column = 0;
+        }
+    } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
+        buy->column++;
+        if (buy->column >= 6) {
+            buy->column = 5;
+        }
+    }
+    if (old != buy->column) {
+        if (buy->stock->cards[buy->page * 6 + buy->column] != 0) {
+            SOUND.playSound(SOUND_MENU_MOVE);
+            STCRDSHP_showBuyCard(buy, win, 1);
+        } else {
+            buy->column = old;
+        }
+    }
+    STCRDSHP_turnBuyPage(buy, win);
+    if (PAD_PRESSED(PAD_CROSS)) {
+        initCardDrawer(&drawer);
+        buy->chosen = buy->stock->cards[buy->page * 6 + buy->column];
+        drawer.setCard(buy->chosen);
+        buy->price = STCRDSHP_funcs.getPrice(buy->chosen);
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+        if (GAME.money < buy->price) {
+            buy->substate = 10;
+            buy->step = 0x13;
+        } else if (GAME.cards[buy->chosen] == 9) {
+            buy->substate = 10;
+            buy->step = 0x14;
+        } else {
+            buy->substate = 5;
+        }
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        buy->substate = 50;
+    }
+}
+
+/* Once the total's panels have opened: shows the price with buy and no, and
+   the cursor */
+static inline void STCRDSHP_openBuyTotal(CardShopBuy *buy, CardShopBuyWindows *win) {
+    STCRDSHP_funcs.updateFade(&buy->fades[2]);
+    if (STCRDSHP_funcs.updateFade(&buy->fades[1])) {
+        win->message->setString(win->message, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0xC);
+        win->message->setNumber(win->message, 1, buy->price);
+        win->yes->setString(win->yes, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0xD);
+        win->no->setString(win->no, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0xE);
+        win->cursor->setPos(win->cursor, 0xB8, buy->choice * 0x10 + 0x56);
+        win->cursor->setVisible(win->cursor, 1);
+        buy->substate++;
+    }
+}
+
+/* Buy or no to the price: buy adds the card and pays for it; triangle declines */
+static inline void STCRDSHP_confirmBuyCard(CardShopBuy *buy, CardShopBuyWindows *win) {
+    s32 old;
+
+    old = buy->choice;
+    if (PAD_PRESSED(PAD_UP)) {
+        buy->choice = 0;
+    } else if (PAD_PRESSED(PAD_DOWN)) {
+        buy->choice = 1;
+    }
+    if (old != buy->choice) {
+        SOUND.playSound(SOUND_CURSOR);
+        win->cursor->setPos(win->cursor, 0xB8, buy->choice * 0x10 + 0x56);
+    }
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        if (buy->choice == 0) {
+            GAME.funcs.addCards(buy->chosen, 1);
+            GAME.money -= buy->price;
+            buy->shop->showMoney(buy->shop);
+        }
+        buy->substate++;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        buy->substate++;
+    }
+}
+
+/* Hides the total, its answers and the cursor, and closes the panel */
+static inline void STCRDSHP_closeBuyTotal(CardShopBuy *buy, CardShopBuyWindows *win) {
+    win->message->setVisible(win->message, 0);
+    win->yes->setVisible(win->yes, 0);
+    win->no->setVisible(win->no, 0);
+    win->cursor->setVisible(win->cursor, 0);
+    buy->choice = 0;
+    STCRDSHP_funcs.startFade(&buy->fades[1], 0);
+    buy->substate++;
+}
+
+/* Leaving: hides the cursor, the arrows' labels and the card, and closes its
+   panel */
+static inline void STCRDSHP_closeBuy(CardShopBuy *buy, CardShopBuyWindows *win) {
+    buy->cursorShown = 0;
+    win->prev->setVisible(win->prev, 0);
+    win->next->setVisible(win->next, 0);
+    STCRDSHP_showBuyCard(buy, win, 0);
+    STCRDSHP_funcs.startFade(&buy->fades[0], 0);
+    buy->substate++;
+}
+
 /* The states of the screen to buy cards: picking a card (left/right, L1/R1
    for the pages), the yes/no to buy it and the messages when the player
    can't */
 void STCRDSHP_runBuy(CardShopBuy *buy, CardShopBuyWindows *win) {
-    CardDrawer drawer;
-    s32 old;
-    s32 i;
-
-    if (win->grid->state != 1) {
+    if (win->grid->state != TASK_RUN) {
         return;
     }
     switch (buy->substate) {
@@ -203,93 +372,10 @@ void STCRDSHP_runBuy(CardShopBuy *buy, CardShopBuyWindows *win) {
         buy->substate++;
         break;
     case 1:
-        if (STCRDSHP_funcs.updateFade(&buy->fades[0])) {
-            buy->cursorShown = 1;
-            STCRDSHP_showBuyCard(buy, win, 1);
-            if (buy->pages >= 2) {
-                if (buy->page < buy->pages - 1) {
-                    win->windows[13]->setString(win->windows[13], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0xB);
-                } else {
-                    win->windows[13]->setVisible(win->windows[13], 0);
-                }
-            }
-            buy->substate++;
-        }
+        STCRDSHP_openBuyCard(buy, win);
         break;
     case 2:
-        old = buy->column;
-        if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-            buy->column--;
-            if (buy->column < 0) {
-                buy->column = 0;
-            }
-        } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-            buy->column++;
-            if (buy->column >= 6) {
-                buy->column = 5;
-            }
-        }
-        if (old != buy->column) {
-            if (buy->stock->cards[buy->page * 6 + buy->column] != 0) {
-                SOUND.playSound(SOUND_MENU_MOVE);
-                STCRDSHP_showBuyCard(buy, win, 1);
-            } else {
-                buy->column = old;
-            }
-        }
-        old = buy->page;
-        if (!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) {
-            buy->page--;
-            if (buy->page < 0) {
-                buy->page = 0;
-            }
-        } else if (!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) {
-            buy->page++;
-            if (buy->page > buy->pages - 1) {
-                buy->page = buy->pages - 1;
-            }
-        }
-        if (old != buy->page) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-            buy->cursorShown = 0;
-            buy->column = 0;
-            for (i = 0; i < 6; i++) {
-                buy->cards[i] = buy->stock->cards[buy->page * 6 + i];
-            }
-            win->grid->setCards(win->grid, buy->cards);
-            if (buy->pages >= 2) {
-                if (buy->page > 0) {
-                    win->windows[12]->setString(win->windows[12], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0xA);
-                } else {
-                    win->windows[12]->setVisible(win->windows[12], 0);
-                }
-                if (buy->page < buy->pages - 1) {
-                    win->windows[13]->setString(win->windows[13], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0xB);
-                } else {
-                    win->windows[13]->setVisible(win->windows[13], 0);
-                }
-            }
-            buy->substate = 1;
-        }
-        if (PAD_PRESSED(PAD_CROSS)) {
-            initCardDrawer(&drawer);
-            buy->chosen = buy->stock->cards[buy->page * 6 + buy->column];
-            drawer.setCard(buy->chosen);
-            buy->price = STCRDSHP_funcs.getPrice(buy->chosen);
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            if (GAME.money < buy->price) {
-                buy->substate = 10;
-                buy->step = 0x13;
-            } else if (GAME.cards[buy->chosen] == 9) {
-                buy->substate = 10;
-                buy->step = 0x14;
-            } else {
-                buy->substate = 5;
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            buy->substate = 50;
-        }
+        STCRDSHP_chooseBuyCard(buy, win);
         break;
     case 5:
         STCRDSHP_funcs.startFade(&buy->fades[1], 1);
@@ -297,49 +383,13 @@ void STCRDSHP_runBuy(CardShopBuy *buy, CardShopBuyWindows *win) {
         buy->substate++;
         break;
     case 6:
-        STCRDSHP_funcs.updateFade(&buy->fades[2]);
-        if (STCRDSHP_funcs.updateFade(&buy->fades[1])) {
-            win->windows[14]->setString(win->windows[14], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0xC);
-            win->windows[14]->setNumber(win->windows[14], 1, buy->price);
-            win->windows[15]->setString(win->windows[15], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0xD);
-            win->windows[16]->setString(win->windows[16], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0xE);
-            win->cursor->setPos(win->cursor, 0xB8, buy->choice * 0x10 + 0x56);
-            win->cursor->setVisible(win->cursor, 1);
-            buy->substate++;
-        }
+        STCRDSHP_openBuyTotal(buy, win);
         break;
     case 7:
-        old = buy->choice;
-        if (PAD_PRESSED(PAD_UP)) {
-            buy->choice = 0;
-        } else if (PAD_PRESSED(PAD_DOWN)) {
-            buy->choice = 1;
-        }
-        if (old != buy->choice) {
-            SOUND.playSound(SOUND_CURSOR);
-            win->cursor->setPos(win->cursor, 0xB8, buy->choice * 0x10 + 0x56);
-        }
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            if (buy->choice == 0) {
-                GAME.funcs.addCards(buy->chosen, 1);
-                GAME.money -= buy->price;
-                buy->shop->showMoney(buy->shop);
-            }
-            buy->substate++;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            buy->substate++;
-        }
+        STCRDSHP_confirmBuyCard(buy, win);
         break;
     case 8:
-        win->windows[14]->setVisible(win->windows[14], 0);
-        win->windows[15]->setVisible(win->windows[15], 0);
-        win->windows[16]->setVisible(win->windows[16], 0);
-        win->cursor->setVisible(win->cursor, 0);
-        buy->choice = 0;
-        STCRDSHP_funcs.startFade(&buy->fades[1], 0);
-        buy->substate++;
+        STCRDSHP_closeBuyTotal(buy, win);
         break;
     case 10:
         STCRDSHP_funcs.startFade(&buy->fades[1], 1);
@@ -348,14 +398,14 @@ void STCRDSHP_runBuy(CardShopBuy *buy, CardShopBuyWindows *win) {
         break;
     case 11:
         if (STCRDSHP_funcs.updateFade(&buy->fades[1])) {
-            win->windows[14]->setString(win->windows[14], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), buy->step);
+            win->message->setString(win->message, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), buy->step);
             buy->substate++;
         }
         break;
     case 12:
         if (PAD_PRESSED(PAD_CROSS) || PAD_PRESSED(PAD_TRIANGLE)) {
             SOUND.playSound(SOUND_MENU_CONFIRM);
-            win->windows[14]->setVisible(win->windows[14], 0);
+            win->message->setVisible(win->message, 0);
             STCRDSHP_funcs.startFade(&buy->fades[1], 0);
             buy->substate++;
         }
@@ -367,12 +417,7 @@ void STCRDSHP_runBuy(CardShopBuy *buy, CardShopBuyWindows *win) {
         }
         break;
     case 50:
-        buy->cursorShown = 0;
-        win->windows[12]->setVisible(win->windows[12], 0);
-        win->windows[13]->setVisible(win->windows[13], 0);
-        STCRDSHP_showBuyCard(buy, win, 0);
-        STCRDSHP_funcs.startFade(&buy->fades[0], 0);
-        buy->substate++;
+        STCRDSHP_closeBuy(buy, win);
         break;
     case 51:
         if (STCRDSHP_funcs.updateFade(&buy->fades[0])) {

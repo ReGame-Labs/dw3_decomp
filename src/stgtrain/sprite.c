@@ -15,7 +15,7 @@ void STGTRAIN_setSpriteBank(TrainSprite *sprite, TrainSpriteBank *bank, s32 offs
     sprite->bank = bank;
     sprite->bankOffset = offset;
     sprite->unk84 = bank->unk2;
-    sprite->unk86 = bank->unk4;
+    sprite->spriteCount = bank->spriteCount;
 }
 
 /* Starts an animation from its first frame */
@@ -89,6 +89,59 @@ void STGTRAIN_setSpritePaused(TrainSprite *sprite, s32 paused) {
     }
 }
 
+/* Fills in a part of the sprite as a sprite, and adds it to the sprite's
+   ordering table */
+static inline void STGTRAIN_addSpriteSprt(TrainSprite *sprite, SPRT *sprt, TrainSpritePart *part,
+                                          TrainAnimFrame *frame, s32 x, s32 y, u8 u, u8 v, u16 w, u16 h,
+                                          u16 clut) {
+    setSprt(sprt);
+    if ((s16)part->clut & 0x8000) {
+        setSemiTrans(sprt, 1);
+    }
+    setRGB0(sprt, 0x80, 0x80, 0x80);
+    sprt->x0 = x + (frame->x + sprite->x);
+    sprt->y0 = y + (frame->y + sprite->y);
+    sprt->u0 = u;
+    sprt->v0 = v;
+    sprt->w = w;
+    sprt->h = h;
+    sprt->clut = clut;
+    addPrim(sprite->ot, sprt);
+}
+
+/* Fills in a part of the sprite as a quad, scaled and rotated about the
+   pivot, and adds it to the sprite's ordering table */
+static inline void STGTRAIN_addSpriteQuad(TrainSprite *sprite, POLY_FT4 *ft4, TrainSpritePart *part,
+                                          TrainAnimFrame *frame, s32 x, s32 y, u8 u, u8 v, u16 w, u16 h,
+                                          u16 tpage, u16 clut) {
+    SVECTOR out;
+    SVECTOR in[4];
+    s32 k;
+
+    setPolyFT4(ft4);
+    if ((s16)part->clut & 0x8000) {
+        setSemiTrans(ft4, 1);
+    }
+    setRGB0(ft4, 0x80, 0x80, 0x80);
+    in[0].vx = in[2].vx = x + (frame->x + sprite->x) - sprite->pivotX;
+    in[1].vx = in[3].vx = in[0].vx + w;
+    in[0].vy = in[1].vy = y + (frame->y + sprite->y) - sprite->pivotY;
+    in[2].vy = in[3].vy = in[0].vy + h;
+    in[0].vz = in[1].vz = in[2].vz = in[3].vz = 0;
+    for (k = 0; k < 4; k++) {
+        ApplyMatrixSV(&sprite->matrix, &in[k], &out);
+        (&ft4->x0)[k * 4] = out.vx + sprite->pivotX;
+        (&ft4->y0)[k * 4] = out.vy + sprite->pivotY;
+    }
+    ft4->u0 = ft4->u2 = u;
+    ft4->u1 = ft4->u3 = w + u - 1;
+    ft4->v0 = ft4->v1 = v;
+    ft4->v2 = ft4->v3 = h + v - 1;
+    ft4->tpage = tpage;
+    ft4->clut = clut;
+    addPrim(sprite->ot, ft4);
+}
+
 /*
  * The animated sprite's update: state 1 advances the animation, unless it
  * is paused, and draws the frame's sprite, its parts from the last to the
@@ -96,8 +149,6 @@ void STGTRAIN_setSpritePaused(TrainSprite *sprite, s32 paused) {
  * The match depends on cur holding the animation before its frames.
  */
 void STGTRAIN_updateSprite(TrainSprite *sprite) {
-    SVECTOR out;
-    SVECTOR in[4];
     union {
         TrainAnim *anim;
         TrainAnimFrame *frame;
@@ -113,7 +164,6 @@ void STGTRAIN_updateSprite(TrainSprite *sprite) {
     s32 count;
     s32 i;
     s32 j;
-    s32 k;
     s32 state;
     u16 info;
     u16 w;
@@ -185,7 +235,7 @@ void STGTRAIN_updateSprite(TrainSprite *sprite) {
             }
         }
         sprite->layer = GFX.funcs.getLayer(sprite->layerId);
-        sprite->ot = (u_long *)sprite->layer->getOtEntry(sprite->layer, sprite->depth);
+        sprite->ot = sprite->layer->getOtEntry(sprite->layer, sprite->depth);
         prim.ptr = GFX.funcs.getPrim();
         n = *p.count++;
         for (i = 0; i < n; i++) {
@@ -213,43 +263,10 @@ void STGTRAIN_updateSprite(TrainSprite *sprite) {
                     prim.tpage++;
                     prevTpage = tpage;
                 }
-                setSprt(prim.sprt);
-                if ((s16)part->clut & 0x8000) {
-                    setSemiTrans(prim.sprt, 1);
-                }
-                setRGB0(prim.sprt, 0x80, 0x80, 0x80);
-                prim.sprt->x0 = x + (cur.frame->x + sprite->x);
-                prim.sprt->y0 = y + (cur.frame->y + sprite->y);
-                prim.sprt->u0 = u;
-                prim.sprt->v0 = v;
-                prim.sprt->w = w;
-                prim.sprt->h = h;
-                prim.sprt->clut = clut;
-                addPrim(sprite->ot, prim.ptr);
+                STGTRAIN_addSpriteSprt(sprite, prim.sprt, part, cur.frame, x, y, u, v, w, h, clut);
                 prim.sprt++;
             } else {
-                setPolyFT4(prim.ft4);
-                if ((s16)part->clut & 0x8000) {
-                    setSemiTrans(prim.ft4, 1);
-                }
-                setRGB0(prim.ft4, 0x80, 0x80, 0x80);
-                in[0].vx = in[2].vx = x + (cur.frame->x + sprite->x) - sprite->pivotX;
-                in[1].vx = in[3].vx = in[0].vx + w;
-                in[0].vy = in[1].vy = y + (cur.frame->y + sprite->y) - sprite->pivotY;
-                in[2].vy = in[3].vy = in[0].vy + h;
-                in[0].vz = in[1].vz = in[2].vz = in[3].vz = 0;
-                for (k = 0; k < 4; k++) {
-                    ApplyMatrixSV(&sprite->matrix, &in[k], &out);
-                    (&prim.ft4->x0)[k * 4] = out.vx + sprite->pivotX;
-                    (&prim.ft4->y0)[k * 4] = out.vy + sprite->pivotY;
-                }
-                prim.ft4->u0 = prim.ft4->u2 = u;
-                prim.ft4->u1 = prim.ft4->u3 = w + u - 1;
-                prim.ft4->v0 = prim.ft4->v1 = v;
-                prim.ft4->v2 = prim.ft4->v3 = h + v - 1;
-                prim.ft4->tpage = tpage;
-                prim.ft4->clut = clut;
-                addPrim(sprite->ot, prim.ptr);
+                STGTRAIN_addSpriteQuad(sprite, prim.ft4, part, cur.frame, x, y, u, v, w, h, tpage, clut);
                 prim.ft4++;
             }
         }

@@ -22,15 +22,14 @@
 /* The root task of the overlay (STGMCARD_start) */
 typedef struct MemCardScene {
     TASK_HEADER(MemCardScene);
-    /* 0x50 */ s32 unk50;
-    /* 0x54 */ s32 unk54;
+    /* 0x50 */ s32 pad[2]; /* never read or written */
 } MemCardScene;
 
 /* A mode (or stage) the screen can be opened from, and the area a save made
    from it shows (STGMCARD_prevModes, which ends with a zero mode) */
 typedef struct MemCardModeEntry {
     /* 0x0 */ u8 area; /* a string of TEXT_AREA_NAMES */
-    /* 0x1 */ u8 unk1; /* nothing reads it */
+    /* 0x1 */ u8 stage; /* a string of TEXT_STAGE_NAMES; nothing reads it */
     /* 0x2 */ s16 mode;
 } MemCardModeEntry;
 
@@ -42,8 +41,7 @@ typedef struct MemCardScreen {
     /* 0x54 */ s32 layer;
     /* 0x58 */ s32 bgScroll; /* the background's offset, 0 to 95 */
     /* 0x5C */ s32 bgScrolled; /* it moves every other frame */
-    /* 0x60 */ s32 unk60;
-    /* 0x64 */ s32 unk64;
+    /* 0x60 */ s32 pad[2]; /* never read or written */
     /* 0x68 */ s32 area; /* a string of TEXT_AREA_NAMES, from the previous mode */
     /* 0x6C */ s32 place; /* a string of TEXT_SHOP_NAMES (STGMCARD_places) */
 } MemCardScreen;
@@ -88,7 +86,6 @@ typedef struct MemCardSave {
     /* 0x30 */ s32 partners[3]; /* 3 and up: a partner, whose animation the
                                    details show */
     /* 0x3C */ s16 levels[3];
-    /* 0x42 */ s16 unk42;
 } MemCardSave;
 
 /* The memory card's info section: the three slots' saves, as the list shows
@@ -97,7 +94,6 @@ typedef struct MemCardFile {
     /* 0x00 */ u8 checksum; /* of the rest, from magic */
     /* 0x01 */ u8 last; /* the slot last saved to */
     /* 0x02 */ u8 version; /* MEMCARD_SAVE_VERSION */
-    /* 0x03 */ u8 unk3;
     /* 0x04 */ s32 magic; /* "DMW3" */
     /* 0x08 */ MemCardSave saves[3];
 } MemCardFile;
@@ -133,7 +129,7 @@ typedef struct GameSave {
 #define GAME_SAVE (*(GameSave *)&GAME)
 
 /* A save's data section (STGMCARD_funcs.dataBuf): copied whole to and from
-   GAME, read by its fields, and read, written and checked as bytes */
+   GAME, read by its fields, and checksummed as bytes */
 typedef union SaveData {
     GameSave save;
     GameState game;
@@ -168,7 +164,7 @@ typedef struct MemCardSaves {
     /* 0x0068 */ s32 result; /* of the last card operation, then the error
                                 (STGMCARD_errorTexts) */
     /* 0x006C */ MemCardFile file; /* the card's */
-    /* 0x0140 */ u8 unk140[GAME_SAVE_SIZE];
+    /* 0x0140 */ u8 pad[GAME_SAVE_SIZE]; /* never read or written */
     /* 0x27FC */ s32 choice; /* of a yes/no question, 0 for yes; 0x2804 in the
                                 European version, as all below */
     /* 0x2800 */ MenuLerp slide[2]; /* the list's x and y offsets */
@@ -232,8 +228,7 @@ typedef struct MemCardPanel {
     /* 0x70 */ CVECTOR bottom;
     /* 0x74 */ s32 duration;
     /* 0x78 */ s32 rate; /* ONE / duration */
-    /* 0x7C */ s32 unk7C;
-    /* 0x80 */ s32 unk80;
+    /* 0x7C */ s32 pad[2]; /* never read or written */
     /* 0x84 */ s32 pivotX;
     /* 0x88 */ s32 pivotY;
     /* 0x8C */ VECTOR scale;

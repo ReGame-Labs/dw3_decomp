@@ -27,7 +27,7 @@ typedef struct FieldMenuScreen {
     /* 0x50 */ s32 layer;
     /* 0x54 */ s32 blinkPos;
     /* 0x58 */ s32 blinkSkip;
-    /* 0x5C */ s32 unk5C;
+    /* 0x5C */ s32 pad; /* never read or written */
     /* 0x60 */ s32 lateGame; /* STSTATUS_area.isLateGame() */
     /* 0x64 */ s32 bgFile;
     /* 0x68 */ s32 bgFile2;
@@ -74,11 +74,11 @@ typedef struct ItemScreen {
     /* 0x060 */ s32 frames[3]; /* of the partners' portraits */
     /* 0x06C */ s32 frameTime;
     /* 0x070 */ s32 option;
-    /* 0x074 */ u8 unk74[4];
+    /* 0x074 */ u8 pad74[4]; /* never read or written */
     /* 0x078 */ s32 item; /* the chosen one */
     /* 0x07C */ s32 itemIndex;
     /* 0x080 */ s32 itemShown;
-    /* 0x084 */ u16 items[0x194]; /* of the chosen option's list */
+    /* 0x084 */ s16 items[0x194]; /* of the chosen option's list */
     /* 0x3AC */ s32 itemCount;
     /* 0x3B0 */ s32 member; /* the one an item is used on */
     /* 0x3B4 */ s32 cursorShown;
@@ -91,7 +91,7 @@ typedef struct ItemScreen {
     /* 0x3FC */ PanelAnim fades[2];
     /* 0x41C */ PanelAnim fades2[2];
     /* 0x43C */ PanelAnim fade;
-    /* 0x44C */ u8 unk44C[0x45C - 0x44C];
+    /* 0x44C */ u8 pad44C[0x45C - 0x44C]; /* never read or written */
 } ItemScreen;
 
 typedef struct ItemScreenWindows {
@@ -230,7 +230,7 @@ typedef struct EquipPanelWindows {
     /* 0x90 */ TextWindow *slotTitle;
     /* 0x94 */ TextWindow *slotItem;
     /* 0x98 */ ScrollBar *scrollBar; /* for more than 8 items */
-    /* 0x9C */ u8 unk9C[0xA4 - 0x9C];
+    /* 0x9C */ u8 pad[0xA4 - 0x9C]; /* never read or written */
 } EquipPanelWindows;
 
 /* A list of the first screen (STSTATUS_createItemList) */
@@ -252,7 +252,7 @@ typedef struct ItemList {
     /* 0x6CC */ s32 pageCount;
     /* 0x6D0 */ s32 hasPrev; /* pages before and after this one */
     /* 0x6D4 */ s32 hasNext;
-    /* 0x6D8 */ u8 unk6D8[4];
+    /* 0x6D8 */ u8 pad[4]; /* never read or written */
     /* 0x6DC */ PanelAnim fades[3];
 } ItemList;
 
@@ -265,7 +265,7 @@ typedef struct ItemListWindows {
     /* 0x50 */ TextWindow *prev; /* arrows */
     /* 0x54 */ TextWindow *next;
     /* 0x58 */ Cursor *cursor;
-    /* 0x5C */ u8 unk5C[0x6C - 0x5C];
+    /* 0x5C */ u8 pad[0x6C - 0x5C]; /* never read or written */
 } ItemListWindows;
 
 /* The screens' helpers (STSTATUS_data.funcs) */
@@ -277,7 +277,7 @@ typedef struct StatusFuncs {
     /* 0x10 */ void (*startLerp)(MenuLerp *lerp, s32 from, s32 to, s32 frames);
     /* 0x14 */ s32 (*updateLerp)(MenuLerp *lerp);
     /* 0x18 */ s32 *(*getList)(s32 list, s32 index);
-    /* 0x1C */ s32 (*listItems)(s32 list, u16 *out); /* 6, 7: special lists; returns the count */
+    /* 0x1C */ s32 (*listItems)(s32 list, s16 *out); /* 6, 7: special lists; returns the count */
     /* 0x20 */ s32 (*canEquip)(s32 partner, s32 slot, s32 item);
     /* 0x24 */ void (*equip)(s32 partner, s32 slot, s32 item);
 } StatusFuncs;
@@ -312,9 +312,9 @@ typedef struct StatusMapScreen {
 #if VERSION_US
     /* 0x064 */ s32 hoverY;
 #endif
-    /* 0x064 */ u8 unk64[4];
+    /* 0x064 */ u8 pad64[4]; /* never read or written */
     /* 0x068 */ s32 file; /* FILE_STATUS_BG or the next one but one */
-    /* 0x06C */ u8 unk6C[0x78 - 0x6C];
+    /* 0x06C */ u8 pad6C[0x78 - 0x6C]; /* never read or written */
     /* 0x078 */ s32 lateGame;
     /* 0x07C */ s32 progress; /* which towns are drawn */
     /* 0x080 */ s32 archive; /* entries of file: the map */
@@ -326,7 +326,7 @@ typedef struct StatusMapScreen {
     /* 0x098 */ s32 homeX; /* the current area's mark */
     /* 0x09C */ s32 homeY;
     /* 0x0A0 */ s32 homeFrame;
-    /* 0x0A4 */ u8 unkA4[4];
+    /* 0x0A4 */ u8 padA4[4]; /* never read or written */
     /* 0x0A8 */ s32 visited[47]; /* the areas, spot i at i - 1 */
     /* 0x164 */ s32 cursorX;
     /* 0x168 */ s32 cursorY;
@@ -588,9 +588,9 @@ s32 STSTATUS_updateLerp(MenuLerp *lerp);
 
 /* helpers.c */
 s32 *STSTATUS_getTowns(s32 list, s32 index);
-s32 STSTATUS_listItems(s32 list, u16 *out);
-s32 STSTATUS_listEquipItems(u16 *out);
-s32 STSTATUS_listItemsOfKind(s32 kind, u16 *out);
+s32 STSTATUS_listItems(s32 list, s16 *out);
+s32 STSTATUS_listEquipItems(s16 *out);
+s32 STSTATUS_listItemsOfKind(s32 kind, s16 *out);
 s32 STSTATUS_canEquip(s32 partner, s32 slot, s32 item);
 void STSTATUS_equip(s32 partner, s32 slot, s32 item);
 s32 STSTATUS_isLateGame(void);

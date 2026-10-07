@@ -94,7 +94,7 @@ void STGMCARD_updatePanel(MemCardPanel *panel) {
             break;
         }
         layer = GFX.funcs.getLayer(panel->layer);
-        ot = (u_long *)layer->getOtEntry(layer, panel->depth);
+        ot = layer->getOtEntry(layer, panel->depth);
         RotMatrixYXZ_gte(&panel->rot, &panel->matrix);
         ScaleMatrix(&panel->matrix, &panel->scale);
         poly = GFX.funcs.getPrim();

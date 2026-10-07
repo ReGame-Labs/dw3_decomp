@@ -20,8 +20,8 @@ PanelTween CNTY_SEL_rightPanelTweens[] = {
     {5, 0, 0x1000},
 };
 LeftPanelTween CNTY_SEL_leftPanelTweens[] = {
-    {10, 0x1000, 0, 0},
-    {5, 0, 0x1000, 0},
+    {10, 0x1000, 0},
+    {5, 0, 0x1000},
 };
 
 #if VERSION_EU
@@ -103,7 +103,7 @@ s32 CNTY_SEL_getFadeLevel(s32 time) {
 /* Darkens the whole screen by level (0 to 255, 255 is black) */
 void CNTY_SEL_drawFade(s32 level) {
     Layer *layer = GFX.funcs.getLayer(CNTY_SEL_LAYER);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, 0);
+    u_long *ot = layer->getOtEntry(layer, 0);
     POLY_F4 *poly = GFX.funcs.getPrim();
     DR_TPAGE *mode;
 
@@ -118,6 +118,7 @@ void CNTY_SEL_drawFade(s32 level) {
     poly->y1 = CNTY_SEL_fadeRect.y;
     poly->y2 = CNTY_SEL_fadeRect.y + CNTY_SEL_fadeRect.h;
     poly->y3 = CNTY_SEL_fadeRect.y + CNTY_SEL_fadeRect.h;
+    /* the texture page packet goes right after the polygon */
     mode = (DR_TPAGE *)(poly + 1);
     addPrim(ot, poly);
     /* Blending mode 2: subtract the polygon's color from the screen */
@@ -459,6 +460,47 @@ PanelTask *CNTY_SEL_startLeftPanelTask(void) {
     return createTask(CNTY_SEL_tickLeftPanel, sizeof(PanelTask), 0);
 }
 
+/* Moves the highlighted option with the pad */
+static inline void moveSelection(MenuTask *task) {
+    /* Options 0-4 are a column moved through with Up and Down. Options 5
+       and 6 are a second one reached with step 1, which nothing sets */
+    switch (task->step) {
+    case 0:
+    default:
+        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+            if (task->selection > 0) {
+                SOUND.playSound(SOUND_MENU_MOVE);
+                task->selection--;
+            }
+        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+            if (task->selection < 4) {
+                SOUND.playSound(SOUND_MENU_MOVE);
+                task->selection++;
+            }
+        } else if (PAD_PRESSED(PAD_LEFT)) {
+            /* Left does nothing in this column */
+        }
+        break;
+    case 1:
+        if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
+            if (task->selection != 6) {
+                SOUND.playSound(SOUND_MENU_MOVE);
+            }
+            task->selection = 6;
+        } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
+            if (task->selection == 6) {
+                SOUND.playSound(SOUND_MENU_MOVE);
+                task->selection = 5;
+            } else {
+                task->selection = 1;
+                SOUND.playSound(SOUND_MENU_MOVE);
+                task->setStep(task, 0);
+            }
+        }
+        break;
+    }
+}
+
 /* The screen's controller: opens the panels one after the other and lets the player
    pick an option with Up and Down until Start, which in the European version sets
    LANGUAGE; then flashes it, closes the panels, fades out and moves on to the next mode */
@@ -521,43 +563,7 @@ void CNTY_SEL_tickMenu(MenuTask *task, MenuChildren *children) {
                 LANGUAGE = CNTY_SEL_languages[task->selection];
 #endif
             } else {
-                /* Options 0-4 are a column moved through with Up and Down. Options 5
-                   and 6 are a second one reached with step 1, which nothing sets */
-                switch (task->step) {
-                case 0:
-                default:
-                    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-                        if (task->selection > 0) {
-                            SOUND.playSound(SOUND_MENU_MOVE);
-                            task->selection--;
-                        }
-                    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-                        if (task->selection < 4) {
-                            SOUND.playSound(SOUND_MENU_MOVE);
-                            task->selection++;
-                        }
-                    } else if (PAD_PRESSED(PAD_LEFT)) {
-                        /* Left does nothing in this column */
-                    }
-                    break;
-                case 1:
-                    if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-                        if (task->selection != 6) {
-                            SOUND.playSound(SOUND_MENU_MOVE);
-                        }
-                        task->selection = 6;
-                    } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-                        if (task->selection == 6) {
-                            SOUND.playSound(SOUND_MENU_MOVE);
-                            task->selection = 5;
-                        } else {
-                            task->selection = 1;
-                            SOUND.playSound(SOUND_MENU_MOVE);
-                            task->setStep(task, 0);
-                        }
-                    }
-                    break;
-                }
+                moveSelection(task);
             }
             children->cursor->setSelection(children->cursor, task->selection);
             break;

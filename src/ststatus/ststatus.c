@@ -183,106 +183,224 @@ void STSTATUS_drawCardScreen(PartyScreen *screen) {
     }
 }
 
+/* Starts the fade of the first page (and, with one party member, of the
+   panels); the next substate is the party's size */
+static inline void STSTATUS_startCardScreen(PartyScreen *screen) {
+    STSTATUS_data.funcs.startFade(&screen->pageFades[0], 1);
+    if (screen->count == 1) {
+        STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
+        STSTATUS_data.funcs.startFade(&screen->fade, 1);
+    }
+    screen->substate = screen->count;
+}
+
+/* One member: once the page and the panels are in, shows the page, the help,
+   the hint and the options */
+static inline void STSTATUS_openCardScreenAlone(PartyScreen *screen, PartyScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    STSTATUS_data.funcs.updateFade(&screen->fade);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_showCardPage(screen, windows, 0, 1);
+        windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x4C);
+        windows->hint->setString(windows->hint, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
+        STSTATUS_showCardChoices(screen, windows, 1);
+        screen->substate = 10;
+    }
+}
+
+/* Two members: once the first page is in, shows it and starts the second
+   page and the help's panel */
+static inline void STSTATUS_openFirstOfTwoCardPages(PartyScreen *screen, PartyScreenWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&screen->pageFades[0])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
+        STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
+        STSTATUS_showCardPage(screen, windows, 0, 1);
+        screen->substate = 4;
+    }
+}
+
+/* Two members: once the second page and the panels are in, shows the page,
+   the help, the hint and the options */
+static inline void STSTATUS_openSecondOfTwoCardPages(PartyScreen *screen, PartyScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
+    STSTATUS_data.funcs.updateFade(&screen->fade);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_showCardPage(screen, windows, 1, 1);
+        windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x4C);
+        windows->hint->setString(windows->hint, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
+        STSTATUS_showCardChoices(screen, windows, 1);
+        screen->substate = 10;
+    }
+}
+
+/* Three members: once the first page is in, shows it and starts the second */
+static inline void STSTATUS_openFirstOfThreeCardPages(PartyScreen *screen, PartyScreenWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&screen->pageFades[0])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
+        STSTATUS_showCardPage(screen, windows, 0, 1);
+        screen->substate = 5;
+    }
+}
+
+/* Three members: once the second page is in, shows it and starts the third
+   and the help's panel */
+static inline void STSTATUS_openSecondOfThreeCardPages(PartyScreen *screen, PartyScreenWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[2], 1);
+        STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
+        STSTATUS_showCardPage(screen, windows, 1, 1);
+        screen->substate++;
+    }
+}
+
+/* Three members: once the third page and the panels are in, shows the page,
+   the help, the hint and the options */
+static inline void STSTATUS_openThirdCardPage(PartyScreen *screen, PartyScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
+    STSTATUS_data.funcs.updateFade(&screen->fade);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_showCardPage(screen, windows, 2, 1);
+        windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x4C);
+        windows->hint->setString(windows->hint, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
+        STSTATUS_showCardChoices(screen, windows, 1);
+        screen->substate = 10;
+    }
+}
+
+/* Choosing an option: up and down move the cursor, cross picks the card
+   album or the deck editor and fades the screen out, triangle closes it */
+static inline void STSTATUS_chooseCardOption(PartyScreen *screen, PartyScreenWindows *windows) {
+    s32 choice;
+
+    choice = screen->choice;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        screen->choice = 0;
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        screen->choice = 1;
+    }
+    if (choice != screen->choice) {
+        SOUND.playSound(SOUND_CURSOR);
+        windows->cursor->setPos(windows->cursor, 0xB8, screen->choice * 14 + 0x3A);
+    }
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        screen->setSubstate(screen, 100);
+        if (screen->choice == 0) {
+            screen->step = 1;
+        } else {
+            screen->step = 2;
+        }
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        screen->setSubstate(screen, 0x32);
+    }
+}
+
+/* Creates the fader that hides the screen */
+static inline void STSTATUS_createCardFader(PartyScreen *screen, PartyScreenWindows *windows) {
+    if (windows->fader == NULL) {
+        windows->fader = STSTATUS_createFader();
+    }
+    screen->substate++;
+}
+
+/* Starts closing the screen: the last page, the panels, the help, the hint
+   and the options */
+static inline void STSTATUS_closeCardScreen(PartyScreen *screen, PartyScreenWindows *windows) {
+    STSTATUS_data.funcs.startFade(&screen->pageFades[screen->count - 1], 0);
+    STSTATUS_showCardPage(screen, windows, screen->count - 1, 0);
+    STSTATUS_data.funcs.startFade(&screen->fades[1], 0);
+    windows->help->setVisible(windows->help, 0);
+    windows->hint->setVisible(windows->hint, 0);
+    STSTATUS_data.funcs.startFade(&screen->fade, 0);
+    STSTATUS_showCardChoices(screen, windows, 0);
+    screen->substate = screen->count + 0x32;
+}
+
+/* One member: once the page and the panels are closed, goes on to the end */
+static inline void STSTATUS_closeCardScreenAlone(PartyScreen *screen) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    STSTATUS_data.funcs.updateFade(&screen->fade);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        screen->substate = 0x39;
+    }
+}
+
+/* Two members: once the second page and the panels are closed, starts
+   closing the first */
+static inline void STSTATUS_closeSecondOfTwoCardPages(PartyScreen *screen, PartyScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
+    STSTATUS_data.funcs.updateFade(&screen->fade);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
+        STSTATUS_showCardPage(screen, windows, 0, 0);
+        screen->substate = 0x36;
+    }
+}
+
+/* Three members: once the third page and the panels are closed, starts
+   closing the second */
+static inline void STSTATUS_closeThirdCardPage(PartyScreen *screen, PartyScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
+    STSTATUS_data.funcs.updateFade(&screen->fade);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[1], 0);
+        STSTATUS_showCardPage(screen, windows, 1, 0);
+        screen->substate = 0x37;
+    }
+}
+
+/* Three members: once the second page is closed, starts closing the first */
+static inline void STSTATUS_closeSecondOfThreeCardPages(PartyScreen *screen, PartyScreenWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
+        STSTATUS_showCardPage(screen, windows, 0, 0);
+        screen->substate++;
+    }
+}
+
+/* The end: goes to the chosen card album or deck editor, or ends the screen */
+static inline void STSTATUS_endCardScreen(PartyScreen *screen) {
+    if (screen->step == 1) {
+        GAME.funcs.requestMode(MODE_CARD_ALBUM, 0);
+    } else if (screen->step == 2) {
+        GAME.funcs.requestMode(MODE_DECK_EDITOR, 0);
+    } else {
+        screen->state = 3;
+    }
+}
+
 /* Runs the screen: the pages come in one after the other, the cursor picks
    one of the two options, and the pages go out in reverse */
 void STSTATUS_runCardScreen(PartyScreen *screen, PartyScreenWindows *windows) {
-    s32 choice;
-
     switch (screen->substate) {
     case 0:
     default:
-        STSTATUS_data.funcs.startFade(&screen->pageFades[0], 1);
-        if (screen->count == 1) {
-            STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
-            STSTATUS_data.funcs.startFade(&screen->fade, 1);
-        }
-        screen->substate = screen->count;
+        STSTATUS_startCardScreen(screen);
         break;
     case 1:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        STSTATUS_data.funcs.updateFade(&screen->fade);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_showCardPage(screen, windows, 0, 1);
-            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x4C);
-            windows->hint->setString(windows->hint, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
-            STSTATUS_showCardChoices(screen, windows, 1);
-            screen->substate = 10;
-        }
+        STSTATUS_openCardScreenAlone(screen, windows);
         break;
     case 2:
-        if (STSTATUS_data.funcs.updateFade(&screen->pageFades[0])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
-            STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
-            STSTATUS_showCardPage(screen, windows, 0, 1);
-            screen->substate = 4;
-        }
+        STSTATUS_openFirstOfTwoCardPages(screen, windows);
         break;
     case 4:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
-        STSTATUS_data.funcs.updateFade(&screen->fade);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_showCardPage(screen, windows, 1, 1);
-            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x4C);
-            windows->hint->setString(windows->hint, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
-            STSTATUS_showCardChoices(screen, windows, 1);
-            screen->substate = 10;
-        }
+        STSTATUS_openSecondOfTwoCardPages(screen, windows);
         break;
     case 3:
-        if (STSTATUS_data.funcs.updateFade(&screen->pageFades[0])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
-            STSTATUS_showCardPage(screen, windows, 0, 1);
-            screen->substate = 5;
-        }
+        STSTATUS_openFirstOfThreeCardPages(screen, windows);
         break;
     case 5:
-        if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[2], 1);
-            STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
-            STSTATUS_showCardPage(screen, windows, 1, 1);
-            screen->substate++;
-        }
+        STSTATUS_openSecondOfThreeCardPages(screen, windows);
         break;
     case 6:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
-        STSTATUS_data.funcs.updateFade(&screen->fade);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_showCardPage(screen, windows, 2, 1);
-            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x4C);
-            windows->hint->setString(windows->hint, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
-            STSTATUS_showCardChoices(screen, windows, 1);
-            screen->substate = 10;
-        }
+        STSTATUS_openThirdCardPage(screen, windows);
         break;
     case 10:
-        choice = screen->choice;
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            screen->choice = 0;
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            screen->choice = 1;
-        }
-        if (choice != screen->choice) {
-            SOUND.playSound(SOUND_CURSOR);
-            windows->cursor->setPos(windows->cursor, 0xB8, screen->choice * 14 + 0x3A);
-        }
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            screen->setSubstate(screen, 100);
-            if (screen->choice == 0) {
-                screen->step = 1;
-            } else {
-                screen->step = 2;
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            screen->setSubstate(screen, 0x32);
-        }
+        STSTATUS_chooseCardOption(screen, windows);
         break;
     case 100:
-        if (windows->fader == NULL) {
-            windows->fader = STSTATUS_createFader();
-        }
-        screen->substate++;
+        STSTATUS_createCardFader(screen, windows);
         break;
     case 101:
         windows->fader->start(windows->fader, 0, 10);
@@ -294,46 +412,19 @@ void STSTATUS_runCardScreen(PartyScreen *screen, PartyScreenWindows *windows) {
         }
         break;
     case 0x32:
-        STSTATUS_data.funcs.startFade(&screen->pageFades[screen->count - 1], 0);
-        STSTATUS_showCardPage(screen, windows, screen->count - 1, 0);
-        STSTATUS_data.funcs.startFade(&screen->fades[1], 0);
-        windows->help->setVisible(windows->help, 0);
-        windows->hint->setVisible(windows->hint, 0);
-        STSTATUS_data.funcs.startFade(&screen->fade, 0);
-        STSTATUS_showCardChoices(screen, windows, 0);
-        screen->substate = screen->count + 0x32;
+        STSTATUS_closeCardScreen(screen, windows);
         break;
     case 0x33:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        STSTATUS_data.funcs.updateFade(&screen->fade);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            screen->substate = 0x39;
-        }
+        STSTATUS_closeCardScreenAlone(screen);
         break;
     case 0x34:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
-        STSTATUS_data.funcs.updateFade(&screen->fade);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
-            STSTATUS_showCardPage(screen, windows, 0, 0);
-            screen->substate = 0x36;
-        }
+        STSTATUS_closeSecondOfTwoCardPages(screen, windows);
         break;
     case 0x35:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
-        STSTATUS_data.funcs.updateFade(&screen->fade);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[1], 0);
-            STSTATUS_showCardPage(screen, windows, 1, 0);
-            screen->substate = 0x37;
-        }
+        STSTATUS_closeThirdCardPage(screen, windows);
         break;
     case 0x37:
-        if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
-            STSTATUS_showCardPage(screen, windows, 0, 0);
-            screen->substate++;
-        }
+        STSTATUS_closeSecondOfThreeCardPages(screen, windows);
         break;
     case 0x36:
     case 0x38:
@@ -342,13 +433,7 @@ void STSTATUS_runCardScreen(PartyScreen *screen, PartyScreenWindows *windows) {
         }
         break;
     case 0x39:
-        if (screen->step == 1) {
-            GAME.funcs.requestMode(MODE_CARD_ALBUM, 0);
-        } else if (screen->step == 2) {
-            GAME.funcs.requestMode(MODE_DECK_EDITOR, 0);
-        } else {
-            screen->state = 3;
-        }
+        STSTATUS_endCardScreen(screen);
         break;
     }
 }
@@ -408,6 +493,6 @@ Task *STSTATUS_createCardScreen(FieldMenuScreen *menu, s32 extra) {
 /* The stats a party member's page shows, in PartnerTotals.stats (as
    STSTATUS_pageStats2, 4, 0, 8 and 9 on the other screens) */
 s32 STSTATUS_pageStats[] = {
-    0, 2, 3, 4,
-    5,
+    STAT_LEVEL, STAT_HP, STAT_MAX_HP, STAT_MP,
+    STAT_MAX_MP,
 };

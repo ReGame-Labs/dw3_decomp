@@ -338,6 +338,242 @@ static inline s16 getResistance(PartnerTotals *totals, s32 stat) {
 }
 #endif
 
+/* Takes the result of a try: plays its sound and applies it, then plays the
+   next try, or, after the last, asks for the bonus try (three good tries) or
+   ends the training (substate 3) */
+static inline void STGTRAIN_takeTry(TrainResult *result, TrainResultWindows *win) {
+    result->trained[result->step] = win->actor->getResult(win->actor);
+    if (result->trained[result->step] != -1) {
+        if (result->trained[result->step] != 0) {
+            SOUND.playSound(0x840001);
+        } else {
+            SOUND.playSound(0x840000);
+        }
+        STGTRAIN_applyTry(result, result->step);
+        result->step++;
+        if (result->counter < result->step) {
+            if (result->counter == 2) {
+                if (result->trained[0] != 0 && result->trained[1] != 0 && result->trained[2] != 0) {
+                    result->substate = 0xA;
+                    return;
+                }
+                if (result->training >= 0xD) {
+                    result->counter = 4;
+                    win->actor->play(win->actor);
+                    return;
+                }
+            }
+            result->setSubstate(result, 3);
+        } else {
+            win->actor->play(win->actor);
+        }
+    }
+}
+
+/* Once cross is pressed, shows what the training gave: the stat's gain, and
+   the other stat's loss or gain, in the message, and the stats before and
+   after */
+static inline void STGTRAIN_showGains(TrainResult *result, TrainResultWindows *win) {
+    TrainEntry *entry;
+    s32 sums[2];
+#if VERSION_EU
+    s32 shown[2]; /* the sums, up to the stats' limits */
+    s16 other;
+#endif
+    s32 i;
+
+    if (!PAD_PRESSED(PAD_CROSS)) {
+        return;
+    }
+    SOUND.playSound(SOUND_MENU_CONFIRM);
+    result->prompting = 0;
+    entry = STGTRAIN_state.findTableEntry(result->modeArg, result->training);
+    if (entry->stat != 0) {
+        sums[0] = 0;
+        for (i = 0; i < 5; i++) {
+            sums[0] += result->gains[i];
+        }
+        if ((u16)entry->stat - 8 < 7u) {
+            if (entry->other != 0) {
+                sums[1] = 0;
+                for (i = 0; i < 5; i++) {
+                    sums[1] += result->losses[i];
+                }
+            }
+        } else {
+            sums[1] = 0;
+        }
+    }
+    if (sums[0] == 0 && sums[1] == 0) {
+        win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), 0x71);
+    } else {
+#if VERSION_EU
+        for (i = 0; i < 2; i++) {
+            shown[i] = sums[i];
+        }
+        if (sums[0] != 0) {
+            if ((u16)entry->stat - 1 < 5u) {
+                if (getStat(&result->before, entry->stat) + sums[0] >= 1000) {
+                    shown[0] = 999 - getStat(&result->before, entry->stat);
+                } else {
+                    shown[0] = sums[0];
+                }
+            } else {
+                if (getResistance(&result->before, entry->stat) + sums[0] >= 1000) {
+                    shown[0] = 999 - getResistance(&result->before, entry->stat);
+                } else {
+                    shown[0] = sums[0];
+                }
+            }
+        }
+        if (sums[1] != 0) {
+            other = entry->other;
+            if ((u16)other - 1 < 5u) {
+                if (getStat(&result->before, other) - sums[1] < 0) {
+                    shown[1] = getStat(&result->before, other);
+                } else {
+                    shown[1] = sums[1];
+                }
+            } else if ((u16)(other - 8) < 7) {
+                if (getResistance(&result->before, other) + sums[1] >= 1000) {
+                    shown[1] = 999 - getResistance(&result->before, other);
+                } else {
+                    shown[1] = sums[1];
+                }
+            } else if (other == 15) {
+                if (result->before.fields.maxHp + sums[1] >= 10000) {
+                    shown[1] = 9999 - result->before.fields.maxHp;
+                } else {
+                    shown[1] = sums[1];
+                }
+            } else if (other == 16) {
+                if (result->before.fields.maxMp + sums[1] >= 10000) {
+                    shown[1] = 9999 - result->before.fields.maxMp;
+                } else {
+                    shown[1] = sums[1];
+                }
+            }
+        }
+#endif
+        if ((u16)entry->stat - 1 < 5u) {
+            win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), entry->stat + 0x5D);
+#if VERSION_US
+            win->message[0]->setNumber(win->message[0], 1, sums[0]);
+#elif VERSION_EU
+            win->message[0]->setNumber(win->message[0], 1, shown[0]);
+#endif
+        } else if (sums[1] != 0) {
+            win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), entry->stat + 0x62);
+#if VERSION_US
+            win->message[0]->setNumber(win->message[0], 1, sums[0]);
+#elif VERSION_EU
+            win->message[0]->setNumber(win->message[0], 1, shown[0]);
+#endif
+#if VERSION_US
+            win->message[0]->setNumber(win->message[0], 2, sums[1]);
+#elif VERSION_EU
+            win->message[0]->setNumber(win->message[0], 2, shown[1]);
+#endif
+        } else {
+            win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), entry->stat + 0x5B);
+#if VERSION_US
+            win->message[0]->setNumber(win->message[0], 1, sums[0]);
+#elif VERSION_EU
+            win->message[0]->setNumber(win->message[0], 1, shown[0]);
+#endif
+        }
+    }
+    win->message[0]->setPalette(win->message[0], PALETTE_WHITE);
+    win->message[0]->setTypeDelay(win->message[0], 6);
+    win->message[1]->setVisible(win->message[1], 0);
+    result->substate++;
+    result->screen->showStats(result->screen, &result->before);
+}
+
+/* Moves the cursor between yes and no of the bonus try's question, and
+   takes the answer (triangle: no) */
+static inline void STGTRAIN_askBonusTry(TrainResult *result, TrainResultWindows *win) {
+    s32 last;
+
+    last = result->before.fields.spare;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        result->before.fields.spare = 0;
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        result->before.fields.spare = 1;
+    }
+    if (last != result->before.fields.spare) {
+        SOUND.playSound(SOUND_CURSOR);
+        win->cursor->setPos(win->cursor, 0x94, result->before.fields.spare * 16 + 0x91);
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        if (result->before.fields.spare == 0) {
+            result->counter = 0;
+            result->substate++;
+        } else {
+            result->counter = 4;
+            result->substate++;
+        }
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        result->counter = 4;
+        result->substate++;
+    }
+}
+
+/* Once the question's panels close: yes makes the bonus try with its sound
+   (a sure fail when the training is the partner's last bonus one, else a
+   50% chance), no plays the other tries */
+static inline void STGTRAIN_startBonusTry(TrainResult *result, TrainResultWindows *win) {
+    PartnerStats *stats;
+
+    STGTRAIN_state.updateFade(&result->panels[2]);
+    if (STGTRAIN_state.updateFade(&result->panels[3])) {
+        if (result->counter == 0) {
+            result->substate = 0x14;
+            result->bonusTrying = 1;
+            win->actor->play(win->actor);
+            result->bonusSound = SOUND.playSound(0xA084603C);
+            stats = GAME.funcs.getPartnerStats(result->partner);
+            if (stats->lastBonus != 0 && stats->lastBonus == result->training) {
+                win->actor->setChance(win->actor, 0);
+            } else {
+                stats->lastBonus = 0;
+                win->actor->setChance(win->actor, 0x32);
+            }
+        } else {
+            win->actor->play(win->actor);
+            result->substate = 2;
+        }
+    }
+}
+
+/* Takes the result of the bonus try: a good one makes the training the
+   partner's last bonus one and the gains take their better columns */
+static inline void STGTRAIN_takeBonusTry(TrainResult *result, TrainResultWindows *win) {
+    PartnerStats *stats;
+
+    result->trained[3] = win->actor->getResult(win->actor);
+    if (result->trained[3] != -1) {
+        stats = GAME.funcs.getPartnerStats(result->partner);
+        if (result->trained[3] != 0) {
+            stats->lastBonus = result->training;
+            result->bonusWorked = 1;
+        } else {
+            stats->lastBonus = 0;
+        }
+        if (result->trained[3] != 0) {
+            SOUND.playSound(0x840001);
+        } else {
+            SOUND.playSound(0x840000);
+        }
+        SOUND.keyOff(0xA084603C, result->bonusSound);
+        STGTRAIN_applyTry(result, 3);
+        result->prompting = 1;
+        result->bonusTrying = 0;
+        result->setSubstate(result, 3);
+    }
+}
+
 /*
  * Runs a training: the partner tries it three times (five at the gyms'
  * second half), then shows what it gained. Three good tries in a row give
@@ -345,16 +581,6 @@ static inline s16 getResistance(PartnerTotals *totals, s32 stat) {
  * the gyms' first half.
  */
 void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
-    TrainEntry *entry;
-    PartnerStats *stats;
-    s32 sums[2];
-#if VERSION_EU
-    s32 shown[2]; /* the sums, up to the stats' limits */
-    s16 other;
-#endif
-    s32 i;
-    s32 last;
-
     switch (result->substate) {
     case 0:
     default:
@@ -373,32 +599,7 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
         }
         break;
     case 2:
-        result->trained[result->step] = win->actor->getResult(win->actor);
-        if (result->trained[result->step] != -1) {
-            if (result->trained[result->step] != 0) {
-                SOUND.playSound(0x840001);
-            } else {
-                SOUND.playSound(0x840000);
-            }
-            STGTRAIN_applyTry(result, result->step);
-            result->step++;
-            if (result->counter < result->step) {
-                if (result->counter == 2) {
-                    if (result->trained[0] != 0 && result->trained[1] != 0 && result->trained[2] != 0) {
-                        result->substate = 0xA;
-                        break;
-                    }
-                    if (result->training >= 0xD) {
-                        result->counter = 4;
-                        win->actor->play(win->actor);
-                        break;
-                    }
-                }
-                result->setSubstate(result, 3);
-            } else {
-                win->actor->play(win->actor);
-            }
-        }
+        STGTRAIN_takeTry(result, win);
         break;
     case 3:
         win->actor->end(win->actor);
@@ -411,111 +612,7 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
         }
         break;
     case 5:
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            result->prompting = 0;
-            entry = STGTRAIN_state.findTableEntry(result->modeArg, result->training);
-            if (entry->stat != 0) {
-                sums[0] = 0;
-                for (i = 0; i < 5; i++) {
-                    sums[0] += result->gains[i];
-                }
-                if ((u16)entry->stat - 8 < 7u) {
-                    if (entry->other != 0) {
-                        sums[1] = 0;
-                        for (i = 0; i < 5; i++) {
-                            sums[1] += result->losses[i];
-                        }
-                    }
-                } else {
-                    sums[1] = 0;
-                }
-            }
-            if (sums[0] == 0 && sums[1] == 0) {
-                win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), 0x71);
-            } else {
-#if VERSION_EU
-                for (i = 0; i < 2; i++) {
-                    shown[i] = sums[i];
-                }
-                if (sums[0] != 0) {
-                    if ((u16)entry->stat - 1 < 5u) {
-                        if (getStat(&result->before, entry->stat) + sums[0] >= 1000) {
-                            shown[0] = 999 - getStat(&result->before, entry->stat);
-                        } else {
-                            shown[0] = sums[0];
-                        }
-                    } else {
-                        if (getResistance(&result->before, entry->stat) + sums[0] >= 1000) {
-                            shown[0] = 999 - getResistance(&result->before, entry->stat);
-                        } else {
-                            shown[0] = sums[0];
-                        }
-                    }
-                }
-                if (sums[1] != 0) {
-                    other = entry->other;
-                    if ((u16)other - 1 < 5u) {
-                        if (getStat(&result->before, other) - sums[1] < 0) {
-                            shown[1] = getStat(&result->before, other);
-                        } else {
-                            shown[1] = sums[1];
-                        }
-                    } else if ((u16)(other - 8) < 7) {
-                        if (getResistance(&result->before, other) + sums[1] >= 1000) {
-                            shown[1] = 999 - getResistance(&result->before, other);
-                        } else {
-                            shown[1] = sums[1];
-                        }
-                    } else if (other == 15) {
-                        if (result->before.fields.maxHp + sums[1] >= 10000) {
-                            shown[1] = 9999 - result->before.fields.maxHp;
-                        } else {
-                            shown[1] = sums[1];
-                        }
-                    } else if (other == 16) {
-                        if (result->before.fields.maxMp + sums[1] >= 10000) {
-                            shown[1] = 9999 - result->before.fields.maxMp;
-                        } else {
-                            shown[1] = sums[1];
-                        }
-                    }
-                }
-#endif
-                if ((u16)entry->stat - 1 < 5u) {
-                    win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), entry->stat + 0x5D);
-#if VERSION_US
-                    win->message[0]->setNumber(win->message[0], 1, sums[0]);
-#elif VERSION_EU
-                    win->message[0]->setNumber(win->message[0], 1, shown[0]);
-#endif
-                } else if (sums[1] != 0) {
-                    win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), entry->stat + 0x62);
-#if VERSION_US
-                    win->message[0]->setNumber(win->message[0], 1, sums[0]);
-#elif VERSION_EU
-                    win->message[0]->setNumber(win->message[0], 1, shown[0]);
-#endif
-#if VERSION_US
-                    win->message[0]->setNumber(win->message[0], 2, sums[1]);
-#elif VERSION_EU
-                    win->message[0]->setNumber(win->message[0], 2, shown[1]);
-#endif
-                } else {
-                    win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), entry->stat + 0x5B);
-#if VERSION_US
-                    win->message[0]->setNumber(win->message[0], 1, sums[0]);
-#elif VERSION_EU
-                    win->message[0]->setNumber(win->message[0], 1, shown[0]);
-#endif
-                }
-            }
-            win->message[0]->setPalette(win->message[0], PALETTE_WHITE);
-            win->message[0]->setTypeDelay(win->message[0], 6);
-            win->message[1]->setVisible(win->message[1], 0);
-            result->substate++;
-            result->screen->showStats(result->screen, &result->before);
-        }
+        STGTRAIN_showGains(result, win);
         break;
     case 6:
         if (win->message[0]->isFinished(win->message[0])) {
@@ -567,29 +664,7 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
         }
         break;
     case 0xE:
-        last = result->before.fields.spare;
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            result->before.fields.spare = 0;
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            result->before.fields.spare = 1;
-        }
-        if (last != result->before.fields.spare) {
-            SOUND.playSound(SOUND_CURSOR);
-            win->cursor->setPos(win->cursor, 0x94, result->before.fields.spare * 16 + 0x91);
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            if (result->before.fields.spare == 0) {
-                result->counter = 0;
-                result->substate++;
-            } else {
-                result->counter = 4;
-                result->substate++;
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            result->counter = 4;
-            result->substate++;
-        }
+        STGTRAIN_askBonusTry(result, win);
         break;
     case 0xF:
         STGTRAIN_state.startFade(&result->panels[2], 0);
@@ -601,47 +676,10 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
         result->substate++;
         break;
     case 0x10:
-        STGTRAIN_state.updateFade(&result->panels[2]);
-        if (STGTRAIN_state.updateFade(&result->panels[3])) {
-            if (result->counter == 0) {
-                result->substate = 0x14;
-                result->bonusTrying = 1;
-                win->actor->play(win->actor);
-                result->bonusSound = SOUND.playSound(0xA084603C);
-                stats = GAME.funcs.getPartnerStats(result->partner);
-                if (stats->lastBonus != 0 && stats->lastBonus == result->training) {
-                    win->actor->setChance(win->actor, 0);
-                } else {
-                    stats->lastBonus = 0;
-                    win->actor->setChance(win->actor, 0x32);
-                }
-            } else {
-                win->actor->play(win->actor);
-                result->substate = 2;
-            }
-        }
+        STGTRAIN_startBonusTry(result, win);
         break;
     case 0x14:
-        result->trained[3] = win->actor->getResult(win->actor);
-        if (result->trained[3] != -1) {
-            stats = GAME.funcs.getPartnerStats(result->partner);
-            if (result->trained[3] != 0) {
-                stats->lastBonus = result->training;
-                result->bonusWorked = 1;
-            } else {
-                stats->lastBonus = 0;
-            }
-            if (result->trained[3] != 0) {
-                SOUND.playSound(0x840001);
-            } else {
-                SOUND.playSound(0x840000);
-            }
-            SOUND.keyOff(0xA084603C, result->bonusSound);
-            STGTRAIN_applyTry(result, 3);
-            result->prompting = 1;
-            result->bonusTrying = 0;
-            result->setSubstate(result, 3);
-        }
+        STGTRAIN_takeBonusTry(result, win);
         break;
     case 0x32:
         result->state = TASK_KILL;

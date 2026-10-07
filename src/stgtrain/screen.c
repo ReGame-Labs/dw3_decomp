@@ -208,6 +208,17 @@ void STGTRAIN_showStatChanges(TrainScreen *screen, PartnerTotals *before) {
     }
 }
 
+/* Advances the selected partner's waiting animation, a frame every 13 ticks */
+static inline void STGTRAIN_animatePartner(TrainScreen *screen, s32 partner) {
+    if (GFX.funcs.getTime() - screen->time >= 0xD) {
+        screen->time = GFX.funcs.getTime();
+        screen->frame++;
+        if (screen->frame >= 7 || STGTRAIN_waitAnims[partner][screen->frame] == -1) {
+            screen->frame = 0;
+        }
+    }
+}
+
 /* Draws the screen: the panels, the party's sprites and the sign */
 void STGTRAIN_drawScreen(TrainScreen *screen) {
     SpriteDrawer sprite;
@@ -225,13 +236,7 @@ void STGTRAIN_drawScreen(TrainScreen *screen) {
         }
     }
     partner = GAME.funcs.getPartyMember(screen->partner);
-    if (GFX.funcs.getTime() - screen->time >= 0xD) {
-        screen->time = GFX.funcs.getTime();
-        screen->frame++;
-        if (screen->frame >= 7 || STGTRAIN_waitAnims[partner][screen->frame] == -1) {
-            screen->frame = 0;
-        }
-    }
+    STGTRAIN_animatePartner(screen, partner);
     initSpriteDrawer(&sprite);
     sprite.setLayerId(screen->layerId, screen->depth);
     if (screen->panels[0].level != 0) {
@@ -332,12 +337,155 @@ void STGTRAIN_drawScreen(TrainScreen *screen) {
     sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), screen->sign, screen->signPos, screen->signPos);
 }
 
+/* Moves the cursor over the party (left, right), showing the partner's
+   stats, and picks the one to train (cross) or leaves (triangle) */
+static inline void STGTRAIN_pickPartner(TrainScreen *screen, TrainScreenWindows *win) {
+    s32 partner;
+
+    partner = screen->partner;
+    if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
+        screen->partner--;
+        if (screen->partner < 0) {
+            screen->partner = 0;
+        }
+    } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
+        screen->partner++;
+        if (screen->partner > screen->partyCount - 1) {
+            screen->partner = screen->partyCount - 1;
+        }
+    }
+    if (partner != screen->partner) {
+        SOUND.playSound(SOUND_MENU_MOVE);
+        STGTRAIN_showVitals(screen, win, 1);
+        STGTRAIN_showBattleStats(screen, win, 1);
+        STGTRAIN_showTp(screen, win, 1);
+        screen->frame = 0;
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+        screen->substate = 0x14;
+        if (win->menu != NULL) {
+            win->menu->state = TASK_KILL;
+        }
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        screen->substate = 0x32;
+    }
+}
+
+/* Closes the partner pick: hides the cursor, the prompt and the help, and
+   closes their panels */
+static inline void STGTRAIN_closePartnerPick(TrainScreen *screen, TrainScreenWindows *win) {
+    STGTRAIN_state.startFade(&screen->panels[6], 0);
+    screen->cursorShown = 0;
+    STGTRAIN_state.startFade(&screen->panels[4], 0);
+    win->prompt->setVisible(win->prompt, 0);
+    STGTRAIN_state.startFade(&screen->panels[3], 0);
+    win->help->setVisible(win->help, 0);
+}
+
+/* Updates the fades of the partner pick's panels; whether they are done */
+static inline s32 STGTRAIN_partnerPickClosed(TrainScreen *screen) {
+    STGTRAIN_state.updateFade(&screen->panels[6]);
+    STGTRAIN_state.updateFade(&screen->panels[4]);
+    return STGTRAIN_state.updateFade(&screen->panels[3]);
+}
+
+/* Waits for the session: once it is training (its substate 0x23), ends the
+   last result first, then makes the next one with the TP shown; once it is
+   done, goes back to the menu */
+static inline void STGTRAIN_waitSession(TrainScreen *screen, TrainScreenWindows *win) {
+    if (win->session->substate == 0x23) {
+        if (win->result != NULL) {
+            win->result->state = TASK_KILL;
+        } else {
+            screen->substate = 0x23;
+            STGTRAIN_showTp(screen, win, 1);
+        }
+    } else if (win->session->state == TASK_DONE) {
+        win->session->state = TASK_KILL;
+        screen->substate = 0xA;
+    }
+}
+
+/* Starts leaving the screen: fades it out and closes every panel */
+static inline void STGTRAIN_startLeaving(TrainScreen *screen, TrainScreenWindows *win) {
+    s32 i;
+
+    win->fade = STGTRAIN_createFader();
+    win->fade->start(win->fade, 0, 30);
+    screen->panels[5].level = 0;
+    for (i = 0; i < 3; i++) {
+        STGTRAIN_state.startFade(&screen->panels[i], 0);
+    }
+    STGTRAIN_showVitals(screen, win, 0);
+    STGTRAIN_showBattleStats(screen, win, 0);
+    STGTRAIN_showTp(screen, win, 0);
+    STGTRAIN_closePartnerPick(screen, win);
+}
+
+/* Once the vitals' panel is open (with the help's), shows the vitals and
+   the help, and opens the battle stats' and the prompt's panels */
+static inline void STGTRAIN_openBattleStats(TrainScreen *screen, TrainScreenWindows *win) {
+    STGTRAIN_state.updateFade(&screen->panels[3]);
+    if (STGTRAIN_state.updateFade(&screen->panels[0])) {
+        STGTRAIN_showVitals(screen, win, 1);
+        win->help->setString(win->help, FILE_CACHE.load(STGTRAIN_TEXT), 5);
+        STGTRAIN_state.startFade(&screen->panels[1], 1);
+        STGTRAIN_state.startFade(&screen->panels[4], 1);
+        screen->substate++;
+    }
+}
+
+/* Once the battle stats' panel is open, shows them and the prompt, and
+   opens the TP's panel and the party's window */
+static inline void STGTRAIN_openTp(TrainScreen *screen, TrainScreenWindows *win) {
+    STGTRAIN_state.updateFade(&screen->panels[4]);
+    if (STGTRAIN_state.updateFade(&screen->panels[1])) {
+        STGTRAIN_showBattleStats(screen, win, 1);
+        win->prompt->setString(win->prompt, FILE_CACHE.load(STGTRAIN_TEXT), 6);
+        STGTRAIN_state.startFade(&screen->panels[2], 1);
+        STGTRAIN_state.startFade(&screen->panels[6], 1);
+        screen->substate++;
+    }
+}
+
+/* Once the TP's panel is open, shows the TP and opens the party's panel */
+static inline void STGTRAIN_openParty(TrainScreen *screen, TrainScreenWindows *win) {
+    STGTRAIN_state.updateFade(&screen->panels[6]);
+    if (STGTRAIN_state.updateFade(&screen->panels[2])) {
+        STGTRAIN_showTp(screen, win, 1);
+        STGTRAIN_state.startFade(&screen->panels[5], 1);
+        screen->substate++;
+    }
+}
+
+/* Waits for the menu to close: with a training picked it is gone, and the
+   training's session starts; without one (triangle) it is done, and the
+   partner pick reopens */
+static inline void STGTRAIN_waitMenu(TrainScreen *screen, TrainScreenWindows *win) {
+    if (win->menu == NULL) {
+        screen->substate = 0x1E;
+    } else if (win->menu->state == TASK_DONE) {
+        screen->training = 0;
+        win->menu->state = TASK_KILL;
+        screen->substate = 0x19;
+    }
+}
+
+/* Updates the fades of every panel as the screen closes; whether they are
+   done */
+static inline s32 STGTRAIN_screenClosed(TrainScreen *screen) {
+    s32 i;
+
+    for (i = 0; i < 3; i++) {
+        STGTRAIN_state.updateFade(&screen->panels[i]);
+    }
+    return STGTRAIN_partnerPickClosed(screen);
+}
+
 /* The training screen: opens the panels, picks the partner, runs the menu
    and the trainings, and closes everything when leaving */
 void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
-    s32 i;
-    s32 partner;
-
     switch (screen->substate) {
     case 0:
     default:
@@ -346,32 +494,13 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         screen->substate++;
         break;
     case 1:
-        STGTRAIN_state.updateFade(&screen->panels[3]);
-        if (STGTRAIN_state.updateFade(&screen->panels[0])) {
-            STGTRAIN_showVitals(screen, win, 1);
-            win->help->setString(win->help, FILE_CACHE.load(STGTRAIN_TEXT), 5);
-            STGTRAIN_state.startFade(&screen->panels[1], 1);
-            STGTRAIN_state.startFade(&screen->panels[4], 1);
-            screen->substate++;
-        }
+        STGTRAIN_openBattleStats(screen, win);
         break;
     case 2:
-        STGTRAIN_state.updateFade(&screen->panels[4]);
-        if (STGTRAIN_state.updateFade(&screen->panels[1])) {
-            STGTRAIN_showBattleStats(screen, win, 1);
-            win->prompt->setString(win->prompt, FILE_CACHE.load(STGTRAIN_TEXT), 6);
-            STGTRAIN_state.startFade(&screen->panels[2], 1);
-            STGTRAIN_state.startFade(&screen->panels[6], 1);
-            screen->substate++;
-        }
+        STGTRAIN_openTp(screen, win);
         break;
     case 3:
-        STGTRAIN_state.updateFade(&screen->panels[6]);
-        if (STGTRAIN_state.updateFade(&screen->panels[2])) {
-            STGTRAIN_showTp(screen, win, 1);
-            STGTRAIN_state.startFade(&screen->panels[5], 1);
-            screen->substate++;
-        }
+        STGTRAIN_openParty(screen, win);
         break;
     case 4:
         if (STGTRAIN_state.updateFade(&screen->panels[5])) {
@@ -380,34 +509,7 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         }
         break;
     case 5:
-        partner = screen->partner;
-        if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-            screen->partner--;
-            if (screen->partner < 0) {
-                screen->partner = 0;
-            }
-        } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-            screen->partner++;
-            if (screen->partner > screen->partyCount - 1) {
-                screen->partner = screen->partyCount - 1;
-            }
-        }
-        if (partner != screen->partner) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-            STGTRAIN_showVitals(screen, win, 1);
-            STGTRAIN_showBattleStats(screen, win, 1);
-            STGTRAIN_showTp(screen, win, 1);
-            screen->frame = 0;
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            screen->substate = 0x14;
-            if (win->menu != NULL) {
-                win->menu->state = TASK_KILL;
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            screen->substate = 0x32;
-        }
+        STGTRAIN_pickPartner(screen, win);
         break;
     case 0xA:
         if (win->menu == NULL) {
@@ -416,28 +518,15 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         }
         break;
     case 0xB:
-        if (win->menu == NULL) {
-            screen->substate = 0x1E;
-        } else if (win->menu->state == TASK_DONE) {
-            screen->training = 0;
-            win->menu->state = TASK_KILL;
-            screen->substate = 0x19;
-        }
+        STGTRAIN_waitMenu(screen, win);
         break;
     case 0x14:
         screen->panels[5].level = 0;
-        STGTRAIN_state.startFade(&screen->panels[6], 0);
-        screen->cursorShown = 0;
-        STGTRAIN_state.startFade(&screen->panels[4], 0);
-        win->prompt->setVisible(win->prompt, 0);
-        STGTRAIN_state.startFade(&screen->panels[3], 0);
-        win->help->setVisible(win->help, 0);
+        STGTRAIN_closePartnerPick(screen, win);
         screen->substate++;
         break;
     case 0x15:
-        STGTRAIN_state.updateFade(&screen->panels[6]);
-        STGTRAIN_state.updateFade(&screen->panels[4]);
-        if (STGTRAIN_state.updateFade(&screen->panels[3])) {
+        if (STGTRAIN_partnerPickClosed(screen)) {
             screen->substate = 0xA;
         }
         break;
@@ -473,17 +562,7 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         }
         break;
     case 0x1F:
-        if (win->session->substate == 0x23) {
-            if (win->result != NULL) {
-                win->result->state = TASK_KILL;
-            } else {
-                screen->substate = 0x23;
-                STGTRAIN_showTp(screen, win, 1);
-            }
-        } else if (win->session->state == TASK_DONE) {
-            win->session->state = TASK_KILL;
-            screen->substate = 0xA;
-        }
+        STGTRAIN_waitSession(screen, win);
         break;
     case 0x23:
         if (STGTRAIN_state.getFile() != NULL && win->result == NULL) {
@@ -504,30 +583,11 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         }
         break;
     case 0x32:
-        win->fade = STGTRAIN_createFader();
-        win->fade->start(win->fade, 0, 30);
-        screen->panels[5].level = 0;
-        for (i = 0; i < 3; i++) {
-            STGTRAIN_state.startFade(&screen->panels[i], 0);
-        }
-        STGTRAIN_showVitals(screen, win, 0);
-        STGTRAIN_showBattleStats(screen, win, 0);
-        STGTRAIN_showTp(screen, win, 0);
-        STGTRAIN_state.startFade(&screen->panels[6], 0);
-        screen->cursorShown = 0;
-        STGTRAIN_state.startFade(&screen->panels[4], 0);
-        win->prompt->setVisible(win->prompt, 0);
-        STGTRAIN_state.startFade(&screen->panels[3], 0);
-        win->help->setVisible(win->help, 0);
+        STGTRAIN_startLeaving(screen, win);
         screen->substate++;
         break;
     case 0x33:
-        for (i = 0; i < 3; i++) {
-            STGTRAIN_state.updateFade(&screen->panels[i]);
-        }
-        STGTRAIN_state.updateFade(&screen->panels[6]);
-        STGTRAIN_state.updateFade(&screen->panels[4]);
-        if (STGTRAIN_state.updateFade(&screen->panels[3])) {
+        if (STGTRAIN_screenClosed(screen)) {
             screen->substate++;
         }
         break;
