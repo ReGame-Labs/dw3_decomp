@@ -81,7 +81,7 @@ The prebuilt tools are x86 Linux binaries, so the image is `linux/amd64`.
 | `src/main/<module>/` | the executable's game code, one folder per module, cut from the original objects in their link order (see [binaries.md](binaries.md#the-games-binaries)) |
 | `src/main/data/` | the executable's data as C, until it moves next to the code that uses it |
 | `src/<overlay>/` | each overlay's C; `<overlay>_2.c` is the second half of an object split in two. `src/fieldstg/` has a file per module instead, more than the original's five objects, split only where each jump table keeps its place, and its data in `data/fieldstg.c` |
-| `src/stages/` | one C file per stage, `wstag###.c` |
+| `src/stages/<area>/` | one C file per stage, `wstag###.c`, in the folder of its area (the list: [src/stages/README.md](../src/stages/README.md)); `src/stages/common/` holds the code the stages share, and `wstag260.c`, in no area, the story events' scripts |
 | `include/game.h`, `include/dw3/` | types and declarations of the game code, one header per module of `src/main/` (`task.h`, `heap.h`, `gfx.h`, `file.h`, `pad.h`, `random.h`, `sound.h`, `overlay.h`, `text.h`, `game_state.h`, `memcard.h`, `menu.h`) |
 | `include/<overlay>.h`, `include/stage.h` | the overlays' types and declarations, and the stages' |
 | `include/` | `common.h`, `version.h`, `include_asm.h` and the assembler macros |
@@ -102,6 +102,7 @@ The prebuilt tools are x86 Linux binaries, so the image is `linux/amd64`.
 | `tools/dl_deps.sh` | downloads the PSX GCC, objdiff-cli and mkpsxiso into `bin/` |
 | `tools/extract_disc.py` | extracts a disc image, `AAA/` included |
 | `tools/stage_yaml.py` | writes a stage's splat config from `config/<version>/stages.txt` |
+| `tools/stage_areas.py` | moves each stage's C file into the folder of its area, `src/stages/<area>/`, from FIELDSTG's stage and area tables, and writes `src/stages/README.md` |
 | `tools/stage_externs.py` | drops the declarations of a stage's own data and functions that are defined before every use |
 | `tools/name_stage_data.py` | names the stages' data by its place in the stage's tables, in the C and every version's symbol files (then `make regenerate`) |
 | `tools/stage_constants.py` | writes the stages' music, sound ids and flag codes with the names of `include/dw3/sound.h`, `include/stage.h` and `include/dw3/game_state.h` |

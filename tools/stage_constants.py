@@ -17,7 +17,7 @@ Writes the stages' sound ids and flag codes by name: MUSIC and the SOUND_ names
 
 It changes no bytes, and can be run again at any time:
 
-    tools/stage_constants.py [src/stages/wstag200.c ...]
+    tools/stage_constants.py [src/stages/central_sector/wstag200.c ...]
 """
 import argparse
 import glob
@@ -212,7 +212,7 @@ def main():
     parser = argparse.ArgumentParser(description="Writes the stages' sound ids and flag codes by name.")
     parser.add_argument("files", nargs="*")
     args = parser.parse_args()
-    files = args.files or sorted(glob.glob("src/stages/*.c") + glob.glob("src/stages/common/*.c"))
+    files = args.files or sorted(glob.glob("src/stages/**/*.c", recursive=True))
     sounds = sound_names()
     changed = 0
     for path in files:

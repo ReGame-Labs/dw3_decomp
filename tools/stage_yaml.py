@@ -18,8 +18,13 @@ splat's assembly in this version) or "asm-data" (only its data is).
 "c-rodata" takes the bytes before the code (the color, or the jump tables)
 from the stage's C file too (it can follow "asm-data"). "head-word" before it
 takes a color that comes before the jump tables from a C file of its own,
-src/stages/<name>_head.c, linked first: in the stage's C file GCC would align
-the jump tables to 8 bytes after it (WSTAG924).
+<name>_head.c next to the stage's, linked first: in the stage's C file GCC
+would align the jump tables to 8 bytes after it (WSTAG924).
+
+The stage's C file is src/stages/<area>/<name>.c, in the folder of its area
+(tools/stage_areas.py), or src/stages/<name>.c for one in no area: the
+subsegments are named <area>/<name>, so that splat finds it there and
+writes its assembly to asm/<version>/stages/<area>/.
 
 A stage with no code, "data" (WSTAG260, the story events' scripts that
 FIELDSTG runs), is all data, from its C file.
@@ -186,13 +191,15 @@ def main():
     if os.path.exists(os.path.join(root, f"{config}/stages/{name}.txt")):
         symbols.append(f"{config}/stages/{name}.txt")
 
+    # the stage's C file is src/stages/<path>.c (and its head <path>_head.c)
+    path = version.stage_path(name)
     if data_only:
-        subsegments = f"      - [0x0, {data_type}, {name}]\n"
+        subsegments = f"      - [0x0, {data_type}, {path}]\n"
     else:
-        subsegments = ((f"      - [0x0, .rodata, {name}_head]\n" if head_word else "")
-                       + (f"      - [0x{4 if head_word else 0:X}, {rodata_type}, {name}]\n" if text_start else "")
-                       + f"      - [0x{text_start:X}, {code}, {name}]\n"
-                       + f"      - [0x{text_end:X}, {data_type}, {name}]\n")
+        subsegments = ((f"      - [0x0, .rodata, {path}_head]\n" if head_word else "")
+                       + (f"      - [0x{4 if head_word else 0:X}, {rodata_type}, {path}]\n" if text_start else "")
+                       + f"      - [0x{text_start:X}, {code}, {path}]\n"
+                       + f"      - [0x{text_end:X}, {data_type}, {path}]\n")
 
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w") as f:

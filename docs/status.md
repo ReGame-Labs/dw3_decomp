@@ -24,7 +24,9 @@ matched C needs.
   match often repeats across stages: those have the same name in every
   stage, and the copies that are the same C are one file in
   `src/stages/common/` that the stages include. The stages' data is
-  C too, as splat's words, at the end of each stage's C file.
+  C too, as splat's words, at the end of each stage's C file. Each stage
+  is in the folder of its area, `src/stages/<area>/` (see
+  [src/stages/README.md](../src/stages/README.md)).
 - The European version is the main one: the build's default and the one
   decomp.dev shows first. It is split into the USA version's files, with the
   USA names, and builds all of them from the same C: the executable's game
@@ -50,7 +52,7 @@ make VERSION=eu report
 After `make objdiff`, open the repository in the
 [objdiff](https://github.com/encounter/objdiff) GUI to see each unit's
 functions and data against the original. `tools/objdiff_generate.py` makes one
-unit per C file (`main/system`, `cnty_sel/cnty_sel`, `stages/wstag200`...); a
+unit per C file (`main/system`, `cnty_sel/cnty_sel`, `stages/central_sector/wstag200`...); a
 file `X_2.c`, the second half of one original object, is reported together
 with `X.c`. The units go into the category `game` (the executable), one
 category per overlay, and `stages` for all the stages. The executable's data

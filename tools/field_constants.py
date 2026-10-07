@@ -19,7 +19,7 @@ It changes no bytes and only rewrites numbers, so it can be run again at any
 time; a stage file it changes that has none of the field's headers gets
 field_map.h after its first include. -n lists what it would change, file by file, without writing:
 
-    tools/field_constants.py [-n] [src/stages/wstag200.c ...]
+    tools/field_constants.py [-n] [src/stages/central_sector/wstag200.c ...]
 """
 import argparse
 import difflib

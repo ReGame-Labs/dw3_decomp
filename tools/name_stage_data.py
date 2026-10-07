@@ -51,6 +51,13 @@ DEFINITION = re.compile(
 )
 
 
+def stage_sources():
+    """{stage: its C file}: src/stages/<area>/wstag###.c (tools/stage_areas.py),
+    or src/stages/wstag###.c for a stage in no area"""
+    paths = sorted(SRC.glob("wstag[0-9][0-9][0-9].c")) + sorted(SRC.glob("*/wstag[0-9][0-9][0-9].c"))
+    return {p.stem: p for p in paths}
+
+
 def stage_list(version):
     """The stages a version has (config/<version>/stages.txt)"""
     out = set()
@@ -377,10 +384,11 @@ def main():
     parser.add_argument("stages", nargs="*")
     args = parser.parse_args()
     has = {v: stage_list(v) for v in VERSIONS}
-    stages = args.stages or sorted(p.stem for p in SRC.glob("wstag[0-9][0-9][0-9].c"))
+    sources = stage_sources()
+    stages = args.stages or sorted(sources)
     total = 0
     for stage in stages:
-        path = SRC / f"{stage}.c"
+        path = sources[stage]
         text = path.read_text()
         versions = [v for v in VERSIONS if stage in has[v]]
         if not versions:
