@@ -16,7 +16,7 @@
  * the counter's in the second scheduler.
  */
 void FIELDSTG_playBattleTransition(FieldTask *task, FieldChildren *fieldChildren) {
-    Task **children = (Task **)fieldChildren;
+    Task **children = (Task **)fieldChildren; /* all of them, as a list of tasks to kill */
     Layer *layer;
     u_long *ot;
     s32 speed;
@@ -369,11 +369,11 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
             switch (task->step) {
             case 0:
             default:
-                children->unk10 = FIELDSTG_createFileLoader(0);
+                children->awaited.fileLoader = FIELDSTG_createFileLoader(0);
                 task->nextStep(task);
                 break;
             case 1:
-                if (children->unk10 == NULL) {
+                if (children->awaited.fileLoader == NULL) {
                     task->nextSubstate(task);
                 }
                 break;
@@ -438,7 +438,7 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
                         break;
                     default:
                         if (npc->conditions == NULL || FLAGS_00.checkConditions(npc->conditions) != 0) {
-                            children->npcs[i] = FIELDSTG_createActor(npc->id, 1, npc->unkA, npc);
+                            children->npcs[i] = FIELDSTG_createActor(npc->id, 1, npc->image, npc);
                             children->npcs[i]->pos.x = npc->x << 8;
                             children->npcs[i]->pos.y = npc->y << 8;
                             children->npcs[i]->dir = npc->dir;
@@ -508,7 +508,7 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
             }
             break;
         case 2:
-            if (children->unk10 == NULL) {
+            if (children->awaited.inn == NULL) {
                 FIELDSTG_state.innOpen = 0;
                 FIELDSTG_state.busy = 0;
                 task->setSubstate(task, 0);
@@ -551,7 +551,7 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
             case 3:
                 if (children->cutscene->state == TASK_DONE) {
                     GAME.place = task->warp->place;
-                    GAME.placeArg = task->warp->unkC;
+                    GAME.placeArg = task->warp->placeArg;
                     FIELDSTG_leaveField(task->warp->mode, -1, task->warp->x << 8, task->warp->y << 8, task->warp->dir);
                 }
                 break;
@@ -646,7 +646,7 @@ void FIELDSTG_startEncounter(s32 encounter) {
         BATTLE_SETUP.ambushChance = FIELDSTG_encounters[encounter].ambushChance;
         BATTLE_SETUP.unk3D = FIELDSTG_encounters[encounter].unkD;
         for (i = 0; i < 12; i++) {
-            BATTLE_SETUP.blocks[i] = FIELDSTG_encounters[encounter].unkE[i];
+            BATTLE_SETUP.blocks[i] = FIELDSTG_encounters[encounter].blocks[i];
         }
         for (i = 0; i < 3; i++) {
             BATTLE_SETUP.enemies[i] = *FIELDSTG_encounters[encounter].enemies[i];
@@ -906,7 +906,8 @@ void *FIELDSTG_startEventBattle5(void) {
 
 /* Starts the event FIELDSTG_eventIds[index] (the executable calls it) */
 void FIELDSTG_startListedEvent(s32 index) {
-    FieldChildren *children = ((Task *)TASK_REGISTRY.funcs.find(FIELD_TASK_FIELD, -1, -1))->children;
+    FieldTask *field = TASK_REGISTRY.funcs.find(FIELD_TASK_FIELD, -1, -1);
+    FieldChildren *children = field->children;
 
     children->event = FIELDSTG_startEvent(FIELDSTG_eventIds[index]);
 }
@@ -918,18 +919,18 @@ void FIELDSTG_openInn(void) {
 
     FIELDSTG_state.innOpen = 1;
     FIELDSTG_state.busy = 1;
-    children->unk10 = (Task *)createInn(FIELD_LAYER_MAP);
+    children->awaited.inn = createInn(FIELD_LAYER_MAP);
     task->setSubstate(task, 2);
 }
 
 /* Starts a warp from pos: the field task plays the effect and the cutscene
    of kind, then leaves for the warp's mode */
-void FIELDSTG_startWarp(s32 kind, Point *pos, FieldWarp *warp) {
+void FIELDSTG_startWarp(s32 kind, Point *pos, SlotDest *dest) {
     FieldTask *task = TASK_REGISTRY.funcs.find(FIELD_TASK_FIELD, -1, -1);
 
     task->warpKind = kind;
     task->warpPos.x = pos->x;
     task->warpPos.y = pos->y;
-    task->warp = warp;
+    task->warp = dest;
     task->setSubstate(task, 3);
 }

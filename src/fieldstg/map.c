@@ -3,6 +3,9 @@
 
 #include "fieldstg.h"
 
+/* Part i of a map file, at the offset from its start that its word i holds */
+#define MAP_PART(entry, i) ((void *)((entry)[i] + (s32)(entry)))
+
 /*
  * Points the map at the file of map index: the grid, whose first two bytes
  * are its width and height, the levels of cells and the pixels, at the
@@ -26,12 +29,12 @@ s32 FIELDSTG_selectMap(s32 index) {
         return 0;
     } while (0);
     entry = (s32 *)FILE_CACHE.getEntry(FIELDSTG_map.files[index]);
-    FIELDSTG_map.grid = (u8 *)(entry[0] + (s32)entry);
-    FIELDSTG_map.cells64 = (u8 *)(entry[1] + (s32)entry);
-    FIELDSTG_map.cells32 = (s16 *)(entry[2] + (s32)entry);
-    FIELDSTG_map.cells16 = (s16 *)(entry[3] + (s32)entry);
-    FIELDSTG_map.cells8 = (s16 *)(entry[4] + (s32)entry);
-    FIELDSTG_map.pixels = (u8 *)(entry[5] + (s32)entry);
+    FIELDSTG_map.grid = MAP_PART(entry, 0);
+    FIELDSTG_map.cells64 = MAP_PART(entry, 1);
+    FIELDSTG_map.cells32 = MAP_PART(entry, 2);
+    FIELDSTG_map.cells16 = MAP_PART(entry, 3);
+    FIELDSTG_map.cells8 = MAP_PART(entry, 4);
+    FIELDSTG_map.pixels = MAP_PART(entry, 5);
     grid = FIELDSTG_map.grid;
     FIELDSTG_map.width = grid[0];
     FIELDSTG_map.height = grid[1];

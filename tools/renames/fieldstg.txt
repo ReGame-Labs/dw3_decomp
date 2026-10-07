@@ -114,3 +114,6 @@ FIELDSTG_map.unk58 FIELDSTG_map.isTileFree
 # FIELDSTG's rodata
 D_80082624 FIELDSTG_noOffset
 D_80082E88 FIELDSTG_startColor
+
+# Round 3
+FIELDSTG_talkVoice FIELDSTG_slideVoice

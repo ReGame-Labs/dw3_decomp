@@ -88,13 +88,13 @@ void FIELDSTG_runLaunch(Launch *task) {
             case 0:
             default:
                 task->negX = 0;
-                task->dist.x = task->dest[1] - task->start.x;
+                task->dist.x = task->dest->x - task->start.x;
                 if (task->dist.x < 0) {
                     task->dist.x = -task->dist.x;
                     task->negX = 1;
                 }
                 task->negY = 0;
-                task->dist.y = task->dest[2] - task->start.y;
+                task->dist.y = task->dest->y - task->start.y;
                 if (task->dist.y < 0) {
                     task->dist.y = -task->dist.y;
                     task->negY = 1;
@@ -104,9 +104,9 @@ void FIELDSTG_runLaunch(Launch *task) {
                 task->counter += GFX.funcs.getFrameTime() * 24;
                 if (task->counter > 0x1000) {
                     task->counter = 0x1000;
-                    task->actor->tile.x = task->dest[1];
+                    task->actor->tile.x = task->dest->x;
                     task->actor->pos.x = task->actor->tile.x << 8;
-                    task->actor->tile.y = task->dest[2];
+                    task->actor->tile.y = task->dest->y;
                     task->actor->pos.y = task->actor->tile.y << 8;
                     task->nextSubstate(task);
                     break;
@@ -149,11 +149,11 @@ void FIELDSTG_runLaunch(Launch *task) {
 
 /* Creates the flight of an actor to the tile at dest; two stages' modes
    (0x26C, 0x2D4) set theirs up */
-Launch *FIELDSTG_createLaunch(Actor *actor, s32 dest) {
+Launch *FIELDSTG_createLaunch(Actor *actor, SlotDest *dest) {
     Launch *task = createTask(FIELDSTG_runLaunch, sizeof(Launch), 0);
 
     task->actor = actor;
-    task->dest = (s16 *)dest;
+    task->dest = dest;
     if (GAME.funcs.getMode() == 0x26C) {
         WSTAG745_startEvent8000();
     }

@@ -64,7 +64,7 @@ void FIELDSTG_requestTiles(MapStreamer *map, StreamPool *pool) {
 /* Draws a 128-pixel block of the cover at (x, y), at a shade of level (8.8) */
 void FIELDSTG_drawCoverBlock(Layer *layer, s32 x, s32 y, s32 level) {
     Point scroll;
-    SPRT *prim;
+    PrimPtr prim;
     u_long *ot;
     s32 i;
     s32 shade;
@@ -72,27 +72,27 @@ void FIELDSTG_drawCoverBlock(Layer *layer, s32 x, s32 y, s32 level) {
     ot = (u_long *)layer->getOtEntry(layer, 0);
     shade = level >> 8;
     layer->getScroll(layer, &scroll);
-    prim = GFX.funcs.getPrim();
+    prim.any = GFX.funcs.getPrim();
     for (i = 0; i < 4; i++) {
-        SetSprt(prim);
+        SetSprt(prim.sprt);
         if (shade != 0xFF) {
-            SetSemiTrans(prim, 1);
+            SetSemiTrans(prim.sprt, 1);
         }
-        prim->r0 = prim->g0 = prim->b0 = shade;
-        prim->x0 = x - scroll.x + ((i & 1) << 6);
-        prim->y0 = y - scroll.y + ((i << 5) & 0x40);
-        prim->u0 = FIELDSTG_state.images.field->u;
-        prim->v0 = FIELDSTG_state.images.field->v;
-        prim->w = 0x40;
-        prim->h = 0x40;
-        prim->clut = GetClut(FIELDSTG_state.images.field->clutX, FIELDSTG_state.images.field->clutY);
-        addPrim(ot, prim);
-        prim++;
-        SetDrawTPage((DR_TPAGE *)prim, 0, 1, GetTPage(0, 1, FIELDSTG_state.images.field->x, FIELDSTG_state.images.field->y));
-        addPrim(ot, prim);
-        prim = (SPRT *)((DR_TPAGE *)prim + 1);
+        prim.sprt->r0 = prim.sprt->g0 = prim.sprt->b0 = shade;
+        prim.sprt->x0 = x - scroll.x + ((i & 1) << 6);
+        prim.sprt->y0 = y - scroll.y + ((i << 5) & 0x40);
+        prim.sprt->u0 = FIELDSTG_state.images.field->u;
+        prim.sprt->v0 = FIELDSTG_state.images.field->v;
+        prim.sprt->w = 0x40;
+        prim.sprt->h = 0x40;
+        prim.sprt->clut = GetClut(FIELDSTG_state.images.field->clutX, FIELDSTG_state.images.field->clutY);
+        addPrim(ot, prim.any);
+        prim.sprt++;
+        SetDrawTPage(prim.tpage, 0, 1, GetTPage(0, 1, FIELDSTG_state.images.field->x, FIELDSTG_state.images.field->y));
+        addPrim(ot, prim.any);
+        prim.tpage++;
     }
-    GFX.funcs.setPrim(prim);
+    GFX.funcs.setPrim(prim.any);
 }
 
 /* The stream task that holds a frame (a tile of the map), or NULL */
@@ -291,7 +291,7 @@ void FIELDSTG_pickViewTiles(MapStreamer *task) {
    stream tasks, then each frame points the slots at the tiles in view, draws
    them and streams the missing ones */
 void FIELDSTG_runMapStreamer(MapStreamer *task, StreamPool *pool) {
-    s32 *header;
+    MapFileHeader *header;
     s32 count;
     s32 i;
     s32 j;
@@ -312,14 +312,14 @@ void FIELDSTG_runMapStreamer(MapStreamer *task, StreamPool *pool) {
         case 1:
             if (CD_READER.isBusy() != 1) {
                 header = task->header;
-                task->width = header[1];
-                task->height = header[2];
-                task->frameSectors = header[3] / 2048;
+                task->width = header->width;
+                task->height = header->height;
+                task->frameSectors = header->tileBytes / 2048;
                 count = task->width * task->height;
                 task->tiles = HEAP.alloc(count * sizeof(MapTile), 2);
                 for (j = 0; j < count; j++) {
-                    task->tiles[j].size = ((u16 *)header)[j + 8];
-                    task->tiles[j].sectors = ((u16 *)header)[j + 8] >> 11;
+                    task->tiles[j].size = header->tileSizes[j];
+                    task->tiles[j].sectors = header->tileSizes[j] >> 11;
                 }
                 HEAP.free(task->header);
                 task->header = NULL;

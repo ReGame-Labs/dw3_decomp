@@ -113,7 +113,8 @@ FIELDSTG_objectId = 0x8009A944; // size:0x4
 FIELDSTG_tiles = 0x8009A948; // size:0xF0
 FIELDSTG_tileRequests = 0x8009AA38; // size:0x4
 FIELDSTG_screenRect = 0x8009AA40; // size:0x8
-FIELDSTG_talkVoice = 0x8009AA48; // size:0x4
+FIELDSTG_slideVoice = 0x8009AA48; // size:0x2
+FIELDSTG_slideVoicePad = 0x8009AA4A; // size:0x2
 FIELDSTG_boxes = 0x8009AA4C; // size:0x140
 FIELDSTG_boxCount = 0x8009AB8C; // size:0x4
 

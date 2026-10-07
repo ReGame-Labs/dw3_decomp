@@ -30,43 +30,43 @@ s32 FIELDSTG_isStreamLoaded(StreamTask *task) {
    depths */
 void FIELDSTG_drawStream(StreamTask *task, Layer *layer, s32 x, s32 y) {
     Point scroll;
-    SPRT *prim;
+    PrimPtr prim;
     u_long *ot;
     s32 i;
     s32 j;
 
     layer->getScroll(layer, &scroll);
-    prim = GFX.funcs.getPrim();
+    prim.any = GFX.funcs.getPrim();
     for (i = 0; i < 3; i++) {
         ot = (u_long *)layer->getOtEntry(layer, FIELDSTG_spriteDepths[i]);
         for (j = 0; j < 5; j++) {
             if (task->sprites[i][j].visible) {
-                SetSprt(prim);
+                SetSprt(prim.sprt);
                 if (i == 2 || FIELDSTG_state.spriteColor.cd != 0) {
-                    prim->r0 = FIELDSTG_state.spriteColor.r;
-                    prim->g0 = FIELDSTG_state.spriteColor.g;
-                    prim->b0 = FIELDSTG_state.spriteColor.b;
+                    prim.sprt->r0 = FIELDSTG_state.spriteColor.r;
+                    prim.sprt->g0 = FIELDSTG_state.spriteColor.g;
+                    prim.sprt->b0 = FIELDSTG_state.spriteColor.b;
                 } else {
-                    prim->r0 = 0x80;
-                    prim->g0 = 0x80;
-                    prim->b0 = 0x80;
+                    prim.sprt->r0 = 0x80;
+                    prim.sprt->g0 = 0x80;
+                    prim.sprt->b0 = 0x80;
                 }
-                prim->x0 = task->sprites[i][j].x + x - scroll.x;
-                prim->y0 = task->sprites[i][j].y + y - scroll.y;
-                prim->w = task->sprites[i][j].w;
-                prim->h = task->sprites[i][j].h;
-                prim->clut = getClut(task->clutX, task->clutY);
-                prim->u0 = task->sprites[i][j].u;
-                prim->v0 = task->imageY + task->sprites[i][j].v;
-                addPrim(ot, prim);
-                prim++;
+                prim.sprt->x0 = task->sprites[i][j].x + x - scroll.x;
+                prim.sprt->y0 = task->sprites[i][j].y + y - scroll.y;
+                prim.sprt->w = task->sprites[i][j].w;
+                prim.sprt->h = task->sprites[i][j].h;
+                prim.sprt->clut = getClut(task->clutX, task->clutY);
+                prim.sprt->u0 = task->sprites[i][j].u;
+                prim.sprt->v0 = task->imageY + task->sprites[i][j].v;
+                addPrim(ot, prim.any);
+                prim.sprt++;
             }
         }
-        SetDrawTPage((DR_TPAGE *)prim, 0, 1, GetTPage(1, 0, task->imageX, task->imageY));
-        addPrim(ot, prim);
-        prim = (SPRT *)((DR_TPAGE *)prim + 1);
+        SetDrawTPage(prim.tpage, 0, 1, GetTPage(1, 0, task->imageX, task->imageY));
+        addPrim(ot, prim.any);
+        prim.tpage++;
     }
-    GFX.funcs.setPrim(prim);
+    GFX.funcs.setPrim(prim.any);
     FIELDSTG_touchStream(task);
 }
 
@@ -87,10 +87,10 @@ void FIELDSTG_loadStreamSprites(StreamTask *task) {
     s32 count;
     s32 *data = task->data;
     s32 slot = task->slot;
-    s16 *p = (s16 *)(data + 1);
+    s16 *p = (s16 *)(data + 1); /* the sprites of the three depths, after the first word */
 
     for (i = 0; i < 3; i++) {
-        count = *(s32 *)p;
+        count = *(s32 *)p; /* a word: how many, then six halfwords each */
         p += 2;
         for (j = 0; j < count; j++) {
             task->sprites[i][j].visible = 1;
