@@ -83,7 +83,7 @@ struct Point; /* fieldstg.h */
 #define FIELD_COMMAND_STOP_BEAM_HIT 0x386
 
 /* Some of FieldMap's maps (files): those of the floors the player walks on
-   come first, and GAME.unk26D8 picks one (FieldMap.setMap, SLOT_MAP) */
+   come first, and GAME.mapIndex picks one (FieldMap.setMap, SLOT_MAP) */
 #define FIELD_MAP_FLOOR0 0
 #define FIELD_MAP_FLOOR1 1
 #define FIELD_MAP_AREAS 4 /* a cell's value: its battle area (FieldBattles), or 0 */
@@ -104,7 +104,7 @@ typedef struct FieldMap {
     /* 0x48 */ void (*getWalkStep)(struct Point *pos, s32 scale, s32 dir, struct Point *out); /* FIELDSTG_getWalkStep */
     /* 0x4C */ void (*getFlyStep)(struct Point *pos, s32 scale, s32 dir, struct Point *out); /* FIELDSTG_getFlyStep */
     /* 0x50 */ void (*setFirstMap)(s32 index); /* FIELDSTG_setFirstMap: the map the player starts on
-                                                  (GAME.unk26D8), when the mode is new */
+                                                  (GAME.mapIndex), when the mode is new */
     /* 0x54 */ void (*setMap)(s32 index); /* FIELDSTG_setMap: the map the player is on */
     /* 0x58 */ s32 (*isTileFree)(struct Point *pos); /* FIELDSTG_isTileFree: 0 where a character or an object stands */
 } FieldMap;
@@ -238,8 +238,8 @@ typedef struct StageSlot {
     /* 0x0E */ u16 unkE; /* y */
     /* 0x10 */ u16 unk10; /* the direction */
     /* 0x12 */ u16 unk12; /* the animation of the map objects to hide, or 0 */
-    /* 0x14 */ u16 unk14; /* copied to GAME.unk44, the place (FieldBattles.id) */
-    /* 0x16 */ u16 unk16; /* copied to GAME.unk46 */
+    /* 0x14 */ u16 unk14; /* copied to GAME.place, the place (FieldBattles.id) */
+    /* 0x16 */ u16 unk16; /* copied to GAME.placeArg */
 } StageSlot;
 
 /* A battle that can start on the field (see FIELDSTG_startEncounter) */
@@ -264,7 +264,7 @@ typedef struct BattleList {
  */
 typedef struct FieldBattles {
     /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 id; /* the place, GAME.unk44 */
+    /* 0x04 */ s32 id; /* the place, GAME.place */
     /* 0x08 */ s32 unk8;
     /* 0x0C */ BattleList *battles[4];
 } FieldBattles;

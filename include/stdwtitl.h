@@ -51,8 +51,7 @@
 
 /* Sounds (SOUND.playSound) */
 #define STDWTITL_TITLE_SOUND_BANK 0x47
-#define STDWTITL_TITLE_MUSIC 0x611C0000
-#define SE_TITLE_OPTIONS 0x8004113E
+#define STDWTITL_TITLE_MUSIC MUSIC(STDWTITL_TITLE_SOUND_BANK, 0)
 
 /* The low byte of the game mode that shows the still screen, after the
    movies' */

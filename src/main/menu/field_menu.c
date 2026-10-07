@@ -194,7 +194,7 @@ void updateFieldMenu(FieldMenu *task, FieldMenuWindows *win) {
                 }
                 SOUND.playSound(SOUND_MENU_OPEN);
                 if (task->option2Enabled == 0) {
-                    win->options[2]->setPalette(win->options[2], 7);
+                    win->options[2]->setPalette(win->options[2], PALETTE_GREY);
                 }
                 task->substate++;
             }

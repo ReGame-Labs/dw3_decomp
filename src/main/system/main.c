@@ -34,7 +34,7 @@ int main(void) {
     rect.h = 0x1FF;
     ClearImage(&rect, 0, 0, 0);
     DrawSync(0);
-    GsInitGraph(320, 240, 1, 1, 0);
+    GsInitGraph(SCREEN_WIDTH, SCREEN_HEIGHT, 1, 1, 0);
     GsInit3D();
     SsInit();
     InitGeom();

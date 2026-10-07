@@ -680,7 +680,7 @@ StageSelectEntry STAGSLCT_entries[] = {
 #endif
 };
 
-RECT STAGSLCT_screenRect = {0, 0, 320, 240};
+RECT STAGSLCT_screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 u16 STAGSLCT_biosVersion[10] = {0};
 u16 STAGSLCT_biosVersionEnd = 0;
 
@@ -748,7 +748,7 @@ void STAGSLCT_showBiosVersion(StageSelect *sel, StageSelectWindows *win) {
     s32 code;
 
     if (sel->biosShown == 0) {
-        win->bios = createTextWindow(0x1000, 1, 0x10, 0x20);
+        win->bios = createTextWindow(SCREEN_LAYER, 1, 0x10, 0x20);
         /* the BIOS version string in the ROM, in full-width Shift-JIS */
         src = (u8 *)0x1FC0012C;
         for (i = 0; i < 10; i++, src++) {
@@ -835,9 +835,9 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
         i = 0;
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0x5000);
-        GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         {
-            Layer *layer = GFX.funcs.createLayer(&STAGSLCT_screenRect, 1, 0x1000);
+            Layer *layer = GFX.funcs.createLayer(&STAGSLCT_screenRect, 1, SCREEN_LAYER);
             layer->setBgColor(layer, 0x1F, 0x1F, 0x1F);
         }
         while (STAGSLCT_entries[i].scene != -1) {
@@ -851,23 +851,23 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
         sel->count = i;
         sel->top = GAME.stageSelectTop;
         sel->cursor = GAME.stageSelectCursor;
-        win->title = createTextWindow(0x1000, 1, 0x10, 0x20);
-        win->cursor = createTextWindow(0x1000, 1, 0x10, 0x2C);
+        win->title = createTextWindow(SCREEN_LAYER, 1, 0x10, 0x20);
+        win->cursor = createTextWindow(SCREEN_LAYER, 1, 0x10, 0x2C);
         win->cursor->setPos(win->cursor, 0xE, sel->cursor * 12 + 0x2D);
         for (i = 0; i < sel->lines; i++) {
-            win->names[i] = createTextWindow(0x1000, 1, 0x18, i * 12 + 0x2D);
-            win->titles[i] = createTextWindow(0x1000, 1, 0x98, i * 12 + 0x2D);
+            win->names[i] = createTextWindow(SCREEN_LAYER, 1, 0x18, i * 12 + 0x2D);
+            win->titles[i] = createTextWindow(SCREEN_LAYER, 1, 0x98, i * 12 + 0x2D);
             win->names[i]->setText(win->names[i], STAGSLCT_entries[sel->top + i].name);
             win->titles[i]->setText(win->titles[i], STAGSLCT_entries[sel->top + i].title);
         }
-        win->region = createTextWindow(0x1000, 1, 0x90, 0x20);
-        win->progress = createTextWindow(0x1000, 1, 0xC0, 0x20);
-        win->unk8C = createTextWindow(0x1000, 1, 0xD0, 0xDC);
-        win->level = createTextWindow(0x1000, 1, 0x100, 0xDC);
-        win->unk88 = createTextWindow(0x1000, 1, 0x10, 0xDC);
+        win->region = createTextWindow(SCREEN_LAYER, 1, 0x90, 0x20);
+        win->progress = createTextWindow(SCREEN_LAYER, 1, 0xC0, 0x20);
+        win->unk8C = createTextWindow(SCREEN_LAYER, 1, 0xD0, 0xDC);
+        win->level = createTextWindow(SCREEN_LAYER, 1, 0x100, 0xDC);
+        win->unk88 = createTextWindow(SCREEN_LAYER, 1, 0x10, 0xDC);
         win->unk88->setNumber(win->unk88, 0, BATTLE_SETUP.unk0);
-        win->unk94 = createTextWindow(0x1000, 1, 0x30, 0xDC);
-        win->unk98 = createTextWindow(0x1000, 1, 0x50, 0xDC);
+        win->unk94 = createTextWindow(SCREEN_LAYER, 1, 0x30, 0xDC);
+        win->unk98 = createTextWindow(SCREEN_LAYER, 1, 0x50, 0xDC);
         task->nextState(task);
         break;
     case 1:

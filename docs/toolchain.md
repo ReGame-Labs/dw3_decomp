@@ -104,7 +104,7 @@ The prebuilt tools are x86 Linux binaries, so the image is `linux/amd64`.
 | `tools/stage_yaml.py` | writes a stage's splat config from `config/<version>/stages.txt` |
 | `tools/stage_externs.py` | drops the declarations of a stage's own data and functions that are defined before every use |
 | `tools/name_stage_data.py` | names the stages' data by its place in the stage's tables, in the C and every version's symbol files (then `make regenerate`) |
-| `tools/stage_constants.py` | writes the stages' music, sound ids and flag codes with the names of `include/stage.h` and `include/dw3/sound.h` |
+| `tools/stage_constants.py` | writes the stages' music, sound ids and flag codes with the names of `include/dw3/sound.h`, `include/stage.h` and `include/dw3/game_state.h` |
 | `tools/stage_common.py` | includes a `src/stages/common/` file in place of a stage's copy of its code |
 | `tools/try_match.py` | compiles a draft and compares each of its functions with the original |
 | `tools/permuter_import.py` | sets up a [decomp-permuter](https://github.com/simonlindholm/decomp-permuter) directory for one function |

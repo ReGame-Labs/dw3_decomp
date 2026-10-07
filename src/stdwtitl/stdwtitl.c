@@ -3,7 +3,7 @@
 /* not used */
 s32 STDWTITL_unused[3] = {0};
 
-RECT STDWTITL_screenRect = {0, 0, 320, 240};
+RECT STDWTITL_screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
 /* The sprite frames of the logo's two animations; -1 ends each */
 s16 STDWTITL_logoFrames[2][13] = {
@@ -55,7 +55,7 @@ void STDWTITL_tickSplashLoader(Task *task, Task **splash) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0xA000);
-        GFX.funcs.setDisplayMode(320, 240, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         initTimLoader(&loader);
         loader.setImagePos(0x280, 0);
         loader.loadArchive(FILE_CACHE.getEntry(SPLASH_IMAGES));
@@ -86,7 +86,7 @@ void STDWTITL_tickScreen(Task *task, ScreenChildren *children) {
         case 0:
             GFX.funcs.reset();
             GFX.funcs.allocPrimBuffers(0x14000);
-            GFX.funcs.setDisplayMode(320, 240, 0, 0);
+            GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
             rect.x = 0;
             rect.y = 0;
             rect.w = 320;
@@ -371,7 +371,7 @@ void STDWTITL_tickMoviePlayer(MoviePlayerTask *task) {
         HEAP.free(STDWTITL_vlcTable);
         DrawSync(0);
         STDWTITL_clearVram();
-        GFX.funcs.setDisplayArea(0, 0, 320, 240);
+        GFX.funcs.setDisplayArea(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         break;
     }
 }
@@ -1083,7 +1083,7 @@ void STDWTITL_tickMenu(MenuTask *task) {
                     task->options[0].y = task->options[1].y = 166;
                     task->blink = 0;
                     task->showCursor = 0;
-                    SOUND.playSound(SE_TITLE_OPTIONS);
+                    SOUND.playSound(SOUND_SWITCH03);
                 }
             }
             break;

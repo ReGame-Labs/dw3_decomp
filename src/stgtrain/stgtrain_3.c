@@ -388,7 +388,7 @@ TrainSession *STGTRAIN_createSession(TrainScreen *screen) {
     TrainSession *session = createTask(STGTRAIN_updateSession, sizeof(TrainSession), sizeof(TrainSessionWindows));
 
     session->finish = STGTRAIN_finishSession;
-    session->layerId = 0x1000;
+    session->layerId = SCREEN_LAYER;
     session->depth = 6;
     session->screen = screen;
     return session;
@@ -1126,7 +1126,7 @@ TrainMenu *STGTRAIN_createMenu(TrainScreen *screen) {
     menu->open = STGTRAIN_openMenu;
     menu->close = STGTRAIN_closeMenu;
     menu->showInfo = STGTRAIN_showMenuInfo;
-    menu->layerId = 0x1000;
+    menu->layerId = SCREEN_LAYER;
     menu->depth = 6;
     menu->screen = screen;
     return menu;

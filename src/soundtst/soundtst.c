@@ -606,7 +606,7 @@ SoundTestEntry SOUNDTST_banks[] = {
     {"", 0},
 };
 
-RECT SOUNDTST_screenRect = {0, 0, 320, 240};
+RECT SOUNDTST_screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
 void SOUNDTST_updateScene(Task *task, Task **items) {
     switch (task->state) {
@@ -617,7 +617,7 @@ void SOUNDTST_updateScene(Task *task, Task **items) {
         break;
     case 1:
         if (PAD.getPressed(0) & (1 << PAD_START)) {
-            GAME.funcs.requestMode(0x1500, 0);
+            GAME.funcs.requestMode(MODE_STAGE_SELECT, 0);
             task->nextState(task);
         }
         break;
@@ -751,16 +751,16 @@ void SOUNDTST_updateSoundTest(SoundTest *task, SoundTestWindows *win) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0x5000);
-        GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
-        res = GFX.funcs.createLayer(&SOUNDTST_screenRect, 1, 0x1000);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
+        res = GFX.funcs.createLayer(&SOUNDTST_screenRect, 1, SCREEN_LAYER);
         res->setBgColor(res, 0x1F, 0x1F, 0x1F);
-        win->title = createTextWindow(0x1000, 1, 0x10, 0x1E);
+        win->title = createTextWindow(SCREEN_LAYER, 1, 0x10, 0x1E);
         win->title->setText(win->title, "\x83\x54\x83\x45\x83\x93\x83\x68\x83\x65\x83\x58\x83\x67"); /* "サウンドテスト" */
-        win->header = createTextWindow(0x1000, 1, 0x20, 0x32);
+        win->header = createTextWindow(SCREEN_LAYER, 1, 0x20, 0x32);
         for (i = 0; i < 8; i++) {
-            win->lines[i] = createTextWindow(0x1000, 1, 0x30, i * 16 + 0x46);
+            win->lines[i] = createTextWindow(SCREEN_LAYER, 1, 0x30, i * 16 + 0x46);
         }
-        win->cursor = createTextWindow(0x1000, 1, 0x20, 0x46);
+        win->cursor = createTextWindow(SCREEN_LAYER, 1, 0x20, 0x46);
         win->cursor->setText(win->cursor, SOUNDTST_STR_CURSOR);
         task->nextState(task);
         break;
@@ -781,7 +781,7 @@ void SOUNDTST_updateSoundTest(SoundTest *task, SoundTestWindows *win) {
     case 2:
         break;
     case 3:
-        GAME.funcs.requestMode(0x1500, 0);
+        GAME.funcs.requestMode(MODE_STAGE_SELECT, 0);
         break;
     }
 }

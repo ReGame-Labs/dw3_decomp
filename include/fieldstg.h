@@ -17,10 +17,6 @@
 
 /* --- Shared: the types several modules use --- */
 
-/* The screen of the field's display mode (FIELDSTG_updateField), in pixels */
-#define FIELD_SCREEN_WIDTH 0x140
-#define FIELD_SCREEN_HEIGHT 0xF0
-
 /* Where the field keeps its textures in VRAM: the two images of
    FIELD_SPRITES_FILE (its entries 2 and 3, for the sprite sheets of its
    entries 0 and 1), the stage's map objects (FIELDSTG_loadFieldFiles) and a
@@ -47,16 +43,13 @@ typedef struct FieldWarp {
     /* 0x4 */ s16 y;
     /* 0x6 */ s16 dir;
     /* 0x8 */ u8 unk8[2];
-    /* 0xA */ u16 place; /* copied to GAME.unk44, the place (FieldBattles.id) */
-    /* 0xC */ u16 unkC; /* copied to GAME.unk46 */
+    /* 0xA */ u16 place; /* copied to GAME.place, the place (FieldBattles.id) */
+    /* 0xC */ u16 unkC; /* copied to GAME.placeArg */
 } FieldWarp;
 
 /*
  * The sounds only FIELDSTG plays (SOUND.playSound), by their SOUNDTST names.
- * Those that other overlays play too are still numbers, with the name in a
- * comment: SWITCH01, SWITCH02, COMEX113, COMCD115, GONDRA_S, SE000002 and
- * ELEVATER (stage.h), SWITCH03 (STDWTITL), COMCD103 and PLAYER11 (FIGHTSTG)
- * and SYSTEM05 (STPLNMET).
+ * Those that other overlays play too are in dw3/sound.h.
  */
 #define SOUND_DIG_DEMO 0x40003
 #define SOUND_DIGIMENT 0x40004 /* a warp's effect */
@@ -675,7 +668,7 @@ typedef struct HiddenSpot {
     /* 0x00 */ s32 frame; /* its object's */
     /* 0x04 */ s32 object; /* its index in FieldState.objects */
     /* 0x08 */ Point pos;
-    /* 0x10 */ s32 hasPrize; /* the one picked at random (GAME.unk26E4) */
+    /* 0x10 */ s32 hasPrize; /* the one picked at random (GAME.prizeSpot) */
 } HiddenSpot;
 
 /* The map's hidden spots (FIELD_TASK_HIDDEN_SPOTS, FIELDSTG_createHiddenSpots):
@@ -776,17 +769,9 @@ typedef struct StageEntry {
 
 /* --- field.c --- */
 
-/* The modes an encounter leaves the field for (FIELDSTG_startEncounter) */
-#define FIELD_MODE_BATTLE 0x600 /* FIGHTSTG's battle */
-#if VERSION_US
-#define FIELD_MODE_BATTLE_MOVIE 0xE09 /* STDWTITL's movie 8, which goes on to the battle */
-#elif VERSION_EU
-#define FIELD_MODE_BATTLE_MOVIE 0xE0A /* STDWTITL's movie 9 */
-#endif
-
 /* The player's FLAGS_00 codes (FIELDSTG_controlPlayer) */
 #define FIELD_FLAG_TALK_AHEAD 0x12 /* the player talks to what it faces, and clears it */
-#define FIELD_SEARCH_ITEM 0x8004 /* item 4, which the player needs to search the hidden spots */
+#define FIELD_SEARCH_ITEM ITEM(0, 4) /* item 4, which the player needs to search the hidden spots */
 
 /* The flag set when the field of a mode is entered: FLAGS_00's group 0x20,
    flag mode - 0x200 */
@@ -798,7 +783,7 @@ typedef struct StageEntry {
 #define FIELD_MODE_WSTAG815 0x2DE
 
 /* Points of the story (GAME.progress) where the field acts differently */
-#define FIELD_PROGRESS_MOVIE_BATTLES 0x2B /* each encounter plays FIELD_MODE_BATTLE_MOVIE first */
+#define FIELD_PROGRESS_MOVIE_BATTLES 0x2B /* each encounter plays MODE_BATTLE_MOVIE first */
 #define FIELD_PROGRESS_EXTRA 0x2D /* the European version's extra chapter, whose stages are
                                      its FIELDSTG_stages (WSTAG920 to WSTAG974) */
 
@@ -810,8 +795,8 @@ typedef struct StageEntry {
    TRANSITION_IMAGE_X in VRAM, cut into columns and rows */
 #define TRANSITION_COLUMNS 5
 #define TRANSITION_ROWS 6
-#define TRANSITION_TILE_WIDTH (FIELD_SCREEN_WIDTH / TRANSITION_COLUMNS)
-#define TRANSITION_TILE_HEIGHT (FIELD_SCREEN_HEIGHT / TRANSITION_ROWS)
+#define TRANSITION_TILE_WIDTH (SCREEN_WIDTH / TRANSITION_COLUMNS)
+#define TRANSITION_TILE_HEIGHT (SCREEN_HEIGHT / TRANSITION_ROWS)
 #define TRANSITION_IMAGE_X 0x280
 #define TRANSITION_SPEED 40 /* pixels a frame */
 #define TRANSITION_GONE 0x200 /* a tile's coordinate once it has slid off */
@@ -1144,7 +1129,7 @@ extern ScriptTimer FIELDSTG_scriptTimer;
 extern void (*FIELDSTG_scriptHelpers[])(); /* the script helpers (FIELDSTG_toScreenPos...) */
 extern ScriptCommand FIELDSTG_scriptCommands[];
 extern void (*FIELDSTG_checkBattle)(); /* FIELDSTG_countBattleSteps */
-extern s32 FIELDSTG_battleRates[]; /* how much each area lowers GAME.unk30, the steps to the next battle */
+extern s32 FIELDSTG_battleRates[]; /* how much each area lowers GAME.battleSteps, the steps to the next battle */
 extern s32 FIELDSTG_boxFrame; /* the frame FIELDSTG_boxes was filled in */
 extern Point FIELDSTG_dirVectors[][8]; /* a direction's vector, scaled by 4096 */
 extern u8 FIELDSTG_mirrorDirs[];

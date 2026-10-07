@@ -287,12 +287,12 @@ void STGTRAIN_updateRoot(Task *task, Task **children) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0x14000);
-        GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         rect.x = 0;
         rect.y = 0;
         rect.w = 0x140;
         rect.h = 0xF0;
-        layer = GFX.funcs.createLayer(&rect, 3, 0x1000);
+        layer = GFX.funcs.createLayer(&rect, 3, SCREEN_LAYER);
         layer->setBgColor(layer, 0, 0, 0);
         rect.x = 0x7B;
         rect.y = 0x53;
@@ -367,14 +367,14 @@ void STGTRAIN_showVitals(TrainScreen *screen, TrainScreenWindows *win, s32 show)
         win->hp[1]->setNumber(win->hp[1], 0, totals.fields.hp);
         win->hp[2]->setNumber(win->hp[2], 0, totals.fields.maxHp);
         for (i = 1; i < 3; i++) {
-            win->hp[i]->setPalette(win->hp[i], 0);
+            win->hp[i]->setPalette(win->hp[i], PALETTE_WHITE);
             win->hp[i]->setRightAlign(win->hp[i], 1);
         }
         win->mp[0]->setString(win->mp[0], FILE_CACHE.load(STGTRAIN_TEXT), 3);
         win->mp[1]->setNumber(win->mp[1], 0, totals.fields.mp);
         win->mp[2]->setNumber(win->mp[2], 0, totals.fields.maxMp);
         for (i = 1; i < 3; i++) {
-            win->mp[i]->setPalette(win->mp[i], 0);
+            win->mp[i]->setPalette(win->mp[i], PALETTE_WHITE);
             win->mp[i]->setRightAlign(win->mp[i], 1);
         }
         for (i = 0; i < 2; i++) {
@@ -405,21 +405,21 @@ void STGTRAIN_showBattleStats(TrainScreen *screen, TrainScreenWindows *win, s32 
         for (i = 0; i < 6; i++) {
             win->stats[i]->setNumber(win->stats[i], 0, totals.fields.battle[i]);
             win->stats[i]->setRightAlign(win->stats[i], 1);
-            win->stats[i]->setPalette(win->stats[i], 0);
+            win->stats[i]->setPalette(win->stats[i], PALETTE_WHITE);
         }
         if (totals.fields.lowered[0] != 0) {
-            win->stats[0]->setPalette(win->stats[0], 6);
+            win->stats[0]->setPalette(win->stats[0], PALETTE_PURPLE);
         }
         if (totals.fields.lowered[1] != 0) {
-            win->stats[1]->setPalette(win->stats[1], 6);
+            win->stats[1]->setPalette(win->stats[1], PALETTE_PURPLE);
         }
         if (totals.fields.lowered[2] != 0) {
-            win->stats[4]->setPalette(win->stats[4], 6);
+            win->stats[4]->setPalette(win->stats[4], PALETTE_PURPLE);
         }
         for (i = 0; i < 7; i++) {
             win->resistances[i]->setNumber(win->resistances[i], 0, totals.fields.resist[i]);
             win->resistances[i]->setRightAlign(win->resistances[i], 1);
-            win->resistances[i]->setPalette(win->resistances[i], 0);
+            win->resistances[i]->setPalette(win->resistances[i], PALETTE_WHITE);
         }
     } else {
         for (i = 0; i < 6; i++) {
@@ -475,11 +475,11 @@ void STGTRAIN_showStatChanges(TrainScreen *screen, PartnerTotals *before) {
         win->hp[i]->setRightAlign(win->hp[i], 1);
     }
     if (before->fields.maxHp < totals.fields.maxHp) {
-        win->hp[2]->setPalette(win->hp[2], 1);
+        win->hp[2]->setPalette(win->hp[2], PALETTE_BLUE);
     } else if (totals.fields.maxHp < before->fields.maxHp) {
-        win->hp[2]->setPalette(win->hp[2], 5);
+        win->hp[2]->setPalette(win->hp[2], PALETTE_RED);
     } else {
-        win->hp[2]->setPalette(win->hp[2], 0);
+        win->hp[2]->setPalette(win->hp[2], PALETTE_WHITE);
     }
     win->mp[0]->setString(win->mp[i], FILE_CACHE.load(STGTRAIN_TEXT), 3);
     win->mp[1]->setNumber(win->mp[1], 0, totals.fields.mp);
@@ -488,40 +488,40 @@ void STGTRAIN_showStatChanges(TrainScreen *screen, PartnerTotals *before) {
         win->mp[i]->setRightAlign(win->mp[i], 1);
     }
     if (before->fields.maxMp < totals.fields.maxMp) {
-        win->mp[2]->setPalette(win->mp[2], 1);
+        win->mp[2]->setPalette(win->mp[2], PALETTE_BLUE);
     } else if (totals.fields.maxMp < before->fields.maxMp) {
-        win->mp[2]->setPalette(win->mp[2], 5);
+        win->mp[2]->setPalette(win->mp[2], PALETTE_RED);
     } else {
-        win->mp[2]->setPalette(win->mp[2], 0);
+        win->mp[2]->setPalette(win->mp[2], PALETTE_WHITE);
     }
     for (i = 0; i < 2; i++) {
         win->slashes[i]->setString(win->slashes[i], FILE_CACHE.load(STGTRAIN_TEXT), 0x43);
     }
     if (totals.fields.lowered[0] != 0) {
-        win->stats[0]->setPalette(win->stats[0], 6);
+        win->stats[0]->setPalette(win->stats[0], PALETTE_PURPLE);
     }
     if (totals.fields.lowered[1] != 0) {
-        win->stats[1]->setPalette(win->stats[1], 6);
+        win->stats[1]->setPalette(win->stats[1], PALETTE_PURPLE);
     }
     if (totals.fields.lowered[2] != 0) {
-        win->stats[4]->setPalette(win->stats[4], 6);
+        win->stats[4]->setPalette(win->stats[4], PALETTE_PURPLE);
     }
     for (i = 0; i < 6; i++) {
         win->stats[i]->setNumber(win->stats[i], 0, *(totals.fields.battle + i));
         win->stats[i]->setRightAlign(win->stats[i], 1);
         if (before->fields.battle[i] < *(totals.fields.battle + i)) {
-            win->stats[i]->setPalette(win->stats[i], 1);
+            win->stats[i]->setPalette(win->stats[i], PALETTE_BLUE);
         } else if (*(totals.fields.battle + i) < before->fields.battle[i]) {
-            win->stats[i]->setPalette(win->stats[i], 5);
+            win->stats[i]->setPalette(win->stats[i], PALETTE_RED);
         }
     }
     for (i = 0; i < 7; i++) {
         win->resistances[i]->setNumber(win->resistances[i], 0, *(totals.fields.resist + i));
         win->resistances[i]->setRightAlign(win->resistances[i], 1);
         if (before->fields.resist[i] < *(totals.fields.resist + i)) {
-            win->resistances[i]->setPalette(win->resistances[i], 1);
+            win->resistances[i]->setPalette(win->resistances[i], PALETTE_BLUE);
         } else if (*(totals.fields.resist + i) < before->fields.resist[i]) {
-            win->resistances[i]->setPalette(win->resistances[i], 5);
+            win->resistances[i]->setPalette(win->resistances[i], PALETTE_RED);
         }
     }
 }
@@ -899,12 +899,12 @@ void STGTRAIN_updateScreen(TrainScreen *screen, TrainScreenWindows *win) {
         break;
     case TASK_DONE:
         if (SOUND.isLoading() == 0) {
-            SOUND.playSound(0x60840002);
+            SOUND.playSound(MUSIC(0x21, 2));
             screen->setState(screen, TASK_RUN);
         }
         break;
     case TASK_KILL:
-        SOUND.stopSound(0x60840002);
+        SOUND.stopSound(MUSIC(0x21, 2));
         GAME.funcs.requestMode(GAME.fieldMode, 0);
         break;
     }
@@ -916,7 +916,7 @@ TrainScreen *STGTRAIN_createScreen(void) {
     s32 sign;
 
     screen->showStats = STGTRAIN_showStatChanges;
-    screen->layerId = 0x1000;
+    screen->layerId = SCREEN_LAYER;
     screen->depth = 6;
     /* the gym's sign, by the stage the player came from */
     switch (GAME.funcs.getPrevMode()) {

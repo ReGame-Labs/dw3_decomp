@@ -16,7 +16,7 @@ typedef struct Random {
 } Random;
 
 void seedRandom(s32 seed);
-u16 random(void);
+s32 random(void);
 
 extern Random RANDOM;
 extern u16 RANDOM_TABLE[RANDOM_COUNT];

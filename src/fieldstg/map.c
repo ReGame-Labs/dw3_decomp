@@ -47,13 +47,13 @@ void FIELDSTG_setMapFile(s32 index, s32 value) {
 /* Puts the player on map index when the mode is new (FieldMap.setFirstMap) */
 void FIELDSTG_setFirstMap(s32 index) {
     if (GAME.clearTempFlags != 0) {
-        GAME.unk26D8 = index;
+        GAME.mapIndex = index;
     }
 }
 
 /* Puts the player on map index (FieldMap.setMap) */
 void FIELDSTG_setMap(s32 index) {
-    GAME.unk26D8 = index;
+    GAME.mapIndex = index;
 }
 
 /* The cell of map index at pos, down the tree from the grid to the pixel
@@ -144,7 +144,7 @@ s32 FIELDSTG_isTileFree(Point *pos) {
 /* A step of scale in a direction on the map the player is on, along the
    slope of its cell (FieldMap.getWalkStep) */
 void FIELDSTG_getWalkStep(Point *pos, s32 scale, s32 dir, Point *out) {
-    s32 cell = (u8)FIELDSTG_getMapCell(GAME.unk26D8, pos);
+    s32 cell = (u8)FIELDSTG_getMapCell(GAME.mapIndex, pos);
     s32 row = cell & 0xF;
     s32 slopeDir;
     s32 sign;

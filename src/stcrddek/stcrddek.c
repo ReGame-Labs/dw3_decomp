@@ -9,12 +9,12 @@ void STCRDDEK_updateScene(Task *task, Task **children) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0xF000);
-        GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         rect.x = 0;
         rect.y = 0;
         rect.w = 0x140;
         rect.h = 0xF0;
-        layer = GFX.funcs.createLayer(&rect, 3, 0x1000);
+        layer = GFX.funcs.createLayer(&rect, 3, SCREEN_LAYER);
         layer->setBgColor(layer, 0, 0, 0);
         children[0] = (Task *)STCRDDEK_createScreen();
         task->nextState(task);
@@ -106,7 +106,7 @@ void STCRDDEK_updateDeckCards(DeckCards *task) {
 DeckCards *STCRDDEK_createDeckCards(DeckEditor *editor) {
     DeckCards *task = createTask(STCRDDEK_updateDeckCards, sizeof(DeckCards), 0);
 
-    task->layer = 0x1000;
+    task->layer = SCREEN_LAYER;
     task->depth = 5;
     task->editor = editor;
     return task;
@@ -758,7 +758,7 @@ void STCRDDEK_stepEditor(DeckEditor *task, DeckEditorChildren *children) {
         }
         break;
     case 60:
-        children->cursor->setPalette(children->cursor, 7);
+        children->cursor->setPalette(children->cursor, PALETTE_GREY);
         children->cursor->setStill(children->cursor, 1);
         STCRDDEK_funcs.startFade(&task->panels[4], 1);
         task->substate++;
@@ -779,7 +779,7 @@ void STCRDDEK_stepEditor(DeckEditor *task, DeckEditorChildren *children) {
         break;
     case 63:
         if (STCRDDEK_funcs.updateFade(&task->panels[4])) {
-            children->cursor->setPalette(children->cursor, 0);
+            children->cursor->setPalette(children->cursor, PALETTE_WHITE);
             children->cursor->setStill(children->cursor, 0);
             task->substate = 23;
         }
@@ -816,7 +816,7 @@ void STCRDDEK_updateEditor(DeckEditor *task, DeckEditorChildren *children) {
 DeckEditor *STCRDDEK_createEditor(DeckScreen *screen, s32 deck) {
     DeckEditor *task = createTask(STCRDDEK_updateEditor, sizeof(DeckEditor), sizeof(DeckEditorChildren));
 
-    task->layer = 0x1000;
+    task->layer = SCREEN_LAYER;
     task->depth = 6;
     task->screen = screen;
     task->deck = deck;
@@ -859,7 +859,7 @@ void STCRDDEK_updateIdle(DeckIdle *task, void *children) {
 DeckIdle *STCRDDEK_createIdle(void *parent) {
     DeckIdle *task = createTask(STCRDDEK_updateIdle, sizeof(DeckIdle), 0);
 
-    task->layer = 0x1000;
+    task->layer = SCREEN_LAYER;
     task->depth = 6;
     task->parent = parent;
     return task;
@@ -884,7 +884,7 @@ NameEntry *STCRDDEK_createNameEntry(char *text) {
 
     entry->getName = STCRDDEK_getName;
     entry->close = STCRDDEK_closeNameEntry;
-    entry->layer = 0x1000;
+    entry->layer = SCREEN_LAYER;
     entry->depth = 3;
     entry->mode = 2;
     entry->maxLength = 10;
@@ -1148,7 +1148,7 @@ void STCRDDEK_stepScreen(DeckScreen *task, DeckScreenChildren *children) {
     case 50:
         if (task->step) {
             children->cursor->setStill(children->cursor, 1);
-            children->cursor->setPalette(children->cursor, 7);
+            children->cursor->setPalette(children->cursor, PALETTE_GREY);
         }
         STCRDDEK_funcs.startFade(&task->panels[2], 0);
         STCRDDEK_funcs.startFade(&task->rowPanels[2], 0);
@@ -1167,7 +1167,7 @@ void STCRDDEK_stepScreen(DeckScreen *task, DeckScreenChildren *children) {
         if (STCRDDEK_funcs.updateFade(&task->rowPanels[1])) {
             if (task->step) {
                 children->cursor->setStill(children->cursor, 0);
-                children->cursor->setPalette(children->cursor, 0);
+                children->cursor->setPalette(children->cursor, PALETTE_WHITE);
                 children->cursor->setVisible(children->cursor, 0);
                 children->options[0]->setVisible(children->options[0], 0);
                 children->options[1]->setVisible(children->options[1], 0);
@@ -1277,7 +1277,7 @@ DeckScreen *STCRDDEK_createScreen(void) {
     DeckScreen *task = createTask(STCRDDEK_updateScreen, sizeof(DeckScreen), sizeof(DeckScreenChildren));
 
     task->countKinds = STCRDDEK_countCardKinds;
-    task->layer = 0x1000;
+    task->layer = SCREEN_LAYER;
     task->depth = 7;
     return task;
 }

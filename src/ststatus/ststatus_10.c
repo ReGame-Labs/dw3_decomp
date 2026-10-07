@@ -319,7 +319,7 @@ void STSTATUS_updateMapScreen(StatusMapScreen *screen, TextWindow **windows) {
 Task *STSTATUS_createMapScreen(FieldMenuScreen *menu, s32 extra) {
     StatusMapScreen *screen = createTask(STSTATUS_updateMapScreen, sizeof(StatusMapScreen), 4);
 
-    screen->layer = 0x1000;
+    screen->layer = SCREEN_LAYER;
     screen->depth = 5;
     screen->menu = menu;
     screen->lateGame = STSTATUS_areaFuncs.isLateGame();
@@ -435,7 +435,7 @@ void STSTATUS_updateMenu(FieldMenuScreen *menu, FieldMenuScreenChildren *childre
 FieldMenuScreen *STSTATUS_createMenu(void) {
     FieldMenuScreen *menu = createTask(STSTATUS_updateMenu, sizeof(FieldMenuScreen), sizeof(FieldMenuScreenChildren));
 
-    menu->layer = 0x1000;
+    menu->layer = SCREEN_LAYER;
     menu->lateGame = STSTATUS_areaFuncs.isLateGame();
     if (menu->lateGame == 0) {
         menu->bgArchive = (FILE_STATUS_BG + 1) << 16;

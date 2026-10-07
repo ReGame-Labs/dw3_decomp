@@ -345,7 +345,7 @@ s32 CARDGAME_checkPlayCondition(CardBattle *battle, CardScreen *screen, s32 kind
 }
 
 /* The mode's task: sets up the display and starts the battle, then returns
-   to the field once it is over (or to mode 0x1500 when the mode's low
+   to the field once it is over (or to MODE_STAGE_SELECT when the mode's low
    bits are set) */
 void CARDGAME_updateScene(Task *task, CardBattle **items) {
     TimLoader tim;
@@ -356,7 +356,7 @@ void CARDGAME_updateScene(Task *task, CardBattle **items) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0xA000);
-        GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         initTimLoader(&tim);
         tim.setImagePos(0x280, 0);
         tim.loadArchive(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16));
@@ -377,7 +377,7 @@ void CARDGAME_updateScene(Task *task, CardBattle **items) {
         switch (task->substate) {
         case 0:
         default:
-            GAME.funcs.requestMode((GAME.funcs.getMode() & 0xF) ? 0x1500 : GAME.fieldMode, 0);
+            GAME.funcs.requestMode((GAME.funcs.getMode() & 0xF) ? MODE_STAGE_SELECT : GAME.fieldMode, 0);
             task->nextSubstate(task);
             break;
         case 1:
@@ -829,9 +829,9 @@ void CARDGAME_drawCenteredText(CardScreen *screen, CardScreenItems *items, CardW
         initTextTools(&tools);
         width = tools.measure(text->text, text->style, text->spacingX);
         if (window->value == 0x1F) {
-            text->setPalette(text, 3);
+            text->setPalette(text, PALETTE_YELLOW);
         } else {
-            text->setPalette(text, 0);
+            text->setPalette(text, PALETTE_WHITE);
         }
         text->setVisible(text, 1);
         text->setPos(text, 0xA0 - width / 2, window->y + 4);
@@ -1014,7 +1014,7 @@ void CARDGAME_updateMessageWindow(CardScreen *screen, CardScreenItems *items) {
                 items->cursor->setPos(items->cursor, 0x14, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x11 + screen->message.choice * 14);
                 items->moreTexts[7]->setString(items->moreTexts[7], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x45);
                 if (screen->message.prompt == 3) {
-                    items->moreTexts[7]->setPalette(items->moreTexts[7], 7);
+                    items->moreTexts[7]->setPalette(items->moreTexts[7], PALETTE_GREY);
                 }
                 items->moreTexts[7]->setPos(items->moreTexts[7], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
                 items->texts[0]->setString(items->texts[0], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x46);
@@ -1077,7 +1077,7 @@ void CARDGAME_updateMessageWindow(CardScreen *screen, CardScreenItems *items) {
         items->cursor->setVisible(items->cursor, 0);
         items->moreTexts[1]->setVisible(items->moreTexts[1], 0);
 #if VERSION_EU
-        items->moreTexts[7]->setPalette(items->moreTexts[7], 0);
+        items->moreTexts[7]->setPalette(items->moreTexts[7], PALETTE_WHITE);
 #endif
         items->moreTexts[7]->setVisible(items->moreTexts[7], 0);
         items->texts[0]->setVisible(items->texts[0], 0);
@@ -5428,7 +5428,7 @@ CardFader *CARDGAME_createFader(u8 blend) {
 
 /* The data: the rest of the overlay's, this object's tables and the
    variables, which cardgame_2.c shares */
-RECT CARDGAME_screenRect = {0, 0, 320, 240};
+RECT CARDGAME_screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 /* where the deck window's six counts are */
 CardOffset CARDGAME_deckCountOffsets[] = {
     {0x24, 0x14}, {0x47, 0x14}, {0x6A, 0x14}, {0x8D, 0x14}, {0xB0, 0x14}, {0xD3, 0x14},

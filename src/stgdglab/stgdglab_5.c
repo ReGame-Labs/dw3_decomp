@@ -61,9 +61,9 @@ void STGDGLAB_showEntryList(LabEntryList *panel, LabEntryListWindows *windows, s
                 windows->options[i]->setString(windows->options[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)),
                                                GET_DIGIMON(id)->nameId);
                 if (partner->battleDigivolve == id) {
-                    windows->options[i]->setPalette(windows->options[i], 1);
+                    windows->options[i]->setPalette(windows->options[i], PALETTE_BLUE);
                 } else {
-                    windows->options[i]->setPalette(windows->options[i], 0);
+                    windows->options[i]->setPalette(windows->options[i], PALETTE_WHITE);
                 }
             }
         }
@@ -83,7 +83,7 @@ void STGDGLAB_showEntryList(LabEntryList *panel, LabEntryListWindows *windows, s
                 windows->values[i]->setNumber(windows->values[i], 0, value);
                 if ((i == 0 && totals.fields.lowered[0] != 0) || (i == 1 && totals.fields.lowered[1] != 0) ||
                     (i == 4 && totals.fields.lowered[2] != 0)) {
-                    windows->values[i]->setPalette(windows->values[i], 6);
+                    windows->values[i]->setPalette(windows->values[i], PALETTE_PURPLE);
                 }
             }
             stats = totals.stats;
@@ -99,11 +99,11 @@ void STGDGLAB_showEntryList(LabEntryList *panel, LabEntryListWindows *windows, s
                     windows->skills[i]->setString(windows->skills[i], FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)),
                                                   entry.skills[i] & SKILL_ID);
                     if (entry.skills[i] & SKILL_LAST) {
-                        windows->skills[i]->setPalette(windows->skills[i], 3);
+                        windows->skills[i]->setPalette(windows->skills[i], PALETTE_YELLOW);
                     } else if (entry.skills[i] & SKILL_MARKED) {
-                        windows->skills[i]->setPalette(windows->skills[i], 4);
+                        windows->skills[i]->setPalette(windows->skills[i], PALETTE_GREEN);
                     } else {
-                        windows->skills[i]->setPalette(windows->skills[i], 0);
+                        windows->skills[i]->setPalette(windows->skills[i], PALETTE_WHITE);
                     }
                 } else {
                     windows->skills[i]->setVisible(windows->skills[i], 0);
@@ -338,7 +338,7 @@ LabEntryList *STGDGLAB_createEntryList(s32 partner, s32 allEntries, s32 closable
     LabEntryList *panel = createTask(STGDGLAB_updateEntryList, sizeof(LabEntryList), 0x70);
 
     panel->close = STGDGLAB_closeEntryList;
-    panel->layer = 0x1000;
+    panel->layer = SCREEN_LAYER;
     panel->depth = 2;
     panel->allEntries = allEntries;
     panel->partner = partner;
@@ -489,7 +489,7 @@ Lab *STGDGLAB_createLab(void) {
     lab->menuOpen = STGDGLAB_labMenuRunning;
     lab->packParty = STGDGLAB_packParty;
     lab->fadeOut = STGDGLAB_fadeOutLab;
-    lab->layer = 0x1000;
+    lab->layer = SCREEN_LAYER;
     return lab;
 }
 

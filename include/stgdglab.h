@@ -21,10 +21,6 @@
 #define FILE_LAB_SPRITES 0x2C5
 #endif
 
-/* The flag of a skill marked in the lab (STGDGLAB_updateSkillPanel), in
-   PartnerEntry.skills beside SKILL_KNOWN and SKILL_LAST */
-#define SKILL_MARKED 0x4000
-
 /* The lab's main menu (STGDGLAB_createMenu) */
 typedef struct LabMenu {
     TASK_HEADER(LabMenu);

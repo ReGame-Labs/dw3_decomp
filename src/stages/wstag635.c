@@ -57,7 +57,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         children[0] = createTileAnims();
-        copyPlacePoints(FIELDSTG_state.slots, placePoints, GAME.unk44, GAME.unk46);
+        copyPlacePoints(FIELDSTG_state.slots, placePoints, GAME.place, GAME.placeArg);
         task->nextState(task);
         break;
     case TASK_RUN:

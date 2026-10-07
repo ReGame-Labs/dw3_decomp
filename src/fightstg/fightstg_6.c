@@ -866,9 +866,9 @@ void FIGHTSTG_updateCounterattack(Counterattack *task, BattleChild *children) {
                 {
                     BattleStats *stats = FIGHTSTG_battleFuncs.computeStats(task->side, 1, FIGHTSTG_battle.active[other]);
 
-                    if (tech->unk7 >= ELEMENT_FIRST || stats->element >= ELEMENT_FIRST) {
-                        if (tech->unk7 >= ELEMENT_FIRST) {
-                            element = tech->unk7 - ELEMENT_FIRST;
+                    if (tech->element >= ELEMENT_FIRST || stats->element >= ELEMENT_FIRST) {
+                        if (tech->element >= ELEMENT_FIRST) {
+                            element = tech->element - ELEMENT_FIRST;
                         } else {
                             element = stats->element - ELEMENT_FIRST;
                         }
@@ -982,7 +982,7 @@ void FIGHTSTG_reviveFighter(s32 tech, s32 fighter) {
     }
     fighters[fighter].flags = 0;
     fighters[fighter].hp = fighters[fighter].maxHp;
-    FIGHTSTG_battleFuncs.changeBoost(0, fighter, 1, entry->power);
+    FIGHTSTG_battleFuncs.changeBoost(0, fighter, 1, entry->effectPower);
     FIGHTSTG_queueBoostEnd(0, fighter, 1, tech);
 }
 #endif
@@ -1115,7 +1115,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
                     return;
                 }
                 if (FIGHTSTG_action.effects[TECH_EFFECT_MULTI_HIT]) {
-                    if (TECHS[task->tech - 1].unkA == TECH_EFFECT_DOUBLE_MAGIC) {
+                    if (TECHS[task->tech - 1].effect == TECH_EFFECT_DOUBLE_MAGIC) {
                         task->damage = FIGHTSTG_action.hitDamage[0] + FIGHTSTG_action.hitDamage[1];
                         task->lines[0] = other << 4;
                         task->lines[1] = task->damage;
@@ -1437,7 +1437,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
                     if (ok == 0) {
                         break;
                     }
-                    FIGHTSTG_battleFuncs.changeBoost((u8)(other << 4), FIGHTSTG_battle.active[other], boost->stat, boost->amount * tech->power);
+                    FIGHTSTG_battleFuncs.changeBoost((u8)(other << 4), FIGHTSTG_battle.active[other], boost->stat, boost->amount * tech->effectPower);
                     FIGHTSTG_queueBoostEnd(other << 4, FIGHTSTG_battle.active[other], boost->stat, task->tech);
                     task->lines[0] = boost->line;
                     task->lines[1] = other << 4;
@@ -1458,7 +1458,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
                     }
                     for (i = 0; i < 3; i++) {
                         if (FIGHTSTG_battle.fighters[task->side >> 4][i].id != 0 && FIGHTSTG_battle.fighters[task->side >> 4][i].hp > 0) {
-                            FIGHTSTG_battleFuncs.changeBoost(task->side, i, boost->stat, boost->amount * tech->power);
+                            FIGHTSTG_battleFuncs.changeBoost(task->side, i, boost->stat, boost->amount * tech->effectPower);
                             FIGHTSTG_queueBoostEnd(task->side, i, boost->stat, task->tech);
                         }
                     }
@@ -1483,7 +1483,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
                     s32 row = other * 0x60;
                     BattleFighter *slot = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[other]];
 
-                    ((BattleFighter *)(row + (s32)slot))->charge = tech->power;
+                    ((BattleFighter *)(row + (s32)slot))->charge = tech->effectPower;
                     task->lines[0] = 0x36;
                     task->lines[1] = task->side;
                     children[0].message->show(children[0].message, 2, task->lines);
@@ -1526,7 +1526,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
                     s32 amount;
 
                     if (from->mp != 0) {
-                        amount = from->maxMp * tech->power / 128;
+                        amount = from->maxMp * tech->effectPower / 128;
                         if (from->mp < amount) {
                             amount = from->mp;
                         }
@@ -1575,13 +1575,13 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
                 stats = FIGHTSTG_battleFuncs.computeStats(task->side, 1, FIGHTSTG_battle.active[task->side == 0x10]);
                 FIGHTSTG_battle.boostElement = tech->icon;
                 level = stats->stats[BATTLE_STAT_SPIRIT] / 10;
-                element = level + tech->power;
+                element = level + tech->effectPower;
                 if (element >= 0x80) {
                     element = 0x7F;
                 }
                 FIGHTSTG_battle.boostAmount = element;
                 FIGHTSTG_queueClearField(stats->stats[BATTLE_STAT_SPIRIT] * 12 + 1000);
-                task->lines[0] = tech->unk7 + 0x61;
+                task->lines[0] = tech->element + 0x61;
                 children[0].message->show(children[0].message, 1, task->lines);
                 task->nextSubstate(task);
                 return;
@@ -3087,11 +3087,11 @@ void FIGHTSTG_showCommands(CommandMenu *task) {
         fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
         if (fighter->flags & FIGHTER_ASLEEP) {
             for (i = 0; i < BATTLE_COMMAND_SWITCH; i++) {
-                w->lines[0]->setPalette(w->lines[i], 7);
+                w->lines[0]->setPalette(w->lines[i], PALETTE_GREY);
             }
         }
         if (fighter->flags & FIGHTER_NO_DIGIVOLVE) {
-            w->lines[0]->setPalette(w->lines[BATTLE_COMMAND_DIGIVOLVE], 7);
+            w->lines[0]->setPalette(w->lines[BATTLE_COMMAND_DIGIVOLVE], PALETTE_GREY);
         }
     }
 }
@@ -3261,9 +3261,9 @@ void FIGHTSTG_showDigivolveNames(DigivolveMenu *task) {
         if (data != NULL) {
             windows[i + 1]->setString(windows[i + 1], FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), data->nameId);
             if (current == task->ids[i]) {
-                windows[i + 1]->setPalette(windows[i + 1], 7);
+                windows[i + 1]->setPalette(windows[i + 1], PALETTE_GREY);
             } else {
-                windows[i + 1]->setPalette(windows[i + 1], 0);
+                windows[i + 1]->setPalette(windows[i + 1], PALETTE_WHITE);
             }
         }
     }
@@ -3418,10 +3418,10 @@ void FIGHTSTG_showPageButtons(PartnerInfo *task, TextWindow **windows) {
 
     windows[1] = createTextWindow(0x1005, 3, 0x22, 0xAB);
     windows[1]->setString(windows[1], text, 0x11);
-    windows[1]->setPalette(windows[1], 2);
+    windows[1]->setPalette(windows[1], PALETTE_DARK_BLUE);
     windows[2] = createTextWindow(0x1005, 3, 0x38, 0xAB);
     windows[2]->setString(windows[2], text, 0x12);
-    windows[2]->setPalette(windows[2], 2);
+    windows[2]->setPalette(windows[2], PALETTE_DARK_BLUE);
 }
 
 /* Draws the frame of the stats page */
@@ -3473,13 +3473,13 @@ void FIGHTSTG_showStats(PartnerInfo *task, TextWindow **windows) {
         windows[i + 5]->setRightAlign(windows[i + 5], 1);
     }
     if (task->stats[19]) {
-        windows[5]->setPalette(windows[5], 6);
+        windows[5]->setPalette(windows[5], PALETTE_PURPLE);
     }
     if (task->stats[20]) {
-        windows[6]->setPalette(windows[6], 6);
+        windows[6]->setPalette(windows[6], PALETTE_PURPLE);
     }
     if (task->stats[21]) {
-        windows[9]->setPalette(windows[9], 6);
+        windows[9]->setPalette(windows[9], PALETTE_PURPLE);
     }
 }
 
@@ -3528,9 +3528,9 @@ void FIGHTSTG_showTechs(PartnerInfo *task, TextWindow **windows) {
         if (tech != 0) {
             windows[i + 18]->setString(windows[i + 18], FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), tech & 0x1FFF);
             if (tech & 0x8000) {
-                windows[i + 18]->setPalette(windows[i + 18], 3);
+                windows[i + 18]->setPalette(windows[i + 18], PALETTE_YELLOW);
             } else if (tech & 0x4000) {
-                windows[i + 18]->setPalette(windows[i + 18], 4);
+                windows[i + 18]->setPalette(windows[i + 18], PALETTE_GREEN);
             }
         }
     }
@@ -3717,10 +3717,10 @@ void FIGHTSTG_createItemWindows(ItemMenu *task, ItemMenuWindows *w) {
     text = FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU));
     w->prevButton = createTextWindow(0x1005, 3, 0x1A, 0xA9);
     w->prevButton->setString(w->prevButton, text, 0x11);
-    w->prevButton->setPalette(w->prevButton, 2);
+    w->prevButton->setPalette(w->prevButton, PALETTE_DARK_BLUE);
     w->nextButton = createTextWindow(0x1005, 3, 0x80, 0xA9);
     w->nextButton->setString(w->nextButton, text, 0x12);
-    w->nextButton->setPalette(w->nextButton, 2);
+    w->nextButton->setPalette(w->nextButton, PALETTE_DARK_BLUE);
     w->countLabel = createTextWindow(0x1005, 1, 0xAC, 0xA5);
     w->countLabel->setString(w->countLabel, text, 0xC);
     for (i = 0; i < ITEM_MENU_LINES; i++) {
@@ -3937,10 +3937,10 @@ void FIGHTSTG_createTechWindows(TechMenu *task, TechMenuChild *children) {
 
     children[1].window = createTextWindow(0x1005, 3, 0x1A, 0x9F);
     children[1].window->setString(children[1].window, text, 0x11);
-    children[1].window->setPalette(children[1].window, 2);
+    children[1].window->setPalette(children[1].window, PALETTE_DARK_BLUE);
     children[2].window = createTextWindow(0x1005, 3, 0x80, 0x9F);
     children[2].window->setString(children[2].window, text, 0x12);
-    children[2].window->setPalette(children[2].window, 2);
+    children[2].window->setPalette(children[2].window, PALETTE_DARK_BLUE);
     children[3].window = createTextWindow(0x1005, 3, 0xAC, 0x3A);
     children[3].window->setString(children[3].window, text, 0xD);
     children[6].window = createTextWindow(0x1005, 3, 0xD8, 0x3A);
@@ -3990,20 +3990,20 @@ void FIGHTSTG_showTechPage(TechMenu *task, TechMenuChild *children) {
                 mp = FIGHTSTG_battleFuncs.getTechCost(0, tech);
                 if (fighter->temporary) {
                     if (tech & 0x8000) {
-                        children[7 + i].window->setPalette(children[7 + i].window, 3);
+                        children[7 + i].window->setPalette(children[7 + i].window, PALETTE_YELLOW);
                     } else if (tech & 0x4000) {
-                        children[7 + i].window->setPalette(children[7 + i].window, 4);
+                        children[7 + i].window->setPalette(children[7 + i].window, PALETTE_GREEN);
                     } else {
-                        children[7 + i].window->setPalette(children[7 + i].window, 0);
+                        children[7 + i].window->setPalette(children[7 + i].window, PALETTE_WHITE);
                     }
                 } else if (fighter->mp < mp) {
-                    children[7 + i].window->setPalette(children[7 + i].window, 7);
+                    children[7 + i].window->setPalette(children[7 + i].window, PALETTE_GREY);
                 } else if (tech & 0x8000) {
-                    children[7 + i].window->setPalette(children[7 + i].window, 3);
+                    children[7 + i].window->setPalette(children[7 + i].window, PALETTE_YELLOW);
                 } else if (tech & 0x4000) {
-                    children[7 + i].window->setPalette(children[7 + i].window, 4);
+                    children[7 + i].window->setPalette(children[7 + i].window, PALETTE_GREEN);
                 } else {
-                    children[7 + i].window->setPalette(children[7 + i].window, 0);
+                    children[7 + i].window->setPalette(children[7 + i].window, PALETTE_WHITE);
                 }
             }
         }
@@ -4012,21 +4012,21 @@ void FIGHTSTG_showTechPage(TechMenu *task, TechMenuChild *children) {
         if (fighter->temporary == 0 && fighter->mp < mp) {
             children[13].window->setString(children[13].window, FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x54);
             children[14].window->setString(children[14].window, FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0xD);
-            children[14].window->setPalette(children[14].window, 7);
+            children[14].window->setPalette(children[14].window, PALETTE_GREY);
             children[15].window->setNumber(children[15].window, 0, mp);
             children[15].window->setRightAlign(children[15].window, 1);
-            children[15].window->setPalette(children[15].window, 7);
+            children[15].window->setPalette(children[15].window, PALETTE_GREY);
         } else {
             children[13].window->setString(children[13].window, FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_INFO)), tech & 0x1FFF);
             children[14].window->setString(children[14].window, FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0xD);
             children[15].window->setNumber(children[15].window, 0, mp);
             children[15].window->setRightAlign(children[15].window, 1);
             if (tech & 0x4000) {
-                children[14].window->setPalette(children[14].window, 4);
-                children[15].window->setPalette(children[15].window, 4);
+                children[14].window->setPalette(children[14].window, PALETTE_GREEN);
+                children[15].window->setPalette(children[15].window, PALETTE_GREEN);
             } else {
-                children[14].window->setPalette(children[14].window, 0);
-                children[15].window->setPalette(children[15].window, 0);
+                children[14].window->setPalette(children[14].window, PALETTE_WHITE);
+                children[15].window->setPalette(children[15].window, PALETTE_WHITE);
             }
         }
     } else {
@@ -4304,9 +4304,9 @@ void FIGHTSTG_showSwitchFighters(SwitchMenu *task, SwitchMenuWindows *w) {
         w->maxMp[i]->setRightAlign(w->maxMp[i], 1);
         w->name[i]->setString(w->name[i], GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(task->others[i])), -1);
         if (fighter->hp == 0) {
-            w->name[i]->setPalette(w->name[i], 7);
+            w->name[i]->setPalette(w->name[i], PALETTE_GREY);
         } else {
-            w->name[i]->setPalette(w->name[i], 0);
+            w->name[i]->setPalette(w->name[i], PALETTE_WHITE);
         }
     }
 }
@@ -4496,9 +4496,9 @@ void FIGHTSTG_showSwitchInChoices(SwitchInMenu *task, SwitchInMenuWindows *w, s3
         w->choices[4]->setString(w->choices[4], FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), data->nameId);
         w->choices[0]->setString(w->choices[0], text, 0x1B);
         if ((active->flags & FIGHTER_NO_SWITCH) || (other->flags & FIGHTER_NO_SWITCH)) {
-            w->choices[0]->setPalette(w->choices[0], 7);
+            w->choices[0]->setPalette(w->choices[0], PALETTE_GREY);
         } else {
-            w->choices[0]->setPalette(w->choices[0], 0);
+            w->choices[0]->setPalette(w->choices[0], PALETTE_WHITE);
         }
         if (task->tech != 0) {
             w->choices[1]->setString(w->choices[1], text, 0x1C);
@@ -4506,13 +4506,13 @@ void FIGHTSTG_showSwitchInChoices(SwitchInMenu *task, SwitchInMenuWindows *w, s3
             w->choices[3]->setNumber(w->choices[3], 0, TECHS[task->tech - 1].mp);
             w->choices[3]->setRightAlign(w->choices[3], 1);
             if (active->mp < TECHS[task->tech - 1].mp || other->mp < TECHS[task->tech - 1].mp) {
-                w->choices[1]->setPalette(w->choices[1], 7);
+                w->choices[1]->setPalette(w->choices[1], PALETTE_GREY);
             } else if ((active->flags & FIGHTER_NO_DIGIVOLVE) || (other->flags & FIGHTER_NO_DIGIVOLVE) || (active->flags & FIGHTER_ASLEEP)) {
-                w->choices[1]->setPalette(w->choices[1], 7);
+                w->choices[1]->setPalette(w->choices[1], PALETTE_GREY);
             } else if (active->hp <= 0 || other->hp <= 0) {
-                w->choices[1]->setPalette(w->choices[1], 7);
+                w->choices[1]->setPalette(w->choices[1], PALETTE_GREY);
             } else {
-                w->choices[1]->setPalette(w->choices[1], 0);
+                w->choices[1]->setPalette(w->choices[1], PALETTE_WHITE);
             }
             w->mp[0]->setString(w->mp[0], text, 0xD);
             w->mp[1]->setNumber(w->mp[1], 0, active->mp);
@@ -6382,12 +6382,12 @@ void FIGHTSTG_startRestriction(s32 tech) {
     BattleFighter *target;
 
     kind = 0;
-    if (entry->unkA != TECH_EFFECT_NO_SWITCH) {
-        kind = entry->unkA == TECH_EFFECT_NO_DIGIVOLVE;
+    if (entry->effect != TECH_EFFECT_NO_SWITCH) {
+        kind = entry->effect == TECH_EFFECT_NO_DIGIVOLVE;
     }
     fighter = FIGHTSTG_battle.active[0];
     i = FIGHTSTG_findEvent(FIGHTSTG_techEvents[kind], 0, fighter);
-    time = (RANDOM.next() % 101 + 100) * entry->power;
+    time = (RANDOM.next() % 101 + 100) * entry->effectPower;
 
     if (i >= 0) {
         QueuedEvent *queued = &FIGHTSTG_events.events[i];
@@ -6527,7 +6527,7 @@ void FIGHTSTG_tryPoison(void) {
 }
 
 /* TECH_EFFECT_PARALYSIS: paralyzes the target when rollParalysis lets it, with
-   the technique's power or the accessory's, twice as strongly when the acting
+   the technique's effectPower or the accessory's, twice as strongly when the acting
    fighter is special */
 void FIGHTSTG_tryParalysis(void) {
     BattleAction *action = &FIGHTSTG_action;
@@ -6539,10 +6539,10 @@ void FIGHTSTG_tryParalysis(void) {
 
     if (funcs->rollParalysis(action->side, action->tech)) {
         entry = &TECHS[action->tech - 1];
-        if (entry->unkA < TECH_EFFECT_FIRST) {
+        if (entry->effect < TECH_EFFECT_FIRST) {
             value = funcs->stats[0].paralysisPower;
         } else {
-            value = entry->power;
+            value = entry->effectPower;
         }
         if (fighter->special) {
             value *= 2;
@@ -6552,7 +6552,7 @@ void FIGHTSTG_tryParalysis(void) {
 }
 
 /* TECH_EFFECT_CONFUSION: confuses the target when rollConfusion lets it, with
-   the technique's power or the accessory's, twice as strongly when the acting
+   the technique's effectPower or the accessory's, twice as strongly when the acting
    fighter is special */
 void FIGHTSTG_tryConfusion(void) {
     BattleAction *action = &FIGHTSTG_action;
@@ -6564,10 +6564,10 @@ void FIGHTSTG_tryConfusion(void) {
 
     if (funcs->rollConfusion(action->side, action->tech)) {
         entry = &TECHS[action->tech - 1];
-        if (entry->unkA < TECH_EFFECT_FIRST) {
+        if (entry->effect < TECH_EFFECT_FIRST) {
             value = funcs->stats[0].confusionPower;
         } else {
-            value = entry->power;
+            value = entry->effectPower;
         }
         if (fighter->special) {
             value *= 2;
@@ -6586,11 +6586,11 @@ void FIGHTSTG_trySleep(void) {
 
     if (FIGHTSTG_battleFuncs.rollSleep(FIGHTSTG_action.side, FIGHTSTG_action.tech)) {
         entry = &TECHS[FIGHTSTG_action.tech - 1];
-        value = entry->power;
+        value = entry->effectPower;
         if (fighter->special) {
             value *= 2;
         }
-        FIGHTSTG_action.effects[entry->unkA] = value;
+        FIGHTSTG_action.effects[entry->effect] = value;
     }
 }
 
@@ -6615,8 +6615,8 @@ void FIGHTSTG_rollMultiHit(void) {
     s32 side;
 
     side = action->side;
-    if (entry->unkA >= TECH_EFFECT_FIRST) {
-        count = entry->unk11;
+    if (entry->effect >= TECH_EFFECT_FIRST) {
+        count = entry->hitCount;
     }
 #if VERSION_US
     action->hitsLanded = 0;
@@ -6645,7 +6645,7 @@ void FIGHTSTG_rollMultiHit(void) {
 }
 
 /* When rollDrain allows it, the action's drain becomes its damage times a 128th of
- * the technique's power (effect 8) or the player's drainPower, doubled when the
+ * the technique's effectPower (effect 8) or the player's drainPower, doubled when the
  * acting fighter is special. The match depends on each branch doubling
  * and scaling its own value. */
 void FIGHTSTG_tryDrain(void) {
@@ -6658,8 +6658,8 @@ void FIGHTSTG_tryDrain(void) {
 
     if (funcs->rollDrain(action->side, action->tech)) {
         entry = &TECHS[action->tech - 1];
-        if (entry->unkA == TECH_EFFECT_DRAIN) {
-            value = entry->power;
+        if (entry->effect == TECH_EFFECT_DRAIN) {
+            value = entry->effectPower;
             if (fighter->special) {
                 value *= 2;
             }
@@ -6681,7 +6681,7 @@ void FIGHTSTG_markEnemyOnly(void) {
     BattleAction *action = &FIGHTSTG_action;
     TechData *e = &TECHS[action->tech - 1];
 
-    action->effects[e->unkA] = e->unkA;
+    action->effects[e->effect] = e->effect;
 }
 
 /* TECH_EFFECT_CRITICAL: marks the effect, which rollCritical has used */
@@ -6689,7 +6689,7 @@ void FIGHTSTG_markCritical(void) {
     BattleAction *action = &FIGHTSTG_action;
     TechData *entry = &TECHS[action->tech - 1];
 
-    action->effects[entry->unkA] = entry->unkA;
+    action->effects[entry->effect] = entry->effect;
 }
 
 /* TECH_EFFECT_STEAL: when the enemy's active fighter holds an
@@ -6705,14 +6705,14 @@ void FIGHTSTG_trySteal(void) {
     if (enemies[FIGHTSTG_battle.active[1]].item > 0) {
         if (funcs->rollSteal(0, FIGHTSTG_action.tech) != 0) {
             entry = &TECHS[FIGHTSTG_action.tech - 1];
-            FIGHTSTG_action.effects[entry->unkA] = 1;
+            FIGHTSTG_action.effects[entry->effect] = 1;
             FILE_CACHE.request(TEXT_FILE(TEXT_ITEM_NAMES));
         }
     }
 }
 
 /* TECH_EFFECT_LOWER_ATTACK: lowers the attack of the other side's active
- * fighter by the technique's power in 128ths and starts its event (not when
+ * fighter by the technique's effectPower in 128ths and starts its event (not when
  * side 0 acts with BATTLE_SETUP.unk3E[8] set). The match depends on team
  * being a u8. */
 void FIGHTSTG_lowerAttack(void) {
@@ -6723,39 +6723,39 @@ void FIGHTSTG_lowerAttack(void) {
         return;
     }
     entry = &TECHS[FIGHTSTG_action.tech - 1];
-    FIGHTSTG_battleFuncs.changeBoost((u8)(0x10 - FIGHTSTG_action.side), FIGHTSTG_battle.active[1 - team], 0, -entry->power);
+    FIGHTSTG_battleFuncs.changeBoost((u8)(0x10 - FIGHTSTG_action.side), FIGHTSTG_battle.active[1 - team], 0, -entry->effectPower);
     FIGHTSTG_queueBoostEnd((u8)(0x10 - FIGHTSTG_action.side), FIGHTSTG_battle.active[1 - team], 0, FIGHTSTG_action.tech);
-    FIGHTSTG_action.effects[entry->unkA] = entry->power;
+    FIGHTSTG_action.effects[entry->effect] = entry->effectPower;
 }
 
 /* TECH_EFFECT_LOWER_DEFENSE: lowers the defense of the other side's active fighter
-   by the technique's power in 128ths and starts its event */
+   by the technique's effectPower in 128ths and starts its event */
 void FIGHTSTG_lowerDefense(void) {
     s32 other = 1 - (FIGHTSTG_action.side != 0);
     TechData *entry = &TECHS[FIGHTSTG_action.tech - 1];
 
-    FIGHTSTG_battleFuncs.changeBoost((u8)(0x10 - FIGHTSTG_action.side), FIGHTSTG_battle.active[other], 1, -entry->power);
+    FIGHTSTG_battleFuncs.changeBoost((u8)(0x10 - FIGHTSTG_action.side), FIGHTSTG_battle.active[other], 1, -entry->effectPower);
     FIGHTSTG_queueBoostEnd((u8)(0x10 - FIGHTSTG_action.side), FIGHTSTG_battle.active[other], 1, FIGHTSTG_action.tech);
-    FIGHTSTG_action.effects[entry->unkA] = entry->power;
+    FIGHTSTG_action.effects[entry->effect] = entry->effectPower;
 }
 
-/* TECH_EFFECT_DRAIN_MP: takes the technique's power in 128ths of the player's
+/* TECH_EFFECT_DRAIN_MP: takes the technique's effectPower in 128ths of the player's
    fighter's max MP, at most what it has, as the action's drain */
 void FIGHTSTG_drainMp(void) {
     BattleFighter *fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
     TechData *entry = &TECHS[FIGHTSTG_action.tech - 1];
 
     if (fighter->mp != 0) {
-        FIGHTSTG_action.drain = fighter->maxMp * entry->power / 128;
+        FIGHTSTG_action.drain = fighter->maxMp * entry->effectPower / 128;
         if (fighter->mp < FIGHTSTG_action.drain) {
             FIGHTSTG_action.drain = fighter->mp;
         }
-        FIGHTSTG_action.effects[entry->unkA] = FIGHTSTG_action.drain;
+        FIGHTSTG_action.effects[entry->effect] = FIGHTSTG_action.drain;
     }
 }
 
 /* TECH_EFFECT_RAISE_ONE_STATUS: when rollStatusRaise lets it, raises one of
-   the partner's status values at random by the technique's power */
+   the partner's status values at random by the technique's effectPower */
 void FIGHTSTG_raiseOneStatus(void) {
     s32 i = RANDOM.next() % 2;
     TechData *entry;
@@ -6764,13 +6764,13 @@ void FIGHTSTG_raiseOneStatus(void) {
     if (FIGHTSTG_battleFuncs.rollStatusRaise(FIGHTSTG_action.side, FIGHTSTG_action.tech)) {
         entry = &TECHS[FIGHTSTG_action.tech - 1];
         stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]));
-        stats->status[i] += entry->power;
-        FIGHTSTG_action.effects[entry->unkA] = 1 << i;
+        stats->status[i] += entry->effectPower;
+        FIGHTSTG_action.effects[entry->effect] = 1 << i;
     }
 }
 
 /* TECH_EFFECT_RAISE_EACH_STATUS: raises each of the partner's status values
-   that rollStatusRaise lets by the technique's power */
+   that rollStatusRaise lets by the technique's effectPower */
 void FIGHTSTG_raiseEachStatus(void) {
     TechData *entry = &TECHS[FIGHTSTG_action.tech - 1];
     PartnerStats *stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]));
@@ -6778,14 +6778,14 @@ void FIGHTSTG_raiseEachStatus(void) {
 
     for (i = 0; i < 3; i++) {
         if (FIGHTSTG_battleFuncs.rollStatusRaise(FIGHTSTG_action.side, FIGHTSTG_action.tech)) {
-            stats->status[i] += entry->power;
-            FIGHTSTG_action.effects[entry->unkA] |= 1 << i;
+            stats->status[i] += entry->effectPower;
+            FIGHTSTG_action.effects[entry->effect] |= 1 << i;
         }
     }
 }
 
 /* TECH_EFFECT_RAISE_ALL_STATUS: when rollStatusRaise lets it, raises all of
-   the partner's status values by the technique's power */
+   the partner's status values by the technique's effectPower */
 void FIGHTSTG_raiseAllStatus(void) {
     BattleAction *action = &FIGHTSTG_action;
     TechData *entry = &TECHS[action->tech - 1];
@@ -6794,9 +6794,9 @@ void FIGHTSTG_raiseAllStatus(void) {
 
     if (FIGHTSTG_battleFuncs.rollStatusRaise(action->side, action->tech)) {
         for (i = 0; i < 3; i++) {
-            stats->status[i] += entry->power;
+            stats->status[i] += entry->effectPower;
         }
-        FIGHTSTG_action.effects[entry->unkA] = 7;
+        FIGHTSTG_action.effects[entry->effect] = 7;
     }
 }
 
@@ -6806,7 +6806,7 @@ void FIGHTSTG_tryNoSwitch(void) {
 
     if (FIGHTSTG_battleFuncs.rollNoSwitch(FIGHTSTG_action.side, FIGHTSTG_action.tech)) {
         entry = &TECHS[FIGHTSTG_action.tech - 1];
-        FIGHTSTG_action.effects[entry->unkA] = 1;
+        FIGHTSTG_action.effects[entry->effect] = 1;
     }
 }
 
@@ -6843,7 +6843,7 @@ void FIGHTSTG_startEndBattle(void) {
 
     if (FIGHTSTG_battle.kind == BATTLE_KIND_UNK2) {
         entry = &TECHS[FIGHTSTG_action.tech - 1];
-        FIGHTSTG_action.effects[entry->unkA] = 1;
+        FIGHTSTG_action.effects[entry->effect] = 1;
     } else {
         FIGHTSTG_action.hits[0] = FIGHTSTG_battleFuncs.rollHit(FIGHTSTG_action.side, FIGHTSTG_action.tech);
         FIGHTSTG_action.hitCount++;
@@ -6855,7 +6855,7 @@ void FIGHTSTG_startEndBattle(void) {
 void FIGHTSTG_applyTechEffect(void) {
     TechData *entry = &TECHS[FIGHTSTG_action.tech - 1];
 
-    switch (entry->unkA) {
+    switch (entry->effect) {
     case TECH_EFFECT_POISON:
         FIGHTSTG_tryPoison();
         break;
@@ -6915,13 +6915,13 @@ void FIGHTSTG_startAction(u8 side, s32 tech) {
     entry = &TECHS[tech - 1];
     FIGHTSTG_action.side = side;
     FIGHTSTG_action.tech = tech;
-    if (entry->unkA == TECH_EFFECT_DOUBLE_MAGIC) {
+    if (entry->effect == TECH_EFFECT_DOUBLE_MAGIC) {
         FIGHTSTG_startDoubleMagic();
-    } else if (entry->unkA == TECH_EFFECT_END_BATTLE) {
+    } else if (entry->effect == TECH_EFFECT_END_BATTLE) {
         FIGHTSTG_startEndBattle();
     } else {
         /* the match depends on the fighter's pointer sum */
-        if (entry->unkA == TECH_EFFECT_ENEMY_ONLY &&
+        if (entry->effect == TECH_EFFECT_ENEMY_ONLY &&
             (side == 0 || FIGHTSTG_battleTableFunc((FIGHTSTG_battle.fighters[1] + FIGHTSTG_battle.active[1])->id)->unk8[0] != tech)) {
             FIGHTSTG_markEnemyOnly();
             return;
@@ -6934,7 +6934,7 @@ void FIGHTSTG_startAction(u8 side, s32 tech) {
             /* the match depends on the second test of unkA 9, which the
                compiler merges with the first and with case 3's */
             if (side == 0) {
-                if (entry->unkA < TECH_EFFECT_FIRST) {
+                if (entry->effect < TECH_EFFECT_FIRST) {
                     if (entry->unk10 == 11 || entry->unk10 == 12) {
                         break;
                     }
@@ -6960,13 +6960,13 @@ void FIGHTSTG_startAction(u8 side, s32 tech) {
                     if (FIGHTSTG_battleFuncs.stats[0].drainChance) {
                         FIGHTSTG_tryDrain();
                     }
-                } else if (entry->unkA == TECH_EFFECT_MULTI_HIT) {
+                } else if (entry->effect == TECH_EFFECT_MULTI_HIT) {
                     FIGHTSTG_rollMultiHit();
                 } else if (FIGHTSTG_action.hits[0]) {
                     FIGHTSTG_applyTechEffect();
                 }
-            } else if (entry->unkA >= TECH_EFFECT_FIRST) {
-                if (entry->unkA == TECH_EFFECT_MULTI_HIT) {
+            } else if (entry->effect >= TECH_EFFECT_FIRST) {
+                if (entry->effect == TECH_EFFECT_MULTI_HIT) {
                     FIGHTSTG_rollMultiHit();
                 } else if (FIGHTSTG_action.hits[0]) {
                     FIGHTSTG_applyTechEffect();
@@ -6977,10 +6977,10 @@ void FIGHTSTG_startAction(u8 side, s32 tech) {
             FIGHTSTG_action.hits[0] = FIGHTSTG_battleFuncs.rollMagicHit(side, tech);
             FIGHTSTG_action.hitCount++;
             FIGHTSTG_action.damage = FIGHTSTG_battleFuncs.computeMagicDamage(side, tech);
-            if (entry->unkA < TECH_EFFECT_FIRST) {
+            if (entry->effect < TECH_EFFECT_FIRST) {
                 break;
             }
-            if (entry->unkA == TECH_EFFECT_MULTI_HIT) {
+            if (entry->effect == TECH_EFFECT_MULTI_HIT) {
                 FIGHTSTG_rollMultiHit();
             } else if (FIGHTSTG_action.hits[0]) {
                 FIGHTSTG_applyTechEffect();
@@ -7465,9 +7465,9 @@ s32 FIGHTSTG_adjustDamage(u8 side, s32 id, s32 value) {
     s32 result = value;
     s32 i;
 
-    result += FIGHTSTG_getElementBoost(result, tech->unk7);
-    if (tech->unk9 >= FAMILY_FIRST) {
-        if (tech->unk9 == target->family) {
+    result += FIGHTSTG_getElementBoost(result, tech->element);
+    if (tech->family >= FAMILY_FIRST) {
+        if (tech->family == target->family) {
             result += result / 2;
         }
     } else {
@@ -7481,12 +7481,12 @@ s32 FIGHTSTG_adjustDamage(u8 side, s32 id, s32 value) {
     if (user->damageBonus != 0) {
         result += result * user->damageBonus / 64;
     }
-    if (tech->unk7 >= ELEMENT_FIRST) {
-        result += result * tech->unk8 * 2 / target->resist[tech->unk7 - ELEMENT_FIRST];
+    if (tech->element >= ELEMENT_FIRST) {
+        result += result * tech->elementPower * 2 / target->resist[tech->element - ELEMENT_FIRST];
     } else if ((tech->unk10 < 11 || tech->unk10 > 12) && user->element != 0) {
         result += result * user->elementPower * 2 / target->resist[user->element - ELEMENT_FIRST];
     }
-    if (tech->unkA < TECH_EFFECT_FIRST && user->tripleHit != 0 && (tech->unk10 < 11 || tech->unk10 > 12)) {
+    if (tech->effect < TECH_EFFECT_FIRST && user->tripleHit != 0 && (tech->unk10 < 11 || tech->unk10 > 12)) {
         result = result * 4 / 10;
     }
     if (FIGHTSTG_rollCritical(side, id) != 0) {
@@ -7530,10 +7530,10 @@ s32 FIGHTSTG_computeDamage(u8 side, s32 id) {
     tech = &TECHS[id - 1];
     target = &FIGHTSTG_battleFuncs.stats[1];
     if (side == 0) {
-        value = tech->unk2 * user->stats[BATTLE_STAT_ATTACK] / target->stats[BATTLE_STAT_DEFENSE];
+        value = tech->power * user->stats[BATTLE_STAT_ATTACK] / target->stats[BATTLE_STAT_DEFENSE];
     } else {
         enemy = FIGHTSTG_battle.active[1]; /* the match depends on reading it first */
-        value = tech->unk2 * BATTLE_SETUP.enemies[enemy].unkA / 16 * user->stats[BATTLE_STAT_ATTACK] /
+        value = tech->power * BATTLE_SETUP.enemies[enemy].unkA / 16 * user->stats[BATTLE_STAT_ATTACK] /
                 target->stats[BATTLE_STAT_DEFENSE];
     }
     return FIGHTSTG_adjustDamage(side, id, value);
@@ -7564,10 +7564,10 @@ s32 FIGHTSTG_computeMagicDamage(u8 side, s32 id) {
     tech = &TECHS[id - 1];
     target = &FIGHTSTG_battleFuncs.stats[1];
     if (side == 0) {
-        base = tech->unk2;
+        base = tech->power;
     } else {
         enemy = FIGHTSTG_battle.active[1]; /* the match depends on reading it first */
-        base = tech->unk2 * BATTLE_SETUP.enemies[enemy].unkA / 16;
+        base = tech->power * BATTLE_SETUP.enemies[enemy].unkA / 16;
     }
     power = base * (user->stats[BATTLE_STAT_SPIRIT] * 50 / target->stats[BATTLE_STAT_SPIRIT] + 50) / 100;
     if (power > base * 2) {
@@ -7577,9 +7577,9 @@ s32 FIGHTSTG_computeMagicDamage(u8 side, s32 id) {
         power = base / 2;
     }
     result = power;
-    result += FIGHTSTG_getElementBoost(result, tech->unk7);
-    if (tech->unk7 >= ELEMENT_FIRST) {
-        resist = target->resist[tech->unk7 - ELEMENT_FIRST];
+    result += FIGHTSTG_getElementBoost(result, tech->element);
+    if (tech->element >= ELEMENT_FIRST) {
+        resist = target->resist[tech->element - ELEMENT_FIRST];
         if (resist < 100) {
             result = result * (400 - resist * 3) / 100;
         } else if (resist >= 300) {
@@ -7588,7 +7588,7 @@ s32 FIGHTSTG_computeMagicDamage(u8 side, s32 id) {
             result = result * (125 - resist / 4) / 100;
         }
     }
-    if (tech->unk9 >= FAMILY_FIRST && tech->unk9 == target->family) {
+    if (tech->family >= FAMILY_FIRST && tech->family == target->family) {
         result += result / 2;
     }
     if (FIGHTSTG_rollMagicCritical(side, id) != 0) {
@@ -7680,9 +7680,9 @@ s32 FIGHTSTG_computeCounterDamage(u8 side, s32 id, s32 value) {
     }
     entry = &TECHS[id - 1];
     if (fighter->special) {
-        result = value * entry->power / 32;
+        result = value * entry->effectPower / 32;
     } else {
-        result = value * entry->power / 64;
+        result = value * entry->effectPower / 64;
     }
     return FIGHTSTG_adjustDamage(side, id, result);
 }
@@ -7709,7 +7709,7 @@ s32 FIGHTSTG_computeHeal(u8 side, s32 id) {
     FIGHTSTG_computeStats(flag, 1, fighter);
     stats = &FIGHTSTG_battleFuncs.stats[0];
     entry = &TECHS[id - 1];
-    value = entry->unk2;
+    value = entry->power;
 #if VERSION_US
     return (value << 6) + stats->stats[BATTLE_STAT_WISDOM] * value / 8;
 #elif VERSION_EU
@@ -7769,9 +7769,9 @@ s32 FIGHTSTG_rollCritical(u8 side, s32 id) {
     atk = &FIGHTSTG_battleFuncs.stats[0];
     def = &FIGHTSTG_battleFuncs.stats[1];
     entry = &TECHS[id - 1];
-    if (entry->unkA >= TECH_EFFECT_FIRST) {
-        if (entry->unkA == TECH_EFFECT_CRITICAL) {
-            chance += entry->power;
+    if (entry->effect >= TECH_EFFECT_FIRST) {
+        if (entry->effect == TECH_EFFECT_CRITICAL) {
+            chance += entry->effectPower;
         }
     } else if (atk->criticalBonus != 0) {
         k = side != 0;
@@ -7782,8 +7782,8 @@ s32 FIGHTSTG_rollCritical(u8 side, s32 id) {
             chance = atk->criticalBonus + 4;
         }
     }
-    if (entry->unk9 >= FAMILY_FIRST) {
-        if (entry->unk9 == def->family) {
+    if (entry->family >= FAMILY_FIRST) {
+        if (entry->family == def->family) {
             chance += 0x3C;
         }
     } else {
@@ -7836,12 +7836,12 @@ s32 FIGHTSTG_rollMagicCritical(u8 side, s32 id) {
 #endif
     def = &FIGHTSTG_battleFuncs.stats[1];
     entry = &TECHS[id - 1];
-    value = entry->unk8 * 100 / def->resist[entry->unk7 - ELEMENT_FIRST];
+    value = entry->elementPower * 100 / def->resist[entry->element - ELEMENT_FIRST];
     if (value > 0x40) {
         value = 0x40;
     }
     chance = value + 4;
-    if (entry->unk9 >= FAMILY_FIRST && entry->unk9 == def->family) {
+    if (entry->family >= FAMILY_FIRST && entry->family == def->family) {
         chance = value + 0x40;
     }
     j = side == 0;
@@ -7886,15 +7886,15 @@ s32 FIGHTSTG_rollHit(u8 side, s32 id) {
         }
         diff = atk->stats[BATTLE_STAT_SPEED] + atk->accuracy - def->stats[BATTLE_STAT_SPEED];
         level = atk->level - def->level;
-        if (entry->unkA < TECH_EFFECT_FIRST) {
-            chance = entry->unk6 + entry->unk6 * (diff / 8 + (level - atk->criticalBonus)) / 128;
+        if (entry->effect < TECH_EFFECT_FIRST) {
+            chance = entry->accuracy + entry->accuracy * (diff / 8 + (level - atk->criticalBonus)) / 128;
         } else {
-            chance = entry->unk6 + entry->unk6 * (diff / 8 + level) / 128;
+            chance = entry->accuracy + entry->accuracy * (diff / 8 + level) / 128;
         }
     } else {
         level = atk->level - def->level;
         diff = atk->stats[BATTLE_STAT_SPEED] - def->stats[BATTLE_STAT_SPEED] - def->evasion;
-        chance = entry->unk6 + entry->unk6 * (diff / 8 + level) / 128;
+        chance = entry->accuracy + entry->accuracy * (diff / 8 + level) / 128;
         if (chance < 0x20) {
             chance = 0x20;
         }
@@ -7927,7 +7927,7 @@ s32 FIGHTSTG_rollMagicHit(u8 side, s32 id) {
     }
     diff = atk->stats[BATTLE_STAT_WISDOM] - def->stats[BATTLE_STAT_WISDOM];
     level = atk->level - def->level;
-    chance = entry->unk6 + entry->unk6 * (diff / 8 + level) / 128;
+    chance = entry->accuracy + entry->accuracy * (diff / 8 + level) / 128;
     return (RANDOM.next() & 0x7F) < chance;
 }
 
@@ -7955,12 +7955,12 @@ s32 FIGHTSTG_rollPoison(u8 side, s32 id) {
     atk = &FIGHTSTG_battleFuncs.stats[0];
     def = &FIGHTSTG_battleFuncs.stats[1];
     entry = &TECHS[id - 1];
-    if (entry->unkA < TECH_EFFECT_FIRST) {
+    if (entry->effect < TECH_EFFECT_FIRST) {
         result = atk->poisonPower;
         base = atk->poisonChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
     } else {
-        result = entry->power;
-        base = entry->unkB + atk->stats[BATTLE_STAT_WISDOM] / 8;
+        result = entry->effectPower;
+        base = entry->effectChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
     }
     chance = base - (def->resist[RESIST_POISON] + def->resist[1] + def->stats[BATTLE_STAT_WISDOM] / 2) / 8;
     if (chance <= 0) {
@@ -7997,10 +7997,10 @@ s32 FIGHTSTG_rollParalysis(u8 side, s32 id) {
     atk = &FIGHTSTG_battleFuncs.stats[0];
     def = &FIGHTSTG_battleFuncs.stats[1];
     entry = &TECHS[id - 1];
-    if (entry->unkA < TECH_EFFECT_FIRST) {
+    if (entry->effect < TECH_EFFECT_FIRST) {
         base = atk->paralysisChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
     } else {
-        base = entry->unkB + atk->stats[BATTLE_STAT_WISDOM] / 8;
+        base = entry->effectChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
     }
     chance = base - (def->resist[RESIST_PARALYSIS] + def->resist[4] + def->stats[BATTLE_STAT_WISDOM] / 2) / 8;
     if (chance <= 0) {
@@ -8034,10 +8034,10 @@ s32 FIGHTSTG_rollConfusion(u8 side, s32 id) {
     atk = &FIGHTSTG_battleFuncs.stats[0];
     def = &FIGHTSTG_battleFuncs.stats[1];
     entry = &TECHS[id - 1];
-    if (entry->unkA < TECH_EFFECT_FIRST) {
+    if (entry->effect < TECH_EFFECT_FIRST) {
         base = atk->confusionChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
     } else {
-        base = entry->unkB + atk->stats[BATTLE_STAT_WISDOM] / 8;
+        base = entry->effectChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
     }
     chance = base - (def->resist[RESIST_CONFUSION] + def->resist[3] + def->stats[BATTLE_STAT_WISDOM] / 2) / 8;
     if (chance <= 0) {
@@ -8070,7 +8070,7 @@ s32 FIGHTSTG_rollSleep(u8 side, s32 id) {
     atk = &FIGHTSTG_battleFuncs.stats[0];
     def = &FIGHTSTG_battleFuncs.stats[1];
     entry = &TECHS[id - 1];
-    chance = entry->unkB + atk->stats[BATTLE_STAT_WISDOM] / 8 - (def->resist[RESIST_SLEEP] + def->resist[2] + def->stats[BATTLE_STAT_WISDOM] / 2) / 8;
+    chance = entry->effectChance + atk->stats[BATTLE_STAT_WISDOM] / 8 - (def->resist[RESIST_SLEEP] + def->resist[2] + def->stats[BATTLE_STAT_WISDOM] / 2) / 8;
     if (chance <= 0) {
         chance = 1;
     }
@@ -8102,10 +8102,10 @@ s32 FIGHTSTG_rollKnockOut(u8 side, s32 id) {
     atk = &FIGHTSTG_battleFuncs.stats[0];
     def = &FIGHTSTG_battleFuncs.stats[1];
     entry = &TECHS[id - 1];
-    if (entry->unkA < TECH_EFFECT_FIRST) {
+    if (entry->effect < TECH_EFFECT_FIRST) {
         base = atk->knockOutChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
     } else {
-        base = entry->unkB + atk->stats[BATTLE_STAT_WISDOM] / 8;
+        base = entry->effectChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
     }
     chance = base - (def->resist[RESIST_KNOCK_OUT] + def->resist[6] + def->stats[BATTLE_STAT_WISDOM] / 2) / 8;
     if (chance <= 0) {
@@ -8149,7 +8149,7 @@ s32 FIGHTSTG_rollSteal(u8 side, s32 id) {
         if (ratio > 200) {
             ratio = 200;
         }
-        power = (entry->unkB + atk->stealBonus) * 100 / 64;
+        power = (entry->effectChance + atk->stealBonus) * 100 / 64;
         chance = FIGHTSTG_battleTableFunc(FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]].id)->itemChance * ratio * power / 10000;
         roll = RANDOM.next() % 1024;
         if (roll < chance) {
@@ -8175,10 +8175,10 @@ s32 FIGHTSTG_rollDrain(u8 side, s32 id) {
     stats = FIGHTSTG_computeStats(side, 1, FIGHTSTG_battle.active[side >> 4]);
 #endif
     entry = &TECHS[id - 1];
-    if (entry->unkA < TECH_EFFECT_FIRST) {
+    if (entry->effect < TECH_EFFECT_FIRST) {
         chance = stats->drainChance;
     } else {
-        chance = entry->unkB;
+        chance = entry->effectChance;
     }
     return (RANDOM.next() & 0x7F) < chance;
 }
@@ -8196,7 +8196,7 @@ s32 FIGHTSTG_rollDedigivolve(s32 actor, s32 id) {
         }
     }
     entry = &TECHS[id - 1];
-    chance = entry->unkB;
+    chance = entry->effectChance;
     return (RANDOM.next() & 0x7F) < chance;
 }
 
@@ -8209,14 +8209,14 @@ s32 FIGHTSTG_rollStatusRaise(s32 actor, s32 id) {
     FIGHTSTG_computeStats(0, 0, FIGHTSTG_battle.active[0]);
     FIGHTSTG_computeStats(0x10, 1, FIGHTSTG_battle.active[1]);
     entry = &TECHS[id - 1];
-    chance = entry->unkB + (FIGHTSTG_battleFuncs.stats[0].stats[BATTLE_STAT_WISDOM] - FIGHTSTG_battleFuncs.stats[1].stats[BATTLE_STAT_WISDOM]) / 8;
+    chance = entry->effectChance + (FIGHTSTG_battleFuncs.stats[0].stats[BATTLE_STAT_WISDOM] - FIGHTSTG_battleFuncs.stats[1].stats[BATTLE_STAT_WISDOM]) / 8;
     return (RANDOM.next() & 0x7F) < chance;
 }
 
 /* Whether TECH_EFFECT_NO_SWITCH works: the technique's chance */
 s32 FIGHTSTG_rollNoSwitch(s32 actor, s32 id) {
     TechData *entry = &TECHS[id - 1];
-    s32 chance = entry->unkB;
+    s32 chance = entry->effectChance;
 
     return (RANDOM.next() & 0x7F) < chance;
 }
@@ -8224,7 +8224,7 @@ s32 FIGHTSTG_rollNoSwitch(s32 actor, s32 id) {
 /* Whether TECH_EFFECT_NO_DIGIVOLVE works: the technique's chance */
 s32 FIGHTSTG_rollNoDigivolve(s32 actor, s32 id) {
     TechData *entry = &TECHS[id - 1];
-    s32 chance = entry->unkB;
+    s32 chance = entry->effectChance;
 
     return (RANDOM.next() & 0x7F) < chance;
 }

@@ -409,7 +409,7 @@ TalkBox *createTalkBox(s32 id, s16 x, s16 y, s32 file, s32 index, u32 type) {
         children->windows[1]->setPos(children->windows[1], children->windows[1]->x - task->w, children->windows[1]->y);
     }
     for (i = 0; i < 2; i++) {
-        children->windows[i]->setPalette(children->windows[i], 2);
+        children->windows[i]->setPalette(children->windows[i], PALETTE_DARK_BLUE);
         children->windows[i]->setVisible(children->windows[i], 0);
     }
     children->frame = createTalkBoxFrame(task);

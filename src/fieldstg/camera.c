@@ -36,11 +36,11 @@ void FIELDSTG_scrollCamera(Camera *task) {
     if (y < 0) {
         y = 0;
     }
-    if (task->bounds.x - FIELD_SCREEN_WIDTH < x) {
-        x = task->bounds.x - FIELD_SCREEN_WIDTH;
+    if (task->bounds.x - SCREEN_WIDTH < x) {
+        x = task->bounds.x - SCREEN_WIDTH;
     }
-    if (task->bounds.y - FIELD_SCREEN_HEIGHT < y) {
-        y = task->bounds.y - FIELD_SCREEN_HEIGHT;
+    if (task->bounds.y - SCREEN_HEIGHT < y) {
+        y = task->bounds.y - SCREEN_HEIGHT;
     }
     shake = 0;
     if (task->shaking != 0) {

@@ -58,12 +58,12 @@ void taskTickCounter(Task *task) {
 /* Default destructor: kills the children, then frees the task */
 void destroyTask(Task *task) {
     s32 i;
-    s32 *children;
+    Task **children;
 
     if (task->childCount != 0) {
         children = task->children;
         for (i = 0; i < task->childCount; i++) {
-            if (children[i] != 0) {
+            if (children[i] != NULL) {
                 TASK_REGISTRY.funcs.kill(children[i]);
             }
         }

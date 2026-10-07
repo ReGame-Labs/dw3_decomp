@@ -111,7 +111,7 @@ ScreenTask *STDGNAME_createScreen(void) {
     ScreenTask *task = createTask(STDGNAME_updateScreen, sizeof(ScreenTask), sizeof(ScreenChildren));
 
     task->fadeOut = STDGNAME_fadeOutScreen;
-    task->layer = 0x1000;
+    task->layer = SCREEN_LAYER;
     return task;
 }
 

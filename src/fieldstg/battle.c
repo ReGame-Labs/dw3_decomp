@@ -3,14 +3,14 @@
 
 #include "fieldstg.h"
 
-/* Rolls the steps to the next battle (GAME.unk30): under 0x100, or 0x100 to 0x4FF */
+/* Rolls the steps to the next battle (GAME.battleSteps): under 0x100, or 0x100 to 0x4FF */
 void FIELDSTG_rollBattleSteps(void) {
     s32 value = RANDOM.next() % 2304;
 
     if (value < 0x100) {
-        GAME.unk30 = value;
+        GAME.battleSteps = value;
     } else {
-        GAME.unk30 = (value + 0x100) / 2;
+        GAME.battleSteps = (value + 0x100) / 2;
     }
 }
 
@@ -46,8 +46,8 @@ void FIELDSTG_countBattleSteps(void) {
         if (area != 0) {
             area--;
             rate = FIELDSTG_battleRates[FIELDSTG_state.battles->battles[area]->count];
-            GAME.unk30 -= rate;
-            if (GAME.unk30 <= 0) {
+            GAME.battleSteps -= rate;
+            if (GAME.battleSteps <= 0) {
                 if (BATTLE_SETUP.unk0 != 0) {
                     FIELDSTG_startAreaBattle();
                 }

@@ -758,60 +758,21 @@ typedef struct StageListMenuChildren {
 /* An entry of the stage's events' text file, for FieldEvent.text */
 #define EVENT_TEXT(n) (EVENT_TEXT_FILE << 16 | (n))
 
-/*
- * A field's or a battle's music (FieldState.music, Battle.unk8): track
- * (SEP) n of the first sequence of a sound bank (dw3/sound.h), exclusive
- * (bit 30) and with bit 29, which playSound doesn't read but every one of
- * SOUNDTST's tunes has, and its loops (BT_LOOP0, EX_AT_LP), not its jingles.
- * A stage's music is usually of the bank it loads (FieldState.soundBank).
- */
-#define MUSIC(bank, n) (0x60000000 | (bank) << 18 | (n))
-
-/*
- * The codes of the (code, value) pairs that FLAGS_00 checks as conditions
- * and applies as actions (game3.c's checkCondition and applyAction): the
- * talks' and characters' lists, which end with CODES_END, and a StageSlot's
- * two conditions, CODES_END for none. code >> 8 & 0xFE is the kind, code &
- * 0x1FF the flag, value or item. A condition holds when the flag is value,
- * or when the test is (1) or isn't (0) true; an action sets the flag to
- * value. The kinds the stages use and these don't name (0x7A, 0x7C and
- * 0x94, actions that change the mode) stay numbers.
- */
-#define FLAG(group, id) ((group) << 8 | (id)) /* group 0x00-0x40: FLAGS_00, GAME.flags02-flags40 */
-#define PROGRESS(n) (0x6000 | (n)) /* GAME.progress is n */
-#define SPECIAL(id) (0x7000 | (id)) /* SPECIAL_CONDITIONS entry id */
-#define PARTY_STAT(id) (0x7200 | (id)) /* checkPartyStat */
-#define EVENT_BATTLE(id) (0x7400 | (id)) /* action: FIELDSTG_battleFuncs.startEventBattle */
-#define CARD_BATTLE(opponent, kind) (0x7600 + (kind) * 0x200 | (opponent)) /* action: startCardBattle */
-#define WARP_ARG(id) (0x7E00 | (id)) /* checkWarpArg */
-/* an item, in the bag or equipped; kind (bits 9-11) isn't read, and the
-   scripts set it after the item's kind loosely */
-#define ITEM(kind, id) (0x8000 | (kind) << 9 | (id))
-#define START_EVENT(index) (0x9000 | (index)) /* action: FIELDSTG_startListedEvent */
-#define CARD(id) (0x9200 | (id)) /* a card: the player has one, or gets or loses one */
-#define CODES_END 0xFFFF
-
 /* The sounds the stages play, with SOUNDTST's names (dw3/sound.h has the
    ones the overlays share) */
 #define SOUND_MTL_DOWN 0x40012
-#define SOUND_SWITCH01 0x8004103C
-#define SOUND_SWITCH02 0x800410BD
 #define SOUND_COMAT102 0x8004213E
 #define SOUND_COMAT103 0x800421BF
-#define SOUND_COMCD115 0xA0042FCB
 #define SOUND_COMEX105 0x800442C1
 #define SOUND_COMEX112 0x80044648
-#define SOUND_COMEX113 0x800446C9
 #define SOUND_COMEX114 0x8004474A
 #define SOUND_BULB_000 0x340001
 #define SOUND_BULB_001 0x340002
 #define SOUND_GONDRA_B 0x340003
-#define SOUND_GONDRA_S 0x340004
 #define SOUND_BULB_002 0x4C0001
 #define SOUND_FLOOR_LT 0x4C0002
 #define SOUND_DIGITAMA 0x540001
 #define SOUND_SE000000 0xA40004
-#define SOUND_SE000002 0xA40006
 #define SOUND_DOOROPEN 0x80A4203C
 #define SOUND_LOGINEF 0xCC0001
 #define SOUND_FLOOR_DN 0xEC0001
@@ -819,7 +780,6 @@ typedef struct StageListMenuChildren {
 #define SOUND_SIGNALON 0x1000002
 #define SOUND_DOORCLSE 0x8100303C
 #define SOUND_CCOMBINE 0x8100383C
-#define SOUND_ELEVATER 0x1080001
 #define SOUND_DIGI_EN0 0x10C0000
 #define SOUND_DIGI_EN1 0x10C0001
 #define SOUND_DIGI_EN2 0x10C0002

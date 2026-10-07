@@ -25,7 +25,7 @@ void setupStage(void) {
     FIELDSTG_state.music = MUSIC(0x1E, 0);
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
-    FIELDSTG_state.battles = FIELDSTG_state.findBattles(stageBattles, GAME.unk44);
+    FIELDSTG_state.battles = FIELDSTG_state.findBattles(stageBattles, GAME.place);
     FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);

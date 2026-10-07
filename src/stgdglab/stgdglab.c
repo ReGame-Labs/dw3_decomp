@@ -10,12 +10,12 @@ void STGDGLAB_updateScene(Task *task, Task **children) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0xF000);
-        GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         rect.x = 0;
         rect.y = 0;
         rect.w = 0x140;
         rect.h = 0xF0;
-        layer = GFX.funcs.createLayer(&rect, 3, 0x1000);
+        layer = GFX.funcs.createLayer(&rect, 3, SCREEN_LAYER);
         layer->setBgColor(layer, 0, 0, 0);
         children[0] = (Task *)STGDGLAB_createLab();
         task->nextState(task);
@@ -653,7 +653,7 @@ void STGDGLAB_updateRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows
 Task *STGDGLAB_createRecipeScreen(Lab *lab) {
     LabRecipeScreen *screen = createTask(STGDGLAB_updateRecipeScreen, sizeof(LabRecipeScreen), 0x1C);
 
-    screen->layer = 0x1000;
+    screen->layer = SCREEN_LAYER;
     screen->depth = 2;
     screen->lab = lab;
     lab->closeMenu(lab);

@@ -78,11 +78,11 @@ void STSTATUS_showDemoChoices(PartyScreen *screen, PartyScreenWindows *windows, 
         screen->choice = 1 - (u8)GAME.digivolveDemo;
         windows->cursor->setPos(windows->cursor, 0xB8, screen->choice * 14 + 0x3A);
         if (screen->choice == 0) {
-            windows->options[0]->setPalette(windows->options[0], 1);
-            windows->options[1]->setPalette(windows->options[1], 0);
+            windows->options[0]->setPalette(windows->options[0], PALETTE_BLUE);
+            windows->options[1]->setPalette(windows->options[1], PALETTE_WHITE);
         } else {
-            windows->options[0]->setPalette(windows->options[0], 0);
-            windows->options[1]->setPalette(windows->options[1], 1);
+            windows->options[0]->setPalette(windows->options[0], PALETTE_WHITE);
+            windows->options[1]->setPalette(windows->options[1], PALETTE_BLUE);
         }
         windows->cursor->setVisible(windows->cursor, 1);
     } else {
@@ -362,7 +362,7 @@ Task *STSTATUS_createDemoScreen(FieldMenuScreen *menu, s32 extra) {
     /* its windows are PartyScreenWindows without the fader */
     PartyScreen *screen = createTask(STSTATUS_updateDemoScreen, sizeof(PartyScreen), 0x9C);
 
-    screen->layer = 0x1000;
+    screen->layer = SCREEN_LAYER;
     screen->depth = 6;
     screen->menu = menu;
     return (Task *)screen;

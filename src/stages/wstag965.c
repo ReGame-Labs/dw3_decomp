@@ -20,7 +20,7 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
-    FIELDSTG_state.battles = FIELDSTG_state.findBattles(stageBattles, GAME.unk44);
+    FIELDSTG_state.battles = FIELDSTG_state.findBattles(stageBattles, GAME.place);
     FIELDSTG_map.setFile(0, 0x9390006);
     FIELDSTG_map.setFile(7, 0x9390007);
     FIELDSTG_map.setFile(4, 0x9390005);

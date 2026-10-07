@@ -390,16 +390,16 @@ s32 checkPartyStat(s32 index, s32 mode) {
     return 0;
 }
 
-/* Conditions 0x7E: the values a warp leaves for its stage (GAME.unk44 for
-   ids under 30, GAME.unk46 above) */
+/* Conditions 0x7E: the values a warp leaves for its stage (GAME.place for
+   ids under 30, GAME.placeArg above) */
 s32 checkWarpArg(s32 id, s32 arg1) {
 #if VERSION_US
     if (id < 30) {
-        if (GAME.unk44 == id + 1) {
+        if (GAME.place == id + 1) {
             return 1;
         }
     } else {
-        if (GAME.unk46 == id - 29) {
+        if (GAME.placeArg == id - 29) {
             return 1;
         }
     }
@@ -407,21 +407,21 @@ s32 checkWarpArg(s32 id, s32 arg1) {
     /* arg1 zero: the opposite test */
     if (id < 30) {
         if (arg1 != 0) {
-            if (GAME.unk44 == id + 1) {
+            if (GAME.place == id + 1) {
                 return 1;
             }
         } else {
-            if (GAME.unk44 != id + 1) {
+            if (GAME.place != id + 1) {
                 return 1;
             }
         }
     } else {
         if (arg1 != 0) {
-            if (GAME.unk46 == id - 29) {
+            if (GAME.placeArg == id - 29) {
                 return 1;
             }
         } else {
-            if (GAME.unk46 != id - 29) {
+            if (GAME.placeArg != id - 29) {
                 return 1;
             }
         }
@@ -491,9 +491,9 @@ void changeCard(s32 card, s32 add) {
     }
 }
 
-/* Actions 0x76 and 0x78: a card battle (mode 0x700) against an opponent */
+/* Actions 0x76 and 0x78: a card battle (MODE_CARD_GAME) against an opponent */
 void startCardBattle(s32 opponent, s32 kind) {
-    FIELDSTG_leaveField(0x700, opponent * 2 + kind + 1, 0, 0, 0);
+    FIELDSTG_leaveField(MODE_CARD_GAME, opponent * 2 + kind + 1, 0, 0, 0);
 }
 
 /*
@@ -626,22 +626,22 @@ void applyAction(s32 code, s32 value) {
         changeCard(id, value);
     }
     if (group == 0x94) {
-        FIELDSTG_leaveField(0xA00, id, 0, 0, 0);
+        FIELDSTG_leaveField(MODE_TRAINING, id, 0, 0, 0);
     }
     if (group == 0x7A) {
         if ((u16)id < 30) {
-            FIELDSTG_leaveField(0xF00, (u16)id, 0, 0, 0);
+            FIELDSTG_leaveField(MODE_ITEM_SHOP, (u16)id, 0, 0, 0);
         } else if ((u32)(id - 0x31) < 0x13 || (u32)(id - 0x46) < 5) {
-            FIELDSTG_leaveField(0x1300, (u16)id, 0, 0, 0);
+            FIELDSTG_leaveField(MODE_CARD_SHOP, (u16)id, 0, 0, 0);
         } else {
             FIELDSTG_openInn();
         }
     }
     if (group == 0x7C) {
         if ((u16)id == 0) {
-            FIELDSTG_leaveField(0xD00, 0, 0, 0, 0);
+            FIELDSTG_leaveField(MODE_DIGI_LAB, 0, 0, 0, 0);
         } else if ((u16)id == 1) {
-            FIELDSTG_leaveField(0xB00, 0, 0, 0, 0);
+            FIELDSTG_leaveField(MODE_NAMING, 0, 0, 0, 0);
         }
     }
 }
@@ -683,7 +683,7 @@ void updateModeFlags(void) {
         }
         applyAction(0x12, 0);
     }
-    if (GAME.funcs.getPrevMode() == 0x700) {
+    if (GAME.funcs.getPrevMode() == MODE_CARD_GAME) {
         applyAction(0x11, 1);
         applyAction(0x12, 1);
         if (FLAGS_00.pendingFlag10 != 0) {

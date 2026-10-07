@@ -62,12 +62,12 @@ SpotHint *FIELDSTG_createSpotHint(Point from, Point to) {
     return task;
 }
 
-/* Hides the prize in one of the hidden spots at random (GAME.unk26E4 keeps
+/* Hides the prize in one of the hidden spots at random (GAME.prizeSpot keeps
    it) */
 void FIELDSTG_hidePrize(HiddenSpots *task) {
     s32 index = RANDOM.next() % task->count;
 
-    GAME.unk26E4 = index;
+    GAME.prizeSpot = index;
     task->entries[index].hasPrize = 1;
     task->pos = task->entries[index].pos;
 }
@@ -176,7 +176,7 @@ HiddenSpots *FIELDSTG_createHiddenSpots(s32 count) {
         if (GAME.clearTempFlags != 0) {
             FIELDSTG_hidePrize(task);
         } else {
-            index = GAME.unk26E4;
+            index = GAME.prizeSpot;
             task->entries[index].hasPrize = 1;
             task->pos = task->entries[index].pos;
         }

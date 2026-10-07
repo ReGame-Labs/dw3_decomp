@@ -55,7 +55,7 @@ void FIELDSTG_updateLift(Lift *task) {
             task->leftY = left->y;
             task->rightY = right->y;
             task->playerY = player->pos.y;
-            SOUND.playSound(0x8004103C); /* SWITCH01 */
+            SOUND.playSound(SOUND_SWITCH01);
             task->nextSubstate(task);
             break;
         case 1:
@@ -63,7 +63,7 @@ void FIELDSTG_updateLift(Lift *task) {
             if (task->time >= 30) {
                 task->shake = 0;
                 task->nextSubstate(task);
-                SOUND.playSound(0x01080001); /* ELEVATER */
+                SOUND.playSound(SOUND_ELEVATER);
             }
             break;
         case 2:
@@ -140,7 +140,7 @@ void FIELDSTG_moveLift(Lift *task, s32 command) {
 Lift *FIELDSTG_createLift(s32 id) {
     Lift *task = createTaskWithId(FIELDSTG_updateLift, sizeof(Lift), 0, id);
 
-    if (FLAGS_00.checkCondition(0x1C3D, 1)) {
+    if (FLAGS_00.checkCondition(FLAG(0x1C, 0x3D), 1)) {
         task->raised = 1;
     } else {
         task->raised = 0;

@@ -1,6 +1,6 @@
 #include "cnty_sel.h"
 
-RECT CNTY_SEL_screenRect = {0, 0, 320, 240};
+RECT CNTY_SEL_screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 RECT CNTY_SEL_vramRect = {0, 0, 1024, 512};
 /* A little larger than the screen */
 RECT CNTY_SEL_fadeRect = {0, -15, 320, 260};
@@ -42,7 +42,7 @@ void CNTY_SEL_tickScreen(Task *task, MenuTask **menu) {
                and a 320x240 display */
             GFX.funcs.reset();
             GFX.funcs.allocPrimBuffers(0xA000);
-            GFX.funcs.setDisplayMode(320, 240, 0, 0);
+            GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
             /* Upload the images to VRAM from (640, 0), their CLUTs from (0, 496) */
             initTimLoader(&loader);
             loader.setImagePos(0x280, 0);
@@ -551,12 +551,11 @@ void CNTY_SEL_tickMenu(MenuTask *task, MenuChildren *children) {
             break;
         case MENU_EXIT:
 #if VERSION_US
-            /* switch to game mode 0xE01 */
-            GAME.funcs.requestMode(0xE01, 0);
+            GAME.funcs.requestMode(MODE_OPENING, 0);
 #elif VERSION_EU
-            /* switch to game mode 0xE01, or 0xE02 for a language but 0 */
+            /* the opening movie, or mode 0xE02 for a language but 0 */
             if (LANGUAGE == 0) {
-                GAME.funcs.requestMode(0xE01, 0);
+                GAME.funcs.requestMode(MODE_OPENING, 0);
             } else {
                 GAME.funcs.requestMode(0xE02, 0);
             }

@@ -3,14 +3,13 @@
 
 /* Clears the save data and sets up a new game */
 void newGame(void) {
+    HEAP.zero(&GAME, GAME_SAVE_SIZE);
 #if VERSION_US
-    HEAP.zero(&GAME, 0x26BC);
-    GAME.mode = 0xE01;
-    GAME.nextMode = 0xE01;
+    GAME.mode = MODE_OPENING;
+    GAME.nextMode = MODE_OPENING;
 #elif VERSION_EU
-    HEAP.zero(&GAME, 0x26C4);
-    GAME.mode = 0x1600;
-    GAME.nextMode = 0x1600;
+    GAME.mode = MODE_COUNTRY_SELECT;
+    GAME.nextMode = MODE_COUNTRY_SELECT;
 #endif
     GAME.digivolveDemo = 1;
     GAME.countdown[0] = 1;
@@ -20,7 +19,7 @@ void newGame(void) {
     GAME.countdown[2] = 0;
     GAME.unkC = -1;
     initNewGameData();
-    GAME.unk30 = (RANDOM.next() & 0x1FF) + 0x200;
+    GAME.battleSteps = (RANDOM.next() & 0x1FF) + 0x200;
 }
 
 /* Makes the requested mode current (main calls it before recreating the mode task) */

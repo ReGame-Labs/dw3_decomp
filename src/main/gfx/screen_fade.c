@@ -25,7 +25,7 @@ void drawScreenFade(ScreenFade *task) {
     poly->code = 0x2A;
     poly->r0 = poly->g0 = poly->b0 = task->level >> 8;
     poly->x0 = poly->x2 = 0;
-    poly->x1 = poly->x3 = 320;
+    poly->x1 = poly->x3 = SCREEN_WIDTH;
     poly->y0 = poly->y1 = 0;
     poly->y2 = poly->y3 = 256;
     addPrim(ot, poly);

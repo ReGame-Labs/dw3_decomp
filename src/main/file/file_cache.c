@@ -11,11 +11,11 @@ FileCache FILE_CACHE = {
     evictOldestFile,
     requestFile,
     updateFileCache,
-    (char *(*)(s32))loadFile,
+    loadFile,
     freeFile,
     freeAllFiles,
     freeFilesFrom,
-    (s32 (*)(s32))getFileEntry,
+    getFileEntry,
     (u8 *(*)(s32, s32))getArchiveEntry,
     markCachedFiles,
     touchMarkedFiles,
@@ -157,7 +157,7 @@ void waitForFile(s32 file) {
 }
 
 /* Returns the file's data, reading it now if it is not in the cache */
-s32 *loadFile(u32 file) {
+void *loadFile(u32 file) {
     FileSlot *slot = findFileSlot(file);
 
     if (slot != NULL && slot->state == FILE_LOADED) {

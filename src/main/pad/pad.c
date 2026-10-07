@@ -128,17 +128,17 @@ s32 setVibration(u16 port, s32 motor, s16 time, u8 value) {
 }
 
 /* The logical buttons newly pressed on pad 1 or 2 this frame */
-u16 getPadPressed(s32 pad) {
+s32 getPadPressed(s32 pad) {
     return PAD.slots[pad][0].pressed;
 }
 
 /* The logical buttons held on pad 1 or 2 */
-u16 getPadHeld(s32 pad) {
+s32 getPadHeld(s32 pad) {
     return PAD.slots[pad][0].held;
 }
 
 /* The logical buttons pressed on pad 1 or 2, repeating while held */
-u16 getPadRepeated(s32 pad) {
+s32 getPadRepeated(s32 pad) {
     return PAD.slots[pad][0].repeated;
 }
 
@@ -160,17 +160,16 @@ void swapButtons(u16 port, s32 a, s32 b) {
 }
 
 /* The bit that logical button `index` sets on pad 1 or 2 */
-u8 getButtonBit(s32 pad, s32 index) {
+s32 getButtonBit(s32 pad, s32 index) {
     return PAD.slots[pad][0].buttonMap[index];
 }
 
-/* Controller input: cleared by initPad, then the methods (the getters
-   return a u16 or a u8, the methods an s32) */
+/* Controller input: cleared by initPad, then the methods */
 PadState PAD = {
     0, { { 0 } }, { { { 0 } } }, { { 0 } }, 0, 0, 0, 0, { 0 },
     initPad, shutdownPad, updatePad, setVibration, lockPadMode,
-    (s32 (*)(s32))getPadPressed, (s32 (*)(s32))getPadHeld, (s32 (*)(s32))getPadRepeated,
-    resetButtonMap, swapButtons, (s32 (*)(s32, s32))getButtonBit,
+    getPadPressed, getPadHeld, getPadRepeated,
+    resetButtonMap, swapButtons, getButtonBit,
     startDemoRecording, stopDemoRecording, isDemoRecording,
     startDemoPlayback, stopDemoPlayback, isDemoPlaying,
 };

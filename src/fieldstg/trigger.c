@@ -55,7 +55,7 @@ s32 FIELDSTG_offerTrigger(Triggers *task, TriggerChildren *children) {
     switch (task->entry->type) {
         case SLOT_DEPTH:
             task->actor->depth = task->entry->unkA;
-            GAME.unk26E0 = task->entry->unkA;
+            GAME.playerDepth = task->entry->unkA;
             return 0;
         case SLOT_MAP:
             FIELDSTG_map.setMap(task->entry->unkA);
@@ -158,8 +158,8 @@ void FIELDSTG_setOffTrigger(Triggers *task) {
                     }
                 }
             }
-            GAME.unk44 = task->entry->unk14;
-            GAME.unk46 = task->entry->unk16;
+            GAME.place = task->entry->unk14;
+            GAME.placeArg = task->entry->unk16;
             break;
         case SLOT_LAUNCH_OUT:
             task->actor->launch(task->actor, &task->entry->unkA);

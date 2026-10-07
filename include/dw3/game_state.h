@@ -53,6 +53,30 @@ typedef struct GameFlags {
     /* 0x18 */ void (*updateModeFlags)(void);
 } GameFlags;
 
+/*
+ * The codes of the (code, value) pairs that FLAGS_00 checks as conditions
+ * and applies as actions (events.c's checkCondition and applyAction): the
+ * talks' and characters' lists, which end with CODES_END, and a StageSlot's
+ * two conditions, CODES_END for none. code >> 8 & 0xFE is the kind, code &
+ * 0x1FF the flag, value or item. A condition holds when the flag is value,
+ * or when the test is (1) or isn't (0) true; an action sets the flag to
+ * value. The kinds the stages use and these don't name (0x7A, 0x7C and
+ * 0x94, actions that change the mode) stay numbers.
+ */
+#define FLAG(group, id) ((group) << 8 | (id)) /* group 0x00-0x40: FLAGS_00, GAME.flags02-flags40 */
+#define PROGRESS(n) (0x6000 | (n)) /* GAME.progress is n */
+#define SPECIAL(id) (0x7000 | (id)) /* SPECIAL_CONDITIONS entry id */
+#define PARTY_STAT(id) (0x7200 | (id)) /* checkPartyStat */
+#define EVENT_BATTLE(id) (0x7400 | (id)) /* action: FIELDSTG_battleFuncs.startEventBattle */
+#define CARD_BATTLE(opponent, kind) (0x7600 + (kind) * 0x200 | (opponent)) /* action: startCardBattle */
+#define WARP_ARG(id) (0x7E00 | (id)) /* checkWarpArg */
+/* an item, in the bag or equipped; kind (bits 9-11) isn't read, and the
+   scripts set it after the item's kind loosely */
+#define ITEM(kind, id) (0x8000 | (kind) << 9 | (id))
+#define START_EVENT(index) (0x9000 | (index)) /* action: FIELDSTG_startListedEvent */
+#define CARD(id) (0x9200 | (id)) /* a card: the player has one, or gets or loses one */
+#define CODES_END 0xFFFF
+
 /* Digimon definition (DIGIMON_DATA, 52 of them; the first 8 are the partners) */
 typedef struct DigimonData {
     /* 0x00 */ u16 id;
@@ -90,21 +114,21 @@ typedef struct ItemInfo {
 /* A technique (TECHS, from 1: technique n is TECHS[n - 1]) */
 typedef struct TechData {
     /* 0x00 */ u16 mp; /* its cost */
-    /* 0x02 */ u16 unk2;
+    /* 0x02 */ u16 power; /* its damage, times the user's attack over the target's defense */
     /* 0x04 */ u8 icon; /* a frame of the menu sprites, from 0x37 */
     /* 0x05 */ u8 kind; /* 3: heals the target */
-    /* 0x06 */ u8 unk6;
-    /* 0x07 */ u8 unk7;
-    /* 0x08 */ u8 unk8;
-    /* 0x09 */ u8 unk9;
-    /* 0x0A */ u8 unkA;
-    /* 0x0B */ u8 unkB;
-    /* 0x0C */ u8 power;
+    /* 0x06 */ u8 accuracy;
+    /* 0x07 */ u8 element; /* ELEMENT_FIRST and up, under it none */
+    /* 0x08 */ u8 elementPower; /* how much the element adds, against the target's resistance */
+    /* 0x09 */ u8 family; /* FAMILY_FIRST and up, under it none */
+    /* 0x0A */ u8 effect; /* TECH_EFFECT_* (fightstg.h), under TECH_EFFECT_FIRST none */
+    /* 0x0B */ u8 effectChance;
+    /* 0x0C */ u8 effectPower; /* the effect's strength (a boost's amount, a drain's 128ths) */
     /* 0x0D */ u8 unkD;
     /* 0x0E */ u8 unkE;
     /* 0x0F */ u8 unkF;
     /* 0x10 */ u8 unk10;
-    /* 0x11 */ u8 unk11;
+    /* 0x11 */ u8 hitCount;
 } TechData;
 
 /* What ItemInfo.data points to for a weapon (types 2-14, WEAPON_DATA) */
@@ -174,6 +198,7 @@ typedef struct PartnerEntry {
 /* PartnerEntry.skills */
 #define SKILL_ID 0x1FFF /* the skill, from 1 (TECHS[id - 1]) */
 #define SKILL_KNOWN 0x2000
+#define SKILL_MARKED 0x4000 /* marked in the lab (STGDGLAB_updateSkillPanel) */
 #define SKILL_LAST 0x8000 /* the sixth skill */
 
 /* The cards of a deck, and the decks the player has */
@@ -216,7 +241,9 @@ typedef struct PartnerStats {
     /* 0x048 */ s16 slots[4]; /* PARTNER_SLOT_COUNT entries picked from entries[] */
     /* 0x050 */ PartnerEntry entries[PARTNER_ENTRY_COUNT];
     /* 0x3C0 */ s16 equip[6];
-    /* 0x3CC */ u8 unk3CC[4];
+    /* 0x3CC */ u8 lastBonus; /* the training whose bonus try last worked, 0 for
+                                 none: its try can't work again at once */
+    /* 0x3CD */ u8 unk3CD[3];
 } PartnerStats;
 
 /* One of the eight partner Digimon */
@@ -288,16 +315,34 @@ typedef union PartnerTotals {
 /* Game modes (GameState: mode >> 8 is the overlay) that more than their own
    overlay asks for */
 #define MODE_NEW_GAME 0x2D7 /* FIELDSTG, where a new game starts */
+#define MODE_DECK_EDITOR 0x400 /* STCRDDEK */
+#define MODE_PLAYER_NAME 0x500 /* STPLNMET: the player's name entry */
+#define MODE_BATTLE 0x600 /* FIGHTSTG */
+#define MODE_CARD_GAME 0x700 /* CARDGAME: a card battle */
+#define MODE_TRAINING 0xA00 /* STGTRAIN */
+#define MODE_NAMING 0xB00 /* STDGNAME */
 #define MODE_CONTINUE 0xC00 /* STGMCARD, to load a game */
-#define MODE_TITLE 0xE00 /* STDWTITL's title screen */
+#define MODE_DIGI_LAB 0xD00 /* STGDGLAB */
+#define MODE_TITLE 0xE00 /* STDWTITL's title screen; its movies follow */
 #define MODE_OPENING 0xE01 /* STDWTITL's first movie */
 #if VERSION_US
+#define MODE_BATTLE_MOVIE 0xE09 /* STDWTITL's movie before each battle at GAME.progress 0x2B */
 #define MODE_ENDING 0xE0A /* STDWTITL's movie after the last battle */
 #elif VERSION_EU
+#define MODE_BATTLE_MOVIE 0xE0A
 #define MODE_ENDING 0xE0B
 #endif
+#define MODE_ITEM_SHOP 0xF00 /* STITSHOP */
 #define MODE_STATUS 0x1000 /* STSTATUS: the field menu's screens (FIELD_MENU_CHOICE) */
+#define MODE_CARD_ALBUM 0x1200 /* STCRDABM */
+#define MODE_CARD_SHOP 0x1300 /* STCRDSHP */
 #define MODE_BATTLE_REPORT 0x1400 /* STFGTREP */
+#define MODE_STAGE_SELECT 0x1500 /* STAGSLCT, the debug stage select */
+#define MODE_COUNTRY_SELECT 0x1600 /* CNTY_SEL, where the European version starts */
+
+/* The first mode of a mode's overlay: MODE_OVERLAY(mode) == MODE_TITLE for
+   all of STDWTITL's */
+#define MODE_OVERLAY(mode) ((mode) & 0xFF00)
 
 /* The partner Digimon, and the ones in the party */
 #define PARTNER_COUNT 8
@@ -321,12 +366,12 @@ typedef struct GameState {
     /* 0x0010 */ u8 unk10[0x18];
     /* 0x0028 */ s32 stageSelectTop; /* the debug stage select's first line */
     /* 0x002C */ s32 stageSelectCursor;
-    /* 0x0030 */ s32 unk30;
+    /* 0x0030 */ s32 battleSteps; /* to the next random battle, which each step lowers */
     /* 0x0034 */ s32 fieldMode; /* where the menu returns to */
     /* 0x0038 */ Vec2 fieldPos; /* the player's, there */
     /* 0x0040 */ s32 fieldDir;
-    /* 0x0044 */ u16 unk44;
-    /* 0x0046 */ u16 unk46;
+    /* 0x0044 */ u16 place; /* where the last warp or trigger put the player (FieldBattles.id) */
+    /* 0x0046 */ u16 placeArg; /* the place's argument, which the stage reads with it */
     /* 0x0048 */ s32 playFrames; /* 8.8, counted by the vsync callback */
     /* 0x004C */ s16 playHours;
     /* 0x004E */ s16 playMinutes;
@@ -369,13 +414,13 @@ typedef struct GameState {
     /* 0x26C8 */ s32 modeArg;
     /* 0x26CC */ u8 countdown[4]; /* three digits of seconds, then frames */
     /* 0x26D0 */ s32 clearTempFlags;
-    /* 0x26D4 */ s32 unk26D4;
-    /* 0x26D8 */ s32 unk26D8;
+    /* 0x26D4 */ s32 lastFieldMode; /* the field mode FIELDSTG last started */
+    /* 0x26D8 */ s32 mapIndex; /* which of the stage's maps the field uses */
     /* 0x26DC */ s32 unk26DC;
-    /* 0x26E0 */ s32 unk26E0;
-    /* 0x26E4 */ s32 unk26E4;
+    /* 0x26E0 */ s32 playerDepth; /* the player's depth, kept while in the mode */
+    /* 0x26E4 */ s32 prizeSpot; /* the hidden spot that has the prize */
     /* 0x26E8 */ s32 unk26E8;
-    /* 0x26EC */ s32 unk26EC;
+    /* 0x26EC */ s32 flightZ; /* the flying player's height, kept while in the mode */
     /* 0x26F0 */ GameFuncs funcs;
 #elif VERSION_EU
     /* 0x2644 */ u8 flags02[0x12];
@@ -397,17 +442,25 @@ typedef struct GameState {
     /* 0x26D0 */ s32 modeArg;
     /* 0x26D4 */ u8 countdown[4];
     /* 0x26D8 */ s32 clearTempFlags;
-    /* 0x26DC */ s32 unk26D4;
-    /* 0x26E0 */ s32 unk26D8;
+    /* 0x26DC */ s32 lastFieldMode;
+    /* 0x26E0 */ s32 mapIndex;
     /* 0x26E4 */ s32 unk26DC;
-    /* 0x26E8 */ s32 unk26E0;
-    /* 0x26EC */ s32 unk26E4;
+    /* 0x26E8 */ s32 playerDepth;
+    /* 0x26EC */ s32 prizeSpot;
     /* 0x26F0 */ s32 unk26E8;
-    /* 0x26F4 */ s32 unk26EC;
-    /* 0x26F8 */ s32 unk26F8;
+    /* 0x26F4 */ s32 flightZ;
+    /* 0x26F8 */ s32 randomGauges; /* gauge games left with random rows, reset with each new mode */
     /* 0x26FC */ GameFuncs funcs;
 #endif
 } GameState;
+
+/* The saved part of the game state, GAME up to mode: a save's data section
+   (stgmcard.h's GameSave) */
+#if VERSION_US
+#define GAME_SAVE_SIZE 0x26BC
+#elif VERSION_EU
+#define GAME_SAVE_SIZE 0x26C4
+#endif
 
 s32 unequipItem(s32 slot, s32 item);
 s32 checkPartner(u32 op, s32 arg);

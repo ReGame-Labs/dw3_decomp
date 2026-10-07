@@ -5,7 +5,7 @@
 /* A gauge game: a cursor runs back and forth along one of the gauge rows until
  * cross is pressed, then slows down and stops; the cell it stops on (2 bits)
  * fails (0) or calls FIELDSTG_battleFuncs.startEventBattle with 4 (1) or 7 (2). In Europe the rows are
- * random only while GAME.unk26F8 lasts, then it is GAUGE_EMPTY_ROW. The match
+ * random only while GAME.randomGauges lasts, then it is GAUGE_EMPTY_ROW. The match
  * depends on the cell read and shifted as two statements. */
 void FIELDSTG_runGauge(GaugeGame *task) {
     SpriteDrawer drawer;
@@ -20,9 +20,9 @@ void FIELDSTG_runGauge(GaugeGame *task) {
     case TASK_INIT:
     default:
 #if VERSION_EU
-        if (GAME.unk26F8 > 0) {
+        if (GAME.randomGauges > 0) {
             task->row = RANDOM.next() & (GAUGE_ROWS - 1);
-            GAME.unk26F8--;
+            GAME.randomGauges--;
         } else {
             task->row = GAUGE_EMPTY_ROW;
         }
@@ -73,7 +73,7 @@ void FIELDSTG_runGauge(GaugeGame *task) {
                 cell = (cell >> shift) & 3;
                 if (task->counter < GAUGE_RESULT_DELAY) {
                     if (task->counter == 0 && cell == 1) {
-                        SOUND.playSound(0x80045341); /* SYSTEM05 */
+                        SOUND.playSound(SOUND_SYSTEM05);
                     }
                     task->counter += GFX.funcs.getFrameTime();
                     break;

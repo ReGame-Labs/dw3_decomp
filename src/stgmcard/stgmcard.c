@@ -9,12 +9,12 @@ void STGMCARD_updateScene(MemCardScene *task, Task **children) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0x5000);
-        GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         rect.x = 0;
         rect.y = 0;
         rect.w = 0x140;
         rect.h = 0xF0;
-        layer = GFX.funcs.createLayer(&rect, 2, 0x1000);
+        layer = GFX.funcs.createLayer(&rect, 2, SCREEN_LAYER);
         layer->setBgColor(layer, 0, 0, 0);
         children[0] = (Task *)STGMCARD_createScreen();
         task->nextState(task);
@@ -148,7 +148,7 @@ void STGMCARD_updateInfo(MemCardInfo *info) {
             }
             /* the match depends on the unsigned compare, which GCC makes a sltiu */
             if (i < 3U) {
-                (*windows)->setPalette(*windows, 1);
+                (*windows)->setPalette(*windows, PALETTE_BLUE);
             }
         }
         info->fade.duration = 8;
@@ -236,7 +236,7 @@ MemCardInfo *STGMCARD_createInfo(MemCardSaves *saves) {
     info->show = STGMCARD_showInfo;
     info->hide = STGMCARD_hideInfo;
     info->refresh = STGMCARD_refreshInfo;
-    info->layer = 0x1000;
+    info->layer = SCREEN_LAYER;
     info->saves = saves;
     info->depth = 1;
     return info;
@@ -385,7 +385,7 @@ MemCardPanel *STGMCARD_createPanel(s32 x, s32 y, s32 w, s32 h) {
     panel->setTopColor = STGMCARD_setPanelTopColor;
     panel->setBottomColor = STGMCARD_setPanelBottomColor;
     panel->setPos = STGMCARD_setPanelPos;
-    panel->layer = 0x1000;
+    panel->layer = SCREEN_LAYER;
     panel->depth = 1;
     panel->x = x;
     panel->y = y;
@@ -575,7 +575,7 @@ MemCardMenu *STGMCARD_createMenu(MemCardSaves *saves) {
     menu->slideOutHeader = STGMCARD_slideOutHeader;
     menu->slideInSlots = STGMCARD_slideInSlots;
     menu->slideOutSlots = STGMCARD_slideOutSlots;
-    menu->layer = 0x1000;
+    menu->layer = SCREEN_LAYER;
     menu->depth = 2;
     menu->saves = saves;
     return menu;
@@ -1393,7 +1393,7 @@ MemCardSaves *STGMCARD_createSaves(MemCardScreen *screen) {
     saves->refresh = STGMCARD_refreshSaves;
     saves->hide = STGMCARD_hideSaves;
     saves->screen = screen;
-    saves->layer = 0x1000;
+    saves->layer = SCREEN_LAYER;
     return saves;
 }
 
@@ -1480,7 +1480,7 @@ Task *STGMCARD_createScreen(void) {
     s32 prev;
     s32 i;
 
-    screen->layer = 0x1000;
+    screen->layer = SCREEN_LAYER;
     mode = GAME.funcs.getMode() & 0xFF;
     screen->loading = (u32)GAME.funcs.getModeArg() >> 31 ^ 1;
     prev = GAME.funcs.getPrevMode();

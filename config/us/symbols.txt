@@ -620,7 +620,10 @@ CD_SECTOR_HEADER = 0x8005C4C0;
 // Function tables in .data (calls through them are scheduled like struct accesses)
 EnterCriticalSection = 0x80024C98; // type:func
 ExitCriticalSection = 0x80024CA8; // type:func
+open = 0x80024CB8; // type:func
+read = 0x80024CC8; // type:func
 write = 0x80024CD8; // type:func
+close = 0x80024CE8; // type:func
 SysDeqIntRP = 0x80024D08; // type:func
 ChangeClearRCnt = 0x80024D18; // type:func
 OpenEvent = 0x80038158; // type:func

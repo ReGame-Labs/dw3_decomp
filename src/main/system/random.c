@@ -7,7 +7,7 @@ void seedRandom(s32 seed) {
 }
 
 /* The next entry of RANDOM_TABLE, 0 to RANDOM_COUNT - 1 */
-u16 random(void) {
+s32 random(void) {
     s32 index = (RANDOM.index + 1) & (RANDOM_COUNT - 1);
 
     RANDOM.index = index;
@@ -530,4 +530,4 @@ u16 RANDOM_TABLE[RANDOM_COUNT] = {
     0x0399, 0x0B39, 0x0953, 0x067B, 0x04C9, 0x0E40, 0x0549, 0x07BD,
 };
 
-Random RANDOM = { 0, seedRandom, (s32 (*)(void))random };
+Random RANDOM = { 0, seedRandom, random };

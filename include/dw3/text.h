@@ -22,7 +22,7 @@ typedef struct Cursor {
     /* 0x54 */ s32 depth;
     /* 0x58 */ s32 x;
     /* 0x5C */ s32 y;
-    /* 0x60 */ s32 palette;
+    /* 0x60 */ s32 palette; /* PALETTE_*, its text window's */
     /* 0x64 */ s32 visible;
     /* 0x68 */ s32 dirty;
     /* 0x6C */ s32 frame;
@@ -105,6 +105,20 @@ typedef struct TextBuffer {
 } TextBuffer;
 
 /*
+ * The text windows' palettes (TextWindow.palette, setPalette): rows of the
+ * font's CLUTs, named by the colour of the letters (white letters with a
+ * grey shade in PALETTE_WHITE, the default)
+ */
+#define PALETTE_WHITE 0
+#define PALETTE_BLUE 1 /* a light blue: what is highlighted or current */
+#define PALETTE_DARK_BLUE 2
+#define PALETTE_YELLOW 3
+#define PALETTE_GREEN 4
+#define PALETTE_RED 5
+#define PALETTE_PURPLE 6
+#define PALETTE_GREY 7 /* what is unavailable */
+
+/*
  * A text window (createTextWindow): up to six text buffers (0 is shown, 1-5
  * are "work" buffers that control code 5 inserts), drawn glyph by glyph as
  * sprites, optionally typed out one character every typeDelay frames.
@@ -135,7 +149,7 @@ typedef struct TextWindow {
     /* 0xBC */ s16 alignWidth;
     /* 0xBE */ u8 blend;
     /* 0xBF */ u8 lines;
-    /* 0xC0 */ u8 palette;
+    /* 0xC0 */ u8 palette; /* PALETTE_* */
     /* 0xC1 */ u8 visible;
     /* 0xC2 */ u8 fixedSpacing;
     /* 0xC3 */ u8 finished;

@@ -18,12 +18,12 @@ void STSTATUS_updateScene(Task *task, Task **children) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0x14000);
-        GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         rect.x = 0;
         rect.y = 0;
         rect.w = 0x140;
         rect.h = 0xF0;
-        layer = GFX.funcs.createLayer(&rect, 3, 0x1000);
+        layer = GFX.funcs.createLayer(&rect, 3, SCREEN_LAYER);
         layer->setBgColor(layer, 0, 0, 0);
         children[0] = (Task *)STSTATUS_createMenu();
         task->nextState(task);
@@ -365,9 +365,9 @@ void STSTATUS_runCardScreen(PartyScreen *screen, PartyScreenWindows *windows) {
         break;
     case 0x39:
         if (screen->step == 1) {
-            GAME.funcs.requestMode(0x1200, 0);
+            GAME.funcs.requestMode(MODE_CARD_ALBUM, 0);
         } else if (screen->step == 2) {
-            GAME.funcs.requestMode(0x400, 0);
+            GAME.funcs.requestMode(MODE_DECK_EDITOR, 0);
         } else {
             screen->state = 3;
         }
@@ -413,7 +413,7 @@ void STSTATUS_updateCardScreen(PartyScreen *screen, PartyScreenWindows *windows)
 Task *STSTATUS_createCardScreen(FieldMenuScreen *menu, s32 extra) {
     PartyScreen *screen = createTask(STSTATUS_updateCardScreen, sizeof(PartyScreen), sizeof(PartyScreenWindows));
 
-    screen->layer = 0x1000;
+    screen->layer = SCREEN_LAYER;
     screen->depth = 6;
     screen->menu = menu;
     return (Task *)screen;

@@ -91,13 +91,13 @@ void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
         SOUND.playSound(SOUND_DEMO_BGM);
         break;
     case FIELD_COMMAND_PLAY_SE000002:
-        SOUND.playSound(0xA40006);
+        SOUND.playSound(SOUND_SE000002);
         break;
     case FIELD_COMMAND_PLAY_BEAM_SHT:
         SOUND.playSound(SOUND_BEAM_SHT);
         break;
     case FIELD_COMMAND_PLAY_SWITCH02:
-        SOUND.playSound(0x800410BD);
+        SOUND.playSound(SOUND_SWITCH02);
         break;
     case FIELD_COMMAND_PLAY_MASK_SET:
         SOUND.playSound(SOUND_MASK_SET);
@@ -115,7 +115,7 @@ void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
         SOUND.playSound(SOUND_SAVEDEMO);
         break;
     case FIELD_COMMAND_PLAY_SWITCH03:
-        SOUND.playSound(0x8004113E);
+        SOUND.playSound(SOUND_SWITCH03);
         break;
     case FIELD_COMMAND_PLAY_SN_ENTRY:
         SOUND.playSound(SOUND_SN_ENTRY);
@@ -130,13 +130,13 @@ void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
         SOUND.playSound(SOUND_BULB_003);
         break;
     case FIELD_COMMAND_PLAY_GONDRA_S:
-        SOUND.playSound(0x340004);
+        SOUND.playSound(SOUND_GONDRA_S);
         break;
     case FIELD_COMMAND_PLAY_PIYOPIYO:
         SOUND.playSound(SOUND_PIYOPIYO);
         break;
     case FIELD_COMMAND_PLAY_COMCD103:
-        SOUND.playSound(0x800429BF);
+        SOUND.playSound(SOUND_COMCD103);
         break;
     case FIELD_COMMAND_PLAY_COMCD201:
         SOUND.playSound(SOUND_COMCD201);
@@ -145,7 +145,7 @@ void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
         SOUND.playSound(SOUND_COMCD111);
         break;
     case FIELD_COMMAND_PLAY_SWITCH01:
-        SOUND.playSound(0x8004103C);
+        SOUND.playSound(SOUND_SWITCH01);
         break;
     }
     switch (command) {
@@ -153,13 +153,13 @@ void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
         FIELDSTG_heldVoice = SOUND.playSound(SOUND_GAYALOOP);
         break;
     case FIELD_COMMAND_PLAY_PLAYER11:
-        FIELDSTG_heldVoice = SOUND.playSound(0xA0045EC9);
+        FIELDSTG_heldVoice = SOUND.playSound(SOUND_PLAYER11);
         break;
     case FIELD_COMMAND_PLAY_BEAM_HIT:
         FIELDSTG_heldVoice = SOUND.playSound(SOUND_BEAM_HIT);
         break;
     case FIELD_COMMAND_PLAY_COMCD115:
-        FIELDSTG_heldVoice = SOUND.playSound(0xA0042FCB);
+        FIELDSTG_heldVoice = SOUND.playSound(SOUND_COMCD115);
         break;
     }
     switch (command) {
@@ -167,10 +167,10 @@ void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
         SOUND.keyOff(SOUND_GAYALOOP, FIELDSTG_heldVoice);
         break;
     case FIELD_COMMAND_STOP_PLAYER11:
-        SOUND.keyOff(0xA0045EC9, FIELDSTG_heldVoice);
+        SOUND.keyOff(SOUND_PLAYER11, FIELDSTG_heldVoice);
         break;
     case FIELD_COMMAND_STOP_COMCD115:
-        SOUND.keyOff(0xA0042FCB, FIELDSTG_heldVoice);
+        SOUND.keyOff(SOUND_COMCD115, FIELDSTG_heldVoice);
         break;
     case FIELD_COMMAND_STOP_BEAM_HIT:
         SOUND.keyOff(SOUND_BEAM_HIT, FIELDSTG_heldVoice);

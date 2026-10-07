@@ -9,12 +9,12 @@ void STITSHOP_updateScene(Task *task, Task **children) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0x14000);
-        GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         rect.x = 0;
         rect.y = 0;
         rect.w = 0x140;
         rect.h = 0xF0;
-        layer = GFX.funcs.createLayer(&rect, 3, 0x1000);
+        layer = GFX.funcs.createLayer(&rect, 3, SCREEN_LAYER);
         layer->setBgColor(layer, 0, 0, 0);
         children[0] = (Task *)STITSHOP_createShop();
         task->nextState(task);
@@ -633,7 +633,7 @@ ShopBuy *STITSHOP_createBuy(ItemShop *shop) {
     ShopBuy *buy = createTask(STITSHOP_updateBuy, sizeof(ShopBuy), sizeof(ShopBuyWindows));
 
     buy->showItem = STITSHOP_showBuyItem;
-    buy->layer = 0x1000;
+    buy->layer = SCREEN_LAYER;
     buy->depth = 4;
     buy->shop = shop;
     return buy;
@@ -1081,7 +1081,7 @@ ShopSell *STITSHOP_createSell(ItemShop *shop) {
     ShopSell *sell = createTask(STITSHOP_updateSell, sizeof(ShopSell), sizeof(ShopSellWindows));
 
     sell->showItem = STITSHOP_showSellItem;
-    sell->layer = 0x1000;
+    sell->layer = SCREEN_LAYER;
     sell->depth = 4;
     sell->shop = shop;
     return sell;
@@ -1353,11 +1353,11 @@ void STITSHOP_freezeListCursor(ShopItemList *list, s32 frozen) {
     ShopItemListWindows *win = list->children;
 
     if (frozen) {
-        win->cursor->setPalette(win->cursor, 7);
+        win->cursor->setPalette(win->cursor, PALETTE_GREY);
         win->cursor->setStill(win->cursor, 1);
         list->active = 0;
     } else {
-        win->cursor->setPalette(win->cursor, 0);
+        win->cursor->setPalette(win->cursor, PALETTE_WHITE);
         win->cursor->setStill(win->cursor, 0);
         list->active = 1;
     }
@@ -1421,7 +1421,7 @@ ShopItemList *STITSHOP_createItemList(ShopDialog *dialog, s32 type, s32 selling)
     list->freezeCursor = STITSHOP_freezeListCursor;
     list->refresh = STITSHOP_refreshItemList;
     list->listBag = STITSHOP_listSellable;
-    list->layer = 0x1000;
+    list->layer = SCREEN_LAYER;
     list->depth = 4;
     list->dialog = dialog;
     list->selling = selling;
@@ -1560,22 +1560,22 @@ void STITSHOP_colorStat(ShopInfo *info, TextWindow *win, ShopStatRow *row) {
     v[0] = *(STITSHOP_stats[row->stat] + p->stats);
     if (row->compare == 0) {
         if (penalty >= 0 && p->penalties[penalty] != 0) {
-            win->setPalette(win, 6);
+            win->setPalette(win, PALETTE_PURPLE);
         } else {
-            win->setPalette(win, 0);
+            win->setPalette(win, PALETTE_WHITE);
         }
     } else {
         v[1] = *(STITSHOP_stats[row->stat] + p->newStats);
         if (v[0] == v[1]) {
             if (penalty >= 0 && p->penalties[penalty] != 0) {
-                win->setPalette(win, 6);
+                win->setPalette(win, PALETTE_PURPLE);
             } else {
-                win->setPalette(win, 0);
+                win->setPalette(win, PALETTE_WHITE);
             }
         } else if (v[0] < v[1]) {
-            win->setPalette(win, 1);
+            win->setPalette(win, PALETTE_BLUE);
         } else {
-            win->setPalette(win, 5);
+            win->setPalette(win, PALETTE_RED);
         }
     }
 }
@@ -1595,9 +1595,9 @@ void STITSHOP_showOtherChanges(ShopInfo *info, TextWindow **win, ShopStatRow *ro
                 win[n]->setNumber(win[n], 0, v[1]);
                 win[n]->setRightAlign(win[n], 1);
                 if (v[0] < v[1]) {
-                    win[n]->setPalette(win[n], 1);
+                    win[n]->setPalette(win[n], PALETTE_BLUE);
                 } else {
-                    win[n]->setPalette(win[n], 5);
+                    win[n]->setPalette(win[n], PALETTE_RED);
                 }
                 n++;
             }
@@ -1863,9 +1863,9 @@ void STITSHOP_showPartnerStats(ShopInfo *info, ShopInfoWindows *win, s32 show) {
             win->partners[i].name->setString(win->partners[i].name, GAME.funcs.getPartnerStats(partner)->name, -1);
             if (STITSHOP_funcs.canEquip(partner, info->item)) {
                 STITSHOP_fillPartnerRows(info, win, i);
-                win->partners[i].name->setPalette(win->partners[i].name, 0);
+                win->partners[i].name->setPalette(win->partners[i].name, PALETTE_WHITE);
             } else {
-                win->partners[i].name->setPalette(win->partners[i].name, 7);
+                win->partners[i].name->setPalette(win->partners[i].name, PALETTE_GREY);
                 for (j = 0; j < 2; j++) {
                     win->partners[i].stats[j]->setVisible(win->partners[i].stats[j], 0);
                 }
@@ -2243,7 +2243,7 @@ ShopInfo *STITSHOP_createInfo(s32 selling, s32 item) {
     info->setKindVisible = STITSHOP_setKindVisible;
     info->turnPage = STITSHOP_turnInfoPage;
     info->refreshPartner = STITSHOP_refreshPartner;
-    info->layer = 0x1000;
+    info->layer = SCREEN_LAYER;
     info->depth = 6;
     info->selling = selling;
     info->item = item;
@@ -2469,7 +2469,7 @@ ItemShop *STITSHOP_createShop(void) {
     ItemShop *shop = createTask(STITSHOP_updateShop, sizeof(ItemShop), sizeof(ItemShopWindows));
 
     shop->showMoney = STITSHOP_showMoney;
-    shop->layer = 0x1000;
+    shop->layer = SCREEN_LAYER;
     shop->shop = GAME.funcs.getModeArg();
     return shop;
 }

@@ -60,9 +60,9 @@ void STSTATUS_showDigivolveSlots(DigivolvePanel *panel, DigivolvePanelWindows *w
                 data = GET_DIGIMON(panel->slots[i]);
                 windows->slots[i]->setString(windows->slots[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), data->nameId);
                 if (partner->battleDigivolve == panel->slots[i]) {
-                    windows->slots[i]->setPalette(windows->slots[i], 1);
+                    windows->slots[i]->setPalette(windows->slots[i], PALETTE_BLUE);
                 } else {
-                    windows->slots[i]->setPalette(windows->slots[i], 0);
+                    windows->slots[i]->setPalette(windows->slots[i], PALETTE_WHITE);
                 }
             } else {
                 windows->slots[i]->setVisible(windows->slots[i], 0);
@@ -132,14 +132,14 @@ void STSTATUS_showDigivolveStats(DigivolvePanel *panel, DigivolvePanelWindows *w
                 windows->list[i]->setNumber(windows->list[i], 0, value);
                 if (i == 0) {
                     if (totals.fields.lowered[0]) {
-                        windows->list[0]->setPalette(windows->list[0], 6);
+                        windows->list[0]->setPalette(windows->list[0], PALETTE_PURPLE);
                     }
                 } else if (i == 1) {
                     if (totals.fields.lowered[1]) {
-                        windows->list[1]->setPalette(windows->list[1], 6);
+                        windows->list[1]->setPalette(windows->list[1], PALETTE_PURPLE);
                     }
                 } else if (i == 4 && totals.fields.lowered[2]) {
-                    windows->list[4]->setPalette(windows->list[4], 6);
+                    windows->list[4]->setPalette(windows->list[4], PALETTE_PURPLE);
                 }
             }
             for (i = 0; i < 7; i++) {
@@ -157,11 +157,11 @@ void STSTATUS_showDigivolveStats(DigivolvePanel *panel, DigivolvePanelWindows *w
                 if (tech != 0) {
                     windows->values[i]->setString(windows->values[i], FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), tech & 0x1FFF);
                     if (tech & 0x8000) {
-                        windows->values[i]->setPalette(windows->values[i], 3);
+                        windows->values[i]->setPalette(windows->values[i], PALETTE_YELLOW);
                     } else if (tech & 0x4000) {
-                        windows->values[i]->setPalette(windows->values[i], 4);
+                        windows->values[i]->setPalette(windows->values[i], PALETTE_GREEN);
                     } else {
-                        windows->values[i]->setPalette(windows->values[i], 0);
+                        windows->values[i]->setPalette(windows->values[i], PALETTE_WHITE);
                     }
                 } else {
                     windows->values[i]->setVisible(windows->values[i], 0);
@@ -182,14 +182,14 @@ void STSTATUS_showDigivolveStats(DigivolvePanel *panel, DigivolvePanelWindows *w
                 windows->list[i]->setNumber(windows->list[i], 0, value);
                 if (i == 0) {
                     if (totals.fields.lowered[0]) {
-                        windows->list[0]->setPalette(windows->list[0], 6);
+                        windows->list[0]->setPalette(windows->list[0], PALETTE_PURPLE);
                     }
                 } else if (i == 1) {
                     if (totals.fields.lowered[1]) {
-                        windows->list[1]->setPalette(windows->list[1], 6);
+                        windows->list[1]->setPalette(windows->list[1], PALETTE_PURPLE);
                     }
                 } else if (i == 4 && totals.fields.lowered[2]) {
-                    windows->list[4]->setPalette(windows->list[4], 6);
+                    windows->list[4]->setPalette(windows->list[4], PALETTE_PURPLE);
                 }
             }
             for (i = 0; i < 7; i++) {
@@ -205,7 +205,7 @@ void STSTATUS_showDigivolveStats(DigivolvePanel *panel, DigivolvePanelWindows *w
             for (i = 0; i < 6; i++) {
                 if (data->skills[i + 1] != 0) {
                     windows->values[i]->setString(windows->values[i], FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), data->skills[i + 1]);
-                    windows->values[i]->setPalette(windows->values[i], 3);
+                    windows->values[i]->setPalette(windows->values[i], PALETTE_YELLOW);
                 } else {
                     windows->values[i]->setVisible(windows->values[i], 0);
                 }
@@ -807,7 +807,7 @@ void STSTATUS_updateDigivolvePanel(DigivolvePanel *panel, DigivolvePanelWindows 
 DigivolvePanel *STSTATUS_createDigivolvePanel(StatsScreen *screen) {
     DigivolvePanel *panel = createTask(STSTATUS_updateDigivolvePanel, sizeof(DigivolvePanel), sizeof(DigivolvePanelWindows));
 
-    panel->layer = 0x1000;
+    panel->layer = SCREEN_LAYER;
     panel->depth = 6;
     panel->screen = screen;
     panel->member = screen->member;

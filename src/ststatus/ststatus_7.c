@@ -361,7 +361,7 @@ void STSTATUS_updateItemList(ItemList *panel, ItemListWindows *windows) {
 ItemList *STSTATUS_createItemList(ItemScreen *screen, s32 list, s32 item) {
     ItemList *panel = createTask(STSTATUS_updateItemList, sizeof(ItemList), sizeof(ItemListWindows));
 
-    panel->layer = 0x1000;
+    panel->layer = SCREEN_LAYER;
     panel->depth = 3;
     panel->screen = screen;
     if (item != 0) {
