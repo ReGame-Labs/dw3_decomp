@@ -5,7 +5,7 @@
  * Once the substate is set to 1, moves the records of animations 2, 3, 4 and
  * 7 and shows those of 5 to 9 in turn
  */
-void func_800A4CB8(StageTileGroup *task) {
+void updateTileGroup(StageTileGroup *task) {
     s32 i;
 
     switch (task->state) {
@@ -80,19 +80,19 @@ void func_800A4CB8(StageTileGroup *task) {
 }
 
 /* Starts the task (substate 1) when map object 0x32C is triggered */
-void func_800A4F94(StageTask *task, s32 id) {
+void handleCommand809(StageTask *task, s32 id) {
     if (task != NULL && id == 0x32C) {
         task->setSubstate(task, 1);
     }
 }
 
-/* Creates the task of func_800A4CB8 with id 0x329 */
-void *func_800A4FCC(s32 arg) {
-    return createTaskWithId(func_800A4CB8, 0x70, 0, 0x329);
+/* Creates the task of updateTileGroup with id 0x329 */
+void *createCommand809(s32 arg) {
+    return createTaskWithId(updateTileGroup, 0x70, 0, 0x329);
 }
 
 /* Once the substate is set to 1, animates the frame of the record of animation 1 for 20 frames, then plays a sound */
-void func_800A4FFC(StageFrameTask *task) {
+void updateFrameTask(StageFrameTask *task) {
     StageTile *tile;
 
     switch (task->state) {
@@ -128,14 +128,14 @@ void func_800A4FFC(StageFrameTask *task) {
 }
 
 /* Starts the task (substate 1) when map object 0x32E is triggered */
-void func_800A50E8(StageTask *task, s32 id) {
+void handleCommand808(StageTask *task, s32 id) {
     if (task != NULL && id == 0x32E) {
         task->setSubstate(task, 1);
     }
 }
 
-void *func_800A5120(s32 arg) {
-    return createTaskWithId(func_800A4FFC, 0x5C, 0, arg);
+void *createCommand808(s32 arg) {
+    return createTaskWithId(updateFrameTask, 0x5C, 0, arg);
 }
 
 /* Creates two objects and the event object of story progress 1 */
@@ -143,8 +143,8 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        children[2] = func_800A4FCC(0x329);
-        children[1] = func_800A5120(0x328);
+        children[2] = createCommand809(0x329);
+        children[1] = createCommand808(0x328);
         if (GAME.progress == 1) {
             children[0] = FIELDSTG_startEvent(4);
         }
@@ -184,7 +184,7 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.music = MUSIC(0x40, 1);
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16);
     FIELDSTG_map.setFirstMap(0);
 }
 

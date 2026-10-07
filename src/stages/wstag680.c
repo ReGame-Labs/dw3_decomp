@@ -1,6 +1,6 @@
 #include "common.h"
 #include "stage.h"
-extern StageRiserFrame *D_800A564C[];
+extern StageRiserFrame *updateRisersFrames[];
 
 /* Steps a mover's looping animation, its last frame setting how far it moves */
 s32 func_800A4DA0(StageRiser *obj, StageRiserFrame *frames, s32 depth) {
@@ -29,7 +29,7 @@ s32 func_800A4DA0(StageRiser *obj, StageRiserFrame *frames, s32 depth) {
 }
 
 /* Animates and moves the records of the stage's table (lifts for animations 8-10) and pushes the player */
-void func_800A4E9C(StageRisers *task) {
+void updateRisers(StageRisers *task) {
     StageTile *rec;
     StageTile *tile;
     StageActor *actor;
@@ -58,7 +58,7 @@ void func_800A4E9C(StageRisers *task) {
                 task->risers[i].y = rec->y << 8;
                 task->risers[i].active = 0;
                 task->risers[i].anim.index = 0;
-                task->risers[i].anim.timer = D_800A564C[i]->duration;
+                task->risers[i].anim.timer = updateRisersFrames[i]->duration;
                 task->risers[i].tile = rec;
                 i++;
                 break;
@@ -70,7 +70,7 @@ void func_800A4E9C(StageRisers *task) {
         for (i = 0; i < 11; i++) {
             if (task->risers[i].active) {
                 tile = task->risers[i].tile;
-                tile->frame = func_800A4DA0(&task->risers[i], D_800A564C[i], 0);
+                tile->frame = func_800A4DA0(&task->risers[i], updateRisersFrames[i], 0);
                 tile->y += task->risers[i].move;
                 task->risers[i].move = 0;
                 if (tile->y > 0x190) {
@@ -89,7 +89,7 @@ void func_800A4E9C(StageRisers *task) {
             }
         }
         if (task->pushing) {
-            actor = TASK_REGISTRY.funcs.find(5, -1, 0);
+            actor = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
             task->push += 0x40;
             actor->y += task->push;
             if (task->timer++ > 0x78) {
@@ -104,14 +104,14 @@ void func_800A4E9C(StageRisers *task) {
 }
 
 /* Starts the records an event moves (the handler of the events the task gets) */
-void func_800A5140(void *arg, s32 event) {
+void handleCommand814(void *arg, s32 event) {
     StageRisers *task = arg;
     StageActor *player;
     s32 anim;
     s32 i;
 
     if (task != NULL) {
-        player = TASK_REGISTRY.funcs.find(5, -1, 0);
+        player = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
         anim = 0;
         switch (event) {
         case 0x344:
@@ -157,8 +157,8 @@ void func_800A5140(void *arg, s32 event) {
     }
 }
 
-void *func_800A5270(s32 arg) {
-    return createTaskWithId(func_800A4E9C, 0x14C, 0, arg);
+void *createCommand814(s32 arg) {
+    return createTaskWithId(updateRisers, 0x14C, 0, arg);
 }
 
 /* Creates the event object of story progress 15 */
@@ -203,7 +203,7 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -228,7 +228,7 @@ s16 script412[] = {
     0x303, 0x32E,
     0x300, 0x1E,
     0x101, 0x323, 0x325, 1,
-    0x101, 0x32D, 0x369, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_DEMO_BGM, 1,
     0x300, 0x3C,
     0x101, 0x323, 0x326, 1,
     0x300, 0x1E,
@@ -307,7 +307,7 @@ StageRiserFrame D_800A5638[] = {
     { 8, 6, 0 },
     { 255, 0, 80 },
 };
-StageRiserFrame *D_800A564C[] = {
+StageRiserFrame *updateRisersFrames[] = {
     D_800A5618,
     D_800A5628,
     D_800A5618,

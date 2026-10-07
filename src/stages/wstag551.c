@@ -28,9 +28,9 @@ void setupStage(void) {
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
-    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress != 0x26 || FLAGS_00.checkCondition(FLAG(0x1A, 0xA), 0) != 0) {
         FIELDSTG_state.soundBank = 0x1F;
@@ -42,7 +42,7 @@ s16 script1226[] = {
     0x102, 2, 0x190, 0xE0, 3,
     0x100, 0x15, 0x171, 0xD1,
     0x101, 0x15, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 3,
     0x300, 6,
@@ -51,7 +51,7 @@ s16 script1226[] = {
     0x301,
     0x300, 0x1E,
     0x101, 0x15, 0x36, 7,
-    0x101, 0x32D, 0x375, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_SAVEDEMO, 2,
     0x303, 0x15,
     0x101, 0x15, 0x37, 7,
     0x300, 0x5A,
@@ -248,22 +248,22 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x2B2, 0x610, 0x540, 3, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 4, 7, 0, 0, 0, 0, 0, 0 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, 9, 0x2E8, 0x240, 0xD0, 1, 0, 3, 5 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, 9, 0x2E9, 0xB0, 0xF8, 7, 0, 6, 1 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, 9, 0x2E9, 0xB0, 0xF8, 7, 0, 0xB, 1 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 6, 0x479, 0x2B0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 6, 0x469, 0x318, 0, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, 0xA, 0x2E2, 0xB0, 0x148, 7, 0, 0x13, 1 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFFE0, 0x2C, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0x20, 0x30, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xC, 0x30, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFFEC, 0x30, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0x30, 0xFFE8, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0, 0xFFE0, 0, 0, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, 0xA, 0x2E2, 0xB0, 0x148, 7, 0, 0x13, 1 },
-    { { { FLAG(0, 0xF), 0 }, { CODES_END, 0 } }, 8, 0x2328, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2B2, 0x610, 0x540, 3, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 7, 0, 0, 0, 0, 0, 0 },
+    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 3, 5 },
+    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 6, 1 },
+    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 0xB, 1 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0x479, 0x2B0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0x469, 0x318, 0, 0, 0, 0 },
+    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 0x13, 1 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFE0, 0x2C, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x20, 0x30, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xC, 0x30, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFEC, 0x30, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x30, 0xFFE8, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0, 0xFFE0, 0, 0, 0, 0, 0 },
+    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 0x13, 1 },
+    { { { FLAG(0, FIELD_FLAG_ENCOUNTERED), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2328, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

@@ -21,12 +21,12 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-void func_800A4D98(void) {
+void endEvent530(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x39), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-void func_800A4DE4(void) {
+void endEvent531(void) {
     GAME.progress = 19;
 }
 
@@ -57,9 +57,9 @@ void setupStage(void) {
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
-    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress < 0x15) {
         FIELDSTG_state.slots = stageSlots0;
@@ -75,7 +75,7 @@ s16 script530[] = {
     0x101, 0x65, 1, 5,
     0x100, 0x97, 0x29C, 0x22A,
     0x101, 0x97, 1, 1,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 6,
     0x300, 0x3C,
@@ -157,7 +157,7 @@ s16 script531[] = {
     0x100, 0x11F, 0x261, 0x222,
     0x101, 0x11F, 1, 1,
     0x300, 0x3C,
-    0x101, 0x32D, 0x37E, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_PIYOPIYO, 1,
     0x300, 0x3C,
     0x200, 0, 1, 0x65, 2,
     0x301,
@@ -205,7 +205,7 @@ s16 script531[] = {
     0x300, 0x12,
     0x100, 0x68, 0x320, 0x207,
     0x101, 0x68, 0x47, 1,
-    0x101, 0x32D, 0x368, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_WEAR_OFF, 1,
     0x303, 0x68,
     0x100, 0x69, 0, 0,
     0x101, 0x69, 1, 0,
@@ -515,25 +515,25 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots0[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x253, 0x90, 0x240, 7, 0, 0, 0 },
-    { { { SPECIAL(0x41), 1 }, { CODES_END, 0 } }, 1, 0x255, 0x268, 0x1AC, 3, 0x64, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 6, 0xB3, 0x238, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 6, 0xC3, 0x2A0, 0, 0, 0, 0 },
-    { { { PROGRESS(0x12), 1 }, { FLAG(0x40, 0x39), 0 } }, 8, 0x212, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x253, 0x90, 0x240, 7, 0, 0, 0 },
+    { { { SPECIAL(0x41), 1 }, { CODES_END, 0 } }, SLOT_EXIT, 0x255, 0x268, 0x1AC, 3, 0x64, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0xB3, 0x238, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0xC3, 0x2A0, 0, 0, 0, 0 },
+    { { { PROGRESS(0x12), 1 }, { FLAG(0x40, 0x39), 0 } }, SLOT_EVENT, 0x212, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots1[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x253, 0x90, 0x240, 7, 0, 0, 0 },
-    { { { SPECIAL(0x41), 1 }, { CODES_END, 0 } }, 1, 0x256, 0x268, 0x1AC, 3, 0x64, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 6, 0xB3, 0x238, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 6, 0xC3, 0x2A0, 0, 0, 0, 0 },
-    { { { PROGRESS(0x12), 1 }, { FLAG(0x40, 0x39), 0 } }, 8, 0x212, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x253, 0x90, 0x240, 7, 0, 0, 0 },
+    { { { SPECIAL(0x41), 1 }, { CODES_END, 0 } }, SLOT_EXIT, 0x256, 0x268, 0x1AC, 3, 0x64, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0xB3, 0x238, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0xC3, 0x2A0, 0, 0, 0, 0 },
+    { { { PROGRESS(0x12), 1 }, { FLAG(0x40, 0x39), 0 } }, SLOT_EVENT, 0x212, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 530, script530, EVENT_TEXT(0x15), NULL, func_800A4D98 },
-    { 531, script531, EVENT_TEXT(5), NULL, func_800A4DE4 },
+    { 530, script530, EVENT_TEXT(0x15), NULL, endEvent530 },
+    { 531, script531, EVENT_TEXT(5), NULL, endEvent531 },
     { -1, NULL, 0, NULL, NULL },
 };

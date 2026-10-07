@@ -19,8 +19,8 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, 0x9270001);
-    FIELDSTG_map.setFile(7, 0x9270002);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x9270001);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x9270002);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -166,13 +166,13 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x298, 0x448, 0xF8, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x29E, 0xC8, 0x1A4, 5, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x29E, 0x1B8, 0x204, 3, 0x64, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x29D, 0x208, 0x1AC, 3, 0x65, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x29F, 0x1A7, 0x254, 3, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 6, 0x400, 0x120, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 6, 0x410, 0x188, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x298, 0x448, 0xF8, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x29E, 0xC8, 0x1A4, 5, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x29E, 0x1B8, 0x204, 3, 0x64, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x29D, 0x208, 0x1AC, 3, 0x65, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x29F, 0x1A7, 0x254, 3, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0x400, 0x120, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0x410, 0x188, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

@@ -54,15 +54,15 @@ s32 FIELDSTG_offerTrigger(Triggers *task, TriggerChildren *children) {
     }
     switch (task->entry->type) {
         case SLOT_DEPTH:
-            task->actor->depth = task->entry->unkA;
-            GAME.playerDepth = task->entry->unkA;
+            task->actor->depth = task->entry->arg;
+            GAME.playerDepth = task->entry->arg;
             return 0;
         case SLOT_MAP:
-            FIELDSTG_map.setMap(task->entry->unkA);
+            FIELDSTG_map.setMap(task->entry->arg);
             return 0;
         case SLOT_EVENT:
             if (children->script == NULL) {
-                children->script = FIELDSTG_startEvent(task->entry->unkA);
+                children->script = FIELDSTG_startEvent(task->entry->arg);
             }
             return 0;
         case SLOT_SLIDE:
@@ -72,7 +72,7 @@ s32 FIELDSTG_offerTrigger(Triggers *task, TriggerChildren *children) {
             task->actor->stopSlide(task->actor);
             return 0;
         case SLOT_LAUNCH:
-            task->actor->launch(task->actor, &task->entry->unkA);
+            task->actor->launch(task->actor, &task->entry->arg);
             return 0;
     }
 #if VERSION_US
@@ -148,43 +148,43 @@ void FIELDSTG_setOffTrigger(Triggers *task) {
     switch (task->entry->type) {
         case SLOT_EXIT:
             task->actor->walkInDir(task->actor, task->dir);
-            FIELDSTG_leaveField(task->entry->unkA, -1, task->entry->unkC << 8, task->entry->unkE << 8, task->entry->unk10);
-            if (task->entry->unk12 != 0) {
+            FIELDSTG_leaveField(task->entry->arg, -1, task->entry->x << 8, task->entry->y << 8, task->entry->dir);
+            if (task->entry->hideAnim != 0) {
                 object = FIELDSTG_state.objects;
-                id = task->entry->unk12;
+                id = task->entry->hideAnim;
                 for (; object->unk2 != 0; object++) {
                     if (object->anim == id) {
                         object->visible = 0;
                     }
                 }
             }
-            GAME.place = task->entry->unk14;
-            GAME.placeArg = task->entry->unk16;
+            GAME.place = task->entry->place;
+            GAME.placeArg = task->entry->placeArg;
             break;
         case SLOT_LAUNCH_OUT:
-            task->actor->launch(task->actor, &task->entry->unkA);
-            FIELDSTG_leaveFieldAfter(task->entry->unkA, -1, task->entry->unkC << 8, task->entry->unkE << 8, task->entry->unk10,
+            task->actor->launch(task->actor, &task->entry->arg);
+            FIELDSTG_leaveFieldAfter(task->entry->arg, -1, task->entry->x << 8, task->entry->y << 8, task->entry->dir,
                           0x3C);
             break;
         case SLOT_CLIMB_UP:
-            task->actor->climbUp(task->actor, task->dir, task->entry->unkC, task->entry->unkE,
-                                (task->entry->unkA - 1) * 16);
+            task->actor->climbUp(task->actor, task->dir, task->entry->x, task->entry->y,
+                                (task->entry->arg - 1) * 16);
             break;
         case SLOT_CLIMB_DOWN:
-            task->actor->climbDown(task->actor, task->dir == 1 ? 5 : 3, task->entry->unkC, task->entry->unkE,
-                                (task->entry->unkA - 1) * 16);
+            task->actor->climbDown(task->actor, task->dir == 1 ? 5 : 3, task->entry->x, task->entry->y,
+                                (task->entry->arg - 1) * 16);
             break;
         case SLOT_DROP:
-            task->actor->dropDown(task->actor, task->dir, FIELDSTG_noOffset, task->entry->unkA * 16);
+            task->actor->dropDown(task->actor, task->dir, FIELDSTG_noOffset, task->entry->arg * 16);
             break;
         case SLOT_GAUGE:
-            task->actor->playGauge(task->actor, task->dir, (Point){task->entry->unkA, task->entry->unkC});
+            task->actor->playGauge(task->actor, task->dir, (Point){task->entry->arg, task->entry->x});
             break;
         case SLOT_WARP0:
-            task->actor->warp(task->actor, &task->entry->unkA, 0);
+            task->actor->warp(task->actor, &task->entry->arg, 0);
             break;
         case SLOT_WARP1:
-            task->actor->warp(task->actor, &task->entry->unkA, 1);
+            task->actor->warp(task->actor, &task->entry->arg, 1);
             break;
     }
 }

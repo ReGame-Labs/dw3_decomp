@@ -1,12 +1,12 @@
 #include "common.h"
 #include "stage.h"
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
-extern AnimFrame D_800A5234[];
+extern AnimFrame updateTileTaskFrames[];
 
 #include "common/step_animation_once.inc.c"
 
 /* Plays the animation of the record with animation 1 once with a sound when the substate is 0, then kills itself */
-void func_800A4D80(StageTileTask *task) {
+void updateTileTask(StageTileTask *task) {
     StageTile *rec;
     StageTile *tile;
     s32 frame;
@@ -16,7 +16,7 @@ void func_800A4D80(StageTileTask *task) {
     default:
         task->nextState(task);
         task->obj.anim.index = 0;
-        task->obj.anim.timer = D_800A5234[0].duration;
+        task->obj.anim.timer = updateTileTaskFrames[0].duration;
         for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
             if (rec->anim == 1) {
                 task->obj.tile = rec;
@@ -26,12 +26,12 @@ void func_800A4D80(StageTileTask *task) {
     case TASK_RUN:
         if (task->substate == 0) {
             task->obj.anim.index = 0;
-            task->obj.anim.timer = D_800A5234[0].duration;
+            task->obj.anim.timer = updateTileTaskFrames[0].duration;
             task->setSubstate(task, 1);
             SOUND.playSound(SOUND_COMAT102);
         }
         tile = task->obj.tile;
-        frame = stepAnimationOnce(&task->obj, D_800A5234, 0);
+        frame = stepAnimationOnce(&task->obj, updateTileTaskFrames, 0);
         if (frame == 0xFF) {
             tile->visible = 0;
             task->setState(task, TASK_KILL);
@@ -46,8 +46,8 @@ void func_800A4D80(StageTileTask *task) {
     }
 }
 
-void *func_800A4ED4(s32 arg) {
-    return createTaskWithId(func_800A4D80, 0x58, 0, arg);
+void *createCommand828(s32 arg) {
+    return createTaskWithId(updateTileTask, 0x58, 0, arg);
 }
 
 /* Creates the event object of story progress 14 */
@@ -70,7 +70,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-void func_800A4FF4(void) {
+void endEvent360(void) {
     FLAGS_00.applyAction(FLAG(0x40, 7), 1);
 }
 
@@ -99,9 +99,9 @@ void setupStage(void) {
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
-    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -120,16 +120,16 @@ s16 script360[] = {
     0x102, 1, 0x428, 0xB4, 3,
     0x302, 1,
     0x300, 0x3C,
-    0x101, 0x32D, 0x36C, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_SWITCH02, 1,
     0x300, 0x3C,
     0x102, 1, 0x470, 0xD8, 7,
     0x302, 1,
     0x101, 1, 0x43, 7,
     0x300, 0x5A,
-    0x101, 0x32D, 0x372, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHAKE_CAMERA, 1,
     0x101, 0x33C, 0x335, 1,
     0x300, 0x3C,
-    0x101, 0x32D, 0x373, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_CAMERA_SHAKE, 1,
     0x300, 0x3C,
     0x101, 1, 1, 7,
     0x300, 0x3C,
@@ -144,7 +144,7 @@ s16 script360[] = {
     0x304, 0x236, 0xD6, 0x84, 1,
     0,
 };
-AnimFrame D_800A5234[] = {
+AnimFrame updateTileTaskFrames[] = {
     { 11, 4 }, { 12, 4 }, { 13, 4 }, { 14, 4 },
     { 15, 4 }, { 16, 4 }, { 17, 4 }, { 18, 4 },
     { 19, 4 }, { 20, 4 }, { 21, 4 }, { 22, 4 },
@@ -373,14 +373,14 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x234, 0x570, 0x3B8, 3, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0x48, 0xFFEC, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x234, 0x570, 0x3B8, 3, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x48, 0xFFEC, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 360, script360, EVENT_TEXT(0x27), NULL, func_800A4FF4 },
+    { 360, script360, EVENT_TEXT(0x27), NULL, endEvent360 },
     { -1, NULL, 0, NULL, NULL },
 };

@@ -30,9 +30,9 @@ void setupStage(void) {
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
-    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
         FIELDSTG_state.soundBank = 0x1F;
@@ -48,14 +48,14 @@ void setupStage(void) {
 s16 script1310[] = {
     0x102, 2, 0x1C0, 0x270, 1,
     0x101, 0x11A, 7, 5,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 1,
     0x300, 0x1E,
     0x200, 0, 1, 0x11A, 1,
     0x301,
     0x101, 0x323, 0x325, 2,
-    0x101, 0x32D, 0x34A, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON3, 2,
     0x300, 0x78,
     0x101, 0x323, 0x326, 2,
     0x300, 0x1E,
@@ -333,12 +333,12 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x21D, 0x102, 0x3AC, 5, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, 0xA, 0x2E3, 0x380, 0x70, 1, 0, 4, 1 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFFC0, 0x3C, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFFC0, 8, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFFC0, 0xFFE8, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0, 0x40, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x21D, 0x102, 0x3AC, 5, 0, 0, 0 },
+    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E3, 0x380, 0x70, 1, 0, 4, 1 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFC0, 0x3C, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFC0, 8, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFC0, 0xFFE8, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0, 0x40, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

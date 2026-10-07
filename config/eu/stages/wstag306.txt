@@ -1,7 +1,7 @@
 // names from the C of the modules this version builds (tools/version_symbols.py)
-func_800A4D7C = 0x800A5EB8; // type:func
-func_800A4EDC = 0x800A6018; // type:func
-func_800A4F48 = 0x800A6084; // type:func
+updateSoundTile = 0x800A5EB8; // type:func
+handleCommand851 = 0x800A6018; // type:func
+createSoundTile = 0x800A6084; // type:func
 script930 = 0x800A62FC;
 script966 = 0x800A643C;
 script980 = 0x800A648C;

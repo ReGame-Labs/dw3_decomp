@@ -25,7 +25,7 @@ void updateStage(StageTask *task, void **children) {
 #include "common/start_stage.inc.c"
 
 /* Applies flag actions 0x40CD and 0x7053 */
-void func_800A5EC0(void) {
+void endEvent1600(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xCD), 1);
     FLAGS_00.applyAction(SPECIAL(0x53), 1);
 }
@@ -44,8 +44,8 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, 0x8E90001);
-    FIELDSTG_map.setFile(7, 0x8E90002);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8E90001);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x8E90002);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -61,7 +61,7 @@ void func_800A60D8(StageTileEffect *task) {
 }
 
 /* Moves the records with animations 1 to 3 to (x, y) and plays their animations once with a sound, then hides them and kills itself */
-void func_800A6110(StageTileEffect *task) {
+void updateTileEffect(StageTileEffect *task) {
     StageTile *rec;
     StageTile *tile;
     s32 i;
@@ -135,9 +135,9 @@ void func_800A6110(StageTileEffect *task) {
     }
 }
 
-/* Creates the StageTileEffect of func_800A6110 at (0x150, 0x112) with the given id */
-void *func_800A639C(s32 id) {
-    StageTileEffect *task = createTaskWithId(func_800A6110, sizeof(StageTileEffect), 0, id);
+/* Creates the StageTileEffect of updateTileEffect at (0x150, 0x112) with the given id */
+void *createCommand855(s32 id) {
+    StageTileEffect *task = createTaskWithId(updateTileEffect, sizeof(StageTileEffect), 0, id);
 
     task->x = 0x150;
     task->y = 0x112;
@@ -183,7 +183,7 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x273, 0x2DA, 0x17E, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x273, 0x2DA, 0x17E, 1, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
@@ -191,7 +191,7 @@ void (*stageFuncs[])(void) = {
 };
 #define EVENT_TEXT_FILE 0x158
 FieldEvent stageEvents[] = {
-    { 1600, script1600, EVENT_TEXT(0), NULL, func_800A5EC0 },
+    { 1600, script1600, EVENT_TEXT(0), NULL, endEvent1600 },
     { -1, NULL, 0, NULL, NULL },
 };
 s16 script1600[] = {

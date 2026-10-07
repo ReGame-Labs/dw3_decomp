@@ -25,16 +25,16 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-void func_800A4E00(void) {
+void endEvent580(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x1A), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0x4D), 1);
 }
 
-void func_800A4E4C(void) {
+void endEvent891(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x58), 1);
 }
 
-void func_800A4E78(void) {
+void endEvent892(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x59), 1);
 }
 
@@ -61,8 +61,8 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -76,7 +76,7 @@ s16 script580[] = {
     0x101, 0x25, 1, 7,
     0x100, 0x43, 0x92, 0x61,
     0x101, 0x43, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 3,
     0x101, 0x323, 0x325, 2,
@@ -466,16 +466,16 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x205, 0x70, 0xE4, 7, 0, 0, 0 },
-    { { { PROGRESS(0x16), 1 }, { FLAG(0x40, 0x4D), 0 } }, 8, 0x244, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x205, 0x70, 0xE4, 7, 0, 0, 0 },
+    { { { PROGRESS(0x16), 1 }, { FLAG(0x40, 0x4D), 0 } }, SLOT_EVENT, 0x244, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 580, script580, EVENT_TEXT(0x21), NULL, func_800A4E00 },
-    { 891, script891, EVENT_TEXT(0x24), NULL, func_800A4E4C },
-    { 892, script892, EVENT_TEXT(0x25), NULL, func_800A4E78 },
+    { 580, script580, EVENT_TEXT(0x21), NULL, endEvent580 },
+    { 891, script891, EVENT_TEXT(0x24), NULL, endEvent891 },
+    { 892, script892, EVENT_TEXT(0x25), NULL, endEvent892 },
     { -1, NULL, 0, NULL, NULL },
 };

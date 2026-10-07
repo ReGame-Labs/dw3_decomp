@@ -90,3 +90,19 @@ actor3 = 0x800A6A80;
 actor4 = 0x800A6A94;
 actor5 = 0x800A6AA8;
 actor6 = 0x800A6ABC;
+
+// functions named by what calls them (tools/name_stage_funcs.py)
+updateTilePair16 = 0x800A4DC4; // type:func
+handleCommand837 = 0x800A5038; // type:func
+createTilePair16 = 0x800A5084; // type:func
+updateTileOnce = 0x800A5208; // type:func
+createCommand839 = 0x800A53D4; // type:func
+endEvent850 = 0x800A5EA4; // type:func
+endEvent870 = 0x800A5EF0; // type:func
+endEvent871 = 0x800A5F3C; // type:func
+
+// named by the function or table that uses them (tools/name_stage_uses.py)
+updateTilePair16Frames0 = 0x800A64C0;
+updateTilePair16Frames1 = 0x800A64F8;
+updateTileOnceFrames = 0x800A65AC;
+updateStageSpots = 0x800A65BC;

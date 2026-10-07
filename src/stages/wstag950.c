@@ -20,9 +20,9 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, 0x91B0002);
-    FIELDSTG_map.setFile(7, 0x91B0003);
-    FIELDSTG_map.setFile(4, 0x91B0001);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x91B0002);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x91B0003);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, 0x91B0001);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -177,21 +177,21 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x291, 0x32A, 0x334, 3, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x298, 0x9A, 0x74, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xA, 0x2E5, 0x240, 0x120, 1, 0, 3, 1 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 3, 0x1A1, 0x140, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 3, 0x1B0, 0x176, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0x38, 0x58, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0x40, 0x40, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0, 0xFFC0, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFFB8, 0x28, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFFC0, 0x38, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFF90, 0xFFF8, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFFB0, 0xFFF8, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0x40, 0xFFE8, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFFE0, 0x18, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFFF0, 0x10, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x291, 0x32A, 0x334, 3, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x298, 0x9A, 0x74, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E5, 0x240, 0x120, 1, 0, 3, 1 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 3, 0x1A1, 0x140, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 3, 0x1B0, 0x176, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x38, 0x58, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x40, 0x40, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0, 0xFFC0, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFB8, 0x28, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFC0, 0x38, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFF90, 0xFFF8, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFB0, 0xFFF8, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x40, 0xFFE8, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFE0, 0x18, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFF0, 0x10, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

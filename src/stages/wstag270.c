@@ -23,12 +23,12 @@ void func_800A4D04(StageMenu *task, StageMenuChildren *children) {
         task->nextState(task);
         task->tween.duration = 10;
         for (i = 0; i < 2; i++) {
-            children->options[i] = createTextWindow(0x1002, 1, 0x1C, 0xBE + i * 14);
+            children->options[i] = createTextWindow(FIELD_LAYER_MAP, 1, 0x1C, 0xBE + i * 14);
             children->options[i]->setDepth(children->options[i], 1);
         }
-        children->cursor = createCursor(0x1002, 1, 0x12, 0xBE);
+        children->cursor = createCursor(FIELD_LAYER_MAP, 1, 0x12, 0xBE);
         children->cursor->setVisible(children->cursor, 0);
-        children->title = createTextWindow(0x1002, 1, 0x12, 0xB0);
+        children->title = createTextWindow(FIELD_LAYER_MAP, 1, 0x12, 0xB0);
         break;
     case TASK_RUN:
         switch (task->substate) {
@@ -101,7 +101,7 @@ void func_800A4D04(StageMenu *task, StageMenuChildren *children) {
             break;
         }
         initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x1002, 2);
+        drawer.setLayerId(FIELD_LAYER_MAP, 2);
         drawer.setTexture(0x140, 0);
         drawer.setFollowScroll(0);
         if (task->tween.value != 0) {
@@ -118,7 +118,7 @@ void func_800A4D04(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
-void *func_800A52A0(void) {
+void *startEvent1518(void) {
     return createTask(func_800A4D04, 0x64, 0x14);
 }
 
@@ -136,12 +136,12 @@ void func_800A52CC(StageMenu *task, StageMenuChildren *children) {
         task->nextState(task);
         task->tween.duration = 10;
         for (i = 0; i < 2; i++) {
-            children->options[i] = createTextWindow(0x1002, 1, 0x1C, 0xBE + i * 14);
+            children->options[i] = createTextWindow(FIELD_LAYER_MAP, 1, 0x1C, 0xBE + i * 14);
             children->options[i]->setDepth(children->options[i], 1);
         }
-        children->cursor = createCursor(0x1002, 1, 0x12, 0xBE);
+        children->cursor = createCursor(FIELD_LAYER_MAP, 1, 0x12, 0xBE);
         children->cursor->setVisible(children->cursor, 0);
-        children->title = createTextWindow(0x1002, 1, 0x12, 0xB0);
+        children->title = createTextWindow(FIELD_LAYER_MAP, 1, 0x12, 0xB0);
         break;
     case TASK_RUN:
         switch (task->substate) {
@@ -214,7 +214,7 @@ void func_800A52CC(StageMenu *task, StageMenuChildren *children) {
             break;
         }
         initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x1002, 2);
+        drawer.setLayerId(FIELD_LAYER_MAP, 2);
         drawer.setTexture(0x140, 0);
         drawer.setFollowScroll(0);
         if (task->tween.value != 0) {
@@ -231,7 +231,7 @@ void func_800A52CC(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
-void *func_800A5868(void) {
+void *startEvent1520(void) {
     return createTask(func_800A52CC, 0x64, 0x14);
 }
 
@@ -240,7 +240,7 @@ void *func_800A5868(void) {
 #include "common/start_stage.inc.c"
 
 /* Sets flags 0x8192, 0x1A1C and 0x40A1 */
-void func_800A5938(void) {
+void endEvent1415(void) {
     FLAGS_00.applyAction(ITEM(0, 0x192), 1);
     FLAGS_00.applyAction(FLAG(0x1A, 0x1C), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0xA1), 1);
@@ -271,8 +271,8 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -285,7 +285,7 @@ s16 script59[] = {
     0x200, 0, 1, 0x33, 2,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x338, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 2,
     0x300, 0x1E,
     0x200, 0, 2, 2, 4,
     0x301,
@@ -305,7 +305,7 @@ s16 script59[] = {
     0x200, 0, 7, 2, 4,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x339, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 2,
     0x300, 0x1E,
     0x300, 0x1E,
     0x200, 0, 8, 0x33, 2,
@@ -322,13 +322,13 @@ __asm__(".section .data\n\t.half 0x104\n");
 s16 script65[] = {
     0x102, 2, 0x117, 0xBD, 3,
     0x101, 0x2D, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x300, 0x1E,
     0x300, 0x1E,
     0x200, 0, 1, 0x2D, 2,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x338, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 2,
     0x300, 0x1E,
     0x200, 0, 2, 2, 4,
     0x301,
@@ -339,7 +339,7 @@ s16 script65[] = {
     0x200, 0, 4, 2, 4,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x339, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 2,
     0x300, 0x1E,
     0x300, 0x1E,
     0x200, 0, 5, 0x2D, 2,
@@ -356,7 +356,7 @@ s16 script1415[] = {
     0x101, 0x34, 1, 3,
     0x101, 0x37, 1, 3,
     0x101, 0xCE, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x200, 0, 1, 0xCE, 2,
     0x301,
@@ -449,7 +449,7 @@ s16 script1415[] = {
     0x300, 0x5A,
     0x200, 0, 0x16, 0xCE, 2,
     0x301,
-    0x101, 0x32D, 0x34A, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON3, 2,
     0x300, 0x1E,
     0x200, 0, 0x17, 2, 1,
     0x101, 2, 7, 3,
@@ -481,7 +481,7 @@ s16 script1519[] = {
 s16 script1521[] = {
     0x102, 2, 0x117, 0xBD, 3,
     0x101, 0x2D, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x300, 0x1E,
     0x300, 0x1E,
     0x200, 0, 1, 0x2D, 2,
@@ -1112,17 +1112,17 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x201, 0x1F0, 0xA0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x201, 0x1F0, 0xA0, 7, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageFuncs stageFuncs = { setupStage, startTween, updateTween };
 FieldEvent stageEvents[] = {
     { 59, script59, EVENT_TEXT(0), NULL, NULL },
     { 65, script65, EVENT_TEXT(1), NULL, NULL },
-    { 1415, script1415, EVENT_TEXT(2), NULL, func_800A5938 },
-    { 1518, NULL, EVENT_TEXT(5), func_800A52A0, NULL },
+    { 1415, script1415, EVENT_TEXT(2), NULL, endEvent1415 },
+    { 1518, NULL, EVENT_TEXT(5), startEvent1518, NULL },
     { 1519, script1519, EVENT_TEXT(3), NULL, NULL },
-    { 1520, NULL, EVENT_TEXT(6), func_800A5868, NULL },
+    { 1520, NULL, EVENT_TEXT(6), startEvent1520, NULL },
     { 1521, script1521, EVENT_TEXT(4), NULL, NULL },
     { -1, NULL, 0, NULL, NULL },
 };

@@ -1,97 +1,20 @@
 #include "common.h"
 #include "stage.h"
-extern StageTileFrame **D_800A5420[];
+extern StageTileFrame **updateTileCursorsFrames[];
 
-/* Plays a sequence of StageTileFrame animations on tile */
-void func_800A4CBC(StageTile *tile, StageTileFrame **seqs, StageTileCursor *cur, s32 depth) {
-    s32 dt;
+#include "common/step_tile_sequences.inc.c"
 
-    if (depth == 0) {
-        dt = GFX.funcs.getFrameTime();
-        if (dt > 4) {
-            dt = 4;
-        }
-        cur->timer -= dt;
-    }
-    if (cur->timer <= 0) {
-        if (seqs[cur->seq][cur->index].last) {
-            cur->seq++;
-            cur->index = 0;
-            if (seqs[cur->seq] == NULL) {
-                cur->seq = 0;
-            }
-        } else {
-            cur->index++;
-        }
-        cur->timer += seqs[cur->seq][cur->index].duration;
-        func_800A4CBC(tile, seqs, cur, depth + 1);
-    }
-    if (depth == 0) {
-        tile->frame = seqs[cur->seq][cur->index].frame;
-        tile->clutRow = seqs[cur->seq][cur->index].clutRow;
-    }
-}
+#include "common/update_tile_cursors.inc.c"
 
-/* Plays the sequences of the records with animations 1 to 5 */
-void func_800A4E48(StageTileCursors *task) {
-    StageTile *tile;
-
-    switch (task->state) {
-    case TASK_INIT:
-    default:
-        task->cursors[0].seq = 0;
-        task->cursors[0].index = 0;
-        task->cursors[0].timer = D_800A5420[0][0][0].duration;
-        task->cursors[1].seq = 0;
-        task->cursors[1].index = 0;
-        task->cursors[1].timer = D_800A5420[1][0][0].duration;
-        task->cursors[2].seq = 0;
-        task->cursors[2].index = 0;
-        task->cursors[2].timer = D_800A5420[2][0][0].duration;
-        task->cursors[3].seq = 0;
-        task->cursors[3].index = 0;
-        task->cursors[3].timer = D_800A5420[3][0][0].duration;
-        task->cursors[4].seq = 0;
-        task->cursors[4].index = 0;
-        task->cursors[4].timer = D_800A5420[3][0][0].duration;
-        task->nextState(task);
-        break;
-    case TASK_RUN:
-        for (tile = FIELDSTG_state.objects; tile->unk2 != 0; tile++) {
-            switch (tile->anim) {
-            case 1:
-                func_800A4CBC(tile, D_800A5420[0], &task->cursors[0], 0);
-                break;
-            case 2:
-                func_800A4CBC(tile, D_800A5420[1], &task->cursors[1], 0);
-                break;
-            case 3:
-                func_800A4CBC(tile, D_800A5420[2], &task->cursors[2], 0);
-                break;
-            case 4:
-                func_800A4CBC(tile, D_800A5420[3], &task->cursors[3], 0);
-                break;
-            case 5:
-                func_800A4CBC(tile, D_800A5420[4], &task->cursors[4], 0);
-                break;
-            }
-        }
-        break;
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
-
-void *func_800A5028(void) {
-    return createTask(func_800A4E48, 0x78, 0);
+void *createTileCursors(void) {
+    return createTask(updateTileCursors, 0x78, 0);
 }
 
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        children[0] = func_800A5028();
+        children[0] = createTileCursors();
         task->nextState(task);
         break;
     case TASK_RUN:
@@ -128,81 +51,81 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(1, STAGE_FILE << 16 | 3);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
-    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 4);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR1, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 4);
     FIELDSTG_map.setFirstMap(0);
 }
 
 StageTileFrame D_800A5240[] = {
     { 64, 10, 0, 0 }, { 64, 10, 1, 0 }, { 64, 10, 2, 0 }, { 64, 10, 1, 1 },
 };
-StageTileFrame D_800A5250[] = {
+StageTileFrame updateTileCursorsFrames_0_12[] = {
     { 65, 4, 2, 0 }, { 65, 4, 4, 0 }, { 65, 4, 6, 0 }, { 65, 4, 4, 0 },
     { 65, 4, 2, 0 }, { 65, 4, 0, 1 },
 };
 StageTileFrame D_800A5268[] = {
     { 66, 10, 0, 0 }, { 66, 10, 1, 0 }, { 66, 10, 2, 0 }, { 66, 10, 1, 1 },
 };
-StageTileFrame D_800A5278[] = {
+StageTileFrame updateTileCursorsFrames_1_12[] = {
     { 67, 4, 2, 0 }, { 67, 4, 4, 0 }, { 67, 4, 6, 0 }, { 67, 4, 4, 0 },
     { 67, 4, 2, 0 }, { 67, 4, 0, 1 },
 };
 StageTileFrame D_800A5290[] = {
     { 68, 10, 0, 0 }, { 68, 10, 1, 0 }, { 68, 10, 2, 0 }, { 68, 10, 1, 1 },
 };
-StageTileFrame D_800A52A0[] = {
+StageTileFrame updateTileCursorsFrames_2_12[] = {
     { 69, 4, 2, 0 }, { 69, 4, 4, 0 }, { 69, 4, 6, 0 }, { 69, 4, 4, 0 },
     { 69, 4, 2, 0 }, { 69, 4, 0, 1 },
 };
 StageTileFrame D_800A52B8[] = {
     { 70, 10, 0, 0 }, { 70, 10, 1, 0 }, { 70, 10, 2, 0 }, { 70, 10, 1, 1 },
 };
-StageTileFrame D_800A52C8[] = {
+StageTileFrame updateTileCursorsFrames_3_12[] = {
     { 71, 4, 2, 0 }, { 71, 4, 4, 0 }, { 71, 4, 6, 0 }, { 71, 4, 4, 0 },
     { 71, 4, 2, 0 }, { 71, 4, 0, 1 },
 };
 StageTileFrame D_800A52E0[] = {
     { 72, 10, 0, 0 }, { 72, 10, 1, 0 }, { 72, 10, 2, 0 }, { 72, 10, 1, 1 },
 };
-StageTileFrame D_800A52F0[] = {
+StageTileFrame updateTileCursorsFrames_4_12[] = {
     { 73, 4, 2, 0 }, { 73, 4, 4, 0 }, { 73, 4, 6, 0 }, { 73, 4, 4, 0 },
     { 73, 4, 2, 0 }, { 73, 4, 0, 1 },
 };
-StageTileFrame *D_800A5308[] = {
+StageTileFrame *updateTileCursorsFrames_0[] = {
     D_800A5240, D_800A5240, D_800A5240, D_800A5240,
     D_800A5240, D_800A5240, D_800A5240, D_800A5240,
     D_800A5240, D_800A5240, D_800A5240, D_800A5240,
-    D_800A5250, NULL,
+    updateTileCursorsFrames_0_12, NULL,
 };
-StageTileFrame *D_800A5340[] = {
+StageTileFrame *updateTileCursorsFrames_1[] = {
     D_800A5268, D_800A5268, D_800A5268, D_800A5268,
     D_800A5268, D_800A5268, D_800A5268, D_800A5268,
     D_800A5268, D_800A5268, D_800A5268, D_800A5268,
-    D_800A5278, NULL,
+    updateTileCursorsFrames_1_12, NULL,
 };
-StageTileFrame *D_800A5378[] = {
+StageTileFrame *updateTileCursorsFrames_2[] = {
     D_800A5290, D_800A5290, D_800A5290, D_800A5290,
     D_800A5290, D_800A5290, D_800A5290, D_800A5290,
     D_800A5290, D_800A5290, D_800A5290, D_800A5290,
-    D_800A52A0, NULL,
+    updateTileCursorsFrames_2_12, NULL,
 };
-StageTileFrame *D_800A53B0[] = {
+StageTileFrame *updateTileCursorsFrames_3[] = {
     D_800A52B8, D_800A52B8, D_800A52B8, D_800A52B8,
     D_800A52B8, D_800A52B8, D_800A52B8, D_800A52B8,
     D_800A52B8, D_800A52B8, D_800A52B8, D_800A52B8,
-    D_800A52C8, NULL,
+    updateTileCursorsFrames_3_12, NULL,
 };
-StageTileFrame *D_800A53E8[] = {
+StageTileFrame *updateTileCursorsFrames_4[] = {
     D_800A52E0, D_800A52E0, D_800A52E0, D_800A52E0,
     D_800A52E0, D_800A52E0, D_800A52E0, D_800A52E0,
     D_800A52E0, D_800A52E0, D_800A52E0, D_800A52E0,
-    D_800A52F0, NULL,
+    updateTileCursorsFrames_4_12, NULL,
 };
-StageTileFrame **D_800A5420[] = {
-    D_800A5308, D_800A5340, D_800A5378, D_800A53B0,
-    D_800A53E8,
+StageTileFrame **updateTileCursorsFrames[] = {
+    updateTileCursorsFrames_0, updateTileCursorsFrames_1, updateTileCursorsFrames_2, updateTileCursorsFrames_3,
+    updateTileCursorsFrames_4,
 };
 Battle area0Battle0 = { 107, 9, MUSIC(2, 0) };
 Battle area0Battle1 = { 107, 9, MUSIC(2, 0) };
@@ -363,17 +286,17 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x2A8, 0x6C8, 0x1D4, 3, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x2A2, 0x140, 0x350, 5, 0, 0, 0 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, 9, 0x2E8, 0x240, 0xD0, 1, 0, 3, 2 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, 9, 0x2E8, 0x240, 0xD0, 1, 0, 0x1A, 1 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFFD0, 0xFFE8, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0x30, 0xFFE8, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0, 0xFFD8, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFFD0, 0x28, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0x30, 0x28, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 6, 0, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 6, 1, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2A8, 0x6C8, 0x1D4, 3, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2A2, 0x140, 0x350, 5, 0, 0, 0 },
+    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 3, 2 },
+    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 0x1A, 1 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFD0, 0xFFE8, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x30, 0xFFE8, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0, 0xFFD8, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFD0, 0x28, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x30, 0x28, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_MAP, 0, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_MAP, 1, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

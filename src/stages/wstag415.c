@@ -1,6 +1,6 @@
 #include "common.h"
 #include "stage.h"
-extern StageFallParams D_800A620C[];
+extern StageFallParams updateFallerParams[];
 extern AnimFrame D_800A62AC[];
 extern AnimFrame D_800A62D4[];
 extern AnimFrame D_800A62E4[];
@@ -54,33 +54,33 @@ void func_800A4DAC(StageFaller *task, Layer *layer) {
 }
 
 /* Updates a StageFaller */
-void func_800A4E6C(StageFaller *task) {
-    Layer *layer = GFX.funcs.getLayer(0x1002);
+void updateFaller(StageFaller *task) {
+    Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
     s32 dv;
 
     switch (task->state) {
     case TASK_INIT:
     default:
-        task->body.x = D_800A620C[task->key1].x << 8;
-        task->body.y = D_800A620C[task->key1].y << 8;
+        task->body.x = updateFallerParams[task->key1].x << 8;
+        task->body.y = updateFallerParams[task->key1].y << 8;
         task->body.bounced = 0;
         task->body.vy = 0;
-        task->body.vx = D_800A620C[task->key1].vx;
+        task->body.vx = updateFallerParams[task->key1].vx;
         task->nextState(task);
         break;
     case TASK_RUN:
-        task->frame = func_800A4CB8(&task->body, D_800A620C[task->key1].frames, 0);
-        dv = D_800A620C[task->key1].gravity * GFX.funcs.getFrameTime();
+        task->frame = func_800A4CB8(&task->body, updateFallerParams[task->key1].frames, 0);
+        dv = updateFallerParams[task->key1].gravity * GFX.funcs.getFrameTime();
         task->body.x += task->body.vx;
         task->body.vy += dv;
         task->x = task->body.x >> 8;
         task->body.y += task->body.vy;
         task->y = task->body.y >> 8;
-        if (D_800A620C[task->key1].bounce != 0 && task->body.bounced == 0 && task->y >= D_800A620C[task->key1].floorY) {
-            task->body.y = D_800A620C[task->key1].floorY << 8;
-            task->y = D_800A620C[task->key1].floorY;
-            task->body.vy = -(task->body.vy / D_800A620C[task->key1].bounce);
-            task->body.vx = D_800A620C[task->key1].vx * 3;
+        if (updateFallerParams[task->key1].bounce != 0 && task->body.bounced == 0 && task->y >= updateFallerParams[task->key1].floorY) {
+            task->body.y = updateFallerParams[task->key1].floorY << 8;
+            task->y = updateFallerParams[task->key1].floorY;
+            task->body.vy = -(task->body.vy / updateFallerParams[task->key1].bounce);
+            task->body.vx = updateFallerParams[task->key1].vx * 3;
             task->body.bounced = 1;
             SOUND.playSound(SOUND_MTL_DOWN);
         }
@@ -97,72 +97,72 @@ void func_800A4E6C(StageFaller *task) {
     }
 }
 
-/* Creates the task of func_800A4E6C with the given id, kind 0 */
-Task *func_800A50F4(s32 id) {
-    Task *task = createTaskWithId(func_800A4E6C, 0x74, 0, id);
+/* Creates the task of updateFaller with the given id, kind 0 */
+Task *createCommand816(s32 id) {
+    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
 
     task->key1 = 0;
     return task;
 }
 
-Task *func_800A5128(s32 id) {
-    Task *task = createTaskWithId(func_800A4E6C, 0x74, 0, id);
+Task *createCommand817(s32 id) {
+    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
 
     task->key1 = 1;
     return task;
 }
 
-Task *func_800A5160(s32 id) {
-    Task *task = createTaskWithId(func_800A4E6C, 0x74, 0, id);
+Task *createCommand818(s32 id) {
+    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
 
     task->key1 = 2;
     return task;
 }
 
-Task *func_800A5198(s32 id) {
-    Task *task = createTaskWithId(func_800A4E6C, 0x74, 0, id);
+Task *createCommand819(s32 id) {
+    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
 
     task->key1 = 3;
     return task;
 }
 
-Task *func_800A51D0(s32 id) {
-    Task *task = createTaskWithId(func_800A4E6C, 0x74, 0, id);
+Task *createCommand820(s32 id) {
+    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
 
     task->key1 = 4;
     return task;
 }
 
-Task *func_800A5208(s32 id) {
-    Task *task = createTaskWithId(func_800A4E6C, 0x74, 0, id);
+Task *createCommand821(s32 id) {
+    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
 
     task->key1 = 5;
     return task;
 }
 
-Task *func_800A5240(s32 id) {
-    Task *task = createTaskWithId(func_800A4E6C, 0x74, 0, id);
+Task *createCommand822(s32 id) {
+    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
 
     task->key1 = 6;
     return task;
 }
 
-Task *func_800A5278(s32 id) {
-    Task *task = createTaskWithId(func_800A4E6C, 0x74, 0, id);
+Task *createCommand823(s32 id) {
+    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
 
     task->key1 = 7;
     return task;
 }
 
-Task *func_800A52B0(s32 id) {
-    Task *task = createTaskWithId(func_800A4E6C, 0x74, 0, id);
+Task *createCommand824(s32 id) {
+    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
 
     task->key1 = 8;
     return task;
 }
 
-Task *func_800A52E8(s32 id) {
-    Task *task = createTaskWithId(func_800A4E6C, 0x74, 0, id);
+Task *createCommand825(s32 id) {
+    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
 
     task->key1 = 9;
     return task;
@@ -194,7 +194,7 @@ s32 func_800A5320(StageMoverBody *body, AnimFrame *frames, s32 depth) {
 }
 
 /* Updates a StageMover: falls in mode 1 and plays an animation in modes 2 to 4 */
-void func_800A541C(StageMover *task) {
+void updateMover(StageMover *task) {
     StageTile *tile;
     StageTile *rec;
 
@@ -299,7 +299,7 @@ void func_800A541C(StageMover *task) {
 }
 
 /* Handles the events 0x331 to 0x334 sent to a StageMover */
-void func_800A5850(StageMover *task, s32 id) {
+void handleCommand811(StageMover *task, s32 id) {
     if (task != NULL) {
         switch (id) {
         case 0x331:
@@ -333,16 +333,16 @@ void func_800A5850(StageMover *task, s32 id) {
     }
 }
 
-/* Creates the task of func_800A541C with the given id, kind 0 */
-Task *func_800A595C(s32 id) {
-    Task *task = createTaskWithId(func_800A541C, 0x78, 0, id);
+/* Creates the task of updateMover with the given id, kind 0 */
+Task *createCommand811(s32 id) {
+    Task *task = createTaskWithId(updateMover, 0x78, 0, id);
 
     task->key1 = 0;
     return task;
 }
 
-Task *func_800A5990(s32 id) {
-    Task *task = createTaskWithId(func_800A541C, 0x78, 0, id);
+Task *createMover(s32 id) {
+    Task *task = createTaskWithId(updateMover, 0x78, 0, id);
 
     task->key1 = 1;
     return task;
@@ -354,7 +354,7 @@ void func_800A59C8(StageScroller *task) {
     s32 pos[2];
 
     initSpriteDrawer(&drawer);
-    drawer.setLayerId(0x1002, 7);
+    drawer.setLayerId(FIELD_LAYER_MAP, 7);
     drawer.setTexture(0x280, 0);
     drawer.setAltClut(0, 0xF0);
     pos[0] = task->x >> 8;
@@ -369,7 +369,7 @@ void func_800A59C8(StageScroller *task) {
 }
 
 /* Loads the images of a StageScroller and scrolls it, slowing down to a stop in substate 1 */
-void func_800A5B50(StageScroller *task) {
+void updateScroller(StageScroller *task) {
     TimLoader loader;
 
     switch (task->state) {
@@ -423,15 +423,15 @@ void func_800A5B50(StageScroller *task) {
 }
 
 /* Sets the substate of the task to 1 when the id is 0x336 */
-void func_800A5D4C(Task *task, s32 id) {
+void handleCommand812(Task *task, s32 id) {
     if (task != NULL && id == 0x336) {
         task->setSubstate(task, 1);
     }
 }
 
-/* Creates the task of func_800A5B50 (id 0x32C) of the given kind */
-Task *func_800A5D84(s32 kind) {
-    Task *task = createTaskWithId(func_800A5B50, 0x60, 0, 0x32C);
+/* Creates the task of updateScroller (id 0x32C) of the given kind */
+Task *createScroller(s32 kind) {
+    Task *task = createTaskWithId(updateScroller, 0x60, 0, 0x32C);
 
     task->key1 = kind;
     return task;
@@ -444,11 +444,11 @@ void updateStage(StageTask *task, void **children) {
     default:
         if (GAME.progress == 6) {
             if (FLAGS_00.checkCondition(FLAG(0x40, 0x18), 0)) {
-                children[0] = func_800A5D84(0);
+                children[0] = createScroller(0);
                 children[1] = FIELDSTG_startEvent(0x96);
             } else {
-                children[0] = func_800A5D84(1);
-                children[2] = func_800A5990(0x32B);
+                children[0] = createScroller(1);
+                children[2] = createMover(0x32B);
                 children[1] = FIELDSTG_startEvent(0x97);
             }
         }
@@ -464,7 +464,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0xC
 #include "common/start_stage.inc.c"
 
-void func_800A5EE0(void) {
+void endEvent150(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x18), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
@@ -515,9 +515,9 @@ s16 script150[] = {
     0x101, 1, 1, 1,
     0x300, 0x1E,
     0x200, 0, 2, 1, 4,
-    0x101, 0x32D, 0x37D, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_GONDRA_S, 1,
     0x301,
-    0x101, 0x32D, 0x372, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHAKE_CAMERA, 1,
     0x300, 0x3C,
     0x200, 0, 3, 1, 0,
     0x101, 1, 0x33, 1,
@@ -544,7 +544,7 @@ s16 script150[] = {
     0x101, 0x32B, 0x331, 0x32B,
     0x300, 0x78,
     0x300, 0x1E,
-    0x101, 0x32D, 0x373, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_CAMERA_SHAKE, 1,
     0x300, 0xC,
     0x200, 0, 4, 1, 0,
     0x101, 1, 0x33, 1,
@@ -573,7 +573,7 @@ s16 script151[] = {
     0x301,
     0x300, 0x78,
     0x200, 0, 1, 1, 4,
-    0x101, 0x32D, 0x37D, 1,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_GONDRA_S, 1,
     0x301,
     0x101, 0x323, 0x325, 1,
     0x300, 0x3C,
@@ -590,7 +590,7 @@ AnimFrame D_800A61F8[] = {
     { 74, 8 }, { 75, 8 }, { 76, 8 }, { 77, 8 },
     { 255, 0 },
 };
-StageFallParams D_800A620C[] = {
+StageFallParams updateFallerParams[] = {
     { D_800A61E4, -0x20, 230, 0, 0x180, 88, 0 },
     { D_800A61F8, 0, 230, 0x1C2, 0x200, 72, 4 },
     { D_800A61E4, 32, 230, 0x19A, 0x180, 88, 8 },
@@ -702,7 +702,7 @@ void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 150, script150, EVENT_TEXT(4), NULL, func_800A5EE0 },
+    { 150, script150, EVENT_TEXT(4), NULL, endEvent150 },
     { 151, script151, EVENT_TEXT(5), NULL, NULL },
     { -1, NULL, 0, NULL, NULL },
 };

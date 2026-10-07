@@ -1,7 +1,7 @@
 /* Whether the rectangle (x, y, w, h) is in the view of the map's layer */
 s32 isOnScreen(s32 x, s32 y, s32 w, s32 h) {
     RECT rect;
-    struct Layer *layer = GFX.funcs.getLayer(0x1002);
+    struct Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
 
     layer->getViewRect(layer, &rect);
     if (x + w < rect.x) {

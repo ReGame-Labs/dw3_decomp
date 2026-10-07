@@ -30,12 +30,19 @@ def shared_code():
     return out
 
 
+COMMENT_BEFORE = re.compile(r"\n/\*(?:[^*]|\*(?!/))*\*/\n\Z")
+
+
 def include_shared(text, shared):
     for include, code in shared.items():
         start = text.find("\n" + code + "\n")
         if start < 0 or include in text:
             continue
-        text = text[: start + 1] + include + text[start + 1 + len(code) :]
+        end = start + 1 + len(code)
+        comment = COMMENT_BEFORE.search(text[: start + 1])
+        if comment:
+            start = comment.start()
+        text = text[: start + 1] + include + text[end:]
     return text
 
 

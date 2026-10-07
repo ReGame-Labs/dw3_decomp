@@ -1,6 +1,6 @@
 #include "common.h"
 #include "stage.h"
-extern StageEffectSpot D_800A5BD0[];
+extern StageEffectSpot updateStageSpots[];
 
 /* The files of the background, which the versions number differently */
 #if VERSION_US
@@ -17,13 +17,13 @@ extern StageEffectSpot D_800A5BD0[];
 void func_800A4CA4(StageTask *task) {
     SpriteDrawer drawer;
     Vec2 scroll;
-    Layer *layer = GFX.funcs.getLayer(0x1002);
+    Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
 
     layer->getScroll(layer, &scroll);
     scroll.x = (scroll.x << 8) / 384;
     scroll.y = (scroll.y << 8) / 384;
     initSpriteDrawer(&drawer);
-    drawer.setLayerId(0x1002, 7);
+    drawer.setLayerId(FIELD_LAYER_MAP, 7);
     drawer.setTexture(0x280, 0);
     drawer.setAltClut(0, 0xF0);
     drawer.draw(FILE_CACHE.getEntry(BG_ARCHIVE << 16 | 2), 0, scroll.x, scroll.y);
@@ -70,8 +70,8 @@ void updateStage(StageTask *task, void **children) {
     default:
         children[0] = func_800A4F10();
         for (i = 0; i < 5; i++) {
-            if (D_800A5BD0[i].kind == 0) {
-                children[i + 1] = createStageEffect(D_800A5BD0[i].x, D_800A5BD0[i].y, D_800A5BD0[i].frame);
+            if (updateStageSpots[i].kind == 0) {
+                children[i + 1] = createStageEffect(updateStageSpots[i].x, updateStageSpots[i].y, updateStageSpots[i].frame);
             }
         }
         if (FLAGS_00.checkCondition(FLAG(0x40, 0x72), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0xA9), 0)) {
@@ -88,7 +88,7 @@ void updateStage(StageTask *task, void **children) {
 
 /* Creates the stage task (id 0x17) and calls the first function of its table */
 StageTask *startStage(void *owner) {
-    StageTask *task = createTaskWithId(updateStage, sizeof(StageTask), 0x1C, 0x17);
+    StageTask *task = createTaskWithId(updateStage, sizeof(StageTask), 0x1C, FIELD_TASK_LAUNCHER);
 
     task->owner = owner;
     stageFuncs[0]();
@@ -101,25 +101,25 @@ StageTask *startStage(void *owner) {
 #include "common/update_stage_effect.inc.c"
 #include "common/create_stage_effect.inc.c"
 
-void func_800A5660(void) {
+void endEvent1020(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x70), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-void func_800A56AC(void) {
+void endEvent1030(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x71), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-void func_800A56F8(void) {
+void endEvent1040(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x72), 1);
 }
 
-void func_800A5724(void) {
+void endEvent1041(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xA9), 1);
 }
 
-void func_800A5750(void) {
+void endEvent1050(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x73), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
@@ -147,14 +147,14 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 4);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 4);
     FIELDSTG_map.setFirstMap(0);
 }
 
 s16 script1020[] = {
     0x102, 2, 0x160, 0x2CB, 3,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 3,
     0x300, 0x1E,
@@ -176,7 +176,7 @@ s16 script1020[] = {
 };
 s16 script1030[] = {
     0x102, 2, 0x3D0, 0x103, 3,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 3,
     0x300, 0x1E,
@@ -198,10 +198,10 @@ s16 script1030[] = {
 };
 s16 script1040[] = {
     0x102, 2, 0x27D, 0x1F9, 3,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 3,
-    0x101, 0x32D, 0x372, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHAKE_CAMERA, 2,
     0x300, 0x1E,
     0x101, 0x323, 0x325, 2,
     0x300, 0x5A,
@@ -224,7 +224,7 @@ s16 script1040[] = {
     0x101, 0x323, 0x326, 2,
     0x300, 0x1E,
     0x101, 2, 1, 1,
-    0x101, 0x32D, 0x373, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_CAMERA_SHAKE, 2,
     0x300, 0x1E,
     0x200, 0, 1, 2, 2,
     0x101, 2, 7, 1,
@@ -232,7 +232,7 @@ s16 script1040[] = {
     0x101, 2, 1, 1,
     0x300, 0x1E,
     0x101, 2, 1, 2,
-    0x101, 0x32D, 0x372, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHAKE_CAMERA, 2,
     0x300, 0x1E,
     0x101, 2, 1, 1,
     0x300, 0x1E,
@@ -241,7 +241,7 @@ s16 script1040[] = {
     0x101, 2, 1, 1,
     0x300, 0x1E,
     0x101, 2, 1, 0,
-    0x101, 0x32D, 0x373, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_CAMERA_SHAKE, 2,
 #if VERSION_US
     0x304, 0xE08, 0x27D, 0x1F9, 1,
 #elif VERSION_EU
@@ -264,10 +264,10 @@ s16 script1041[] = {
 };
 s16 script1050[] = {
     0x102, 2, 0x17D, 0x119, 3,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 3,
-    0x101, 0x32D, 0x372, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHAKE_CAMERA, 2,
     0x300, 0x1E,
     0x101, 0x323, 0x325, 2,
     0x300, 0x5A,
@@ -293,13 +293,13 @@ s16 script1050[] = {
     0x300, 0x1E,
     0x200, 0, 1, 2, 2,
     0x101, 2, 7, 3,
-    0x101, 0x32D, 0x373, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_CAMERA_SHAKE, 2,
     0x301,
     0x101, 2, 1, 3,
     0x300, 0x1E,
     0,
 };
-StageEffectSpot D_800A5BD0[] = {
+StageEffectSpot updateStageSpots[] = {
     { 60, 0, 0x318, 166 },
     { 60, 0, 0x3F8, 0x116 },
     { 60, 0, 168, 0x26E },
@@ -405,25 +405,25 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x2DF, 0x310, 0x228, 3, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xE, 0x2DD, 0x504, 0x296, 5, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xE, 0x2DD, 0x344, 0xF6, 5, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xE, 0x2DD, 0x29C, 0x1AA, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xE, 0x2DD, 0x3E4, 0x146, 5, 0, 0, 0 },
-    { { { FLAG(0x40, 0x70), 0 }, { CODES_END, 0 } }, 8, 0x3FC, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0x71), 0 }, { CODES_END, 0 } }, 8, 0x406, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0x72), 0 }, { CODES_END, 0 } }, 8, 0x410, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0x73), 0 }, { CODES_END, 0 } }, 8, 0x41A, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2DF, 0x310, 0x228, 3, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH_OUT, 0x2DD, 0x504, 0x296, 5, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH_OUT, 0x2DD, 0x344, 0xF6, 5, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH_OUT, 0x2DD, 0x29C, 0x1AA, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH_OUT, 0x2DD, 0x3E4, 0x146, 5, 0, 0, 0 },
+    { { { FLAG(0x40, 0x70), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x3FC, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG(0x40, 0x71), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x406, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG(0x40, 0x72), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x410, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG(0x40, 0x73), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x41A, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 1020, script1020, EVENT_TEXT(9), NULL, func_800A5660 },
-    { 1030, script1030, EVENT_TEXT(0xA), NULL, func_800A56AC },
-    { 1040, script1040, EVENT_TEXT(0xC), NULL, func_800A56F8 },
-    { 1041, script1041, EVENT_TEXT(0xD), NULL, func_800A5724 },
-    { 1050, script1050, EVENT_TEXT(0xE), NULL, func_800A5750 },
+    { 1020, script1020, EVENT_TEXT(9), NULL, endEvent1020 },
+    { 1030, script1030, EVENT_TEXT(0xA), NULL, endEvent1030 },
+    { 1040, script1040, EVENT_TEXT(0xC), NULL, endEvent1040 },
+    { 1041, script1041, EVENT_TEXT(0xD), NULL, endEvent1041 },
+    { 1050, script1050, EVENT_TEXT(0xE), NULL, endEvent1050 },
     { -1, NULL, 0, NULL, NULL },
 };

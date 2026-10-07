@@ -55,3 +55,8 @@ actor9 = 0x800A5950;
 actor10 = 0x800A5964;
 actor11 = 0x800A5978;
 actor12 = 0x800A598C;
+
+// functions named by what calls them (tools/name_stage_funcs.py)
+updateSoundTile = 0x800A4D7C; // type:func
+handleCommand851 = 0x800A4EDC; // type:func
+createSoundTile = 0x800A4F48; // type:func

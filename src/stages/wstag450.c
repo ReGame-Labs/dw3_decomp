@@ -20,12 +20,12 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-void func_800A4DA4(void) {
+void endEvent1279(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x31), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
-void func_800A4DF0(void) {
+void endEvent1280(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x32), 1);
     FLAGS_00.applyAction(ITEM(0, 0x23), 1);
 }
@@ -56,9 +56,9 @@ void setupStage(void) {
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
-    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress < 0x18) {
         FIELDSTG_state.battles = &stageBattles[0];
@@ -72,7 +72,7 @@ s16 script1279[] = {
     0x102, 2, 0x14A, 0x125, 3,
     0x100, 0x7F, 0x131, 0x119,
     0x101, 0x7F, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 3,
     0x300, 6,
@@ -109,7 +109,7 @@ s16 script1280[] = {
     0x300, 0x1E,
     0x200, 0, 2, 0x7F, 2,
     0x301,
-    0x101, 0x32D, 0x34A, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON3, 2,
     0x300, 0x1E,
     0x200, 0, 3, 2, 1,
     0x101, 2, 7, 3,
@@ -676,23 +676,23 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x233, 0x80, 0x220, 5, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x237, 0x49C, 0x246, 3, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x235, 0xF8, 0xA4, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x23A, 0x560, 0x440, 1, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, 0xA, 0x2E5, 0x240, 0x120, 1, 0, 1, 2 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0x50, 0x28, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0x50, 0xFFD8, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0, 0xFFB8, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0xFFB0, 0x28, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, 7, 0, 0x50, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x233, 0x80, 0x220, 5, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x237, 0x49C, 0x246, 3, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x235, 0xF8, 0xA4, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x23A, 0x560, 0x440, 1, 0, 0, 0 },
+    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E5, 0x240, 0x120, 1, 0, 1, 2 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x50, 0x28, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x50, 0xFFD8, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0, 0xFFB8, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFB0, 0x28, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0, 0x50, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 1279, script1279, EVENT_TEXT(0x19), NULL, func_800A4DA4 },
-    { 1280, script1280, EVENT_TEXT(0x1A), NULL, func_800A4DF0 },
+    { 1279, script1279, EVENT_TEXT(0x19), NULL, endEvent1279 },
+    { 1280, script1280, EVENT_TEXT(0x1A), NULL, endEvent1280 },
     { -1, NULL, 0, NULL, NULL },
 };

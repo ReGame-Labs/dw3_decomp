@@ -4,7 +4,7 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
-void func_800A4D48(void) {
+void endEvent735(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x49), 1);
 }
 
@@ -32,9 +32,9 @@ void setupStage(void) {
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
-    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -44,7 +44,7 @@ s16 script735[] = {
     0x101, 0x2D, 1, 1,
     0x100, 0x31, 0x288, 0x115,
     0x101, 0x31, 1, 1,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x102, 2, 0x258, 0x114, 5,
     0x302, 2,
@@ -308,15 +308,15 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x2C4, 0x27A, 0x256, 3, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x2C1, 0x110, 0x108, 7, 0, 1, 6 },
-    { { { FLAG(0x40, 0x49), 0 }, { CODES_END, 0 } }, 8, 0x2DF, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2C4, 0x27A, 0x256, 3, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2C1, 0x110, 0x108, 7, 0, 1, 6 },
+    { { { FLAG(0x40, 0x49), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2DF, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 735, script735, EVENT_TEXT(0x1D), NULL, func_800A4D48 },
+    { 735, script735, EVENT_TEXT(0x1D), NULL, endEvent735 },
     { -1, NULL, 0, NULL, NULL },
 };

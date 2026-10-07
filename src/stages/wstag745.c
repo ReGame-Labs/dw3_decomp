@@ -1,66 +1,16 @@
 #include "common.h"
 #include "stage.h"
-extern StageEffectSpot D_800A5AA4[];
+extern StageEffectSpot updateStageSpots[];
 
-/* The flash: a white screen drawn while in TASK_DONE (GAME.unk26E8 is set then) */
-void func_800A4CA4(StageTask *task) {
-    Layer *layer;
-    u_long *ot;
-    POLY_F4 *poly;
-    DR_TPAGE *mode;
+#include "common/update_darkness.inc.c"
 
-    if (task->state == TASK_INIT) {
-        if (GAME.unk26E8 != 0) {
-            task->setState(task, TASK_DONE);
-        } else {
-            task->setState(task, TASK_RUN);
-        }
-    }
-    switch (task->state) {
-    case TASK_RUN:
-        if (task->key1 != 0) {
-            if (task->substate != 5) {
-                task->nextSubstate(task);
-            } else {
-                task->key1 = 0;
-                task->setState(task, TASK_DONE);
-                SOUND.playSound(SOUND_SWITCH02);
-            }
-        }
-        GAME.unk26E8 = 0;
-        break;
-    case TASK_DONE:
-        layer = GFX.funcs.getLayer(0x1002);
-        ot = (u_long *)layer->getOtEntry(layer, 6);
-        poly = GFX.funcs.getPrim();
-        setlen(poly, 5);
-        poly->code = 0x2A;
-        poly->r0 = poly->g0 = poly->b0 = 0xFF;
-        poly->x1 = poly->x3 = 320;
-        poly->x0 = poly->x2 = 0;
-        poly->y0 = poly->y1 = 0;
-        poly->y2 = poly->y3 = 256;
-        addPrim(ot, poly);
-        mode = (DR_TPAGE *)(poly + 1);
-        setlen(mode, 1);
-        mode->code[0] = 0xE1000245;
-        addPrim(ot, mode);
-        GFX.funcs.setPrim(mode + 1);
-        GAME.unk26E8 = 1;
-        break;
-    case TASK_INIT:
-    case TASK_KILL:
-        break;
-    }
+/* Creates the darkness task (id 0x18) */
+void *createDarkness(void) {
+    return createTaskWithId(updateDarkness, sizeof(StageTask), 0, 0x18);
 }
 
-/* Creates the flash task (id 0x18) */
-void *func_800A4EB8(void) {
-    return createTaskWithId(func_800A4CA4, sizeof(StageTask), 0, 0x18);
-}
-
-/* Turns the flash off (TASK_RUN) */
-void *func_800A4EE8(void) {
+/* Lifts the darkness (TASK_RUN) */
+void *startEvent8000(void) {
     StageTask *task = TASK_REGISTRY.funcs.find(0x18, -1, -1);
 
     if (task != NULL) {
@@ -73,8 +23,8 @@ void *func_800A4EE8(void) {
     return NULL;
 }
 
-/* Turns the flash on (TASK_DONE) */
-void *func_800A4F68(void) {
+/* Brings the darkness back (TASK_DONE) */
+void *startEvent8001(void) {
     StageTask *task = TASK_REGISTRY.funcs.find(0x18, -1, -1);
 
     if (task != NULL) {
@@ -87,8 +37,8 @@ void *func_800A4F68(void) {
     return NULL;
 }
 
-/* Turns the flash off and starts its countdown (TASK_RUN, key1 = 1) */
-void *func_800A4FE8(void) {
+/* Lifts the darkness and starts its countdown back (TASK_RUN, key1 = 1) */
+void *startEvent8002(void) {
     StageTask *task = TASK_REGISTRY.funcs.find(0x18, -1, -1);
 
     if (task != NULL) {
@@ -108,10 +58,10 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        children[20] = func_800A4EB8();
+        children[20] = createDarkness();
         for (i = 0; i < 20; i++) {
-            if (D_800A5AA4[i].kind == 0) {
-                children[i] = createStageEffect(D_800A5AA4[i].x, D_800A5AA4[i].y, D_800A5AA4[i].frame);
+            if (updateStageSpots[i].kind == 0) {
+                children[i] = createStageEffect(updateStageSpots[i].x, updateStageSpots[i].y, updateStageSpots[i].frame);
             }
         }
         if (FLAGS_00.checkCondition(FLAG(0x40, 0x41), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x42), 0)) {
@@ -134,13 +84,13 @@ void updateStage(StageTask *task, void **children) {
 #include "common/update_stage_effect.inc.c"
 #include "common/create_stage_effect.inc.c"
 
-void func_800A5790(void) {
+void endEvent810(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x41), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
 /* Sets flags 0x88A3 and 0x4042 */
-void func_800A57DC(void) {
+void endEvent811(void) {
     FLAGS_00.applyAction(ITEM(4, 0xA3), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0x42), 1);
 }
@@ -171,9 +121,9 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
-    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.clearTempFlags != 0) {
         GAME.unk26E8 = 0;
@@ -185,7 +135,7 @@ s16 script810[] = {
     0x102, 2, 0x103, 0xDA, 3,
     0x100, 0xCA, 0xF0, 0xD1,
     0x101, 0xCA, 1, 7,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 3,
     0x300, 0x1E,
@@ -242,7 +192,7 @@ s16 script811[] = {
     0x300, 0x1E,
     0,
 };
-StageEffectSpot D_800A5AA4[] = {
+StageEffectSpot updateStageSpots[] = {
     { 68, 0, 188, 0x1C4 },
     { 68, 0, 0x11C, 0x154 },
     { 68, 0, 0x11C, 0x254 },
@@ -405,40 +355,40 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x26B, 0xD0, 0x33C, 5, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x26D, 0x1E8, 0x254, 3, 0, 0, 0 },
-    { { { ITEM(0, 0x11), 1 }, { FLAG(0x40, 0x41), 0 } }, 8, 0x32A, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 8, 0x1F40, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 8, 0x1F41, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 8, 0x1F42, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xD, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x26B, 0xD0, 0x33C, 5, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x26D, 0x1E8, 0x254, 3, 0, 0, 0 },
+    { { { ITEM(0, 0x11), 1 }, { FLAG(0x40, 0x41), 0 } }, SLOT_EVENT, 0x32A, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x1F40, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x1F41, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x1F42, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26C, 0x3C0, 0x2B0, 7, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 810, script810, EVENT_TEXT(0xE), NULL, func_800A5790 },
-    { 811, script811, EVENT_TEXT(0xF), NULL, func_800A57DC },
-    { 8000, NULL, 0, func_800A4EE8, NULL },
-    { 8001, NULL, 0, func_800A4F68, NULL },
-    { 8002, NULL, 0, func_800A4FE8, NULL },
+    { 810, script810, EVENT_TEXT(0xE), NULL, endEvent810 },
+    { 811, script811, EVENT_TEXT(0xF), NULL, endEvent811 },
+    { 8000, NULL, 0, startEvent8000, NULL },
+    { 8001, NULL, 0, startEvent8001, NULL },
+    { 8002, NULL, 0, startEvent8002, NULL },
     { -1, NULL, 0, NULL, NULL },
 };

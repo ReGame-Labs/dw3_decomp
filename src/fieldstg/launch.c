@@ -155,10 +155,10 @@ Launch *FIELDSTG_createLaunch(Actor *actor, s32 dest) {
     task->actor = actor;
     task->dest = (s16 *)dest;
     if (GAME.funcs.getMode() == 0x26C) {
-        WSTAG745_func_800A4EE8();
+        WSTAG745_startEvent8000();
     }
     if (GAME.funcs.getMode() == 0x2D4) {
-        WSTAG746_func_800A4EE8();
+        WSTAG746_startEvent8000();
     }
     return task;
 }

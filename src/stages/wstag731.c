@@ -1,34 +1,10 @@
 #include "common.h"
 #include "stage.h"
-extern AnimFrame D_800A50A0[];
+extern AnimFrame updateTileAnimsFrames[];
 
 #include "common/step_looping_animation.inc.c"
 
-void updateTileAnims(StageTileAnims *task) {
-    StageTile *tile;
-    s32 frame;
-
-    switch (task->state) {
-    case TASK_INIT:
-    default:
-        task->nextState(task);
-        task->anims[0].index = 0;
-        task->anims[0].timer = D_800A50A0[0].duration;
-        break;
-    case TASK_RUN:
-        tile = FIELDSTG_state.objects;
-        frame = stepLoopingAnimation(&task->anims[0], D_800A50A0, 0);
-        for (; tile->unk2 != 0; tile++) {
-            if (tile->anim == 1) {
-                tile->frame = frame;
-            }
-        }
-        break;
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
+#include "common/update_tile_anims1_once.inc.c"
 
 void *createTileAnims(void) {
     return createTask(updateTileAnims, 0x54, 0);
@@ -61,8 +37,8 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -70,7 +46,7 @@ s16 script1236[] = {
     0x102, 2, 0x1AD, 0xCE, 5,
     0x100, 0x15, 0x1CD, 0xBE,
     0x101, 0x15, 1, 1,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 5,
     0x300, 6,
@@ -79,7 +55,7 @@ s16 script1236[] = {
     0x301,
     0x300, 0x1E,
     0x101, 0x15, 0x36, 3,
-    0x101, 0x32D, 0x375, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_SAVEDEMO, 2,
     0x303, 0x15,
     0x101, 0x15, 0x37, 3,
     0x300, 0x5A,
@@ -90,7 +66,7 @@ s16 script1236[] = {
 #if VERSION_US
 __asm__(".section .data\n\t.half 0x350\n");
 #endif
-AnimFrame D_800A50A0[] = {
+AnimFrame updateTileAnimsFrames[] = {
     { 53, 8 }, { 54, 8 }, { 55, 8 }, { 56, 4 },
     { 57, 40 }, { 58, 8 }, { 255, 0 },
 };
@@ -337,7 +313,7 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x2D0, 0x318, 0xAC, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2D0, 0x318, 0xAC, 1, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

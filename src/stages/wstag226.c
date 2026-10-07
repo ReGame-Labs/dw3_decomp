@@ -17,7 +17,7 @@ void func_800A4D7C(StageTileEffect *task) {
 }
 
 /* Moves its records to (x, y) and animates them when the substate is set to 1 */
-void func_800A4DB4(StageTileEffect *task) {
+void updateTileEffect(StageTileEffect *task) {
     StageTile *tile;
     StageTile *t;
     s32 i;
@@ -111,12 +111,12 @@ void func_800A5028(StageTileEffect *task, s32 id) {
     }
 }
 
-void *func_800A5090(s32 arg) {
-    return createTaskWithId(func_800A4DB4, 0x70, 0, arg);
+void *createTileEffect(s32 arg) {
+    return createTaskWithId(updateTileEffect, 0x70, 0, arg);
 }
 
 void *func_800A50C0(void) {
-    return createTask(func_800A4DB4, 0x70, 0);
+    return createTask(updateTileEffect, 0x70, 0);
 }
 
 /* Creates the stage helper task and the event object of progress 0x25 when flag 0x4060 is set */
@@ -143,7 +143,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
-void func_800A51E8(void) {
+void endEvent935(void) {
     GAME.progress = 38;
 }
 
@@ -170,8 +170,8 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress != 0x26 || FLAGS_00.checkCondition(FLAG(0x1A, 0xA), 0) != 0) {
         FIELDSTG_state.soundBank = 0x1F;
@@ -455,13 +455,13 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x273, 0x2DA, 0x17E, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x273, 0x2DA, 0x17E, 1, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 935, script935, EVENT_TEXT(0x29), NULL, func_800A51E8 },
+    { 935, script935, EVENT_TEXT(0x29), NULL, endEvent935 },
     { -1, NULL, 0, NULL, NULL },
 };

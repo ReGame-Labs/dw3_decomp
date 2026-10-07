@@ -21,8 +21,8 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, 0x8E60004);
-    FIELDSTG_map.setFile(7, 0x8E60005);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8E60004);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x8E60005);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -166,12 +166,12 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x270, 0x60, 0x31C, 5, 0x64, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x28C, 0x5E2, 0xE0, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xA, 0x2E1, 0x1D0, 0x154, 7, 0, 1, 1 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0xA, 0x2E1, 0xE0, 0x110, 7, 0, 1, 1 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 3, 0x110, 0x100, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 3, 0x120, 0xC8, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x270, 0x60, 0x31C, 5, 0x64, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x28C, 0x5E2, 0xE0, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E1, 0x1D0, 0x154, 7, 0, 1, 1 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E1, 0xE0, 0x110, 7, 0, 1, 1 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 3, 0x110, 0x100, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 3, 0x120, 0xC8, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

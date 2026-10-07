@@ -1,37 +1,11 @@
 #include "common.h"
 #include "stage.h"
-extern AnimFrame D_800A6244[];
-extern AnimFrame D_800A6294[];
+extern AnimFrame updateTileAnimsFrames0[];
+extern AnimFrame updateTileAnimsFrames1[];
 
 #include "common/step_looping_animation.inc.c"
 
-void updateTileAnims(StageTileAnims *task) {
-    StageTile *tile;
-
-    switch (task->state) {
-    case TASK_INIT:
-    default:
-        task->anims[0].index = 0;
-        task->anims[0].timer = D_800A6244[0].duration;
-        task->anims[1].index = 0;
-        task->anims[1].timer = D_800A6294[0].duration;
-        task->nextState(task);
-        break;
-    case TASK_RUN:
-        for (tile = FIELDSTG_state.objects; tile->unk2 != 0; tile++) {
-            if (tile->anim == 1) {
-                tile->frame = stepLoopingAnimation(&task->anims[0], D_800A6244, 0);
-            }
-            if (tile->anim == 2) {
-                tile->frame = stepLoopingAnimation(&task->anims[1], D_800A6294, 0);
-            }
-        }
-        break;
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
+#include "common/update_tile_anims2.inc.c"
 
 void *createTileAnims(void) {
     return createTask(updateTileAnims, 0x58, 0);
@@ -62,7 +36,7 @@ void updateStage(StageTask *task, void **children) {
 #include "common/start_stage.inc.c"
 
 /* Event: applies actions 0x100C and 0x7400 */
-void func_800A6118(void) {
+void endEvent1608(void) {
     FLAGS_00.applyAction(FLAG(0x10, 0xC), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
@@ -81,21 +55,21 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, 0x8ED0001);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8ED0001);
     FIELDSTG_map.setFirstMap(0);
 }
 
 extern s16 script1608[];
 extern s16 script1610[];
 
-AnimFrame D_800A6244[] = {
+AnimFrame updateTileAnimsFrames0[] = {
     { 50, 18 }, { 44, 6 }, { 50, 60 }, { 44, 6 },
     { 45, 6 }, { 46, 6 }, { 44, 6 }, { 51, 78 },
     { 44, 6 }, { 45, 6 }, { 46, 6 }, { 44, 6 },
     { 52, 60 }, { 44, 6 }, { 52, 18 }, { 44, 6 },
     { 45, 6 }, { 46, 6 }, { 44, 6 }, { 255, 0 },
 };
-AnimFrame D_800A6294[] = {
+AnimFrame updateTileAnimsFrames1[] = {
     { 56, 60 }, { 47, 6 }, { 56, 18 }, { 47, 6 },
     { 48, 6 }, { 49, 6 }, { 47, 6 }, { 57, 78 },
     { 47, 6 }, { 48, 6 }, { 49, 6 }, { 47, 6 },
@@ -142,7 +116,7 @@ void (*stageFuncs[])(void) = {
 };
 #define EVENT_TEXT_FILE 0x158
 FieldEvent stageEvents[] = {
-    { 1608, script1608, EVENT_TEXT(4), NULL, func_800A6118 },
+    { 1608, script1608, EVENT_TEXT(4), NULL, endEvent1608 },
     { 1610, script1610, EVENT_TEXT(5), NULL, NULL },
     { -1, NULL, 0, NULL, NULL },
 };

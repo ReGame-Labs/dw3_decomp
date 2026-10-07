@@ -17,10 +17,10 @@ void func_800A5DE4(StageTask *task) {
         break;
     case TASK_RUN:
         initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x1002, 0xC);
+        drawer.setLayerId(FIELD_LAYER_MAP, 0xC);
         drawer.setTexture(0x140, 0x100);
         drawer.setAltClut(0, 0x1F0);
-        layer = GFX.funcs.getLayer(0x1002);
+        layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
         layer->getScroll(layer, scroll);
         pos[0] = (scroll[0] - 0x2C0) >> 3;
         pos[1] = (scroll[1] - 0x280) >> 3;
@@ -72,10 +72,10 @@ void setupStage(void) {
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, 0x9190002);
-    FIELDSTG_map.setFile(1, 0x9190003);
-    FIELDSTG_map.setFile(7, 0x9190004);
-    FIELDSTG_map.setFile(4, 0x9190001);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x9190002);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR1, 0x9190003);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x9190004);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, 0x9190001);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -174,15 +174,15 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x294, 0x510, 0x88, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 5, 8, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 5, 4, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 6, 1, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 6, 0, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 4, 6, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 4, 5, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 9, 0x7E, 0x1AF, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 9, 0x6D, 0x117, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x294, 0x510, 0x88, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DEPTH, 8, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DEPTH, 4, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_MAP, 1, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_MAP, 0, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 6, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 5, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 9, 0x7E, 0x1AF, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 9, 0x6D, 0x117, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

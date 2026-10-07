@@ -2,8 +2,8 @@
 #include "stage.h"
 extern u8 D_800A726C[];
 extern s32 D_800A7274[2][2][2][2];
-extern StageAnimSpot D_800A72CC[];
-extern AnimFrame *D_800A73C4[];
+extern StageAnimSpot updateEffectSpots[];
+extern AnimFrame *updateTileLoop2Frames[];
 extern StageQuadTexture D_800A73CC[];
 extern StageQuad D_800A78FC[];
 extern u8 *D_800A7CC0[];
@@ -23,7 +23,7 @@ void func_800A4CA4(StageFlyer *task) {
     initSpriteDrawer(&drawer);
     pos[0] = task->x >> 8;
     pos[1] = task->y >> 8;
-    drawer.setLayerId(0x1002, 2);
+    drawer.setLayerId(FIELD_LAYER_MAP, 2);
     drawer.setTexture(0x140, 0x100);
     drawer.setAltClut(0, 0x1F0);
     drawer.setPivot(pos[0], pos[1]);
@@ -34,7 +34,7 @@ void func_800A4CA4(StageFlyer *task) {
 }
 
 /* Moves the sprite diagonally unless it is still, animates it and ends it off screen */
-void func_800A4D84(StageFlyer *task) {
+void updateFlyer(StageFlyer *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
@@ -78,8 +78,8 @@ void func_800A4D84(StageFlyer *task) {
 }
 
 /* Creates a flyer at the start the direction and stillness pick */
-void *func_800A4F20(s32 up, s32 right, s32 still, s32 anim) {
-    StageFlyer *task = createTask(func_800A4D84, 0x70, 0);
+void *createFlyer(s32 up, s32 right, s32 still, s32 anim) {
+    StageFlyer *task = createTask(updateFlyer, 0x70, 0);
 
     task->up = up;
     task->right = right;
@@ -99,14 +99,14 @@ void func_800A4FF4(StageGlow *task) {
     SpriteDrawer drawer;
 
     initSpriteDrawer(&drawer);
-    drawer.setLayerId(0x1002, 7);
+    drawer.setLayerId(FIELD_LAYER_MAP, 7);
     drawer.setTexture(0x140, 0x100);
     drawer.setAltClut(0, 0x1F0);
     drawer.draw(FILE_CACHE.getEntry(SPRITES << 16), task->level >> 2, 0xDA, 0x47);
 }
 
 /* Raises the level with a sound, waits, lowers it and ends, drawing it */
-void func_800A508C(StageGlow *task) {
+void updateGlow(StageGlow *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
@@ -150,8 +150,8 @@ void func_800A508C(StageGlow *task) {
     }
 }
 
-void *func_800A5220(s32 arg) {
-    return createTaskWithId(func_800A508C, 0x54, 0, arg);
+void *createCommand802(s32 arg) {
+    return createTaskWithId(updateGlow, 0x54, 0, arg);
 }
 
 #include "common/step_looping_animation.inc.c"
@@ -171,21 +171,21 @@ void func_800A5344(StageEffect *task, void *arg) {
 }
 
 /* A looping sprite animation at the place key1 picks, started at a random point */
-void func_800A53F0(StageEffect *task) {
-    Layer *layer = GFX.funcs.getLayer(0x1002);
+void updateEffect(StageEffect *task) {
+    Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
 
     switch (task->state) {
     case TASK_INIT:
     default:
-        task->x = D_800A72CC[task->key1].x;
-        task->y = D_800A72CC[task->key1].y;
+        task->x = updateEffectSpots[task->key1].x;
+        task->y = updateEffectSpots[task->key1].y;
         task->anim.index = RANDOM.next() & 1;
         task->anim.timer = RANDOM.next() % 3 + 2;
         task->frame = 0;
         task->nextState(task);
         break;
     case TASK_RUN:
-        task->frame = stepLoopingAnimation(&task->anim, D_800A72CC[task->key1].frames, 0);
+        task->frame = stepLoopingAnimation(&task->anim, updateEffectSpots[task->key1].frames, 0);
         if (task->frame != 0) {
             layer->addSortedCallback(layer, func_800A5344, task, task->y, 0);
         }
@@ -196,9 +196,9 @@ void func_800A53F0(StageEffect *task) {
     }
 }
 
-/* Creates the task of func_800A53F0 with KEY as its key1 */
-void *func_800A553C(s32 key) {
-    Task *task = createTask(func_800A53F0, 0x60, 0);
+/* Creates the task of updateEffect with KEY as its key1 */
+void *createEffect(s32 key) {
+    Task *task = createTask(updateEffect, 0x60, 0);
 
     task->key1 = key;
     return task;
@@ -229,7 +229,7 @@ s32 func_800A5574(StageTileAnim *obj, AnimFrame *frames, s32 depth) {
 }
 
 /* Shows and loops the animations of the records with animations 1 and 2 */
-void func_800A5668(StageTileLoop2 *task) {
+void updateTileLoop2(StageTileLoop2 *task) {
     StageTile *t;
     StageTile *tile;
     s32 i;
@@ -238,9 +238,9 @@ void func_800A5668(StageTileLoop2 *task) {
     case TASK_INIT:
     default:
         task->tiles[0].anim.index = 0;
-        task->tiles[0].anim.timer = D_800A73C4[0][0].duration;
+        task->tiles[0].anim.timer = updateTileLoop2Frames[0][0].duration;
         task->tiles[1].anim.index = 0;
-        task->tiles[1].anim.timer = D_800A73C4[1][0].duration;
+        task->tiles[1].anim.timer = updateTileLoop2Frames[1][0].duration;
         for (t = FIELDSTG_state.objects; t->unk2 != 0; t++) {
             switch (t->anim) {
             case 1:
@@ -257,7 +257,7 @@ void func_800A5668(StageTileLoop2 *task) {
         for (i = 0; i < 2; i++) {
             tile = task->tiles[i].tile;
             tile->visible = 1;
-            tile->frame = func_800A5574(&task->tiles[i], D_800A73C4[i], 0);
+            tile->frame = func_800A5574(&task->tiles[i], updateTileLoop2Frames[i], 0);
             tile->clutRow = 0;
         }
         break;
@@ -267,11 +267,11 @@ void func_800A5668(StageTileLoop2 *task) {
     }
 }
 
-void *func_800A57D8(void) {
-    return createTask(func_800A5668, 0x60, 0);
+void *createTileLoop2(void) {
+    return createTask(updateTileLoop2, 0x60, 0);
 }
 
-/* Creates the six objects of func_800A53F0 (keys 0-5) and the object of func_800A5668 */
+/* Creates the six objects of updateEffect (keys 0-5) and the object of updateTileLoop2 */
 void func_800A5804(StageTask *task, void **children) {
     s32 i;
 
@@ -279,9 +279,9 @@ void func_800A5804(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         for (i = 0; i < 6; i++) {
-            children[i] = func_800A553C(i);
+            children[i] = createEffect(i);
         }
-        children[6] = func_800A57D8();
+        children[6] = createTileLoop2();
         task->nextState(task);
         break;
     case TASK_RUN:
@@ -303,25 +303,25 @@ void func_800A58C8(StageFlyerGate *task, void **children) {
     if (task->spawnA) {
         animA = RANDOM.next() & 1;
         if (children[0] == NULL) {
-            children[0] = func_800A4F20(0, 0, 0, animA);
+            children[0] = createFlyer(0, 0, 0, animA);
         }
         if (children[3] == NULL) {
-            children[3] = func_800A4F20(1, 1, 0, 0);
+            children[3] = createFlyer(1, 1, 0, 0);
         }
     }
     if (task->spawnB) {
         animB = RANDOM.next() & 1;
         if (children[0] == NULL) {
-            children[0] = func_800A4F20(0, 0, 1, 0);
+            children[0] = createFlyer(0, 0, 1, 0);
         }
         if (children[3] == NULL) {
-            children[3] = func_800A4F20(0, 0, 1, 1);
+            children[3] = createFlyer(0, 0, 1, 1);
         }
         if (children[1] == NULL) {
-            children[1] = func_800A4F20(1, 0, 0, 0);
+            children[1] = createFlyer(1, 0, 0, 0);
         }
         if (children[2] == NULL) {
-            children[2] = func_800A4F20(0, 1, 0, animB);
+            children[2] = createFlyer(0, 1, 0, animB);
         }
     }
 }
@@ -331,7 +331,7 @@ void func_800A5A10(StageFlyerGate *task) {
     SpriteDrawer drawer;
 
     initSpriteDrawer(&drawer);
-    drawer.setLayerId(0x1002, 2);
+    drawer.setLayerId(FIELD_LAYER_MAP, 2);
     drawer.setTexture(0x140, 0x100);
     drawer.setAltClut(0, 0x1F0);
     drawer.setClutRow((GFX.funcs.getTime() >> 1) & 1);
@@ -374,7 +374,7 @@ void func_800A5A10(StageFlyerGate *task) {
 }
 
 /* Swaps the pictures every 0x79 frames, letting out the flyers */
-void func_800A5C88(StageFlyerGate *task, void **children) {
+void updateFlyerGate(StageFlyerGate *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
@@ -429,7 +429,7 @@ void func_800A5C88(StageFlyerGate *task, void **children) {
 }
 
 /* Stops the object (substate 0) for map 0x324, starts it (substate 1) for 0x320 */
-void func_800A5E04(Task *task, s32 id) {
+void handleCommand800(Task *task, s32 id) {
     if (task != NULL) {
         switch (id) {
         case 0x324:
@@ -442,14 +442,14 @@ void func_800A5E04(Task *task, s32 id) {
     }
 }
 
-/* Creates the task of func_800A5C88 with id ARG */
-void *func_800A5E50(s32 arg) {
-    return createTaskWithId(func_800A5C88, 0x60, 0x10, arg);
+/* Creates the task of updateFlyerGate with id ARG */
+void *createCommand800(s32 arg) {
+    return createTaskWithId(updateFlyerGate, 0x60, 0x10, arg);
 }
 
 /* Draws the 40 quads, those of kind 0 and 1 with the frames of the animations */
 void func_800A5E80(StageByteAnims *task) {
-    Layer *layer = GFX.funcs.getLayer(0x1002);
+    Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
     u_long *ot = (u_long *)layer->getOtEntry(layer, 2);
     s32 scroll[2];
     POLY_FT4 *poly;
@@ -505,7 +505,7 @@ void func_800A5E80(StageByteAnims *task) {
 }
 
 /* Plays its two byte-pair animations, restarting one when its animation changes, and draws */
-void func_800A6174(StageByteAnims *task) {
+void updateByteAnims(StageByteAnims *task) {
     StageByteAnim *a;
     s32 i;
 
@@ -546,7 +546,7 @@ void func_800A6174(StageByteAnims *task) {
 }
 
 /* Switches the animations to 2 and 5 with a sound for map 0x322 */
-void func_800A6314(StageByteAnims *task, s32 id) {
+void handleCommand801(StageByteAnims *task, s32 id) {
     if (id == 0x322) {
         task->anims[0].anim = 2;
         task->anims[1].anim = 5;
@@ -554,8 +554,8 @@ void func_800A6314(StageByteAnims *task, s32 id) {
     }
 }
 
-void *func_800A6360(s32 arg) {
-    return createTaskWithId(func_800A6174, 0x78, 0, arg);
+void *createCommand801(s32 arg) {
+    return createTaskWithId(updateByteAnims, 0x78, 0, arg);
 }
 
 /* Creates an object and the event object of the story progress */
@@ -563,7 +563,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        children[1] = func_800A6360(0x321);
+        children[1] = createCommand801(0x321);
         do {
             if (GAME.progress == 0) {
                 children[0] = FIELDSTG_startEvent(0);
@@ -604,11 +604,11 @@ void updateStage(StageTask *task, void **children) {
 #include "common/start_stage.inc.c"
 
 /* Sets the story progress to 0 */
-void func_800A64D0(void) {
+void endEvent0(void) {
     GAME.progress = 0;
 }
 
-void func_800A64DC(void) {
+void endEvent885(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x66), 1);
 }
 
@@ -642,7 +642,7 @@ void setupStage(void) {
     FIELDSTG_state.music = MUSIC(0x29, 0);
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
     switch (GAME.progress) {
     case 0x1B:
@@ -1161,7 +1161,7 @@ AnimFrame D_800A72B4[] = {
 AnimFrame D_800A72C0[] = {
     { 53, 4 }, { 54, 4 }, { 255, 0 },
 };
-StageAnimSpot D_800A72CC[] = {
+StageAnimSpot updateEffectSpots[] = {
     { D_800A72C0, 20, 130 },
     { D_800A72C0, 80, 180 },
     { D_800A72C0, 120, 230 },
@@ -1173,7 +1173,7 @@ StageAnimSpot D_800A72CC[] = {
     { NULL, 0, 0 },
     { NULL, 0, 0 },
 };
-AnimFrame D_800A731C[] = {
+AnimFrame updateTileLoop2Frames_0[] = {
     { 10, 12 }, { 11, 12 }, { 12, 12 }, { 13, 12 },
     { 14, 12 }, { 15, 20 }, { 16, 4 }, { 17, 4 },
     { 15, 4 }, { 13, 4 }, { 18, 4 }, { 11, 4 },
@@ -1181,15 +1181,15 @@ AnimFrame D_800A731C[] = {
     { 16, 4 }, { 15, 4 }, { 18, 4 }, { 17, 4 },
     { 11, 4 }, { 255, 0 },
 };
-AnimFrame D_800A7374[] = {
+AnimFrame updateTileLoop2Frames_1[] = {
     { 18, 12 }, { 19, 12 }, { 20, 12 }, { 21, 12 },
     { 22, 12 }, { 23, 20 }, { 24, 4 }, { 25, 4 },
     { 22, 4 }, { 19, 4 }, { 21, 4 }, { 18, 4 },
     { 23, 4 }, { 20, 4 }, { 19, 4 }, { 25, 4 },
     { 22, 4 }, { 19, 4 }, { 18, 4 }, { 255, 0 },
 };
-AnimFrame *D_800A73C4[] = {
-    D_800A731C, D_800A7374,
+AnimFrame *updateTileLoop2Frames[] = {
+    updateTileLoop2Frames_0, updateTileLoop2Frames_1,
 };
 StageQuadTexture D_800A73CC[] = {
     { 0x180, 0x100, 0x1B2, 0x130, 0x1C8, 48, 0x170, 0x1DE },
@@ -1479,10 +1479,10 @@ void (*stageFuncs[])(void) = {
     setupStage,
 };
 FieldEvent stageEvents[] = {
-    { 0, script0, EVENT_TEXT(0), NULL, func_800A64D0 },
+    { 0, script0, EVENT_TEXT(0), NULL, endEvent0 },
     { 684, script684, EVENT_TEXT(0x20), NULL, NULL },
     { 742, script742, EVENT_TEXT(0x21), NULL, NULL },
-    { 885, script885, EVENT_TEXT(0x22), NULL, func_800A64DC },
+    { 885, script885, EVENT_TEXT(0x22), NULL, endEvent885 },
     { 971, script971, EVENT_TEXT(0x23), NULL, NULL },
 #if VERSION_US
     { 1500, script1500, EVENT_TEXT(0x24), NULL, NULL },

@@ -1,7 +1,7 @@
-D_800A700C = 0x800A700C; // size:0x24
-D_800A7030 = 0x800A7030; // size:0x20
-D_800A7050 = 0x800A7050; // size:0x1C
-D_800A706C = 0x800A706C; // size:0x20
+updateTileAnimsFrames0 = 0x800A700C; // size:0x24
+updateTileAnimsFrames1 = 0x800A7030; // size:0x20
+updateTileAnimsFrames2 = 0x800A7050; // size:0x1C
+updateTileAnimsFrames3 = 0x800A706C; // size:0x20
 D_800A708C = 0x800A708C; // size:0x34
 D_800A70C0 = 0x800A70C0; // size:0x34
 D_800A7100 = 0x800A7100; // size:0x70
@@ -98,3 +98,15 @@ actor5 = 0x800A771C;
 actor6 = 0x800A7730;
 actor7 = 0x800A7744;
 actor8 = 0x800A7758;
+
+// functions named by what calls them (tools/name_stage_funcs.py)
+createCommand838 = 0x800A62A8; // type:func
+endEvent931 = 0x800A6324; // type:func
+endEvent932 = 0x800A6384; // type:func
+endEvent933 = 0x800A63D0; // type:func
+endEvent934 = 0x800A63FC; // type:func
+endEvent981 = 0x800A6428; // type:func
+endEvent982 = 0x800A6454; // type:func
+
+// named by the function or table that uses them (tools/name_stage_uses.py)
+updateStageSpots = 0x800A72B0;

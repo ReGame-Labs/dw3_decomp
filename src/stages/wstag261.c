@@ -3,7 +3,7 @@
 extern s16 D_800A555C[];
 
 /* Moves the two records and the player 0x7F up or down when an event sets TASK_DONE */
-void func_800A4CC0(StageTileLift *task) {
+void updateTileLift(StageTileLift *task) {
     StageTile *rec;
     StageTile *tile0;
     StageTile *tile1;
@@ -41,7 +41,7 @@ void func_800A4CC0(StageTileLift *task) {
     case TASK_DONE:
         tile0 = task->tiles[0];
         tile1 = task->tiles[1];
-        player = TASK_REGISTRY.funcs.find(5, -1, 0);
+        player = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
         switch (task->substate) {
         case 0:
         default:
@@ -115,7 +115,7 @@ void func_800A4CC0(StageTileLift *task) {
 }
 
 /* Ends the task when map object 0x348 (down = 0) or 0x349 (down = 1) is triggered */
-void func_800A50DC(StageTileLift *task, s32 id) {
+void handleCommand827(StageTileLift *task, s32 id) {
     if (task != NULL) {
         switch (id) {
         case 0x348:
@@ -130,9 +130,9 @@ void func_800A50DC(StageTileLift *task, s32 id) {
     }
 }
 
-/* Creates the task of func_800A4CC0, down set from flag 0x1C3D */
-StageTileLift *func_800A5150(s32 id) {
-    StageTileLift *task = createTaskWithId(func_800A4CC0, sizeof(StageTileLift), 0, id);
+/* Creates the task of updateTileLift, down set from flag 0x1C3D */
+StageTileLift *createCommand827(s32 id) {
+    StageTileLift *task = createTaskWithId(updateTileLift, sizeof(StageTileLift), 0, id);
 
     if (FLAGS_00.checkCondition(FLAG(0x1C, 0x3D), 1)) {
         task->down = 1;
@@ -148,7 +148,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        children[0] = func_800A5150(0x33B);
+        children[0] = createCommand827(0x33B);
         break;
     case TASK_RUN:
     case TASK_DONE:
@@ -187,9 +187,9 @@ void setupStage(void) {
     FIELDSTG_state.music = MUSIC(0x42, 2);
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(1, STAGE_FILE << 16 | 3);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR1, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -197,9 +197,9 @@ s16 script1321[] = {
     0x102, 2, 0xBF, 0x190, 3,
     0x100, 0x3F, 0xB0, 0x188,
     0x101, 0x3F, 1, 0,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
-    0x101, 0x32D, 0x36C, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_SWITCH02, 2,
     0x300, 0x3C,
     0x101, 2, 1, 6,
     0x300, 0x1E,
@@ -235,9 +235,9 @@ s16 script1326[] = {
     0x102, 2, 0xBF, 0x111, 3,
     0x100, 0x3F, 0xB0, 0x109,
     0x101, 0x3F, 1, 0,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
-    0x101, 0x32D, 0x36C, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_SWITCH02, 2,
     0x300, 0x3C,
     0x101, 2, 1, 6,
     0x300, 0x1E,
@@ -323,10 +323,10 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x271, 0x368, 0xF4, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x281, 0x2FE, 0xA5, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 6, 1, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 5, 8, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x271, 0x368, 0xF4, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x281, 0x2FE, 0xA5, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_MAP, 1, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DEPTH, 8, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

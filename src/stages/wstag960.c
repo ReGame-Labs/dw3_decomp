@@ -21,9 +21,9 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.battles = FIELDSTG_state.findBattles(stageBattles, GAME.place);
-    FIELDSTG_map.setFile(0, 0x92F0002);
-    FIELDSTG_map.setFile(7, 0x92F0003);
-    FIELDSTG_map.setFile(4, 0x92F0001);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x92F0002);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x92F0003);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, 0x92F0001);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -75,8 +75,8 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x2E0, 0x240, 0xD8, 4, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x2E0, 0xB0, 0x178, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2E0, 0x240, 0xD8, 4, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2E0, 0xB0, 0x178, 1, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

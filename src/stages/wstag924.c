@@ -26,8 +26,8 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, 0x8E70001);
-    FIELDSTG_map.setFile(7, 0x8E70002);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8E70001);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x8E70002);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -49,12 +49,12 @@ void func_800A60FC(StageListMenu *task, StageListMenuChildren *children) {
         task->tweens[0].duration = 10;
         task->tweens[1].duration = 10;
         for (i = 0; i < 8; i++) {
-            children->options[i] = createTextWindow(0x1002, 1, 0xBD, 0x21 + i * 14);
+            children->options[i] = createTextWindow(FIELD_LAYER_MAP, 1, 0xBD, 0x21 + i * 14);
             children->options[i]->setDepth(children->options[i], 1);
         }
-        children->cursor = createCursor(0x1002, 1, 0xAF, 0x21);
+        children->cursor = createCursor(FIELD_LAYER_MAP, 1, 0xAF, 0x21);
         children->cursor->setVisible(children->cursor, 0);
-        children->message = createTextWindow(0x1002, 1, 0x12, 0xB0);
+        children->message = createTextWindow(FIELD_LAYER_MAP, 1, 0x12, 0xB0);
         children->message->setLines(children->message, 3);
         task->count = 8;
         break;
@@ -159,7 +159,7 @@ void func_800A60FC(StageListMenu *task, StageListMenuChildren *children) {
             break;
         }
         initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x1002, 2);
+        drawer.setLayerId(FIELD_LAYER_MAP, 2);
         drawer.setTexture(0x140, 0);
         drawer.setFollowScroll(0);
         if (task->showArrow) {
@@ -197,7 +197,7 @@ void func_800A60FC(StageListMenu *task, StageListMenuChildren *children) {
     }
 }
 
-void *func_800A6A68(void) {
+void *startEvent1602(void) {
     return createTask(func_800A60FC, 0x84, 0x28);
 }
 
@@ -216,12 +216,12 @@ void func_800A6A94(StageListMenu *task, StageListMenuChildren *children) {
         task->tweens[0].duration = 10;
         task->tweens[1].duration = 10;
         for (i = 0; i < 8; i++) {
-            children->options[i] = createTextWindow(0x1002, 1, 0xBD, 0x21 + i * 14);
+            children->options[i] = createTextWindow(FIELD_LAYER_MAP, 1, 0xBD, 0x21 + i * 14);
             children->options[i]->setDepth(children->options[i], 1);
         }
-        children->cursor = createCursor(0x1002, 1, 0xAF, 0x21);
+        children->cursor = createCursor(FIELD_LAYER_MAP, 1, 0xAF, 0x21);
         children->cursor->setVisible(children->cursor, 0);
-        children->message = createTextWindow(0x1002, 1, 0x12, 0xB0);
+        children->message = createTextWindow(FIELD_LAYER_MAP, 1, 0x12, 0xB0);
         children->message->setLines(children->message, 3);
         task->count = 8;
         break;
@@ -326,7 +326,7 @@ void func_800A6A94(StageListMenu *task, StageListMenuChildren *children) {
             break;
         }
         initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x1002, 2);
+        drawer.setLayerId(FIELD_LAYER_MAP, 2);
         drawer.setTexture(0x140, 0);
         drawer.setFollowScroll(0);
         if (task->showArrow) {
@@ -364,7 +364,7 @@ void func_800A6A94(StageListMenu *task, StageListMenuChildren *children) {
     }
 }
 
-void *func_800A7400(void) {
+void *startEvent1604(void) {
     return createTask(func_800A6A94, 0x84, 0x28);
 }
 
@@ -472,15 +472,15 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x273, 0x2C8, 0x24C, 3, 0x64, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x270, 0x410, 0x200, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x273, 0x2C8, 0x24C, 3, 0x64, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x270, 0x410, 0x200, 1, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageFuncs stageFuncs = { setupStage, startTween, updateTween };
 #define EVENT_TEXT_FILE 0x158
 FieldEvent stageEvents[] = {
-    { 1602, NULL, EVENT_TEXT(1), func_800A6A68, NULL },
-    { 1604, NULL, EVENT_TEXT(2), func_800A7400, NULL },
+    { 1602, NULL, EVENT_TEXT(1), startEvent1602, NULL },
+    { 1604, NULL, EVENT_TEXT(2), startEvent1604, NULL },
     { -1, NULL, 0, NULL, NULL },
 };
 s32 D_800A7A34[] = {

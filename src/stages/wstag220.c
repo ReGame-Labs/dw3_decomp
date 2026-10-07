@@ -23,12 +23,12 @@ void func_800A4D38(StageMenu *task, StageMenuChildren *children) {
         task->nextState(task);
         task->tween.duration = 10;
         for (i = 0; i < 2; i++) {
-            children->options[i] = createTextWindow(0x1002, 1, 0x1C, 0xBE + i * 14);
+            children->options[i] = createTextWindow(FIELD_LAYER_MAP, 1, 0x1C, 0xBE + i * 14);
             children->options[i]->setDepth(children->options[i], 1);
         }
-        children->cursor = createCursor(0x1002, 1, 0x12, 0xBE);
+        children->cursor = createCursor(FIELD_LAYER_MAP, 1, 0x12, 0xBE);
         children->cursor->setVisible(children->cursor, 0);
-        children->title = createTextWindow(0x1002, 1, 0x12, 0xB0);
+        children->title = createTextWindow(FIELD_LAYER_MAP, 1, 0x12, 0xB0);
         break;
     case TASK_RUN:
         switch (task->substate) {
@@ -101,7 +101,7 @@ void func_800A4D38(StageMenu *task, StageMenuChildren *children) {
             break;
         }
         initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x1002, 2);
+        drawer.setLayerId(FIELD_LAYER_MAP, 2);
         drawer.setTexture(0x140, 0);
         drawer.setFollowScroll(0);
         if (task->tween.value != 0) {
@@ -118,7 +118,7 @@ void func_800A4D38(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
-void *func_800A52D4(void) {
+void *startEvent1512(void) {
     return createTask(func_800A4D38, 0x64, 0x14);
 }
 
@@ -136,12 +136,12 @@ void func_800A5300(StageMenu *task, StageMenuChildren *children) {
         task->nextState(task);
         task->tween.duration = 10;
         for (i = 0; i < 2; i++) {
-            children->options[i] = createTextWindow(0x1002, 1, 0x1C, 0xBE + i * 14);
+            children->options[i] = createTextWindow(FIELD_LAYER_MAP, 1, 0x1C, 0xBE + i * 14);
             children->options[i]->setDepth(children->options[i], 1);
         }
-        children->cursor = createCursor(0x1002, 1, 0x12, 0xBE);
+        children->cursor = createCursor(FIELD_LAYER_MAP, 1, 0x12, 0xBE);
         children->cursor->setVisible(children->cursor, 0);
-        children->title = createTextWindow(0x1002, 1, 0x12, 0xB0);
+        children->title = createTextWindow(FIELD_LAYER_MAP, 1, 0x12, 0xB0);
         break;
     case TASK_RUN:
         switch (task->substate) {
@@ -214,7 +214,7 @@ void func_800A5300(StageMenu *task, StageMenuChildren *children) {
             break;
         }
         initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x1002, 2);
+        drawer.setLayerId(FIELD_LAYER_MAP, 2);
         drawer.setTexture(0x140, 0);
         drawer.setFollowScroll(0);
         if (task->tween.value != 0) {
@@ -231,7 +231,7 @@ void func_800A5300(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
-void *func_800A589C(void) {
+void *startEvent1514(void) {
     return createTask(func_800A5300, 0x64, 0x14);
 }
 
@@ -249,12 +249,12 @@ void func_800A58C8(StageMenu *task, StageMenuChildren *children) {
         task->nextState(task);
         task->tween.duration = 10;
         for (i = 0; i < 2; i++) {
-            children->options[i] = createTextWindow(0x1002, 1, 0x1C, 0xBE + i * 14);
+            children->options[i] = createTextWindow(FIELD_LAYER_MAP, 1, 0x1C, 0xBE + i * 14);
             children->options[i]->setDepth(children->options[i], 1);
         }
-        children->cursor = createCursor(0x1002, 1, 0x12, 0xBE);
+        children->cursor = createCursor(FIELD_LAYER_MAP, 1, 0x12, 0xBE);
         children->cursor->setVisible(children->cursor, 0);
-        children->title = createTextWindow(0x1002, 1, 0x12, 0xB0);
+        children->title = createTextWindow(FIELD_LAYER_MAP, 1, 0x12, 0xB0);
         break;
     case TASK_RUN:
         switch (task->substate) {
@@ -327,7 +327,7 @@ void func_800A58C8(StageMenu *task, StageMenuChildren *children) {
             break;
         }
         initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x1002, 2);
+        drawer.setLayerId(FIELD_LAYER_MAP, 2);
         drawer.setTexture(0x140, 0);
         drawer.setFollowScroll(0);
         if (task->tween.value != 0) {
@@ -344,7 +344,7 @@ void func_800A58C8(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
-void *func_800A5E64(void) {
+void *startEvent1516(void) {
     return createTask(func_800A58C8, 0x64, 0x14);
 }
 
@@ -381,8 +381,8 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= 0x14 && GAME.progress < 0x18) {
         FIELDSTG_state.soundBank = 0x1F;
@@ -403,7 +403,7 @@ s16 script53[] = {
     0x200, 0, 1, 0x24, 2,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x338, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 2,
     0x300, 0x1E,
     0x200, 0, 2, 2, 4,
     0x301,
@@ -417,7 +417,7 @@ s16 script53[] = {
     0x200, 0, 5, 2, 4,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x339, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 2,
     0x300, 0x1E,
     0x300, 0x1E,
     0x200, 0, 7, 0x24, 2,
@@ -433,19 +433,19 @@ s16 script54[] = {
     0x102, 2, 0xBA, 0xF8, 5,
     0x100, 0x20, 0xDC, 0xE8,
     0x101, 0x20, 1, 1,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 5,
     0x300, 0x1E,
     0x200, 0, 1, 0x20, 2,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x338, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 2,
     0x300, 0x1E,
     0x200, 0, 2, 0x32D, 4,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x339, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 2,
     0x300, 0x1E,
     0x300, 0x1E,
     0x200, 0, 3, 0x20, 2,
@@ -459,7 +459,7 @@ s16 script55[] = {
     0x200, 0, 1, 0x20, 2,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x338, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 2,
     0x300, 0x1E,
     0x200, 0, 2, 2, 4,
     0x301,
@@ -470,7 +470,7 @@ s16 script55[] = {
     0x200, 0, 4, 2, 4,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x339, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 2,
     0x300, 0x1E,
     0x300, 0x1E,
     0x200, 0, 5, 0x20, 2,
@@ -484,7 +484,7 @@ s16 script56[] = {
     0x200, 0, 1, 0x20, 2,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x338, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 2,
     0x300, 0x1E,
     0x200, 0, 2, 2, 4,
     0x301,
@@ -498,7 +498,7 @@ s16 script56[] = {
     0x200, 0, 5, 2, 4,
     0x301,
     0x300, 0x1E,
-    0x101, 0x32D, 0x339, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 2,
     0x300, 0x1E,
     0x300, 0x1E,
     0x200, 0, 6, 0x20, 2,
@@ -819,8 +819,8 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x203, 0x2C8, 0x24C, 3, 0x64, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x200, 0x410, 0x200, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x203, 0x2C8, 0x24C, 3, 0x64, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x200, 0x410, 0x200, 1, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageFuncs stageFuncs = { setupStage, startTween, updateTween };
@@ -829,11 +829,11 @@ FieldEvent stageEvents[] = {
     { 54, script54, EVENT_TEXT(0xE), NULL, NULL },
     { 55, script55, EVENT_TEXT(0xF), NULL, NULL },
     { 56, script56, EVENT_TEXT(0x10), NULL, NULL },
-    { 1512, NULL, EVENT_TEXT(0x36), func_800A52D4, NULL },
+    { 1512, NULL, EVENT_TEXT(0x36), startEvent1512, NULL },
     { 1513, script1513, EVENT_TEXT(0x31), NULL, NULL },
-    { 1514, NULL, EVENT_TEXT(0x37), func_800A589C, NULL },
+    { 1514, NULL, EVENT_TEXT(0x37), startEvent1514, NULL },
     { 1515, script1515, EVENT_TEXT(0x32), NULL, NULL },
-    { 1516, NULL, EVENT_TEXT(0x38), func_800A5E64, NULL },
+    { 1516, NULL, EVENT_TEXT(0x38), startEvent1516, NULL },
     { 1517, script1517, EVENT_TEXT(0x33), NULL, NULL },
     { -1, NULL, 0, NULL, NULL },
 };

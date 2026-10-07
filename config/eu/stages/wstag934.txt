@@ -23,3 +23,7 @@ actor0Talks = 0x800A6680;
 actor1Talks = 0x800A6698;
 actor0 = 0x800A66C8;
 actor1 = 0x800A66DC;
+
+// functions named by what calls them (tools/name_stage_funcs.py)
+updateTileLift = 0x800A5DFC; // type:func
+createTileLift = 0x800A628C; // type:func

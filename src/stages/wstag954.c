@@ -1,31 +1,10 @@
 #include "common.h"
 #include "stage.h"
-extern AnimFrame D_800A61A4[];
+extern AnimFrame updateTileAnimsFrames[];
 
 #include "common/step_looping_animation.inc.c"
 
-void updateTileAnims(StageTileAnims *task) {
-    StageTile *tile;
-
-    switch (task->state) {
-    case TASK_INIT:
-    default:
-        task->nextState(task);
-        task->anims[0].index = 0;
-        task->anims[0].timer = D_800A61A4[0].duration;
-        break;
-    case TASK_RUN:
-        for (tile = FIELDSTG_state.objects; tile->unk2 != 0; tile++) {
-            if (tile->anim == 1) {
-                tile->frame = stepLoopingAnimation(&task->anims[0], D_800A61A4, 0);
-            }
-        }
-        break;
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
+#include "common/update_tile_anims1.inc.c"
 
 void *createTileAnims(void) {
     return createTask(updateTileAnims, 0x54, 0);
@@ -63,13 +42,13 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, 0x9230002);
-    FIELDSTG_map.setFile(7, 0x9230003);
-    FIELDSTG_map.setFile(4, 0x9230001);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x9230002);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x9230003);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, 0x9230001);
     FIELDSTG_map.setFirstMap(0);
 }
 
-AnimFrame D_800A61A4[] = {
+AnimFrame updateTileAnimsFrames[] = {
     { 50, 8 }, { 51, 4 }, { 52, 8 }, { 53, 4 },
     { 54, 8 }, { 55, 4 }, { 56, 8 }, { 57, 16 },
     { 58, 4 }, { 59, 8 }, { 60, 4 }, { 61, 8 },
@@ -147,18 +126,18 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x299, 0x648, 0xD0, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 8, 0xF0, 0x4D8, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 8, 0x100, 0x450, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 9, 0x102, 0x420, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 9, 0xF2, 0x388, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 6, 0x1D2, 0x4C8, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 6, 0x1C2, 0x460, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 0xF, 0x1AF, 0x428, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 0xF, 0x1BF, 0x330, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 4, 0x16, 0, 0, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 9, 0x330, 0x208, 0, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 9, 0x340, 0x170, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x299, 0x648, 0xD0, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 8, 0xF0, 0x4D8, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 8, 0x100, 0x450, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 9, 0x102, 0x420, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 9, 0xF2, 0x388, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0x1D2, 0x4C8, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0x1C2, 0x460, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 0xF, 0x1AF, 0x428, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 0xF, 0x1BF, 0x330, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 0x16, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 9, 0x330, 0x208, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 9, 0x340, 0x170, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

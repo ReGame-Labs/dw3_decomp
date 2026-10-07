@@ -73,3 +73,27 @@ actor2Conditions = 0x800A6AF4;
 actor0 = 0x800A6B08;
 actor1 = 0x800A6B1C;
 actor2 = 0x800A6B30;
+
+// functions named by what calls them (tools/name_stage_funcs.py)
+updateCommand829 = 0x800A4CA4; // type:func
+handleCommand829 = 0x800A4EB4; // type:func
+createCommand829 = 0x800A4EEC; // type:func
+updateTileDuo = 0x800A53C0; // type:func
+createTileDuo = 0x800A5684; // type:func
+updateWanderPair = 0x800A5E78; // type:func
+createWanderPair = 0x800A622C; // type:func
+endEvent760 = 0x800A6380; // type:func
+
+// named by the function or table that uses them (tools/name_stage_uses.py)
+updateTileDuoFrames0_0 = 0x800A65D4;
+updateTileDuoFrames1_0 = 0x800A65F0;
+updateTileDuoFrames0_1 = 0x800A6608;
+updateTileDuoFrames1_1 = 0x800A6624;
+updateTileDuoFrames0 = 0x800A663C;
+updateTileDuoFrames1 = 0x800A6644;
+updateWanderPairFrames0_0 = 0x800A6660;
+updateWanderPairFrames1_0 = 0x800A668C;
+updateWanderPairFrames0_1 = 0x800A66BC;
+updateWanderPairFrames1_1 = 0x800A66E8;
+updateWanderPairFrames0 = 0x800A6718;
+updateWanderPairFrames1 = 0x800A6720;

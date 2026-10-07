@@ -11,7 +11,7 @@ Writes the numbers the stages give FIELDSTG with the names of field_map.h.
 - the map given to FIELDSTG_map.setFile, getCell or files[] becomes its
   FIELD_MAP_ name;
 - the type of a StageSlot, the word after its two conditions, becomes its
-  SLOT_ name;
+  SLOT_ name, and a flag of its conditions, FLAG(0, n), its FIELD_FLAG_ name;
 - a field command of an event script, a pose command (0x101) of
   FIELD_TASK_COMMANDS, becomes its FIELD_COMMAND_ name.
 
@@ -45,6 +45,7 @@ LAYERS = names("FIELD_LAYER_")
 TASKS = names("FIELD_TASK_")
 MAPS = names("FIELD_MAP_")
 SLOTS = names("SLOT_")
+FLAGS = names("FIELD_FLAG_")
 
 
 def commands():
@@ -85,6 +86,7 @@ RULES = [
 # a StageSlot table, and the type of each of its records
 SLOT_TABLE = re.compile(r"^(?:static )?StageSlot \w+\[\w*\] = \{.*?^\};", re.M | re.S)
 SLOT_TYPE = re.compile(rf"\{{ \{{ \{{ [^{{}}]+ \}}, \{{ [^{{}}]+ \}} \}}, {N},")
+SLOT_FLAG = re.compile(rf"\bFLAG\(0, {N}\)")
 
 
 HEADERS = re.compile(r'^#include "(?:stage|field_map|fieldstg)\.h"', re.M)
@@ -95,7 +97,7 @@ def rewrite(text):
     """text with the numbers named"""
     for pattern, sub in RULES:
         text = pattern.sub(sub, text)
-    return SLOT_TABLE.sub(lambda m: SLOT_TYPE.sub(by(SLOTS), m.group(0)), text)
+    return SLOT_TABLE.sub(lambda m: SLOT_FLAG.sub(by(FLAGS), SLOT_TYPE.sub(by(SLOTS), m.group(0))), text)
 
 
 def with_header(path, text):

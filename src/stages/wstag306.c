@@ -4,7 +4,7 @@ extern AnimFrame D_800A55F4[];
 
 #include "common/step_animation_once.inc.c"
 
-void func_800A4D7C(StageSoundTile *task) {
+void updateSoundTile(StageSoundTile *task) {
     StageTile *rec;
     StageTile *tile;
     s32 frame;
@@ -52,7 +52,7 @@ void func_800A4D7C(StageSoundTile *task) {
     }
 }
 
-void func_800A4EDC(StageSoundTile *task, s32 id) {
+void handleCommand851(StageSoundTile *task, s32 id) {
     if (task != NULL && id == 0x335) {
         task->voice = SOUND.playSound(SOUND_COMCD115);
         task->obj.anim.index = 0;
@@ -61,8 +61,8 @@ void func_800A4EDC(StageSoundTile *task, s32 id) {
     }
 }
 
-void *func_800A4F48(s32 arg) {
-    return createTaskWithId(func_800A4D7C, 0x5C, 0, arg);
+void *createSoundTile(s32 arg) {
+    return createTaskWithId(updateSoundTile, 0x5C, 0, arg);
 }
 
 /* Creates the event object of progress 0x25 or 0x27, and the stage helper task before progress 0x27 */
@@ -80,7 +80,7 @@ void updateStage(StageTask *task, void **children) {
             break;
         }
         if (GAME.progress < 0x27) {
-            children[0] = func_800A4F48(0x353);
+            children[0] = createSoundTile(0x353);
         }
         break;
     case TASK_RUN:
@@ -116,8 +116,8 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress != 0x26 || FLAGS_00.checkCondition(FLAG(0x1A, 0xA), 0) != 0) {
         FIELDSTG_state.soundBank = 0x1F;
@@ -180,7 +180,7 @@ s16 script930[] = {
 };
 s16 script966[] = {
     0x102, 2, 0x188, 0xF5, 5,
-    0x101, 0x32D, 0x337, 2,
+    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
     0x302, 2,
     0x101, 2, 1, 5,
     0x300, 0x1E,
@@ -421,8 +421,8 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x286, 0x398, 0xCC, 1, 0, 0, 0 },
-    { { { SPECIAL(0x1A), 1 }, { CODES_END, 0 } }, 8, 0x3C6, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x286, 0x398, 0xCC, 1, 0, 0, 0 },
+    { { { SPECIAL(0x1A), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x3C6, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

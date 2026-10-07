@@ -33,11 +33,11 @@ void updateStage(StageTask *task, void **children) {
 #include "common/start_stage.inc.c"
 
 /* Clears the flag of the story so far */
-void func_800A4DCC(void) {
+void endEvent272(void) {
     FLAGS_00.applyAction(FLAG(0x40, 5), 0);
 }
 
-void func_800A4DF8(void) {
+void endEvent340(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0xC), 1);
 }
 
@@ -67,8 +67,8 @@ void setupStage(void) {
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 2);
-    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= 0x14 && GAME.progress < 0x18) {
         FIELDSTG_state.soundBank = 0x1F;
@@ -393,9 +393,9 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x217, 0x318, 0x1DC, 5, 0x64, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x203, 0x14A, 0xC4, 1, 0, 0, 0 },
-    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x215, 0xC8, 0x7C, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x217, 0x318, 0x1DC, 5, 0x64, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x203, 0x14A, 0xC4, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x215, 0xC8, 0x7C, 7, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
@@ -403,7 +403,7 @@ void (*stageFuncs[])(void) = {
 };
 FieldEvent stageEvents[] = {
     { 40, script40, EVENT_TEXT(0xA), NULL, NULL },
-    { 272, script272, EVENT_TEXT(0x19), NULL, func_800A4DCC },
-    { 340, script340, EVENT_TEXT(0x1F), NULL, func_800A4DF8 },
+    { 272, script272, EVENT_TEXT(0x19), NULL, endEvent272 },
+    { 340, script340, EVENT_TEXT(0x1F), NULL, endEvent340 },
     { -1, NULL, 0, NULL, NULL },
 };

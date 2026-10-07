@@ -22,3 +22,8 @@ actor0Conditions = 0x800A6474;
 actor0 = 0x800A647C;
 actor1 = 0x800A6490;
 script1600 = 0x800A65E4;
+
+// functions named by what calls them (tools/name_stage_funcs.py)
+endEvent1600 = 0x800A5EC0; // type:func
+updateTileEffect = 0x800A6110; // type:func
+createCommand855 = 0x800A639C; // type:func
