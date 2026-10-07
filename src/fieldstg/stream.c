@@ -136,11 +136,11 @@ s32 FIELDSTG_getStreamFrame(StreamTask *task) {
    its read ends */
 void FIELDSTG_updateStream(StreamTask *task) {
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         task->nextState(task);
         break;
-    case 1:
+    case TASK_RUN:
         switch (task->substate) {
         case 0:
             break;
@@ -156,9 +156,9 @@ void FIELDSTG_updateStream(StreamTask *task) {
             task->loadedTime = GFX.funcs.getTime();
         }
         break;
-    case 2:
+    case TASK_DONE:
         break;
-    case 3:
+    case TASK_KILL:
         HEAP.free(task->buffer);
         break;
     }

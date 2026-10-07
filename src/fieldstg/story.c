@@ -13,7 +13,7 @@ void FIELDSTG_runStoryEvents(StoryEvents *task, StoryEventsChildren *children) {
     s32 i;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         task->nextState(task);
         task->script = 0;
@@ -56,14 +56,14 @@ void FIELDSTG_runStoryEvents(StoryEvents *task, StoryEventsChildren *children) {
             }
         }
         break;
-    case 1:
+    case TASK_RUN:
         if (children->script == NULL && task->script != 0) {
             children->script = FIELDSTG_startEvent(task->script);
             task->script = 0;
         }
         break;
-    case 2:
-    case 3:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }

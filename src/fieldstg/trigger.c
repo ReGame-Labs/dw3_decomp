@@ -77,7 +77,7 @@ s32 FIELDSTG_offerTrigger(Triggers *task, TriggerChildren *children) {
     }
 #if VERSION_US
     if (children->balloon != NULL) {
-        children->balloon->setState(children->balloon, 1);
+        children->balloon->setState(children->balloon, TASK_RUN);
         return 1;
     }
     switch (task->entry->type) {
@@ -127,7 +127,7 @@ s32 FIELDSTG_offerTrigger(Triggers *task, TriggerChildren *children) {
             break;
     }
     if (children->balloon != NULL) {
-        children->balloon->setState(children->balloon, 1);
+        children->balloon->setState(children->balloon, TASK_RUN);
         children->balloon->key2 = arg;
         children->balloon->frame = 0;
         children->balloon->time = 0;
@@ -195,13 +195,13 @@ void FIELDSTG_updateTriggers(Triggers *task, TriggerChildren *children) {
     task->entries = FIELDSTG_state.slots;
     switch (task->state) {
         default:
-        case 0:
+        case TASK_INIT:
             task->actor = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
             if (task->actor != NULL) {
                 task->nextState(task);
             }
             break;
-        case 1:
+        case TASK_RUN:
             if (FIELDSTG_state.busy != 0 || FIELDSTG_state.bannerShown != 0) {
                 break;
             }
@@ -215,9 +215,9 @@ void FIELDSTG_updateTriggers(Triggers *task, TriggerChildren *children) {
                 case 1:
                     if (FIELDSTG_findTrigger(task) == 0) {
                         task->setSubstate(task, 0);
-                        children->balloon->setState(children->balloon, 2);
+                        children->balloon->setState(children->balloon, TASK_DONE);
                     } else if ((PAD.getPressed(0) & (1 << PAD_CROSS)) && FIELDSTG_state.bannerShown == 0) {
-                        children->balloon->setState(children->balloon, 3);
+                        children->balloon->setState(children->balloon, TASK_KILL);
                         FIELDSTG_setOffTrigger(task);
                         task->nextSubstate(task);
                     }
@@ -229,8 +229,8 @@ void FIELDSTG_updateTriggers(Triggers *task, TriggerChildren *children) {
                     break;
             }
             break;
-        case 2:
-        case 3:
+        case TASK_DONE:
+        case TASK_KILL:
             break;
     }
 }

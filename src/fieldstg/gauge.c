@@ -5,7 +5,7 @@
 /* A gauge game: a cursor runs back and forth along one of the gauge rows until
  * cross is pressed, then slows down and stops; the cell it stops on (2 bits)
  * fails (0) or calls FIELDSTG_battleFuncs.startEventBattle with 4 (1) or 7 (2). In Europe the rows are
- * random only while GAME.unk26F8 lasts, then it is row 8, all zeros. The match
+ * random only while GAME.unk26F8 lasts, then it is GAUGE_EMPTY_ROW. The match
  * depends on the cell read and shifted as two statements. */
 void FIELDSTG_runGauge(GaugeGame *task) {
     SpriteDrawer drawer;
@@ -17,70 +17,70 @@ void FIELDSTG_runGauge(GaugeGame *task) {
     s32 shift;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
 #if VERSION_EU
         if (GAME.unk26F8 > 0) {
-            task->row = RANDOM.next() & 7;
+            task->row = RANDOM.next() & (GAUGE_ROWS - 1);
             GAME.unk26F8--;
         } else {
-            task->row = 8;
+            task->row = GAUGE_EMPTY_ROW;
         }
 #else
-        task->row = RANDOM.next() & 7;
+        task->row = RANDOM.next() & (GAUGE_ROWS - 1);
 #endif
         task->speed = 0x100;
         task->nextState(task);
-    case 1:
+    case TASK_RUN:
         switch (task->substate) {
         case 0:
         default:
             task->step += GFX.funcs.getFrameTime();
-            if (task->step > 0x5A) {
+            if (task->step > GAUGE_START_DELAY) {
                 task->nextSubstate(task);
             }
             break;
         case 1:
             switch (task->step) {
-            case 0:
+            case GAUGE_RUNNING:
             default:
                 if (PAD.getPressed(0) & (1 << PAD_CROSS)) {
                     if (!(RANDOM.next() & 3)) {
-                        task->setStep(task, 2);
+                        task->setStep(task, GAUGE_STOPPING_SLOWLY);
                     } else {
-                        task->setStep(task, 1);
+                        task->setStep(task, GAUGE_STOPPING);
                     }
                     SOUND.playSound(SOUND_MENU_MOVE);
                 }
                 break;
-            case 1:
+            case GAUGE_STOPPING:
                 task->speed -= 0x10;
                 if (task->speed == 0) {
-                    task->setStep(task, 3);
+                    task->setStep(task, GAUGE_STOPPED);
                 }
                 break;
-            case 2:
+            case GAUGE_STOPPING_SLOWLY:
                 task->speed -= 4;
                 if (task->speed == 0) {
-                    task->setStep(task, 3);
+                    task->setStep(task, GAUGE_STOPPED);
                 }
                 break;
-            case 3:
+            case GAUGE_STOPPED:
 #if VERSION_EU
                 index = task->cursor >> 10;
                 shift = (task->cursor >> 7) & 6;
                 cell = FIELDSTG_gaugeRows[task->row][index];
                 cell = (cell >> shift) & 3;
-                if (task->counter < 0x3C) {
+                if (task->counter < GAUGE_RESULT_DELAY) {
                     if (task->counter == 0 && cell == 1) {
-                        SOUND.playSound(0x80045341);
+                        SOUND.playSound(0x80045341); /* SYSTEM05 */
                     }
                     task->counter += GFX.funcs.getFrameTime();
                     break;
                 }
 #else
                 task->counter += GFX.funcs.getFrameTime();
-                if (task->counter < 0x3C) {
+                if (task->counter < GAUGE_RESULT_DELAY) {
                     break;
                 }
                 index = task->cursor >> 10;
@@ -91,15 +91,15 @@ void FIELDSTG_runGauge(GaugeGame *task) {
                 switch (cell) {
                 case 0:
                 default:
-                    task->setState(task, 3);
+                    task->setState(task, TASK_KILL);
                     break;
                 case 1:
                     FIELDSTG_battleFuncs.startEventBattle(4);
-                    task->setState(task, 2);
+                    task->setState(task, TASK_DONE);
                     break;
                 case 2:
                     FIELDSTG_battleFuncs.startEventBattle(7);
-                    task->setState(task, 2);
+                    task->setState(task, TASK_DONE);
                     break;
                 }
                 break;
@@ -112,29 +112,29 @@ void FIELDSTG_runGauge(GaugeGame *task) {
                 }
             } else {
                 task->cursor += task->speed;
-                if (task->cursor >= 0x3000) {
-                    task->cursor = 0x3000;
+                if (task->cursor >= GAUGE_CURSOR_MAX) {
+                    task->cursor = GAUGE_CURSOR_MAX;
                     task->back = 1;
                 }
             }
             sprites = FILE_CACHE.getEntry(FIELD_SPRITES_FILE << 16);
             initSpriteDrawer(&drawer);
             drawer.setLayerId(FIELD_LAYER_MAP, 4);
-            drawer.setTexture(0x200, 0x100);
+            drawer.setTexture(FIELD_SPRITES_X, FIELD_SPRITES_Y);
             drawer.draw(sprites, GFX.funcs.getTime() % 48 / 12 + 0x60, task->pos.x, task->pos.y);
             gaugeSprites = FILE_CACHE.getEntry((FIELD_SPRITES_FILE << 16) | 1);
             initSpriteDrawer(&gauge);
             gauge.setLayerId(FIELD_LAYER_MAP, 0);
-            gauge.setTexture(0x240, 0x100);
+            gauge.setTexture(FIELD_SPRITES2_X, FIELD_SPRITES_Y);
             gauge.setFollowScroll(0);
-            gauge.draw(gaugeSprites, 0x3D, (task->cursor >> 8) + 0x18, 0xC0);
-            gauge.draw(gaugeSprites, task->row + 0x3E, 0x18, 0xC0);
-            gauge.draw(gaugeSprites, 0x3C, 0x18, 0xC0);
+            gauge.draw(gaugeSprites, GAUGE_CURSOR_FRAME, (task->cursor >> 8) + GAUGE_X, GAUGE_Y);
+            gauge.draw(gaugeSprites, task->row + GAUGE_ROW_FRAMES, GAUGE_X, GAUGE_Y);
+            gauge.draw(gaugeSprites, GAUGE_FRAME, GAUGE_X, GAUGE_Y);
             break;
         }
         break;
-    case 2:
-    case 3:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }

@@ -36,7 +36,7 @@ void FIELDSTG_updateEffect(FieldEffect *task) {
 
     switch (task->state) {
         default:
-        case 0:
+        case TASK_INIT:
             for (i = 0; i < 4; i++) {
                 task->anims[i].active = 1;
                 task->anims[i].anim.index = 0;
@@ -44,7 +44,7 @@ void FIELDSTG_updateEffect(FieldEffect *task) {
             }
             task->nextState(task);
             break;
-        case 1:
+        case TASK_RUN:
             for (j = 0; j < 4; j++) {
                 if (task->anims[j].active != 0) {
                     frame = FIELDSTG_stepEffectAnim(&task->anims[j], FIELDSTG_effectAnims[task->set][j], 0);
@@ -56,7 +56,7 @@ void FIELDSTG_updateEffect(FieldEffect *task) {
                             break;
                         default:
                             initSpriteDrawer(&sprite);
-                            sprite.setTexture(0x240, 0x100);
+                            sprite.setTexture(FIELD_SPRITES2_X, FIELD_SPRITES_Y);
                             sprite.setLayer(layer, 0);
                             sprite.setClutRow(0);
                             sprite.draw(FILE_CACHE.getEntry(FIELD_SPRITES_FILE << 16 | 1), frame, task->x, task->y);
@@ -66,11 +66,11 @@ void FIELDSTG_updateEffect(FieldEffect *task) {
             }
             if (task->anims[0].active == 0 && task->anims[1].active == 0 && task->anims[2].active == 0
                 && task->anims[3].active == 0) {
-                task->setState(task, 3);
+                task->setState(task, TASK_KILL);
             }
             break;
-        case 2:
-        case 3:
+        case TASK_DONE:
+        case TASK_KILL:
             break;
     }
 }

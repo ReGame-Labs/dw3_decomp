@@ -8,11 +8,11 @@ s32 FIELDSTG_scaleSin(s32 angle, s32 radius) {
     return rsin(angle >> 2) * radius / 4096;
 }
 
-/* Sends an actor from the nearest task with id 0x17 (y counts twice in the
- * distance) to its dest tile: the actor walks to the task, sets it to state 2,
- * waits for it to leave that state, then moves along a quarter sine, spinning,
- * until it lands; without such a task it ends at once. The match depends on
- * the distance written twice. */
+/* Sends an actor from the nearest FIELD_TASK_LAUNCHER (y counts twice in the
+ * distance) to its dest tile: the actor walks to the task, sets it to
+ * TASK_DONE, waits for it to leave that state, then moves along a quarter
+ * sine, spinning, until it lands; without such a task it ends at once. The
+ * match depends on the distance written twice. */
 void FIELDSTG_runLaunch(Launch *task) {
     Point pos;
     Point near;
@@ -24,7 +24,7 @@ void FIELDSTG_runLaunch(Launch *task) {
     s32 d;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         best = 0x8000;
         found = NULL;
@@ -47,14 +47,14 @@ void FIELDSTG_runLaunch(Launch *task) {
             }
         }
         if (found == NULL) {
-            task->setState(task, 3);
+            task->setState(task, TASK_KILL);
             break;
         }
         task->from = found;
         task->start.x = near.x + 0x14;
         task->start.y = near.y + 0xD;
         task->nextState(task);
-    case 1:
+    case TASK_RUN:
         switch (task->substate) {
         case 0:
             switch (task->step) {
@@ -73,11 +73,11 @@ void FIELDSTG_runLaunch(Launch *task) {
             switch (task->step) {
             case 0:
             default:
-                task->from->setState(task->from, 2);
+                task->from->setState(task->from, TASK_DONE);
                 SOUND.playSound(SOUND_TELEPORT);
                 task->nextStep(task);
             case 1:
-                if (task->from->state != 2) {
+                if (task->from->state != TASK_DONE) {
                     task->nextSubstate(task);
                 }
                 break;
@@ -131,13 +131,13 @@ void FIELDSTG_runLaunch(Launch *task) {
             }
             break;
         default:
-            task->setState(task, 3);
+            task->setState(task, TASK_KILL);
             break;
         }
         break;
-    case 2:
+    case TASK_DONE:
         break;
-    case 3:
+    case TASK_KILL:
         task->actor->dir = 0;
         task->actor->hasShadow = 1;
         FIELDSTG_state.busy = 0;

@@ -326,6 +326,7 @@ FIELDSTG_waitScriptTime = 0x80091520; // type:func
 FIELDSTG_waitAnimDone = 0x800915B0; // type:func
 FIELDSTG_waitWalkDone = 0x800915FC; // type:func
 FIELDSTG_toScreenPos = 0x80091648; // type:func
+FIELDSTG_clearScriptFlag = 0x800916B4; // type:func
 FIELDSTG_findScriptCommand = 0x800916E8; // type:func
 FIELDSTG_createScriptCommand = 0x80091730; // type:func
 FIELDSTG_handleScriptCommand = 0x80091774; // type:func

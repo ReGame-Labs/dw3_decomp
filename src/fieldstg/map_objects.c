@@ -7,19 +7,19 @@ void FIELDSTG_drawMapObject(MapObjects *task, Layer *layer, s32 index) {
     StageTile *object = &task->objects[index];
     SpriteDrawer sprite;
 
-    if (task->state == 1) {
+    if (task->state == TASK_RUN) {
         initSpriteDrawer(&sprite);
-        sprite.setAltClut(0, 0x1F0);
+        sprite.setAltClut(0, FIELD_OBJECTS_CLUT_Y);
         sprite.setLayer(layer, object->depth);
         if (object->anim != 0xFF) {
-            sprite.setTexture(0x140, 0x100);
+            sprite.setTexture(FIELD_OBJECTS_X, FIELD_OBJECTS_Y);
             sprite.setClutRow(object->clutRow);
             if (FIELDSTG_state.spriteColor.cd != 0) {
                 sprite.setColor(&FIELDSTG_state.spriteColor);
             }
             sprite.draw(FILE_CACHE.getEntry(task->sprites), object->frame, object->x, object->y);
         } else {
-            sprite.setTexture(0x200, 0x100);
+            sprite.setTexture(FIELD_SPRITES_X, FIELD_SPRITES_Y);
             sprite.setClutRow(object->clutRow);
             sprite.draw(FILE_CACHE.getEntry(FIELD_SPRITES_FILE << 16), object->frame, object->x, object->y);
         }
@@ -41,7 +41,7 @@ void FIELDSTG_updateMapObjects(MapObjects *task, HiddenSpots **children) {
     s32 back;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         count = 0;
         for (entry = task->objects; entry->y != 0; entry++) {
@@ -54,13 +54,13 @@ void FIELDSTG_updateMapObjects(MapObjects *task, HiddenSpots **children) {
         }
         task->nextState(task);
         break;
-    case 1:
+    case TASK_RUN:
         object = task->objects;
         layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
         layer->getViewRect(layer, &view);
         initSpriteDrawer(&sprite);
-        sprite.setTexture(0x140, 0x100);
-        sprite.setAltClut(0, 0x1F0);
+        sprite.setTexture(FIELD_OBJECTS_X, FIELD_OBJECTS_Y);
+        sprite.setAltClut(0, FIELD_OBJECTS_CLUT_Y);
         for (i = 0; object->unk2 != 0; object++, i++) {
             if (object->visible == 0) {
                 continue;
@@ -132,8 +132,8 @@ void FIELDSTG_updateMapObjects(MapObjects *task, HiddenSpots **children) {
             }
         }
         break;
-    case 2:
-    case 3:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }

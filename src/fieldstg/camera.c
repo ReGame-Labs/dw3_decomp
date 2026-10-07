@@ -17,7 +17,7 @@ void FIELDSTG_scrollCamera(Camera *task) {
     if (task->hasBounds == 0) {
         map = TASK_REGISTRY.funcs.find(FIELD_TASK_MAP, -1, -1);
         if (map != NULL) {
-            if (map->state == 1) {
+            if (map->state == TASK_RUN) {
                 size = map->getSize(map);
                 task->bounds = *size;
                 task->hasBounds = 1;
@@ -36,21 +36,21 @@ void FIELDSTG_scrollCamera(Camera *task) {
     if (y < 0) {
         y = 0;
     }
-    if (task->bounds.x - 0x140 < x) {
-        x = task->bounds.x - 0x140;
+    if (task->bounds.x - FIELD_SCREEN_WIDTH < x) {
+        x = task->bounds.x - FIELD_SCREEN_WIDTH;
     }
-    if (task->bounds.y - 0xF0 < y) {
-        y = task->bounds.y - 0xF0;
+    if (task->bounds.y - FIELD_SCREEN_HEIGHT < y) {
+        y = task->bounds.y - FIELD_SCREEN_HEIGHT;
     }
     shake = 0;
     if (task->shaking != 0) {
         task->shake = (task->shake + 1) & 3;
         shake = task->shake + 1;
         if (task->voice == -1) {
-            task->voice = SOUND.playSound(0xA00431BF);
+            task->voice = SOUND.playSound(SOUND_COMCD203);
         }
     } else if (task->voice != -1) {
-        SOUND.keyOff(0xA00431BF, task->voice);
+        SOUND.keyOff(SOUND_COMCD203, task->voice);
         task->voice = -1;
     }
     layer->setScroll(layer, (FIELDSTG_shakeOffsets[shake].x + x) << 8, (FIELDSTG_shakeOffsets[shake].y + y) << 8);
@@ -64,14 +64,14 @@ void FIELDSTG_updateCamera(Camera *task) {
 
     switch (task->state) {
         default:
-        case 0:
+        case TASK_INIT:
             task->target = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
             task->snap = 1;
             if (task->target != NULL) {
                 task->nextState(task);
             }
             break;
-        case 1:
+        case TASK_RUN:
             switch (task->substate) {
                 case 0:
                     task->center.x = task->target->tile.x;
@@ -124,11 +124,11 @@ void FIELDSTG_updateCamera(Camera *task) {
             }
             FIELDSTG_scrollCamera(task);
             break;
-        case 2:
+        case TASK_DONE:
             break;
-        case 3:
+        case TASK_KILL:
             if (task->voice != -1) {
-                SOUND.keyOff(0xA00431BF, task->voice);
+                SOUND.keyOff(SOUND_COMCD203, task->voice);
                 task->voice = -1;
             }
             break;

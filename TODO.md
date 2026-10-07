@@ -88,7 +88,7 @@ own.
   stores, so the stores stay on their side of it and the constants don't.
   It gives the USA order too. The text file is `STAGE_TEXT`, the file and
   archive numbers `STAGE_FILE` and `STAGE_ARCHIVE`, the stage's own
-  defines; `unk7C` (`FIELDSTG`'s `func_80091490`) finds a record of a list
+  defines; `unk7C` (`FIELDSTG`'s `FIELDSTG_findBattles`) finds a record of a list
   of 0x1C-byte records by its id.
 - [x] The 8 functions that read `GAME` fields 8 bytes later in the European
   version (`countdown`, `unk26DC`, `unk26E8`) are C in both: `WSTAG745`/
@@ -254,7 +254,7 @@ compilers, are in the history.
   `s16` commands) and `unk4C` (`FieldActorEntry`, with their `FieldTalk`s
   and `u16` condition and action lists) are records now, all their types
   shared with FIELDSTG through `field_map.h` (its own stage,
-  `func_80091124`, has them as `FIELDSTG_mapObjects`, `FIELDSTG_slots`,
+  `FIELDSTG_setupField`, has them as `FIELDSTG_mapObjects`, `FIELDSTG_slots`,
   `FIELDSTG_images`, `FIELDSTG_events` and `FIELDSTG_actors`). Where the
   original's padding after a script isn't zeros (39 scripts), a top-level
   asm writes it. Where the same address holds different things in each

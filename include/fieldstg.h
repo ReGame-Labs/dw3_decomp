@@ -17,6 +17,24 @@
 
 /* --- Shared: the types several modules use --- */
 
+/* The screen of the field's display mode (FIELDSTG_updateField), in pixels */
+#define FIELD_SCREEN_WIDTH 0x140
+#define FIELD_SCREEN_HEIGHT 0xF0
+
+/* Where the field keeps its textures in VRAM: the two images of
+   FIELD_SPRITES_FILE (its entries 2 and 3, for the sprite sheets of its
+   entries 0 and 1), the stage's map objects (FIELDSTG_loadFieldFiles) and a
+   cutscene's frames (FIELDSTG_playCutsceneAnim) */
+#define FIELD_SPRITES_X 0x200
+#define FIELD_SPRITES2_X 0x240
+#define FIELD_SPRITES_Y 0x100
+#define FIELD_OBJECTS_X 0x140
+#define FIELD_OBJECTS_Y 0x100
+#define FIELD_OBJECTS_CLUT_Y 0x1F0
+#define FIELD_CUTSCENE_X 0x280
+#define FIELD_CUTSCENE_CLUT_Y 0xF0
+#define FIELD_MENU_SPRITES_X 0x140 /* the executable's FILE_MENU_SPRITES */
+
 typedef struct Point {
     s32 x;
     s32 y;
@@ -32,6 +50,48 @@ typedef struct FieldWarp {
     /* 0xA */ u16 place; /* copied to GAME.unk44, the place (FieldBattles.id) */
     /* 0xC */ u16 unkC; /* copied to GAME.unk46 */
 } FieldWarp;
+
+/*
+ * The sounds only FIELDSTG plays (SOUND.playSound), by their SOUNDTST names.
+ * Those that other overlays play too are still numbers, with the name in a
+ * comment: SWITCH01, SWITCH02, COMEX113, COMCD115, GONDRA_S, SE000002 and
+ * ELEVATER (stage.h), SWITCH03 (STDWTITL), COMCD103 and PLAYER11 (FIGHTSTG)
+ * and SYSTEM05 (STPLNMET).
+ */
+#define SOUND_DIG_DEMO 0x40003
+#define SOUND_DIGIMENT 0x40004 /* a warp's effect */
+#define SOUND_ENCOUNTS 0x40005 /* the transition to a battle */
+#define SOUND_FUKIDASH 0x40007 /* a balloon */
+#define SOUND_ITEM_GET 0x40009
+#define SOUND_PIYOPIYO 0x40013
+#define SOUND_SAVEDEMO 0x40015
+#define SOUND_SUB_DEMO 0x40018
+#define SOUND_BULB_003 0x440001
+#define SOUND_TRAP_OFF 0x700001
+#define SOUND_INFO_SIG 0xB80001
+#define SOUND_BM_ERASE 0x1100000
+#define SOUND_LD_ERASE 0x1100002
+#define SOUND_DEMO_BGM 0x60040002
+#define SOUND_COMCD111 0x80042DC7
+#define SOUND_COMCD201 0x800430BD
+#define SOUND_PLAYER00 0x8004583C
+#define SOUND_PLAYER01 0x800458BD
+#define SOUND_PLAYER02 0x8004593E
+#define SOUND_PLAYER08 0x80045C44
+#define SOUND_PLAYER09 0x80045CC5
+#define SOUND_PLAYER10 0x80045D46
+#define SOUND_TRESUREB 0x80045DC7
+#define SOUND_DIG_MOVE 0x80045FCB
+#define SOUND_MASK_SET 0x803C503C
+#define SOUND_BEAM_SHT 0x805458BD
+#define SOUND_WEAR_OFF 0x80E8383C
+#define SOUND_SN_ENTRY 0x8110303C
+#define SOUND_SN_ERASE 0x81103240
+#define SOUND_COMCD203 0xA00431BF /* held while the camera shakes */
+#define SOUND_SUB_MOVE 0xA0045F4A /* held */
+#define SOUND_BEAM_HIT 0xA054583C /* held */
+#define SOUND_TRAP_ICE 0xA064683C /* held */
+#define SOUND_GAYALOOP 0xA10C703C /* held */
 
 /* --- tween.c --- */
 
@@ -69,6 +129,49 @@ typedef struct Tween {
 #define ACTOR_USED 0x4E /* that object */
 #define ACTOR_SLIDE 0x4F /* FIELDSTG_startActorSlide */
 #define ACTOR_STOP_SLIDE 0x50
+
+/* The animation sets that the actions play (FIELDSTG_setActorAnim), by the
+   substate that plays them */
+#define ACTOR_ANIM_STAND 1
+#define ACTOR_ANIM_WALK 4
+#define ACTOR_ANIM_RUN 5
+#define ACTOR_ANIM_STOP 6
+#define ACTOR_ANIM_SEARCH 8
+#define ACTOR_ANIM_GAUGE_START 0x11
+#define ACTOR_ANIM_GAUGE_RESULT 0x12 /* after the game, with a balloon */
+#define ACTOR_ANIM_GAUGE_PLAY 0x13 /* with PLAYER09 */
+#define ACTOR_ANIM_GAUGE_WAIT 0x14 /* with PLAYER10, until the game ends */
+#define ACTOR_ANIM_GAUGE_END 0x15
+#define ACTOR_ANIM_DROP_OFF 0x16
+#define ACTOR_ANIM_FALL 0x17
+#define ACTOR_ANIM_FALL_FAR 0x18 /* once the fall is more than 0x1800 */
+#define ACTOR_ANIM_LAND 0x19
+#define ACTOR_ANIM_CLIMB_UP 0x1A
+#define ACTOR_ANIM_CLIMB_DOWN 0x1B
+#define ACTOR_ANIM_GET_ON_WALL 0x1C
+#define ACTOR_ANIM_CLIMB_OFF_TOP 0x1D
+#define ACTOR_ANIM_GET_OVER_EDGE 0x1E
+#define ACTOR_ANIM_CLIMB_OFF_BOTTOM 0x1F
+#define ACTOR_ANIM_CLIMB 0x20
+#define ACTOR_ANIM_OPEN 0x41 /* a treasure's, when it is talked to */
+#define ACTOR_ANIM_USE 0x45
+#define ACTOR_ANIM_USED 0x54 /* the object's */
+
+/*
+ * Flight (FIELDSTG_controlFlight, FIELDSTG_checkFlightProbe): an actor's z
+ * against the floor map's cells. Cell 1 is open; a wall, cell n from 2 to
+ * 6, stands up to FLIGHT_LEVEL(n); a ceiling, cell 24 - n from 18 to 22,
+ * hangs from FLIGHT_LEVEL(n) up.
+ */
+#define FLIGHT_OPEN 1
+#define FLIGHT_WALL(n) (n)
+#define FLIGHT_CEILING(n) (24 - (n))
+#define FLIGHT_LEVEL(n) ((n) << 12) /* n * 16 pixels, in z's 1/256 pixels */
+#define FLIGHT_LANDING 0xC /* how far above a wall's top a descent stops */
+#define FLIGHT_Z_MIN 0x1800
+#define FLIGHT_Z_MAX 0x7000
+#define FLIGHT_SPEED_MAX 0x200
+#define FLIGHT_SPEED_MAX_PAL 0x266 /* FLIGHT_SPEED_MAX * 6 / 5, for 50 frames a second */
 
 /*
  * A character on the field (FIELDSTG_createActor): the player (kind 0) and the
@@ -117,7 +220,7 @@ typedef struct Actor {
     /* 0x100 */ s32 isLarge; /* one of the large characters */
     /* 0x104 */ struct Trail *trail; /* a follower's: the leader's steps */
     /* 0x108 */ void (*control)(struct Actor *); /* its update by kind, or NULL (resetControl) */
-    /* 0x10C */ s32 unk10C;
+    /* 0x10C */ s32 scriptFlag; /* cleared by FIELDSTG_clearScriptFlag; nothing in FIELDSTG or the stages reads it */
     /* 0x110 */ void (*walkInDir)(struct Actor *, s32 dir);
     /* 0x114 */ void (*climbUp)();
     /* 0x118 */ void (*climbDown)();
@@ -139,7 +242,10 @@ typedef struct Actor {
     /* 0x158 */ void (*launch)();
 } Actor;
 
-/* The last 64 steps of the actor that another one follows (Actor.trail) */
+/* The last TRAIL_STEPS steps of the actor that another one follows
+   (Actor.trail), a ring from tail to head */
+#define TRAIL_STEPS 64 /* a power of two */
+
 typedef struct TrailStep {
     /* 0x0 */ s32 x;
     /* 0x4 */ s32 y;
@@ -150,7 +256,7 @@ typedef struct Trail {
     /* 0x000 */ Actor *leader;
     /* 0x004 */ s32 head;
     /* 0x008 */ s32 tail;
-    /* 0x00C */ TrailStep steps[64];
+    /* 0x00C */ TrailStep steps[TRAIL_STEPS];
 } Trail;
 
 /* The children of an actor (FIELDSTG_updateActor) */
@@ -163,8 +269,9 @@ typedef struct ActorChildren {
 
 /* --- actor_icon.c --- */
 
-/* The player's icon (id 0x16, FIELDSTG_createActorIcon): the event commands and a
-   special condition set its substate, the animation it plays */
+/* The player's icon (FIELD_TASK_ICON, FIELDSTG_createActorIcon): the field
+   commands FIELD_COMMAND_ICON1 to 3 and a special condition set its
+   substate, the animation it plays */
 typedef struct ActorIcon {
     TASK_HEADER(ActorIcon);
     /* 0x50 */ Actor *actor;
@@ -204,13 +311,13 @@ typedef struct Speech {
 
 /* --- launch.c --- */
 
-/* Launches an actor, spinning, from the nearest launcher (a task with id
-   0x17) to a tile (FIELDSTG_createLaunch, Actor.launch) */
+/* Launches an actor, spinning, from the nearest launcher (FIELD_TASK_LAUNCHER)
+   to a tile (FIELDSTG_createLaunch, Actor.launch) */
 typedef struct Launch {
     TASK_HEADER(Launch);
     /* 0x50 */ Actor *actor;
     /* 0x54 */ s16 *dest; /* the tile it lands on, at [1] and [2] */
-    /* 0x58 */ Task *from; /* the nearest task with id 0x17 */
+    /* 0x58 */ Task *from; /* the nearest FIELD_TASK_LAUNCHER */
     /* 0x5C */ Point start;
     /* 0x64 */ Point dist;
     /* 0x6C */ s32 negX;
@@ -219,20 +326,37 @@ typedef struct Launch {
 
 /* --- gauge.c --- */
 
-/* A gauge game (FIELDSTG_createGauge) */
+/* A gauge game (FIELDSTG_createGauge, FIELDSTG_runGauge) */
+#define GAUGE_ROWS 8 /* the random rows of FIELDSTG_gaugeRows */
+#define GAUGE_EMPTY_ROW 8 /* the European version's, all zeros */
+#define GAUGE_CURSOR_MAX 0x3000 /* the row's 48 pixels, in 1/256 pixels */
+#define GAUGE_START_DELAY 0x5A /* frames before the cursor runs */
+#define GAUGE_RESULT_DELAY 0x3C /* frames on the stopped cursor */
+#define GAUGE_X 0x18 /* where it is drawn, on the screen */
+#define GAUGE_Y 0xC0
+#define GAUGE_FRAME 0x3C /* its sprites, of FIELD_SPRITES_FILE's sheet 1 */
+#define GAUGE_CURSOR_FRAME 0x3D
+#define GAUGE_ROW_FRAMES 0x3E /* + the row */
+
+/* The steps of a running gauge */
+#define GAUGE_RUNNING 0 /* until cross is pressed */
+#define GAUGE_STOPPING 1
+#define GAUGE_STOPPING_SLOWLY 2 /* one time in four */
+#define GAUGE_STOPPED 3
+
 typedef struct GaugeGame {
     TASK_HEADER(GaugeGame);
     /* 0x50 */ Point pos;
     /* 0x58 */ s32 row; /* of FIELDSTG_gaugeRows */
-    /* 0x5C */ s32 cursor; /* along the row, 0-0x3000 */
+    /* 0x5C */ s32 cursor; /* along the row, 0-GAUGE_CURSOR_MAX */
     /* 0x60 */ s32 speed;
     /* 0x64 */ s32 back; /* the cursor goes back */
 } GaugeGame;
 
 /* --- camera.c --- */
 
-/* The camera (id 0x10, FIELDSTG_createCamera): it centers the field's layer
-   on an actor or a spot, panning there unless it snaps, and shakes */
+/* The camera (FIELD_TASK_CAMERA, FIELDSTG_createCamera): it centers the field's
+   layer on an actor or a spot, panning there unless it snaps, and shakes */
 typedef struct Camera {
     TASK_HEADER(Camera);
     /* 0x50 */ Actor *target; /* the actor it follows (substate 0) */
@@ -293,7 +417,7 @@ typedef struct ScriptTimer {
     /* 0x0 */ s32 time;
     /* 0x4 */ s32 active;
     /* 0x8 */ void (*reset)(void);
-    /* 0xC */ Actor *(*findActor)(s32 id);
+    /* 0xC */ Actor *(*findActor)(s32 character);
 } ScriptTimer;
 
 /* --- lift.c --- */
@@ -554,8 +678,8 @@ typedef struct HiddenSpot {
     /* 0x10 */ s32 hasPrize; /* the one picked at random (GAME.unk26E4) */
 } HiddenSpot;
 
-/* The map's hidden spots (id 0xB, FIELDSTG_createHiddenSpots): one of them, picked at
-   random, holds the prize */
+/* The map's hidden spots (FIELD_TASK_HIDDEN_SPOTS, FIELDSTG_createHiddenSpots):
+   one of them, picked at random, holds the prize */
 typedef struct HiddenSpots {
     TASK_HEADER(HiddenSpots);
     /* 0x50 */ s32 count;
@@ -633,11 +757,11 @@ typedef struct BannerBox {
     /* 0x20 */ s32 unk20;
 } BannerBox;
 
-/* The area name banner (id 9, FIELDSTG_createBanner) */
+/* The area name banner (FIELD_TASK_BANNER, FIELDSTG_createBanner) */
 typedef struct AreaBanner {
     TASK_HEADER(AreaBanner);
     /* 0x050 */ BannerBox boxes[10];
-    /* 0x1B8 */ RECT clip; /* the layer's, closing on state 2 */
+    /* 0x1B8 */ RECT clip; /* the layer's, closing in TASK_DONE */
 } AreaBanner;
 
 /* --- state.c --- */
@@ -651,6 +775,48 @@ typedef struct StageEntry {
 } StageEntry;
 
 /* --- field.c --- */
+
+/* The modes an encounter leaves the field for (FIELDSTG_startEncounter) */
+#define FIELD_MODE_BATTLE 0x600 /* FIGHTSTG's battle */
+#if VERSION_US
+#define FIELD_MODE_BATTLE_MOVIE 0xE09 /* STDWTITL's movie 8, which goes on to the battle */
+#elif VERSION_EU
+#define FIELD_MODE_BATTLE_MOVIE 0xE0A /* STDWTITL's movie 9 */
+#endif
+
+/* The player's FLAGS_00 codes (FIELDSTG_controlPlayer) */
+#define FIELD_FLAG_TALK_AHEAD 0x12 /* the player talks to what it faces, and clears it */
+#define FIELD_SEARCH_ITEM 0x8004 /* item 4, which the player needs to search the hidden spots */
+
+/* The flag set when the field of a mode is entered: FLAGS_00's group 0x20,
+   flag mode - 0x200 */
+#define FIELD_VISITED_FLAG(mode) (0x2000 + (mode) - 0x200)
+
+/* The modes of two fields that keep the file cache (FIELDSTG_keepsFileCache) */
+#define FIELD_MODE_WSTAG415 0x22D /* where the player's run doesn't check the probes
+                                       ahead (FIELDSTG_checkFlightProbes) */
+#define FIELD_MODE_WSTAG815 0x2DE
+
+/* Points of the story (GAME.progress) where the field acts differently */
+#define FIELD_PROGRESS_MOVIE_BATTLES 0x2B /* each encounter plays FIELD_MODE_BATTLE_MOVIE first */
+#define FIELD_PROGRESS_EXTRA 0x2D /* the European version's extra chapter, whose stages are
+                                     its FIELDSTG_stages (WSTAG920 to WSTAG974) */
+
+/* The fighters whose battles always give an item (FIELDSTG_startEncounter) */
+#define FIELD_PRIZE_FIGHTERS 0x1C9
+#define FIELD_PRIZE_FIGHTER_COUNT 8
+
+/* FIELDSTG_playBattleTransition's tiles: a copy of the screen at
+   TRANSITION_IMAGE_X in VRAM, cut into columns and rows */
+#define TRANSITION_COLUMNS 5
+#define TRANSITION_ROWS 6
+#define TRANSITION_TILE_WIDTH (FIELD_SCREEN_WIDTH / TRANSITION_COLUMNS)
+#define TRANSITION_TILE_HEIGHT (FIELD_SCREEN_HEIGHT / TRANSITION_ROWS)
+#define TRANSITION_IMAGE_X 0x280
+#define TRANSITION_SPEED 40 /* pixels a frame */
+#define TRANSITION_GONE 0x200 /* a tile's coordinate once it has slid off */
+#define TRANSITION_WAIT 0x10 /* the steps after the last tile, before the mode */
+#define TRANSITION_DONE 0x1000 /* the step once the mode is requested */
 
 /* A step of FIELDSTG_playBattleTransition's spiral: one coordinate of a tile moves by dir
  * until it passes limit */
@@ -666,7 +832,7 @@ typedef struct FieldImages {
     /* 0x20 */ ActorImage actors[20];
 } FieldImages;
 
-/* The field's main task (FIELDSTG_updateField, id 7); its children follow */
+/* The field's main task (FIELDSTG_updateField, FIELD_TASK_FIELD); its children follow */
 typedef struct FieldTask {
     TASK_HEADER(FieldTask);
     /* 0x50 */ s32 fade; /* FIELDSTG_drawCover's level */
@@ -704,7 +870,7 @@ typedef struct FieldChildren {
    the bytes it copies to BATTLE_SETUP.ambushChance on */
 typedef struct Encounter {
     /* 0x00 */ BattleEnemy *enemies[3];
-    /* 0x0C */ u8 unkC;
+    /* 0x0C */ u8 ambushChance;
     /* 0x0D */ u8 unkD;
     /* 0x0E */ u8 unkE[12];
     /* 0x1A */ u8 unk1A[2];
@@ -893,12 +1059,12 @@ FieldBattles *FIELDSTG_findBattles(FieldBattles *list, s32 id);
 
 /* script.c */
 void FIELDSTG_resetScriptTimer(void);
-Actor *FIELDSTG_findActor(s32 id);
+Actor *FIELDSTG_findActor(s32 character);
 void FIELDSTG_waitScriptTime(s32 time, s32 *pc);
 void FIELDSTG_waitAnimDone(s32 id, s32 *pc);
 void FIELDSTG_waitWalkDone(s32 id, s32 *pc);
 void FIELDSTG_toScreenPos(Point *pos);
-void func_800916B4(void);
+void FIELDSTG_clearScriptFlag(void);
 ScriptCommand *FIELDSTG_findScriptCommand(s32 id);
 s32 FIELDSTG_createScriptCommand(s32 id);
 void FIELDSTG_handleScriptCommand(s32 arg0, s32 id, s32 arg2, s32 arg3);
@@ -972,7 +1138,7 @@ extern s32 FIELDSTG_fileEntries[]; /* by character (Actor.key1) */
 extern u8 FIELDSTG_actorWidths[]; /* by character, in pixels (FieldState.getActorWidth) */
 extern StageEntry FIELDSTG_stages[];
 #if VERSION_EU
-extern StageEntry FIELDSTG_euStages[]; /* the European version's, but at progress 0x2D */
+extern StageEntry FIELDSTG_euStages[]; /* the European version's, but in FIELD_PROGRESS_EXTRA */
 #endif
 extern ScriptTimer FIELDSTG_scriptTimer;
 extern void (*FIELDSTG_scriptHelpers[])(); /* the script helpers (FIELDSTG_toScreenPos...) */
@@ -986,7 +1152,7 @@ extern s16 FIELDSTG_heldVoice; /* the voice of FIELDSTG_handleFieldCommand's hel
 extern Point FIELDSTG_mapSize; /* FIELDSTG_getMapSize's */
 extern StageTile *FIELDSTG_objectCursor; /* FIELDSTG_findNextObject's search of the map objects */
 extern s32 FIELDSTG_objectId; /* and the id it looks for */
-extern Point FIELDSTG_tiles[5][6]; /* FIELDSTG_playBattleTransition's 64x40 tiles of the screen */
+extern Point FIELDSTG_tiles[TRANSITION_COLUMNS][TRANSITION_ROWS]; /* FIELDSTG_playBattleTransition's */
 extern s32 FIELDSTG_tileRequests; /* FIELDSTG_playBattleTransition's file requests, 0 to 2 */
 extern RECT FIELDSTG_screenRect;
 extern Box FIELDSTG_boxes[20]; /* the characters' boxes (FIELDSTG_isTileFree) */

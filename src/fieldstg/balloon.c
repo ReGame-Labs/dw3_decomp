@@ -25,7 +25,7 @@ void FIELDSTG_drawBalloon(Balloon *task) {
     pos.y = task->actor->tile.y - (task->actor->z >> 8);
     initSpriteDrawer(&sprite);
     sprite.setLayerId(FIELD_LAYER_MAP, 1);
-    sprite.setTexture(0x200, 0x100);
+    sprite.setTexture(FIELD_SPRITES_X, FIELD_SPRITES_Y);
     if (task->substate == 2) {
         frame = FIELDSTG_stepBalloonAnim(task);
         sprite.draw(FILE_CACHE.getEntry(FIELD_SPRITES_FILE << 16), frame, pos.x, pos.y - 0x1B);
@@ -34,11 +34,11 @@ void FIELDSTG_drawBalloon(Balloon *task) {
 }
 
 /* A balloon's update: it pops open over the player (or another actor), stays
-   while the trigger is on offer and pops shut on state 2 */
+   while the trigger is on offer and pops shut in TASK_DONE */
 void FIELDSTG_updateBalloon(Balloon *task) {
     switch (task->state) {
         default:
-        case 0:
+        case TASK_INIT:
             if (task->actor == NULL) {
                 task->actor = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
                 if (task->actor == NULL) {
@@ -55,11 +55,11 @@ void FIELDSTG_updateBalloon(Balloon *task) {
                 task->popEnd = 0x114;
             }
             if (task->key2 != 1) {
-                SOUND.playSound(0x40007);
+                SOUND.playSound(SOUND_FUKIDASH);
             }
             task->nextState(task);
             /* fallthrough */
-        case 1:
+        case TASK_RUN:
             if (FIELDSTG_state.innOpen != 0) {
                 break;
             }
@@ -81,15 +81,15 @@ void FIELDSTG_updateBalloon(Balloon *task) {
             }
             FIELDSTG_drawBalloon(task);
             break;
-        case 2:
+        case TASK_DONE:
             task->pop += GFX.funcs.getFrameTime();
             if (task->pop >= task->popEnd) {
                 task->pop = task->popEnd;
-                task->setState(task, 3);
+                task->setState(task, TASK_KILL);
             }
             FIELDSTG_drawBalloon(task);
             break;
-        case 3:
+        case TASK_KILL:
             break;
     }
 }
@@ -121,7 +121,7 @@ void FIELDSTG_balloonCommand(Balloon *task, s32 command, s32 id) {
             task->key2 = 1;
             break;
         case 0x326:
-            task->setState(task, 2);
+            task->setState(task, TASK_DONE);
             break;
         }
         if (command == 0x325 || command == 0x327) {

@@ -298,7 +298,7 @@ void FIELDSTG_runMapStreamer(MapStreamer *task, StreamPool *pool) {
     Layer *layer;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         switch (task->substate) {
         case 0:
@@ -336,16 +336,16 @@ void FIELDSTG_runMapStreamer(MapStreamer *task, StreamPool *pool) {
             break;
         }
         break;
-    case 1:
+    case TASK_RUN:
         layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
         layer->getScroll(layer, &task->scroll);
         FIELDSTG_pickViewTiles(task);
         FIELDSTG_drawMapTiles(task, pool);
         FIELDSTG_requestTiles(task, pool);
         break;
-    case 2:
+    case TASK_DONE:
         break;
-    case 3:
+    case TASK_KILL:
         if (task->header != NULL) {
             HEAP.free(task->header);
         }
@@ -379,8 +379,8 @@ void FIELDSTG_drawCover(s32 id, s32 level) {
     s32 y;
 
     if (layer != NULL) {
-        for (y = 0; y < 0xF0; y += 0x80) {
-            for (x = 0; x < 0x140; x += 0x80) {
+        for (y = 0; y < FIELD_SCREEN_HEIGHT; y += 0x80) {
+            for (x = 0; x < FIELD_SCREEN_WIDTH; x += 0x80) {
                 FIELDSTG_drawCoverBlock(layer, x, y, level);
             }
         }

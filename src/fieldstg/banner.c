@@ -122,10 +122,11 @@ void FIELDSTG_drawBannerBox(AreaBanner *task, u_long *ot, DVECTOR pos, DVECTOR s
 }
 
 /*
- * The area name banner: on state 0 it copies its ten boxes from FIELDSTG_bannerBoxes
- * and opens the area and place windows (FIELDSTG_showAreaName); on state 1 the boxes
- * appear and stretch in turn until both windows have finished; on state 2
- * it closes the layer's clip from the top and the bottom.
+ * The area name banner: in TASK_INIT it copies its ten boxes from
+ * FIELDSTG_bannerBoxes and opens the area and place windows
+ * (FIELDSTG_showAreaName); in TASK_RUN the boxes appear and stretch in turn
+ * until both windows have finished; in TASK_DONE it closes the layer's clip
+ * from the top and the bottom.
  */
 void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
     Layer *layer;
@@ -134,7 +135,7 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
 
     switch (task->state) {
     default:
-    case 0:
+    case TASK_INIT:
         if (task->key1 != 0) {
             s32 j;
 
@@ -144,10 +145,10 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
             FIELDSTG_showAreaName((Task *)task, windows);
             task->nextState(task);
         } else {
-            task->setState(task, 2);
+            task->setState(task, TASK_DONE);
         }
         break;
-    case 1:
+    case TASK_RUN:
         switch (task->substate) {
         default:
         case 0:
@@ -179,12 +180,12 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
             break;
         case 4:
             if (windows->area->isFinished(windows->area) && windows->place->isFinished(windows->place)) {
-                task->setState(task, 2);
+                task->setState(task, TASK_DONE);
             }
             break;
         }
         break;
-    case 2:
+    case TASK_DONE:
         layer = GFX.funcs.getLayer(FIELD_LAYER_BANNER);
         /* the match depends on the empty case 0 */
         switch (task->substate) {
@@ -208,12 +209,12 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
             layer->setClipPos(layer, task->clip.x, task->clip.y);
             layer->setClipSize(layer, task->clip.w, task->clip.h);
             if (task->clip.h == 0) {
-                task->setState(task, 3);
+                task->setState(task, TASK_KILL);
             }
             break;
         }
         break;
-    case 3:
+    case TASK_KILL:
         FIELDSTG_state.bannerShown = 0;
         break;
     }

@@ -34,7 +34,7 @@ void FIELDSTG_updateSpeech(Speech *task, void **box) {
     TalkBox *talkBox;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         if (task->isMessage != 0) {
             *box = createMessageBox(FIELD_LAYER_TEXT, task->text, task->entry);
@@ -44,17 +44,17 @@ void FIELDSTG_updateSpeech(Speech *task, void **box) {
         }
         task->nextState(task);
         break;
-    case 1:
+    case TASK_RUN:
         if (*box == NULL) {
-            task->setState(task, 3);
+            task->setState(task, TASK_KILL);
         } else if (task->isMessage == 0) {
             FIELDSTG_getSpeechPos(task, &newPos);
             talkBox = *box;
             talkBox->setPos(talkBox, newPos.x, newPos.y);
         }
         break;
-    case 2:
-    case 3:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }

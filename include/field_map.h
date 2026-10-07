@@ -32,9 +32,60 @@ struct Point; /* fieldstg.h */
 #define FIELD_TASK_CAMERA 0x10
 #define FIELD_TASK_ICON 0x16 /* the icon over the player's head */
 #define FIELD_TASK_LAUNCHER 0x17 /* a stage's launchers (FIELDSTG_runLaunch) */
+#define FIELD_TASK_COMMANDS 0x32D /* script command 813 (FIELDSTG_startCommandTask): the field commands */
+
+/*
+ * The field commands, which an event script hands FIELD_TASK_COMMANDS as the
+ * first argument of a pose command (FIELDSTG_handleFieldCommand). The
+ * PLAY_ commands play the sound of their SOUNDTST name; a STOP_ command
+ * keys off the sound its PLAY_ command holds.
+ */
+#define FIELD_COMMAND_HALT_PARTNERS 0x337 /* the partners stop following */
+#define FIELD_COMMAND_ICON1 0x338 /* the player icon's substate 1, with ITEM_GET */
+#define FIELD_COMMAND_ICON2 0x339 /* its substate 2 */
+#define FIELD_COMMAND_ICON3 0x34A /* its substate 3, with ITEM_GET */
+#define FIELD_COMMAND_HIDE_OBJECTS(n) (0x34D + (n)) /* hides the map objects of group n */
+#define FIELD_COMMAND_SHOW_OBJECTS(n) (0x353 + (n)) /* shows them */
+#define FIELD_OBJECT_GROUPS 6
+#define FIELD_OBJECT_GROUP_ANIM 100 /* the StageTile.anim of group 0; group n has 100 + n */
+#define FIELD_COMMAND_PLAY_INFO_SIG 0x365
+#define FIELD_COMMAND_PLAY_GAYALOOP 0x366
+#define FIELD_COMMAND_STOP_GAYALOOP 0x367
+#define FIELD_COMMAND_PLAY_WEAR_OFF 0x368
+#define FIELD_COMMAND_PLAY_DEMO_BGM 0x369
+#define FIELD_COMMAND_PLAY_SE000002 0x36A
+#define FIELD_COMMAND_PLAY_BEAM_SHT 0x36B
+#define FIELD_COMMAND_PLAY_SWITCH02 0x36C
+#define FIELD_COMMAND_PLAY_MASK_SET 0x36D
+#define FIELD_COMMAND_PLAY_BM_ERASE 0x36E
+#define FIELD_COMMAND_PLAY_LD_ERASE 0x36F
+#define FIELD_COMMAND_PLAY_PLAYER11 0x370
+#define FIELD_COMMAND_STOP_PLAYER11 0x371
+#define FIELD_COMMAND_SHAKE_CAMERA 0x372
+#define FIELD_COMMAND_STOP_CAMERA_SHAKE 0x373
+#define FIELD_COMMAND_PLAY_TRAP_OFF 0x374
+#define FIELD_COMMAND_PLAY_SAVEDEMO 0x375
+#define FIELD_COMMAND_SEARCH_EVENT_SPOT 0x376 /* FIELDSTG_searchEventSpot */
+#define FIELD_COMMAND_PLAY_SWITCH03 0x377
+#define FIELD_COMMAND_PLAY_SN_ENTRY 0x378
+#define FIELD_COMMAND_PLAY_SN_ERASE 0x379
+#define FIELD_COMMAND_PLAY_TELEPORT 0x37A
+#define FIELD_COMMAND_PLAY_BULB_003 0x37C
+#define FIELD_COMMAND_PLAY_GONDRA_S 0x37D
+#define FIELD_COMMAND_PLAY_PIYOPIYO 0x37E
+#define FIELD_COMMAND_PLAY_COMCD103 0x37F
+#define FIELD_COMMAND_PLAY_COMCD201 0x380
+#define FIELD_COMMAND_PLAY_COMCD111 0x381
+#define FIELD_COMMAND_PLAY_BEAM_HIT 0x382
+#define FIELD_COMMAND_PLAY_SWITCH01 0x383
+#define FIELD_COMMAND_PLAY_COMCD115 0x384
+#define FIELD_COMMAND_STOP_COMCD115 0x385
+#define FIELD_COMMAND_STOP_BEAM_HIT 0x386
 
 /* Some of FieldMap's maps (files): those of the floors the player walks on
-   come first, and GAME.unk26D8 picks one */
+   come first, and GAME.unk26D8 picks one (FieldMap.setMap, SLOT_MAP) */
+#define FIELD_MAP_FLOOR0 0
+#define FIELD_MAP_FLOOR1 1
 #define FIELD_MAP_AREAS 4 /* a cell's value: its battle area (FieldBattles), or 0 */
 #define FIELD_MAP_TRIGGERS 7 /* a cell's value: a direction (3 bits) and a StageSlot (5) */
 
@@ -106,8 +157,18 @@ typedef struct FieldTalk {
     /* 0x8 */ s32 unk8; /* FIELDSTG_createTalk's */
 } FieldTalk;
 
+/* The characters (Actor.key1, FieldActorEntry.id) that FIELDSTG_updateField
+   creates for the party. A field can list one of the player's other
+   characters, 1, 0x6A, 0x146 or 0x147, to lead instead, without partners. */
+#define FIELD_CHARACTER_PLAYER 2
+#define FIELD_CHARACTER_PARTNERS 3 /* + the partner (GAME.funcs.getPartyPartner) */
+
+/* The FLAGS_00 flag that every encounter sets (FIELDSTG_startEncounter);
+   until it is set, the stages' slots run an event before the first battle */
+#define FIELD_FLAG_ENCOUNTERED 0xF
+
 /* A character of the field (FieldState.actors, a list of pointers up to NULL), which FIELDSTG_updateField creates
-   unless its conditions fail. Ids 1, 0x6A, 0x146 and 0x147 are the player's. */
+   unless its conditions fail; the player's other characters (FIELD_CHARACTER_PLAYER) lead the party instead. */
 typedef struct FieldActorEntry {
     /* 0x00 */ u16 *conditions; /* FLAGS_00.checkConditions's, or NULL */
     /* 0x04 */ struct FieldTalk *talks; /* up to the first without conditions */
@@ -126,8 +187,8 @@ typedef struct StageTile {
     /* 0x00 */ u8 visible;
     /* 0x01 */ u8 anim; /* which of a stage's animations sets frame (1-3);
                            FIELDSTG finds objects by it (its lift, 2 and 3,
-                           its commands, 100-105) and draws 0xFF from its
-                           effect sprites */
+                           the field commands' groups, FIELD_OBJECT_GROUP_ANIM
+                           on) and draws 0xFF from its effect sprites */
     /* 0x02 */ u8 unk2; /* how far off the view it is still drawn; 0 ends the table */
     /* 0x03 */ u8 depth;
     /* 0x04 */ u8 frame;

@@ -69,9 +69,9 @@ s32 FIELDSTG_loadFieldFiles(Task *task) {
                 return 0;
             }
             initTimLoader(&sprites);
-            sprites.setImagePos(0x200, 0x100);
+            sprites.setImagePos(FIELD_SPRITES_X, FIELD_SPRITES_Y);
             sprites.loadArchive(FILE_CACHE.getEntry((FIELD_SPRITES_FILE << 16) | 2));
-            sprites.setImagePos(0x240, 0x100);
+            sprites.setImagePos(FIELD_SPRITES2_X, FIELD_SPRITES_Y);
             sprites.loadArchive(FILE_CACHE.getEntry((FIELD_SPRITES_FILE << 16) | 3));
             task->nextStep(task);
             break;
@@ -101,8 +101,8 @@ s32 FIELDSTG_loadFieldFiles(Task *task) {
                     return 0;
                 }
                 initTimLoader(&loader);
-                loader.setClutPos(0, 0x1F0);
-                loader.setImagePos(0x140, 0x100);
+                loader.setClutPos(0, FIELD_OBJECTS_CLUT_Y);
+                loader.setImagePos(FIELD_OBJECTS_X, FIELD_OBJECTS_Y);
                 loader.loadArchive(FILE_CACHE.getEntry(FIELDSTG_state.imageEntry));
             }
             task->tickCounter(task);
@@ -112,8 +112,8 @@ s32 FIELDSTG_loadFieldFiles(Task *task) {
                     return 0;
                 }
                 initTimLoader(&loader);
-                loader.setClutPos(0, 0x1F0);
-                loader.setImagePos(0x140, 0x100);
+                loader.setClutPos(0, FIELD_OBJECTS_CLUT_Y);
+                loader.setImagePos(FIELD_OBJECTS_X, FIELD_OBJECTS_Y);
                 loader.loadArchive(FILE_CACHE.load(FIELDSTG_state.imageFile));
             }
             task->tickCounter(task);
@@ -148,24 +148,24 @@ s32 FIELDSTG_loadFieldFiles(Task *task) {
    (FIELDSTG_loadFieldFiles) */
 void FIELDSTG_runFileLoader(Task *task) {
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         task->nextState(task);
         task->substate = task->key2;
-    case 1:
+    case TASK_RUN:
         if (FIELDSTG_loadFieldFiles(task) != 0) {
-            task->setState(task, 3);
+            task->setState(task, TASK_KILL);
         }
         break;
-    case 2:
-    case 3:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }
 
 /* Creates the file loader, which starts at a step */
 Task *FIELDSTG_createFileLoader(s32 arg0) {
-    Task *task = createTask(FIELDSTG_runFileLoader, 0x54, 0);
+    Task *task = createTask(FIELDSTG_runFileLoader, sizeof(Task) + 4, 0); /* 4 bytes more than it uses */
 
     task->key2 = arg0;
     return task;

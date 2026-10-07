@@ -14,9 +14,9 @@ void FIELDSTG_updateActorIcon(ActorIcon *task) {
 
     switch (task->state) {
     default:
-    case 0:
+    case TASK_INIT:
         task->nextState(task);
-    case 1:
+    case TASK_RUN:
         if (task->step == 0) {
             task->anim = FIELDSTG_actorAnims[task->substate];
             task->animStep = 0;
@@ -24,12 +24,12 @@ void FIELDSTG_updateActorIcon(ActorIcon *task) {
             switch (task->substate) {
             case 1:
             case 3:
-                SOUND.playSound(0x40009);
+                SOUND.playSound(SOUND_ITEM_GET);
                 break;
             }
             task->nextStep(task);
         }
-        if (task->actor != NULL && task->actor->state == 1) {
+        if (task->actor != NULL && task->actor->state == TASK_RUN) {
             step = task->animStep;
             time = task->animTime;
             time += GFX.funcs.getFrameTime();
@@ -78,13 +78,13 @@ void FIELDSTG_updateActorIcon(ActorIcon *task) {
                 break;
             }
             initSpriteDrawer(&sprite);
-            sprite.setTexture(0x200, 0x100);
+            sprite.setTexture(FIELD_SPRITES_X, FIELD_SPRITES_Y);
             sprite.setLayerId(FIELD_LAYER_MAP, 2);
             sprite.draw(FILE_CACHE.getEntry(FIELD_SPRITES_FILE << 16), task->frame, pos.x, pos.y);
         }
         break;
-    case 2:
-    case 3:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }

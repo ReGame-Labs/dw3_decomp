@@ -4,7 +4,7 @@
 #include "fieldstg.h"
 
 /*
- * A lift made of the map objects 2 and 3: on state 2 it shakes, moves the
+ * A lift made of the map objects 2 and 3: in TASK_DONE it shakes, moves the
  * objects and the player 0x7F pixels up or down a pixel every other frame,
  * shakes again and flips raised.
  */
@@ -16,7 +16,7 @@ void FIELDSTG_updateLift(Lift *task) {
     s32 offset;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         task->nextState(task);
         for (object = FIELDSTG_state.objects; object->unk2 != 0; object++) {
@@ -41,9 +41,9 @@ void FIELDSTG_updateLift(Lift *task) {
         }
         task->raised = 0;
         break;
-    case 1:
+    case TASK_RUN:
         break;
-    case 2:
+    case TASK_DONE:
         left = task->left;
         right = task->right;
         player = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
@@ -55,7 +55,7 @@ void FIELDSTG_updateLift(Lift *task) {
             task->leftY = left->y;
             task->rightY = right->y;
             task->playerY = player->pos.y;
-            SOUND.playSound(0x8004103C);
+            SOUND.playSound(0x8004103C); /* SWITCH01 */
             task->nextSubstate(task);
             break;
         case 1:
@@ -63,7 +63,7 @@ void FIELDSTG_updateLift(Lift *task) {
             if (task->time >= 30) {
                 task->shake = 0;
                 task->nextSubstate(task);
-                SOUND.playSound(0x01080001);
+                SOUND.playSound(0x01080001); /* ELEVATER */
             }
             break;
         case 2:
@@ -110,12 +110,12 @@ void FIELDSTG_updateLift(Lift *task) {
             break;
         case 5:
             right->visible = 0;
-            task->setState(task, 1);
+            task->setState(task, TASK_RUN);
             task->raised ^= 1;
             break;
         }
         break;
-    case 3:
+    case TASK_KILL:
         break;
     }
 }
@@ -125,11 +125,11 @@ void FIELDSTG_moveLift(Lift *task, s32 command) {
     if (task != NULL) {
         switch (command) {
         case LIFT_LOWER:
-            task->setState(task, 2);
+            task->setState(task, TASK_DONE);
             task->raised = 0;
             break;
         case LIFT_RAISE:
-            task->setState(task, 2);
+            task->setState(task, TASK_DONE);
             task->raised = 1;
             break;
         }
