@@ -26,11 +26,19 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 900, with Bai Hu Chief: starts the stage's event battle 0 and
+ * keeps it from playing again
+ */
 void endEvent900(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x5A), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 901, with the player: moves the story on to its step 0x23 and
+ * gives the player the White ID Pass
+ */
 void endEvent901(void) {
     GAME.progress = 0x23;
     FLAGS_00.applyAction(ITEM(0, 0x18), 1);
@@ -45,6 +53,10 @@ void endEvent901(void) {
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x662
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing BGM_0021;
+ * BGM_0029 instead except at story step 0x26 once flag 0x1A0A is set
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

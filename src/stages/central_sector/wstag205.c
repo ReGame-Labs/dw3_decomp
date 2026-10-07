@@ -76,6 +76,7 @@ void updateSpriteField(StageSpriteField *task) {
     }
 }
 
+/* Creates the field of animated sprites (updateSpriteField); nothing in the game calls it */
 void *createSpriteField(void) {
     return createTask(updateSpriteField, sizeof(StageSpriteField), 0);
 }
@@ -100,11 +101,16 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 100, with Mystery Player and Keith: starts the stage's event
+ * battle 0 and keeps it from playing again
+ */
 void endEvent100(void) {
     FLAGS_00.applyAction(FLAG(0x40, 6), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/* After event 101, with Keith: keeps it from playing again */
 void endEvent101(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x16), 1);
 }
@@ -121,6 +127,10 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #define STAGE_FILE 0x199
 #define STAGE_ARCHIVE 0x2C3
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing ASKA_BGM;
+ * BGM_0029 instead at story steps 0x14 to 0x17 and 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

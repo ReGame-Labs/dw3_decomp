@@ -31,11 +31,17 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 1600, with the Tour Leader (Digimon Online's practice): heals
+ * the party's HP and MP (the European special action 0x53) and keeps it from
+ * playing again
+ */
 void endEvent1600(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xCD), 1);
     FLAGS_00.applyAction(SPECIAL(0x53), 1);
 }
 
+/* Sets the stage up: its map, actors and events, playing the ambience ENV_0011 */
 void setupStage(void) {
     FIELDSTG_state.textFile = LANGUAGE + 0xFD;
     FIELDSTG_state.mapFile = 0x19E;

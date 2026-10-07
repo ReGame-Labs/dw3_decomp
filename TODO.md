@@ -17,17 +17,11 @@ and the tooling around it. The counts below are from commit `ab85a3a6`.
   name them when the code or the disc's data shows what they hold. The
   ones still read in `src/` (32 uses) are listed with what is known in
   their headers.
-- [ ] 9 `D_` symbols are left, each with a comment on why:
+- [ ] 3 `D_` symbols are left, each with a comment on why:
   - `FIGHTSTG`'s `D_800A342C`, `D_800A3434` and `D_800A346C` in
-    `fightstg.c`;
-  - `WSTAG331`'s `D_800A5840`, `D_800A5AA4`, `D_800A5D2C` and `D_800A6F88`,
-    the talk and condition lists that differ between the versions;
-  - `WSTAG934`'s `D_800A6874` and `D_800A6878`, unused words that hold
-    `startTween` and `updateTween`.
-- [ ] Two functions keep splat's name: `WSTAG780`'s `func_800A7644`, an event
-  end only the European version has (`endEvent1500` by the stage tools'
-  rule, which name only the functions both versions have), and
-  `func_80029DB8`, PsyQ's `GsSetRefView2`, which FIGHTSTG's cameras call.
+    `fightstg.c`.
+- [ ] One function keeps splat's name: `func_80029DB8`, PsyQ's
+  `GsSetRefView2`, which FIGHTSTG's cameras call.
 - [ ] 184 pointer casts are left in `src/` (75 in FIGHTSTG, 33 in the
   executable, 14 in FIELDSTG, the rest a few per overlay). Each one says
   why it stays (another form changes the code) or is plain, like a byte

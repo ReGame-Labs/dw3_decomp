@@ -34,11 +34,13 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/* After event 170, with Zanbamon: lets event 171 start and starts the stage's event battle 0 */
 void endEvent170(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/* After event 171, with Zanbamon: moves the story on to its step 8 */
 void endEvent171(void) {
     GAME.progress = 8;
 }
@@ -57,6 +59,11 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0 };
 #define STAGE_FILE 0x366
 #define STAGE_ARCHIVE 0x638
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing BGM_0015;
+ * battle list 0 before story step 0xA, 1 before story step 0x18, 2 from then
+ * on
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

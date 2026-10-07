@@ -5,6 +5,10 @@
 #include "common.h"
 #include "stage.h"
 
+/*
+ * Back from the battle after event 1269, starts event 1270, with
+ * MagnaAngemon, unless it has played
+ */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -24,11 +28,19 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 1269, with MagnaAngemon: lets event 1270 start and starts the
+ * stage's event battle 0
+ */
 void endEvent1269(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x27), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1270, with MagnaAngemon: gives the player the Patamon DDNA and
+ * keeps it from playing again
+ */
 void endEvent1270(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x28), 1);
     FLAGS_00.applyAction(ITEM(0, 0x27), 1);
@@ -44,6 +56,10 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x46E
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing BGM_0018;
+ * BGM_0029 instead at story steps 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

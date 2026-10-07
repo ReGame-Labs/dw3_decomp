@@ -30,6 +30,7 @@ void updateStage(StageTask *task) {
 
 #include "common/start_stage.inc.c"
 
+/* After event 290, with Mischievous Mat: gives the player the Agumon Suit */
 void endEvent290(void) {
     FLAGS_00.applyAction(ITEM(0, 0xF), 1);
 }
@@ -46,6 +47,10 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #define STAGE_FILE 0x2A4
 #define STAGE_ARCHIVE 0x326
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing BGM_0003;
+ * BGM_0029 instead at story steps 0x14 to 0x17 and 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

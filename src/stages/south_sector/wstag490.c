@@ -28,21 +28,34 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 1267, with WarGrowlmon: lets event 1268 start and starts the
+ * stage's event battle 0
+ */
 void endEvent1267(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x25), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1268, with WarGrowlmon: gives the player the Guilmon DDNA and
+ * keeps it from playing again
+ */
 void endEvent1268(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x26), 1);
     FLAGS_00.applyAction(ITEM(0, 0x22), 1);
 }
 
+/* After event 1277, with GrapLeomon: lets event 1278 start and starts the stage's event battle 1 */
 void endEvent1277(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x2F), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
+/*
+ * After event 1278, with GrapLeomon: gives the player the Kumamon DDNA and
+ * keeps it from playing again
+ */
 void endEvent1278(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x30), 1);
     FLAGS_00.applyAction(ITEM(0, 0x18B), 1);
@@ -57,6 +70,7 @@ void endEvent1278(void) {
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x3FF
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0013 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

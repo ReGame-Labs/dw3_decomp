@@ -25,11 +25,16 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 530, with WaruMonzaemon and Lisa: starts the stage's event
+ * battle 0 and keeps it from playing again
+ */
 void endEvent530(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x39), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/* After event 531, with Lisa, Numemon and Lucky Mouse: moves the story on to its step 0x13 */
 void endEvent531(void) {
     GAME.progress = 0x13;
 }
@@ -47,6 +52,10 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x55D
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing the
+ * ambience ENV_0018; slot list 0 before story step 0x15, 1 from then on
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

@@ -163,6 +163,10 @@ void handleCommand814(void *arg, s32 event) {
     }
 }
 
+/*
+ * Command 814 of the event scripts: the lifts that rise and carry the player
+ * off in event 412 (updateRisers)
+ */
 void *createCommand814(s32 arg) {
     return createTaskWithId(updateRisers, sizeof(StageRisers), 0, arg);
 }
@@ -196,6 +200,7 @@ void updateStage(StageTask *task, void **children) {
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x63D
 #endif
+/* Sets the stage up: its map, actors and events, playing the ambience ENV_0019 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

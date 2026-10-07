@@ -364,4 +364,4 @@ endEvent310 = 0x800A636C; // type:func
 endEvent685 = 0x800A63B8; // type:func
 
 // named by the function or table that uses them (tools/name_stage_uses.py)
-updateListMenuCountFrames = 0x800A6DE8;
+listWindowFrames = 0x800A6DE8;

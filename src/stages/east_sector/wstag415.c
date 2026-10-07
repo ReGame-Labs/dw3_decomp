@@ -119,38 +119,50 @@ Task *createCommand816(s32 id) {
     return createFaller(id, 0);
 }
 
+/* Command 817 of the event scripts: a thing that falls in event 150's earthquake (kind 1) */
 Task *createCommand817(s32 id) {
     return createFaller(id, 1);
 }
 
+/* Command 818 of the event scripts: a thing that falls in event 150's earthquake (kind 2) */
 Task *createCommand818(s32 id) {
     return createFaller(id, 2);
 }
 
+/* Command 819 of the event scripts: a thing that falls in event 150's earthquake (kind 3) */
 Task *createCommand819(s32 id) {
     return createFaller(id, 3);
 }
 
+/* Command 820 of the event scripts: a thing that falls in event 150's earthquake (kind 4) */
 Task *createCommand820(s32 id) {
     return createFaller(id, 4);
 }
 
+/* Command 821 of the event scripts: a thing that falls in event 150's earthquake (kind 5) */
 Task *createCommand821(s32 id) {
     return createFaller(id, 5);
 }
 
+/* Command 822 of the event scripts: a thing that falls in event 150's earthquake (kind 6) */
 Task *createCommand822(s32 id) {
     return createFaller(id, 6);
 }
 
+/* Command 823 of the event scripts: a thing that falls in event 150's earthquake (kind 7) */
 Task *createCommand823(s32 id) {
     return createFaller(id, 7);
 }
 
+/* Command 824 of the event scripts: a thing that falls in event 150's earthquake (kind 8) */
 Task *createCommand824(s32 id) {
     return createFaller(id, 8);
 }
 
+/*
+ * Command 825 of the event scripts: the last of the ten things that fall in
+ * event 150's earthquake (kind 9)
+ */
 Task *createCommand825(s32 id) {
     return createFaller(id, 9);
 }
@@ -328,6 +340,10 @@ Task *createCommand811(s32 id) {
     return task;
 }
 
+/*
+ * Creates the mover of event 151, where the Digimon gets away (updateMover),
+ * already falling (mode 1)
+ */
 Task *createMover(s32 id) {
     Task *task = createTaskWithId(updateMover, sizeof(StageMover), 0, id);
 
@@ -451,6 +467,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0xC
 #include "common/start_stage.inc.c"
 
+/* After event 150, with the player: starts the stage's event battle 0 and sets flag 0x4018 */
 void endEvent150(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x18), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
@@ -465,6 +482,7 @@ void endEvent150(void) {
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x75E
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0011 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.sheetEntry = STAGE_FILE << 16;

@@ -19,6 +19,7 @@ extern AnimFrame updateTileAnimsFrames2[];
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/* After event 380, with Numemon: keeps it from playing again */
 void endEvent380(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xC), 1);
 }
@@ -34,6 +35,7 @@ void endEvent380(void) {
 #define STAGE_FILE 0x244
 #define STAGE_ARCHIVE 0x321
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0016 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

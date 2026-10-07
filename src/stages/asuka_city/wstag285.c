@@ -41,6 +41,7 @@ void endEvent272(void) {
     FLAGS_00.applyAction(FLAG(0x40, 5), 0);
 }
 
+/* After event 340, with DO Guard: keeps it from playing again */
 void endEvent340(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0xC), 1);
 }
@@ -56,6 +57,10 @@ void endEvent340(void) {
 #define STAGE_FILE 0x2B5
 #define STAGE_ARCHIVE 0x32D
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing KANRIBGM;
+ * BGM_0029 instead at story steps 0x14 to 0x17 and 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

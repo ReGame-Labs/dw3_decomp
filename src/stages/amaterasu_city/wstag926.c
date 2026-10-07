@@ -10,6 +10,7 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+/* Sets the stage up: its map, actors and events, playing KANRIBGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = LANGUAGE + 0xFD;
     FIELDSTG_state.mapFile = 0x1A0;
@@ -64,6 +65,10 @@ void updateTileTimer(StageTileTimer *task) {
     }
 }
 
+/*
+ * Command 854 of the event scripts: the lift that takes the player down to
+ * the Arena in event 1606 (updateTileTimer)
+ */
 void *createCommand854(s32 arg) {
     return createTaskWithId(updateTileTimer, sizeof(StageTileTimer), 0, arg);
 }

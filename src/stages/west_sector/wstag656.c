@@ -18,6 +18,7 @@
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x627
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0020 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

@@ -26,11 +26,19 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 750, with Zhu Que Chief: lets event 751 start and starts the
+ * stage's event battle 0
+ */
 void endEvent750(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x52), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 751, with the player: moves the story on to its step 0x1D and
+ * gives the player the Red ID Pass
+ */
 void endEvent751(void) {
     GAME.progress = 0x1D;
     FLAGS_00.applyAction(ITEM(0, 0x17), 1);
@@ -45,6 +53,10 @@ void endEvent751(void) {
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x5CA
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing BGM_0016;
+ * BGM_0029 instead except at story step 0x26 once flag 0x1A0A is set
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

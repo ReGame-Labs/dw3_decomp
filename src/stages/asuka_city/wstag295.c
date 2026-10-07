@@ -29,15 +29,25 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 580, with Teddy, Dr. Kadomatsu, DO Operator and DO Guard: sets
+ * flag 0x1C1A (which decides whether actors 0, 2 and 20 appear) and keeps it
+ * from playing again
+ */
 void endEvent580(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x1A), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0x4D), 1);
 }
 
+/* After event 891, with Lisa, Game Master and Teddy: keeps it from playing again */
 void endEvent891(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x58), 1);
 }
 
+/*
+ * After event 892, with Game Master, Lisa, Teddy and Nick: lets events 893
+ * and 894 of WSTAG305 start
+ */
 void endEvent892(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x59), 1);
 }
@@ -51,6 +61,7 @@ void endEvent892(void) {
 #define EVENT_TEXT_FILE 0x112
 #define STAGE_FILE 0x60F
 #endif
+/* Sets the stage up: its map, actors and events, playing BGM_0029 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

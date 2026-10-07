@@ -1,8 +1,9 @@
 /*
- * Events 9000 to 9015: the player stops, then each partner of the party (the
- * stage's partyActorIds) in turn gets a createSpritePair effect and is left
- * with 1 HP, 0x1E frames apart; the task then runs while the first effect is
- * in children->party[0]
+ * Events 9000 to 9015, the traps of the dungeon's Fire floor (Book Worm Ruri
+ * calls it "an advanced dungeon with various traps"): the player stops, then
+ * each partner of the party (the stage's partyActorIds) in turn gets a
+ * createSpritePair effect and is left with 1 HP, 0x1E frames apart; the task
+ * then runs while the first effect is in children->party[0]
  */
 void updateEvent9015(StageTask *task, StagePartyChildren *children) {
     StageActor *player;

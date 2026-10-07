@@ -5,6 +5,7 @@
 #include "common.h"
 #include "stage.h"
 
+/* Back from the battle after event 1273, starts event 1274, with Kyukimon, unless it has played */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -24,15 +25,21 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 550, with Nick and Keith: lets event 551 of WSTAG620 start */
 void endEvent550(void) {
     FLAGS_00.applyAction(FLAG(0x40, 3), 1);
 }
 
+/* After event 1273, with Kyukimon: lets event 1274 start and starts the stage's event battle 0 */
 void endEvent1273(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x2B), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1274, with Kyukimon: gives the player the Kotemon DDNA and
+ * keeps it from playing again
+ */
 void endEvent1274(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x2C), 1);
     FLAGS_00.applyAction(ITEM(0, 0x13), 1);
@@ -47,6 +54,7 @@ void endEvent1274(void) {
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x3C3
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0015 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

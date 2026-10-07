@@ -143,6 +143,10 @@ void updateClutTile(StageTileSolo *task) {
     }
 }
 
+/*
+ * Makes the color-cycling map object by the Digi-Egg of Knowledge fade out
+ * in 150 frames, once the player takes the egg (event 760)
+ */
 void fadeOutClutTile(StageTileDuo *task, s32 arg1, s32 arg2) {
     if (task != NULL) {
         task->mode = 2;
@@ -150,10 +154,18 @@ void fadeOutClutTile(StageTileDuo *task, s32 arg1, s32 arg2) {
     }
 }
 
+/*
+ * Creates the color-cycling map object by the Digi-Egg of Knowledge
+ * (updateClutTile) with an id; nothing in the game calls it
+ */
 void *createClutTile(s32 arg) {
     return createTaskWithId(updateClutTile, sizeof(StageTileSolo), 0, arg);
 }
 
+/*
+ * Creates the color-cycling map object by the Digi-Egg of Knowledge
+ * (updateClutTile), the one with animation 0x15
+ */
 void *createClutTileTask(void) {
     return createTask(updateClutTile, sizeof(StageTileSolo), 0);
 }
@@ -322,14 +334,27 @@ void fadeOutStillTile(StageTileDuo *task) {
     }
 }
 
+/*
+ * Creates the still map object by the Digi-Egg of Knowledge
+ * (updateStillTile) with an id; nothing in the game calls it
+ */
 void *createStillTile(s32 arg) {
     return createTaskWithId(updateStillTile, sizeof(StageTileSolo), 0, arg);
 }
 
+/*
+ * Creates the still map object by the Digi-Egg of Knowledge
+ * (updateStillTile), the one with animation 0x16
+ */
 void *createStillTileTask(void) {
     return createTask(updateStillTile, sizeof(StageTileSolo), 0);
 }
 
+/*
+ * stepTileAnimation (common/step_tile_animation.inc.c) under a fourth name,
+ * for the wandering pairs: steps OBJ's animation through FRAMES and returns
+ * its frame, looping at the end or returning 0xFF if once
+ */
 s32 stepTileAnimation4(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 depth) {
     AnimFrame *frame = &frames[obj->anim.index];
     s32 dt = GFX.funcs.getFrameTime();
@@ -358,6 +383,7 @@ s32 stepTileAnimation4(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 dept
     return frame->frame;
 }
 
+/* Whether the wandering pair is more than dist from home (in x + y) */
 s32 isFarFromHome(StageWanderPair *task, s32 dist) {
     s32 dx = task->posX - task->homeX;
     s32 dy = task->posY - task->homeY;
@@ -373,6 +399,10 @@ s32 isFarFromHome(StageWanderPair *task, s32 dist) {
 
 #include "common/get_angle.inc.c"
 
+/*
+ * Moves the wandering pair, turning it every period frames: back home when
+ * it is more than 30 away, otherwise anywhere
+ */
 void moveWanderPair(StageWanderPair *task) {
     s32 dx;
     s32 dy;
@@ -395,6 +425,11 @@ void moveWanderPair(StageWanderPair *task) {
     task->posY = task->y >> 8;
 }
 
+/*
+ * One of the nine pairs of map objects that wander by the Digi-Egg of
+ * Knowledge: tileAnim and tileAnim + 9 move together, their colors cycling;
+ * when done they fade out
+ */
 void updateWanderPair(StageWanderPair *task) {
     StageTile *tile;
     StageTile *object;
@@ -491,6 +526,10 @@ void updateWanderPair(StageWanderPair *task) {
     }
 }
 
+/*
+ * Makes the wandering pair fade out in 60 frames, once the player takes the
+ * Digi-Egg of Knowledge (event 760)
+ */
 void fadeOutWanderPair(StageWanderer *task) {
     if (task != NULL) {
         task->mode = 2;
@@ -498,6 +537,7 @@ void fadeOutWanderPair(StageWanderer *task) {
     }
 }
 
+/* Creates a wandering pair (updateWanderPair) with an id; nothing in the game calls it */
 void *createWanderPair(s32 arg) {
     return createTaskWithId(updateWanderPair, sizeof(StageWanderPair), 0, arg);
 }
@@ -532,6 +572,10 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 760, with the player: moves the story on to its step 0x1E and
+ * gives the player the DE Knowledge
+ */
 void endEvent760(void) {
     GAME.progress = 0x1E;
     FLAGS_00.applyAction(ITEM(0, 0x11), 1);
@@ -546,6 +590,7 @@ void endEvent760(void) {
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x6B8
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0015 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

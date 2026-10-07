@@ -113,15 +113,24 @@ void handleCommand845(Task *task, s32 id) {
     }
 }
 
+/*
+ * After event 1060, with the player: starts the stage's event battle 0 and
+ * keeps it from playing again
+ */
 void endEvent1060(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x74), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/* After event 1070, with the player: keeps it from playing again */
 void endEvent1070(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x75), 1);
 }
 
+/*
+ * After event 1080, with Snatchmon: moves the story on to
+ * FIELD_PROGRESS_MOVIE_BATTLES and starts the stage's event battle 1
+ */
 void endEvent1080(void) {
     GAME.progress = FIELD_PROGRESS_MOVIE_BATTLES;
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
@@ -136,6 +145,7 @@ void endEvent1080(void) {
 #define EVENT_TEXT_FILE 0x151
 #define STAGE_FILE 0x715
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0206 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

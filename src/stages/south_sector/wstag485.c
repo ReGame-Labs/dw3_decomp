@@ -9,6 +9,7 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+/* After event 1530, with the player: keeps it from playing again */
 void endEvent1530(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x51), 1);
 }
@@ -22,6 +23,7 @@ void endEvent1530(void) {
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x3B6
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0014 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

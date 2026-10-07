@@ -150,26 +150,35 @@ void updateStage(StageTask *task, void **children) {
 #include "common/update_stage_effect.inc.c"
 #include "common/create_stage_effect.inc.c"
 
+/* After event 820, with Chamber Officer: moves the story on to its step 0x20 */
 void endEvent820(void) {
     GAME.progress = 0x20;
 }
 
+/* After event 860, with Chamber Office: keeps it from playing again */
 void endEvent860(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x48), 1);
 }
 
+/* After event 883, with Chamber Officer: keeps it from playing again */
 void endEvent883(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x47), 1);
 }
 
+/* After event 884, with the player: keeps it from playing again */
 void endEvent884(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x62), 1);
 }
 
+/* After event 886, with the player: moves the story on to its step 0x21 */
 void endEvent886(void) {
     GAME.progress = 0x21;
 }
 
+/*
+ * After event 1245, with Guardromon: applies 0x7C0A, an action that does
+ * nothing (applyAction's mode changes 0x7C are only 0 and 1)
+ */
 void endEvent1245(void) {
     FLAGS_00.applyAction(0x7C0A, 1);
 }
@@ -183,6 +192,7 @@ void endEvent1245(void) {
 #define EVENT_TEXT_FILE 0x14A
 #define STAGE_FILE 0x6C1
 #endif
+/* Sets the stage up: its map, actors and events, playing the ambience ENV_0024 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

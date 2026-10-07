@@ -63,6 +63,7 @@ void updateBackground(StageTask *task) {
     }
 }
 
+/* Creates the spy satellite's background (updateBackground) */
 void *createBackground(void) {
     return createTask(updateBackground, 0x60, 0);
 }
@@ -107,24 +108,38 @@ StageTask *startStage(void *owner) {
 #include "common/update_stage_effect.inc.c"
 #include "common/create_stage_effect.inc.c"
 
+/*
+ * After event 1020, with Metal Soldier: starts the stage's event battle 0
+ * and keeps it from playing again
+ */
 void endEvent1020(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x70), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1030, with Metal Soldier: starts the stage's event battle 0
+ * and keeps it from playing again
+ */
 void endEvent1030(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x71), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/* After event 1040, with the player: keeps it from playing again */
 void endEvent1040(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x72), 1);
 }
 
+/* After event 1041, with the player: keeps it from playing again */
 void endEvent1041(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xA9), 1);
 }
 
+/*
+ * After event 1050, with the player: starts the stage's event battle 1 and
+ * keeps it from playing again
+ */
 void endEvent1050(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x73), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
@@ -139,6 +154,7 @@ void endEvent1050(void) {
 #define EVENT_TEXT_FILE 0x151
 #define STAGE_FILE 0x776
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0026 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.sheetEntry = STAGE_FILE << 16;

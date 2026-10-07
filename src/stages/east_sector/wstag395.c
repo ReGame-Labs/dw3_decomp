@@ -32,10 +32,16 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 80, with Teddy: keeps it from playing again */
 void endEvent80(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x11), 1);
 }
 
+/*
+ * After event 1305, with Veemon: gives the player the Tree Boots, clears
+ * flag 0x1C08 (which decides whether actors 11 to 22 in WSTAG255 appear) and
+ * keeps it from playing again
+ */
 void endEvent1305(void) {
     FLAGS_00.applyAction(ITEM(0, 4), 1);
     FLAGS_00.applyAction(FLAG(0x1A, 0x28), 1);
@@ -53,6 +59,7 @@ void endEvent1305(void) {
 #define STAGE_FILE 0x21B
 #define STAGE_ARCHIVE 0x31F
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0006 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

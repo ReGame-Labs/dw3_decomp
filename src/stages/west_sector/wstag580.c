@@ -32,36 +32,58 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 440, with Numemon: sets flag 0x1C1F and keeps it from playing again */
 void endEvent440(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x3C), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x1F), 1);
 }
 
+/*
+ * After event 450, with the player: lets event 460 of WSTAG585 start and
+ * keeps it from playing again
+ */
 void endEvent450(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x21), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x20), 1);
 }
 
+/*
+ * After event 470, with Numemon: sets flag 0x1C22 (which decides whether
+ * actor 0 in WSTAG600 appears) and keeps it from playing again
+ */
 void endEvent470(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x34), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x22), 1);
 }
 
+/*
+ * After event 480, with the player: sets flag 0x1C23 (which decides whether
+ * actor 0 in WSTAG590 appears) and keeps it from playing again
+ */
 void endEvent480(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x35), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x23), 1);
 }
 
+/*
+ * After event 490, with the player: sets flag 0x1C24 (which decides whether
+ * actor 0 in WSTAG595 appears) and keeps it from playing again
+ */
 void endEvent490(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x36), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x24), 1);
 }
 
+/*
+ * After event 500, with the player: sets flag 0x1C25 (which decides what
+ * actor 8 in WSTAG605 says) and keeps it from playing again
+ */
 void endEvent500(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x37), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x25), 1);
 }
 
+/* After event 520, with the player: keeps it from playing again */
 void endEvent520(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x38), 1);
 }
@@ -75,6 +97,7 @@ void endEvent520(void) {
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x780
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0017 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

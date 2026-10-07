@@ -190,6 +190,10 @@ void handleCommand840(StageTileQuad *task, s32 id) {
     }
 }
 
+/*
+ * Creates the map objects of event 881, where the Juggernaut launches
+ * (updateTileQuad), with an id
+ */
 void *createTileQuad(s32 arg) {
     return createTaskWithId(updateTileQuad, sizeof(StageTileQuad), 0, arg);
 }
@@ -344,15 +348,21 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0xC
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 880, with Royal Guard: starts the stage's event battle 0 and
+ * keeps it from playing again
+ */
 void endEvent880(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x46), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/* After event 881, with the player: gives the player the Wing Helmet */
 void endEvent881(void) {
     FLAGS_00.applyAction(ITEM(5, 0xF0), 1);
 }
 
+/* After event 882, with Royal Guard: keeps it from playing again */
 void endEvent882(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x65), 1);
 }
@@ -367,6 +377,7 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #define EVENT_TEXT_FILE 0x151
 #define STAGE_FILE 0x672
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0011 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

@@ -9,6 +9,10 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 720, with Boy and Courageous Kenny: gives the player the Crony
+ * ID and keeps it from playing again
+ */
 void endEvent720(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x1D), 1);
     FLAGS_00.applyAction(ITEM(0, 0x18C), 1);
@@ -23,6 +27,7 @@ void endEvent720(void) {
 #define EVENT_TEXT_FILE 0x127
 #define STAGE_FILE 0x585
 #endif
+/* Sets the stage up: its map, actors and events, playing the ambience ENV_0009 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

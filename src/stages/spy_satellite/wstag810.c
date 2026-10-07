@@ -207,21 +207,34 @@ void *startEvent9001(void) {
     return NULL;
 }
 
+/*
+ * After event 990, with the player: sets flag 0x1C3A (which decides whether
+ * actor 0 appears) and keeps it from playing again
+ */
 void endEvent990(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x6D), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x3A), 1);
 }
 
+/*
+ * After event 1000, with the player: sets flag 0x1C3B (which decides whether
+ * actor 1 appears) and keeps it from playing again
+ */
 void endEvent1000(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x6E), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x3B), 1);
 }
 
+/*
+ * After event 1010, with the player: sets flag 0x1C3C (which decides whether
+ * actor 2 appears) and keeps it from playing again
+ */
 void endEvent1010(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x6F), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x3C), 1);
 }
 
+/* After event 1035, with the player: moves the story on to its step 0x29 */
 void endEvent1035(void) {
     GAME.progress = 0x29;
 }
@@ -233,6 +246,11 @@ void endEvent1035(void) {
 #define STAGE_TEXT (LANGUAGE + 0xF6)
 #define EVENT_TEXT_FILE 0x151
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing BGM_0026,
+ * with the first triggers map when the player comes in, and the second one
+ * kept when back from a battle or a menu that left it in use
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

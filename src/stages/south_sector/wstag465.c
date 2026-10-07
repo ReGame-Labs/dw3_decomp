@@ -18,6 +18,7 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #define STAGE_FILE 0x1C3
 #define STAGE_ARCHIVE 0x3E1
 #endif
+/* Sets the stage up: its map, actors and battles, playing the ambience ENV_0012 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

@@ -12,6 +12,7 @@
 #include "common/start_stage.inc.c"
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
+/* Sets the stage up: its map, actors and battles, playing FIELDBGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = LANGUAGE + 0x104;
     FIELDSTG_state.mapFile = 0x1B4;

@@ -111,6 +111,10 @@ StageTileSet *createTileSet(void) {
     return task;
 }
 
+/*
+ * Command 835 of the event scripts: the map objects of event 1, where the
+ * Account Clerk sets up the accounts (updateTileSet)
+ */
 void *createCommand835(s32 arg) {
     return createTaskWithId(updateTileSet, sizeof(StageTileSet), 0, arg);
 }
@@ -208,6 +212,7 @@ void updateActorMark(StageActorMark *task) {
     }
 }
 
+/* Command 807 of the event scripts: the mark over a character in event 1 (updateActorMark) */
 void *createCommand807(s32 arg) {
     return createTaskWithId(updateActorMark, sizeof(StageActorMark), 0, arg);
 }
@@ -262,6 +267,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/* After event 1, with Junior, Teddy, Account Clerk and Ivy: moves the story on to its step 1 */
 void endEvent1(void) {
     GAME.progress = 1;
 }
@@ -278,6 +284,7 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #define STAGE_FILE 0x1C7
 #define STAGE_ARCHIVE 0x3E2
 #endif
+/* Sets the stage up: its map, actors and events, playing ON_CNBGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

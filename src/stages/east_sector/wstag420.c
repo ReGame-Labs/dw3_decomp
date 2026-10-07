@@ -25,11 +25,16 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 70, with Seiryu Leader: lets event 71 start and starts the stage's event battle 1 */
 void endEvent70(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x12), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
+/*
+ * After event 71, with Seiryu Leader: gives the player the Silver ID and the
+ * Seiryu Badge and moves the story on to its step 5
+ */
 void endEvent71(void) {
     FLAGS_00.applyAction(ITEM(0, 0x28), 1);
     FLAGS_00.applyAction(ITEM(0, 9), 1);
@@ -45,6 +50,10 @@ void endEvent71(void) {
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x784
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing SEIR_BGM;
+ * BGM_0029 instead at story steps 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

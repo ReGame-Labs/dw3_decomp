@@ -9,6 +9,11 @@
 /* Defined below, after the code that uses them */
 extern StageSeqStep updateTileSeqs8Steps[4][4];
 
+/*
+ * stepTileAnimation (common/step_tile_animation.inc.c) for a StageTileSeq8:
+ * steps OBJ's animation through FRAMES and returns its frame, looping at the
+ * end or returning 0xFF if once
+ */
 s32 stepTileAnimation(StageTileSeq8 *obj, AnimFrame *frames, s32 once, s32 depth) {
     AnimFrame *frame = &frames[obj->anim.index];
     s32 dt = GFX.funcs.getFrameTime();
@@ -37,6 +42,10 @@ s32 stepTileAnimation(StageTileSeq8 *obj, AnimFrame *frames, s32 once, s32 depth
     return frame->frame;
 }
 
+/*
+ * Plays the steps of updateTileSeqs8Steps on the map objects with animations
+ * 1 to 4, which go on to their next step at the end, the last with a sound
+ */
 void updateTileSeqs8(StageTileSeqs8 *task) {
     StageTile *object;
     s32 n;
@@ -117,6 +126,10 @@ void updateTileSeqs8(StageTileSeqs8 *task) {
     }
 }
 
+/*
+ * Command 849 of the event scripts: the map objects of event 532, at Lucky
+ * Mouse's hideout (updateTileSeqs8)
+ */
 void *createCommand849(s32 arg) {
     return createTaskWithId(updateTileSeqs8, sizeof(StageTileSeqs8), 0, arg);
 }
@@ -147,20 +160,30 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 532, with Lucky Mouse, Lisa, Kail, General and Attacker:
+ * starts the stage's event battle 0 and keeps it from playing again
+ */
 void endEvent532(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x3B), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/* After event 534, with Attacker, Lisa, Kail and Kurt: moves the story on to its step 0x14 */
 void endEvent534(void) {
     GAME.progress = 0x14;
 }
 
+/*
+ * After event 540, with Kail, Kurt and Lisa: lets event 550 of WSTAG525
+ * start and keeps it from playing again
+ */
 void endEvent540(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x1C), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0x3A), 1);
 }
 
+/* After event 551, with Lisa, Keith, Nick and Kail: moves the story on to its step 0x15 */
 void endEvent551(void) {
     GAME.progress = 0x15;
 }
@@ -174,6 +197,7 @@ void endEvent551(void) {
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x489
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0019 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

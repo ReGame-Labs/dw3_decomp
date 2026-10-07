@@ -89,11 +89,19 @@ void updateStage(StageTask *task, void **children) {
 #include "common/update_stage_effect.inc.c"
 #include "common/create_stage_effect.inc.c"
 
+/*
+ * After event 810, with Dark Knight: starts the stage's event battle 0 and
+ * keeps it from playing again
+ */
 void endEvent810(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x41), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 811, with Dark Knight: gives the player the Brave Sword and
+ * keeps it from playing again
+ */
 void endEvent811(void) {
     FLAGS_00.applyAction(ITEM(4, 0xA3), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0x42), 1);
@@ -110,6 +118,10 @@ void endEvent811(void) {
 #define STAGE_FILE 0x6EE
 #define STAGE_FILE_8 0x710
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing BGM_0023,
+ * with the Dark Dungeon's darkness off when the player comes in
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE_8;

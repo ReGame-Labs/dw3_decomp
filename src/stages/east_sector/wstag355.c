@@ -22,6 +22,11 @@ extern FieldBattles stageBattles2[];
 #define STAGE_FILE 0x1BB
 #define STAGE_ARCHIVE 0x3D5
 #endif
+/*
+ * Sets the stage up: its map, actors and battles, playing the ambience
+ * ENV05_00; battle list 0 before story step 0xB, 1 before story step 0x18, 2
+ * from then on
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

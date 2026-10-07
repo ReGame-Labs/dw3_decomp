@@ -6,7 +6,7 @@
 #define STAGE_TWEEN /* stageFuncs is a StageFuncs (stage.h) */
 #include "stage.h"
 /* Defined below, after the code that uses them */
-extern s32 updateListMenuCountFrames[];
+extern s32 listWindowFrames[];
 
 /* The text file of the menus, which the versions number differently */
 #if VERSION_US
@@ -15,29 +15,17 @@ extern s32 updateListMenuCountFrames[];
 #define MENU_TEXT 0x112
 #endif
 
+#include "common/list_menu.inc.c"
+
 /* A list of up to eight options that each open a message */
 void updateListMenu(StageListMenu *task, StageListMenuChildren *children) {
     SpriteDrawer drawer;
     s32 prev;
-    s32 i;
-    s32 j;
-    s32 k;
 
     switch (task->state) {
     case TASK_INIT:
     default:
-        task->nextState(task);
-        task->tweens[0].duration = 10;
-        task->tweens[1].duration = 10;
-        for (i = 0; i < 8; i++) {
-            children->options[i] = createTextWindow(FIELD_LAYER_MAP, 1, 0xBD, 0x21 + i * 14);
-            children->options[i]->setDepth(children->options[i], 1);
-        }
-        children->cursor = createCursor(FIELD_LAYER_MAP, 1, 0xAF, 0x21);
-        children->cursor->setVisible(children->cursor, 0);
-        children->message = createTextWindow(FIELD_LAYER_MAP, 1, 0x12, 0xB0);
-        children->message->setLines(children->message, 3);
-        task->count = 8;
+        createListMenu(task, children);
         break;
     case TASK_RUN:
         switch (task->substate) {
@@ -48,40 +36,26 @@ void updateListMenu(StageListMenu *task, StageListMenuChildren *children) {
             break;
         case 1:
             if (stageFuncs.update(&task->tweens[0])) {
-                for (j = 0; j < task->count; j++) {
-                    children->options[j]->setString(children->options[j], FILE_CACHE.getEntry(TEXT_ENTRY(MENU_TEXT, 0x1)), j + 1);
-                }
-                children->cursor->setVisible(children->cursor, 1);
+                showListMenuOptions(task, children, 0x1);
                 task->substate++;
             }
             break;
         case 2:
             prev = task->cursor;
-            if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_UP)) & 1) ||
-                ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_UP)) & 1)) {
-                if (--task->cursor < 0) {
-                    task->cursor = 0;
-                }
-            } else if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1) ||
-                       ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1)) {
-                task->cursor++;
-                if (task->cursor > task->count - 1) {
-                    task->cursor = task->count - 1;
-                }
-            }
+            moveListMenuCursor(task);
             if (prev != task->cursor) {
                 SOUND.playSound(SOUND_CURSOR);
                 children->cursor->setPos(children->cursor, 0xAF, task->cursor * 14 + 0x21);
                 break;
             }
-            if ((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_CROSS)) & 1) {
+            if (PAD_PRESSED(PAD_CROSS)) {
                 SOUND.playSound(SOUND_SELECT);
                 if (task->cursor == task->count - 1) {
                     task->substate = 10;
                 } else {
                     task->substate++;
                 }
-            } else if ((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_TRIANGLE)) & 1) {
+            } else if (PAD_PRESSED(PAD_TRIANGLE)) {
                 SOUND.playSound(SOUND_MENU_CANCEL);
                 task->substate = 10;
             }
@@ -94,24 +68,12 @@ void updateListMenu(StageListMenu *task, StageListMenuChildren *children) {
             break;
         case 4:
             if (stageFuncs.update(&task->tweens[1])) {
-                children->message->setString(children->message, FILE_CACHE.getEntry(TEXT_ENTRY(MENU_TEXT, 0x1)), task->cursor + 9);
-                children->message->setTypeDelay(children->message, 6);
+                openListMenuMessage(task, children, 0x1);
                 task->substate++;
             }
             break;
         case 5:
-            if (children->message->isFinished(children->message)) {
-                task->substate++;
-            } else if (children->message->isWaitingForButton(children->message)) {
-                if ((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_CROSS)) & 1) {
-                    SOUND.playSound(SOUND_MENU_CONFIRM);
-                    task->showArrow = 0;
-                } else {
-                    task->showArrow = 1;
-                }
-            } else if ((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_CROSS)) & 1) {
-                children->message->showPage(children->message);
-            }
+            readListMenuMessage(task, children);
             break;
         case 6:
             stageFuncs.start(&task->tweens[1], 0);
@@ -126,12 +88,7 @@ void updateListMenu(StageListMenu *task, StageListMenuChildren *children) {
             }
             break;
         case 10:
-            for (k = 0; k < task->count; k++) {
-                children->options[k]->setVisible(children->options[k], 0);
-            }
-            children->cursor->setVisible(children->cursor, 0);
-            stageFuncs.start(&task->tweens[0], 0);
-            task->substate++;
+            closeListMenu(task, children);
             break;
         case 11:
             if (stageFuncs.update(&task->tweens[0])) {
@@ -159,7 +116,7 @@ void updateListMenu(StageListMenu *task, StageListMenuChildren *children) {
                 drawer.setScale(task->tweens[0].value, 0x1000, 0x1000);
                 drawer.setPivot(0x140, 0x56);
             }
-            drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), updateListMenuCountFrames[task->count - 5], 0xA8, 0x18);
+            drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), listWindowFrames[task->count - 5], 0xA8, 0x18);
         }
         if (task->tweens[1].value != 0) {
             if (task->tweens[1].value != 0x1000) {
@@ -178,6 +135,11 @@ void updateListMenu(StageListMenu *task, StageListMenuChildren *children) {
     }
 }
 
+/*
+ * Starts event 8, the guide to Digimon Online: a list of topics (Objective,
+ * City Guide, Field Guide, Battle Tips, Training Basics, Status Screen...)
+ * that each open a message
+ */
 void *startEvent8(void) {
     return createTask(updateListMenu, sizeof(StageListMenu), sizeof(StageListMenuChildren));
 }
@@ -222,13 +184,11 @@ void updateEvent9(StageMenu *task, StageMenuChildren *children) {
             break;
         case 2:
             prev = task->cursor;
-            if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_UP)) & 1) ||
-                ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_UP)) & 1)) {
+            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
                 if (--task->cursor < 0) {
                     task->cursor = 0;
                 }
-            } else if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1) ||
-                       ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1)) {
+            } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
                 task->cursor++;
                 if (task->cursor > 1) {
                     task->cursor = 1;
@@ -239,7 +199,7 @@ void updateEvent9(StageMenu *task, StageMenuChildren *children) {
                 children->cursor->setPos(children->cursor, 0x12, task->cursor * 14 + 0xBE);
                 break;
             }
-            if ((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_CROSS)) & 1) {
+            if (PAD_PRESSED(PAD_CROSS)) {
                 SOUND.playSound(SOUND_SELECT);
                 task->substate = 10;
                 task->step = 1;
@@ -291,6 +251,10 @@ void updateEvent9(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
+/*
+ * Starts event 9, which asks whether to download the partner Digimon now:
+ * yes starts event 13, no event 14
+ */
 void *startEvent9(void) {
     return createTask(updateEvent9, sizeof(StageMenu), sizeof(StageMenuChildren));
 }
@@ -335,13 +299,11 @@ void updateEvent1510(StageMenu *task, StageMenuChildren *children) {
             break;
         case 2:
             prev = task->cursor;
-            if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_UP)) & 1) ||
-                ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_UP)) & 1)) {
+            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
                 if (--task->cursor < 0) {
                     task->cursor = 0;
                 }
-            } else if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1) ||
-                       ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1)) {
+            } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
                 task->cursor++;
                 if (task->cursor > 1) {
                     task->cursor = 1;
@@ -352,7 +314,7 @@ void updateEvent1510(StageMenu *task, StageMenuChildren *children) {
                 children->cursor->setPos(children->cursor, 0x12, task->cursor * 14 + 0xBE);
                 break;
             }
-            if ((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_CROSS)) & 1) {
+            if (PAD_PRESSED(PAD_CROSS)) {
                 SOUND.playSound(SOUND_SELECT);
                 task->substate = 10;
                 task->step = 1;
@@ -404,6 +366,10 @@ void updateEvent1510(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
+/*
+ * Starts event 1510, which asks whether to listen to basic tamer
+ * information: yes starts event 58, no event 1511
+ */
 void *startEvent1510(void) {
     return createTask(updateEvent1510, sizeof(StageMenu), sizeof(StageMenuChildren));
 }
@@ -435,11 +401,17 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 310, with Kail: sets flag 0x4005 and keeps it from playing again */
 void endEvent310(void) {
     FLAGS_00.applyAction(FLAG(0x40, 5), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0xB), 1);
 }
 
+/*
+ * After event 685, with Teddy: moves the story on to its step 0x18 and
+ * clears flag 0x1C26 (which decides whether actors 17, 19, 21 and 23 in
+ * WSTAG660 appear)
+ */
 void endEvent685(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x26), 0);
     GAME.progress = 0x18;
@@ -459,6 +431,10 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0 };
 #define STAGE_FILE 0x19B
 #define STAGE_ARCHIVE 0x322
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing KANRIBGM;
+ * BGM_0029 instead at story steps 0x14 to 0x17 and 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;
@@ -828,7 +804,8 @@ s16 script1511[] = {
     0x300, 0x1E,
     0,
 };
-s32 updateListMenuCountFrames[] = {
+/* MENU_SPRITES' frame of the list's window, by the number of options (5 to 8) */
+s32 listWindowFrames[] = {
     28, 27, 25, 36,
 };
 Battle area0Battle0 = { 0, 0, MUSIC(1, 0) };

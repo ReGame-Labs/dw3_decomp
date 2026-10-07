@@ -10,6 +10,7 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+/* Sets the stage up: its map and actors, playing ASKA_BGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = LANGUAGE + 0xFD;
     FIELDSTG_state.mapFile = 0x2B7;

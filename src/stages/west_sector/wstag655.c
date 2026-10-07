@@ -25,11 +25,19 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 430, with Byakko Leader: lets event 431 start and starts the
+ * stage's event battle 0
+ */
 void endEvent430(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x3E), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 431, with Byakko Leader: moves the story on to its step 0x11
+ * and gives the player the Byakko Badge
+ */
 void endEvent431(void) {
     GAME.progress = 0x11;
     FLAGS_00.applyAction(ITEM(0, 0xB), 1);
@@ -44,6 +52,10 @@ void endEvent431(void) {
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x497
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing BGM_0020;
+ * BGM_0029 instead at story steps 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

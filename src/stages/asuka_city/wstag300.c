@@ -27,17 +27,27 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 570, with Soldier: starts the stage's event battle 1, sets
+ * flag 0x0C11 (which decides whether actor 15 appears) and keeps it from
+ * playing again
+ */
 void endEvent570(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x4A), 1);
     FLAGS_00.applyAction(FLAG(0xC, 0x11), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
+/*
+ * After event 571, with the player: starts the stage's event battle 2 and
+ * keeps it from playing again
+ */
 void endEvent571(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x4B), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(2), 1);
 }
 
+/* After event 572, with the player: keeps it from playing again */
 void endEvent572(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x4C), 1);
 }
@@ -51,6 +61,10 @@ void endEvent572(void) {
 #define EVENT_TEXT_FILE 0x127
 #define STAGE_FILE 0x34F
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing KANRIBGM;
+ * BGM_0029 instead at story steps 0x14 to 0x17 and 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

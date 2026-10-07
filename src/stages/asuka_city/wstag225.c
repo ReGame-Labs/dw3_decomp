@@ -109,10 +109,15 @@ void handleCommand815(StageTileEffect *task, s32 id) {
     }
 }
 
+/*
+ * Command 815 of the event scripts: the effect of event 5, the player's
+ * arrival at the Asuka Server
+ */
 void *createCommand815(s32 arg) {
     return createTaskWithId(updateTileEffect, sizeof(StageTileEffect), 0, arg);
 }
 
+/* Creates the arrival effect (updateTileEffect) without an id; nothing in the game calls it */
 void *createTileEffect(void) {
     return createTask(updateTileEffect, sizeof(StageTileEffect), 0);
 }
@@ -137,6 +142,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 5, with Account Clerk: moves the story on to its step 2 */
 void endEvent5(void) {
     GAME.progress = 2;
 }
@@ -152,6 +158,10 @@ void endEvent5(void) {
 #define STAGE_FILE 0x19F
 #define STAGE_ARCHIVE 0x3CD
 #endif
+/*
+ * Sets the stage up: its map, actors and events, playing the ambience
+ * ENV_0011; BGM_0029 instead at story steps 0x14 to 0x17 and 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

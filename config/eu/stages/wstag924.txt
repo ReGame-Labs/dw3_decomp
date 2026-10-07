@@ -37,5 +37,5 @@ updateEvent1604 = 0x800A6A94; // type:func
 startEvent1604 = 0x800A7400; // type:func
 
 // named by the function or table that uses them (tools/name_stage_uses.py)
-updateEvent1602CountFrames = 0x800A7A34;
-updateEvent1604CountFrames = 0x800A7A44;
+event1602WindowFrames = 0x800A7A34;
+event1604WindowFrames = 0x800A7A44;

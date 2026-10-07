@@ -18,6 +18,10 @@ extern AnimFrame *updateSpritePairFrames[];
 
 #include "common/start_events9000_to9015.inc.c"
 
+/*
+ * Back from the battle after event 1295, starts event 1296, with Fire
+ * Master, unless it has played
+ */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -45,76 +49,100 @@ void updateStage(StageTask *task, void **children) {
 
 #include "common/create_sprite_pair.inc.c"
 
+/*
+ * After event 1295, with Fire Master: starts the stage's event battle 0 and
+ * keeps it from playing again
+ */
 void endEvent1295(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x84), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1296, with Fire Master: gives the player the Mind Chip and
+ * keeps it from playing again
+ */
 void endEvent1296(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x85), 1);
     FLAGS_00.applyAction(ITEM(1, 0x33), 1);
 }
 
+/* After the trap of event 9000 goes off: keeps it from going off again */
 void endEvent9000(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xBA), 1);
 }
 
+/* After the trap of event 9001 goes off: keeps it from going off again */
 void endEvent9001(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xBB), 1);
 }
 
+/* After the trap of event 9002 goes off: keeps it from going off again */
 void endEvent9002(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xBC), 1);
 }
 
+/* After the trap of event 9003 goes off: keeps it from going off again */
 void endEvent9003(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xBD), 1);
 }
 
+/* After the trap of event 9004 goes off: keeps it from going off again */
 void endEvent9004(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xBE), 1);
 }
 
+/* After the trap of event 9005 goes off: keeps it from going off again */
 void endEvent9005(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xBF), 1);
 }
 
+/* After the trap of event 9006 goes off: keeps it from going off again */
 void endEvent9006(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xC0), 1);
 }
 
+/* After the trap of event 9007 goes off: keeps it from going off again */
 void endEvent9007(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xC1), 1);
 }
 
+/* After the trap of event 9008 goes off: keeps it from going off again */
 void endEvent9008(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xC2), 1);
 }
 
+/* After the trap of event 9009 goes off: keeps it from going off again */
 void endEvent9009(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xC3), 1);
 }
 
+/* After the trap of event 9010 goes off: keeps it from going off again */
 void endEvent9010(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xC4), 1);
 }
 
+/* After the trap of event 9011 goes off: keeps it from going off again */
 void endEvent9011(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xC5), 1);
 }
 
+/* After the trap of event 9012 goes off: keeps it from going off again */
 void endEvent9012(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xC6), 1);
 }
 
+/* After the trap of event 9013 goes off: keeps it from going off again */
 void endEvent9013(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xC7), 1);
 }
 
+/* After the trap of event 9014 goes off: keeps it from going off again */
 void endEvent9014(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xC8), 1);
 }
 
+/* After the trap of event 9015 goes off: keeps it from going off again */
 void endEvent9015(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xC9), 1);
 }
@@ -128,6 +156,7 @@ void endEvent9015(void) {
 #define EVENT_TEXT_FILE 0x14A
 #define STAGE_FILE 0x751
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0023 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;
@@ -207,6 +236,7 @@ s16 script1296[] = {
     0x300, 0x1E,
     0,
 };
+/* The actor ids of the party's three partners, as FIELDSTG's partner lists */
 s32 partyActorIds[] = {
     2, 4, 8,
 };

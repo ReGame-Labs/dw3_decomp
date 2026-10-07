@@ -9,6 +9,10 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 1459, with Guardromon: applies 0x7C16, an action that does
+ * nothing (applyAction's mode changes 0x7C are only 0 and 1)
+ */
 void endEvent1459(void) {
     FLAGS_00.applyAction(0x7C16, 1);
 }
@@ -24,6 +28,7 @@ void endEvent1459(void) {
 #define STAGE_FILE 0x2B0
 #define STAGE_ARCHIVE 0x324
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0025 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

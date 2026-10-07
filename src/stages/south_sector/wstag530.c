@@ -20,6 +20,10 @@ extern StageSlot stageSlots1[];
 #define STAGE_FILE 0x279
 #define STAGE_ARCHIVE 0x3DD
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing BGM_0015;
+ * slot list 0 before story step 0x1A, 1 from then on
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

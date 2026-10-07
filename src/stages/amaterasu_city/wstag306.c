@@ -12,6 +12,10 @@ extern AnimFrame updateSoundTileFrames[];
 
 #include "common/update_sound_tile.inc.c"
 
+/*
+ * Command 851 of the event scripts: told 0x335 in event 930, opens the
+ * secret door, with its sound
+ */
 void handleCommand851(StageSoundTile *task, s32 id) {
     if (task != NULL && id == 0x335) {
         task->voice = SOUND.playSound(SOUND_COMCD115);
@@ -60,6 +64,10 @@ void updateStage(StageTask *task, void **children) {
 #define EVENT_TEXT_FILE 0x127
 #define STAGE_FILE 0x546
 #endif
+/*
+ * Sets the stage up: its map, actors and events, playing KANRIBGM; BGM_0029
+ * instead except at story step 0x26 once flag 0x1A0A is set
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

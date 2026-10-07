@@ -8,6 +8,7 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+/* After event 1264, with Soccer Kid Hide: sets flag 0x1C07 and keeps it from playing again */
 void endEvent1264(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 7), 1);
     FLAGS_00.applyAction(FLAG(0x1A, 0x22), 1);
@@ -23,6 +24,11 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #define EVENT_TEXT_FILE 0x127
 #define STAGE_FILE 0x3A6
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing the
+ * ambience ENV_0014; BGM_0029 instead at story steps 0x27 to 0x28; battle
+ * list 0 before story step 0xB, 1 from then on
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

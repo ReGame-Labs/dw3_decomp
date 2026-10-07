@@ -24,6 +24,7 @@ handleCommand801 = 0x800A7450; // type:func
 createCommand801 = 0x800A749C; // type:func
 endEvent0 = 0x800A760C; // type:func
 endEvent885 = 0x800A7618; // type:func
+endEvent1500 = 0x800A7644; // type:func version-only
 script0 = 0x800A7798;
 script684 = 0x800A7B4C;
 script742 = 0x800A7C74;

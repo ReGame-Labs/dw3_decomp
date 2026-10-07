@@ -5,6 +5,11 @@
 #include "common.h"
 #include "stage.h"
 
+/*
+ * Command 833 of the event scripts, which none of them uses: shows map
+ * objects 1 and 2 instead of 3 and 4 while running, and the other way round
+ * once done
+ */
 void updateCommand833(StageTask *task) {
     StageTile *tile;
 
@@ -54,6 +59,7 @@ void updateCommand833(StageTask *task) {
     }
 }
 
+/* Command 833 of the event scripts: creates its task (updateCommand833) with the given id */
 void *createCommand833(s32 arg) {
     return createTaskWithId(updateCommand833, 0x50, 0, arg);
 }
@@ -65,6 +71,7 @@ void handleCommand833(StageTask *task, s32 id) {
     }
 }
 
+/* Back from the battle after event 375, starts event 376, with Datamon, unless it has played */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -84,16 +91,22 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/* After event 375, with Datamon: lets event 376 start and starts the stage's event battle 0 */
 void endEvent375(void) {
     FLAGS_00.applyAction(FLAG(0x40, 8), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 376, with Datamon: gives the player the Rusty Glove and keeps
+ * it from playing again
+ */
 void endEvent376(void) {
     FLAGS_00.applyAction(FLAG(0x40, 9), 1);
     FLAGS_00.applyAction(ITEM(3, 0x74), 1);
 }
 
+/* After event 560, with Datamon: moves the story on to its step 0x16 */
 void endEvent560(void) {
     GAME.progress = 0x16;
 }
@@ -107,6 +120,7 @@ void endEvent560(void) {
 #define EVENT_TEXT_FILE 0x127
 #define STAGE_FILE 0x765
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0003 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

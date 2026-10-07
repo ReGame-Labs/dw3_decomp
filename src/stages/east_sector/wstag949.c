@@ -7,7 +7,7 @@
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */
-extern s32 farSpriteSpots[][2];
+extern Vec2 farSpriteSpots[];
 
 /* Draws the 36 sprites of file 0x919 at their places, scrolling at 1/8 of the layer */
 void updateFarSprites(StageTask *task) {
@@ -32,7 +32,7 @@ void updateFarSprites(StageTask *task) {
         pos[0] = (scroll[0] - 0x2C0) >> 3;
         pos[1] = (scroll[1] - 0x280) >> 3;
         for (i = 0; i < 0x24; i++) {
-            drawer.draw(FILE_CACHE.getEntry(0x9190000), 0, farSpriteSpots[i][0] + pos[0], farSpriteSpots[i][1] + pos[1]);
+            drawer.draw(FILE_CACHE.getEntry(0x9190000), 0, farSpriteSpots[i].x + pos[0], farSpriteSpots[i].y + pos[1]);
         }
         break;
     case TASK_DONE:
@@ -43,6 +43,7 @@ void updateFarSprites(StageTask *task) {
 
 #include "common/create_far_sprites.inc.c"
 
+/* The stage task: creates the far sprites (updateFarSprites) */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -61,6 +62,7 @@ void updateStage(StageTask *task, void **children) {
 #include "common/start_stage.inc.c"
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
+/* Sets the stage up: its map, actors, battles and events, playing PYRA_BGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = LANGUAGE + 0x104;
     FIELDSTG_state.mapFile = 0x1BE;
@@ -84,25 +86,16 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-s32 farSpriteSpots[][2] = {
-    596, 399, 809, 564,
-    820, 832, 1143, 1009,
-    738, 1035, 416, 1055,
-    36, 28, 140, 0,
-    178, 159, 218, 202,
-    186, 242, 299, 93,
-    418, 16, 440, 329,
-    476, 369, 725, 82,
-    1137, 24, 1213, 103,
-    1281, 147, 1349, 48,
-    669, 632, 491, 796,
-    661, 889, 624, 926,
-    998, 634, 1026, 648,
-    890, 940, 915, 959,
-    826, 1119, 1028, 1089,
-    1227, 1002, 1306, 861,
-    498, 1190, 146, 569,
-    187, 590, 394, 616,
+Vec2 farSpriteSpots[] = {
+    { 596, 399 }, { 809, 564 }, { 820, 832 }, { 1143, 1009 },
+    { 738, 1035 }, { 416, 1055 }, { 36, 28 }, { 140, 0 },
+    { 178, 159 }, { 218, 202 }, { 186, 242 }, { 299, 93 },
+    { 418, 16 }, { 440, 329 }, { 476, 369 }, { 725, 82 },
+    { 1137, 24 }, { 1213, 103 }, { 1281, 147 }, { 1349, 48 },
+    { 669, 632 }, { 491, 796 }, { 661, 889 }, { 624, 926 },
+    { 998, 634 }, { 1026, 648 }, { 890, 940 }, { 915, 959 },
+    { 826, 1119 }, { 1028, 1089 }, { 1227, 1002 }, { 1306, 861 },
+    { 498, 1190 }, { 146, 569 }, { 187, 590 }, { 394, 616 },
 };
 ActorImage stageImages[] = {
     { 0x200, 0x100, 0x21C, 0x1A6, 0x70, 0xA6, 0x230, 0x1FE },

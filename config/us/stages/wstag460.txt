@@ -54,6 +54,6 @@ updateTileDuoFrames0_1 = 0x800A6210;
 updateTileDuoFrames1_1 = 0x800A6250;
 updateTileDuoFrames0 = 0x800A6284;
 updateTileDuoFrames1 = 0x800A628C;
-tileDuoRecordFrames = 0x800A6294;
+tileDuoObjectFrames = 0x800A6294;
 wandererSpeeds = 0x800A62F4;
 angleTangents = 0x800A62FC;

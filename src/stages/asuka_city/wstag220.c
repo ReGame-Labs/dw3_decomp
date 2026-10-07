@@ -53,13 +53,11 @@ void updateEvent1512(StageMenu *task, StageMenuChildren *children) {
             break;
         case 2:
             prev = task->cursor;
-            if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_UP)) & 1) ||
-                ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_UP)) & 1)) {
+            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
                 if (--task->cursor < 0) {
                     task->cursor = 0;
                 }
-            } else if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1) ||
-                       ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1)) {
+            } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
                 task->cursor++;
                 if (task->cursor > 1) {
                     task->cursor = 1;
@@ -70,7 +68,7 @@ void updateEvent1512(StageMenu *task, StageMenuChildren *children) {
                 children->cursor->setPos(children->cursor, 0x12, task->cursor * 14 + 0xBE);
                 break;
             }
-            if ((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_CROSS)) & 1) {
+            if (PAD_PRESSED(PAD_CROSS)) {
                 SOUND.playSound(SOUND_SELECT);
                 task->substate = 10;
                 task->step = 1;
@@ -122,6 +120,10 @@ void updateEvent1512(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
+/*
+ * Starts event 1512, which asks whether to listen to partner Digimon
+ * information: yes starts event 53, no event 1513
+ */
 void *startEvent1512(void) {
     return createTask(updateEvent1512, sizeof(StageMenu), sizeof(StageMenuChildren));
 }
@@ -166,13 +168,11 @@ void updateEvent1514(StageMenu *task, StageMenuChildren *children) {
             break;
         case 2:
             prev = task->cursor;
-            if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_UP)) & 1) ||
-                ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_UP)) & 1)) {
+            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
                 if (--task->cursor < 0) {
                     task->cursor = 0;
                 }
-            } else if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1) ||
-                       ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1)) {
+            } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
                 task->cursor++;
                 if (task->cursor > 1) {
                     task->cursor = 1;
@@ -183,7 +183,7 @@ void updateEvent1514(StageMenu *task, StageMenuChildren *children) {
                 children->cursor->setPos(children->cursor, 0x12, task->cursor * 14 + 0xBE);
                 break;
             }
-            if ((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_CROSS)) & 1) {
+            if (PAD_PRESSED(PAD_CROSS)) {
                 SOUND.playSound(SOUND_SELECT);
                 task->substate = 10;
                 task->step = 1;
@@ -235,6 +235,10 @@ void updateEvent1514(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
+/*
+ * Starts event 1514, which asks whether to listen to digivolve information:
+ * yes starts event 55, no event 1515
+ */
 void *startEvent1514(void) {
     return createTask(updateEvent1514, sizeof(StageMenu), sizeof(StageMenuChildren));
 }
@@ -279,13 +283,11 @@ void updateEvent1516(StageMenu *task, StageMenuChildren *children) {
             break;
         case 2:
             prev = task->cursor;
-            if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_UP)) & 1) ||
-                ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_UP)) & 1)) {
+            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
                 if (--task->cursor < 0) {
                     task->cursor = 0;
                 }
-            } else if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1) ||
-                       ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1)) {
+            } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
                 task->cursor++;
                 if (task->cursor > 1) {
                     task->cursor = 1;
@@ -296,7 +298,7 @@ void updateEvent1516(StageMenu *task, StageMenuChildren *children) {
                 children->cursor->setPos(children->cursor, 0x12, task->cursor * 14 + 0xBE);
                 break;
             }
-            if ((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_CROSS)) & 1) {
+            if (PAD_PRESSED(PAD_CROSS)) {
                 SOUND.playSound(SOUND_SELECT);
                 task->substate = 10;
                 task->step = 1;
@@ -348,6 +350,10 @@ void updateEvent1516(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
+/*
+ * Starts event 1516, which asks whether to listen to digivolve information:
+ * yes starts event 56, no event 1517
+ */
 void *startEvent1516(void) {
     return createTask(updateEvent1516, sizeof(StageMenu), sizeof(StageMenuChildren));
 }
@@ -370,6 +376,10 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0 };
 #define STAGE_FILE 0x19D
 #define STAGE_ARCHIVE 0x2D6
 #endif
+/*
+ * Sets the stage up: its map, actors and events, playing the ambience
+ * ENV_0011; BGM_0029 instead at story steps 0x14 to 0x17 and 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

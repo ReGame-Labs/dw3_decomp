@@ -8,6 +8,7 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+/* After event 300, with Kail: moves the story on to its step 0xD */
 void endEvent300(void) {
     GAME.progress = 0xD;
 }
@@ -23,6 +24,7 @@ void endEvent300(void) {
 #define STAGE_FILE 0x2B8
 #define STAGE_ARCHIVE 0x33F
 #endif
+/* Sets the stage up: its map, actors and events, playing ASKA_BGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

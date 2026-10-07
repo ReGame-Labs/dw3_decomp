@@ -5,7 +5,7 @@
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the tables that use them */
-extern s32 farSpriteSpots[][2];
+extern Vec2 farSpriteSpots[];
 
 /* The file of the sprites, which the versions number differently */
 #if VERSION_US
@@ -37,7 +37,7 @@ void updateFarSprites(StageTask *task) {
         pos[0] = (scroll[0] - 0x2C0) >> 3;
         pos[1] = (scroll[1] - 0x280) >> 3;
         for (i = 0; i < 0x24; i++) {
-            drawer.draw(FILE_CACHE.getEntry(SPRITES << 16), 0, farSpriteSpots[i][0] + pos[0], farSpriteSpots[i][1] + pos[1]);
+            drawer.draw(FILE_CACHE.getEntry(SPRITES << 16), 0, farSpriteSpots[i].x + pos[0], farSpriteSpots[i].y + pos[1]);
         }
         break;
     case TASK_DONE:
@@ -69,11 +69,16 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/* After event 1260, with Pharaohmon: lets event 1261 start and starts the stage's event battle 0 */
 void endEvent1260(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x53), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1261, with Pharaohmon: gives the player the Old Wand and keeps
+ * it from playing again
+ */
 void endEvent1261(void) {
     FLAGS_00.applyAction(ITEM(3, 0x8D), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0x54), 1);
@@ -94,6 +99,10 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #define STAGE_FILE 0x1BF
 #define STAGE_ARCHIVE 0x2D1
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing PYRA_BGM;
+ * battle list 0 before story step 0xE, 1 from then on
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;
@@ -182,25 +191,16 @@ s16 script1261[] = {
     0x300, 0x3C,
     0,
 };
-s32 farSpriteSpots[][2] = {
-    596, 399, 809, 564,
-    820, 832, 1143, 1009,
-    738, 1035, 416, 1055,
-    36, 28, 140, 0,
-    178, 159, 218, 202,
-    186, 242, 299, 93,
-    418, 16, 440, 329,
-    476, 369, 725, 82,
-    1137, 24, 1213, 103,
-    1281, 147, 1349, 48,
-    669, 632, 491, 796,
-    661, 889, 624, 926,
-    998, 634, 1026, 648,
-    890, 940, 915, 959,
-    826, 1119, 1028, 1089,
-    1227, 1002, 1306, 861,
-    498, 1190, 146, 569,
-    187, 590, 394, 616,
+Vec2 farSpriteSpots[] = {
+    { 596, 399 }, { 809, 564 }, { 820, 832 }, { 1143, 1009 },
+    { 738, 1035 }, { 416, 1055 }, { 36, 28 }, { 140, 0 },
+    { 178, 159 }, { 218, 202 }, { 186, 242 }, { 299, 93 },
+    { 418, 16 }, { 440, 329 }, { 476, 369 }, { 725, 82 },
+    { 1137, 24 }, { 1213, 103 }, { 1281, 147 }, { 1349, 48 },
+    { 669, 632 }, { 491, 796 }, { 661, 889 }, { 624, 926 },
+    { 998, 634 }, { 1026, 648 }, { 890, 940 }, { 915, 959 },
+    { 826, 1119 }, { 1028, 1089 }, { 1227, 1002 }, { 1306, 861 },
+    { 498, 1190 }, { 146, 569 }, { 187, 590 }, { 394, 616 },
 };
 Battle battles0Area0Battle0 = { 47, 7, MUSIC(2, 0) };
 Battle battles0Area0Battle1 = { 47, 7, MUSIC(2, 0) };

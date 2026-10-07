@@ -83,38 +83,47 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/* After event 350, with Kail, Game Master and DO Guard: keeps it from playing again */
 void endEvent350(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0xD), 1);
 }
 
+/* After event 351, with Game Master and Kail: sets flag 0x1C0E */
 void endEvent351(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0xE), 1);
 }
 
+/* After event 660, with the player: clears flag 0x1C36 */
 void endEvent660(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x36), 0);
 }
 
+/* After event 661, with the player: moves the story on to its step 0x17 */
 void endEvent661(void) {
     GAME.progress = 0x17;
 }
 
+/* After event 890, with Lisa, Teddy, Keith and Nick: keeps it from playing again */
 void endEvent890(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x57), 1);
 }
 
+/* After event 893, with Lisa, Nick, Keith and Teddy: moves the story on to its step 0x22 */
 void endEvent893(void) {
     GAME.progress = 0x22;
 }
 
+/* After event 894, with Lisa, Nick and Keith: keeps it from playing again */
 void endEvent894(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x39), 1);
 }
 
+/* After event 895, with Lisa, Keith, Nick and Teddy: moves the story on to its step 0x22 */
 void endEvent895(void) {
     GAME.progress = 0x22;
 }
 
+/* After event 960, with Oinkmon: keeps it from playing again */
 void endEvent960(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x69), 1);
 }
@@ -128,6 +137,7 @@ void endEvent960(void) {
 #define EVENT_TEXT_FILE 0x12E
 #define STAGE_FILE 0x34B
 #endif
+/* Sets the stage up: its map, actors and events, playing KANRIBGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

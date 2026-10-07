@@ -9,6 +9,10 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 1461, with Guardromon: applies 0x7C18, an action that does
+ * nothing (applyAction's mode changes 0x7C are only 0 and 1)
+ */
 void endEvent1461(void) {
     FLAGS_00.applyAction(0x7C18, 1);
 }
@@ -22,6 +26,7 @@ void endEvent1461(void) {
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x57D
 #endif
+/* Sets the stage up: its map, actors and events, playing SHOP1BGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

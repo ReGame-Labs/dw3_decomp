@@ -52,6 +52,10 @@ void updateTileTask(StageTileTask *task) {
     }
 }
 
+/*
+ * Command 828 of the event scripts: the wall the TNT Chip blows a hole in,
+ * in event 360 (updateTileTask)
+ */
 void *createCommand828(s32 arg) {
     return createTaskWithId(updateTileTask, sizeof(StageTileTask), 0, arg);
 }
@@ -76,6 +80,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 360, with the player: sets flag 0x4007 (which decides whether actor 0 appears) */
 void endEvent360(void) {
     FLAGS_00.applyAction(FLAG(0x40, 7), 1);
 }
@@ -89,6 +94,7 @@ void endEvent360(void) {
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x391
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0012 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

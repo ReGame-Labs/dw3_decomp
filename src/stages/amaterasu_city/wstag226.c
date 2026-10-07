@@ -112,6 +112,7 @@ void startTileEffect(StageTileEffect *task, s32 id) {
 
 #include "common/create_tile_effect.inc.c"
 
+/* Creates the effect of map objects that startTileEffect sets off (updateTileEffect) */
 void *createTileEffectTask(void) {
     return createTask(updateTileEffect, sizeof(StageTileEffect), 0);
 }
@@ -140,6 +141,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/* After event 935, with Teddy, Kail and Kurt: moves the story on to its step 0x26 */
 void endEvent935(void) {
     GAME.progress = 0x26;
 }
@@ -153,6 +155,10 @@ void endEvent935(void) {
 #define EVENT_TEXT_FILE 0x112
 #define STAGE_FILE 0x4B8
 #endif
+/*
+ * Sets the stage up: its map, actors and events, playing KANRIBGM; BGM_0029
+ * instead except at story step 0x26 once flag 0x1A0A is set
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

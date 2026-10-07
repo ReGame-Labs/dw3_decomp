@@ -16,6 +16,10 @@
 #define STAGE_TEXT (LANGUAGE + 0xDA)
 #define STAGE_FILE 0x5C6
 #endif
+/*
+ * Sets the stage up: its map, actors and battles, playing BGM_0016; BGM_0029
+ * instead except at story step 0x26 once flag 0x1A0A is set
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

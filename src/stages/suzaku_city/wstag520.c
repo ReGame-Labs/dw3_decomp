@@ -25,16 +25,25 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 260, with Suzaku Leader: lets event 261 start and starts the
+ * stage's event battle 0
+ */
 void endEvent260(void) {
     FLAGS_00.applyAction(FLAG(0x40, 2), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 261, with Suzaku Leader: gives the player the Suzaku Badge and
+ * moves the story on to its step 0xB
+ */
 void endEvent261(void) {
     FLAGS_00.applyAction(ITEM(0, 0xA), 1);
     GAME.progress = 0xB;
 }
 
+/* After event 695, with Patamon: moves the story on to its step 0x1A */
 void endEvent695(void) {
     GAME.progress = 0x1A;
 }
@@ -50,6 +59,10 @@ void endEvent695(void) {
 #define STAGE_FILE 0x24B
 #define STAGE_ARCHIVE 0x3DC
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing BGM_0016;
+ * BGM_0029 instead at story steps 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

@@ -40,11 +40,19 @@ void updateStage(StageTask *task, void **children) {
 #include "common/update_stage_effect.inc.c"
 #include "common/create_stage_effect.inc.c"
 
+/*
+ * After event 1293, with Ice Master: starts the stage's event battle 0 and
+ * keeps it from playing again
+ */
 void endEvent1293(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x82), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1294, with Ice Master: gives the player the MP Chip and keeps
+ * it from playing again
+ */
 void endEvent1294(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x83), 1);
     FLAGS_00.applyAction(ITEM(1, 0x30), 1);
@@ -59,6 +67,7 @@ void endEvent1294(void) {
 #define EVENT_TEXT_FILE 0x14A
 #define STAGE_FILE 0x6CA
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0023 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

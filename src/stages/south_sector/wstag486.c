@@ -10,6 +10,7 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+/* After event 745, with Trooper: sets flag 0x40A8 */
 void endEvent745(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xA8), 1);
 }
@@ -23,6 +24,7 @@ void endEvent745(void) {
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x5BE
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0014 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;
