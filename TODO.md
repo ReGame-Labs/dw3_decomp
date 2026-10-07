@@ -153,9 +153,9 @@ compilers, are in the history.
   start: the two reads of `scrollY` rank its load ahead of the x test in
   local-alloc, which was all that was left of its 24 diffs. The notes on
   what was tried before are in the history.
-- [ ] `fightstg_3.c`'s `func_80087304`
-  returns its task, which `func_80091A58` stores, but is defined `void`
-  (`fightstg_6.c` has a prototype of its own that returns the task).
+- [x] `shot_camera.c`'s `FIGHTSTG_createShotCamera`
+  returns its task, which `FIGHTSTG_updatePlayerTurn` stores, and is
+  defined so, with the one prototype in `fightstg.h`.
 - [x] The field menu's near miss. `STGDGLAB`'s `func_8008C234` matches in
   both versions with its `skillCount = 6` store alone in a `do { } while (0)`,
   a BEC form (`docs/status.md`): the loop notes keep sched1 and sched2 from moving the
@@ -175,7 +175,7 @@ compilers, are in the history.
   BEC's too, has the same block in its task-state init cases
   (`Stg10_TitleUpdate`, `Stg20_ShopListUpdate`).
   None of the three objects (`fieldstg_3.c`, now `event.c` to `start.c`
-  and `banner.c`'s first function, `fightstg_6.c` and `stgdglab_4.c`)
+  and `banner.c`'s first function, `fightstg_6.c`, now `item.c` to `interp.c`, and `stgdglab_4.c`)
   builds with another compiler for the whole file (`fightstg/r37/cc.sh`,
   results in `r37/cx/cc_*.txt`): GCC 2.7.2 (patched, stock, with the
   second CSE pass), SN's 2.8.1, 2.95.2 and `-O1` leave

@@ -232,7 +232,7 @@ typedef struct CardOpponent {
     /* 0xA0 */ s16 counterCards[20]; /* from 1, up to a 0: CardBattle.counterCards before the usual ones */
     /* 0xC8 */ u8 unkC8;
     /* 0xC9 */ u8 unkC9[3];
-    /* 0xCC */ s32 unkCC;
+    /* 0xCC */ s32 prize; /* its index in CARDGAME_prizeItems */
 } CardOpponent;
 
 /* The card battle (CARDGAME_createBattle). Its seven task items: the battle
@@ -454,7 +454,7 @@ typedef struct CardPanel {
     /* 0x00 */ s16 time;
     /* 0x02 */ s16 duration;
     /* 0x04 */ s16 state;
-    /* 0x06 */ s16 unk6;
+    /* 0x06 */ s16 event; /* for a frame, until CARDGAME_slidePanel clears it: 2 the panel started sliding in, 1 it slid out; nothing reads it */
     /* 0x08 */ s32 blinkTime; /* a frame counter for the blinking (CARDGAME_drawPanel) */
     /* 0x0C */ s16 x;
     /* 0x0E */ s16 y;
@@ -498,7 +498,7 @@ typedef struct CardSprite {
     /* 0x28 */ s32 time;
     /* 0x2C */ s32 duration;
     /* 0x30 */ s32 growTime; /* the frames it grows for before it flies (CARDGAME_flySprite) */
-    /* 0x34 */ s32 unk34; /* the effect's time */
+    /* 0x34 */ s32 effectTime;
     /* 0x38 */ s16 color; /* the card's colour, from 0 */
     /* 0x3A */ s16 index; /* in the battle's card list */
     /* 0x3C */ s16 isKind16;
@@ -652,7 +652,8 @@ typedef struct CardScreen {
 
 /* The card battle's task items */
 typedef struct CardBattleItems {
-    /* 0x00 */ void *unk0[2];
+    /* 0x00 */ CardPreloader *preloader; /* the card game's files' (CARDGAME_startPreloader) */
+    /* 0x04 */ CardFader *fader;
     /* 0x08 */ CardMarker *marker; /* the deck choice's */
     /* 0x0C */ CardDeckWindow *deckWindows[3];
     /* 0x18 */ CardScreen *screen;

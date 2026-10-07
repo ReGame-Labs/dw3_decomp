@@ -9,6 +9,9 @@
 #include "dw3/menu.h"
 #include "dw3/file.h"
 
+/* The name of this overlay's copy of a function of src/menu_common/ */
+#define OVL_NAME(name) FIGHTSTG_##name
+
 extern MATRIX IDENTITY_MATRIX; /* the root bone's parent (src/main/data/matrices.c) */
 
 /* The sub-overlays (FIGHTSTG_updateRoot) and their entry points */
@@ -277,10 +280,10 @@ typedef struct BattleTableEntry {
     /* 0x02 */ s16 item; /* what the enemy may leave */
     /* 0x04 */ s16 itemChance; /* in 1024ths, less one */
     /* 0x06 */ s16 nameId; /* string in file 0x4F */
-    /* 0x08 */ s16 unk8[3];
+    /* 0x08 */ s16 techs[3]; /* its first, then those of FIGHTSTG_getEnemyAction's kinds 2 and 3 */
     /* 0x0E */ s16 stats[5]; /* by BATTLE_STAT_*, scaled by the enemy's unkA / 16 */
     /* 0x18 */ s16 resist[RESIST_COUNT];
-    /* 0x30 */ u8 unk30;
+    /* 0x30 */ u8 family; /* FAMILY_*, the enemy's stats' */
     /* 0x31 */ u8 unk31;
     /* 0x32 */ BattleTableAction actions[3]; /* the first whose condition holds (FIGHTSTG_testEnemyCondition) */
     /* 0x3E */ u8 unk3E[4];
@@ -336,7 +339,7 @@ typedef struct FightStage {
 
 /* FIGHTSTG_interp: the functions that go between values */
 typedef struct InterpFuncs {
-    /* 0x0 */ void (*unk0)();
+    /* 0x0 */ void (*nop)(void);
     /* 0x4 */ void (*lerp)(SVECTOR *from, SVECTOR *to, s32 t, SVECTOR *out); /* t: 0-0x1000 */
     /* 0x8 */ s32 (*ease)(s32 curve, s32 t, s32 value); /* value scaled by a curve of t */
 } InterpFuncs;
@@ -518,7 +521,7 @@ typedef struct BattleSound {
 /* A sprite sheet for the battle's 2D effects: an archive of animations,
    the sheet and where its texture goes in VRAM */
 typedef struct EffectSheet {
-    /* 0x0 */ s32 unk0;
+    /* 0x0 */ s32 images; /* the archive of TIMs a script loads for it, 0 for none */
     /* 0x4 */ s32 sheet;
     /* 0x8 */ Vec2 texPos;
 } EffectSheet;
@@ -610,7 +613,7 @@ typedef struct BattleItem {
 /* An item's script settings (FIGHTSTG_itemScripts, ended by -1) */
 typedef struct ItemScript {
     /* 0x0 */ s16 item;
-    /* 0x2 */ s16 unk6C; /* BattleScript's */
+    /* 0x2 */ s16 effect; /* BattleScript's */
     /* 0x4 */ s16 sound;
 } ItemScript;
 
@@ -618,7 +621,7 @@ typedef struct ItemScript {
    ended by -1) */
 typedef struct TechBoost {
     /* 0x0 */ s16 tech;
-    /* 0x2 */ s16 amount; /* times the technique's unkC, below 0 for the other side */
+    /* 0x2 */ s16 amount; /* times the technique's effectPower, below 0 for the other side */
     /* 0x4 */ s16 stat;
     /* 0x6 */ s16 line; /* the message */
 } TechBoost;
@@ -640,6 +643,7 @@ extern s32 FIGHTSTG_statusTechArgs[];
 extern s32 FIGHTSTG_statusTechLines[];
 #if VERSION_EU
 extern s32 FIGHTSTG_clearIds[]; /* the six event types FIGHTSTG_reviveFighter clears */
+void FIGHTSTG_reviveFighter(s32 tech, s32 fighter);
 #endif
 
 typedef struct TechAction {
@@ -657,7 +661,7 @@ typedef struct TechAction {
 typedef struct EnemyAttack {
     TASK_HEADER(EnemyAttack);
     /* 0x50 */ s32 lines[4]; /* FIGHTSTG_updateMessage's */
-    /* 0x60 */ s32 unk60; /* call WFIGHTMN_setIdleMotion once the motion starts */
+    /* 0x60 */ s32 resetIdleMotion; /* the weakness ended: WFIGHTMN_setIdleMotion once the technique starts */
     /* 0x64 */ u8 unk64[0xC];
     /* 0x70 */ s32 tech; /* the technique */
     /* 0x74 */ s32 kind; /* 0 the enemy's technique, 1 another attack */
@@ -706,12 +710,12 @@ typedef struct HpDisplay {
 typedef struct PlayerTurn {
     TASK_HEADER(PlayerTurn);
     /* 0x50 */ s32 command; /* the command menu's choice, a BATTLE_COMMAND_* */
-    /* 0x54 */ s32 unk54; /* FIGHTSTG_createSwitchMenu's line */
+    /* 0x54 */ s32 switchLine; /* FIGHTSTG_createSwitchMenu's line, kept while the turn goes back to it */
     /* 0x58 */ s32 result; /* the open menu's, -1 until it is done and -2 to go back */
     /* 0x5C */ s32 action; /* what the turn does */
-    /* 0x60 */ s32 unk60;
+    /* 0x60 */ s32 arg; /* the action's: the item, the technique, or the party slot of the partner that digivolves or switches out */
     /* 0x64 */ s32 digimon; /* the Digimon a partner changes into, or the one it switches to */
-    /* 0x68 */ s32 unk68; /* FIGHTSTG_createPairSwitchMenu's technique */
+    /* 0x68 */ s32 pairTech; /* FIGHTSTG_createPairSwitchMenu's technique, which the outgoing and incoming partners do together (action 6) */
 } PlayerTurn;
 
 /* The menu of the Digimon the active partner can digivolve into
@@ -735,15 +739,6 @@ typedef struct DigivolveMenuWindows {
     /* 0x14 */ struct PartnerInfo *info[2]; /* shown and hiding, in turns */
 } DigivolveMenuWindows;
 
-/* A partner's entry in its slot, as GAME.funcs.getPartnerEntry gives it */
-typedef struct BattlePartnerEntry {
-    /* 0x0 */ s16 id;
-    /* 0x2 */ s8 unk2;
-    /* 0x3 */ u8 unk3;
-    /* 0x4 */ s16 unk4[2];
-    /* 0x8 */ s16 techs[6]; /* the low 13 bits, 0x4000 for one it can pass on */
-} BattlePartnerEntry;
-
 /* The lines of a page of the technique menu */
 #define TECH_MENU_LINES 6
 
@@ -753,7 +748,7 @@ typedef struct TechMenu {
     /* 0x50 */ s32 *result; /* -1 until it is done */
     /* 0x54 */ s32 sel; /* the cursor's line last frame */
     /* 0x58 */ s16 slots[4]; /* GAME.funcs.getPartnerSlots's */
-    /* 0x60 */ BattlePartnerEntry entries[3];
+    /* 0x60 */ PartnerEntry entries[3]; /* skills with SKILL_MARKED can be passed on */
     /* 0x9C */ s32 techs[12]; /* ids in the low 13 bits, from 1 */
     /* 0xCC */ s32 count;
     /* 0xD0 */ s32 page;
@@ -863,7 +858,7 @@ typedef struct EnemyTurn {
     TASK_HEADER(EnemyTurn);
     /* 0x50 */ s32 lines[10]; /* FIGHTSTG_updateMessage's, 0 ends them */
     /* 0x78 */ s32 target; /* -2 to -4 for an enemy, else any but the active one */
-    /* 0x7C */ s32 unk7C;
+    /* 0x7C */ s32 switchTo; /* the enemy fighter it brings in (FIGHTSTG_pickEnemySwitch) */
 } EnemyTurn;
 
 /* A battle message box (FIGHTSTG_createMessage): shows its messages a line
@@ -957,7 +952,7 @@ typedef struct Entrance {
     /* 0x58 */ struct BattleCamera *camera;
     /* 0x5C */ struct FightStage *stage;
     /* 0x60 */ s32 file; /* its model's */
-    /* 0x64 */ s32 unk64;
+    /* 0x64 */ s32 weak; /* it comes in with motion 2 (WFIGHTMN_setIdleMotion's weak one) */
 } Entrance;
 
 /* A page about a partner in one of its Digimon (FIGHTSTG_createPartnerInfo):
@@ -968,10 +963,10 @@ typedef struct PartnerInfo {
     /* 0x54 */ s32 partner;
     /* 0x58 */ s32 page; /* what it shows: 0 the stats, 1 and 2 techniques */
     /* 0x5C */ s32 slot; /* from 1, or 0 for the partner itself */
-    /* 0x60 */ s32 unk60; /* shown as a number, or text 0x1A when negative */
+    /* 0x60 */ s32 level; /* the Digimon's (PartnerEntry.level), or -1 for none: text 0x1A */
     /* 0x64 */ s16 stats[0x16]; /* the 22 of a PartnerTotals computeStats fills, shown up to 999 */
     /* 0x90 */ s16 slots[4]; /* GAME.funcs.getPartnerSlots's */
-    /* 0x98 */ BattlePartnerEntry entries[3];
+    /* 0x98 */ PartnerEntry entries[3]; /* skills with SKILL_MARKED can be passed on */
     /* 0xD4 */ s32 techs[6]; /* a technique in the low 13 bits */
 } PartnerInfo;
 
@@ -1152,11 +1147,11 @@ typedef struct FighterFilter {
    motions, effects, sounds and camera moves */
 typedef struct BattleScript {
     TASK_HEADER(BattleScript);
-    /* 0x50 */ s32 unk50; /* the enemy's */
+    /* 0x50 */ s32 enemy; /* the script is the enemy's (nonzero) or the partner's */
     /* 0x54 */ s32 index; /* the script, in the fighter's archive */
     /* 0x58 */ s32 hits[4]; /* 0 a hit, 3 a miss; [3] how it ended */
     /* 0x68 */ s32 stage; /* what the stage command's 0x38 stands for */
-    /* 0x6C */ s32 unk6C;
+    /* 0x6C */ s32 effect; /* the sprite effect the effect command's 9999 stands for */
     /* 0x70 */ s32 sound; /* what the sound commands' 0x62 and 0x63 stand for on a hit */
     /* 0x74 */ s32 unk74;
     /* 0x78 */ s32 fighter;
@@ -1175,6 +1170,12 @@ typedef struct BattleScript {
     /* 0xAC */ Vec2 effectTexPos;
 } BattleScript;
 
+/* FIGHTSTG_updateHitEffect's children */
+typedef struct HitEffectChildren {
+    /* 0x0 */ SpriteEffect *effect;
+    /* 0x4 */ BattleScript *script;
+} HitEffectChildren;
+
 /* A turn's or a counterattack's one child, and what WFIGHTMN's battle menu
    waits for (NULL when it is done): a message box, or what plays an action */
 typedef union BattleChild {
@@ -1192,24 +1193,24 @@ typedef union BattleChild {
     OneHpTurn *oneHpTurn; /* BATTLE_KIND_FINAL_SECOND's enemy turn (FIGHTSTG_startOneHpTurn) */
     CameraTurn *cameraTurn; /* when the player loses (FIGHTSTG_startCameraTurn) */
     CameraShots *cameraShots; /* the European version's (FIGHTSTG_startCameraShots) */
-    ScreenFade *fade; /* FIGHTSTG_createScreenFade */
+    ScreenFade *fade; /* FIGHTSTG_createFader */
     struct Counterattack *counter; /* a counterattack (FIGHTSTG_startCounterattack) */
     struct ActionEvents *events; /* the queued events (FIGHTSTG_startActionEvents) */
 } BattleChild;
 
 /* The tasks FIGHTSTG starts for WFIGHTMN and WFIGHTTS */
 FightStage *FIGHTSTG_createStage(s32 id, s32 fadeInTime);
-Entrance *FIGHTSTG_startEntrance(s32 id, s32 side, s32 arg2);
+Entrance *FIGHTSTG_startEntrance(s32 id, s32 side, s32 weak);
 Models *FIGHTSTG_createModels(void);
 /* WFIGHTMN passes the damage as a third argument, which it doesn't read; its
    code loads it, so no parameter list */
-HitEffect *FIGHTSTG_startHitEffect();
+HitEffect *FIGHTSTG_startHitEffect(); /* (s32 result, s32 arg1): unprototyped, as WFIGHTMN passes it the damage too */
 /* WFIGHTMN passes them the battle, which they don't read; its code loads
    it, so no parameter list */
-EnemyTurn *FIGHTSTG_startEnemyTurn();
-OneHpTurn *FIGHTSTG_startOneHpTurn();
+EnemyTurn *FIGHTSTG_startEnemyTurn(); /* (void): unprototyped, as WFIGHTMN passes it &FIGHTSTG_battle */
+OneHpTurn *FIGHTSTG_startOneHpTurn(); /* (void): unprototyped, as WFIGHTMN passes it &FIGHTSTG_battle */
 DigimonChange *FIGHTSTG_startDigimonChange(s32 key1, s32 key2);
-ScreenFade *FIGHTSTG_createScreenFade(void);
+ScreenFade *FIGHTSTG_createFader(void);
 BattleScript *FIGHTSTG_createBattleScript(void);
 FirstTech *FIGHTSTG_startFirstTech(s32 side);
 BattleItem *FIGHTSTG_startItem(s32 item);
@@ -1260,7 +1261,7 @@ typedef struct BattleScriptChildren {
 #define EVENT_STATUS_DAMAGE 9 /* the damage of a poisoned fighter (FIGHTER_POISONED) */
 #define EVENT_STATUS_END 10 /* 10-12: the end of FIGHTER_PARALYZED, FIGHTER_CONFUSED or FIGHTER_ASLEEP */
 #define EVENT_BOOST_END 13 /* 13-15: the end of a boost, by the stat */
-#define EVENT_RESTRICTION_END 16 /* 16-17: the end of a restriction (flag 0x10 or 0x20) */
+#define EVENT_RESTRICTION_END 16 /* 16-17: the end of a restriction (FIGHTER_NO_SWITCH or FIGHTER_NO_DIGIVOLVE) */
 #define EVENT_BLAST 18 /* the partner's digivolution for the battle */
 #define EVENT_BLAST_END 19
 #define EVENT_KNOCK_OUT 20
@@ -1283,10 +1284,11 @@ typedef struct QueuedEvent {
     /* 0x04 */ s32 args[6];
 } QueuedEvent;
 
-/* What FIGHTSTG_removeEvents removes the events of */
+/* What FIGHTSTG_removeEvents removes the events of: an event's first two
+   args, as FIGHTSTG_queueRecovery and the others push them */
 typedef struct EventKey {
-    /* 0x0 */ u8 unk0;
-    /* 0x4 */ s32 unk4;
+    /* 0x0 */ u8 side; /* SIDE_PLAYER or SIDE_ENEMY */
+    /* 0x4 */ s32 fighter; /* its index in the side's fighters */
 } EventKey;
 
 /* The kinds of battle (Battle.kind), which WFIGHTMN picks by the battle and
@@ -1307,7 +1309,7 @@ typedef struct EventKey {
 /* The event queue's functions (FIGHTSTG_events.funcs) */
 typedef struct EventQueueFuncs {
     /* 0x00 */ u8 result; /* the battle's, for WFIGHTMN (BATTLE_FLED...) */
-    /* 0x01 */ u8 unk1;
+    /* 0x01 */ u8 statusStrength; /* getDelay's, for the end of a status (kinds 9 to 11) */
     /* 0x04 */ void (*push)(BattleEvent *event);
     /* 0x08 */ void (*pushFirst)(BattleEvent *event); /* before all the others */
     /* 0x0C */ s32 (*pop)(void); /* the next event due */
@@ -1340,6 +1342,12 @@ typedef struct EventQueue {
     /* 0xAF3 */ s8 found; /* the event they found, or -1 */
     /* 0xAF4 */ EventQueueFuncs funcs;
 } EventQueue;
+
+/* The battle's sides, as the functions that take a side want them: side >> 4
+   is its row of FIGHTSTG_battle.fighters, and SIDE_ENEMY - side the other
+   side */
+#define SIDE_PLAYER 0
+#define SIDE_ENEMY 0x10
 
 /* BattleFighter.flags: the statuses, which the techniques give
    (FIGHTSTG_inflict*) and events of type EVENT_STATUS_END + n end */
@@ -1385,7 +1393,7 @@ typedef struct Battle {
     /* 0x10 */ BattleFighter fighters[2][3];
     /* 0xD0 */ s16 boostElement; /* an element FIGHTSTG_getElementBoost boosts */
     /* 0xD2 */ s16 boostAmount; /* and how much, in 128ths */
-    /* 0xD4 */ s16 unkD4;
+    /* 0xD4 */ s16 runAttempts; /* the player's, each of which makes running away likelier (FIGHTSTG_testRunAway) */
     /* 0xD6 */ s16 kind; /* the kind of battle */
     /* 0xD8 */ s16 tech; /* a technique id, set by WFIGHTMN */
     /* 0xDA */ s8 hitCount; /* BATTLE_KIND_FINAL_LAST: the partner's hits that did damage */
@@ -1427,7 +1435,7 @@ typedef struct BattleAction {
     /* 0x00 */ s16 unk0[0xE];
     /* 0x1C */ u8 unk1C;
     /* 0x1D */ u8 unk1D[3];
-    /* 0x20 */ u8 side; /* the acting side: 0 the player, 0x10 the enemy */
+    /* 0x20 */ u8 side; /* the acting side, SIDE_PLAYER or SIDE_ENEMY */
     /* 0x24 */ s32 tech; /* the technique */
     /* 0x28 */ s32 damage; /* per hit */
     /* 0x2C */ s32 drain; /* the HP or MP that TECH_EFFECT_DRAIN or TECH_EFFECT_DRAIN_MP takes */
@@ -1522,11 +1530,11 @@ void FIGHTSTG_setMotion(Model *model, s32 motion, s32 restart);
 void FIGHTSTG_updateModel(Model *model, Mesh **children);
 Mesh *FIGHTSTG_createMesh(s32 archive, Vec2 texPos);
 void FIGHTSTG_setModelColor(Model *model, s32 mode, CVECTOR *color);
-void FIGHTSTG_setBoneNoBoundsCheck();
+void FIGHTSTG_setBoneNoBoundsCheck(Model *model, s32 bone, s32 value);
 s32 FIGHTSTG_isMotionDone(Model *model);
 Model *FIGHTSTG_createPlainModel(s32 file, s32 motionFile, Vec2 texPos, ModelControl *control);
-void FIGHTSTG_drawMesh();
-void FIGHTSTG_drawMeshWireframe();
+void FIGHTSTG_drawMesh(void *arg, Layer *layer);
+void FIGHTSTG_drawMeshWireframe(Mesh *mesh, Layer *layer);
 void FIGHTSTG_updateStage(FightStage *task, Model **children);
 void FIGHTSTG_updateLights(Lights *task);
 void FIGHTSTG_setLights(Lights *task, LightSet *set);
@@ -1567,7 +1575,7 @@ void FIGHTSTG_updateRoot(Task *task, Task **children);
 s32 FIGHTSTG_randomStage(void);
 void FIGHTSTG_updateShotCamera(ShotCamera *task);
 void FIGHTSTG_updateEnemyTurn(EnemyTurn *task, BattleChild *children);
-void FIGHTSTG_updateBattleScript();
+void FIGHTSTG_updateBattleScript(BattleScript *script, BattleScriptChildren *children);
 void FIGHTSTG_updateOneHpTurn(OneHpTurn *task, union BattleChild *children);
 void FIGHTSTG_queueLastEnemy(void);
 s32 FIGHTSTG_testEnemyCondition(u8 condition, s16 arg);
@@ -1583,59 +1591,60 @@ void FIGHTSTG_updateHpTweens(HpDisplay *task, TextWindow **windows);
 void FIGHTSTG_drawHud(HpDisplay *task, TextWindow **windows);
 void FIGHTSTG_updateHud(HpDisplay *task, TextWindow **windows);
 void FIGHTSTG_updatePartnerView(PartnerView *task, FighterCamera **cameras);
-void FIGHTSTG_updateCameraTurn();
-void FIGHTSTG_updateCameraShots();
+void FIGHTSTG_updateCameraTurn(CameraTurn *task, BattleScript **children);
+void FIGHTSTG_updateCameraShots(CameraShots *task);
 void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, Task **children);
 void FIGHTSTG_drawShadedQuad(s32 layerId, s32 depth, DVECTOR *xy, CVECTOR *colors, s32 semi);
-void FIGHTSTG_updateSwitchInMenu();
-void FIGHTSTG_updateHitEffect();
-void FIGHTSTG_updateScreenFade(ScreenFade *task);
-void FIGHTSTG_startScreenFade(ScreenFade *task, s32 fadeIn, s32 duration);
-void FIGHTSTG_updateDigimonChange();
-void FIGHTSTG_updateTechAction();
-void FIGHTSTG_updateEnemyAttack();
+void FIGHTSTG_updateSwitchInMenu(SwitchInMenu *task, SwitchInMenuWindows *w);
+void FIGHTSTG_updateHitEffect(HitEffect *task, HitEffectChildren *children);
+void FIGHTSTG_updateFader(ScreenFade *task);
+void FIGHTSTG_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
+void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *children);
+void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children);
+void FIGHTSTG_updateEnemyAttack(EnemyAttack *task, BattleChild *children);
 void FIGHTSTG_updateCamera(FighterCamera *task);
+FighterCamera *FIGHTSTG_createCamera(s32 fighter, ModelControl *control);
 void FIGHTSTG_drawWhiteFlash(WhiteFlash *task);
 void FIGHTSTG_updateWhiteFlash(WhiteFlash *task);
-void FIGHTSTG_updateDigivolveMenu();
-void FIGHTSTG_updateFirstTech();
-void FIGHTSTG_updateItem();
+void FIGHTSTG_updateDigivolveMenu(DigivolveMenu *task, void *children);
+void FIGHTSTG_updateFirstTech(FirstTech *task, BattleChild *children);
+void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children);
 s32 FIGHTSTG_runItemScript(BattleItem *task, BattleScript **children);
 void FIGHTSTG_updateActionEvents(ActionEvents *task, union BattleChild *children);
 SwitchInMenu *FIGHTSTG_createSwitchInMenu(s32 *result);
-void FIGHTSTG_updateItemMenu();
+void FIGHTSTG_updateItemMenu(ItemMenu *task, ItemMenuWindows *w);
 void FIGHTSTG_updateTechMenu(TechMenu *task, TechMenuChild *children);
-void FIGHTSTG_tryPoison();
-void FIGHTSTG_tryParalysis();
-void FIGHTSTG_tryConfusion();
-void FIGHTSTG_trySleep();
-void FIGHTSTG_tryDrain();
-void FIGHTSTG_lowerAttack();
-void FIGHTSTG_lowerDefense();
-void FIGHTSTG_drainMp();
-void FIGHTSTG_raiseOneStatus();
-void FIGHTSTG_raiseEachStatus();
-void FIGHTSTG_raiseAllStatus();
-void FIGHTSTG_trySteal();
+void FIGHTSTG_tryPoison(void);
+void FIGHTSTG_tryParalysis(void);
+void FIGHTSTG_tryConfusion(void);
+void FIGHTSTG_trySleep(void);
+void FIGHTSTG_tryDrain(void);
+void FIGHTSTG_lowerAttack(void);
+void FIGHTSTG_lowerDefense(void);
+void FIGHTSTG_drainMp(void);
+void FIGHTSTG_raiseOneStatus(void);
+void FIGHTSTG_raiseEachStatus(void);
+void FIGHTSTG_raiseAllStatus(void);
+void FIGHTSTG_trySteal(void);
 void FIGHTSTG_queueBoostEnd(u8 side, s32 fighter, s32 kind, s32 arg3);
-void FIGHTSTG_drawMessageBox();
-void FIGHTSTG_stepMessage();
-void FIGHTSTG_showMessage();
-void FIGHTSTG_updateCommandMenu();
-void FIGHTSTG_updateCounterattack();
+void FIGHTSTG_drawMessageBox(BattleMessageBox *task);
+void FIGHTSTG_stepMessage(BattleMessageBox *task, BattleMessageBoxWindows *windows);
+void FIGHTSTG_showMessage(BattleMessageBox *task, s32 type, s32 *data);
+void FIGHTSTG_updateCommandMenu(CommandMenu *task, CommandMenuWindows *w);
+void FIGHTSTG_updateCounterattack(Counterattack *task, BattleChild *children);
 s32 FIGHTSTG_findBattleTableIndex(s32 id);
 BattleTableEntry *FIGHTSTG_getBattleTableEntry(s32 id);
-void FIGHTSTG_updatePartnerInfo();
-void FIGHTSTG_updateSwitchMenu();
-void FIGHTSTG_updateConfusedMenu();
+void FIGHTSTG_updatePartnerInfo(PartnerInfo *task, TextWindow **windows);
+void FIGHTSTG_updateSwitchMenu(SwitchMenu *task, SwitchMenuWindows *w);
+void FIGHTSTG_updateConfusedMenu(ConfusedMenu *task, ConfusedMenuWindows *w);
 void FIGHTSTG_updateBattleCamera(BattleCamera *task);
 void FIGHTSTG_fadeBattleCamera(BattleCamera *task, CameraView *from, CameraView *to, s32 time);
 CameraView *FIGHTSTG_getFighterView(BattleCamera *task, s32 id, s32 camera);
 CameraView *FIGHTSTG_getEnemyView(BattleCamera *task);
-void FIGHTSTG_updateEntrance();
+void FIGHTSTG_updateEntrance(Entrance *task, WhiteFlash **children);
 void FIGHTSTG_endWhiteFlash(WhiteFlash *task, s32 frames);
 WhiteFlash *FIGHTSTG_startWhiteFlash(s32 frames);
-void FIGHTSTG_updateCursor();
+void FIGHTSTG_updateCursor(MenuCursor *task);
 BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index);
 extern s32 FIGHTSTG_opposedElements[];
 void FIGHTSTG_stepMotion(Model *model);
@@ -1705,11 +1714,12 @@ s32 FIGHTSTG_getEffectModelFile(s32 id);
 EffectModel *FIGHTSTG_startEffectModel(s32 id, SVECTOR *pos, SVECTOR *rot);
 BattleSound *FIGHTSTG_playBattleSound(s32 index, s32 time);
 s32 FIGHTSTG_findEffectSheet(s32 effect, s32 *images, s32 *sheet, Vec2 *texPos);
+SpriteAnim *FIGHTSTG_createSpriteAnim(s16 *data, SVECTOR *pos, s32 sheet, Vec2 *texPos, s32 layerId);
 SpriteEffect *FIGHTSTG_startSpriteEffect(s32 effect, SVECTOR *pos);
 extern s32 FIGHTSTG_boostEvents[]; /* FIGHTSTG_queueBoostEnd's event types */
 extern s32 FIGHTSTG_techEvents[]; /* and of FIGHTSTG_startRestriction */
 
-/* fightstg_6.c's statuses and events */
+/* events.c's statuses and events */
 void FIGHTSTG_queueClearField(s32 time);
 void FIGHTSTG_inflictConfusion(u8 side, s32 fromTech, u8 strength);
 void FIGHTSTG_inflictPoison(u8 side, s32 fighter, s32 damage);

@@ -18,7 +18,8 @@ matched C needs.
   same helpers (the screen fader, the panels' fades, the lerps, the scroll
   bar, and the name entry's keyboard in STCRDDEK, STPLNMET and STDGNAME),
   built from one file each in `src/menu_common/` that they include, named
-  with each overlay's prefix (`OVL_NAME`).
+  with each overlay's prefix (`OVL_NAME`). STFGTREP has the fader, the
+  fades and the lerps too, and FIGHTSTG the fader's start and drawing.
 - The stages are all C, the 238 USA ones and the 55 of the European version
   alone. Many stages share functions built from the same source, so one
   match often repeats across stages: those have the same name in every

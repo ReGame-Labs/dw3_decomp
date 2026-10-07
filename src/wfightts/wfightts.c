@@ -296,7 +296,7 @@ void WFIGHTTS_battleTest(BattleTest *task, BattleTestChildren *children) {
                         if (task->effect != 0x12) {
                             children->task.script = FIGHTSTG_createBattleScript();
                             children->task.script->index = task->effect;
-                            children->task.script->unk50 = task->side;
+                            children->task.script->enemy = task->side;
                             children->task.script->hits[0] = 3;
                             children->task.script->hits[1] = 3;
                             children->task.script->hits[2] = 3;

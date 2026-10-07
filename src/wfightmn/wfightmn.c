@@ -1,3 +1,8 @@
+/* WFIGHTMN, the battle's sub-overlay that FIGHTSTG loads for a normal
+   battle: the battle menu and the turn's events. Its first object is this
+   file, the loader; the second is cut, in its link order, into setup.c,
+   menu.c and techs.c, with its data in data/wfightmn_2.c. */
+
 #include "wfightmn.h"
 
 /* Loads the battle menu's images into VRAM, one file a frame, then its

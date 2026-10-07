@@ -1,5 +1,5 @@
 /* The camera's turn around the fighters, a task that both versions have:
-   the USA version in fightstg_7.c, the European one in fightstg_5.c. Each
+   the USA version in fightstg_7.c, the European one in battle_script.c. Each
    includes this file where its object has the task. */
 
 
@@ -30,7 +30,7 @@ void FIGHTSTG_updateCameraTurn(CameraTurn *task, BattleScript **children) {
         FIGHTSTG_battle.setSpeed(2);
         *children = FIGHTSTG_createBattleScript();
         (*children)->index = 3;
-        (*children)->unk50 = 0;
+        (*children)->enemy = 0;
         task->nextState(task);
     case 1:
 #if VERSION_EU

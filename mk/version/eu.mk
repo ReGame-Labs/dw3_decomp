@@ -54,15 +54,16 @@ C_SRC += $(addprefix src/ststatus/, demo_screen.c equip_panel.c digivolve_panel.
 
 # cardgame
 C_SRC += src/cardgame/cardgame.c
-C_SRC += src/cardgame/cardgame_2.c
-C_SRC += src/cardgame/cardgame_3.c
-C_SRC += src/cardgame/cardgame_4.c
+# cardgame's other objects and modules (cardgame.c is above), and the
+# second and third objects' data
+C_SRC += $(filter-out src/cardgame/cardgame.c,$(wildcard src/cardgame/*.c))
+C_SRC += src/cardgame/data/cardgame_2.c src/cardgame/data/cardgame_3.c
 
-# fightstg's other objects (fightstg.c is with the overlays)
-C_SRC += $(addprefix src/fightstg/, fightstg_2.c fightstg_3.c fightstg_4.c fightstg_5.c fightstg_6.c fightstg_7.c)
+# fightstg's other objects and modules (fightstg.c is with the overlays)
+C_SRC += $(filter-out src/fightstg/fightstg.c,$(wildcard src/fightstg/*.c))
 
 # small overlays
-C_SRC += src/stgmcard/stgmcard.c src/stfgtrep/stfgtrep.c src/wfightmn/wfightmn.c src/wfightmn/wfightmn_2.c src/stcrdshp/stcrdshp.c src/stplnmet/stplnmet.c src/wfightts/wfightts.c
+C_SRC += src/stgmcard/stgmcard.c src/stfgtrep/scene.c src/stfgtrep/partner.c src/stfgtrep/report.c src/stfgtrep/fade.c src/stfgtrep/growth.c src/stfgtrep/data/stfgtrep.c src/wfightmn/wfightmn.c src/wfightmn/setup.c src/wfightmn/menu.c src/wfightmn/techs.c src/wfightmn/data/wfightmn_2.c src/stcrdshp/stcrdshp.c src/stplnmet/stplnmet.c src/wfightts/wfightts.c
 # stcrdshp's modules
 C_SRC += $(addprefix src/stcrdshp/, pack_open.c fader.c card_grid.c buy.c shop.c)
 # stgmcard's modules, and its data

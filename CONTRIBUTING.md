@@ -284,7 +284,7 @@ does:
 - Code that several binaries have, each its own copy of the same C, is one
   `.inc.c` file that their C files include where the function is, named
   after it: `src/stages/common/` for the stages, `src/menu_common/` for the
-  menu overlays. An overlay's copy keeps the overlay's prefix: its header
+  menu overlays (and STFGTREP's and FIGHTSTG's copies of their functions). An overlay's copy keeps the overlay's prefix: its header
   defines `OVL_NAME(name)` (`STGMCARD_##name`), and the shared file names
   its functions with it (`void OVL_NAME(drawFader)(ScreenFade *task)` is
   `STGMCARD_drawFader` in STGMCARD). A copy that differs in a constant
