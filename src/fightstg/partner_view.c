@@ -39,9 +39,9 @@ void FIGHTSTG_updatePartnerView(PartnerView *task, FighterCamera **cameras) {
             models = TASK_REGISTRY.funcs.find(BATTLE_TASK_MODELS, -1, -1);
             if (models != NULL) {
                 control = models->get(models, 0);
-                control->unk34[1].enabled = 1;
-                control->unk34[1].alt = 0;
-                control->unk34[1].arg = 0x1009;
+                control->layers[1].enabled = 1;
+                control->layers[1].wireframe = 0;
+                control->layers[1].layerId = 0x1009;
                 fighter = control->fighter;
                 if (cameras[0] == NULL) {
                     cameras[0] = FIGHTSTG_createCamera(fighter, control);
@@ -64,7 +64,7 @@ void FIGHTSTG_updatePartnerView(PartnerView *task, FighterCamera **cameras) {
     case TASK_KILL:
         if (task->layer != NULL) {
             models = TASK_REGISTRY.funcs.find(BATTLE_TASK_MODELS, -1, -1);
-            models->get(models, 0)->unk34[1].enabled = 0;
+            models->get(models, 0)->layers[1].enabled = 0;
             GFX.funcs.destroyLayer(0x1009);
         }
         break;

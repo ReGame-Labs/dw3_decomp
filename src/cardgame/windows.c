@@ -145,7 +145,7 @@ void CARDGAME_drawWindowFrame(CardScreen *screen, CardScreenItems *items, CardWi
     if (window->layout == 2 && window->numbers[2] == 1) {
         offset = 0x45;
     }
-    if (window->state == 2 && window->layout == 3 && window->unkE != 0) {
+    if (window->state == 2 && window->layout == 3 && window->showCount != 0) {
         drawWindowCount(window);
     }
     {

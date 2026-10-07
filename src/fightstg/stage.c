@@ -53,10 +53,10 @@ void FIGHTSTG_updateStage(FightStage *task, Model **children) {
     case TASK_RUN:
         switch (task->substate) {
         case 0:
-            task->control.unk34[0].enabled = 1;
-            task->control.unk34[0].arg = 0x1002;
+            task->control.layers[0].enabled = 1;
+            task->control.layers[0].layerId = 0x1002;
             task->control.fighter = 0;
-            task->control.unk34[0].alt = 0;
+            task->control.layers[0].wireframe = 0;
             children[0] = FIGHTSTG_createPlainModel(stages[task->stage].model, stages[task->stage].motions, FIGHTSTG_stageTexPos, &task->control);
             if (stages[task->stage].music != -1) {
                 task->voice = SOUND.playSound(FIGHTSTG_stageMusic[stages[task->stage].music]);
@@ -70,11 +70,11 @@ void FIGHTSTG_updateStage(FightStage *task, Model **children) {
         case 1:
             if (children[0]->state == TASK_RUN) {
                 for (i = 0; i < 8; i++) {
-                    if (stages[task->stage].unk10[i] == 0) {
+                    if (stages[task->stage].noBoundsBones[i] == 0) {
                         break;
                     }
                     model = children[0];
-                    model->setBoneNoBoundsCheck(model, stages[task->stage].unk10[i], 1);
+                    model->setBoneNoBoundsCheck(model, stages[task->stage].noBoundsBones[i], 1);
                 }
                 color[0] = 0;
                 color[1] = 0;

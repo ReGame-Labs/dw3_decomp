@@ -5,8 +5,8 @@
 #include "wfightmn.h"
 
 /* In BATTLE_KIND_FINAL, keeps the partner's technique ID in
-   FIGHTSTG_battle.tech when its unk10 is not 5 or 12 and it has an effect
-   (its kind is not 0-1, 9-10 or 12, or its unk7 is 2 or more);
+   FIGHTSTG_battle.tech when its script is not 5 or 12 and it has an effect
+   (not 0-1, 9-10 or 12) or an element;
    WFIGHTMN_bringLastEnemy makes technique 440 from it */
 void WFIGHTMN_recordTech(u8 side, s32 id) {
     TechData *info = &TECHS[id - 1];
@@ -15,7 +15,7 @@ void WFIGHTMN_recordTech(u8 side, s32 id) {
 
     if (side == 0 && FIGHTSTG_battle.kind == BATTLE_KIND_FINAL) {
         flag = 0;
-        if (info->unk10 != 5 && info->unk10 != 12) {
+        if (info->script != 5 && info->script != 12) {
             kind = info->effect;
             if (!(kind <= 1 || (kind >= 9 && kind <= 10) || kind == 12)) {
                 flag = 1;
@@ -66,11 +66,11 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
     task = FIGHTSTG_createBattleScript();
     task->enemy = actor;
     if (actor == 0) {
-        if (info->unk10 == 5) {
+        if (info->script == 5) {
             if (own->tripleHit != 0) {
                 task->index = 8;
-                task->effect = info->unkE;
-                task->sound = info->unkF;
+                task->effect = info->scriptEffect;
+                task->sound = info->scriptSound;
             } else {
                 for (i = 2; i < 13; i++) {
                     if (FIGHTSTG_action.effects[i] != 0) {
@@ -89,28 +89,28 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
                     for (i = 0; i < 3; i++) {
                         if (own->weaponFamilies[i] >= FAMILY_FIRST && own->weaponFamilies[i] == other->family) {
                             task->index = 6;
-                            task->effect = info->unkE;
-                            task->sound = info->unkF;
+                            task->effect = info->scriptEffect;
+                            task->sound = info->scriptSound;
                             break;
                         }
                     }
                     if (task->index == 0) {
-                        task->index = info->unk10;
-                        task->effect = info->unkE;
-                        task->sound = info->unkF;
+                        task->index = info->script;
+                        task->effect = info->scriptEffect;
+                        task->sound = info->scriptSound;
                     }
                 }
             }
         } else {
-            if (info->effect < TECH_EFFECT_FIRST && info->icon == TECH_PHYSICAL && info->unk10 == 6 && own->tripleHit != 0) {
+            if (info->effect < TECH_EFFECT_FIRST && info->icon == TECH_PHYSICAL && info->script == 6 && own->tripleHit != 0) {
                 task->index = 8;
             } else {
-                task->index = info->unk10;
+                task->index = info->script;
             }
-            task->effect = info->unkE;
-            task->sound = info->unkF;
+            task->effect = info->scriptEffect;
+            task->sound = info->scriptSound;
             if (info->element >= ELEMENT_FIRST || (info->family >= FAMILY_FIRST && info->family == other->family)) {
-                task->stage = info->unkD;
+                task->stage = info->scriptStage;
             } else {
                 task->stage = -1;
             }
@@ -145,11 +145,11 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
             }
         }
     } else {
-        task->index = info->unk10;
-        task->effect = info->unkE;
-        task->sound = info->unkF;
+        task->index = info->script;
+        task->effect = info->scriptEffect;
+        task->sound = info->scriptSound;
         if (info->element >= ELEMENT_FIRST || (info->family >= FAMILY_FIRST && info->family == other->family)) {
-            task->stage = info->unkD;
+            task->stage = info->scriptStage;
         } else {
             task->stage = -1;
         }

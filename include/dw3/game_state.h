@@ -83,12 +83,12 @@ typedef struct DigimonData {
     /* 0x02 */ u16 battleStats[6];
     /* 0x0E */ u16 resistances[7];
     /* 0x1C */ u16 skills[7]; /* [1]-[6] are learnt at skillLevels */
-    /* 0x2A */ u16 unk2A; /* a technique it has with the partner whose nameId is unk3D */
-    /* 0x2C */ u8 unk2C[5];
+    /* 0x2A */ u16 pairTech; /* its pair technique, with pairPartner */
+    /* 0x2C */ u8 statusResists[5]; /* against poison, paralysis, confusion, sleep and knock-outs */
     /* 0x31 */ u8 skillLevels[6];
     /* 0x37 */ u8 knownLevels[5]; /* the levels that mark an entry's skills[0]-[4] known */
     /* 0x3C */ u8 expLevel; /* the level after which its exp grows faster */
-    /* 0x3D */ u8 unk3D;
+    /* 0x3D */ u8 pairPartner; /* the Digimon (from 1) it does pairTech with, 0 for none */
     /* 0x3E */ u8 expRate; /* a partner's exp per level, in tenths */
     /* 0x3F */ u8 hp;
     /* 0x40 */ u8 mp;
@@ -96,9 +96,10 @@ typedef struct DigimonData {
     /* 0x42 */ u8 mpGrowth;
     /* 0x43 */ u8 statGrowth[6]; /* columns of the growth tables */
     /* 0x49 */ u8 resistGrowth[7]; /* 1-5: how fast the gyms raise them */
-    /* 0x50 */ u8 unk50[5];
+    /* 0x50 */ u8 blastForms[5]; /* what a blast turns a partner into (from 1), by its level's tier */
     /* 0x55 */ u8 nameId; /* string in file 0x4F */
-    /* 0x56 */ u8 unk56[2];
+    /* 0x56 */ u8 family; /* the family it fights as (BattleStats.family) */
+    /* 0x57 */ u8 unk57;
 } DigimonData;
 
 /* An item (ITEMS, GET_ITEM) */
@@ -121,13 +122,13 @@ typedef struct TechData {
     /* 0x07 */ u8 element; /* ELEMENT_FIRST and up, under it none */
     /* 0x08 */ u8 elementPower; /* how much the element adds, against the target's resistance */
     /* 0x09 */ u8 family; /* FAMILY_FIRST and up, under it none */
-    /* 0x0A */ u8 effect; /* TECH_EFFECT_* (fightstg.h), under TECH_EFFECT_FIRST none */
+    /* 0x0A */ u8 effect; /* TECH_EFFECT_* (fightstg/battle.h), under TECH_EFFECT_FIRST none */
     /* 0x0B */ u8 effectChance;
     /* 0x0C */ u8 effectPower; /* the effect's strength (a boost's amount, a drain's 128ths) */
-    /* 0x0D */ u8 unkD;
-    /* 0x0E */ u8 unkE;
-    /* 0x0F */ u8 unkF;
-    /* 0x10 */ u8 unk10;
+    /* 0x0D */ u8 scriptStage; /* its script's stage (BattleScript.stage) */
+    /* 0x0E */ u8 scriptEffect; /* its script's sprite effect (BattleScript.effect) */
+    /* 0x0F */ u8 scriptSound; /* its script's hit sound (BattleScript.sound) */
+    /* 0x10 */ u8 script; /* its script in the user's archive (BattleScript.index); 5 and 12 are special */
     /* 0x11 */ u8 hitCount;
 } TechData;
 
@@ -260,23 +261,38 @@ typedef struct BattleEnemy {
     /* 0x4 */ s16 level;
     /* 0x6 */ s16 hp;
     /* 0x8 */ s16 mp;
-    /* 0xA */ s16 unkA;
+    /* 0xA */ s16 strength; /* its stats and techniques' power, in 16ths */
 } BattleEnemy;
+
+/* BattleSetup.blocks' indices: the encounter keeps the player from
+   inflicting a status, draining, stealing, lowering a stat of the enemy's
+   or running away */
+#define BATTLE_BLOCK_POISON 0
+#define BATTLE_BLOCK_PARALYSIS 1
+#define BATTLE_BLOCK_CONFUSION 2
+#define BATTLE_BLOCK_SLEEP 3
+#define BATTLE_BLOCK_KNOCK_OUT 4
+#define BATTLE_BLOCK_DRAIN 5
+#define BATTLE_BLOCK_STEAL 7
+#define BATTLE_BLOCK_LOWER_ATTACK 8 /* to 10: attack, defense, speed (a technique's boost stat + 8) */
+#define BATTLE_BLOCK_LOWER_DEFENSE 9
+#define BATTLE_BLOCK_LOWER_SPEED 10
+#define BATTLE_BLOCK_RUN_AWAY 11
 
 /* The next battle: FIELDSTG_startEncounter fills it (the stage select its
    first words), FIGHTSTG and WFIGHTMN read it; the gauges carry over from
    battle to battle */
 typedef struct BattleSetup {
-    /* 0x00 */ s32 unk0; /* 0 or 1, toggled by the stage select (Select) */
-    /* 0x04 */ s32 unk4; /* -1 to 3, set by the stage select (up/down) */
-    /* 0x08 */ s32 unk8; /* -1 to 7, set by the stage select */
+    /* 0x00 */ s32 randomBattles; /* the field starts random battles; the stage select toggles it (Select) */
+    /* 0x04 */ s32 debugUpDown; /* -1 to 3, set by the stage select (pad 2's up/down); nothing reads it */
+    /* 0x08 */ s32 debugLeftRight; /* -1 to 7, set by the stage select (pad 2's left/right); nothing reads it */
     /* 0x0C */ s32 stage; /* the battle's fight stage */
     /* 0x10 */ s32 battle; /* the battle (BattleResult.battle) */
     /* 0x14 */ s32 music; /* the battle's music */
     /* 0x18 */ BattleEnemy enemies[3];
     /* 0x3C */ u8 ambushChance; /* a chance that WFIGHTMN scales by level */
     /* 0x3D */ u8 unk3D;
-    /* 0x3E */ u8 unk3E[12]; /* FIGHTSTG_rollDrain gives 0 for side 0 when [5] is set */
+    /* 0x3E */ u8 blocks[12]; /* by BATTLE_BLOCK_*: what the player can't do in the battle */
     /* 0x4C */ s32 hasPrize; /* 1: the battle always gives prize */
     /* 0x50 */ s32 prize; /* an item (BattleResult.item) */
     /* 0x54 */ void (*clearGauges)(void);

@@ -76,7 +76,7 @@ void FIGHTSTG_updateEntrance(Entrance *task, WhiteFlash **children) {
                 if (task->counter < 30) {
                     break;
                 }
-                models->get(models, task->key2 == 0 ? 0x10 : 0)->unk34[0].enabled = 0;
+                models->get(models, task->key2 == 0 ? 0x10 : 0)->layers[0].enabled = 0;
                 task->step++;
             case 1:
                 if (task->counter >= 60) {
@@ -98,9 +98,9 @@ void FIGHTSTG_updateEntrance(Entrance *task, WhiteFlash **children) {
             models->setId(models, task->key2 + 1, task->key2);
             models->face(models, task->key2);
             control = models->get(models, task->key2);
-            control->unk34[0].arg = 0x1004;
-            control->unk34[0].enabled = 1;
-            control->unk34[0].alt = 0;
+            control->layers[0].layerId = 0x1004;
+            control->layers[0].enabled = 1;
+            control->layers[0].wireframe = 0;
             control->motion = 13;
             camera->set(camera, camera->getFighterView(camera, task->key2, task->key2 != 0 ? 2 : 10));
             if (is1D2) {
@@ -134,7 +134,7 @@ void FIGHTSTG_updateEntrance(Entrance *task, WhiteFlash **children) {
             } else {
                 entering->motion = 1;
             }
-            models->get(models, task->key2 == 0 ? 0x10 : 0)->unk34[0].enabled = 1;
+            models->get(models, task->key2 == 0 ? 0x10 : 0)->layers[0].enabled = 1;
             task->setState(task, 3);
             break;
         }

@@ -38,9 +38,9 @@ typedef struct BattleMenuChildren {
 
 /* The screen its layers cover */
 extern RECT WFIGHTMN_screen;
-/* A technique's effects by its kind and by its unk7, for WFIGHTMN_bringLastEnemy */
-extern s32 WFIGHTMN_kindEffects[][3];
-extern s32 WFIGHTMN_unk7Effects[][4];
+/* A technique's look by its effect and by its element, for WFIGHTMN_bringLastEnemy */
+extern s32 WFIGHTMN_effectVisuals[][3];
+extern s32 WFIGHTMN_elementVisuals[][4];
 /* WFIGHTMN_startTech's effects */
 extern s32 WFIGHTMN_actionEffects[][2];
 /* The battle menu's states, by its substate */

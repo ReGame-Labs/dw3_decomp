@@ -78,9 +78,9 @@ void FIGHTSTG_addFighterModel(Models *task, s32 id, s32 fighter, s32 visible) {
         task->controls[i].motion = 1;
         task->controls[i].fighter = fighter;
         task->controls[i].id = id;
-        task->controls[i].unk34[0].enabled = visible;
-        task->controls[i].unk34[0].alt = 0;
-        task->controls[i].unk34[0].arg = 0x1004;
+        task->controls[i].layers[0].enabled = visible;
+        task->controls[i].layers[0].wireframe = 0;
+        task->controls[i].layers[0].layerId = 0x1004;
     }
 }
 
@@ -123,14 +123,14 @@ void FIGHTSTG_faceModel(Models *task, s32 id) {
         if (id < 0x10) {
             control->pos.x = 0;
             control->pos.y = -info->height;
-            z = -0x1400 - info->unk10;
+            z = -0x1400 - info->distance;
             control->rot.y = 0x800;
             control->rot.x = 0;
             control->rot.z = 0;
         } else {
             control->pos.x = 0;
             control->pos.y = -info->height;
-            z = info->unk10 + 0x1400;
+            z = info->distance + 0x1400;
             control->rot.x = 0;
             control->rot.y = 0;
             control->rot.z = 0;

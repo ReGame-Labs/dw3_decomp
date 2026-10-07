@@ -155,7 +155,7 @@ compilers, are in the history.
   what was tried before are in the history.
 - [x] `shot_camera.c`'s `FIGHTSTG_createShotCamera`
   returns its task, which `FIGHTSTG_updatePlayerTurn` stores, and is
-  defined so, with the one prototype in `fightstg.h`.
+  defined so, with the one prototype in `fightstg/camera.h`.
 - [x] The field menu's near miss. `STGDGLAB`'s `func_8008C234` matches in
   both versions with its `skillCount = 6` store alone in a `do { } while (0)`,
   a BEC form (`docs/status.md`): the loop notes keep sched1 and sched2 from moving the

@@ -30,7 +30,7 @@ void FIGHTSTG_blendBone(Model *model, ModelBone *bone) {
     SVECTOR diff;
     SVECTOR step;
 
-    archive = FILE_CACHE.getEntry(bone->unk8);
+    archive = FILE_CACHE.getEntry(bone->keyFile);
     for (i = 0; i < 9; i += 3) {
         key = (SVECTOR *)FILE_CACHE.getArchiveEntry(i / 3, archive);
         switch (i) {
@@ -92,7 +92,7 @@ void FIGHTSTG_poseBone(Model *model, ModelBone *bone, s32 frame) {
     SVECTOR diff;
     SVECTOR step;
 
-    archive = FILE_CACHE.getEntry(bone->unk8);
+    archive = FILE_CACHE.getEntry(bone->keyFile);
     for (i = 0; i < 9; i += 3) {
         key = (SVECTOR *)FILE_CACHE.getArchiveEntry(i / 3, archive);
         found = 0;
@@ -204,31 +204,31 @@ void FIGHTSTG_setMotion(Model *model, s32 motion, s32 restart) {
         n = step->count;
         if (n == 0) {
             model->keyframes[count] = step->frame;
-            model->unkD24[count] = step->unk6;
+            model->blendTargets[count] = step->endFrame;
             count++;
             break;
         }
-        if (step->unk6 == 0) {
+        if (step->endFrame == 0) {
             to = step[1].frame;
             if (to == -1) {
                 to = model->idleFrames[model->control->idleMotion];
                 model->toIdle = 1;
             }
             if (step->index != 0) {
-                from = step[-1].unk6;
+                from = step[-1].endFrame;
             } else {
                 from = 0xFFFF;
             }
             for (i = 0; i < n; i++) {
-                model->unk19A4[count] = from;
-                model->unkD24[count] = to;
+                model->blendSources[count] = from;
+                model->blendTargets[count] = to;
                 model->keyframes[count] = (((i + 1) << 12) / (n + 1)) | 0x8000;
                 count++;
             }
         } else {
             for (i = 0; i < n; i++) {
                 model->keyframes[count] = step->frame + i;
-                model->unkD24[count] = 0;
+                model->blendTargets[count] = 0;
                 count++;
             }
         }
@@ -247,17 +247,17 @@ void FIGHTSTG_stepMotion(Model *model) {
 
     if (model->motionDone == 0) {
         if (model->keyframes[key] & 0x8000) {
-            if (model->blendTarget != model->unkD24[key]) {
-                model->blendTarget = model->unkD24[key];
-                if (model->unk19A4[key] != 0xFFFF) {
+            if (model->blendTarget != model->blendTargets[key]) {
+                model->blendTarget = model->blendTargets[key];
+                if (model->blendSources[key] != 0xFFFF) {
                     bone = model->bones;
                     for (i = 1, bone++; i < model->boneCount; i++, bone++) {
-                        FIGHTSTG_poseBone(model, bone, model->unk19A4[key]);
+                        FIGHTSTG_poseBone(model, bone, model->blendSources[key]);
                     }
                 }
                 FIGHTSTG_saveBlendPose(model);
             }
-            model->frame = model->unkD24[key];
+            model->frame = model->blendTargets[key];
             model->blend = model->keyframes[key] & 0x7FFF;
             model->blending = 1;
         } else {
@@ -272,7 +272,7 @@ void FIGHTSTG_stepMotion(Model *model) {
         key = model->keyframe;
         switch (model->keyframes[key]) {
         case 0x8000:
-            model->keyframe = model->unkD24[key];
+            model->keyframe = model->blendTargets[key];
             break;
         case 0xFFFF:
             model->motionDone = 1;
@@ -377,13 +377,13 @@ void FIGHTSTG_updateModel(Model *model, Mesh **children) {
             }
         }
         for (j = 0; j < 2; j++) {
-            if (model->control->unk34[j].enabled) {
+            if (model->control->layers[j].enabled) {
                 for (d = 0, drawn = model->bones; d < model->boneCount; d++, drawn++) {
                     if (d != 0 && drawn->visible) {
-                        if (model->control->unk34[j].alt) {
-                            children[d + 1]->drawAlt(children[d + 1], model->control->unk34[j].arg, &drawn->world);
+                        if (model->control->layers[j].wireframe) {
+                            children[d + 1]->drawWireframe(children[d + 1], model->control->layers[j].layerId, &drawn->world);
                         } else {
-                            children[d + 1]->draw(children[d + 1], model->control->unk34[j].arg, &drawn->world);
+                            children[d + 1]->draw(children[d + 1], model->control->layers[j].layerId, &drawn->world);
                         }
                     }
                 }
@@ -409,7 +409,7 @@ void FIGHTSTG_setModelColor(Model *model, s32 mode, CVECTOR *color) {
     s32 j;
 
     for (i = 0; i < 2; i++) {
-        if (model->control->unk34[i].enabled) {
+        if (model->control->layers[i].enabled) {
             for (j = 0; j < model->boneCount; j++) {
                 if (j != 0) {
                     children[j + 1]->colorMode = mode;
@@ -423,7 +423,7 @@ void FIGHTSTG_setModelColor(Model *model, s32 mode, CVECTOR *color) {
 }
 
 /* Model.setBoneNoBoundsCheck: sets bone's Mesh noBoundsCheck when either of the
-   control's unk34 is enabled and bone isn't 0. The match
+   control's layers is enabled and bone isn't 0. The match
    depends on the pointer to the bone's slot, which children[bone + 1]
    computes with the addu's operands the other way round. */
 void FIGHTSTG_setBoneNoBoundsCheck(Model *model, s32 bone, s32 value) {
@@ -431,7 +431,7 @@ void FIGHTSTG_setBoneNoBoundsCheck(Model *model, s32 bone, s32 value) {
     s32 i;
 
     for (i = 0; i < 2; i++) {
-        if (model->control->unk34[i].enabled && bone != 0) {
+        if (model->control->layers[i].enabled && bone != 0) {
             meshes[1]->noBoundsCheck = value;
         }
     }
@@ -463,7 +463,7 @@ Model *FIGHTSTG_createModel(s32 file, s32 motionFile, Vec2 texPos, ModelControl 
     model->boneCount = count;
     model->bones[0].parent = 0;
     model->bones[0].file = 0;
-    model->bones[0].unk8 = 0;
+    model->bones[0].keyFile = 0;
     model->bones[0].parentMatrix = &IDENTITY_MATRIX;
     model->bones[0].pos.vx = 0;
     model->bones[0].pos.vy = 0;
@@ -478,7 +478,7 @@ Model *FIGHTSTG_createModel(s32 file, s32 motionFile, Vec2 texPos, ModelControl 
     for (i = 1; i < count; i++) {
         model->bones[i].parent = *entry++;
         model->bones[i].file = *entry++ | high;
-        model->bones[i].unk8 = *entry++ | high;
+        model->bones[i].keyFile = *entry++ | high;
     }
     model->setMotion = FIGHTSTG_setMotion;
     model->isMotionDone = FIGHTSTG_isMotionDone;
@@ -1009,7 +1009,7 @@ void FIGHTSTG_queueMeshDraw(Mesh *mesh, s32 layerId, MATRIX *matrix) {
     mesh->matrix = *matrix;
 }
 
-/* Mesh.drawAlt: has the layer draw the Mesh as wireframe
+/* Mesh.drawWireframe: has the layer draw the Mesh as wireframe
    (FIGHTSTG_drawMeshWireframe) with MATRIX */
 void FIGHTSTG_queueMeshWireframe(Mesh *mesh, s32 layerId, MATRIX *matrix) {
     Layer *layer = GFX.funcs.getLayer(layerId);
@@ -1051,7 +1051,7 @@ Mesh *FIGHTSTG_createMesh(s32 archive, Vec2 texPos) {
     mesh->bounds = FILE_CACHE.getArchiveEntry(5, archive);
     mesh->texPos = texPos;
     mesh->draw = FIGHTSTG_queueMeshDraw;
-    mesh->drawAlt = FIGHTSTG_queueMeshWireframe;
+    mesh->drawWireframe = FIGHTSTG_queueMeshWireframe;
     return mesh;
 }
 

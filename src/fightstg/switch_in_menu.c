@@ -217,8 +217,8 @@ void FIGHTSTG_updateSwitchInMenu(SwitchInMenu *task, SwitchInMenuWindows *w) {
                 if (FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]].temporary == 0) {
                     data = GET_DIGIMON(FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]].id);
                     partner = GET_DIGIMON(task->ids[task->digimon]);
-                    if (data->unk3D != 0 && data->unk3D == partner->nameId) {
-                        task->tech = data->unk2A;
+                    if (data->pairPartner != 0 && data->pairPartner == partner->nameId) {
+                        task->tech = data->pairTech;
                     } else {
                         task->tech = 0;
                     }

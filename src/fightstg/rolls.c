@@ -191,7 +191,7 @@ s32 FIGHTSTG_rollMagicHit(u8 side, s32 id) {
 
 /* The poison a hit inflicts, or 0: the technique's or the accessory's chance
    and an eighth of the user's wisdom, less the target's resistances and
-   wisdom (BATTLE_SETUP.unk3E[0] keeps the player from it) */
+   wisdom (BATTLE_BLOCK_POISON keeps the player from it) */
 s32 FIGHTSTG_rollPoison(u8 side, s32 id) {
     BattleStats *atk;
     BattleStats *def;
@@ -201,7 +201,7 @@ s32 FIGHTSTG_rollPoison(u8 side, s32 id) {
     s32 base;
 
     if (side == 0) {
-        if (BATTLE_SETUP.unk3E[0]) {
+        if (BATTLE_SETUP.blocks[BATTLE_BLOCK_POISON]) {
             return 0;
         }
         FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
@@ -233,7 +233,7 @@ s32 FIGHTSTG_rollPoison(u8 side, s32 id) {
     return 0;
 }
 
-/* Whether a hit paralyzes, like rollPoison (BATTLE_SETUP.unk3E[1] keeps the
+/* Whether a hit paralyzes, like rollPoison (BATTLE_BLOCK_PARALYSIS keeps the
    player from it) */
 s32 FIGHTSTG_rollParalysis(u8 side, s32 id) {
     BattleStats *atk;
@@ -243,7 +243,7 @@ s32 FIGHTSTG_rollParalysis(u8 side, s32 id) {
     s32 base;
 
     if (side == 0) {
-        if (BATTLE_SETUP.unk3E[1]) {
+        if (BATTLE_SETUP.blocks[BATTLE_BLOCK_PARALYSIS]) {
             return 0;
         }
         FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
@@ -270,7 +270,7 @@ s32 FIGHTSTG_rollParalysis(u8 side, s32 id) {
     return (RANDOM.next() & 0x7F) < chance;
 }
 
-/* Whether a hit confuses, like rollPoison (BATTLE_SETUP.unk3E[2] keeps the
+/* Whether a hit confuses, like rollPoison (BATTLE_BLOCK_CONFUSION keeps the
    player from it) */
 s32 FIGHTSTG_rollConfusion(u8 side, s32 id) {
     BattleStats *atk;
@@ -280,7 +280,7 @@ s32 FIGHTSTG_rollConfusion(u8 side, s32 id) {
     s32 base;
 
     if (side == 0) {
-        if (BATTLE_SETUP.unk3E[2]) {
+        if (BATTLE_SETUP.blocks[BATTLE_BLOCK_CONFUSION]) {
             return 0;
         }
         FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
@@ -308,7 +308,7 @@ s32 FIGHTSTG_rollConfusion(u8 side, s32 id) {
 }
 
 /* Whether a hit puts the target to sleep, like rollPoison with the
-   technique's chance (BATTLE_SETUP.unk3E[3] keeps the player from it) */
+   technique's chance (BATTLE_BLOCK_SLEEP keeps the player from it) */
 s32 FIGHTSTG_rollSleep(u8 side, s32 id) {
     BattleStats *atk;
     BattleStats *def;
@@ -316,7 +316,7 @@ s32 FIGHTSTG_rollSleep(u8 side, s32 id) {
     s32 chance;
 
     if (side == 0) {
-        if (BATTLE_SETUP.unk3E[3]) {
+        if (BATTLE_SETUP.blocks[BATTLE_BLOCK_SLEEP]) {
             return 0;
         }
         FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
@@ -339,7 +339,7 @@ s32 FIGHTSTG_rollSleep(u8 side, s32 id) {
 }
 
 /* Whether a hit knocks the target out, like rollPoison
-   (BATTLE_SETUP.unk3E[4] keeps the player from it) */
+   (BATTLE_BLOCK_KNOCK_OUT keeps the player from it) */
 s32 FIGHTSTG_rollKnockOut(u8 side, s32 id) {
     BattleStats *atk;
     BattleStats *def;
@@ -348,7 +348,7 @@ s32 FIGHTSTG_rollKnockOut(u8 side, s32 id) {
     s32 base;
 
     if (side == 0) {
-        if (BATTLE_SETUP.unk3E[4]) {
+        if (BATTLE_SETUP.blocks[BATTLE_BLOCK_KNOCK_OUT]) {
             return 0;
         }
         FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
@@ -387,7 +387,7 @@ s32 FIGHTSTG_rollSteal(u8 side, s32 id) {
     s32 roll;
 
     if (side == 0) {
-        if (BATTLE_SETUP.unk3E[7]) {
+        if (BATTLE_SETUP.blocks[BATTLE_BLOCK_STEAL]) {
             return 0;
         }
         if (FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]].item <= 0) {
@@ -424,7 +424,7 @@ s32 FIGHTSTG_rollDrain(u8 side, s32 id) {
     TechData *entry;
     s32 chance;
 
-    if (side == 0 && BATTLE_SETUP.unk3E[5] != 0) {
+    if (side == 0 && BATTLE_SETUP.blocks[BATTLE_BLOCK_DRAIN] != 0) {
         return 0;
     }
 #if VERSION_US
@@ -441,21 +441,25 @@ s32 FIGHTSTG_rollDrain(u8 side, s32 id) {
     return (RANDOM.next() & 0x7F) < chance;
 }
 
+/* Rolls a technique's effect chance (TechData.effectChance, in 128ths) */
+static inline s32 rollTechChance(s32 id) {
+    TechData *entry = &TECHS[id - 1];
+    s32 chance = entry->effectChance;
+
+    return (RANDOM.next() & 0x7F) < chance;
+}
+
 /* Whether a technique turns the player's fighter back: never when it is one
    of the first 8 Digimon, otherwise the technique's chance */
 s32 FIGHTSTG_rollDedigivolve(s32 actor, s32 id) {
     s32 i;
-    TechData *entry;
-    s32 chance;
 
     for (i = 0; i < 8; i++) {
         if (DIGIMON_DATA[i].id == FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]].id) {
             return 0;
         }
     }
-    entry = &TECHS[id - 1];
-    chance = entry->effectChance;
-    return (RANDOM.next() & 0x7F) < chance;
+    return rollTechChance(id);
 }
 
 /* Whether a status raise works: the technique's chance and an eighth of
@@ -473,18 +477,12 @@ s32 FIGHTSTG_rollStatusRaise(s32 actor, s32 id) {
 
 /* Whether TECH_EFFECT_NO_SWITCH works: the technique's chance */
 s32 FIGHTSTG_rollNoSwitch(s32 actor, s32 id) {
-    TechData *entry = &TECHS[id - 1];
-    s32 chance = entry->effectChance;
-
-    return (RANDOM.next() & 0x7F) < chance;
+    return rollTechChance(id);
 }
 
 /* Whether TECH_EFFECT_NO_DIGIVOLVE works: the technique's chance */
 s32 FIGHTSTG_rollNoDigivolve(s32 actor, s32 id) {
-    TechData *entry = &TECHS[id - 1];
-    s32 chance = entry->effectChance;
-
-    return (RANDOM.next() & 0x7F) < chance;
+    return rollTechChance(id);
 }
 
 #if VERSION_EU
@@ -499,7 +497,7 @@ s32 FIGHTSTG_rollCounter(s32 arg0, s32 arg1) {
 #endif
 
 /* FIGHTSTG_battleFuncs.testRunAway: a random test for side running away, from
-   both sides' stats; the player can't while BATTLE_SETUP.unk3E[11] is set, and
+   both sides' stats; the player can't while BATTLE_BLOCK_RUN_AWAY is set, and
    in the European version neither can the enemy while its fighter is asleep. The match depends on the battle's runAttempts being read through a pointer to
    its active array, taken before side is tested again, and on the flags being
    tested with family as a halfword. */
@@ -520,7 +518,7 @@ s32 FIGHTSTG_testRunAway(u8 side) {
     atk = &FIGHTSTG_battleFuncs.stats[0];
     def = &FIGHTSTG_battleFuncs.stats[1];
     if (side == 0) {
-        if (BATTLE_SETUP.unk3E[11]) {
+        if (BATTLE_SETUP.blocks[BATTLE_BLOCK_RUN_AWAY]) {
             return 0;
         }
         if (*(u16 *)&atk->flags & 0x18) {

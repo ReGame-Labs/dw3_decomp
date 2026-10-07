@@ -56,10 +56,10 @@ s32 FIGHTSTG_adjustDamage(u8 side, s32 id, s32 value) {
     }
     if (tech->element >= ELEMENT_FIRST) {
         result += result * tech->elementPower * 2 / target->resist[tech->element - ELEMENT_FIRST];
-    } else if ((tech->unk10 < 11 || tech->unk10 > 12) && user->element != 0) {
+    } else if ((tech->script < 11 || tech->script > 12) && user->element != 0) {
         result += result * user->elementPower * 2 / target->resist[user->element - ELEMENT_FIRST];
     }
-    if (tech->effect < TECH_EFFECT_FIRST && user->tripleHit != 0 && (tech->unk10 < 11 || tech->unk10 > 12)) {
+    if (tech->effect < TECH_EFFECT_FIRST && user->tripleHit != 0 && (tech->script < 11 || tech->script > 12)) {
         result = result * 4 / 10;
     }
     if (FIGHTSTG_rollCritical(side, id) != 0) {
@@ -106,7 +106,7 @@ s32 FIGHTSTG_computeDamage(u8 side, s32 id) {
         value = tech->power * user->stats[BATTLE_STAT_ATTACK] / target->stats[BATTLE_STAT_DEFENSE];
     } else {
         enemy = FIGHTSTG_battle.active[1]; /* the match depends on reading it first */
-        value = tech->power * BATTLE_SETUP.enemies[enemy].unkA / 16 * user->stats[BATTLE_STAT_ATTACK] /
+        value = tech->power * BATTLE_SETUP.enemies[enemy].strength / 16 * user->stats[BATTLE_STAT_ATTACK] /
                 target->stats[BATTLE_STAT_DEFENSE];
     }
     return FIGHTSTG_adjustDamage(side, id, value);
@@ -140,7 +140,7 @@ s32 FIGHTSTG_computeMagicDamage(u8 side, s32 id) {
         base = tech->power;
     } else {
         enemy = FIGHTSTG_battle.active[1]; /* the match depends on reading it first */
-        base = tech->power * BATTLE_SETUP.enemies[enemy].unkA / 16;
+        base = tech->power * BATTLE_SETUP.enemies[enemy].strength / 16;
     }
     power = base * (user->stats[BATTLE_STAT_SPIRIT] * 50 / target->stats[BATTLE_STAT_SPIRIT] + 50) / 100;
     if (power > base * 2) {

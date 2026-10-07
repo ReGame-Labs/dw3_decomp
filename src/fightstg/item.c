@@ -65,7 +65,7 @@ s32 FIGHTSTG_runItemScript(BattleItem *task, BattleScript **children) {
             fighter = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
             stats = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
             if (stats->stats[BATTLE_STAT_ATTACK] > stats->stats[BATTLE_STAT_DEFENSE]) {
-                if (BATTLE_SETUP.unk3E[8] == 0) {
+                if (BATTLE_SETUP.blocks[BATTLE_BLOCK_LOWER_ATTACK] == 0) {
                     task->lowered = 1;
                     atk = stats->stats[BATTLE_STAT_ATTACK];
                     def = stats->stats[BATTLE_STAT_DEFENSE];
@@ -79,7 +79,7 @@ s32 FIGHTSTG_runItemScript(BattleItem *task, BattleScript **children) {
                     }
                 }
             } else if (stats->stats[BATTLE_STAT_ATTACK] < stats->stats[BATTLE_STAT_DEFENSE]) {
-                if (BATTLE_SETUP.unk3E[9] == 0) {
+                if (BATTLE_SETUP.blocks[BATTLE_BLOCK_LOWER_DEFENSE] == 0) {
                     task->lowered = 2;
                     atk = stats->stats[BATTLE_STAT_ATTACK];
                     def = stats->stats[BATTLE_STAT_DEFENSE];
@@ -115,7 +115,7 @@ s32 FIGHTSTG_runItemScript(BattleItem *task, BattleScript **children) {
             children[0]->stage = -1;
             children[0]->effect = 0x1C;
             children[0]->sound = 0x27;
-            if (BATTLE_SETUP.unk3E[5] == 0) {
+            if (BATTLE_SETUP.blocks[BATTLE_BLOCK_DRAIN] == 0) {
                 enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
                 task->damage = enemy->maxHp * 20 / 100;
                 if (enemy->hp - task->damage <= 0) {
@@ -133,9 +133,9 @@ s32 FIGHTSTG_runItemScript(BattleItem *task, BattleScript **children) {
         case 0x5A:
             children[0]->index = 0xE;
             tech = &TECHS[0x88];
-            children[0]->stage = tech->unkD;
-            children[0]->effect = tech->unkE;
-            children[0]->sound = tech->unkF;
+            children[0]->stage = tech->scriptStage;
+            children[0]->effect = tech->scriptEffect;
+            children[0]->sound = tech->scriptSound;
             task->damage = WFIGHTMN_limitDamage(0, FIGHTSTG_battleFuncs.computeMagicDamage(0, 0x89), 0);
             row = FIGHTSTG_battle.fighters[1];
             if (task->damage > 0) {
@@ -177,7 +177,7 @@ s32 FIGHTSTG_runItemScript(BattleItem *task, BattleScript **children) {
         break;
     case 1:
         if (children[0] == NULL) {
-            if (task->item != 0x55 || task->counter != 0 || BATTLE_SETUP.unk3E[5] != 0) {
+            if (task->item != 0x55 || task->counter != 0 || BATTLE_SETUP.blocks[BATTLE_BLOCK_DRAIN] != 0) {
                 return 1;
             }
             children[0] = FIGHTSTG_createBattleScript();
@@ -537,7 +537,7 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
             case 0x55: {
                 BattleFighter *fighter;
 
-                if (BATTLE_SETUP.unk3E[5] == 0) {
+                if (BATTLE_SETUP.blocks[BATTLE_BLOCK_DRAIN] == 0) {
                     children[0].message = FIGHTSTG_createMessage();
                     task->lines[0] = 0x10;
                     task->lines[1] = task->damage;
@@ -574,7 +574,7 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
                 switch (task->step) {
                 case 0:
                 default:
-                    if ((RANDOM.next() & 1) && BATTLE_SETUP.unk3E[2] == 0) {
+                    if ((RANDOM.next() & 1) && BATTLE_SETUP.blocks[BATTLE_BLOCK_CONFUSION] == 0) {
                         FIGHTSTG_inflictConfusion(0x10, 0, data[2]);
                         children[0].message = FIGHTSTG_createMessage();
                         task->lines[0] = 0x20;
@@ -614,7 +614,7 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
                 s32 atk;
                 s32 def;
 
-                if (BATTLE_SETUP.unk3E[9] == 0) {
+                if (BATTLE_SETUP.blocks[BATTLE_BLOCK_LOWER_DEFENSE] == 0) {
                     enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
                     stats = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
                     atk = stats->stats[BATTLE_STAT_ATTACK];
@@ -682,7 +682,7 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
                 u8 *data;
                 s32 min;
 
-                if (BATTLE_SETUP.unk3E[10] == 0) {
+                if (BATTLE_SETUP.blocks[BATTLE_BLOCK_LOWER_SPEED] == 0) {
                     data = GET_ITEM[0](task->item)->data;
                     enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
                     stats = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);

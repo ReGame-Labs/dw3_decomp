@@ -26,7 +26,7 @@ void FIGHTSTG_updateCameraTurn(CameraTurn *task, BattleScript **children) {
         stage = TASK_REGISTRY.funcs.find(BATTLE_TASK_STAGE, -1, -1);
         stage->setStage(stage, 0x17, 0x1E, 0x1E);
         models = TASK_REGISTRY.funcs.find(BATTLE_TASK_MODELS, -1, -1);
-        models->get(models, 0x10)->unk34[0].enabled = 0;
+        models->get(models, 0x10)->layers[0].enabled = 0;
         FIGHTSTG_battle.setSpeed(2);
         *children = FIGHTSTG_createBattleScript();
         (*children)->index = 3;

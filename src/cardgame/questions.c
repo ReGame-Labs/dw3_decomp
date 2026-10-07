@@ -216,7 +216,7 @@ s32 CARDGAME_stepYesNo(CardBattle *battle, CardScreen *screen) {
 
 /* Empties the card information windows 1-4 */
 void CARDGAME_clearCardInfo(CardBattle *battle, CardScreen *screen) {
-    screen->windows[1].unkE = 0;
+    screen->windows[1].showCount = 0;
     screen->windows[1].value = 0;
     screen->windows[2].value = 0;
     screen->windows[3].value = 0;
@@ -236,7 +236,7 @@ void CARDGAME_showCardInfo(CardBattle *battle, CardScreen *screen, s32 offset) {
     if (screen->sprites[offset + battle->effectStep.cursor].isKind16 != 0) {
         screen->windows[1].value |= screen->sprites[offset + battle->effectStep.cursor].points;
         screen->windows[1].value |= screen->sprites[offset + battle->effectStep.cursor].color << 4;
-        screen->windows[1].unkE = 1;
+        screen->windows[1].showCount = 1;
     }
     found = 0;
     if (screen->sprites[offset + battle->effectStep.cursor].visible != 3) {
