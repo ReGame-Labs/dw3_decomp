@@ -1,7 +1,9 @@
 #ifndef STPLNMET_H
 #define STPLNMET_H
 
-/* STPLNMET.PRO: mode 0x500, the player's name entry. */
+/* STPLNMET.PRO: mode 0x500, the player's name entry. Its modules are in
+   src/stplnmet/, and the functions below are by module, in the order they
+   link. */
 
 #include "game.h"
 /* The overlay's NameEntry and the name entry's files (name_entry.h) */
@@ -172,25 +174,74 @@ typedef struct PlayerNameFuncs {
     /* 0x1C */ s32 (*updateLerp)(MenuLerp *lerp);
 } PlayerNameFuncs;
 
-Task *STPLNMET_createScreen(void);
+/* stplnmet.c */
+void STPLNMET_centerLayer(Task *task, Task **children, Layer *layer, RECT *rect);
+void STPLNMET_updateScene(Task *task, Task **children);
+Task *STPLNMET_start(void);
+
+/* backdrop.c */
 void STPLNMET_updateScroll(NameScroll *task);
+void STPLNMET_loadScroll(NameScroll *task, s32 x, s32 y);
+void STPLNMET_setScrollLayer(NameScroll *task, s32 layer, s32 depth);
+NameScroll *STPLNMET_createScroll(void);
 void STPLNMET_updateSparkles(NameSparkle *task);
+NameSparkle *STPLNMET_createSparkles(void);
 void STPLNMET_updateShine(NameSparkle *task);
+NameSparkle *STPLNMET_createShine(void);
+
+/* welcome.c */
 void STPLNMET_updateWelcome(NameDialog *task, NameDialogWindows *windows);
-void STPLNMET_updateNameEntry(NameEntry *task, NameEntryWindows *windows);
+NameDialog *STPLNMET_createWelcome(PlayerNameScreen *screen);
+
+/* name_entry.c */
+void STPLNMET_startTween(PanelAnim *fade, s32 fadeIn);
+s32 STPLNMET_updateTween(PanelAnim *fade);
+void STPLNMET_createNameWindows(NameEntry *task, NameEntryWindows *windows);
 void STPLNMET_showNameWindows(NameEntry *task, NameEntryWindows *windows, s32 show);
 void STPLNMET_drawKeyboard(NameEntry *task);
 void STPLNMET_updateKeyboard(NameEntry *task, NameEntryWindows *windows);
+void STPLNMET_updateNameEntry(NameEntry *task, NameEntryWindows *windows);
+void STPLNMET_setNameVram(NameEntry *task, s32 x, s32 y);
+void STPLNMET_setName(NameEntry *task, char *name);
+void STPLNMET_getName(NameEntry *task, char *out);
+void STPLNMET_closeNameEntry(NameEntry *task);
 void STPLNMET_hideNameEntry(NameEntry *task, s32 hide);
+NameEntry *STPLNMET_createNameEntry(char *name);
+
+/* confirm.c */
 void STPLNMET_createConfirmWindows(NameConfirm *task, NameConfirmWindows *windows);
 void STPLNMET_showConfirmWindows(NameConfirm *task, NameConfirmWindows *windows, s32 show);
 void STPLNMET_drawConfirm(NameConfirm *task);
 void STPLNMET_runConfirm(NameConfirm *task, NameConfirmWindows *windows);
+void STPLNMET_hideConfirm(NameConfirm *task, s32 hide);
+void STPLNMET_closeConfirm(NameConfirm *task);
+void STPLNMET_updateConfirm(NameConfirm *task, NameConfirmWindows *windows);
+NameConfirm *STPLNMET_createConfirm(PlayerNameScreen *screen);
+
+/* choice.c */
 void STPLNMET_createChoiceWindows(PartnerChoice *task, PartnerChoiceWindows *windows);
 void STPLNMET_showChoiceWindows(PartnerChoice *task, PartnerChoiceWindows *windows, s32 show);
 void STPLNMET_drawChoice(PartnerChoice *task);
-void STPLNMET_updateScreen(PlayerNameScreen *screen, PlayerNameScreenChildren *children);
+void STPLNMET_runChoice(PartnerChoice *task, PartnerChoiceWindows *windows);
+void STPLNMET_hideChoice(PartnerChoice *task, s32 hide);
+void STPLNMET_updateChoice(PartnerChoice *task, PartnerChoiceWindows *windows);
+PartnerChoice *STPLNMET_createChoice(PlayerNameScreen *screen);
 
+/* screen.c */
+void STPLNMET_createTabs(PlayerNameScreen *screen, PlayerNameScreenChildren *children);
+void STPLNMET_showTabs(PlayerNameScreen *screen, PlayerNameScreenChildren *children, s32 show);
+void STPLNMET_stepScreen(PlayerNameScreen *screen, PlayerNameScreenChildren *children);
+void STPLNMET_drawTitle(PlayerNameScreen *screen);
+void STPLNMET_updateScreen(PlayerNameScreen *screen, PlayerNameScreenChildren *children);
+Task *STPLNMET_createScreen(void);
+void STPLNMET_loadFiles(void);
+s32 STPLNMET_filesLoading(void);
+void STPLNMET_startFade(PanelAnim *fade, s32 fadeIn);
+s32 STPLNMET_updateFade(PanelAnim *fade);
+void STPLNMET_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
+s32 STPLNMET_updateLerp(MenuLerp *lerp);
+
+/* STPLNMET's data (data/stplnmet.c), in its order */
 extern PlayerNameFuncs STPLNMET_funcs;
 extern TextStyle STPLNMET_nameStyle;
 extern s32 STPLNMET_scrollEnds[];

@@ -364,7 +364,8 @@ typedef struct TrainState {
 
 extern TrainState STGTRAIN_state;
 
-/* The overlay's data and the functions its objects share */
+/* The overlay's data, in its order: the first object's, the second's and the
+   third's */
 extern s32 STGTRAIN_waitAnims[8][7];
 extern TrainGain STGTRAIN_statGains[];
 extern TrainGain STGTRAIN_statLosses[];
@@ -377,30 +378,115 @@ extern TrainCursor STGTRAIN_bankCursor;
 extern TrainCursor STGTRAIN_animCursor;
 extern TrainCursor STGTRAIN_imageCursor;
 extern TrainCursor STGTRAIN_setCursor;
+
+/* sprite.c */
+void STGTRAIN_setSpriteBank(TrainSprite *sprite, TrainSpriteBank *bank, s32 offset);
+void STGTRAIN_setSpriteAnim(TrainSprite *sprite, TrainAnim *anim);
+void STGTRAIN_setSpriteLayer(TrainSprite *sprite, s32 layerId, s32 depth);
+void STGTRAIN_setSpritePos(TrainSprite *sprite, s32 x, s32 y);
+void STGTRAIN_setSpriteImagePos(TrainSprite *sprite, s32 x, s32 y);
+void STGTRAIN_setSpriteClutPos(TrainSprite *sprite, s32 x, s32 y);
+void STGTRAIN_setSpriteScale(TrainSprite *sprite, s32 x, s32 y, s32 z);
+void STGTRAIN_setSpritePivot(TrainSprite *sprite, s32 x, s32 y);
+void STGTRAIN_setSpriteRotation(TrainSprite *sprite, s16 x, s16 y, s16 z);
+s32 STGTRAIN_getSpriteFlags(TrainSprite *sprite);
+void STGTRAIN_setSpritePaused(TrainSprite *sprite, s32 paused);
 void STGTRAIN_updateSprite(TrainSprite *sprite);
 TrainSprite *STGTRAIN_createSprite(void);
+
+/* stgtrain.c */
+void STGTRAIN_updateRoot(Task *task, Task **children);
+Task *STGTRAIN_start(void);
+
+/* screen.c */
+void STGTRAIN_createScreenWindows(TrainScreen *screen, TrainScreenWindows *win);
+void STGTRAIN_showVitals(TrainScreen *screen, TrainScreenWindows *win, s32 show);
+void STGTRAIN_showBattleStats(TrainScreen *screen, TrainScreenWindows *win, s32 show);
+void STGTRAIN_showTp(TrainScreen *screen, TrainScreenWindows *win, s32 show);
 void STGTRAIN_showStatChanges(TrainScreen *screen, PartnerTotals *before);
 void STGTRAIN_drawScreen(TrainScreen *screen);
 void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win);
+void STGTRAIN_updateScreen(TrainScreen *screen, TrainScreenWindows *win);
 TrainScreen *STGTRAIN_createScreen(void);
+void STGTRAIN_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
+void STGTRAIN_drawFader(ScreenFade *task);
+void STGTRAIN_updateFader(ScreenFade *task);
 ScreenFade *STGTRAIN_createFader(void);
-TrainResult *STGTRAIN_createResult(TrainScreen *screen, s32 partner, s32 training);
-TrainSession *STGTRAIN_createSession(TrainScreen *screen);
-TrainMenu *STGTRAIN_createMenu(TrainScreen *screen);
+
+/* result.c */
+s32 STGTRAIN_raiseStat(TrainResult *result, s32 stat);
 s32 STGTRAIN_lowerStat(TrainResult *result, s32 stat);
 s32 STGTRAIN_raiseResistance(TrainResult *result, s32 stat);
+s32 STGTRAIN_raiseMaxHpMp(TrainResult *result, s32 stat);
+void STGTRAIN_applyTry(TrainResult *result, s32 i);
+s32 STGTRAIN_getAccessoryBonus(TrainResult *result);
 void STGTRAIN_createResultWindows(TrainResult *result, TrainResultWindows *win);
-void STGTRAIN_updateResult(TrainResult *result, TrainResultWindows *win);
 void STGTRAIN_drawResult(TrainResult *result);
 void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win);
+void STGTRAIN_updateResult(TrainResult *result, TrainResultWindows *win);
+TrainResult *STGTRAIN_createResult(TrainScreen *screen, s32 partner, s32 training);
+void STGTRAIN_initIdle(TrainIdle *task, void *children);
+void STGTRAIN_showIdle(TrainIdle *task, void *children, s32 arg2);
+void STGTRAIN_drawIdle(TrainIdle *task);
+void STGTRAIN_runIdle(TrainIdle *task, void *children);
+void STGTRAIN_updateIdle(TrainIdle *task, void *children);
+TrainIdle *STGTRAIN_createIdle(TrainScreen *screen);
+
+/* session.c */
 void STGTRAIN_createSessionWindows(TrainSession *session, TrainSessionWindows *win);
 void STGTRAIN_drawSession(TrainSession *session);
 void STGTRAIN_runSession(TrainSession *session, TrainSessionWindows *win);
+void STGTRAIN_updateSession(TrainSession *session, TrainSessionWindows *win);
+void STGTRAIN_finishSession(TrainSession *session);
+TrainSession *STGTRAIN_createSession(TrainScreen *screen);
+
+/* actor.c */
 void STGTRAIN_updateActor(TrainActor *actor, TrainActorSprites *sprites);
+void STGTRAIN_pauseActor(TrainActor *actor);
+void STGTRAIN_playActor(TrainActor *actor);
+void STGTRAIN_setActorPos(TrainActor *actor, s32 x, s32 y);
+void STGTRAIN_setActorClutPos(TrainActor *actor, s32 x, s32 y);
+void STGTRAIN_setActorChance(TrainActor *actor, s32 chance);
+void STGTRAIN_growActor(TrainActor *actor);
+void STGTRAIN_shrinkActor(TrainActor *actor);
+void STGTRAIN_setActorScale(TrainActor *actor, s32 scale);
+s32 STGTRAIN_getActorResult(TrainActor *actor);
+void STGTRAIN_endActor(TrainActor *actor);
 TrainActor *STGTRAIN_createActor(s32 set, s32 file, s32 layerId, s32 depth);
+
+/* menu.c */
+void STGTRAIN_createMenuWindows(TrainMenu *menu, TextWindow **win);
 void STGTRAIN_showTrainingInfo(TrainMenu *menu, TextWindow **win, s32 show);
-void STGTRAIN_updateMenu(TrainMenu *menu, TextWindow **win);
-void STGTRAIN_runMenu(TrainMenu *menu, TextWindow **win);
 void STGTRAIN_drawMenu(TrainMenu *menu);
+void STGTRAIN_runMenu(TrainMenu *menu, TextWindow **win);
+void STGTRAIN_updateMenu(TrainMenu *menu, TextWindow **win);
+void STGTRAIN_openMenu(TrainMenu *menu);
+void STGTRAIN_closeMenu(TrainMenu *menu);
+void STGTRAIN_showMenuInfo(TrainMenu *menu);
+TrainMenu *STGTRAIN_createMenu(TrainScreen *screen);
+
+/* files.c */
+void STGTRAIN_loadImages(void);
+void STGTRAIN_startFade(PanelAnim *fade, s32 fadeIn);
+s32 STGTRAIN_updateFade(PanelAnim *fade);
+void STGTRAIN_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
+s32 STGTRAIN_updateLerp(MenuLerp *lerp);
+s32 STGTRAIN_requestFile(s32 index);
+u8 *STGTRAIN_getFile(void);
+void STGTRAIN_freeFile(void);
+s32 STGTRAIN_readSetBank(TrainSetHeader *header, s32 set);
+s32 STGTRAIN_readSetAnims(TrainSetHeader *header, s32 set);
+s32 STGTRAIN_readSetImages(TrainSetHeader *header, s32 set);
+s32 STGTRAIN_readSet(s32 set);
+s32 STGTRAIN_loadSet(s32 set, s32 *pos);
+s32 STGTRAIN_getFileId(s32 index);
+s32 STGTRAIN_getFilePos(s32 index);
+s32 STGTRAIN_getFileUnkC(s32 index);
+TrainSpriteBank *STGTRAIN_getBank(s32 set);
+s32 STGTRAIN_getBankOffset(s32 set);
+s32 STGTRAIN_getSetUnkC(s32 set);
+TrainAnim *STGTRAIN_getAnim(s32 set, s32 i);
+s32 *STGTRAIN_getGymTrainings(s32 index);
+s32 *STGTRAIN_findGymTraining(s32 index, s32 id);
 
 #endif /* STGTRAIN_H */

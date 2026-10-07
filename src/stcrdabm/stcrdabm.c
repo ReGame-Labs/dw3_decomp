@@ -14,6 +14,8 @@ CardAlbumFuncs STCRDABM_funcs = {
 #define FADER_DEPTH 0
 #include "../menu_common/create_fader.inc.c"
 
+/* Loads the images of the grid's page of cards, from grid->first, into VRAM's 6x2 grid
+   of card images */
 void STCRDABM_loadIcons(CardAlbumGrid *grid) {
     CardDrawer icon;
     s32 card;
@@ -33,18 +35,23 @@ void STCRDABM_loadIcons(CardAlbumGrid *grid) {
     }
 }
 
+/* Turns the grid to the page whose first card is `first` (grid->setPage) */
 void STCRDABM_setPage(CardAlbumGrid *grid, s32 first) {
     grid->prevFirst = grid->first;
     grid->first = first;
     grid->turned = 0;
     grid->frame = 0;
-    grid->setState(grid, 2);
+    grid->setState(grid, TASK_DONE);
 }
 
+/* Makes the grid hide its cards one by one (grid->hide, which nothing calls) */
 void STCRDABM_hideCards(CardAlbumGrid *grid) {
     grid->setSubstate(grid, 1);
 }
 
+/* Draws the page's cards, or the page being turned when previous != 0: a seen card's
+   image, the sprite of its color and its AP and HP (sprite 0x1D instead for the other
+   kinds), else an empty slot */
 void STCRDABM_drawCards(CardAlbumGrid *grid, s32 previous) {
     SpriteDrawer sprite;
     CardDrawer icon;
@@ -123,6 +130,7 @@ void STCRDABM_drawCards(CardAlbumGrid *grid, s32 previous) {
     }
 }
 
+/* Draws the slots turned so far over the cards, flashing the ones with a seen card */
 void STCRDABM_drawTurningSlots(CardAlbumGrid *grid) {
     SpriteDrawer sprite;
     s32 i;
@@ -146,6 +154,7 @@ void STCRDABM_drawTurningSlots(CardAlbumGrid *grid) {
     }
 }
 
+/* 1 when the grid's page holds a seen card (or runs past the last card) */
 s32 STCRDABM_pageHasCards(CardAlbumGrid *grid) {
     s32 card;
     s32 i;
@@ -159,6 +168,7 @@ s32 STCRDABM_pageHasCards(CardAlbumGrid *grid) {
     return 0;
 }
 
+/* Hides the grid's cards one every 2 frames after grid->hide, then stops drawing it */
 void STCRDABM_updateHiding(CardAlbumGrid *grid) {
     switch (grid->substate) {
     case 0:
@@ -180,19 +190,22 @@ void STCRDABM_updateHiding(CardAlbumGrid *grid) {
     }
 }
 
+/* The card grid's task: draws the page's cards; on a page turn, turns its 12 slots one
+   every 2 frames over the old cards, then loads and shows the new ones, with a sound
+   when the page has cards */
 void STCRDABM_updateGrid(CardAlbumGrid *grid) {
     switch (grid->state) {
-    case 0:
+    case TASK_INIT:
     default:
         grid->nextState(grid);
         grid->first = 1;
         STCRDABM_setPage(grid, 1);
         break;
-    case 1:
+    case TASK_RUN:
         STCRDABM_updateHiding(grid);
         STCRDABM_drawCards(grid, 0);
         break;
-    case 2:
+    case TASK_DONE:
         switch (grid->substate) {
         case 0:
         default:
@@ -234,11 +247,12 @@ void STCRDABM_updateGrid(CardAlbumGrid *grid) {
             STCRDABM_drawCards(grid, 0);
         }
         break;
-    case 3:
+    case TASK_KILL:
         break;
     }
 }
 
+/* Creates the album's card grid (task), on the top layer */
 CardAlbumGrid *STCRDABM_createGrid(CardAlbum *album) {
     CardAlbumGrid *grid = createTask(STCRDABM_updateGrid, sizeof(CardAlbumGrid), 0);
 
@@ -250,12 +264,13 @@ CardAlbumGrid *STCRDABM_createGrid(CardAlbum *album) {
     return grid;
 }
 
+/* The mode's root task: sets up the display and a black layer, then creates the album */
 void STCRDABM_updateScene(Task *task, Task **items) {
     RECT rect;
     Layer *res;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0xF000);
@@ -269,17 +284,20 @@ void STCRDABM_updateScene(Task *task, Task **items) {
         items[0] = STCRDABM_createAlbum();
         task->nextState(task);
         break;
-    case 1:
-    case 2:
-    case 3:
+    case TASK_RUN:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }
 
+/* The mode's entry point (MODE_ENTRY_POINTS): starts the root task */
 Task *STCRDABM_start(void) {
     return createTask(STCRDABM_updateScene, sizeof(Task), 4);
 }
 
+/* Creates the album's text windows (the page's and the selected card's), in front of
+   the album */
 void STCRDABM_createWindows(CardAlbum *album, CardAlbumWindows *win) {
     TextWindow **items;
     s32 i;
@@ -306,6 +324,8 @@ void STCRDABM_createWindows(CardAlbum *album, CardAlbumWindows *win) {
     }
 }
 
+/* Shows the title, help and page number and, while the album takes input, the previous
+   and next page hints where there is such a page; hides them all when show is 0 */
 void STCRDABM_showPageInfo(CardAlbum *album, CardAlbumWindows *win, s32 show) {
     if (show != 0) {
         win->title->setString(win->title, FILE_CACHE.load(TEXT_FILE(TEXT_CARD_ALBUM)), 1);
@@ -398,6 +418,9 @@ void STCRDABM_showCardInfo(CardAlbum *album, CardAlbumWindows *win, s32 show) {
     }
 }
 
+/* Draws the album: the scrolling background, its panels as they open, the blinking
+   previous and next page sprites and the cursor while it takes input, and the panels of
+   the card's details */
 void STCRDABM_drawAlbum(CardAlbum *album) {
     SpriteDrawer sprite;
     CardDrawer icon;
@@ -498,6 +521,7 @@ void STCRDABM_drawAlbum(CardAlbum *album) {
     }
 }
 
+/* Notes which slots of the current page hold a seen card, and whether any does */
 void STCRDABM_findPageCards(CardAlbum *album) {
     s32 i;
     s32 card;
@@ -515,6 +539,9 @@ void STCRDABM_findPageCards(CardAlbum *album) {
     }
 }
 
+/* The album's steps: opens it, then turns pages with L1 and R1, moves the cursor
+   between the seen cards and shows the selected one's details; Triangle fades the
+   screen out to leave */
 void STCRDABM_runAlbum(CardAlbum *album, CardAlbumWindows *win) {
     s32 prev;
     s32 slot;
@@ -679,15 +706,17 @@ void STCRDABM_runAlbum(CardAlbum *album, CardAlbumWindows *win) {
         break;
     case 53:
         if (win->grid == NULL) {
-            album->setState(album, 3);
+            album->setState(album, TASK_KILL);
         }
         break;
     }
 }
 
+/* The album's task: loads the files and creates its windows, then runs and draws it;
+   once the screen has faded out, goes back to the previous mode */
 void STCRDABM_updateAlbum(CardAlbum *album, CardAlbumWindows *win) {
     switch (album->state) {
-    case 0:
+    case TASK_INIT:
     default:
         switch (album->substate) {
         case 0:
@@ -707,18 +736,19 @@ void STCRDABM_updateAlbum(CardAlbum *album, CardAlbumWindows *win) {
             break;
         }
         break;
-    case 1:
+    case TASK_RUN:
         STCRDABM_runAlbum(album, win);
         STCRDABM_drawAlbum(album);
         break;
-    case 2:
+    case TASK_DONE:
         break;
-    case 3:
+    case TASK_KILL:
         GAME.funcs.requestMode(GAME.funcs.getPrevMode(), 0);
         break;
     }
 }
 
+/* Creates the album (task), on the top layer */
 Task *STCRDABM_createAlbum(void) {
     CardAlbum *album = createTask(STCRDABM_updateAlbum, sizeof(CardAlbum), sizeof(CardAlbumWindows));
 
@@ -727,6 +757,8 @@ Task *STCRDABM_createAlbum(void) {
     return (Task *)album;
 }
 
+/* Loads the album's images and requests the card data and the card names, effects and
+   album strings */
 void STCRDABM_loadFiles(void) {
     TimLoader loader;
 
@@ -743,6 +775,7 @@ void STCRDABM_loadFiles(void) {
     FILE_CACHE.request(TEXT_FILE(TEXT_CARD_ALBUM));
 }
 
+/* Whether the card data or the strings are still loading */
 s32 STCRDABM_filesLoading(void) {
     if (FILE_CACHE.isLoading(STCRDABM_FILE_DATA) != 0) {
         return 1;

@@ -1,7 +1,9 @@
 #ifndef STGMCARD_H
 #define STGMCARD_H
 
-/* STGMCARD.PRO: mode 0xC00, the memory card screen. */
+/* STGMCARD.PRO: mode 0xC00, the memory card screen. Its modules are in
+   src/stgmcard/, and the functions below are by module, in the order they
+   link. */
 
 #include "game.h"
 
@@ -254,15 +256,64 @@ typedef struct MemCardScreenFuncs {
     /* 0x34 */ s32 (*updateLerp)(MenuLerp *lerp);
 } MemCardScreenFuncs;
 
-void STGMCARD_updatePanel(MemCardPanel *panel);
-void STGMCARD_updateInfo(MemCardInfo *info);
-void STGMCARD_refreshInfo(MemCardInfo *info);
-void STGMCARD_updateSaves(MemCardSaves *saves, MemCardSavesWindows *win);
-void STGMCARD_updateMenu(MemCardMenu *menu, TextWindow **windows);
-Task *STGMCARD_createScreen(void);
-void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win);
-void STGMCARD_updateScreen(MemCardScreen *screen, MemCardScreenTasks *tasks);
+/* stgmcard.c */
+void STGMCARD_updateScene(MemCardScene *task, Task **children);
+Task *STGMCARD_start(void);
+void STGMCARD_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
+void STGMCARD_drawFader(ScreenFade *task);
+void STGMCARD_updateFader(ScreenFade *task);
+ScreenFade *STGMCARD_createFader(void);
 
+/* info.c */
+void STGMCARD_showInfo(MemCardInfo *info);
+void STGMCARD_hideInfo(MemCardInfo *info);
+void STGMCARD_refreshInfo(MemCardInfo *info);
+void STGMCARD_updateInfo(MemCardInfo *info);
+MemCardInfo *STGMCARD_createInfo(MemCardSaves *saves);
+
+/* panel.c */
+void STGMCARD_resetPanel(MemCardPanel *panel);
+void STGMCARD_startPanel(MemCardPanel *panel, s32 substate, s32 duration);
+void STGMCARD_setPanelTopColor(MemCardPanel *panel, u8 r, u8 g, u8 b);
+void STGMCARD_setPanelBottomColor(MemCardPanel *panel, u8 r, u8 g, u8 b);
+void STGMCARD_setPanelPos(MemCardPanel *panel, s32 x, s32 y);
+void STGMCARD_updatePanel(MemCardPanel *panel);
+MemCardPanel *STGMCARD_createPanel(s32 x, s32 y, s32 w, s32 h);
+
+/* menu.c */
+void STGMCARD_slideInHeader(MemCardMenu *menu);
+void STGMCARD_startSlotPick(MemCardMenu *menu, s32 arg);
+void STGMCARD_slideOutHeader(MemCardMenu *menu);
+void STGMCARD_moveSlotCursor(MemCardMenu *menu);
+void STGMCARD_slideInSlots(MemCardMenu *menu);
+void STGMCARD_slideOutSlots(MemCardMenu *menu);
+void STGMCARD_resetMenu(MemCardMenu *menu);
+void STGMCARD_updateMenu(MemCardMenu *menu, TextWindow **windows);
+MemCardMenu *STGMCARD_createMenu(MemCardSaves *saves);
+
+/* saves.c */
+void STGMCARD_showPort(MemCardSaves *saves, MemCardSavesWindows *win, s32 show);
+void STGMCARD_showError(MemCardSaves *saves, MemCardSavesWindows *win);
+void STGMCARD_closeMenuForError(MemCardSaves *saves, MemCardSavesWindows *win);
+void STGMCARD_refreshSaves(MemCardSaves *saves);
+void STGMCARD_hideSaves(MemCardSaves *saves);
+void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win);
+void STGMCARD_drawSaves(MemCardSaves *saves);
+void STGMCARD_updateSaves(MemCardSaves *saves, MemCardSavesWindows *win);
+MemCardSaves *STGMCARD_createSaves(MemCardScreen *screen);
+
+/* screen.c */
+void STGMCARD_updateScreen(MemCardScreen *screen, MemCardScreenTasks *tasks);
+Task *STGMCARD_createScreen(void);
+void STGMCARD_loadFiles(void);
+s32 STGMCARD_filesLoading(void);
+void STGMCARD_freeBuffers(void);
+void STGMCARD_startFade(PanelAnim *fade, s32 fadeIn);
+s32 STGMCARD_updateFade(PanelAnim *fade);
+void STGMCARD_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
+s32 STGMCARD_updateLerp(MenuLerp *lerp);
+
+/* STGMCARD's data (data/stgmcard.c) */
 extern MemCardScreenFuncs STGMCARD_funcs;
 extern SaveIcon STGMCARD_saveIcon;
 extern MemCardWindowSpec STGMCARD_detailWindows[];

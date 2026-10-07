@@ -3,7 +3,9 @@
 
 /*
  * STCRDDEK: the deck editor, where the player builds the three decks from
- * the cards they own and renames them on the keyboard (name_entry.h).
+ * the cards they own and renames them on the keyboard (name_entry.h). Its
+ * modules are in src/stcrddek/, and the functions below are by module, in
+ * the order they link.
  */
 
 /* The overlay's NameEntry and the name entry's files (name_entry.h) */
@@ -154,20 +156,61 @@ typedef struct DeckScreen {
     /* 0x11C */ void (*countKinds)(struct DeckScreen *task); /* STCRDDEK_countCardKinds */
 } DeckScreen;
 
+/* stcrddek.c */
+void STCRDDEK_updateScene(Task *task, Task **children);
+Task *STCRDDEK_start(void);
+void STCRDDEK_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
+void STCRDDEK_drawFader(ScreenFade *task);
+void STCRDDEK_updateFader(ScreenFade *task);
+ScreenFade *STCRDDEK_createFader(void);
+
+/* deck_cards.c */
 void STCRDDEK_drawDeckCards(DeckCards *task);
 void STCRDDEK_loadNextCard(DeckCards *task);
+void STCRDDEK_updateDeckCards(DeckCards *task);
+DeckCards *STCRDDEK_createDeckCards(DeckEditor *editor);
+
+/* editor.c */
 void STCRDDEK_createEditorWindows(DeckEditor *task, DeckEditorChildren *children);
+void STCRDDEK_showEditorWindows(DeckEditor *task, DeckEditorChildren *children, s32 show);
+void STCRDDEK_showCardList(DeckEditor *task, DeckEditorChildren *children, s32 show);
+void STCRDDEK_showListCard(DeckEditor *task, DeckEditorChildren *children, s32 show);
 void STCRDDEK_buildCardList(DeckEditor *task);
 void STCRDDEK_drawEditor(DeckEditor *task);
 void STCRDDEK_stepEditor(DeckEditor *task, DeckEditorChildren *children);
+void STCRDDEK_updateEditor(DeckEditor *task, DeckEditorChildren *children);
+DeckEditor *STCRDDEK_createEditor(DeckScreen *screen, s32 deck);
 void STCRDDEK_initIdle(DeckIdle *task, void *children);
+void STCRDDEK_drawIdle(DeckIdle *task);
+void STCRDDEK_stepIdle(DeckIdle *task, void *children);
+void STCRDDEK_updateIdle(DeckIdle *task, void *children);
+DeckIdle *STCRDDEK_createIdle(void *parent);
+
+/* name_entry.c */
+void STCRDDEK_startTween(PanelAnim *fade, s32 fadeIn);
+s32 STCRDDEK_updateTween(PanelAnim *fade);
+void STCRDDEK_createNameWindows(NameEntry *task, NameEntryWindows *windows);
 void STCRDDEK_showNameWindows(NameEntry *task, NameEntryWindows *windows, s32 show);
 void STCRDDEK_drawKeyboard(NameEntry *task);
 void STCRDDEK_updateKeyboard(NameEntry *task, NameEntryWindows *windows);
 void STCRDDEK_updateNameEntry(NameEntry *task, NameEntryWindows *windows);
+void STCRDDEK_setNameVram(NameEntry *task, s32 x, s32 y);
+void STCRDDEK_setName(NameEntry *task, char *name);
+void STCRDDEK_getName(NameEntry *task, char *out);
+void STCRDDEK_closeNameEntry(NameEntry *task);
+NameEntry *STCRDDEK_createNameEntry(char *text);
+
+/* scroll_bar.c */
+void STCRDDEK_setScrollBarX(ScrollBar *bar, s32 x, s32 width);
+void STCRDDEK_setScrollBarRange(ScrollBar *bar, s32 top, s32 bottom);
+void STCRDDEK_setScrollBarCount(ScrollBar *bar, s32 pageSize, s32 count);
+void STCRDDEK_setScrollBarPos(ScrollBar *bar, s32 pos);
 void STCRDDEK_updateScrollBar(ScrollBar *bar);
 ScrollBar *STCRDDEK_createScrollBar(void);
+
+/* screen.c */
 void STCRDDEK_createScreenWindows(DeckScreen *task, DeckScreenChildren *children);
+void STCRDDEK_showDeckRow(DeckScreen *task, DeckScreenChildren *children, s32 deck, s32 show);
 void STCRDDEK_drawScreen(DeckScreen *task);
 void STCRDDEK_countCardKinds(DeckScreen *task);
 void STCRDDEK_stepScreen(DeckScreen *task, DeckScreenChildren *children);
@@ -180,7 +223,7 @@ s32 STCRDDEK_updateFade(PanelAnim *fade);
 void STCRDDEK_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
 s32 STCRDDEK_updateLerp(MenuLerp *lerp);
 
-/* STCRDDEK's data, in its order */
+/* STCRDDEK's data (data/stcrddek.c), in its order */
 extern s32 STCRDDEK_cursorCluts[];
 extern Glyph STCRDDEK_glyphs[]; /* the name's font */
 extern Glyph STCRDDEK_icons[];

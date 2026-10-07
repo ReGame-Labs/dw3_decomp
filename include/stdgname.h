@@ -1,6 +1,10 @@
 #ifndef STDGNAME_H
 #define STDGNAME_H
 
+/* STDGNAME.PRO: the screen where the partners are renamed. Its modules are
+   in src/stdgname/, and the functions below are by module, in the order they
+   link. */
+
 /* The overlay's NameEntry and the name entry's files (name_entry.h) */
 #define NAME_ENTRY_HAS_UNK98 1
 #define NAME_ENTRY_HAS_HIDE 0
@@ -76,7 +80,7 @@ typedef struct ScreenChildren {
     /* 0x0 */ MenuTask *menu;
     /* 0x4 */ NameEntry *name;
     /* 0x8 */ ScreenFade *fade;
-    /* 0xC */ Task *unkC;
+    /* 0xC */ Task *unkC; /* never set: the screen waits on it in TASK_DONE */
 } ScreenChildren;
 
 /* The screen's controller */
@@ -100,6 +104,7 @@ typedef struct ScreenFuncs {
     /* 0x14 */ s32 (*updateFade)(PanelAnim *fade);
 } ScreenFuncs;
 
+/* STDGNAME's data (data/stdgname.c) */
 extern NameKeyboard STDGNAME_keyboard;
 extern TextStyle STDGNAME_nameStyle;
 extern s32 STDGNAME_nameAnims[];
@@ -117,11 +122,15 @@ extern s32 STDGNAME_menuAnims[][7];
 extern ScreenFuncs STDGNAME_funcs;
 extern TextStyle STDGNAME_menuStyle;
 
+/* stdgname.c */
 void STDGNAME_updateScene(Task *task, void **children);
+Task *STDGNAME_start(void);
 void STDGNAME_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
 void STDGNAME_drawFader(ScreenFade *task);
 void STDGNAME_updateFader(ScreenFade *task);
 ScreenFade *STDGNAME_createFader(void);
+
+/* name_entry.c */
 void STDGNAME_startTween(PanelAnim *fade, s32 fadeIn);
 s32 STDGNAME_updateTween(PanelAnim *fade);
 void STDGNAME_createNameWindows(NameEntry *task, NameEntryWindows *windows);
@@ -134,11 +143,15 @@ void STDGNAME_setName(NameEntry *task, char *name);
 void STDGNAME_getName(NameEntry *task, char *out);
 void STDGNAME_closeNameEntry(NameEntry *task);
 NameEntry *STDGNAME_createNameEntry(char *name, s32 partner);
+
+/* menu.c */
 void STDGNAME_showMenuWindow(MenuTask *task, TextWindow **window, s32 index, s32 show);
 void STDGNAME_drawMenu(MenuTask *task, TextWindow **windows);
 s32 STDGNAME_runMenu(MenuTask *task, TextWindow **windows);
 void STDGNAME_updateMenu(MenuTask *task, TextWindow **windows);
 MenuTask *STDGNAME_createMenu(ScreenTask *screen);
+
+/* screen.c */
 void STDGNAME_stepScreen(ScreenTask *task, ScreenChildren *children);
 void STDGNAME_drawBackground(ScreenTask *task);
 void STDGNAME_updateScreen(ScreenTask *task, ScreenChildren *children);

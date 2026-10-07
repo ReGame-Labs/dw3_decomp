@@ -9,6 +9,8 @@
 
 #include "ststatus.h"
 
+/* The mode's scene task: sets up the display and a black layer, then creates the
+   mode's main task (STSTATUS_createMenu) */
 void STSTATUS_updateScene(Task *task, Task **children) {
     RECT rect;
     Layer *layer;
@@ -35,6 +37,7 @@ void STSTATUS_updateScene(Task *task, Task **children) {
     }
 }
 
+/* Starts the mode: creates its scene task */
 Task *STSTATUS_start(void) {
     return createTask(STSTATUS_updateScene, sizeof(Task), 4);
 }
@@ -380,7 +383,7 @@ void STSTATUS_updateCardScreen(PartyScreen *screen, PartyScreenWindows *windows)
     s32 i;
 
     switch (screen->state) {
-    case 0:
+    case TASK_INIT:
     default:
         screen->nextState(screen);
         for (i = 0; i < 3; i++) {
@@ -400,16 +403,18 @@ void STSTATUS_updateCardScreen(PartyScreen *screen, PartyScreenWindows *windows)
         STSTATUS_data.funcs.startFade(&screen->fade, 1);
         STSTATUS_createCardWindows(screen, windows);
         break;
-    case 1:
+    case TASK_RUN:
         STSTATUS_runCardScreen(screen, windows);
         STSTATUS_drawCardScreen(screen);
         break;
-    case 2:
-    case 3:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }
 
+/* Creates the screen with the party's pages (task) whose two options go to the
+   card album (scene 0x1200) or the deck editor (scene 0x400) */
 Task *STSTATUS_createCardScreen(FieldMenuScreen *menu, s32 extra) {
     PartyScreen *screen = createTask(STSTATUS_updateCardScreen, sizeof(PartyScreen), sizeof(PartyScreenWindows));
 

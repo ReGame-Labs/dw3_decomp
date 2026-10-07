@@ -608,29 +608,34 @@ SoundTestEntry SOUNDTST_banks[] = {
 
 RECT SOUNDTST_screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
+/* The sound test's root task: starts the sound test; START goes back to the
+   stage select (mode 0x1500) */
 void SOUNDTST_updateScene(Task *task, Task **items) {
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         items[0] = SOUNDTST_createSoundTest();
         task->nextState(task);
         break;
-    case 1:
+    case TASK_RUN:
         if (PAD.getPressed(0) & (1 << PAD_START)) {
             GAME.funcs.requestMode(MODE_STAGE_SELECT, 0);
             task->nextState(task);
         }
         break;
-    case 2:
-    case 3:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }
 
+/* Creates the sound test's root task */
 Task *SOUNDTST_start(void) {
     return createTask(SOUNDTST_updateScene, sizeof(Task), 4);
 }
 
+/* Moves a list's cursor by delta within its count, scrolling the eight lines
+   shown to keep it in view */
 void SOUNDTST_moveCursor(SoundTest *task, s32 delta, s32 *cursor, s32 *top, s32 count) {
     s32 pos = *cursor + delta;
 
@@ -645,6 +650,8 @@ void SOUNDTST_moveCursor(SoundTest *task, s32 delta, s32 *cursor, s32 *top, s32 
     }
 }
 
+/* The bank's sound list: cross plays the sound under the cursor for as long
+   as it is held, square stops all sounds, triangle goes back to the banks */
 void SOUNDTST_playSounds(SoundTest *task, SoundTestWindows *win) {
     SoundTestEntry *list = SOUNDTST_soundLists[task->bankCursor];
     s32 i;
@@ -690,6 +697,7 @@ void SOUNDTST_playSounds(SoundTest *task, SoundTestWindows *win) {
     win->cursor->setPos(win->cursor, 0x20, (task->soundCursor - task->soundTop) * 16 + 0x46);
 }
 
+/* Loads the bank picked, then goes on to its sounds */
 void SOUNDTST_loadBank(SoundTest *task, SoundTestWindows *win) {
     switch (task->step) {
     case 0:
@@ -708,6 +716,8 @@ void SOUNDTST_loadBank(SoundTest *task, SoundTestWindows *win) {
     }
 }
 
+/* The list of the sound banks (VAB) to load: cross picks the one under the
+   cursor */
 void SOUNDTST_selectBank(SoundTest *task, SoundTestWindows *win) {
     s32 i;
     s32 j;
@@ -742,12 +752,15 @@ void SOUNDTST_selectBank(SoundTest *task, SoundTestWindows *win) {
     win->cursor->setPos(win->cursor, 0x20, (task->bankCursor - task->bankTop) * 16 + 0x46);
 }
 
+/* The sound test's task: sets up the screen and its windows, then picks a
+   bank, loads it and plays its sounds; when killed, goes back to the stage
+   select */
 void SOUNDTST_updateSoundTest(SoundTest *task, SoundTestWindows *win) {
     Layer *res;
     s32 i;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0x5000);
@@ -764,7 +777,7 @@ void SOUNDTST_updateSoundTest(SoundTest *task, SoundTestWindows *win) {
         win->cursor->setText(win->cursor, SOUNDTST_STR_CURSOR);
         task->nextState(task);
         break;
-    case 1:
+    case TASK_RUN:
         switch (task->substate) {
         case 0:
         default:
@@ -778,14 +791,15 @@ void SOUNDTST_updateSoundTest(SoundTest *task, SoundTestWindows *win) {
             break;
         }
         break;
-    case 2:
+    case TASK_DONE:
         break;
-    case 3:
+    case TASK_KILL:
         GAME.funcs.requestMode(MODE_STAGE_SELECT, 0);
         break;
     }
 }
 
+/* Creates the sound test */
 Task *SOUNDTST_createSoundTest(void) {
     return createTask(SOUNDTST_updateSoundTest, sizeof(SoundTest), sizeof(SoundTestWindows));
 }
