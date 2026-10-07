@@ -17,26 +17,45 @@ typedef struct FileTableFuncs {
 } FileTableFuncs;
 
 /* A file in the cache */
+/* FileSlot.state */
+enum FileSlotState { FILE_FREE, FILE_QUEUED, FILE_READING, FILE_LOADED };
+
+/* The files the cache holds at most */
+#define FILE_CACHE_SLOTS 64
+
 typedef struct FileSlot {
-    /* 0x0 */ s16 state; /* 0 free, 1 queued, 2 being read, 3 loaded */
+    /* 0x0 */ s16 state; /* FILE_* */
     /* 0x2 */ s16 marked;
     /* 0x4 */ s32 file;
     /* 0x8 */ s32 lastUsed; /* GFX time */
     /* 0xC */ void *data;
 } FileSlot;
 
+/* What the CD reader waits for (CdReader.state): the command each state
+   sent to complete, or, in CD_READ_SECTORS, the sectors and then CdlPause */
+enum CdReadState {
+    CD_READ_IDLE,
+    CD_READ_SETLOC,
+    CD_READ_SETMODE,
+    CD_READ_READN,
+    CD_READ_SECTORS,
+};
+
+/* The bytes of data in a sector (Mode 2 Form 1), as the reader reads them */
+#define CD_SECTOR_SIZE 0x800
+
 /* Reads whole sectors of a file with CdlReadN, from callbacks */
 typedef struct CdReader {
-    /* 0x00 */ s32 state; /* 0 idle, 1 seek, 2 set mode, 3 read, 4 done */
+    /* 0x00 */ s32 state; /* CD_READ_* */
     /* 0x04 */ s32 file;
     /* 0x08 */ s32 offset; /* in sectors */
     /* 0x0C */ s32 sectorCount;
-    /* 0x10 */ s32 buffer;
+    /* 0x10 */ u8 *buffer;
     /* 0x14 */ s32 *done; /* set to 1 when the read is complete */
     /* 0x18 */ u8 loc[4];
     /* 0x1C */ s32 sector;
     /* 0x20 */ s32 sectorsLeft;
-    /* 0x24 */ s32 dst;
+    /* 0x24 */ u8 *dst;
     /* 0x28 */ s32 nextSector;
     /* 0x2C */ s32 (*isBusy)(void);
     /* 0x30 */ void (*read)(s32 file, s32 offset, s32 size, void *buf, s32 *done);
@@ -49,7 +68,7 @@ typedef struct CdReader {
  */
 typedef struct FileCache {
     /* 0x000 */ s32 pending;
-    /* 0x004 */ FileSlot slots[64];
+    /* 0x004 */ FileSlot slots[FILE_CACHE_SLOTS];
     /* 0x404 */ s32 (*isLoading)(s32 file);
     /* 0x408 */ void (*evictOldest)(void);
     /* 0x40C */ void (*request)(s32 file);
@@ -79,11 +98,11 @@ s32 getFileEntry(u32 fileAndIndex);
 s32 getArchiveEntry(u32 index, s32 *archive);
 void markCachedFiles(void);
 void touchMarkedFiles(void);
-void cdSyncCallback();
+void cdSyncCallback(s32 status, u_char *result);
 s32 cdCheckSector(void);
 s32 isCdReading(void);
 void startCdRead(void);
-void readFile(s32 file, s32 offset, s32 size, s32 buffer, s32 *done);
+void readFile(s32 file, s32 offset, s32 size, void *buffer, s32 *done);
 s32 fileExists(s32 file);
 u16 getFileSectorCount(s32 file);
 s32 getFileSector(s32 file);

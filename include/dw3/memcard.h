@@ -8,7 +8,48 @@
 #include <libgte.h>
 #include <libgpu.h>
 
-/* Memory card save header (first 0x80 bytes of a save) */
+/* The bytes the card reads or writes at once: one sector */
+#define CARD_SECTOR_SIZE 0x80
+
+/* The blocks of the save file */
+#define SAVE_BLOCKS 4
+
+/* The icon frames a save may have */
+#define SAVE_MAX_ICONS 3
+
+/* CardHeader.type: this flag plus the icon frame count */
+#define CARD_HEADER_ICONS 0x10
+
+/* The files MEMCARD lists from a card's directory */
+#define CARD_MAX_FILES 15
+
+/*
+ * MemCard.result, as libmcrd's MemCardSync reports it (McErr*), plus
+ * CARD_ERR_NOT_STARTED when the command could not even be sent
+ */
+#define CARD_ERR_NONE 0
+#define CARD_ERR_NO_CARD 1
+#define CARD_ERR_NEW_CARD 3
+#define CARD_ERR_UNFORMATTED 4
+#define CARD_ERR_NOT_STARTED 8
+
+/* MemCard.state: idle, or waiting for the command each operation sent */
+enum MemCardState {
+    MEMCARD_IDLE,
+    MEMCARD_CHECKING,
+    MEMCARD_ACCEPTING,
+    MEMCARD_READING,
+    MEMCARD_WRITING,
+    MEMCARD_COMMAND,
+};
+
+/* readSave and writeSave's sections: the header, the info, then the data copies */
+enum SaveSection { SAVE_SECTION_HEADER, SAVE_SECTION_INFO, SAVE_SECTION_DATA };
+
+/* memCardCommand's operations */
+enum MemCardOp { MEMCARD_OP_LIST, MEMCARD_OP_CREATE, MEMCARD_OP_FORMAT, MEMCARD_OP_UNFORMAT };
+
+/* Memory card save header (first CARD_SECTOR_SIZE bytes of a save) */
 typedef struct CardClut {
     /* 0x00 */ u8 data[0x20];
 } CardClut;
@@ -35,11 +76,11 @@ typedef struct CardDirEntry {
 /*
  * Memory card access (MEMCARD), one step per call: every operation returns
  * 0 while it runs, 1 when it succeeds and result + 1 when it fails.
- * The save file (4 blocks) holds the header and 1-3 icon frames (128 bytes
- * each), an info section (infoSize) and data sections (dataSize each).
+ * The save file (SAVE_BLOCKS blocks) holds the header and 1-3 icon frames (a
+ * sector each), an info section (infoSize) and data sections (dataSize each).
  */
 typedef struct MemCard {
-    /* 0x00 */ s32 state;
+    /* 0x00 */ s32 state; /* MEMCARD_* */
     /* 0x04 */ u8 unk4[8];
     /* 0x0C */ char *fileName;
     /* 0x10 */ CardHeader header;
@@ -49,14 +90,14 @@ typedef struct MemCard {
     /* 0x9C */ s32 maxRetries;
     /* 0xA0 */ s32 restart; /* the command failed and must be reissued */
     /* 0xA4 */ s32 fileCount;
-    /* 0xA8 */ CardDirEntry files[15];
+    /* 0xA8 */ CardDirEntry files[CARD_MAX_FILES];
     /* 0x300 */ s32 progress;
     /* 0x304 */ s32 offset;
     /* 0x308 */ s32 unk308;
     /* 0x30C */ s32 dataSize;
     /* 0x310 */ s32 infoSize;
     /* 0x314 */ s32 iconCount;
-    /* 0x318 */ s32 icons[3];
+    /* 0x318 */ s32 icons[SAVE_MAX_ICONS];
     /* 0x324 */ s32 unk324;
 } MemCard;
 
@@ -87,6 +128,7 @@ s32 syncMemCard(void);
 
 extern MemCard MEMCARD;
 extern MemCardFuncs MEMCARD_FUNCS;
+extern s32 MEMCARD_SYNC_CMDS[]; /* the MemCardSync command of each MEMCARD_OP_* */
 extern char STR_ALL_FILES[]; /* the directory pattern that matches every file */
 
 #endif /* DW3_MEMCARD_H */

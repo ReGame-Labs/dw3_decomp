@@ -1,5 +1,7 @@
 #include "game.h"
 #include <libgs.h>
+#include <libetc.h>
+#include <libsnd.h>
 
 /* Small variables, addressed through $gp (see the Makefile) */
 static s32 GFX_STARTED = 0;
@@ -9,20 +11,24 @@ static SpriteDrawer *SPRITE_DRAWER;
 static TextTools *TEXT_TOOLS;
 static TimLoader *TIM_LOADER;
 
+/*
+ * Every vsync: advances the time counters and the play time, runs GFX.vsyncFunc, shows the
+ * finished buffer and ticks the music
+ */
 void vsyncCallback(void) {
 #if VERSION_US
-    GFX.timeCounter += 0x100;
-    GFX.frameTimeCounter += 0x100;
-    GAME.playFrames += 0x100;
+    GFX.timeCounter += VSYNC_STEP_NTSC;
+    GFX.frameTimeCounter += VSYNC_STEP_NTSC;
+    GAME.playFrames += VSYNC_STEP_NTSC;
 #elif VERSION_EU
     if (NTSC_MODE) {
-        GFX.timeCounter += 0x100;
-        GFX.frameTimeCounter += 0x100;
-        GAME.playFrames += 0x100;
+        GFX.timeCounter += VSYNC_STEP_NTSC;
+        GFX.frameTimeCounter += VSYNC_STEP_NTSC;
+        GAME.playFrames += VSYNC_STEP_NTSC;
     } else {
-        GFX.timeCounter += 0x133;
-        GFX.frameTimeCounter += 0x133;
-        GAME.playFrames += 0x133;
+        GFX.timeCounter += VSYNC_STEP_PAL;
+        GFX.frameTimeCounter += VSYNC_STEP_PAL;
+        GAME.playFrames += VSYNC_STEP_PAL;
     }
 #endif
     if (GFX.vsyncFunc != NULL) {
@@ -36,6 +42,7 @@ void vsyncCallback(void) {
     FLIP_PENDING = 0;
 }
 
+/* Installs vsyncCallback */
 void startVSyncCallback(void) {
     VSyncCallback(vsyncCallback);
 }
@@ -52,7 +59,7 @@ void drawFrame(s32 draw) {
     if (draw) {
         s32 j;
 
-        for (j = 0; j < 30; j++) {
+        for (j = 0; j < LAYER_COUNT; j++) {
             layer = GFX.layers[j];
             if (layer != NULL) {
                 if (layer->keepView != 0) {
@@ -70,7 +77,7 @@ void drawFrame(s32 draw) {
     while (*(volatile s32 *)&FLIP_PENDING != 0) {
     }
     if (GFX.prim != 0) {
-        for (i = 0; i < 30; i++) {
+        for (i = 0; i < LAYER_COUNT; i++) {
             if (GFX.layers[i] != NULL) {
                 GFX.layers[i]->draw(GFX.layers[i]);
             }
@@ -78,12 +85,12 @@ void drawFrame(s32 draw) {
     }
     GFX.buffer = GFX.buffer == 0;
 #if VERSION_US
-    GFX.frameCounter += 0x100;
+    GFX.frameCounter += VSYNC_STEP_NTSC;
 #elif VERSION_EU
     if (NTSC_MODE) {
-        GFX.frameCounter += 0x100;
+        GFX.frameCounter += VSYNC_STEP_NTSC;
     } else {
-        GFX.frameCounter += 0x133;
+        GFX.frameCounter += VSYNC_STEP_PAL;
     }
 #endif
     GFX.frameCount = GFX.frameCounter >> 8;
@@ -92,30 +99,36 @@ void drawFrame(s32 draw) {
     GFX.frameTimeCounter &= 0xFF;
     GAME.funcs.updatePlayTime();
     GFX.prim = (s32)GFX.primBufs[GFX.buffer];
-    for (i = 0; i < 30; i++) {
+    for (i = 0; i < LAYER_COUNT; i++) {
         if (GFX.layers[i] != NULL) {
             GFX.layers[i]->clearOt(GFX.layers[i]);
         }
     }
 }
 
+/* The frames drawn since boot */
 s32 getFrameCount(void) {
     return GFX.frameCount;
 }
 
+/* The vsyncs since boot (in 60 Hz frames) */
 s32 getTime(void) {
     return GFX.time;
 }
 
+/* The vsyncs the last frame took (in 60 Hz frames) */
 s32 getFrameTime(void) {
     return GFX.frameTime;
 }
 
+/*
+ * Destroys every layer and clears the packet buffers' state; the first call just picks the buffers
+ */
 void resetGraphics(void) {
     s32 i;
 
     if (GFX_STARTED != 0) {
-        for (i = 0; i < 30; i++) {
+        for (i = 0; i < LAYER_COUNT; i++) {
             if (GFX.layers[i] != NULL) {
                 GFX.funcs.destroyLayer(GFX.layerIds[i]);
                 i--;
@@ -129,21 +142,25 @@ void resetGraphics(void) {
     }
 }
 
+/* Allocates the two GPU packet buffers, `size` bytes each, at the end of the heap */
 void allocPrimBuffers(s32 size) {
     GFX.primBufSize = size;
-    GFX.primBufs[0] = HEAP.allocHigh(size, 2);
-    GFX.primBufs[1] = HEAP.allocHigh(size, 2);
+    GFX.primBufs[0] = HEAP.allocHigh(size, MEM_MODE);
+    GFX.primBufs[1] = HEAP.allocHigh(size, MEM_MODE);
     GFX.prim = (s32)GFX.primBufs[GFX.buffer];
 }
 
+/* The next free byte of the packet buffer being drawn */
 s32 getPrim(void) {
     return GFX.prim;
 }
 
+/* Moves the packet buffer's free pointer past the primitives just written */
 void setPrim(s32 next) {
     GFX.prim = next;
 }
 
+/* Frees the two packet buffers */
 void freePrimBuffers(void) {
     if (GFX.primBufs[0] != NULL) {
         HEAP.free(GFX.primBufs[0]);
@@ -155,6 +172,10 @@ void freePrimBuffers(void) {
     GFX.primBufs[1] = NULL;
 }
 
+/*
+ * Sets up the two display buffers: side by side in hi-res (interlaced 320x480 24-bit), else one
+ * above the other
+ */
 void setDisplayMode(s32 w, s32 h, s32 hires, s32 interlace) {
     if (hires != 0) {
         if (interlace != 0) {
@@ -182,15 +203,17 @@ void setDisplayMode(s32 w, s32 h, s32 hires, s32 interlace) {
     SetGeomOffset(0, 0);
 }
 
+/* Shows the same VRAM area from both display buffers */
 void setDisplayArea(s32 x, s32 y, s32 w, s32 h) {
     SetDefDispEnv(&GFX.disp[0], x, y, w, h);
     SetDefDispEnv(&GFX.disp[1], x, y, w, h);
 }
 
+/* The layer with id `id`, or NULL */
 Layer *getLayer(s32 id) {
     s32 i;
 
-    for (i = 0; i < 30; i++) {
+    for (i = 0; i < LAYER_COUNT; i++) {
         if (GFX.layers[i] != NULL && GFX.layerIds[i] == id) {
             return GFX.layers[i];
         }
@@ -202,7 +225,7 @@ Layer *getLayer(s32 id) {
 s32 findLayerSlot(s32 id) {
     s32 i;
 
-    for (i = 0; i < 30; i++) {
+    for (i = 0; i < LAYER_COUNT; i++) {
         if (id != 0) {
             if (GFX.layers[i] != NULL && GFX.layerIds[i] == id) {
                 return i;
@@ -214,17 +237,19 @@ s32 findLayerSlot(s32 id) {
     return -1;
 }
 
+/* Closes the gap of a removed layer in the draw order */
 void removeLayerSlot(s32 index) {
-    for (; index < 29; index++) {
+    for (; index < LAYER_COUNT - 1; index++) {
         GFX.layers[index] = GFX.layers[index + 1];
         GFX.layerIds[index] = GFX.layerIds[index + 1];
     }
 }
 
+/* Puts a layer at position `index` of the draw order, moving the later ones back */
 void insertLayerSlot(s32 index, Layer *layer, s32 id) {
     s32 i;
 
-    for (i = 29; i != index; i--) {
+    for (i = LAYER_COUNT - 1; i != index; i--) {
         GFX.layers[i] = GFX.layers[i - 1];
         GFX.layerIds[i] = GFX.layerIds[i - 1];
     }
@@ -232,6 +257,10 @@ void insertLayerSlot(s32 index, Layer *layer, s32 id) {
     GFX.layerIds[index] = id;
 }
 
+/*
+ * A new layer drawing to `rect`, with an OT of OT_LENGTHS[otShift - 1] entries; NULL when all are
+ * in use
+ */
 Layer *createLayer(RECT *rect, s32 otShift, s32 id) {
     DRAWENV env;
     s32 index = findLayerSlot(0);
@@ -244,6 +273,7 @@ Layer *createLayer(RECT *rect, s32 otShift, s32 id) {
     return NULL;
 }
 
+/* Frees the layer with id `id`; 0 if there is none */
 s32 destroyLayer(s32 id) {
     s32 index = findLayerSlot(id);
     Layer *layer;
@@ -278,6 +308,7 @@ void moveLayer(s32 id, s32 targetId, s32 delta) {
     }
 }
 
+/* Layer method: clears the OT of the buffer being drawn */
 void layerClearOt(Layer *layer) {
     ClearOTagR(layer->ot[GFX.buffer], layer->otLen);
 }
@@ -301,6 +332,7 @@ void layerSkipEmptyOt(Layer *layer) {
     }
 }
 
+/* Layer method: sends the OT of the finished buffer, after its DRAWENV with the layer's offset */
 void layerDraw(Layer *layer) {
     DRAWENV env = layer->env;
     DR_ENV *dr;
@@ -324,24 +356,29 @@ void layerDraw(Layer *layer) {
     DrawOTag(tag);
 }
 
+/* Layer method: the OT entry at `depth` in the buffer being drawn */
 u_long *layerGetOtEntry(Layer *layer, s32 depth) {
     return layer->ot[GFX.buffer] + depth;
 }
 
+/* Layer method: the OT entry for a 16-bit Z, scaled to the OT's length */
 u_long *layerGetOtEntryZ(Layer *layer, s32 z) {
     s32 i = z >> (16 - layer->otShift);
 
     return layer->ot[GFX.buffer] + i;
 }
 
+/* Layer method: the OT of the buffer being drawn */
 u_long *layerGetOt(Layer *layer) {
     return layer->ot[GFX.buffer];
 }
 
+/* Layer method: the OT size it was created with */
 s32 layerGetOtShift(LayerView *layer) {
     return layer->otShift;
 }
 
+/* Layer method: the color the layer's area is cleared to (black: not cleared) */
 void layerSetBgColor(LayerView *layer, u8 r, u8 g, u8 b) {
     layer->bgR = r;
     layer->bgB = b;
@@ -353,36 +390,43 @@ void layerSetBgColor(LayerView *layer, u8 r, u8 g, u8 b) {
     }
 }
 
+/* Layer method: the drawing offset */
 void layerSetOffset(LayerView *layer, s16 x, s16 y) {
     layer->offsetX = x;
     layer->offsetY = y;
 }
 
+/* Layer method: the scroll position, in pixels */
 void layerGetScroll(LayerView *layer, Vec2 *out) {
     out->x = layer->scrollX >> 8;
     out->y = layer->scrollY >> 8;
 }
 
+/* Layer method: sets the scroll position (8.8 fixed point) */
 void layerSetScroll(LayerView *layer, s32 x, s32 y) {
     layer->scrollX = x;
     layer->scrollY = y;
 }
 
+/* Layer method: scrolls by (dx, dy) (8.8 fixed point) */
 void layerAddScroll(LayerView *layer, s32 dx, s32 dy) {
     layer->scrollX += dx;
     layer->scrollY += dy;
 }
 
+/* Layer method: moves the clip rectangle */
 void layerSetClipPos(LayerView *layer, s16 x, s16 y) {
     layer->x = x;
     layer->y = y;
 }
 
+/* Layer method: resizes the clip rectangle */
 void layerSetClipSize(LayerView *layer, s16 w, s16 h) {
     layer->w = w;
     layer->h = h;
 }
 
+/* Layer method: the part of the scrolled world the clip rectangle shows */
 void layerGetViewRect(LayerView *layer, Rect16 *rect) {
     rect->x = layer->x - layer->offsetX + (layer->scrollX >> 8);
     rect->y = layer->y - layer->offsetY + (layer->scrollY >> 8);
@@ -390,6 +434,7 @@ void layerGetViewRect(LayerView *layer, Rect16 *rect) {
     rect->h = layer->h;
 }
 
+/* Layer method: frees its OTs and draw callbacks, once the GPU is done with them */
 void layerFree(Layer *layer) {
     DrawSync(0);
     HEAP.free(layer->ot[0]);
@@ -399,6 +444,7 @@ void layerFree(Layer *layer) {
     }
 }
 
+/* Layer method: empties the draw callbacks, but for the head entry, which sorts first */
 void layerResetCallbacks(LayerView *layer) {
     layer->callbacks->priority = 0x7FFFFFFF;
     layer->callbacks->param = 0;
@@ -408,13 +454,15 @@ void layerResetCallbacks(LayerView *layer) {
     layer->callbackCount = 1;
 }
 
+/* Layer method: room for `count` draw callbacks */
 void layerAllocCallbacks(LayerView *layer, s32 count) {
-    layer->callbacks = HEAP.alloc(count * sizeof(DrawCallback), 2);
+    layer->callbacks = HEAP.alloc(count * sizeof(DrawCallback), MEM_MODE);
     layer->callbackCap = count;
     layerResetCallbacks(layer);
 }
 
-void layerAddSortedCallback(Layer *layer, s32 func, s32 arg, s32 priority, s32 param) {
+/* Layer method: adds a draw callback in order of priority, highest first */
+void layerAddSortedCallback(Layer *layer, void (*func)(s32, void *, s32), s32 arg, s32 priority, s32 param) {
     DrawCallback *cur;
     DrawCallback *prev;
     DrawCallback *e;
@@ -456,6 +504,7 @@ void layerAddSortedCallback(Layer *layer, s32 func, s32 arg, s32 priority, s32 p
     }
 }
 
+/* Layer method: adds a draw callback at the end of the list */
 void layerAddCallback(LayerView *layer, void (*func)(s32, void *, s32), s32 arg) {
     DrawCallback *cb;
 
@@ -473,6 +522,7 @@ void layerAddCallback(LayerView *layer, void (*func)(s32, void *, s32), s32 arg)
     }
 }
 
+/* Layer method: runs the draw callbacks in order, then empties the list */
 void layerRunCallbacks(LayerView *layer) {
     DrawCallback *cb;
 
@@ -488,6 +538,7 @@ void layerRunCallbacks(LayerView *layer) {
     }
 }
 
+/* Layer method: keeps the current world-screen matrix and projection for this buffer's drawing */
 void layerSetKeepView(Layer *layer, s32 enable, s32 projection) {
     layer->keepView = enable;
     if (enable) {
@@ -496,11 +547,13 @@ void layerSetKeepView(Layer *layer, s32 enable, s32 projection) {
     }
 }
 
+/* Layer method: restores the view that setKeepView kept */
 void layerLoadView(Layer *layer) {
-    func_80029598(layer->projection);
+    GsSetProjection(layer->projection);
     GsWSMATRIX = layer->view[GFX.buffer];
 }
 
+/* Layer method: keeps the current light matrix for this buffer's drawing */
 void layerSetKeepLightMatrix(Layer *layer, s32 enable) {
     layer->keepLightMatrix = enable;
     if (enable) {
@@ -508,26 +561,28 @@ void layerSetKeepLightMatrix(Layer *layer, s32 enable) {
     }
 }
 
+/* Layer method: restores the light matrix that setKeepLightMatrix kept */
 void layerLoadLightMatrix(Layer *layer) {
     GsLIGHTWSMATRIX = layer->lightMatrix[GFX.buffer];
 }
 
+/* Allocates a layer with its two OTs and methods */
 Layer *newLayer(DRAWENV *env, s32 otShift) {
-    Layer *layer = HEAP.allocZeroed(0x16C, 2);
+    Layer *layer = HEAP.allocZeroed(sizeof(Layer), MEM_MODE);
 
     layer->env = *env;
     layer->otShift = otShift;
     layer->otLen = OT_LENGTHS[otShift - 1];
-    layer->ot[0] = HEAP.alloc(layer->otLen << 2, 2);
-    layer->ot[1] = HEAP.alloc(layer->otLen << 2, 2);
+    layer->ot[0] = HEAP.alloc(layer->otLen * sizeof(u_long), MEM_MODE);
+    layer->ot[1] = HEAP.alloc(layer->otLen * sizeof(u_long), MEM_MODE);
     ClearOTagR(layer->ot[0], layer->otLen);
     ClearOTagR(layer->ot[1], layer->otLen);
     layer->setBgColor = layerSetBgColor;
-    layer->draw = (void *)layerDraw;
-    layer->clearOt = (void *)layerClearOt;
+    layer->draw = layerDraw;
+    layer->clearOt = layerClearOt;
     layer->getOtEntry = (void *)layerGetOtEntry;
     layer->getOtEntryZ = layerGetOtEntryZ;
-    layer->free = (void *)layerFree;
+    layer->free = layerFree;
     layer->setClipPos = layerSetClipPos;
     layer->setClipSize = layerSetClipSize;
     layer->setOffset = layerSetOffset;
@@ -542,16 +597,20 @@ Layer *newLayer(DRAWENV *env, s32 otShift) {
     layer->addCallback = layerAddCallback;
     layer->runCallbacks = (void *)layerRunCallbacks;
     layer->setKeepView = layerSetKeepView;
-    layer->loadView = (void *)layerLoadView;
+    layer->loadView = layerLoadView;
     layer->setKeepLightMatrix = layerSetKeepLightMatrix;
-    layer->loadLightMatrix = (void *)layerLoadLightMatrix;
+    layer->loadLightMatrix = layerLoadLightMatrix;
     return layer;
 }
 
+/* Makes `obj` the card drawer the methods work on */
 void bindCardDrawer(CardDrawer *obj) {
     CARD_DRAWER = obj;
 }
 
+/*
+ * Card drawer method: picks the image of card `id` (0 or less: the first image of the first file)
+ */
 void cardDrawerSetCard(s32 id) {
     s32 n;
     s32 i;
@@ -564,6 +623,7 @@ void cardDrawerSetCard(s32 id) {
     }
 }
 
+/* Card drawer method: loads the card's image and CLUT into its cell of VRAM */
 void cardDrawerLoadImage(void) {
     TimLoader obj;
 
@@ -573,6 +633,7 @@ void cardDrawerLoadImage(void) {
     obj.load(CARD_DRAWER->card->tim);
 }
 
+/* Card drawer method: the layer and depth to draw to */
 void cardDrawerSetLayer(s32 id, s32 depth) {
     Layer *layer = GFX.funcs.getLayer(id);
 
@@ -580,29 +641,35 @@ void cardDrawerSetLayer(s32 id, s32 depth) {
     CARD_DRAWER->ot = layer->getOtEntry(layer, depth);
 }
 
+/* Card drawer method: the VRAM area of the image cells */
 void cardDrawerSetImagePos(s32 x, s32 y) {
     CARD_DRAWER->imageX = x;
     CARD_DRAWER->imageY = y;
 }
 
+/* Card drawer method: the VRAM area of the CLUTs */
 void cardDrawerSetClutPos(s32 x, s32 y) {
     CARD_DRAWER->clutX = x;
     CARD_DRAWER->clutY = y;
 }
 
+/* Card drawer method: the cell a card is loaded to and drawn from */
 void cardDrawerSetCell(s32 x, s32 y) {
     CARD_DRAWER->cellX = x;
     CARD_DRAWER->cellY = y;
 }
 
+/* Card drawer method: the CLUT rows between two columns of cells */
 void cardDrawerSetClutStride(s32 stride) {
     CARD_DRAWER->clutStride = stride;
 }
 
+/* Card drawer method: draws semi-transparent, or not */
 void cardDrawerSetSemiTrans(s32 on) {
     CARD_DRAWER->semiTrans = on;
 }
 
+/* Card drawer method: draws the card of the current cell at (x, y), a 32x32 sprite */
 void cardDrawerDraw(s32 x, s32 y) {
     SPRT *sprt = GFX.funcs.getPrim();
     SPRT *base = sprt;
@@ -631,10 +698,12 @@ void cardDrawerDraw(s32 x, s32 y) {
     GFX.funcs.setPrim(end);
 }
 
+/* Card drawer method: the kind of the current card (CARD_KINDS) */
 s32 cardDrawerGetKind(void) {
     return CARD_KINDS[CARD_DRAWER->card->kind];
 }
 
+/* Clears a card drawer, gives it its methods and binds it */
 void initCardDrawer(CardDrawer *obj) {
     HEAP.zero(obj, sizeof(CardDrawer));
     obj->setCard = cardDrawerSetCard;
@@ -651,10 +720,12 @@ void initCardDrawer(CardDrawer *obj) {
     obj->clutStride = 8;
 }
 
+/* Makes `obj` the sprite drawer the methods work on */
 void bindSpriteDrawer(SpriteDrawer *obj) {
     SPRITE_DRAWER = obj;
 }
 
+/* Sprite drawer method: the VRAM position of the sheet's texture and CLUTs */
 void spriteDrawerSetTexture(s32 x, s32 y) {
     SPRITE_DRAWER->tpageX = x;
     SPRITE_DRAWER->tpageY = y;
@@ -662,20 +733,24 @@ void spriteDrawerSetTexture(s32 x, s32 y) {
     SPRITE_DRAWER->clutY = y;
 }
 
+/* Sprite drawer method: the other CLUT area, for parts that ask for it */
 void spriteDrawerSetAltClut(s32 x, s32 y) {
     SPRITE_DRAWER->altClutX = x;
     SPRITE_DRAWER->altClutY = y - 0x100;
 }
 
+/* Sprite drawer method: the CLUT row added to every part's */
 void spriteDrawerSetClutRow(s32 row) {
     SPRITE_DRAWER->clutRow = row;
 }
 
+/* Sprite drawer method: the layer and depth to draw to */
 void spriteDrawerSetLayer(Layer *layer, s32 depth) {
     SPRITE_DRAWER->layer = layer;
     SPRITE_DRAWER->ot = layer->getOtEntry(layer, depth);
 }
 
+/* Sprite drawer method: the layer (by id) and depth to draw to */
 void spriteDrawerSetLayerId(s32 id, s32 depth) {
     spriteDrawerSetLayer(GFX.funcs.getLayer(id), depth);
 }
@@ -828,6 +903,7 @@ void spriteDrawerDraw(s32 *sheet, s32 frame, s32 x, s32 y) {
     GFX.funcs.setPrim(prim);
 }
 
+/* Sprite drawer method: scales the sprites (ONE: as they are) */
 void spriteDrawerSetScale(s32 x, s32 y, s32 z) {
     SPRITE_DRAWER->scaleX = x;
     SPRITE_DRAWER->scaleY = y;
@@ -835,6 +911,7 @@ void spriteDrawerSetScale(s32 x, s32 y, s32 z) {
     SPRITE_DRAWER->transformDirty = 1;
 }
 
+/* Sprite drawer method: rotates the sprites */
 void spriteDrawerSetRotation(s16 x, s16 y, s16 z) {
     SPRITE_DRAWER->rot.vx = x;
     SPRITE_DRAWER->rot.vy = y;
@@ -842,19 +919,26 @@ void spriteDrawerSetRotation(s16 x, s16 y, s16 z) {
     SPRITE_DRAWER->transformDirty = 1;
 }
 
+/* Sprite drawer method: the point the sprites scale and rotate around */
 void spriteDrawerSetPivot(s32 x, s32 y) {
     SPRITE_DRAWER->pivotX = x;
     SPRITE_DRAWER->pivotY = y;
 }
 
+/* Sprite drawer method: whether the sprites move with the layer's scroll */
 void spriteDrawerSetFollowScroll(s32 on) {
     SPRITE_DRAWER->followScroll = on;
 }
 
+/* Sprite drawer method: the color the sprites are tinted with */
 void spriteDrawerSetColor(CVECTOR *color) {
     SPRITE_DRAWER->color = *color;
 }
 
+/*
+ * Clears a sprite drawer to neutral (no scale, gray tint, follows the scroll), gives it its
+ * methods and binds it
+ */
 void initSpriteDrawer(SpriteDrawer *obj) {
     HEAP.zero(obj, sizeof(SpriteDrawer));
     obj->scaleX = 0x1000;
@@ -879,10 +963,12 @@ void initSpriteDrawer(SpriteDrawer *obj) {
     bindSpriteDrawer(obj);
 }
 
+/* Makes `obj` the text tools the methods work on */
 void bindTextTools(TextTools *obj) {
     TEXT_TOOLS = obj;
 }
 
+/* String `index` of a string table (a count, then offsets), or NULL */
 char *getString(s32 *table, s32 index) {
     s32 count = table[0];
 
@@ -892,6 +978,7 @@ char *getString(s32 *table, s32 index) {
     return (char *)table + table[index + 1];
 }
 
+/* The width in pixels of the text's widest line in a style */
 s32 measureText(TextBuffer *text, TextStyle *style, s32 spacing) {
     s32 pos;
     s32 w;
@@ -1049,6 +1136,7 @@ void convertText(void *buf, void *text, s32 mode) {
     }
 }
 
+/* Clears a text tools object, gives it its methods and binds it */
 void initTextTools(TextTools *obj) {
     HEAP.zero(obj, sizeof(TextTools));
     obj->getString = getString;
@@ -1057,20 +1145,24 @@ void initTextTools(TextTools *obj) {
     bindTextTools(obj);
 }
 
+/* Makes `obj` the TIM loader the methods work on */
 void bindTimLoader(TimLoader *obj) {
     TIM_LOADER = obj;
 }
 
+/* TIM loader method: where in VRAM the next image goes */
 void timLoaderSetImagePos(s32 x, s32 y) {
     TIM_LOADER->imageX = x;
     TIM_LOADER->imageY = y;
 }
 
+/* TIM loader method: where in VRAM the next CLUT goes */
 void timLoaderSetClutPos(s32 x, s32 y) {
     TIM_LOADER->clutX = x;
     TIM_LOADER->clutY = y;
 }
 
+/* TIM loader method: sends a TIM's CLUT (4 and 8-bit images) and image to VRAM */
 void timLoaderLoad(u_long *tim) {
     RECT clut;
     RECT image;
@@ -1105,8 +1197,12 @@ void timLoaderLoad(u_long *tim) {
     TIM_LOADER->h = image.h;
 }
 
+/*
+ * TIM loader method: loads every TIM of an archive side by side, 0x40 halfwords apart, unpacking
+ * the RLEN ones
+ */
 void timLoaderLoadArchive(s32 archive) {
-    u8 *buf = HEAP.alloc(TIM_LOADER->bufferSize, 2);
+    u8 *buf = HEAP.alloc(TIM_LOADER->bufferSize, MEM_MODE);
     s32 i;
     s32 compressed;
     u8 *data;
@@ -1151,10 +1247,12 @@ void timLoaderLoadArchive(s32 archive) {
     HEAP.free(buf);
 }
 
+/* TIM loader method: the buffer that RLEN TIMs are unpacked to */
 void timLoaderSetBufferSize(s32 size) {
     TIM_LOADER->bufferSize = size;
 }
 
+/* Clears a TIM loader, gives it its methods and binds it */
 void initTimLoader(TimLoader *obj) {
     HEAP.zero(obj, sizeof(TimLoader));
     obj->load = timLoaderLoad;

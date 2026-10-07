@@ -17,7 +17,11 @@ const char STR_BAD_EXT_BUFFER[] = "\x82\x64\x82\x98\x82\x94\x82\x6C\x82\x85\x82\
 const char STR_MESSAGE_NOT_SET[] = "\x83\x81\x83\x62\x83\x5A\x81\x5B\x83\x57\x82\xAA\x82\xB9\x82\xC1"
                                    "\x82\xC4\x82\xA2\x82\xB3\x82\xEA\x82\xC4\x82\xA2\x82\xDC\x82\xB9\x82\xF1";
 
-void setTextBuffer(TextWindow *obj, TextBuffer *buf, char *text) {
+/*
+ * Copies a string into one of a window's text buffers, growing it as needed (NULL shows
+ * STR_NULL_MESSAGE)
+ */
+void setTextBuffer(TextWindow *obj, TextBuffer *buf, const char *text) {
     s16 len;
     s16 cap;
     u16 size;
@@ -48,7 +52,7 @@ void setTextBuffer(TextWindow *obj, TextBuffer *buf, char *text) {
             cap = size + 4;
         }
         buf->cap = cap;
-        buf->data = HEAP.alloc(cap, 2);
+        buf->data = HEAP.alloc(cap, MEM_MODE);
     copy:
         HEAP.zero(buf->data, buf->cap);
         memcpy(buf->data, text, buf->len);
@@ -60,14 +64,17 @@ void setTextBuffer(TextWindow *obj, TextBuffer *buf, char *text) {
     }
 }
 
-void textWindowSetText(TextWindow *obj, char *text) {
+/* Text window method: shows a string */
+void textWindowSetText(TextWindow *obj, const char *text) {
     setTextBuffer(obj, &obj->text[0], text);
 }
 
+/* Text window method: shows string `id` of a string table (-1: `text` itself) */
 void textWindowSetString(TextWindow *obj, char *text, s32 id) {
     textWindowSetSubString(obj, text, id, 0);
 }
 
+/* Writes a number's decimal digits (0 for zero or less) */
 void formatNumber(u8 *buf, s32 value) {
     s32 saved;
     s32 len;
@@ -95,6 +102,7 @@ void formatNumber(u8 *buf, s32 value) {
     }
 }
 
+/* Text window method: puts a number into text buffer `index`, in the font's digit glyphs */
 void textWindowSetNumber(TextWindow *obj, u32 index, s32 value) {
     u8 buf[16];
     u8 *p;
@@ -115,7 +123,8 @@ void textWindowSetNumber(TextWindow *obj, u32 index, s32 value) {
     obj->text[index].sjis = 0;
 }
 
-void textWindowSetSubText(TextWindow *obj, char *text, s32 index) {
+/* Text window method: puts a string into work buffer `index` (1-5), for control code 5 */
+void textWindowSetSubText(TextWindow *obj, const char *text, s32 index) {
     if (index < 1 || index > 5) {
         textWindowSetText(obj, STR_BAD_EXT_BUFFER);
     } else {
@@ -123,6 +132,7 @@ void textWindowSetSubText(TextWindow *obj, char *text, s32 index) {
     }
 }
 
+/* Text window method: puts string `id` of a table (-1: `text` itself) into text buffer `index` */
 void textWindowSetSubString(TextWindow *obj, char *text, s32 id, s32 index) {
     TextTools cls;
     char *str;
@@ -140,6 +150,7 @@ void textWindowSetSubString(TextWindow *obj, char *text, s32 id, s32 index) {
     obj->text[index].sjis = 0;
 }
 
+/* Text window method: draws the visible part of the text as sprites, running the control codes */
 void textWindowDraw(TextWindow *obj) {
     TextDraw wait;
     SVECTOR out;
@@ -294,6 +305,7 @@ end:
     GFX.funcs.setPrim(wait.prim);
 }
 
+/* Text window method: makes the whole current page visible at once */
 void textWindowShowPage(TextWindow *obj) {
     s32 extra;
     s32 pos;
@@ -364,6 +376,7 @@ void textWindowShowPage(TextWindow *obj) {
     }
 }
 
+/* Text window method: one of the three font styles (others pick style 1) */
 void textWindowSetStyle(TextWindow *obj, s32 style) {
     u8 *entry;
 
@@ -375,6 +388,9 @@ void textWindowSetStyle(TextWindow *obj, s32 style) {
     obj->blend = *entry;
 }
 
+/*
+ * Text window method: types the text out a character every `delay` frames (0 or less: all at once)
+ */
 void textWindowSetTypeDelay(TextWindow *obj, s32 delay) {
     if (delay <= 0) {
         obj->typeTimer = 0;
@@ -388,19 +404,23 @@ void textWindowSetTypeDelay(TextWindow *obj, s32 delay) {
     obj->start = 0;
 }
 
+/* Text window method: moves the window */
 void textWindowSetPos(TextWindow *obj, s16 x, s16 y) {
     obj->x = x;
     obj->y = y;
 }
 
+/* Text window method: the CLUT row of the glyphs */
 void textWindowSetPalette(TextWindow *obj, u8 palette) {
     obj->palette = palette;
 }
 
+/* Text window method: the glyphs' blending */
 void textWindowSetBlend(TextWindow *obj, u8 blend) {
     obj->blend = blend;
 }
 
+/* Text window method: a fixed advance and line height (0, 0: the style's) */
 void textWindowSetSpacing(TextWindow *obj, s16 x, s16 y) {
     if (x != 0 || y != 0) {
         obj->fixedSpacing = 1;
@@ -413,6 +433,7 @@ void textWindowSetSpacing(TextWindow *obj, s16 x, s16 y) {
     }
 }
 
+/* Text window method: shows or hides the window (an empty text stays hidden) */
 void textWindowSetVisible(TextWindow *obj, u8 visible) {
     if (obj->text[0].len == 0) {
         obj->visible = 0;
@@ -421,6 +442,7 @@ void textWindowSetVisible(TextWindow *obj, u8 visible) {
     }
 }
 
+/* Text window method: aligns the text to its right end, or back to the left */
 void textWindowSetRightAlign(TextWindow *obj, u8 type) {
     TextTools cls;
 
@@ -432,6 +454,7 @@ void textWindowSetRightAlign(TextWindow *obj, u8 type) {
     }
 }
 
+/* Text window method: fills the work buffers that control code 8 asks for with the player's name */
 void textWindowInsertPlayerName(TextWindow *obj) {
     TextBuffer *text = &obj->text[0];
     s32 pos;
@@ -474,10 +497,12 @@ void textWindowInsertPlayerName(TextWindow *obj) {
     }
 }
 
+/* Text window method: the sound each typed character plays (0 for none) */
 void textWindowSetTypeSound(TextWindow *obj, s32 sound) {
     obj->typeSound = sound;
 }
 
+/* Text window method: scales the glyphs */
 void textWindowSetScale(TextWindow *obj, s32 x, s32 y) {
     obj->scaleZ = 0x1000;
     obj->scaleX = x;
@@ -485,38 +510,46 @@ void textWindowSetScale(TextWindow *obj, s32 x, s32 y) {
     obj->scaled = 1;
 }
 
+/* Text window method: the point the glyphs scale around */
 void textWindowSetPivot(TextWindow *obj, s32 x, s32 y) {
     obj->pivotX = x;
     obj->pivotY = y;
 }
 
+/* Text window method: the OT depth the glyphs are drawn at */
 void textWindowSetDepth(TextWindow *obj, s32 depth) {
     obj->depth = depth;
 }
 
+/* Text window method: the lines of a page */
 void textWindowSetLines(TextWindow *obj, u8 lines) {
     obj->lines = lines;
 }
 
+/* Text window method: sets unkC4, which nothing reads */
 void textWindowSetUnkC4(TextWindow *obj, u8 value) {
     obj->unkC4 = value;
 }
 
+/* Text window method: whether the end of the text was reached */
 u8 textWindowIsFinished(TextWindow *obj) {
     return obj->finished;
 }
 
+/* Text window method: whether the window is shown */
 u8 textWindowIsVisible(TextWindow *obj) {
     return obj->visible;
 }
 
+/* Text window method: whether the text waits for a button (control code 2) */
 s32 textWindowIsWaitingForButton(TextWindow *obj) {
     return obj->substate == 1;
 }
 
-/* (obj, text, wait): most handlers take only the first two */
-extern s32 (*TEXT_CODE_HANDLERS[])();
-
+/*
+ * Picks the glyph of the next character, or runs its control code; returns what the drawing does
+ * next
+ */
 s32 processTextChar(TextWindow *obj, TextBuffer *text, TextDraw *wait, s16 *pos) {
     TextStyle *style;
     s32 c;
@@ -577,6 +610,7 @@ s32 processTextChar(TextWindow *obj, TextBuffer *text, TextDraw *wait, s16 *pos)
     return 1;
 }
 
+/* Control codes 0, 7 and 9: show the page, or (code 7) start the text after a speaker's name */
 s32 textCodeDefault(TextWindow *obj, TextBuffer *buf) {
     switch (buf->data[buf->pos + 1]) {
     case 0:
@@ -590,6 +624,7 @@ s32 textCodeDefault(TextWindow *obj, TextBuffer *buf) {
     return 0;
 }
 
+/* Control code 1: a new line, or a new page when the page is full */
 s32 textCodeNewLine(TextWindow *obj, TextBuffer *buf, TextDraw *wait) {
     if (++wait->lineCount == 1) {
         wait->pageStart = buf->pos + 2;
@@ -611,6 +646,7 @@ s32 textCodeNewLine(TextWindow *obj, TextBuffer *buf, TextDraw *wait) {
     return 0x8004;
 }
 
+/* Control code 2: waits for one of TEXT_WAIT_BUTTONS */
 s32 textCodeWaitButton(TextWindow *obj, TextBuffer *buf) {
     if (buf->data[buf->pos + 2] < 5) {
         obj->state = 2;
@@ -626,6 +662,7 @@ s32 textCodeWaitButton(TextWindow *obj, TextBuffer *buf) {
     return 0x8003;
 }
 
+/* Control code 3: starts a new page */
 s32 textCodePageBreak(TextWindow *obj, TextBuffer *buf) {
     u8 c;
 
@@ -659,10 +696,12 @@ s32 textCodePageBreak(TextWindow *obj, TextBuffer *buf) {
     return 0;
 }
 
+/* Control code 4: skipped */
 s32 textCodeIgnore(void) {
     return 0x8003;
 }
 
+/* Control code 5: draws the next character of a work buffer in its place */
 s32 textCodeInsert(TextWindow *obj, TextBuffer *buf, TextDraw *wait) {
     u8 index = buf->data[buf->pos + 2];
     s16 c;
@@ -691,6 +730,7 @@ s32 textCodeInsert(TextWindow *obj, TextBuffer *buf, TextDraw *wait) {
     return ret;
 }
 
+/* Control code 6: pauses the typing for some frames, once */
 s32 textCodePause(TextWindow *obj, TextBuffer *buf) {
     if (buf->data[buf->pos + 2] < 0xFF) {
         obj->state = 2;
@@ -703,7 +743,8 @@ s32 textCodePause(TextWindow *obj, TextBuffer *buf) {
     return 0x8003;
 }
 
-s32 textCodePlayerName(s32 obj, TextBuffer *buf) {
+/* Control code 8: puts the player's name into a work buffer, once */
+s32 textCodePlayerName(TextWindow *obj, TextBuffer *buf) {
     if ((u8)buf->data[buf->pos + 2] < 6) {
         textWindowSetSubString(obj, GAME.name, -1, (u8)buf->data[buf->pos + 2]);
         buf->data[buf->pos + 2] = 6;
@@ -711,6 +752,10 @@ s32 textCodePlayerName(s32 obj, TextBuffer *buf) {
     return 0x8003;
 }
 
+/*
+ * The text window task: types and draws the text, waits where the control codes say, frees the
+ * buffers at the end
+ */
 void updateTextWindow(TextWindow *obj) {
     s32 i;
 
@@ -763,6 +808,7 @@ void updateTextWindow(TextWindow *obj) {
     }
 }
 
+/* A text window on a layer, in a font style, at (x, y) */
 TextWindow *createTextWindow(s16 layerId, s16 style, s16 x, s16 y) {
     TextWindow *ret;
     TextWindow *obj = createTask(updateTextWindow, 0x174, 0);
@@ -808,6 +854,7 @@ TextWindow *createTextWindow(s16 layerId, s16 style, s16 x, s16 y) {
     return ret;
 }
 
+/* Cursor method: shows it (from its first frame) or hides it */
 void cursorSetVisible(Cursor *task, s32 visible) {
     task->visible = visible;
     if (visible == 0) {
@@ -817,29 +864,35 @@ void cursorSetVisible(Cursor *task, s32 visible) {
     task->dirty = 1;
 }
 
+/* Cursor method: moves it */
 void cursorSetPos(Cursor *task, s32 x, s32 y) {
     task->x = x;
     task->y = y;
     task->dirty = 1;
 }
 
+/* Cursor method: the CLUT row of its glyph */
 void cursorSetPalette(Cursor *task, s32 palette) {
     task->palette = palette;
     task->dirty = 1;
 }
 
+/* Cursor method: the vsyncs it rests between two swings */
 void cursorSetIdleDelay(Cursor *task, s32 delay) {
     task->idleDelay = delay;
 }
 
+/* Cursor method: the vsyncs of each frame of a swing */
 void cursorSetFrameDelay(Cursor *task, s32 delay) {
     task->frameDelay = delay;
 }
 
+/* Cursor method: keeps it on its first frame */
 void cursorSetStill(Cursor *task, s32 still) {
     task->still = still;
 }
 
+/* The cursor task: creates its text window, then swings it every idleDelay vsyncs */
 void updateCursor(Cursor *task, TextWindow **win) {
     switch (task->state) {
     case 0:
@@ -889,6 +942,7 @@ void updateCursor(Cursor *task, TextWindow **win) {
     }
 }
 
+/* A menu cursor on a layer at (x, y) */
 Cursor *createCursor(s16 layerId, s32 depth, s16 x, s16 y) {
     Cursor *task = createTask(updateCursor, 0x98, 4);
 
@@ -908,6 +962,7 @@ Cursor *createCursor(s16 layerId, s32 depth, s16 x, s16 y) {
     return task;
 }
 
+/* Decompressor method: frees its buffer */
 void decompressorFree(Decompressor *task) {
     if (task->buffer != NULL) {
         HEAP.free(task->buffer);
@@ -916,6 +971,7 @@ void decompressorFree(Decompressor *task) {
     task->bufferSize = 0;
 }
 
+/* Points the decompressor at data, which is RLEN-packed or plain */
 void decompressorSetData(Decompressor *task, s32 *data) {
     task->data = data;
     if (data[0] == 0x4E454C52) {
@@ -930,17 +986,19 @@ void decompressorSetData(Decompressor *task, s32 *data) {
     task->src = data;
 }
 
+/* Makes the buffer big enough for the unpacked size */
 void decompressorAllocBuffer(Decompressor *task) {
     if (task->size > task->bufferSize) {
         if (task->buffer != NULL) {
             HEAP.free(task->buffer);
         }
-        task->buffer = HEAP.alloc(task->size, 2);
+        task->buffer = HEAP.alloc(task->size, MEM_MODE);
         task->bufferSize = task->size;
     }
     task->dst = task->buffer;
 }
 
+/* Unpacks at least chunkSize bytes; back to substate 0 at the end */
 void decompressorStep(Decompressor *task) {
     u8 *src = (u8 *)task->src;
     u8 *dst = task->dst;
@@ -976,6 +1034,7 @@ void decompressorStep(Decompressor *task) {
     }
 }
 
+/* Decompressor method: unpacks data at once; returns it unpacked (plain data as it is) */
 void *decompressorRun(Decompressor *task, s32 *data) {
     task->chunkSize = 0x10000000;
     decompressorSetData(task, data);
@@ -987,6 +1046,7 @@ void *decompressorRun(Decompressor *task, s32 *data) {
     return data;
 }
 
+/* Decompressor method: starts unpacking data chunkSize bytes a frame */
 void decompressorStart(Decompressor *task, s32 *data, s32 chunkSize) {
     task->chunkSize = chunkSize;
     decompressorSetData(task, data);
@@ -996,6 +1056,7 @@ void decompressorStart(Decompressor *task, s32 *data, s32 chunkSize) {
     }
 }
 
+/* Decompressor method: the unpacked data, or NULL while it is unpacking */
 void *decompressorGetData(Decompressor *task) {
     if (task->substate != 0) {
         return NULL;
@@ -1006,6 +1067,7 @@ void *decompressorGetData(Decompressor *task) {
     return task->data;
 }
 
+/* The decompressor task: unpacks a chunk a frame, frees the buffer at the end */
 void updateDecompressor(Decompressor *task) {
     switch (task->state) {
     case 0:
@@ -1027,6 +1089,7 @@ void updateDecompressor(Decompressor *task) {
     }
 }
 
+/* A decompressor task */
 Decompressor *createDecompressor(void) {
     Decompressor *task = createTask(updateDecompressor, 0x84, 0);
 
@@ -1037,6 +1100,7 @@ Decompressor *createDecompressor(void) {
     return task;
 }
 
+/* Draws the two halves of a message box's panel, growing, still or fading */
 void drawMessageBoxFrame(MessageBoxFrame *task) {
     SpriteDrawer obj;
     s32 i;
@@ -1061,6 +1125,7 @@ void drawMessageBoxFrame(MessageBoxFrame *task) {
     }
 }
 
+/* Draws a message box's blinking "next" arrow */
 void drawMessageBoxArrow(MessageBoxFrame *task) {
     SpriteDrawer obj;
 
@@ -1077,6 +1142,7 @@ void drawMessageBoxArrow(MessageBoxFrame *task) {
     obj.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 10, 0x124, 0xCD);
 }
 
+/* The message box frame task: grows, waits with the arrow when asked, then fades out and ends */
 void updateMessageBoxFrame(MessageBoxFrame *task) {
     switch (task->state) {
     case 0:
@@ -1117,6 +1183,7 @@ void updateMessageBoxFrame(MessageBoxFrame *task) {
     }
 }
 
+/* A message box frame on a layer, with the menu sound */
 MessageBoxFrame *createMessageBoxFrame(s32 layerId) {
     MessageBoxFrame *task = createTask(updateMessageBoxFrame, 0x6C, 0);
 
@@ -1125,6 +1192,7 @@ MessageBoxFrame *createMessageBoxFrame(s32 layerId) {
     return task;
 }
 
+/* The message box task: shows the text once the frame is open, closes when the text ends */
 void updateMessageBox(MessageBoxFrame *task, MessageBox *data) {
     switch (task->state) {
     case 0:
@@ -1170,6 +1238,7 @@ void updateMessageBox(MessageBoxFrame *task, MessageBox *data) {
     }
 }
 
+/* A message box with string `index` of a table, typed out in three-line pages */
 Task *createMessageBox(s32 layerId, s32 strings, s32 index) {
     Task *task = createTask(updateMessageBox, 0x50, 8);
     MessageBox *data = task->children;
@@ -1183,6 +1252,7 @@ Task *createMessageBox(s32 layerId, s32 strings, s32 index) {
     return task;
 }
 
+/* Draws a talk box's blinking "next" arrow where its type puts it */
 void drawTalkBoxArrow(TalkBoxFrame *task) {
     SpriteDrawer obj;
     SVECTOR unused; /* unused, but it is in the original stack frame */
@@ -1213,6 +1283,7 @@ void drawTalkBoxArrow(TalkBoxFrame *task) {
     }
 }
 
+/* Draws a talk box's corner sprites and its semi-transparent panel */
 void drawTalkBoxFrame(TalkBoxFrame *task) {
     SpriteDrawer obj;
     SVECTOR v[4];
@@ -1286,6 +1357,7 @@ void drawTalkBoxFrame(TalkBoxFrame *task) {
     GFX.funcs.setPrim(p + 1);
 }
 
+/* The talk box frame task: idle until the box opens, then draws the frame and the arrow */
 void updateTalkBoxFrame(TalkBoxFrame *task) {
     switch (task->state) {
     case 0:
@@ -1302,6 +1374,7 @@ void updateTalkBoxFrame(TalkBoxFrame *task) {
     }
 }
 
+/* The frame of a talk box */
 TalkBoxFrame *createTalkBoxFrame(TalkBox *parent) {
     TalkBoxFrame *task = createTask(updateTalkBoxFrame, 0x60, 0);
 
@@ -1316,6 +1389,7 @@ typedef struct Order4 {
 /* The corner of the box each corner's side of the outline goes to */
 const Order4 OUTLINE_ORDER = {{1, 3, 0, 2}};
 
+/* Zooms the outline one frame in or out and draws it as four lines; ends when done */
 void drawZoomBox(ZoomBox *task) {
     Layer *layer = GFX.funcs.getLayer(task->layerId);
     u_long *ot = (u_long *)layer->getOtEntry(layer, 0);
@@ -1368,6 +1442,7 @@ void drawZoomBox(ZoomBox *task) {
     GFX.funcs.setPrim(line);
 }
 
+/* The zoom box task: starts zoomed out (opening) or in (closing), then draws */
 void updateZoomBox(ZoomBox *task) {
     switch (task->state) {
     case 0:
@@ -1392,6 +1467,7 @@ void updateZoomBox(ZoomBox *task) {
     }
 }
 
+/* A zoom box around a talk box of type `type` at (x, y) */
 ZoomBox *createZoomBox(s32 layerId, s16 x, s16 y, s32 w, s32 h, s32 type) {
     s16 pad = w;
     ZoomBox *task = createTask(updateZoomBox, 0xC0, 0);
@@ -1411,6 +1487,7 @@ ZoomBox *createZoomBox(s32 layerId, s16 x, s16 y, s32 w, s32 h, s32 type) {
     return task;
 }
 
+/* Talk box method: moves the box with its outlines and windows */
 void talkBoxSetPos(TalkBox *task, s32 x, s32 y) {
     TalkBoxChildren *children = task->children;
     s32 i;
@@ -1454,6 +1531,7 @@ typedef struct Delays3 {
 /* The frames before each of the three zoom boxes of an opening or closing */
 const Delays3 ZOOM_BOX_DELAYS = {{0, 2, 4}};
 
+/* The talk box task: opens with its outlines, runs the text, then closes and ends */
 void updateTalkBox(TalkBox *task, TalkBoxChildren *children) {
     Delays3 delays;
 
@@ -1523,8 +1601,10 @@ void updateTalkBox(TalkBox *task, TalkBoxChildren *children) {
     }
 }
 
-char *strncpy(char *dst, char *src, s32 n);
-
+/*
+ * A talk box with string `index` of a table (an optional speaker's name between 02 07 codes),
+ * sized to the text
+ */
 TalkBox *createTalkBox(s32 id, s16 x, s16 y, s32 file, s32 index, u32 type) {
     TextTools fn;
     char name[0x20];
@@ -1588,6 +1668,7 @@ TalkBox *createTalkBox(s32 id, s16 x, s16 y, s32 file, s32 index, u32 type) {
     return task;
 }
 
+/* Loads the font's images into VRAM and starts loading the menu sprites */
 void loadFont(void) {
     TimLoader obj;
 
@@ -1599,6 +1680,7 @@ void loadFont(void) {
 }
 
 
+/* The next character as kind << 8 | value (see Font); `mode` set for Shift-JIS text */
 s16 decodeChar(u8 *s, u8 mode, TextStyle *font) {
     u16 code;
     GlyphMap *map;

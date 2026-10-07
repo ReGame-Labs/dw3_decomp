@@ -16,6 +16,23 @@
  *   key-on:    program bits 11-17, tone bits 7-10, note bits 0-6
  *   sequence:  SEQ bits 8-15, track (SEP) bits 0-7
  */
+#define SOUND_IS_KEY_ON(id) ((u32)(id) >> 31)
+#define SOUND_IS_EXCLUSIVE(id) (((id) >> 30) & 1)
+#define SOUND_BANK(id) (((id) >> 18) & 0x7F)
+#define SOUND_PROG(id) (((id) >> 11) & 0x7F)
+#define SOUND_TONE(id) (((id) >> 7) & 0xF)
+#define SOUND_NOTE(id) ((id) & 0x7F)
+#define SOUND_SEQ(id) (((id) >> 8) & 0xFF)
+#define SOUND_SEP(id) ((id) & 0xFF)
+
+/* The banks loaded at once: slot 0 keeps bank 1 (system sounds), 1 and 2 alternate */
+#define SOUND_SLOT_COUNT 3
+
+/* The tracks (SEPs) of each SEQ */
+#define SOUND_SEP_COUNT 16
+
+/* The loudest volume of a voice or track */
+#define SOUND_VOLUME_MAX 0x7F
 
 /* Sounds the overlays share, with SOUNDTST's names */
 #define SOUND_SELECT 0x8004503C /* SYSTEM00: a choice is taken */
@@ -29,8 +46,9 @@
 #define SOUND_RECOVERY 0x40014 /* RECOVERY */
 #define SOUND_TELEPORT 0x4001D /* TELEPORT */
 #define SOUND_WIN_JINGLE 0x6004001E /* W_JINGLE: a battle won */
+#define SOUND_INN_JINGLE 0x4004000D /* JINGLE04: a night at the inn */
 
-/* One of the three loaded sound banks: a VAB and its SEP sequences */
+/* One of the SOUND_SLOT_COUNT loaded sound banks: a VAB and its SEP sequences */
 typedef struct SoundBank {
     /* 0x00 */ s32 id;
     /* 0x04 */ s16 vabId;
@@ -49,17 +67,20 @@ typedef struct SoundFiles {
     /* 0x10 */ s32 seps[0]; /* indices in headFile, 0-terminated */
 } SoundFiles;
 
+/* SoundLoader.state: waiting for the header file, the body file, then the SPU */
+enum SoundLoadState { SOUND_LOAD_IDLE, SOUND_LOAD_HEAD, SOUND_LOAD_BODY, SOUND_LOAD_TRANSFER };
+
 /* Loads a bank in the background (updateSoundLoading) */
 typedef struct SoundLoader {
     /* 0x0 */ SoundFiles *files;
-    /* 0x4 */ s16 state; /* 0 idle, 1 header, 2 body, 3 transfer */
+    /* 0x4 */ s16 state; /* SOUND_LOAD_* */
     /* 0x6 */ s16 slot;
 } SoundLoader;
 
 /* The sound engine (SOUND) */
 typedef struct SoundState {
     /* 0x0000 */ u8 seqTable[0x4200]; /* SsSetTableSize(6 SEQs, 16 SEPs) */
-    /* 0x4200 */ SoundBank banks[3];
+    /* 0x4200 */ SoundBank banks[SOUND_SLOT_COUNT];
     /* 0x4248 */ s32 music; /* the exclusive sound playing */
     /* 0x424C */ s32 lastSlot;
     /* 0x4250 */ SoundLoader loader;

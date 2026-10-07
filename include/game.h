@@ -19,25 +19,12 @@
 #include "dw3/memcard.h"
 #include "dw3/menus.h"
 
-/* SDK functions without a PsyQ 4.7 header here, and overlay functions */
-void PadStartCom(void);
-int PadInitMtap(unsigned char *p1, unsigned char *p2);
-void PadInitDirect(unsigned char *p1, unsigned char *p2);
-int PadInfoAct(int port, int acno, int term);
-int PadSetActAlign(int port, unsigned char *data);
-void PadSetAct(int port, unsigned char *data, int len);
-void func_800345B8(void);
-void SsVabClose(short vabId);
-void func_80030198(short seq);
-int PadInfoMode(int port, int term, int offs);
-int PadSetMainMode(int port, int offs, int lock);
-void PadStopCom(void);
-s32 VSyncCallback(void (*func)(void));
-short SsUtKeyOn(short vabId, short prog, short tone, short note, short fine, short voll, short volr);
-void SsSepStop(short seq, short sep);
-void SsSepSetDecrescendo(short seq, short sep, short vol, long frames);
-void SsSeqCalledTbyT(void);
-short SsUtKeyOff(short voice, short vabId, short prog, short tone, short note);
+/* SDK functions declared here rather than from their PsyQ headers: libmcrd.h
+   takes the buffers as u_long * and MemCardSync's result as a long *, where
+   the game passes u8 buffers and compares the result unsigned; strings.h
+   and memory.h declare these without prototypes, strlen as unsigned */
+void MemCardInit(long val);
+void MemCardStart(void);
 long MemCardSync(long mode, long *cmds, u_long *result);
 long MemCardExist(long chan);
 long MemCardAccept(long chan);
@@ -47,13 +34,9 @@ long MemCardReadFile(long chan, char *file, void *adrs, long ofs, long bytes);
 long MemCardWriteFile(long chan, char *file, void *adrs, long ofs, long bytes);
 long MemCardUnformat(long chan);
 long MemCardGetDirentry(long chan, char *name, CardDirEntry *dir, long *files, long ofs, long max);
-void func_80029598(s32);
-void func_8002DE68(void (*func)());
-int CdControlF(u_char com, u_char *param);
-int strlen(char *);
-char *strcpy(char *dst, char *src);
-void *memcpy(void *, void *, int);
-int func_8002E268(void *buf, int size);
-long func_8002DE88(long value); /* libcd: sets the data-ready callback, returns the old one */
+int strlen(const char *);
+char *strcpy(char *dst, const char *src);
+char *strncpy(char *dst, const char *src, s32 n);
+void *memcpy(void *dst, const void *src, int size);
 
 #endif /* GAME_H */

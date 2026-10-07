@@ -298,12 +298,12 @@ typedef struct ZoomBox {
 
 void drawMessageBoxFrame(struct MessageBoxFrame *task);
 void drawMessageBoxArrow(struct MessageBoxFrame *task);
-void setTextBuffer(struct TextWindow *obj, struct TextBuffer *buf, char *text);
+void setTextBuffer(struct TextWindow *obj, struct TextBuffer *buf, const char *text);
 void textWindowSetSubString(struct TextWindow *obj, char *text, s32 id, s32 index);
 void drawZoomBox(ZoomBox *task);
 void drawTalkBoxArrow(struct TalkBoxFrame *task);
 void drawTalkBoxFrame(struct TalkBoxFrame *task);
-void textWindowSetText(TextWindow *obj, char *text);
+void textWindowSetText(TextWindow *obj, const char *text);
 void formatNumber(u8 *buf, s32 value);
 void textWindowSetTypeDelay(TextWindow *, s32);
 void *decompressorRun(Decompressor *task, s32 *data);
@@ -335,6 +335,7 @@ extern char CURSOR_TEXT_3[];
 extern char *CURSOR_FRAMES[];
 extern s32 TEXT_WAIT_BUTTONS[];
 extern Font FONT;
+extern s32 (*TEXT_CODE_HANDLERS[])(); /* (obj, text, wait): most handlers take only the first two */
 extern GlyphMap FONT_GLYPH_MAP[];
 extern GlyphMap FONT_ICON_MAP[];
 extern Glyph FONT_GLYPHS_1[]; /* the three font sizes' glyphs and icons (graphics.c) */

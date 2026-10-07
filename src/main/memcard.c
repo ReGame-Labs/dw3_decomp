@@ -60,13 +60,13 @@ void setSaveFileName(void) {
 void setSaveHeader(char *title, CardClut *clut, s32 count, s32 *icons) {
     s32 i;
 
-    if (count >= 1 && count <= 3 && (u32)strlen(title) <= 64) {
+    if (count >= 1 && count <= SAVE_MAX_ICONS && (u32)strlen(title) <= sizeof(MEMCARD.header.title)) {
         MEMCARD.iconCount = count;
         HEAP.zero(&MEMCARD.header, sizeof(CardHeader));
         MEMCARD.header.magic[0] = 'S';
         MEMCARD.header.magic[1] = 'C';
-        MEMCARD.header.blocks = 4;
-        MEMCARD.header.type = MEMCARD.iconCount | 0x10;
+        MEMCARD.header.blocks = SAVE_BLOCKS;
+        MEMCARD.header.type = MEMCARD.iconCount | CARD_HEADER_ICONS;
         strcpy(MEMCARD.header.title, title);
         MEMCARD.header.clut = *clut;
         for (i = 0; i < MEMCARD.iconCount; i++) {
@@ -84,7 +84,7 @@ s32 syncMemCard(void) {
     if (ret == 1) {
         MEMCARD.cmd = cmds;
         MEMCARD.result = result;
-        if (result < 2 || result == 3) {
+        if (result <= CARD_ERR_NO_CARD || result == CARD_ERR_NEW_CARD) {
             MEMCARD.retries = 0;
         } else {
             if (++MEMCARD.retries < MEMCARD.maxRetries) {
@@ -98,19 +98,20 @@ s32 syncMemCard(void) {
     return ret;
 }
 
+/* Checks whether a card is in port `port` (MemCardExist) */
 s32 checkMemCard(s32 port) {
     switch (MEMCARD.state) {
-    case 0:
+    case MEMCARD_IDLE:
     default:
         while (MemCardExist(port << 4) == 0) {
             syncMemCard();
         }
-        MEMCARD.state = 1;
+        MEMCARD.state = MEMCARD_CHECKING;
         break;
-    case 1:
+    case MEMCARD_CHECKING:
         if (syncMemCard() != 0) {
-            MEMCARD.state = 0;
-            if (MEMCARD.result == 0) {
+            MEMCARD.state = MEMCARD_IDLE;
+            if (MEMCARD.result == CARD_ERR_NONE) {
                 return 1;
             }
             return MEMCARD.result + 1;
@@ -126,19 +127,23 @@ s32 checkMemCard(s32 port) {
     return 0;
 }
 
+/*
+ * Checks a card in port `port` in full, finding out whether it is new or unformatted
+ * (MemCardAccept)
+ */
 s32 acceptMemCard(s32 port) {
     switch (MEMCARD.state) {
-    case 0:
+    case MEMCARD_IDLE:
     default:
         while (MemCardAccept(port << 4) == 0) {
             syncMemCard();
         }
-        MEMCARD.state = 2;
+        MEMCARD.state = MEMCARD_ACCEPTING;
         break;
-    case 2:
+    case MEMCARD_ACCEPTING:
         if (syncMemCard() != 0) {
-            MEMCARD.state = 0;
-            if (MEMCARD.result == 0) {
+            MEMCARD.state = MEMCARD_IDLE;
+            if (MEMCARD.result == CARD_ERR_NONE) {
                 return 1;
             }
             return MEMCARD.result + 1;
@@ -154,78 +159,78 @@ s32 acceptMemCard(s32 port) {
     return 0;
 }
 
-/* Reads a section of the save: 0 header, 1 info, 2-4 data (128 bytes a call) */
+/* Reads a section of the save (SAVE_SECTION_*, then 2-4 for the data), a sector a call */
 s32 readSave(s32 port, u8 *buf, s32 size, s32 section) {
     u8 *dst;
 
     if (buf == NULL || size == 0) {
         return 1;
     }
-    if ((u32)(MEMCARD.iconCount - 1) >= 3) {
+    if ((u32)(MEMCARD.iconCount - 1) >= SAVE_MAX_ICONS) {
         return 1;
     }
     dst = buf;
     switch (MEMCARD.state) {
-    case 0:
+    case MEMCARD_IDLE:
     default:
         if (checkMemCard(port) == 0) {
             return 0;
         }
         switch (MEMCARD.result) {
-        case 0:
+        case CARD_ERR_NONE:
             MEMCARD.progress = 0;
             switch (section) {
-            case 0:
+            case SAVE_SECTION_HEADER:
             default:
                 MEMCARD.offset = 0;
                 break;
-            case 1:
-                MEMCARD.offset = MEMCARD.iconCount * 128 + 128;
+            case SAVE_SECTION_INFO:
+                MEMCARD.offset = MEMCARD.iconCount * CARD_SECTOR_SIZE + CARD_SECTOR_SIZE;
                 break;
-            case 2:
-                MEMCARD.offset = MEMCARD.iconCount * 128 + 128 + MEMCARD.infoSize;
+            case SAVE_SECTION_DATA:
+                MEMCARD.offset = MEMCARD.iconCount * CARD_SECTOR_SIZE + CARD_SECTOR_SIZE + MEMCARD.infoSize;
                 break;
-            case 3:
-                MEMCARD.offset = MEMCARD.iconCount * 128 + 128 + MEMCARD.infoSize + MEMCARD.dataSize;
+            case SAVE_SECTION_DATA + 1:
+                MEMCARD.offset = MEMCARD.iconCount * CARD_SECTOR_SIZE + CARD_SECTOR_SIZE + MEMCARD.infoSize + MEMCARD.dataSize;
                 break;
-            case 4:
-                MEMCARD.offset = MEMCARD.iconCount * 128 + 128 + MEMCARD.infoSize + MEMCARD.dataSize * 2;
+            case SAVE_SECTION_DATA + 2:
+                MEMCARD.offset = MEMCARD.iconCount * CARD_SECTOR_SIZE + CARD_SECTOR_SIZE + MEMCARD.infoSize + MEMCARD.dataSize * 2;
                 break;
             }
-            while (MemCardReadFile(port << 4, MEMCARD.fileName, dst, MEMCARD.offset, 128) == 0) {
+            while (MemCardReadFile(port << 4, MEMCARD.fileName, dst, MEMCARD.offset, CARD_SECTOR_SIZE) == 0) {
                 syncMemCard();
             }
-            MEMCARD.state = 3;
+            MEMCARD.state = MEMCARD_READING;
             break;
         default:
-            MEMCARD.state = 0;
+            MEMCARD.state = MEMCARD_IDLE;
             return MEMCARD.result + 1;
         }
         break;
-    case 3:
+    case MEMCARD_READING:
         if (syncMemCard() != 0) {
             switch (MEMCARD.result) {
-            case 0:
-                MEMCARD.progress += 128;
+            case CARD_ERR_NONE:
+                MEMCARD.progress += CARD_SECTOR_SIZE;
                 if (MEMCARD.progress >= size) {
-                    MEMCARD.state = 0;
+                    MEMCARD.state = MEMCARD_IDLE;
                     return 1;
                 }
                 while (1) {
-                    if (MemCardReadFile(port << 4, MEMCARD.fileName, dst + MEMCARD.progress, MEMCARD.offset + MEMCARD.progress, 128) != 0) {
+                    if (MemCardReadFile(port << 4, MEMCARD.fileName, dst + MEMCARD.progress, MEMCARD.offset + MEMCARD.progress, CARD_SECTOR_SIZE) != 0) {
                         return 0;
                     }
                     syncMemCard();
                 }
             default:
-                MEMCARD.state = 0;
+                MEMCARD.state = MEMCARD_IDLE;
                 return MEMCARD.result + 1;
             }
         }
         if (MEMCARD.restart != 0) {
             MEMCARD.restart = 0;
             MEMCARD.progress = 0;
-            while (MemCardReadFile(port << 4, MEMCARD.fileName, dst, MEMCARD.offset, 128) == 0) {
+            while (MemCardReadFile(port << 4, MEMCARD.fileName, dst, MEMCARD.offset, CARD_SECTOR_SIZE) == 0) {
                 syncMemCard();
             }
             return 0;
@@ -242,71 +247,71 @@ s32 writeSave(s32 port, u8 *buf, s32 size, s32 section) {
     if (buf == NULL || size == 0) {
         return 1;
     }
-    if ((u32)(MEMCARD.iconCount - 1) >= 3) {
+    if ((u32)(MEMCARD.iconCount - 1) >= SAVE_MAX_ICONS) {
         return 1;
     }
     dst = buf;
     switch (MEMCARD.state) {
-    case 0:
+    case MEMCARD_IDLE:
     default:
         if (checkMemCard(port) == 0) {
             return 0;
         }
         switch (MEMCARD.result) {
-        case 0:
+        case CARD_ERR_NONE:
             MEMCARD.progress = 0;
             switch (section & 0xFF) {
-            case 0:
+            case SAVE_SECTION_HEADER:
             default:
                 MEMCARD.offset = section >> 8;
                 break;
-            case 1:
-                MEMCARD.offset = MEMCARD.iconCount * 128 + 128;
+            case SAVE_SECTION_INFO:
+                MEMCARD.offset = MEMCARD.iconCount * CARD_SECTOR_SIZE + CARD_SECTOR_SIZE;
                 break;
-            case 2:
-                MEMCARD.offset = MEMCARD.iconCount * 128 + 128 + MEMCARD.infoSize;
+            case SAVE_SECTION_DATA:
+                MEMCARD.offset = MEMCARD.iconCount * CARD_SECTOR_SIZE + CARD_SECTOR_SIZE + MEMCARD.infoSize;
                 break;
-            case 3:
-                MEMCARD.offset = MEMCARD.iconCount * 128 + 128 + MEMCARD.infoSize + MEMCARD.dataSize;
+            case SAVE_SECTION_DATA + 1:
+                MEMCARD.offset = MEMCARD.iconCount * CARD_SECTOR_SIZE + CARD_SECTOR_SIZE + MEMCARD.infoSize + MEMCARD.dataSize;
                 break;
-            case 4:
-                MEMCARD.offset = MEMCARD.iconCount * 128 + 128 + MEMCARD.infoSize + MEMCARD.dataSize * 2;
+            case SAVE_SECTION_DATA + 2:
+                MEMCARD.offset = MEMCARD.iconCount * CARD_SECTOR_SIZE + CARD_SECTOR_SIZE + MEMCARD.infoSize + MEMCARD.dataSize * 2;
                 break;
             }
-            while (MemCardWriteFile(port << 4, MEMCARD.fileName, dst, MEMCARD.offset, 128) == 0) {
+            while (MemCardWriteFile(port << 4, MEMCARD.fileName, dst, MEMCARD.offset, CARD_SECTOR_SIZE) == 0) {
                 syncMemCard();
             }
-            MEMCARD.state = 4;
+            MEMCARD.state = MEMCARD_WRITING;
             break;
         default:
-            MEMCARD.state = 0;
+            MEMCARD.state = MEMCARD_IDLE;
             return MEMCARD.result + 1;
         }
         break;
-    case 4:
+    case MEMCARD_WRITING:
         if (syncMemCard() != 0) {
             switch (MEMCARD.result) {
-            case 0:
-                MEMCARD.progress += 128;
+            case CARD_ERR_NONE:
+                MEMCARD.progress += CARD_SECTOR_SIZE;
                 if (MEMCARD.progress >= size) {
-                    MEMCARD.state = 0;
+                    MEMCARD.state = MEMCARD_IDLE;
                     return 1;
                 }
                 while (1) {
-                    if (MemCardWriteFile(port << 4, MEMCARD.fileName, dst + MEMCARD.progress, MEMCARD.offset + MEMCARD.progress, 128) != 0) {
+                    if (MemCardWriteFile(port << 4, MEMCARD.fileName, dst + MEMCARD.progress, MEMCARD.offset + MEMCARD.progress, CARD_SECTOR_SIZE) != 0) {
                         return 0;
                     }
                     syncMemCard();
                 }
             default:
-                MEMCARD.state = 0;
+                MEMCARD.state = MEMCARD_IDLE;
                 return MEMCARD.result + 1;
             }
         }
         if (MEMCARD.restart != 0) {
             MEMCARD.restart = 0;
             MEMCARD.progress = 0;
-            while (MemCardWriteFile(port << 4, MEMCARD.fileName, dst, MEMCARD.offset, 128) == 0) {
+            while (MemCardWriteFile(port << 4, MEMCARD.fileName, dst, MEMCARD.offset, CARD_SECTOR_SIZE) == 0) {
                 syncMemCard();
             }
             return 0;
@@ -316,58 +321,56 @@ s32 writeSave(s32 port, u8 *buf, s32 size, s32 section) {
     return 0;
 }
 
-extern s32 MEMCARD_SYNC_CMDS[];
-
-/* 0 read the directory, 1 create the save file, 2 format, 3 unformat */
+/* Reads the directory, creates the save file, formats or unformats (MEMCARD_OP_*) */
 s32 memCardCommand(s32 port, s32 cmd) {
     switch (MEMCARD.state) {
-    case 0:
+    case MEMCARD_IDLE:
     default:
         if (acceptMemCard(port) == 0) {
             return 0;
         }
         switch (MEMCARD.result) {
-        case 0:
-            MEMCARD.state = 5;
+        case CARD_ERR_NONE:
+            MEMCARD.state = MEMCARD_COMMAND;
             break;
-        case 4:
-            if (cmd == 2) {
-                MEMCARD.state = 5;
+        case CARD_ERR_UNFORMATTED:
+            if (cmd == MEMCARD_OP_FORMAT) {
+                MEMCARD.state = MEMCARD_COMMAND;
                 break;
             }
-            MEMCARD.state = 0;
-            return 5;
+            MEMCARD.state = MEMCARD_IDLE;
+            return CARD_ERR_UNFORMATTED + 1;
         default:
-            MEMCARD.state = 0;
+            MEMCARD.state = MEMCARD_IDLE;
             return MEMCARD.result + 1;
         }
         break;
-    case 5:
-        if ((MEMCARD.result == 0 && (cmd == 0 || cmd == 1 || cmd == 3)) ||
-            (MEMCARD.result == 4 && cmd == 2)) {
-            HEAP.zero(&MEMCARD.fileCount, 0x25C);
+    case MEMCARD_COMMAND:
+        if ((MEMCARD.result == CARD_ERR_NONE && (cmd == MEMCARD_OP_LIST || cmd == MEMCARD_OP_CREATE || cmd == MEMCARD_OP_UNFORMAT)) ||
+            (MEMCARD.result == CARD_ERR_UNFORMATTED && cmd == MEMCARD_OP_FORMAT)) {
+            HEAP.zero(&MEMCARD.fileCount, sizeof(MEMCARD.fileCount) + sizeof(MEMCARD.files));
             MEMCARD.cmd = MEMCARD_SYNC_CMDS[cmd];
             switch (cmd) {
-            case 0:
+            case MEMCARD_OP_LIST:
             default:
-                MEMCARD.result = MemCardGetDirentry(port << 4, STR_ALL_FILES, MEMCARD.files, (long *)&MEMCARD.fileCount, 0, 15);
+                MEMCARD.result = MemCardGetDirentry(port << 4, STR_ALL_FILES, MEMCARD.files, (long *)&MEMCARD.fileCount, 0, CARD_MAX_FILES);
                 break;
-            case 1:
-                MEMCARD.result = MemCardCreateFile(port << 4, MEMCARD.fileName, 4);
+            case MEMCARD_OP_CREATE:
+                MEMCARD.result = MemCardCreateFile(port << 4, MEMCARD.fileName, SAVE_BLOCKS);
                 break;
-            case 2:
+            case MEMCARD_OP_FORMAT:
                 MEMCARD.result = MemCardFormat(port << 4);
                 break;
-            case 3:
+            case MEMCARD_OP_UNFORMAT:
                 MEMCARD.result = MemCardUnformat(port << 4);
                 break;
             }
             if (MEMCARD.result == -1) {
-                MEMCARD.result = 8;
+                MEMCARD.result = CARD_ERR_NOT_STARTED;
             }
         }
-        MEMCARD.state = 0;
-        if (MEMCARD.result == 0) {
+        MEMCARD.state = MEMCARD_IDLE;
+        if (MEMCARD.result == CARD_ERR_NONE) {
             return 1;
         }
         return MEMCARD.result + 1;
@@ -375,8 +378,9 @@ s32 memCardCommand(s32 port, s32 cmd) {
     return 0;
 }
 
+/* Reads the card's directory into MEMCARD.files */
 s32 listSaves(s32 port) {
-    s32 ret = memCardCommand(port, 0);
+    s32 ret = memCardCommand(port, MEMCARD_OP_LIST);
 
     if (ret == 1) {
         return 1;
@@ -384,8 +388,9 @@ s32 listSaves(s32 port) {
     return ret;
 }
 
+/* Creates the save file on the card */
 s32 createSave(s32 port) {
-    s32 ret = memCardCommand(port, 1);
+    s32 ret = memCardCommand(port, MEMCARD_OP_CREATE);
 
     if (ret == 1) {
         return 1;
@@ -393,8 +398,9 @@ s32 createSave(s32 port) {
     return ret;
 }
 
+/* Formats an unformatted card */
 s32 formatMemCard(s32 port) {
-    s32 ret = memCardCommand(port, 2);
+    s32 ret = memCardCommand(port, MEMCARD_OP_FORMAT);
 
     if (ret == 1) {
         return 1;
@@ -402,9 +408,9 @@ s32 formatMemCard(s32 port) {
     return ret;
 }
 
-/* memCardCommand's operation 3, left out: always fails as if no card (2) */
+/* memCardCommand's MEMCARD_OP_UNFORMAT, left out: always fails as if there were no card */
 s32 unformatMemCard(void) {
-    return 2;
+    return CARD_ERR_NO_CARD + 1;
 }
 
 /* XOR of every byte */
@@ -418,6 +424,7 @@ s32 verifyChecksum(u8 *data, s32 size, char expected) {
     return ((expected ^ sum) & 0xFF) == 0;
 }
 
+/* The XOR of every byte, which verifyChecksum checks */
 u8 computeChecksum(u8 *data, s32 size) {
     u8 sum = 0;
     s32 i;
@@ -436,4 +443,4 @@ MemCardFuncs MEMCARD_FUNCS = {
 };
 
 /* The commands of memCardCommand's operations */
-s32 MEMCARD_SYNC_CMDS[4] = { 7, 8, 9, 10 };
+s32 MEMCARD_SYNC_CMDS[MEMCARD_OP_UNFORMAT + 1] = { 7, 8, 9, 10 };

@@ -61,9 +61,12 @@ typedef struct Task {
     TASK_HEADER(Task);
 } Task;
 
+/* The tasks the registry holds at most */
+#define TASK_REGISTRY_SIZE 100
+
 /* Tasks created with an id, so that other code can find them */
 typedef struct TaskRegistry {
-    /* 0x000 */ s32 tasks[100]; /* Task pointers, 0 for a free entry */
+    /* 0x000 */ s32 tasks[TASK_REGISTRY_SIZE]; /* Task pointers, 0 for a free entry */
     /* 0x190 */ s32 findId; /* -1 matches anything */
     /* 0x194 */ s32 findKey1;
     /* 0x198 */ s32 findKey2;

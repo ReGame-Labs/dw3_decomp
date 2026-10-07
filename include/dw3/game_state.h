@@ -142,9 +142,16 @@ typedef struct AccessoryData {
     /* 0x9 */ u8 unk9[3];
 } AccessoryData;
 
+/* The Digimon a partner can have, and the ones it takes to battle */
+#define PARTNER_ENTRY_COUNT 44
+#define PARTNER_SLOT_COUNT 3
+
+/* The first PartnerEntry.id of a Digimon: 0 is a free entry, 1 and 2 unused ones */
+#define FIRST_ENTRY_ID 3
+
 /* One of a partner's Digimon (getPartnerEntry, setPartnerEntry) */
 typedef struct PartnerEntry {
-    /* 0x00 */ s16 id; /* 0-2 unused */
+    /* 0x00 */ s16 id; /* FIRST_ENTRY_ID and up */
     /* 0x02 */ s8 level; /* shown in the lab; 1 when added */
     /* 0x03 */ u8 unk3;
     /* 0x04 */ s32 exp;
@@ -156,10 +163,22 @@ typedef struct PartnerEntry {
 #define SKILL_KNOWN 0x2000
 #define SKILL_LAST 0x8000 /* the sixth skill */
 
+/* The cards of a deck, and the decks the player has */
+#define DECK_SIZE 40
+#define DECK_COUNT 3
+
+/* The copies of a card the player can have */
+#define CARD_COPIES_MAX 9
+
+/* A partner's equipment set: the four items computeStats compares with equip[0-3] */
+typedef struct EquipSet {
+    s16 items[4];
+} EquipSet;
+
 /* A card deck */
 typedef struct Deck {
     /* 0x00 */ char name[0x16];
-    /* 0x16 */ s16 cards[40];
+    /* 0x16 */ s16 cards[DECK_SIZE];
 } Deck;
 
 /* Indices of a partner's stats (PartnerStats.stats, computeStats, setStat) */
@@ -181,8 +200,8 @@ typedef struct PartnerStats {
     /* 0x018 */ s32 exp;
     /* 0x01C */ s16 stats[19];
     /* 0x042 */ s16 status[3];
-    /* 0x048 */ s16 slots[4]; /* three entries picked from entries[] */
-    /* 0x050 */ PartnerEntry entries[44];
+    /* 0x048 */ s16 slots[4]; /* PARTNER_SLOT_COUNT entries picked from entries[] */
+    /* 0x050 */ PartnerEntry entries[PARTNER_ENTRY_COUNT];
     /* 0x3C0 */ s16 equip[6];
     /* 0x3CC */ u8 unk3CC[4];
 } PartnerStats;
@@ -266,6 +285,13 @@ typedef union PartnerTotals {
 #endif
 #define MODE_BATTLE_REPORT 0x1400 /* STFGTREP */
 
+/* The partner Digimon, and the ones in the party */
+#define PARTNER_COUNT 8
+#define PARTY_SIZE 3
+
+/* The most money the player can have */
+#define MONEY_MAX 9999999
+
 /*
  * The game state (GAME): the first 0x26BC bytes are what newGame clears (the
  * save data), then the current game mode and the methods.
@@ -294,14 +320,14 @@ typedef struct GameState {
     /* 0x0052 */ s16 playTimeMaxed;
     /* 0x0054 */ char name[0x18]; /* the player's */
     /* 0x006C */ s32 money;
-    /* 0x0070 */ s32 party[3]; /* partner indices */
+    /* 0x0070 */ s32 party[PARTY_SIZE]; /* partner indices */
     /* 0x007C */ s8 items[0x193]; /* counts, up to 99 */
     /* 0x020F */ s8 equippedItems[0x193];
-    /* 0x03A2 */ s8 cards[0x13D]; /* counts, up to 9 */
+    /* 0x03A2 */ s8 cards[0x13D]; /* counts, up to CARD_COPIES_MAX */
     /* 0x04DF */ u8 cardsSeen[0x149];
-    /* 0x0628 */ Deck decks[3];
+    /* 0x0628 */ Deck decks[DECK_COUNT];
     /* 0x075A */ u8 unk75A[2];
-    /* 0x075C */ Partner partners[8];
+    /* 0x075C */ Partner partners[PARTNER_COUNT];
     /* 0x263C */ s32 progress;
     /* 0x2640 */ s32 partySet; /* setParty's */
     /*
@@ -385,6 +411,7 @@ s32 listPartnerEntries(s32 partner, u16 *out);
 s32 addPartnerEntry(s32 partner, s32 id);
 s32 getPartnerEntry(s32 partner, s32 id, PartnerEntry *out);
 s32 setPartnerEntry(s32 partner, s32 id, PartnerEntry *in);
+void addStatBonus(s16 *p, s32 stat, s32 delta);
 PartnerStats *getPartnerStats(s32 partner);
 
 extern DigimonData DIGIMON_DATA[];
@@ -426,9 +453,13 @@ extern u8 SPECIAL_CONDITIONS[];
 extern s32 MONEY_GAINS[];
 extern s32 MONEY_LOSSES[];
 extern GameFlags FLAGS_00;
-extern s32 STARTER_DECK[40];
+extern s32 STARTER_DECK[DECK_SIZE];
 extern u8 STARTER_PARTIES[][3];
 extern u8 PROGRESS_RANGES[][2];
+extern s32 PARTY_STAT_THRESHOLDS[];
+extern EquipSet EQUIP_SETS[];
+extern s16 EQUIP_SET_BONUSES[][6];
+extern u16 *ITEM_LISTS[]; /* listItems' lists, 0-terminated */
 extern GameState GAME;
 
 #endif /* DW3_GAME_STATE_H */
