@@ -90,7 +90,6 @@ void endEvent810(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-/* Sets flags 0x88A3 and 0x4042 */
 void endEvent811(void) {
     FLAGS_00.applyAction(ITEM(4, 0xA3), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0x42), 1);
@@ -319,7 +318,7 @@ FieldTalk actor5Talks[] = {
 };
 u16 actor0Conditions[] = { FLAG(2, 0x38), 0, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor4Conditions[] = { FLAG(0x40, 0x42), 0, SPECIAL(0x19), 1, CODES_END };
 u16 actor5Conditions[] = { FLAG(0x40, 0x42), 1, SPECIAL(0x19), 1, CODES_END };

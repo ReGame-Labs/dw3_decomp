@@ -19,7 +19,7 @@ extern AnimFrame *updateTileDuoFrames0[];
 extern AnimFrame *updateTileDuoFrames1[];
 extern AnimFrame updateStillTileFrames[];
 
-/* Creates the stage's objects (three records and nine wandering pairs); in TASK_DONE tells them all to go away */
+/* Creates the stage's objects (three map objects and nine wandering pairs); in TASK_DONE tells them all to go away */
 void updateCommand829(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -74,9 +74,9 @@ void *createCommand829(s32 arg) {
 
 #include "common/step_tile_animation.inc.c"
 
-/* Animates the record of animation 0x15 (frame 2) while mode isn't 0; fades it out wait frames after mode 2 */
+/* Animates the map object of animation 0x15 (frame 2) while mode isn't 0; fades it out wait frames after mode 2 */
 void updateClutTile(StageTileSolo *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     StageTile *fading;
     s32 frame;
@@ -87,9 +87,9 @@ void updateClutTile(StageTileSolo *task) {
         task->tile.anim.index = 0;
         task->tile.anim.timer = updateClutTileFrames0[0].duration;
         task->mode = 1;
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == 0x15) {
-                task->tile.tile = rec;
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == 0x15) {
+                task->tile.tile = object;
             }
         }
         task->nextState(task);
@@ -153,37 +153,11 @@ void *createClutTileTask(void) {
     return createTask(updateClutTile, sizeof(StageTileSolo), 0);
 }
 
-s32 stepTileAnimation2(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 depth) {
-    AnimFrame *frame = &frames[obj->anim.index];
-    s32 dt = GFX.funcs.getFrameTime();
+#include "common/step_tile_animation2.inc.c"
 
-    if (dt > 4) {
-        dt = 4;
-    }
-    if (depth == 0) {
-        obj->anim.timer -= dt;
-    }
-    if (obj->anim.timer <= 0) {
-        frame++;
-        obj->anim.index++;
-        obj->anim.timer += frame->duration;
-        if (once) {
-            if (frame->frame == 0xFF) {
-                return 0xFF;
-            }
-        } else if (frame->frame == 0xFF) {
-            frame = frames;
-            obj->anim.index = 0;
-            obj->anim.timer += frame->duration;
-        }
-        stepTileAnimation2(obj, frames, once, depth + 1);
-    }
-    return frame->frame;
-}
-
-/* Animates the records of animations 0x13 and 0x14 while mode isn't 0; fades them out wait frames after mode 2 */
+/* Animates the map objects of animations 0x13 and 0x14 while mode isn't 0; fades them out wait frames after mode 2 */
 void updateTileDuo(StageTileDuo *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     StageTile *fading;
     s32 i;
@@ -198,13 +172,13 @@ void updateTileDuo(StageTileDuo *task) {
         task->tiles[1].anim.index = 0;
         task->tiles[1].anim.timer = updateTileDuoFrames0[1]->duration;
         task->mode = 1;
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            switch (rec->anim) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            switch (object->anim) {
             case 0x13:
-                task->tiles[0].tile = rec;
+                task->tiles[0].tile = object;
                 break;
             case 0x14:
-                task->tiles[1].tile = rec;
+                task->tiles[1].tile = object;
                 break;
             }
         }
@@ -268,45 +242,15 @@ void fadeOutTileDuo(StageTileDuo *task) {
     }
 }
 
-void *createTileDuo(s32 arg) {
-    return createTaskWithId(updateTileDuo, sizeof(StageTileDuo), 0, arg);
-}
+#include "common/create_tile_duo.inc.c"
 
-void *createTileDuoTask(void) {
-    return createTask(updateTileDuo, sizeof(StageTileDuo), 0);
-}
+#include "common/create_tile_duo_task.inc.c"
 
-s32 stepTileAnimation3(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 depth) {
-    AnimFrame *frame = &frames[obj->anim.index];
-    s32 dt = GFX.funcs.getFrameTime();
+#include "common/step_tile_animation3.inc.c"
 
-    if (dt > 4) {
-        dt = 4;
-    }
-    if (depth == 0) {
-        obj->anim.timer -= dt;
-    }
-    if (obj->anim.timer <= 0) {
-        frame++;
-        obj->anim.index++;
-        obj->anim.timer += frame->duration;
-        if (once) {
-            if (frame->frame == 0xFF) {
-                return 0xFF;
-            }
-        } else if (frame->frame == 0xFF) {
-            frame = frames;
-            obj->anim.index = 0;
-            obj->anim.timer += frame->duration;
-        }
-        stepTileAnimation3(obj, frames, once, depth + 1);
-    }
-    return frame->frame;
-}
-
-/* Shows the record of animation 0x16 (frame 0x21) while mode isn't 0; fades it out wait frames after mode 2 */
+/* Shows the map object of animation 0x16 (frame 0x21) while mode isn't 0; fades it out wait frames after mode 2 */
 void updateStillTile(StageTileSolo *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     StageTile *fading;
     s32 frame;
@@ -315,9 +259,9 @@ void updateStillTile(StageTileSolo *task) {
     case TASK_INIT:
     default:
         task->mode = 1;
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == 0x16) {
-                task->tile.tile = rec;
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == 0x16) {
+                task->tile.tile = object;
             }
         }
         task->nextState(task);
@@ -422,61 +366,7 @@ s32 isFarFromHome(StageWanderPair *task, s32 dist) {
     return dist < dx + dy;
 }
 
-s32 getAngle(s32 x, s32 y) {
-    s32 result = 0;
-    s32 ratio = 0;
-    s32 base;
-    s32 i;
-
-    if (x <= 0 && y >= 0) {
-        base = 0;
-    } else if (x >= 0 && y >= 0) {
-        base = 0x40;
-    } else if (x >= 0 && y <= 0) {
-        base = 0x80;
-    } else if (x <= 0 && y <= 0) {
-        base = 0xC0;
-    } else {
-        base = 0;
-    }
-    if (x < 0) {
-        x = -x;
-    }
-    if (y < 0) {
-        y = -y;
-    }
-    if (x == y) {
-        return base | 0x20;
-    }
-    if (y < x) {
-        ratio = y * 0xFFFF / x;
-    } else if (x < y) {
-        ratio = x * 0xFFFF / y;
-    }
-    for (i = 0; i <= 0x20; i++) {
-        if (angleTangents[i] <= ratio && ratio <= angleTangents[i + 1]) {
-            switch (base) {
-            case 0:
-            case 0x80:
-                if (y < x) {
-                    result = i;
-                } else if (x < y) {
-                    result = 0x40 - i;
-                }
-                return result + base;
-            case 0x40:
-            case 0xC0:
-                if (y < x) {
-                    result = 0x40 - i;
-                } else if (x < y) {
-                    result = i;
-                }
-                return result + base;
-            }
-        }
-    }
-    return 0xFF;
-}
+#include "common/get_angle.inc.c"
 
 void moveWanderPair(StageWanderPair *task) {
     s32 dx;
@@ -502,7 +392,7 @@ void moveWanderPair(StageWanderPair *task) {
 
 void updateWanderPair(StageWanderPair *task) {
     StageTile *tile;
-    StageTile *rec;
+    StageTile *object;
     StageTile *fading;
     s32 i;
     s32 j;
@@ -516,16 +406,16 @@ void updateWanderPair(StageWanderPair *task) {
         task->tiles[1].anim.index = task->start;
         task->tiles[1].anim.timer = updateWanderPairFrames0[1]->duration;
         task->mode = 1;
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == task->tileAnim) {
-                task->tiles[0].tile = rec;
-                task->homeX = rec->x;
-                task->homeY = rec->y;
-                task->x = rec->x << 8;
-                task->y = rec->y << 8;
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == task->tileAnim) {
+                task->tiles[0].tile = object;
+                task->homeX = object->x;
+                task->homeY = object->y;
+                task->x = object->x << 8;
+                task->y = object->y << 8;
             }
-            if (rec->anim == task->tileAnim + 9) {
-                task->tiles[1].tile = rec;
+            if (object->anim == task->tileAnim + 9) {
+                task->tiles[1].tile = object;
             }
         }
         task->period = 0x28;
@@ -607,7 +497,7 @@ void *createWanderPair(s32 arg) {
     return createTaskWithId(updateWanderPair, sizeof(StageWanderPair), 0, arg);
 }
 
-/* Creates a pair of wandering records: tileAnim and tileAnim + 9 */
+/* Creates a pair of wandering map objects: tileAnim and tileAnim + 9 */
 StageWanderPair *createWanderPairTask(s32 tileAnim, s32 speedIndex, s32 start) {
     StageWanderPair *task = createTask(updateWanderPair, sizeof(StageWanderPair), 0);
 
@@ -617,7 +507,7 @@ StageWanderPair *createWanderPairTask(s32 tileAnim, s32 speedIndex, s32 start) {
     return task;
 }
 
-/* The stage task: creates the object of map object 0x33D before progress 30 */
+/* The stage task: creates the object of map object 0x33D before progress 0x1E */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -637,7 +527,6 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-/* Event: sets the progress to 30 and applies action 0x8011 */
 void endEvent760(void) {
     GAME.progress = 0x1E;
     FLAGS_00.applyAction(ITEM(0, 0x11), 1);

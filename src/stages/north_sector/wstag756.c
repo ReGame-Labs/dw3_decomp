@@ -29,9 +29,8 @@ void endEvent910(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-/* Sets the story progress to 36 and flag 0x8019 */
 void endEvent911(void) {
-    GAME.progress = 36;
+    GAME.progress = 0x24;
     FLAGS_00.applyAction(ITEM(0, 0x19), 1);
 }
 
@@ -262,12 +261,12 @@ FieldTalk actor14Talks[] = {
 };
 u16 actor0Conditions[] = { SPECIAL(0x1E), 1, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x1E), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(0x23), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor8Conditions[] = { FLAG(0x40, 0x5B), 0, PROGRESS(0x24), 0, SPECIAL(0x1D), 1, CODES_END };
 u16 actor9Conditions[] = { SPECIAL(0x1E), 1, SPECIAL(0x21), 0, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(0x22), 1, CODES_END };

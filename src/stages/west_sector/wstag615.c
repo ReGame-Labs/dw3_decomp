@@ -1,7 +1,7 @@
 #include "common.h"
 #include "stage.h"
 
-/* Creates the event object of story progress 18 */
+/* Creates the event object of story progress 0x12 */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -27,7 +27,7 @@ void endEvent530(void) {
 }
 
 void endEvent531(void) {
-    GAME.progress = 19;
+    GAME.progress = 0x13;
 }
 
 /* Defined below, after the code that uses them */
@@ -347,7 +347,7 @@ u16 actor5Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor7Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor8Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(0x12), 1, CODES_END };
 u16 actor11Conditions[] = { PROGRESS(0x12), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };

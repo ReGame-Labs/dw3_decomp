@@ -15,28 +15,28 @@ extern AnimFrame updateTileSetFrames0[];
 
 #include "common/step_animation.inc.c"
 
-/* Plays the animations of records 4/3 then 2 (with 1 looping); starts at 2 when done is set */
+/* Plays the animations of map objects 4/3 then 2 (with 1 looping); starts at 2 when done is set */
 void updateTileSet(StageTileSet *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     s32 frame;
 
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            switch (rec->anim) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            switch (object->anim) {
             case 1:
-                task->tiles[3] = rec;
+                task->tiles[3] = object;
                 break;
             case 2:
-                task->tiles[2] = rec;
+                task->tiles[2] = object;
                 break;
             case 3:
-                task->tiles[1] = rec;
+                task->tiles[1] = object;
                 break;
             case 4:
-                task->tiles[0] = rec;
+                task->tiles[0] = object;
                 break;
             }
         }

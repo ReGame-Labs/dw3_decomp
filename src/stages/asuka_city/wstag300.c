@@ -23,7 +23,6 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-/* Sets flags 0x404A, 0xC11 and 0x7401 */
 void endEvent570(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x4A), 1);
     FLAGS_00.applyAction(FLAG(0xC, 0x11), 1);

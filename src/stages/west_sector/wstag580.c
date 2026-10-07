@@ -1,7 +1,7 @@
 #include "common.h"
 #include "stage.h"
 
-/* Creates the event object of story progress 17 or 18, the first that applies */
+/* Creates the event object of story progress 0x11 or 0x12, the first that applies */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:

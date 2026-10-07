@@ -8,9 +8,7 @@ extern AnimFrame updateTileAnimsFrames1[];
 
 #include "common/update_tile_anims2.inc.c"
 
-void *createTileAnims(void) {
-    return createTask(updateTileAnims, 0x58, 0);
-}
+#include "common/create_tile_anims_58.inc.c"
 
 #include "common/update_stage_tile_anims.inc.c"
 #define STAGE_CHILDREN_SIZE 4

@@ -7,9 +7,7 @@ extern AnimFrame updateTileAnimsFrames[];
 
 #include "common/update_tile_anims1.inc.c"
 
-void *createTileAnims(void) {
-    return createTask(updateTileAnims, 0x54, 0);
-}
+#include "common/create_tile_anims_54.inc.c"
 
 /* Creates the stage helper task, and the event object when flag 0x407A is set and 0x407B is not */
 void updateStage(StageTask *task, void **children) {
@@ -254,7 +252,7 @@ u16 actor0Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(0x25), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x108, 4, 923, 317, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x108, 4, 923, 317, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x108, 4, 923, 317, 1 };

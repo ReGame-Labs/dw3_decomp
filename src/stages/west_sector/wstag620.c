@@ -32,7 +32,7 @@ s32 stepTileAnimation(StageTileSeq8 *obj, AnimFrame *frames, s32 once, s32 depth
 }
 
 void updateTileSeqs8(StageTileSeqs8 *task) {
-    StageTile *rec;
+    StageTile *object;
     s32 n;
     StageTile *tile;
     s32 i;
@@ -43,9 +43,9 @@ void updateTileSeqs8(StageTileSeqs8 *task) {
     default:
         task->nextState(task);
         n = 0;
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim >= 1 && rec->anim <= 4) {
-                task->entries[n].tile = rec;
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim >= 1 && object->anim <= 4) {
+                task->entries[n].tile = object;
                 n++;
             }
         }
@@ -147,7 +147,7 @@ void endEvent532(void) {
 }
 
 void endEvent534(void) {
-    GAME.progress = 20;
+    GAME.progress = 0x14;
 }
 
 void endEvent540(void) {
@@ -156,7 +156,7 @@ void endEvent540(void) {
 }
 
 void endEvent551(void) {
-    GAME.progress = 21;
+    GAME.progress = 0x15;
 }
 
 #if VERSION_US

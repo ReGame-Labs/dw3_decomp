@@ -32,7 +32,6 @@ void endEvent80(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x11), 1);
 }
 
-/* Applies flag actions 0x8004, 0x1A28 and 0x1C08 (cleared) */
 void endEvent1305(void) {
     FLAGS_00.applyAction(ITEM(0, 4), 1);
     FLAGS_00.applyAction(FLAG(0x1A, 0x28), 1);

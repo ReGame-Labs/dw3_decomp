@@ -35,9 +35,7 @@ void updateFarSprites(StageTask *task) {
     }
 }
 
-void *createFarSprites(void) {
-    return createTask(updateFarSprites, 0x50, 0);
-}
+#include "common/create_far_sprites.inc.c"
 
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {

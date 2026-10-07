@@ -34,9 +34,8 @@ void endEvent180(void) {
     FLAGS_00.applyAction(FLAG(0x1A, 0x17), 1);
 }
 
-/* Sets the progress to 10 and applies flag action 0x800D */
 void endEvent230(void) {
-    GAME.progress = 10;
+    GAME.progress = 0xA;
     FLAGS_00.applyAction(ITEM(0, 0xD), 1);
 }
 
@@ -395,7 +394,7 @@ u16 actor1Conditions[] = { PROGRESS(9), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(0x18), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(0xA), 1, CODES_END };
 u16 actor7Conditions[] = { PROGRESS(0xC), 1, CODES_END };
 u16 actor8Conditions[] = { PROGRESS(0xE), 1, CODES_END };

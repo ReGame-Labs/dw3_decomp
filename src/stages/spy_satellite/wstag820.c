@@ -7,9 +7,9 @@ extern AnimFrame updateTileTaskFrames[];
 
 #include "common/step_animation_once.inc.c"
 
-/* Shows the record with animation 1, animated once, then hides it and kills itself */
+/* Shows the map object with animation 1, animated once, then hides it and kills itself */
 void updateTileTask(StageTileTask *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     s32 frame;
 
@@ -17,9 +17,9 @@ void updateTileTask(StageTileTask *task) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == 1) {
-                task->obj.tile = rec;
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == 1) {
+                task->obj.tile = object;
             }
         }
         task->obj.anim.index = 0;
@@ -117,7 +117,6 @@ void endEvent1070(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x75), 1);
 }
 
-/* Moves the story on to FIELD_PROGRESS_MOVIE_BATTLES and applies EVENT_BATTLE(1) */
 void endEvent1080(void) {
     GAME.progress = FIELD_PROGRESS_MOVIE_BATTLES;
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);

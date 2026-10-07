@@ -4,7 +4,6 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
-/* Sets flag 0x7C0E */
 void endEvent1646(void) {
     FLAGS_00.applyAction(0x7C0E, 1);
 }

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "stage.h"
 
-/* Creates the event object of story progress 17 */
+/* Creates the event object of story progress 0x11 */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -21,7 +21,6 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-/* Sets flag 0x8680 and moves the story to 0x12 */
 void endEvent511(void) {
     FLAGS_00.applyAction(ITEM(3, 0x80), 1);
     GAME.progress = 0x12;
@@ -225,7 +224,7 @@ FieldTalk actor9Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { PROGRESS(0xF), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x17), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x19), 1, CODES_END };

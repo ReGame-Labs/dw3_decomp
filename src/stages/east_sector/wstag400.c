@@ -37,13 +37,11 @@ void endEvent1303(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x4E), 1);
 }
 
-/* Sets flag 0x1A27 and clears 0x1A26 */
 void endEvent1304(void) {
     FLAGS_00.applyAction(FLAG(0x1A, 0x27), 1);
     FLAGS_00.applyAction(FLAG(0x1A, 0x26), 0);
 }
 
-/* Clears flags 0x1A26 and 0x1C4B to 0x1C4E */
 void endEvents1507To1509(void) {
     FLAGS_00.applyAction(FLAG(0x1A, 0x26), 0);
     FLAGS_00.applyAction(FLAG(0x1C, 0x4B), 0);

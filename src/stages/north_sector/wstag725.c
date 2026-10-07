@@ -212,7 +212,7 @@ FieldTalk actor14Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor4Conditions[] = {
@@ -253,7 +253,7 @@ u16 actor9Conditions[] = {
 };
 u16 actor10Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor13Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor14Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x22, 4, 161, 321, 1 };

@@ -15,27 +15,27 @@ extern AnimFrame *updateTilePairFrames[];
 
 #include "common/step_tile_animation_u8.inc.c"
 
-/* Shows the first record animated while running; when done, both */
+/* Shows the first map object animated while running; when done, both */
 void updateTilePair(StageTilePair *task) {
     StageTile *tile;
-    StageTile *rec;
+    StageTile *object;
     s32 i;
     s32 frame;
 
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            switch (rec->anim) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            switch (object->anim) {
             case 1:
                 task->anims[0].anim.index = 0;
                 task->anims[0].anim.timer = (u8)updateTilePairFrames[0]->duration;
-                task->anims[0].tile = rec;
+                task->anims[0].tile = object;
                 break;
             case 2:
                 task->anims[1].anim.index = 0;
                 task->anims[1].anim.timer = (u8)updateTilePairFrames[2]->duration;
-                task->anims[1].tile = rec;
+                task->anims[1].tile = object;
                 break;
             }
         }
@@ -95,7 +95,7 @@ void updateTilePair(StageTilePair *task) {
     }
 }
 
-/* Plays the first record's one-shot animation when the event of map object 0x35B happens */
+/* Plays the first map object's one-shot animation when the event of map object 0x35B happens */
 void handleCommand836(StageTilePair *task, s32 id) {
     if (task != NULL && id == 0x35B) {
         task->playing = 1;
@@ -117,24 +117,7 @@ void *createTilePairDone(void) {
     return task;
 }
 
-/* Draws the timer: its frame and the three digits of GAME.countdown */
-void drawTimer(StageTask *task) {
-    SpriteDrawer drawer;
-    Vec2 scroll;
-    s32 i;
-    Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
-
-    layer->getScroll(layer, &scroll);
-    initSpriteDrawer(&drawer);
-    drawer.setLayer(layer, 0);
-    drawer.setTexture(0x140, 0x100);
-    drawer.setAltClut(0, 0x1F0);
-    drawer.draw(FILE_CACHE.getEntry(TIMER_SHEET << 16), 1, scroll.x + 0xE0, scroll.y + 0x16);
-    scroll.y += 0x19;
-    for (i = 0; i < 3; i++) {
-        drawer.draw(FILE_CACHE.getEntry(TIMER_SHEET << 16), GAME.countdown[i] + 2, scroll.x + timerDigitX[i], scroll.y);
-    }
-}
+#include "common/draw_timer.inc.c"
 
 /* The timer: counts GAME.countdown down while nothing stops it, then starts event 0x5E1 */
 void updateTimer(StageTask *task, void **children) {
@@ -169,9 +152,7 @@ void updateTimer(StageTask *task, void **children) {
     }
 }
 
-void *createTimer(void) {
-    return createTask(updateTimer, sizeof(StageTask), 0x4);
-}
+#include "common/create_timer.inc.c"
 
 /* Creates the timer, one of two objects by flag 0x4063, and the event object of story progress 0x20 */
 void updateStage(StageTask *task, void **children) {

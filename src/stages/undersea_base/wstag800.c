@@ -18,26 +18,26 @@ extern AnimFrame updateTileOnceFrames_1[];
 
 #include "common/step_tile_animation_u8.inc.c"
 
-/* Shows the first record animated while running; when done, both */
+/* Shows the first map object animated while running; when done, both */
 void updateTilePair16(StageTilePair16 *task) {
     StageTile *tile;
-    StageTile *rec;
+    StageTile *object;
     s32 i;
     s32 frame;
 
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == 1) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == 1) {
                 task->anims[0].anim.index = 0;
                 task->anims[0].anim.timer = (u8)updateTilePair16Frames0[0].duration;
-                task->anims[0].tile = rec;
+                task->anims[0].tile = object;
             }
-            if (rec->anim == 2) {
+            if (object->anim == 2) {
                 task->anims[1].anim.index = 0;
                 task->anims[1].anim.timer = (u8)updateTilePair16Frames1[0].duration;
-                task->anims[1].tile = rec;
+                task->anims[1].tile = object;
             }
         }
         task->playing = 0;
@@ -96,7 +96,7 @@ void updateTilePair16(StageTilePair16 *task) {
     }
 }
 
-/* Plays the first record's one-shot animation when the event of map object 0x35B happens */
+/* Plays the first map object's one-shot animation when the event of map object 0x35B happens */
 void handleCommand837(StageTilePair16 *task, s32 id) {
     if (id == 0x35B) {
         task->playing = 1;
@@ -147,9 +147,9 @@ s32 stepTileAnimation2(StageTileAnimFlag *obj, AnimFrame *frames, s32 once, s32 
     return frame->frame;
 }
 
-/* Plays the records with animations 3 and 4 once, then ends */
+/* Plays the map objects with animations 3 and 4 once, then ends */
 void updateTileOnce(StageTileOnce *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     s32 i;
     s32 frame;
@@ -157,14 +157,14 @@ void updateTileOnce(StageTileOnce *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == 3) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == 3) {
                 task->tiles[0].playing = 0;
-                task->tiles[0].tile = rec;
+                task->tiles[0].tile = object;
             }
-            if (rec->anim == 4) {
+            if (object->anim == 4) {
                 task->tiles[1].playing = 0;
-                task->tiles[1].tile = rec;
+                task->tiles[1].tile = object;
             }
         }
         task->tiles[0].playing = 1;
@@ -211,24 +211,7 @@ void *createCommand839(s32 arg) {
     return createTaskWithId(updateTileOnce, sizeof(StageTileOnce), 0, arg);
 }
 
-/* Draws the timer: its frame and the three digits of GAME.countdown */
-void drawTimer(StageTask *task) {
-    SpriteDrawer drawer;
-    Vec2 scroll;
-    s32 i;
-    Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
-
-    layer->getScroll(layer, &scroll);
-    initSpriteDrawer(&drawer);
-    drawer.setLayer(layer, 0);
-    drawer.setTexture(0x140, 0x100);
-    drawer.setAltClut(0, 0x1F0);
-    drawer.draw(FILE_CACHE.getEntry(TIMER_SHEET << 16), 1, scroll.x + 0xE0, scroll.y + 0x16);
-    scroll.y += 0x19;
-    for (i = 0; i < 3; i++) {
-        drawer.draw(FILE_CACHE.getEntry(TIMER_SHEET << 16), GAME.countdown[i] + 2, scroll.x + timerDigitX[i], scroll.y);
-    }
-}
+#include "common/draw_timer.inc.c"
 
 /* The timer: counts GAME.countdown down while nothing stops it, then starts event 0x5E2 */
 void updateTimer(StageTask *task, void **children) {
@@ -263,9 +246,7 @@ void updateTimer(StageTask *task, void **children) {
     }
 }
 
-void *createTimer(void) {
-    return createTask(updateTimer, sizeof(StageTask), 0x4);
-}
+#include "common/create_timer.inc.c"
 
 /* Creates the timer, the stage's four effects, the event object of flags 0x4044/0x4045 and one of two objects by flag 0x4061 */
 void updateStage(StageTask *task, void **children) {

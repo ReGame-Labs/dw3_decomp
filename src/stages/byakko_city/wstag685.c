@@ -22,7 +22,7 @@ void updateStage(StageTask *task, void **children) {
 #include "common/start_stage.inc.c"
 
 void endEvent413(void) {
-    GAME.progress = 16;
+    GAME.progress = 0x10;
 }
 
 void endEvent421(void) {
@@ -30,7 +30,7 @@ void endEvent421(void) {
 }
 
 void endEvent690(void) {
-    GAME.progress = 25;
+    GAME.progress = 0x19;
 }
 
 #if VERSION_US
@@ -356,9 +356,9 @@ u16 actor20Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor21Conditions[] = { PROGRESS(0xF), 1, CODES_END };
 u16 actor22Conditions[] = { PROGRESS(0x10), 1, CODES_END };
 u16 actor23Conditions[] = { PROGRESS(0x10), 1, CODES_END };
-u16 actor24Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
-u16 actor25Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
-u16 actor26Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor24Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor25Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor26Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x25, 5, 386, 129, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x25, 5, 386, 129, 1 };

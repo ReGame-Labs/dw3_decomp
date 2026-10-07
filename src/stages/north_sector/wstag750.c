@@ -9,16 +9,9 @@ extern s16 tileEffectPlaces[][2];
 
 #include "common/step_animation_once.inc.c"
 
-void resetTileEffect(StageTileEffect *task) {
-    s32 i;
+#include "common/reset_tile_effect.inc.c"
 
-    for (i = 0; i < 3; i++) {
-        task->anims[i].anim.index = 0;
-        task->anims[i].anim.timer = updateTileEffectFrames[i][0].duration;
-    }
-}
-
-/* Moves its records to (x, y) and animates them when the substate is set to 1 */
+/* Moves its map objects to (x, y) and animates them when the substate is set to 1 */
 void updateTileEffect(StageTileEffect *task) {
     StageTile *tile;
     StageTile *t;
@@ -111,9 +104,7 @@ void handleCommand846(StageTileEffect *task, s32 id) {
     }
 }
 
-void *createTileEffect(s32 arg) {
-    return createTaskWithId(updateTileEffect, sizeof(StageTileEffect), 0, arg);
-}
+#include "common/create_tile_effect.inc.c"
 
 /* Creates the stage's effect, the event object of story progress 0x20 that applies, and another object */
 void updateStage(StageTask *task, void **children) {
@@ -154,7 +145,7 @@ void updateStage(StageTask *task, void **children) {
 #include "common/create_stage_effect.inc.c"
 
 void endEvent820(void) {
-    GAME.progress = 32;
+    GAME.progress = 0x20;
 }
 
 void endEvent860(void) {
@@ -170,7 +161,7 @@ void endEvent884(void) {
 }
 
 void endEvent886(void) {
-    GAME.progress = 33;
+    GAME.progress = 0x21;
 }
 
 void endEvent1245(void) {
@@ -569,7 +560,7 @@ FieldTalk actor13Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { SPECIAL(0xA), 1, SPECIAL(0x1A), 0, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(0x21), 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(0x22), 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(0x23), 1, CODES_END };

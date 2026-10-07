@@ -16,26 +16,26 @@ extern StageSlot stageSlots1[];
 
 #include "common/step_tile_animation_u8.inc.c"
 
-/* Shows the first record animated while running; when done, both */
+/* Shows the first map object animated while running; when done, both */
 void updateTilePairN(StageTilePairN *task) {
     StageTile *tile;
-    StageTile *rec;
+    StageTile *object;
     s32 i;
     s32 frame;
 
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == task->anim) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == task->anim) {
                 task->anims[0].anim.index = 0;
                 task->anims[0].anim.timer = (u8)updateTilePairNFrames0[0].duration;
-                task->anims[0].tile = rec;
+                task->anims[0].tile = object;
             }
-            if (rec->anim == task->anim + 1) {
+            if (object->anim == task->anim + 1) {
                 task->anims[1].anim.index = 0;
                 task->anims[1].anim.timer = (u8)updateTilePairNFrames1[0].duration;
-                task->anims[1].tile = rec;
+                task->anims[1].tile = object;
             }
         }
         task->playing = 0;
@@ -95,7 +95,7 @@ void updateTilePairN(StageTilePairN *task) {
     }
 }
 
-/* Plays the first record's one-shot animation when the event of map object 0x35B happens */
+/* Plays the first map object's one-shot animation when the event of map object 0x35B happens */
 void handleCommands842To844(StageTilePairN *task, s32 id) {
     if (id == 0x35B) {
         task->playing = 1;
@@ -105,31 +105,28 @@ void handleCommands842To844(StageTilePairN *task, s32 id) {
     }
 }
 
-/* Creates the tile pair object of animations 1 and 2 */
-void *createTilePairN1(s32 arg) {
+/* Creates the tile pair object of animations ANIM and ANIM + 1 with the id ARG */
+static inline void *createTilePairN(s32 arg, s32 anim) {
     StageTilePairN *task = createTaskWithId(updateTilePairN, 0x68, 0, arg);
 
-    task->anim = 1;
+    task->anim = anim;
     task->done = 0;
     return task;
+}
+
+/* Creates the tile pair object of animations 1 and 2 */
+void *createTilePairN1(s32 arg) {
+    return createTilePairN(arg, 1);
 }
 
 /* Creates the tile pair object of animations 3 and 4 */
 void *createTilePairN3(s32 arg) {
-    StageTilePairN *task = createTaskWithId(updateTilePairN, 0x68, 0, arg);
-
-    task->anim = 3;
-    task->done = 0;
-    return task;
+    return createTilePairN(arg, 3);
 }
 
 /* Creates the tile pair object of animations 5 and 6 */
 void *createTilePairN5(s32 arg) {
-    StageTilePairN *task = createTaskWithId(updateTilePairN, 0x68, 0, arg);
-
-    task->anim = 5;
-    task->done = 0;
-    return task;
+    return createTilePairN(arg, 5);
 }
 
 /* Creates the tile pair object of animations anim and anim + 1, started in TASK_DONE */
@@ -221,7 +218,7 @@ void endEvent1010(void) {
 }
 
 void endEvent1035(void) {
-    GAME.progress = 41;
+    GAME.progress = 0x29;
 }
 
 #if VERSION_US

@@ -91,7 +91,7 @@ void endEvent376(void) {
 }
 
 void endEvent560(void) {
-    GAME.progress = 22;
+    GAME.progress = 0x16;
 }
 
 #if VERSION_US
@@ -323,7 +323,7 @@ FieldTalk actor9Talks[] = {
 };
 u16 actor0Conditions[] = { SPECIAL(0x16), 1, FLAG(0xA, 3), 1, CODES_END };
 u16 actor1Conditions[] = { FLAG(0xA, 3), 0, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x2B), 1, FLAG(0xA, 3), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, FLAG(0xA, 3), 1, CODES_END };
 u16 actor3Conditions[] = { FLAG(0xA, 3), 1, PROGRESS(0x14), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(0x15), 1, FLAG(0xA, 3), 1, CODES_END };
 u16 actor5Conditions[] = { FLAG(0xA, 3), 1, PROGRESS(0x16), 1, CODES_END };

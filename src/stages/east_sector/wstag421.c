@@ -3,7 +3,7 @@
 
 /*
  * Cycles the frames of the map objects with animation 1 if flag
- * 0x1A0A, and creates the event object of story progress 27
+ * 0x1A0A, and creates the event object of story progress 0x1B
  */
 void updateStage(StageTask *task, void **children) {
     StageTile *tile;
@@ -42,14 +42,13 @@ void endEvent740(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-/* Sets flags 0x8016 and 0x40A7 */
 void endEvent741(void) {
     FLAGS_00.applyAction(ITEM(0, 0x16), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0xA7), 1);
 }
 
 void endEvent743(void) {
-    GAME.progress = 28;
+    GAME.progress = 0x1C;
 }
 
 #if VERSION_US
@@ -338,15 +337,15 @@ u16 actor0Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor2Conditions[] = { FLAG(0x1A, 0xA), 1, PROGRESS(0x26), 1, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor7Conditions[] = { FLAG(0x1A, 0xA), 1, PROGRESS(0x26), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor9Conditions[] = { FLAG(0x1A, 0xA), 1, PROGRESS(0x26), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor13Conditions[] = { SPECIAL(0x1E), 1, FLAG(0x1A, 0xA), 0, CODES_END };
 u16 actor14Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor15Conditions[] = { SPECIAL(0x1A), 1, CODES_END };

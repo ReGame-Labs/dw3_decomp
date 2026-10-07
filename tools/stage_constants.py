@@ -11,7 +11,7 @@ names (include/field_map.h), and the condition codes
   fadeOutSound or in a table of them, becomes its SOUND_ name from
   include/dw3/sound.h or include/stage.h;
 - a story point that include/field_map.h names (FIELD_PROGRESS_), compared
-  with or stored in GAME.progress, becomes its name;
+  with or stored in GAME.progress or in a PROGRESS code, becomes its name;
 - the codes of the FLAGS_00 conditions and actions (the lists of the
   characters and their talks, a StageSlot's conditions, and the codes given
   to FLAGS_00.checkCondition and applyAction) become FLAG(group, id),
@@ -23,6 +23,7 @@ It changes no bytes, and can be run again at any time:
     tools/stage_constants.py [src/stages/central_sector/wstag200.c ...]
 """
 import argparse
+import functools
 import glob
 import re
 import sys
@@ -45,6 +46,7 @@ def music(value):
     return f"MUSIC({number(v >> 18 & 0x7F)}, {number(v & 0xFF)})"
 
 
+@functools.lru_cache(maxsize=None)
 def progress_names():
     """{value: FIELD_PROGRESS_ name} of include/field_map.h"""
     text = open("include/field_map.h").read()
@@ -79,6 +81,8 @@ def code(word):
     n = v & 0x1FF
     if group in FLAG_GROUPS:
         return f"FLAG({number(group)}, {number(n)})"
+    if group == 0x60 and n in progress_names():
+        return f"PROGRESS({progress_names()[n]})"
     if group in SIMPLE_CODES:
         return f"{SIMPLE_CODES[group]}({number(n)})"
     if group in (0x76, 0x78):
@@ -194,6 +198,7 @@ def rewrite(text, sounds):
         return m.group(1) + points[v] if v in points else m.group(0)
 
     text = re.sub(r"(GAME\.progress (?:==|!=|=) )(" + NUMBER + r")\b", progress, text)
+    text = re.sub(r"(\bPROGRESS\()(" + NUMBER + r")(?=\))", progress, text)
 
     # a table of sounds that a function plays: s32 D_[] = { ids }
     def table(m):

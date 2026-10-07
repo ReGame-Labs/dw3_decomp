@@ -8,17 +8,9 @@ extern s32 tileEffectSounds[];
 
 #include "common/step_animation_once.inc.c"
 
-/* Restarts the effect's animations */
-void resetTileEffect(StageTileEffect *task) {
-    s32 i;
+#include "common/reset_tile_effect.inc.c"
 
-    for (i = 0; i < 3; i++) {
-        task->anims[i].anim.index = 0;
-        task->anims[i].anim.timer = updateTileEffectFrames[i][0].duration;
-    }
-}
-
-/* Moves its records to (x, y) and animates them when the substate is set to 1 */
+/* Moves its map objects to (x, y) and animates them when the substate is set to 1 */
 void updateTileEffect(StageTileEffect *task) {
     StageTile *tile;
     StageTile *t;
@@ -124,32 +116,19 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        do {
-            if (GAME.progress == 2 && FLAGS_00.checkCondition(SPECIAL(0), 1)) {
-                children[0] = FIELDSTG_startEvent(0xA);
-                break;
-            }
-            if (GAME.progress == 2 && FLAGS_00.checkCondition(SPECIAL(1), 1)) {
-                children[0] = FIELDSTG_startEvent(0xB);
-                break;
-            }
-            if (GAME.progress == 2 && FLAGS_00.checkCondition(SPECIAL(2), 1)) {
-                children[0] = FIELDSTG_startEvent(0xC);
-                break;
-            }
-            if (GAME.progress == 0xB && FLAGS_00.checkCondition(FLAG(0x40, 4), 0)) {
-                children[0] = FIELDSTG_startEvent(0x10F);
-                break;
-            }
-            if (GAME.progress == 0xB && FLAGS_00.checkCondition(FLAG(0x40, 4), 1)) {
-                children[0] = FIELDSTG_startEvent(0x111);
-                break;
-            }
-            if (GAME.progress == 0xD && FLAGS_00.checkCondition(FLAG(0x1C, 0xD), 1)) {
-                children[0] = FIELDSTG_startEvent(0x160);
-                break;
-            }
-        } while (0);
+        if (GAME.progress == 2 && FLAGS_00.checkCondition(SPECIAL(0), 1)) {
+            children[0] = FIELDSTG_startEvent(0xA);
+        } else if (GAME.progress == 2 && FLAGS_00.checkCondition(SPECIAL(1), 1)) {
+            children[0] = FIELDSTG_startEvent(0xB);
+        } else if (GAME.progress == 2 && FLAGS_00.checkCondition(SPECIAL(2), 1)) {
+            children[0] = FIELDSTG_startEvent(0xC);
+        } else if (GAME.progress == 0xB && FLAGS_00.checkCondition(FLAG(0x40, 4), 0)) {
+            children[0] = FIELDSTG_startEvent(0x10F);
+        } else if (GAME.progress == 0xB && FLAGS_00.checkCondition(FLAG(0x40, 4), 1)) {
+            children[0] = FIELDSTG_startEvent(0x111);
+        } else if (GAME.progress == 0xD && FLAGS_00.checkCondition(FLAG(0x1C, 0xD), 1)) {
+            children[0] = FIELDSTG_startEvent(0x160);
+        }
         task->nextState(task);
         break;
     case TASK_RUN:
@@ -172,13 +151,12 @@ void endEvent271(void) {
 }
 
 void endEvent273(void) {
-    GAME.progress = 12;
+    GAME.progress = 0xC;
 }
 
-/* Clears flag 0x4005 and sets the story progress to 14 */
 void endEvent352(void) {
     FLAGS_00.applyAction(FLAG(0x40, 5), 0);
-    GAME.progress = 14;
+    GAME.progress = 0xE;
 }
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };

@@ -66,9 +66,9 @@ void *createCommand830(s32 id) {
 
 #include "common/step_tile_animation.inc.c"
 
-/* Shows the record with animation 10 (animated) while mode isn't 0, and hides it by a one-shot animation wait frames after mode 2 */
+/* Shows the map object with animation 10 (animated) while mode isn't 0, and hides it by a one-shot animation wait frames after mode 2 */
 void updateTileSolo(StageTileSolo *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     StageTile *fading;
     s32 frame;
@@ -81,9 +81,9 @@ void updateTileSolo(StageTileSolo *task) {
         task->tile.anim.index = 0;
         task->tile.anim.timer = updateTileSoloFrames0[0].duration;
         task->mode = 1;
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == 10) {
-                task->tile.tile = rec;
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == 10) {
+                task->tile.tile = object;
             }
         }
         task->nextState(task);
@@ -148,37 +148,11 @@ void *createTileSoloTask(void) {
     return createTask(updateTileSolo, sizeof(StageTileSolo), 0);
 }
 
-s32 stepTileAnimation2(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 depth) {
-    AnimFrame *frame = &frames[obj->anim.index];
-    s32 dt = GFX.funcs.getFrameTime();
-
-    if (dt > 4) {
-        dt = 4;
-    }
-    if (depth == 0) {
-        obj->anim.timer -= dt;
-    }
-    if (obj->anim.timer <= 0) {
-        frame++;
-        obj->anim.index++;
-        obj->anim.timer += frame->duration;
-        if (once) {
-            if (frame->frame == 0xFF) {
-                return 0xFF;
-            }
-        } else if (frame->frame == 0xFF) {
-            frame = frames;
-            obj->anim.index = 0;
-            obj->anim.timer += frame->duration;
-        }
-        stepTileAnimation2(obj, frames, once, depth + 1);
-    }
-    return frame->frame;
-}
+#include "common/step_tile_animation2.inc.c"
 
 void updateTileDuo(StageTileDuo *task) {
     StageTile *tile;
-    StageTile *rec;
+    StageTile *object;
     StageTile *fading;
     s32 i;
     s32 j;
@@ -192,13 +166,13 @@ void updateTileDuo(StageTileDuo *task) {
         task->tiles[1].anim.index = 0;
         task->tiles[1].anim.timer = updateTileDuoFrames0[1]->duration;
         task->mode = 1;
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            switch (rec->anim) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            switch (object->anim) {
             case 8:
-                task->tiles[0].tile = rec;
+                task->tiles[0].tile = object;
                 break;
             case 9:
-                task->tiles[1].tile = rec;
+                task->tiles[1].tile = object;
                 break;
             }
         }
@@ -262,41 +236,11 @@ void fadeOutTileDuo(StageTileDuo *task, s32 arg1, s32 arg2) {
     }
 }
 
-void *createTileDuo(s32 arg) {
-    return createTaskWithId(updateTileDuo, sizeof(StageTileDuo), 0, arg);
-}
+#include "common/create_tile_duo.inc.c"
 
-void *createTileDuoTask(void) {
-    return createTask(updateTileDuo, sizeof(StageTileDuo), 0);
-}
+#include "common/create_tile_duo_task.inc.c"
 
-s32 stepTileAnimation3(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 depth) {
-    AnimFrame *frame = &frames[obj->anim.index];
-    s32 dt = GFX.funcs.getFrameTime();
-
-    if (dt > 4) {
-        dt = 4;
-    }
-    if (depth == 0) {
-        obj->anim.timer -= dt;
-    }
-    if (obj->anim.timer <= 0) {
-        frame++;
-        obj->anim.index++;
-        obj->anim.timer += frame->duration;
-        if (once) {
-            if (frame->frame == 0xFF) {
-                return 0xFF;
-            }
-        } else if (frame->frame == 0xFF) {
-            frame = frames;
-            obj->anim.index = 0;
-            obj->anim.timer += frame->duration;
-        }
-        stepTileAnimation3(obj, frames, once, depth + 1);
-    }
-    return frame->frame;
-}
+#include "common/step_tile_animation3.inc.c"
 
 /* Whether the wanderer is more than dist from home (in x + y) */
 s32 isFarFromHome(StageWanderer *task, s32 dist) {
@@ -312,62 +256,7 @@ s32 isFarFromHome(StageWanderer *task, s32 dist) {
     return dist < dx + dy;
 }
 
-/* The angle of (x, y), 0x100 a turn, from the table of tangents angleTangents */
-s32 getAngle(s32 x, s32 y) {
-    s32 result = 0;
-    s32 ratio = 0;
-    s32 base;
-    s32 i;
-
-    if (x <= 0 && y >= 0) {
-        base = 0;
-    } else if (x >= 0 && y >= 0) {
-        base = 0x40;
-    } else if (x >= 0 && y <= 0) {
-        base = 0x80;
-    } else if (x <= 0 && y <= 0) {
-        base = 0xC0;
-    } else {
-        base = 0;
-    }
-    if (x < 0) {
-        x = -x;
-    }
-    if (y < 0) {
-        y = -y;
-    }
-    if (x == y) {
-        return base | 0x20;
-    }
-    if (y < x) {
-        ratio = y * 0xFFFF / x;
-    } else if (x < y) {
-        ratio = x * 0xFFFF / y;
-    }
-    for (i = 0; i <= 0x20; i++) {
-        if (angleTangents[i] <= ratio && ratio <= angleTangents[i + 1]) {
-            switch (base) {
-            case 0:
-            case 0x80:
-                if (y < x) {
-                    result = i;
-                } else if (x < y) {
-                    result = 0x40 - i;
-                }
-                return result + base;
-            case 0x40:
-            case 0xC0:
-                if (y < x) {
-                    result = 0x40 - i;
-                } else if (x < y) {
-                    result = i;
-                }
-                return result + base;
-            }
-        }
-    }
-    return 0xFF;
-}
+#include "common/get_angle.inc.c"
 
 /* Moves the wanderer, turning it every period frames */
 void moveWanderer(StageWanderer *task) {
@@ -395,7 +284,7 @@ void moveWanderer(StageWanderer *task) {
 /* Wanders; when done, plays the animation of updateWandererFrames1 once and hides */
 void updateWanderer(StageWanderer *task) {
     StageTile *tile;
-    StageTile *rec;
+    StageTile *object;
     StageTile *fading;
     s32 frame;
 
@@ -405,13 +294,13 @@ void updateWanderer(StageWanderer *task) {
         task->tile.anim.index = task->start;
         task->tile.anim.timer = updateWandererFrames0[0].duration;
         task->mode = 1;
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == task->tileAnim) {
-                task->tile.tile = rec;
-                task->homeX = rec->x;
-                task->homeY = rec->y;
-                task->x = rec->x << 8;
-                task->y = rec->y << 8;
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == task->tileAnim) {
+                task->tile.tile = object;
+                task->homeX = object->x;
+                task->homeY = object->y;
+                task->x = object->x << 8;
+                task->y = object->y << 8;
             }
         }
         task->period = 0x28;
@@ -488,7 +377,7 @@ void *createWanderer(s32 arg) {
     return createTaskWithId(updateWanderer, sizeof(StageWanderer), 0, arg);
 }
 
-/* Creates a wanderer of the record with the given animation */
+/* Creates a wanderer of the map object with the given animation */
 StageWanderer *createWandererTask(s32 tileAnim, s32 speedIndex, s32 start) {
     StageWanderer *task = createTask(updateWanderer, sizeof(StageWanderer), 0);
 
@@ -498,13 +387,13 @@ StageWanderer *createWandererTask(s32 tileAnim, s32 speedIndex, s32 start) {
     return task;
 }
 
-/* Creates the task of updateCommand830 (id 0x33E) before progress 15 */
+/* Creates the task of updateCommand830 (id 0x33E) before progress 0xF */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (GAME.progress < 15) {
+        if (GAME.progress < 0xF) {
             children[0] = createCommand830(0x33E);
         }
         break;
@@ -518,9 +407,8 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-/* Sets the progress to 15 and applies flag action 0x8010 */
 void endEvent370(void) {
-    GAME.progress = 15;
+    GAME.progress = 0xF;
     FLAGS_00.applyAction(ITEM(0, 0x10), 1);
 }
 

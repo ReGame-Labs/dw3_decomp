@@ -5,7 +5,7 @@
 #include "common/start_stage.inc.c"
 
 void endEvent300(void) {
-    GAME.progress = 13;
+    GAME.progress = 0xD;
 }
 
 #if VERSION_US

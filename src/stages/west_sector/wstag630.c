@@ -9,9 +9,7 @@ extern AnimFrame updateTileAnimsFrames2[];
 
 #include "common/update_tile_anims3_once.inc.c"
 
-void *createTileAnims(void) {
-    return createTask(updateTileAnims, 0x5C, 0);
-}
+#include "common/create_tile_anims_5c.inc.c"
 
 #include "common/update_stage_tile_anims.inc.c"
 #define STAGE_CHILDREN_SIZE 4
@@ -243,7 +241,7 @@ u16 actor6Conditions[] = { SPECIAL(0x17), 1, PROGRESS(0x14), 0, CODES_END };
 u16 actor7Conditions[] = { PROGRESS(0x10), 1, CODES_END };
 u16 actor8Conditions[] = { SPECIAL(0x16), 1, PROGRESS(0x10), 0, PROGRESS(0xF), 0, CODES_END };
 u16 actor9Conditions[] = { PROGRESS(0xF), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor12Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor13Conditions[] = { SPECIAL(0x19), 1, CODES_END };

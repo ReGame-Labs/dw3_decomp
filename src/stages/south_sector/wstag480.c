@@ -7,9 +7,7 @@ extern StageTileFrame **updateTileCursorsFrames[];
 
 #include "common/update_tile_cursors.inc.c"
 
-void *createTileCursors(void) {
-    return createTask(updateTileCursors, sizeof(StageTileCursors), 0);
-}
+#include "common/create_tile_cursors.inc.c"
 
 /* Creates the stage's second object, and the event object of story progress 7 */
 void updateStage(StageTask *task, void **children) {

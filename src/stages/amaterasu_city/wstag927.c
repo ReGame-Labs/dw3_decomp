@@ -8,9 +8,7 @@ extern AnimFrame updateTileAnimsFrames1[];
 
 #include "common/update_tile_anims2.inc.c"
 
-void *createTileAnims(void) {
-    return createTask(updateTileAnims, 0x58, 0);
-}
+#include "common/create_tile_anims_58.inc.c"
 
 /* Creates an object and the event object of flag 0x100C */
 void updateStage(StageTask *task, void **children) {
@@ -36,7 +34,6 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
-/* Event: applies actions 0x100C and 0x7400 */
 void endEvent1608(void) {
     FLAGS_00.applyAction(FLAG(0x10, 0xC), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);

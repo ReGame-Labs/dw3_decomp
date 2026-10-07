@@ -7,9 +7,7 @@ extern AnimFrame updateTileAnimsFrames[];
 
 #include "common/update_tile_anims1.inc.c"
 
-void *createTileAnims(void) {
-    return createTask(updateTileAnims, 0x54, 0);
-}
+#include "common/create_tile_anims_54.inc.c"
 
 /* Creates the event object of progress 4 when flag 0x400F is set and 0x4010 is not, and the stage helper task */
 void updateStage(StageTask *task, void **children) {
@@ -353,8 +351,8 @@ FieldTalk actor15Talks[] = {
 };
 u16 actor0Conditions[] = { PROGRESS(4), 0, ITEM(0, 6), 0, SPECIAL(0x22), 1, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x22), 1, PROGRESS(4), 0, ITEM(0, 6), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x2B), 1, ITEM(0, 6), 0, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x2B), 1, ITEM(0, 6), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 6), 0, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 6), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(4), 1, CODES_END };
 u16 actor5Conditions[] = { SPECIAL(0x15), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
@@ -362,7 +360,7 @@ u16 actor7Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor8Conditions[] = { PROGRESS(0xC), 1, CODES_END };
 u16 actor9Conditions[] = { SPECIAL(0x16), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x17), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor12Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor13Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor14Conditions[] = { PROGRESS(0xE), 1, CODES_END };

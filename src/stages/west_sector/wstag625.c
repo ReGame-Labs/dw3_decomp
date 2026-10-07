@@ -32,7 +32,7 @@ s32 stepTileAnimation(StageTileSeq *obj, AnimFrame *frames, s32 once, s32 depth)
 }
 
 void updateTileSeqs(StageTileSeqs *task) {
-    StageTile *rec;
+    StageTile *object;
     s32 n;
     StageTile *tile;
     s32 i;
@@ -43,9 +43,9 @@ void updateTileSeqs(StageTileSeqs *task) {
     default:
         task->nextState(task);
         n = 0;
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim >= 1 && rec->anim <= 4) {
-                task->entries[n].tile = rec;
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim >= 1 && object->anim <= 4) {
+                task->entries[n].tile = object;
                 n++;
             }
         }
@@ -110,7 +110,7 @@ void *createTileSeqs(s32 arg) {
     return createTaskWithId(updateTileSeqs, sizeof(StageTileSeqs), 0, arg);
 }
 
-/* Creates the event object of story progress 21 */
+/* Creates the event object of story progress 0x15 */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:

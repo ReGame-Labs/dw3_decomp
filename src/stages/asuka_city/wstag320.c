@@ -26,7 +26,6 @@ void updateStage(StageTask *task) {
 
 #include "common/start_stage.inc.c"
 
-/* Sets flag 0x800F */
 void endEvent290(void) {
     FLAGS_00.applyAction(ITEM(0, 0xF), 1);
 }
@@ -269,7 +268,7 @@ u16 actor2Conditions[] = { PROGRESS(0xE), 1, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(0x14), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x16), 1, CODES_END };
 u16 actor8Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor9Conditions[] = { PROGRESS(0x26), 1, CODES_END };

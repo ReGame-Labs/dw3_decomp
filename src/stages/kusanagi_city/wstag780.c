@@ -229,7 +229,7 @@ s32 stepTileLoopAnimation(StageTileAnim *obj, AnimFrame *frames, s32 depth) {
     return frame->frame;
 }
 
-/* Shows and loops the animations of the records with animations 1 and 2 */
+/* Shows and loops the animations of the map objects with animations 1 and 2 */
 void updateTileLoop2(StageTileLoop2 *task) {
     StageTile *t;
     StageTile *tile;
@@ -565,33 +565,20 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         children[1] = createCommand801(0x321);
-        do {
-            if (GAME.progress == 0) {
-                children[0] = FIELDSTG_startEvent(0);
-                break;
-            }
-            if (GAME.progress == 0x17) {
-                children[0] = FIELDSTG_startEvent(0x2AC);
-                break;
-            }
-            if (GAME.progress == 0x1B) {
-                children[0] = FIELDSTG_startEvent(0x2E6);
-                children[2] = createEffectSet();
-                break;
-            }
-            if (GAME.progress == 0x20) {
-                children[0] = FIELDSTG_startEvent(0x375);
-                break;
-            }
-            if (GAME.progress == 0x27) {
-                children[0] = FIELDSTG_startEvent(0x3CB);
-                break;
-            }
-            if (GAME.progress == FIELD_PROGRESS_MOVIE_BATTLES) {
-                children[0] = FIELDSTG_startEvent(0x5DC);
-                break;
-            }
-        } while (0);
+        if (GAME.progress == 0) {
+            children[0] = FIELDSTG_startEvent(0);
+        } else if (GAME.progress == 0x17) {
+            children[0] = FIELDSTG_startEvent(0x2AC);
+        } else if (GAME.progress == 0x1B) {
+            children[0] = FIELDSTG_startEvent(0x2E6);
+            children[2] = createEffectSet();
+        } else if (GAME.progress == 0x20) {
+            children[0] = FIELDSTG_startEvent(0x375);
+        } else if (GAME.progress == 0x27) {
+            children[0] = FIELDSTG_startEvent(0x3CB);
+        } else if (GAME.progress == FIELD_PROGRESS_MOVIE_BATTLES) {
+            children[0] = FIELDSTG_startEvent(0x5DC);
+        }
         task->nextState(task);
         break;
     case TASK_RUN:
@@ -604,7 +591,6 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0xC
 #include "common/start_stage.inc.c"
 
-/* Sets the story progress to 0 */
 void endEvent0(void) {
     GAME.progress = 0;
 }
@@ -1420,11 +1406,11 @@ FieldTalk actor6Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor12Conditions[] = { PROGRESS(0x27), 1, CODES_END };
 u16 actor13Conditions[] = { PROGRESS(0x27), 1, CODES_END };
 u16 actor14Conditions[] = { PROGRESS(0x27), 1, CODES_END };
