@@ -53,8 +53,8 @@ linked with `ld -r`, so progress keeps being tracked per unit as before.
 An overlay split into several objects, X.c, X_2.c, X_3.c..., is not a pair
 of halves: each of its files is a unit of its own (CARDGAME, FIGHTSTG).
 A stage's head, src/stages/X_head.c (the color linked before WSTAG924's
-jump tables, tools/stage_yaml.py), is reported with the stage too, its
-rodata first: its target is splat's rodata of it
+jump tables, tools/stage_yaml.py), is reported with the stage, its rodata
+first, and gets no unit of its own: its target is splat's rodata of it
 (asm/<version>/stages/data/X_head.rodata.s).
 
 The PsyQ SDK linked into the executable and STDWTITL (libpress) is Sony's
@@ -623,8 +623,9 @@ def main() -> None:
              for src in sorted((ROOT / "src").rglob("*.c"))]
     overlay_data = [n for n in names if n.split("/")[1:2] == ["data"] and not n.startswith("main/")]
     names = [n for n in names if not n.startswith("main/data/") and n not in overlay_data]
-    # the stages with no code, which splat writes only the data of
-    data_stages = [n for n in names if n.startswith("stages/")
+    # the stages with no code, which splat writes only the data of; a
+    # stage's head has only data too, but it is reported with its stage
+    data_stages = [n for n in names if n.startswith("stages/") and not n.endswith("_head")
                    and not (ASM / f"{n}.s").exists() and data_segments(n)]
     # a stage's head: its target, and its object if this version builds it
     heads = {n[:-len("_head")]: (f"expected/{V}/asm/stages/data/{n[len('stages/'):]}.rodata.s.o",
