@@ -103,9 +103,11 @@ MEMORY_MAP := $(foreach a,EXE_VRAM OVERLAY_VRAM STAGE_VRAM,--defsym $(a)=$($(a))
 # The executable links with its children's symbols too (CHILDREN_template)
 MAIN_AUTO_SYMS := $(GENDIR)/undefined_syms_auto_main.txt $(GENDIR)/undefined_funcs_auto_main.txt
 MAIN_IMPORTS := $(LINKDIR)/main_imports.ld
+# and with where the heap begins, after the overlays (tools/link_heap.py)
+HEAP_SYMS := $(LINKDIR)/heap.ld
 LDFLAGS := -nostdlib --no-check-sections --emit-relocs -Map $(MAP) \
 	   $(MEMORY_MAP) -T $(GENDIR)/main.ld \
-	   $(addprefix -T ,$(UNDEFINED_SYMS) $(MAIN_AUTO_SYMS) $(MAIN_IMPORTS))
+	   $(addprefix -T ,$(UNDEFINED_SYMS) $(MAIN_AUTO_SYMS) $(MAIN_IMPORTS) $(HEAP_SYMS))
 
 # The stage overlays the version has, from $(CONFIG_DIR)/stages.txt
 STAGES := $(shell awk '!/^\#/ && NF { print tolower($$1) }' $(CONFIG_DIR)/stages.txt)
@@ -234,10 +236,17 @@ $$(GENDIR)/$(1).ld: $$(or $$(OVL_YAML_$(1)),$$(CONFIG_DIR)/$(1).yaml) $$(CONFIG_
 # own hand-written ones ($(CONFIG_DIR)/undefined_syms_<name>.txt)
 $(1)_SYMS := $$(MAIN_SYMS) $$(if $$(OVL_PARENT_$(1)),$$(LINKDIR)/$$(OVL_PARENT_$(1))_syms.ld) \
 	$$(wildcard $$(CONFIG_DIR)/undefined_syms_$(1).txt)
-$(1)_AUTO_SYMS := $$(GENDIR)/undefined_syms_auto_$(1).txt $$(GENDIR)/undefined_funcs_auto_$(1).txt
+# and of splat's symbol files, the names that $(1)_SYMS doesn't have
+# (tools/link_imports.py): those of $(1)_SYMS move with a padding build,
+# splat's keep the unpadded addresses
+$(1)_SPLAT_SYMS := $$(GENDIR)/undefined_syms_auto_$(1).txt $$(GENDIR)/undefined_funcs_auto_$(1).txt
+$(1)_AUTO_SYMS := $$(LINKDIR)/auto/$(1).ld
+$$($(1)_AUTO_SYMS): $$($(1)_OBJ) $$(GENDIR)/$(1).ld $$($(1)_SYMS) tools/link_imports.py
+	@mkdir -p $$(dir $$@)
+	$$(PYTHON) tools/link_imports.py $$@ $$($(1)_OBJ) --from $$($(1)_SPLAT_SYMS) --linked $$($(1)_SYMS)
 # and its children's (CHILDREN_template)
 $(1)_IMPORTS := $$(if $$(CHILDREN_$(1)),$$(LINKDIR)/$(1)_imports.ld)
-$$(LINKDIR)/$(1).elf: $$($(1)_OBJ) $$(GENDIR)/$(1).ld $$($(1)_SYMS) $$($(1)_IMPORTS)
+$$(LINKDIR)/$(1).elf: $$($(1)_OBJ) $$(GENDIR)/$(1).ld $$($(1)_SYMS) $$($(1)_AUTO_SYMS) $$($(1)_IMPORTS)
 	@mkdir -p $$(dir $$@)
 	$$(LD) -nostdlib --no-check-sections --emit-relocs -Map $$(LINKDIR)/$(1).map \
 		$$(MEMORY_MAP) -T $$(GENDIR)/$(1).ld $$(addprefix -T ,$$($(1)_SYMS) $$($(1)_AUTO_SYMS) $$($(1)_IMPORTS)) -o $$@
@@ -274,7 +283,11 @@ $(EXE): $(ELF)
 	$(OBJCOPY) -O binary $< $@
 	@truncate -s %2048 $@
 
-$(ELF): $(OBJ) $(GENDIR)/main.ld $(UNDEFINED_SYMS) $(MAIN_IMPORTS)
+# The heap begins after the overlays (HEAP_SYMS)
+$(HEAP_SYMS): $(OVL_ELF) tools/link_heap.py
+	$(PYTHON) tools/link_heap.py $@ $(OVL_ELF)
+
+$(ELF): $(OBJ) $(GENDIR)/main.ld $(UNDEFINED_SYMS) $(MAIN_IMPORTS) $(HEAP_SYMS)
 	@mkdir -p $(dir $@)
 	$(LD) $(LDFLAGS) -o $@
 	$(PYTHON) tools/inputcheck.py $(MAP) $(OBJ) --blobs $(BIN_OBJ)
@@ -306,6 +319,19 @@ PADS := 0x4 0x10004
 links: $(ELF) $(OVL_ELF)
 padcheck: links
 	$(foreach p,$(PADS),$(MAKE) PAD=$(p) links && $(PYTHON) tools/padcheck.py -v $(VERSION) $(p) &&) true
+
+# A boot test of the build, or of a padding build (make PAD=0x10004 smoke),
+# for your machine only (tools/smoke.py): it writes the binaries into a copy
+# of the original disc image DISC under $(LINKDIR)/smoke/ and boots it in
+# DuckStation under xvfb-run, with a PlayStation BIOS from the directory BIOS.
+# Set DISC, BIOS and, if DuckStation isn't duckstation-qt, DUCKSTATION on the
+# command line or in local.mk.
+DUCKSTATION ?= duckstation-qt
+smoke: $(EXE) $(OVL_BIN)
+	$(if $(DISC),,$(error make smoke needs DISC=<the original disc image, .bin>))
+	$(if $(BIOS),,$(error make smoke needs BIOS=<a directory with a PlayStation BIOS>))
+	@command -v xvfb-run > /dev/null || { echo "make smoke runs DuckStation under xvfb-run: install xvfb (apt install xvfb)" >&2; exit 1; }
+	$(PYTHON) tools/smoke.py --disc "$(DISC)" --bios "$(BIOS)" --pad $(PAD) --emulator "$(DUCKSTATION)"
 
 # The executable's .bss in C: maspsx turns its commons into definitions in
 # order in .bss when they aren't kept as .comm
@@ -355,4 +381,4 @@ reset: clean
 
 -include $(C_OBJ:.o=.d) $(C_OVL_OBJ:.o=.d)
 
-.PHONY: all generate regenerate compare expected objdiff report clean reset shiftcheck shiftreport links padcheck lint
+.PHONY: all generate regenerate compare expected objdiff report clean reset shiftcheck shiftreport links padcheck lint smoke

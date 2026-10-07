@@ -158,6 +158,10 @@ how to fix what they find:
   size changed or a word that changed without a relocation, with the label
   before it. Something there depends on where the code is, such as a pad
   or an alignment: write it so that the layout is the same at any address.
+  It also fails on a relocation's absolute symbol, with the name of
+  something in a binary, that didn't move: a symbol file gives that name's
+  unpadded address. Drop the name from the file, so that the binary takes
+  it from the executable's or the parent's symbols.
 - `tools/inputcheck.py`, which every link runs, fails on an object that
   isn't one of the binary's or on a blob. The first is a stale object in
   `build/` (`make regenerate` after changing a config) or one that a splat
@@ -165,6 +169,18 @@ how to fix what they find:
   version's `C_SRC`). A blob, a `.bin` or assembly that `.incbin`s one, has
   no relocations: make it data (C, or splat's words) so that its pointers
   get them. Only the executable's tail, a picture, may stay one.
+
+`make smoke` (`tools/smoke.py`) is an optional check for your machine, never
+the CI's: it writes the build into a copy of your disc image under `build/`
+and boots it in DuckStation under `xvfb-run`, with settings of its own,
+until the first menu (the title screen, or the European language menu),
+then watches it for an exception or code that runs outside the BIOS, the
+kernel and the build.
+`make PAD=0x10004 smoke` boots a padding build, which shows that the code
+and data that moved still work. It needs `DISC=` (the original image, a
+`.bin`), `BIOS=` (a directory with a PlayStation BIOS) and, if DuckStation
+isn't `duckstation-qt`, `DUCKSTATION=`, on the command line or in
+`local.mk`.
 
 ## Versions
 

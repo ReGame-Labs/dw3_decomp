@@ -20,7 +20,8 @@ the code moves:
   jal      a j/jal to an address without an R_MIPS_26
   abs      a relocation against an absolute symbol in RAM that the binary
            doesn't get from the binaries it links with (the executable, its
-           parent overlay, its children): splat's undefined_syms_auto entries and the
+           parent overlay, its children) or, for the executable, from where
+           the overlays end (heap.ld): splat's undefined_syms_auto entries and the
            addresses in the symbol files, which the linker never moves.
            `own` when the address is inside the binary (a label that is
            missing), `other` when it is in another binary
@@ -295,7 +296,8 @@ def main():
     binaries = []
     for e in sorted(set(elfs) | set(every)):
         name = "main" if e.stem == exe else e.stem
-        imported = set()
+        # the executable's heap begins after the overlays (tools/link_heap.py)
+        imported = syms_of_ld(build / "heap.ld") if name == "main" else set()
         if name != "main":
             imported = set(main_syms)
             p = par.get(name, "fieldstg" if name in stages else None)

@@ -49,5 +49,7 @@ void *tryAllocMemHigh(u32 size, s32 tag);
 
 extern Heap HEAP;
 extern MemBlock *HEAP_START;
+/* The heap's first block, after the overlays: a linker symbol (tools/link_heap.py) */
+extern MemBlock HEAP_BASE[];
 
 #endif /* DW3_HEAP_H */
