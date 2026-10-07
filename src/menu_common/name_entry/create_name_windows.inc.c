@@ -4,7 +4,7 @@ void OVL_NAME(createNameWindows)(NameEntry *task, NameEntryWindows *windows) {
     s32 i;
 
     windows->title = createTextWindow(task->layer, 1, 0x20, 0x1A);
-    windows->title->setPalette(windows->title, 4);
+    windows->title->setPalette(windows->title, PALETTE_GREEN);
     windows->name = createTextWindow(task->layer, 1, 0x4B, 0x40);
     windows->name->setSpacing(windows->name, 0x13, 0);
     windows->name->style = &OVL_NAME(nameStyle);

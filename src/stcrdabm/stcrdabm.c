@@ -244,7 +244,7 @@ CardAlbumGrid *STCRDABM_createGrid(CardAlbum *album) {
 
     grid->setPage = STCRDABM_setPage;
     grid->hide = STCRDABM_hideCards;
-    grid->layer = 0x1000;
+    grid->layer = SCREEN_LAYER;
     grid->depth = 6;
     grid->album = album;
     return grid;
@@ -259,12 +259,12 @@ void STCRDABM_updateScene(Task *task, Task **items) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0xF000);
-        GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         rect.x = 0;
         rect.y = 0;
         rect.w = 0x140;
         rect.h = 0xF0;
-        res = GFX.funcs.createLayer(&rect, 3, 0x1000);
+        res = GFX.funcs.createLayer(&rect, 3, SCREEN_LAYER);
         res->setBgColor(res, 0, 0, 0);
         items[0] = STCRDABM_createAlbum();
         task->nextState(task);
@@ -722,7 +722,7 @@ void STCRDABM_updateAlbum(CardAlbum *album, CardAlbumWindows *win) {
 Task *STCRDABM_createAlbum(void) {
     CardAlbum *album = createTask(STCRDABM_updateAlbum, sizeof(CardAlbum), sizeof(CardAlbumWindows));
 
-    album->layer = 0x1000;
+    album->layer = SCREEN_LAYER;
     album->depth = 7;
     return (Task *)album;
 }

@@ -20,7 +20,7 @@ void cardDrawerSetCard(s32 id) {
     if (id > 0) {
         n = id - 1;
         i = n >> 6;
-        CARD_DRAWER->card = (CardImageHeader *)(FILE_CACHE.load(CARD_IMAGE_FILES[i]) + (n & 0x3F) * 0x62C);
+        CARD_DRAWER->card = (CardImageHeader *)((u8 *)FILE_CACHE.load(CARD_IMAGE_FILES[i]) + (n & 0x3F) * 0x62C);
     } else {
         CARD_DRAWER->card = (CardImageHeader *)FILE_CACHE.load(CARD_IMAGE_FILES[0]);
     }

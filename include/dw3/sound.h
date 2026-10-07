@@ -47,6 +47,26 @@
 #define SOUND_TELEPORT 0x4001D /* TELEPORT */
 #define SOUND_WIN_JINGLE 0x6004001E /* W_JINGLE: a battle won */
 #define SOUND_INN_JINGLE 0x4004000D /* JINGLE04: a night at the inn */
+#define SOUND_SWITCH01 0x8004103C
+#define SOUND_SWITCH02 0x800410BD
+#define SOUND_SWITCH03 0x8004113E
+#define SOUND_COMCD103 0x800429BF
+#define SOUND_COMCD115 0xA0042FCB /* held until SOUND.keyOff */
+#define SOUND_COMEX113 0x800446C9
+#define SOUND_PLAYER11 0xA0045EC9 /* held until SOUND.keyOff */
+#define SOUND_SYSTEM05 0x80045341
+#define SOUND_GONDRA_S 0x340004
+#define SOUND_SE000002 0xA40006
+#define SOUND_ELEVATER 0x1080001
+
+/*
+ * A field's or a battle's music (FieldState.music, Battle.music): track
+ * (SEP) n of the first sequence of a sound bank, exclusive (bit 30) and with
+ * bit 29, which playSound doesn't read but every one of SOUNDTST's tunes
+ * has, and its loops (BT_LOOP0, EX_AT_LP), not its jingles. A stage's music
+ * is usually of the bank it loads (FieldState.soundBank).
+ */
+#define MUSIC(bank, n) (0x60000000 | (bank) << 18 | (n))
 
 /* One of the SOUND_SLOT_COUNT loaded sound banks: a VAB and its SEP sequences */
 typedef struct SoundBank {

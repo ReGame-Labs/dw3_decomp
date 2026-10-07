@@ -67,12 +67,7 @@ typedef struct ShockTestRow {
     /* 0x8 */ s32 highlight[4]; /* per column: selected, then being edited */
 } ShockTestRow;
 
-/* The kernel's file functions (sim: opens the file on the PC), and the C
-   library's functions the loader parses the text with */
-long func_80024CB8(char *name, long mode);
-long func_80024CC8(long fd, void *buf, long n);
-long write(long fd, void *buf, long n);
-long func_80024CE8(long fd);
+/* The C library's functions the loader parses the text with */
 int atoi(u8 *s);
 int strcspn(u8 *s, char *reject);
 

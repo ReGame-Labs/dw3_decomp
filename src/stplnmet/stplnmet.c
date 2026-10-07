@@ -14,12 +14,12 @@ void STPLNMET_updateScene(Task *task, Task **children) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0x19000);
-        GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         rect.x = 0;
         rect.y = 0;
         rect.w = 0x140;
         rect.h = 0xF0;
-        layer = GFX.funcs.createLayer(&rect, 1, 0x1000);
+        layer = GFX.funcs.createLayer(&rect, 1, SCREEN_LAYER);
         layer->setBgColor(layer, 1, 1, 1);
         STPLNMET_centerLayer(task, children, layer, &rect);
         GFX.funcs.createLayer(&rect, 3, 0x1001);
@@ -178,7 +178,7 @@ void STPLNMET_updateWelcome(NameDialog *task, NameDialogWindows *windows) {
         task->nextState(task);
         task->setSubstate(task, 1);
         windows->arrow->setString(windows->arrow, FILE_CACHE.load(TEXT_FILE(TEXT_ONLINE)), 2);
-        windows->arrow->setPalette(windows->arrow, 1);
+        windows->arrow->setPalette(windows->arrow, PALETTE_BLUE);
         windows->arrow->setVisible(windows->arrow, 0);
         windows->text->setTypeSound(windows->text, 0x800454C4);
         task->step = GFX.funcs.getTime();
@@ -195,7 +195,7 @@ void STPLNMET_updateWelcome(NameDialog *task, NameDialogWindows *windows) {
                     task->setSubstate(task, 2);
                     task->step = GFX.funcs.getTime();
                     windows->text->setString(windows->text, FILE_CACHE.load(TEXT_FILE(TEXT_ONLINE)), 1);
-                    windows->text->setPalette(windows->text, 1);
+                    windows->text->setPalette(windows->text, PALETTE_BLUE);
                     windows->text->setTypeDelay(windows->text, 6);
                     windows->arrow->setVisible(windows->arrow, 1);
                 }
@@ -321,22 +321,22 @@ NameEntry *STPLNMET_createNameEntry(char *name) {
 
 void STPLNMET_createConfirmWindows(NameConfirm *task, NameConfirmWindows *windows) {
     windows->title = createTextWindow(task->layer, 1, 0x20, 0x1A);
-    windows->title->setPalette(windows->title, 4);
+    windows->title->setPalette(windows->title, PALETTE_GREEN);
     windows->name = createTextWindow(task->layer, 1, 0x61, 0x42);
-    windows->name->setPalette(windows->name, 1);
+    windows->name->setPalette(windows->name, PALETTE_BLUE);
     windows->pack = createTextWindow(task->layer, 1, 0x40, 0x60);
-    windows->pack->setPalette(windows->pack, 1);
+    windows->pack->setPalette(windows->pack, PALETTE_BLUE);
     windows->message = createTextWindow(task->layer, 1, 0x5A, 0xA9);
-    windows->message->setPalette(windows->message, 1);
+    windows->message->setPalette(windows->message, PALETTE_BLUE);
     windows->yes = createTextWindow(task->layer, 1, 0x6B, 0xB9);
-    windows->yes->setPalette(windows->yes, 1);
+    windows->yes->setPalette(windows->yes, PALETTE_BLUE);
     windows->no = createTextWindow(task->layer, 1, 0x6B, 0xC7);
-    windows->no->setPalette(windows->no, 1);
+    windows->no->setPalette(windows->no, PALETTE_BLUE);
     windows->cursor = createCursor(task->layer, task->depth - 2, 0x5A, 0xB9);
-    windows->cursor->setPalette(windows->cursor, 1);
+    windows->cursor->setPalette(windows->cursor, PALETTE_BLUE);
     windows->cursor->setVisible(windows->cursor, 0);
     windows->progress = createTextWindow(task->layer, 1, 0xE3, 0xA9);
-    windows->progress->setPalette(windows->progress, 1);
+    windows->progress->setPalette(windows->progress, PALETTE_BLUE);
 }
 
 void STPLNMET_showConfirmWindows(NameConfirm *task, NameConfirmWindows *windows, s32 show) {
@@ -509,7 +509,7 @@ void STPLNMET_runConfirm(NameConfirm *task, NameConfirmWindows *windows) {
         if (task->progress > 100) {
             task->progress = 100;
             windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_ONLINE)), 0x1E);
-            SOUND.playSound(0x80045341);
+            SOUND.playSound(SOUND_SYSTEM05);
             task->nextSubstate(task);
         } else {
             SOUND.playSound(SOUND_COUNT);
@@ -600,22 +600,22 @@ void STPLNMET_createChoiceWindows(PartnerChoice *task, PartnerChoiceWindows *win
     s32 i;
 
     windows->title = createTextWindow(task->layer, 1, 0x20, 0x1A);
-    windows->title->setPalette(windows->title, 4);
+    windows->title->setPalette(windows->title, PALETTE_GREEN);
     for (i = 0; i < 3; i++) {
         windows->labels[i] = createTextWindow(task->layer, 1, 0x1A, 0x34 + i * 0x18);
-        windows->labels[i]->setPalette(windows->labels[i], 1);
+        windows->labels[i]->setPalette(windows->labels[i], PALETTE_BLUE);
     }
     windows->name = createTextWindow(task->layer, 1, 0x3A, 0x32);
-    windows->name->setPalette(windows->name, 4);
+    windows->name->setPalette(windows->name, PALETTE_GREEN);
     windows->text = createTextWindow(task->layer, 1, 0x3A, 0xC2);
     windows->text->setLines(windows->text, 3);
-    windows->text->setPalette(windows->text, 1);
+    windows->text->setPalette(windows->text, PALETTE_BLUE);
     for (i = 0; i < 3; i++) {
         windows->partners[i].name = createTextWindow(task->layer, 2, 0x72, 0x43 + i * 0x2A);
-        windows->partners[i].name->setPalette(windows->partners[i].name, 5);
+        windows->partners[i].name->setPalette(windows->partners[i].name, PALETTE_RED);
         windows->partners[i].text = createTextWindow(task->layer, 1, 0x72, 0x4F + i * 0x2A);
         windows->partners[i].text->setLines(windows->partners[i].text, 2);
-        windows->partners[i].text->setPalette(windows->partners[i].text, 1);
+        windows->partners[i].text->setPalette(windows->partners[i].text, PALETTE_BLUE);
     }
 }
 
@@ -768,7 +768,7 @@ void STPLNMET_createTabs(PlayerNameScreen *screen, PlayerNameScreenChildren *chi
     for (i = 0; i < 3; i++) {
         children->tabs[i] = createTextWindow(screen->layer, 3, STPLNMET_tabX[i], 0x12);
         children->tabs[i]->setString(children->tabs[i], FILE_CACHE.load(TEXT_FILE(TEXT_ONLINE)), i + 3);
-        children->tabs[i]->setPalette(children->tabs[i], 1);
+        children->tabs[i]->setPalette(children->tabs[i], PALETTE_BLUE);
         children->tabs[i]->setVisible(children->tabs[i], 0);
     }
 }
@@ -779,9 +779,9 @@ void STPLNMET_showTabs(PlayerNameScreen *screen, PlayerNameScreenChildren *child
     for (i = 0; i < 3; i++) {
         children->tabs[i]->setVisible(children->tabs[i], show);
         if (screen->page == i) {
-            children->tabs[i]->setPalette(children->tabs[i], 0);
+            children->tabs[i]->setPalette(children->tabs[i], PALETTE_WHITE);
         } else {
-            children->tabs[i]->setPalette(children->tabs[i], 1);
+            children->tabs[i]->setPalette(children->tabs[i], PALETTE_BLUE);
         }
     }
 }

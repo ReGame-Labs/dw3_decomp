@@ -54,9 +54,9 @@ void STGDGLAB_showSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *window
                 windows->slotNames[i]->setString(windows->slotNames[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)),
                                              GET_DIGIMON(screen->slots[i])->nameId);
                 if (partner->battleDigivolve == screen->slots[i]) {
-                    windows->slotNames[i]->setPalette(windows->slotNames[i], 1);
+                    windows->slotNames[i]->setPalette(windows->slotNames[i], PALETTE_BLUE);
                 } else {
-                    windows->slotNames[i]->setPalette(windows->slotNames[i], 0);
+                    windows->slotNames[i]->setPalette(windows->slotNames[i], PALETTE_WHITE);
                 }
             }
         }
@@ -72,13 +72,13 @@ void STGDGLAB_showSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *window
             windows->list[i]->setNumber(windows->list[i], 0, value);
         }
         if (totals.fields.lowered[0] != 0) {
-            windows->list[0]->setPalette(windows->list[0], 6);
+            windows->list[0]->setPalette(windows->list[0], PALETTE_PURPLE);
         }
         if (totals.fields.lowered[1] != 0) {
-            windows->list[1]->setPalette(windows->list[1], 6);
+            windows->list[1]->setPalette(windows->list[1], PALETTE_PURPLE);
         }
         if (totals.fields.lowered[2] != 0) {
-            windows->list[4]->setPalette(windows->list[4], 6);
+            windows->list[4]->setPalette(windows->list[4], PALETTE_PURPLE);
         }
         for (i = 0; i < 13; i++) {
             windows->list[i]->setRightAlign(windows->list[i], 1);
@@ -409,7 +409,7 @@ void STGDGLAB_updateSlotScreen(LabSlotScreen *screen, void *children) {
 Task *STGDGLAB_createSlotScreen(Lab *lab) {
     LabSlotScreen *screen = createTask(STGDGLAB_updateSlotScreen, sizeof(LabSlotScreen), 0x60);
 
-    screen->layer = 0x1000;
+    screen->layer = SCREEN_LAYER;
     screen->depth = 6;
     screen->lab = lab;
     return (Task *)screen;

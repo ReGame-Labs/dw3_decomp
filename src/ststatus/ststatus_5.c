@@ -151,9 +151,9 @@ void STSTATUS_showPartnerSlots(StatsScreen *screen, StatsScreenWindows *windows,
                 entry = GET_DIGIMON(slots[i]);
                 windows->slots[i]->setString(windows->slots[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), entry->nameId);
                 if (partner->battleDigivolve == slots[i]) {
-                    windows->slots[i]->setPalette(windows->slots[i], 1);
+                    windows->slots[i]->setPalette(windows->slots[i], PALETTE_BLUE);
                 } else {
-                    windows->slots[i]->setPalette(windows->slots[i], 0);
+                    windows->slots[i]->setPalette(windows->slots[i], PALETTE_WHITE);
                 }
             } else {
                 windows->slots[i]->setVisible(windows->slots[i], 0);
@@ -216,19 +216,19 @@ void STSTATUS_showPartnerStats(StatsScreen *screen, StatsScreenWindows *windows,
         }
         for (i = 0; i < 13; i++) {
             windows->values[i]->setRightAlign(windows->values[i], 1);
-            windows->values[i]->setPalette(windows->values[i], 0);
+            windows->values[i]->setPalette(windows->values[i], PALETTE_WHITE);
         }
         windows->tpLabel->setString(windows->tpLabel, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x4E);
         windows->tp->setNumber(windows->tp, 0, totals.fields.tp);
         windows->tp->setRightAlign(windows->tp, 1);
         if (totals.fields.lowered[0]) {
-            windows->values[0]->setPalette(windows->values[0], 6);
+            windows->values[0]->setPalette(windows->values[0], PALETTE_PURPLE);
         }
         if (totals.fields.lowered[1]) {
-            windows->values[1]->setPalette(windows->values[1], 6);
+            windows->values[1]->setPalette(windows->values[1], PALETTE_PURPLE);
         }
         if (totals.fields.lowered[2]) {
-            windows->values[4]->setPalette(windows->values[4], 6);
+            windows->values[4]->setPalette(windows->values[4], PALETTE_PURPLE);
         }
     } else {
         for (i = 0; i < 13; i++) {
@@ -320,21 +320,21 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
             windows->values[i]->setNumber(windows->values[i], 0, after);
         }
         if (before < after) {
-            windows->values[i]->setPalette(windows->values[i], 1);
+            windows->values[i]->setPalette(windows->values[i], PALETTE_BLUE);
         } else if (after < before) {
-            windows->values[i]->setPalette(windows->values[i], 5);
+            windows->values[i]->setPalette(windows->values[i], PALETTE_RED);
         } else {
-            windows->values[i]->setPalette(windows->values[i], 0);
+            windows->values[i]->setPalette(windows->values[i], PALETTE_WHITE);
             if (i == 0) {
                 if (now.fields.lowered[0]) {
-                    windows->values[0]->setPalette(windows->values[0], 6);
+                    windows->values[0]->setPalette(windows->values[0], PALETTE_PURPLE);
                 }
             } else if (i == 1) {
                 if (now.fields.lowered[1]) {
-                    windows->values[1]->setPalette(windows->values[1], 6);
+                    windows->values[1]->setPalette(windows->values[1], PALETTE_PURPLE);
                 }
             } else if (i == 4 && now.fields.lowered[2]) {
-                windows->values[4]->setPalette(windows->values[4], 6);
+                windows->values[4]->setPalette(windows->values[4], PALETTE_PURPLE);
             }
         }
     }
@@ -347,11 +347,11 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
             windows->values[i + 6]->setNumber(windows->values[i + 6], 0, after);
         }
         if (before < after) {
-            windows->values[i + 6]->setPalette(windows->values[i + 6], 1);
+            windows->values[i + 6]->setPalette(windows->values[i + 6], PALETTE_BLUE);
         } else if (after < before) {
-            windows->values[i + 6]->setPalette(windows->values[i + 6], 5);
+            windows->values[i + 6]->setPalette(windows->values[i + 6], PALETTE_RED);
         } else {
-            windows->values[i + 6]->setPalette(windows->values[i + 6], 0);
+            windows->values[i + 6]->setPalette(windows->values[i + 6], PALETTE_WHITE);
         }
     }
     for (i = 0; i < 13; i++) {
@@ -890,7 +890,7 @@ Task *STSTATUS_createStatusScreen(FieldMenuScreen *menu, s32 extra) {
     StatsScreen *screen = createTask(STSTATUS_updateStatusScreen, sizeof(StatsScreen), sizeof(StatsScreenWindows));
 
     screen->previewStats = STSTATUS_previewStats;
-    screen->layer = 0x1000;
+    screen->layer = SCREEN_LAYER;
     screen->depth = 6;
     screen->menu = menu;
     return (Task *)screen;

@@ -11,11 +11,11 @@ void FIELDSTG_updateRoot(Task *task, Task **children) {
         default:
         case TASK_INIT:
             mode = GAME.funcs.getMode();
-            if (GAME.unk26D4 != mode) {
-                GAME.unk26D4 = mode;
+            if (GAME.lastFieldMode != mode) {
+                GAME.lastFieldMode = mode;
                 GAME.clearTempFlags = 1;
 #if VERSION_EU
-                GAME.unk26F8 = 0x10;
+                GAME.randomGauges = 0x10;
 #endif
             } else {
                 GAME.clearTempFlags = 0;

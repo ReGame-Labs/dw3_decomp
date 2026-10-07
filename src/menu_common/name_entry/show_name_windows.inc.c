@@ -5,21 +5,21 @@ void OVL_NAME(showNameWindows)(NameEntry *task, NameEntryWindows *windows, s32 s
     if (show != 0) {
         windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 1);
         windows->name->setText(windows->name, task->name);
-        windows->name->setPalette(windows->name, 1);
+        windows->name->setPalette(windows->name, PALETTE_BLUE);
         for (i = 0; i < 3; i++) {
             windows->tabs[i]->setString(windows->tabs[i], FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)),
                                         OVL_NAME(keyboard).tabTexts[task->page].texts[i]);
-            windows->tabs[i]->setPalette(windows->tabs[i], 1);
+            windows->tabs[i]->setPalette(windows->tabs[i], PALETTE_BLUE);
         }
         windows->leftLabel->setString(windows->leftLabel, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0xD);
-        windows->leftLabel->setPalette(windows->leftLabel, 1);
+        windows->leftLabel->setPalette(windows->leftLabel, PALETTE_BLUE);
         windows->rightLabel->setString(windows->rightLabel, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0xE);
-        windows->rightLabel->setPalette(windows->rightLabel, 1);
+        windows->rightLabel->setPalette(windows->rightLabel, PALETTE_BLUE);
         if (OVL_NAME(keyboard).pageCount >= 2) {
             windows->l1Label->setString(windows->l1Label, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0x10);
-            windows->l1Label->setPalette(windows->l1Label, 1);
+            windows->l1Label->setPalette(windows->l1Label, PALETTE_BLUE);
             windows->r1Label->setString(windows->r1Label, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0x11);
-            windows->r1Label->setPalette(windows->r1Label, 1);
+            windows->r1Label->setPalette(windows->r1Label, PALETTE_BLUE);
         }
     } else {
         windows->title->setVisible(windows->title, 0);

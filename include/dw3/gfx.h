@@ -32,8 +32,17 @@ typedef struct GfxFuncs {
     /* 0x3C */ s32 (*getFrameTime)(void);
 } GfxFuncs;
 
+/* The screen the modes draw on (setDisplayMode, their layers' rects) */
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+
 /* The drawing layers GFX holds at most */
 #define LAYER_COUNT 30
+
+/* The layer over the whole screen that most modes create first and draw
+   their menus on (FIELDSTG and STDWTITL name theirs: FIELD_LAYER_BACK,
+   STDWTITL_TITLE_LAYER); the ones they add next take 0x1001 and up */
+#define SCREEN_LAYER 0x1000
 
 /*
  * What a vsync adds to the 8.8 time counters: a frame of the 60 Hz game,

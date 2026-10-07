@@ -1195,12 +1195,12 @@ void STDGNAME_updateScene(Task *task, void **children) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0x5000);
-        GFX.funcs.setDisplayMode(320, 240, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         rect.x = 0;
         rect.y = 0;
         rect.w = 320;
         rect.h = 240;
-        layer = GFX.funcs.createLayer(&rect, 3, 0x1000);
+        layer = GFX.funcs.createLayer(&rect, 3, SCREEN_LAYER);
         layer->setBgColor(layer, 0, 0, 0);
         *children = STDGNAME_createScreen();
         task->nextState(task);
@@ -1241,7 +1241,7 @@ NameEntry *STDGNAME_createNameEntry(char *name, s32 partner) {
 
     task->getName = STDGNAME_getName;
     task->close = STDGNAME_closeNameEntry;
-    task->layer = 0x1000;
+    task->layer = SCREEN_LAYER;
     task->depth = 3;
     task->mode = 1;
     task->partner = partner;
@@ -1279,7 +1279,7 @@ void STDGNAME_showMenuWindow(MenuTask *task, TextWindow **window, s32 index, s32
         } else {
             (*window)->setString(*window, FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMING)), STDGNAME_menuWindows[index].text);
         }
-        (*window)->setPalette(*window, 0);
+        (*window)->setPalette(*window, PALETTE_WHITE);
     } else if (*window != NULL) {
         (*window)->setVisible(*window, 0);
     }
@@ -1481,6 +1481,6 @@ MenuTask *STDGNAME_createMenu(ScreenTask *screen) {
     MenuTask *task = createTask(STDGNAME_updateMenu, sizeof(MenuTask), 10 * sizeof(TextWindow *));
 
     task->screen = screen;
-    task->layer = 0x1000;
+    task->layer = SCREEN_LAYER;
     return task;
 }

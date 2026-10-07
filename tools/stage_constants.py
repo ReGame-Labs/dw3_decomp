@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Writes the stages' sound ids and flag codes with the names include/stage.h gives them.
+Writes the stages' sound ids and flag codes by name: MUSIC and the SOUND_ names
+(include/dw3/sound.h, include/stage.h), and the condition codes
+(include/dw3/game_state.h).
 
 - a field's or a battle's music (FieldState.music, the third word of a
   Battle) becomes MUSIC(bank, n);
@@ -55,7 +57,7 @@ SIMPLE_CODES = {0x60: "PROGRESS", 0x70: "SPECIAL", 0x72: "PARTY_STAT", 0x74: "EV
 
 
 def code(word):
-    """A condition or action code by name (include/stage.h), or the word as it is"""
+    """A condition or action code by name (include/dw3/game_state.h), or the word as it is"""
     if not re.fullmatch(NUMBER, word):
         return word
     v = int(word, 0)

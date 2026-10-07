@@ -102,14 +102,12 @@ typedef struct MemCardFile {
 
 #define MEMCARD_FILE_MAGIC 0x33574D44
 
-/* The saved part of the game state, GAME's first bytes: a save's data
-   section. Its bytes 0 and 2 hold the checksum of the rest, from byte 4, and
+/* A save's data section is GAME's first GAME_SAVE_SIZE bytes. Its bytes 0
+   and 2 hold the checksum of the rest, from byte 4, and
    MEMCARD_SAVE_VERSION. */
 #if VERSION_US
-#define GAME_SAVE_SIZE 0x26BC
 #define MEMCARD_SAVE_VERSION 3
 #elif VERSION_EU
-#define GAME_SAVE_SIZE 0x26C4
 #define MEMCARD_SAVE_VERSION 4
 #endif
 

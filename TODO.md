@@ -68,8 +68,8 @@ own.
     both versions.
   - `STGDGLAB_moveRecipeCursor`, the recipe screen's cursor step.
     European only (a `version-only` name) and C.
-  - `FIGHTSTG`'s `func_8008F5D4`, `func_800A15A8`, `func_800A1FE0` and
-    `func_800A246C`. European only (splat's names) and C.
+  - `FIGHTSTG`'s `func_8008F5D4`, `func_800A1FE0` and `func_800A246C`
+    (splat's names) and `FIGHTSTG_rollCounter`. European only and C.
 - [x] The stages: 233 of the USA version's 238 are 8 bytes longer in the
   European version because each one's setup function adds the language
   (`LANGUAGE`, which `CNTY_SEL` sets) to the text file it loads; the

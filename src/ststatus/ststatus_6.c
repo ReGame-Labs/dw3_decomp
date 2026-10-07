@@ -728,7 +728,7 @@ void STSTATUS_runItemScreen(ItemScreen *screen, ItemScreenWindows *windows) {
         break;
     case 0x6E:
         windows->optionCursor->setStill(windows->optionCursor, 1);
-        windows->optionCursor->setPalette(windows->optionCursor, 7);
+        windows->optionCursor->setPalette(windows->optionCursor, PALETTE_GREY);
         windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), screen->option + 0x64);
         screen->substate++;
         break;
@@ -736,7 +736,7 @@ void STSTATUS_runItemScreen(ItemScreen *screen, ItemScreenWindows *windows) {
         if (PAD_PRESSED(PAD_TRIANGLE)) {
             SOUND.playSound(SOUND_MENU_CANCEL);
             windows->optionCursor->setStill(windows->optionCursor, 0);
-            windows->optionCursor->setPalette(windows->optionCursor, 0);
+            windows->optionCursor->setPalette(windows->optionCursor, PALETTE_WHITE);
             windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), screen->option + 0x1B);
             screen->substate = 10;
         }
@@ -879,7 +879,7 @@ void STSTATUS_updateItemScreen(ItemScreen *screen, ItemScreenWindows *windows) {
 Task *STSTATUS_createItemScreen(FieldMenuScreen *menu, s32 extra) {
     ItemScreen *screen = createTask(STSTATUS_updateItemScreen, sizeof(ItemScreen), sizeof(ItemScreenWindows));
 
-    screen->layer = 0x1000;
+    screen->layer = SCREEN_LAYER;
     screen->depth = 6;
     screen->menu = menu;
     return (Task *)screen;

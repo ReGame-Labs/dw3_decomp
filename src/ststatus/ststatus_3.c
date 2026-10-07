@@ -82,9 +82,9 @@ void STSTATUS_showEquipList(EquipPanel *panel, EquipPanelWindows *windows, s32 s
             item = panel->items[row];
             if (item > 0) {
                 if (STSTATUS_data.funcs.canEquip(panel->partner, panel->slot, item)) {
-                    windows->rows[i].name->setPalette(windows->rows[i].name, 0);
+                    windows->rows[i].name->setPalette(windows->rows[i].name, PALETTE_WHITE);
                 } else {
-                    windows->rows[i].name->setPalette(windows->rows[i].name, 7);
+                    windows->rows[i].name->setPalette(windows->rows[i].name, PALETTE_GREY);
                 }
                 windows->rows[i].name->setString(windows->rows[i].name, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_NAMES)), item);
                 windows->rows[i].times->setString(windows->rows[i].times, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x40);
@@ -94,7 +94,7 @@ void STSTATUS_showEquipList(EquipPanel *panel, EquipPanelWindows *windows, s32 s
             } else {
                 if (item == -1) {
                     windows->rows[i].name->setString(windows->rows[i].name, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x45);
-                    windows->rows[i].name->setPalette(windows->rows[i].name, 0);
+                    windows->rows[i].name->setPalette(windows->rows[i].name, PALETTE_WHITE);
                 } else {
                     windows->rows[i].name->setVisible(windows->rows[i].name, 0);
                 }
@@ -509,7 +509,7 @@ void STSTATUS_updateEquipPanel(EquipPanel *panel, EquipPanelWindows *windows) {
 EquipPanel *STSTATUS_createEquipPanel(StatsScreen *screen) {
     EquipPanel *panel = createTask(STSTATUS_updateEquipPanel, sizeof(EquipPanel), sizeof(EquipPanelWindows));
 
-    panel->layer = 0x1000;
+    panel->layer = SCREEN_LAYER;
     panel->depth = 4;
     panel->screen = screen;
     panel->partner = GAME.funcs.getPartyMember(screen->member);

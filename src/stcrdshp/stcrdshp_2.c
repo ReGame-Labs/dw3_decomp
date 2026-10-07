@@ -426,7 +426,7 @@ void STCRDSHP_updateBuy(CardShopBuy *buy, CardShopBuyWindows *win) {
 CardShopBuy *STCRDSHP_createBuy(CardShop *shop, s32 shopId) {
     CardShopBuy *buy = createTask(STCRDSHP_updateBuy, sizeof(CardShopBuy), sizeof(CardShopBuyWindows));
 
-    buy->layer = 0x1000;
+    buy->layer = SCREEN_LAYER;
     buy->depth = 6;
     buy->shop = shop;
     buy->shopId = shopId;

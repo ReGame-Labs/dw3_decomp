@@ -37,7 +37,7 @@ void func_800A4D7C(StageSoundTile *task) {
             } else {
                 tile->frame = 10;
                 task->nextSubstate(task);
-                SOUND.keyOff(0xA0042FCB, task->voice);
+                SOUND.keyOff(SOUND_COMCD115, task->voice);
             }
             break;
         case 2:

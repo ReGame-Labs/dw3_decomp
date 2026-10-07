@@ -66,7 +66,7 @@ void FIELDSTG_setupField(void) {
     FIELDSTG_state.soundBank = 0x42;
     FIELDSTG_state.actors = FIELDSTG_actorList;
     FIELDSTG_state.startDir = 0;
-    FIELDSTG_state.music = 0x61080002;
+    FIELDSTG_state.music = MUSIC(0x42, 2);
     FIELDSTG_state.spriteColor = FIELDSTG_startColor;
     FIELDSTG_state.events = FIELDSTG_events;
     FIELDSTG_map.setFile(0, FIELD_FILE << 16 | 2);
@@ -91,7 +91,7 @@ void FIELDSTG_setupField(void) {
     case 38:
     case 39:
         FIELDSTG_state.soundBank = 0x42;
-        FIELDSTG_state.music = 0x61080000;
+        FIELDSTG_state.music = MUSIC(0x42, 0);
         break;
     }
 }

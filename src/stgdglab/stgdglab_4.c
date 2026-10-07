@@ -74,12 +74,12 @@ void STGDGLAB_showMenuPage(LabMenu *menu, LabMenuWindows *windows) {
     if (member < 0) {
         windows->name->setString(windows->name, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x1B);
         if (windows->entriesHint != NULL) {
-            windows->entriesHint->setPalette(windows->entriesHint, 7);
+            windows->entriesHint->setPalette(windows->entriesHint, PALETTE_GREY);
         }
     } else {
         windows->name->setString(windows->name, GAME.funcs.getPartnerStats(member)->name, -1);
         if (windows->entriesHint != NULL) {
-            windows->entriesHint->setPalette(windows->entriesHint, 0);
+            windows->entriesHint->setPalette(windows->entriesHint, PALETTE_WHITE);
         }
     }
     menu->frames[3] = 0;
@@ -552,7 +552,7 @@ LabMenu *STGDGLAB_createMenu(Lab *lab) {
 
     menu->open = STGDGLAB_openMenu;
     menu->close = STGDGLAB_closeMenu;
-    menu->layer = 0x1000;
+    menu->layer = SCREEN_LAYER;
     menu->depth = 2;
     menu->lab = lab;
     return menu;
@@ -610,10 +610,10 @@ void STGDGLAB_showPartyPage(LabPartyScreen *screen, LabPartyScreenWindows *windo
     }
     if (member < 0) {
         windows->name->setString(windows->name, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x1B);
-        windows->entriesHint->setPalette(windows->entriesHint, 7);
+        windows->entriesHint->setPalette(windows->entriesHint, PALETTE_GREY);
     } else {
         windows->name->setString(windows->name, GAME.funcs.getPartnerStats(member)->name, -1);
-        windows->entriesHint->setPalette(windows->entriesHint, 0);
+        windows->entriesHint->setPalette(windows->entriesHint, PALETTE_WHITE);
     }
     windows->name->setPos(windows->name, pos[1], pos[2] + screen->pageRow * 0x7A);
     screen->frame = 0;
@@ -797,9 +797,9 @@ void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *wind
             }
             windows->entriesHint->setString(windows->entriesHint, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x14);
             if (screen->count == 0) {
-                windows->entriesHint->setPalette(windows->entriesHint, 7);
+                windows->entriesHint->setPalette(windows->entriesHint, PALETTE_GREY);
             } else {
-                windows->entriesHint->setPalette(windows->entriesHint, 0);
+                windows->entriesHint->setPalette(windows->entriesHint, PALETTE_WHITE);
             }
             screen->substate++;
         }
@@ -978,7 +978,7 @@ void STGDGLAB_updatePartyScreen(LabPartyScreen *screen, void *children) {
 Task *STGDGLAB_createPartyScreen(Lab *lab) {
     LabPartyScreen *screen = createTask(STGDGLAB_updatePartyScreen, sizeof(LabPartyScreen), 0x38);
 
-    screen->layer = 0x1000;
+    screen->layer = SCREEN_LAYER;
     screen->depth = 2;
     screen->lab = lab;
     return (Task *)screen;
@@ -1038,17 +1038,17 @@ void STGDGLAB_showSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windows
                         windows->right[i]->setString(windows->right[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x12);
                     }
                     if (skill & SKILL_MARKED) {
-                        windows->left[i]->setPalette(windows->left[i], 4);
-                        windows->right[i]->setPalette(windows->right[i], 4);
+                        windows->left[i]->setPalette(windows->left[i], PALETTE_GREEN);
+                        windows->right[i]->setPalette(windows->right[i], PALETTE_GREEN);
                     } else if (skill & SKILL_LAST) {
-                        windows->left[i]->setPalette(windows->left[i], 3);
-                        windows->right[i]->setPalette(windows->right[i], 3);
+                        windows->left[i]->setPalette(windows->left[i], PALETTE_YELLOW);
+                        windows->right[i]->setPalette(windows->right[i], PALETTE_YELLOW);
                     } else if (!(skill & SKILL_KNOWN)) {
-                        windows->left[i]->setPalette(windows->left[i], 7);
-                        windows->right[i]->setPalette(windows->right[i], 7);
+                        windows->left[i]->setPalette(windows->left[i], PALETTE_GREY);
+                        windows->right[i]->setPalette(windows->right[i], PALETTE_GREY);
                     } else {
-                        windows->left[i]->setPalette(windows->left[i], 0);
-                        windows->right[i]->setPalette(windows->right[i], 0);
+                        windows->left[i]->setPalette(windows->left[i], PALETTE_WHITE);
+                        windows->right[i]->setPalette(windows->right[i], PALETTE_WHITE);
                     }
                 } else {
                     windows->left[i]->setVisible(windows->left[i], 0);
@@ -1116,7 +1116,7 @@ void STGDGLAB_updateSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windo
                 windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x26);
                 windows->cursor->setPos(windows->cursor, 0x4C, panel->cursor * 0x11 + 0x58);
                 windows->cursor->setVisible(windows->cursor, 1);
-                windows->cursor->setPalette(windows->cursor, 0);
+                windows->cursor->setPalette(windows->cursor, PALETTE_WHITE);
                 windows->optionCursor->setVisible(windows->optionCursor, 0);
                 panel->substate++;
             }
@@ -1159,7 +1159,7 @@ void STGDGLAB_updateSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windo
                             panel->substate = 5;
                             panel->step = 20;
                         }
-                        windows->cursor->setPalette(windows->cursor, 7);
+                        windows->cursor->setPalette(windows->cursor, PALETTE_GREY);
                         windows->cursor->setStill(windows->cursor, 1);
                     }
                 } else if (PAD_PRESSED(PAD_TRIANGLE)) {
@@ -1324,7 +1324,7 @@ void STGDGLAB_updateSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windo
 LabSkillPanel *STGDGLAB_createSkillPanel(s32 member, s32 slot) {
     LabSkillPanel *panel = createTask(STGDGLAB_updateSkillPanel, sizeof(LabSkillPanel), 0x5C);
 
-    panel->layer = 0x1000;
+    panel->layer = SCREEN_LAYER;
     panel->depth = 2;
     panel->member = member;
     panel->slot = slot;

@@ -33,7 +33,7 @@ void FIELDSTG_playBattleTransition(FieldTask *task, FieldChildren *fieldChildren
     switch (task->substate) {
     case 0:
         FILE_CACHE.markCached();
-        setRECT(&FIELDSTG_screenRect, 0, 0, FIELD_SCREEN_WIDTH, FIELD_SCREEN_HEIGHT);
+        setRECT(&FIELDSTG_screenRect, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         MoveImage(&FIELDSTG_screenRect, TRANSITION_IMAGE_X, 0);
         layer = GFX.funcs.getLayer(FIELD_LAYER_BACK);
         layer->setBgColor(layer, 0, 0, 0);
@@ -120,13 +120,13 @@ void FIELDSTG_playBattleTransition(FieldTask *task, FieldChildren *fieldChildren
             setPolyF4((POLY_F4 *)poly);
             setSemiTrans((POLY_F4 *)poly, 1);
             ((POLY_F4 *)poly)->x0 = 0;
-            ((POLY_F4 *)poly)->x1 = FIELD_SCREEN_WIDTH;
+            ((POLY_F4 *)poly)->x1 = SCREEN_WIDTH;
             ((POLY_F4 *)poly)->x2 = 0;
-            ((POLY_F4 *)poly)->x3 = FIELD_SCREEN_WIDTH;
+            ((POLY_F4 *)poly)->x3 = SCREEN_WIDTH;
             ((POLY_F4 *)poly)->y0 = 0;
             ((POLY_F4 *)poly)->y1 = 0;
-            ((POLY_F4 *)poly)->y2 = FIELD_SCREEN_HEIGHT;
-            ((POLY_F4 *)poly)->y3 = FIELD_SCREEN_HEIGHT;
+            ((POLY_F4 *)poly)->y2 = SCREEN_HEIGHT;
+            ((POLY_F4 *)poly)->y3 = SCREEN_HEIGHT;
             addPrim(ot, poly);
             poly = (POLY_FT4 *)((POLY_F4 *)poly + 1);
             setDrawTPage((DR_TPAGE *)poly, 0, 1, getTPage(0, 2, 320, 0));
@@ -188,9 +188,9 @@ void FIELDSTG_closeField(FieldTask *task, FieldChildren *children) {
         } else {
             task->centerOnPlayer = 0;
         }
-        task->width = FIELD_SCREEN_WIDTH;
+        task->width = SCREEN_WIDTH;
         task->fade = 0;
-        task->height = FIELD_SCREEN_HEIGHT;
+        task->height = SCREEN_HEIGHT;
         task->nextSubstate(task);
     case 1:
         layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
@@ -209,8 +209,8 @@ void FIELDSTG_closeField(FieldTask *task, FieldChildren *children) {
             clip.x = actor->tile.x - clip.x;
             clip.y = actor->tile.y - clip.y;
         } else {
-            clip.x = FIELD_SCREEN_WIDTH / 2;
-            clip.y = FIELD_SCREEN_HEIGHT / 2;
+            clip.x = SCREEN_WIDTH / 2;
+            clip.y = SCREEN_HEIGHT / 2;
         }
         clip.x -= task->width / 2;
         if (clip.x < 0) {
@@ -223,11 +223,11 @@ void FIELDSTG_closeField(FieldTask *task, FieldChildren *children) {
         layer->setClipPos(layer, clip.x, clip.y);
         width = task->width;
         height = task->height;
-        if (clip.x + width > FIELD_SCREEN_WIDTH) {
-            width = FIELD_SCREEN_WIDTH - clip.x;
+        if (clip.x + width > SCREEN_WIDTH) {
+            width = SCREEN_WIDTH - clip.x;
         }
-        if (clip.y + height > FIELD_SCREEN_HEIGHT) {
-            height = FIELD_SCREEN_HEIGHT - clip.y;
+        if (clip.y + height > SCREEN_HEIGHT) {
+            height = SCREEN_HEIGHT - clip.y;
         }
         layer->setClipSize(layer, width, height);
         FIELDSTG_drawCover(FIELD_LAYER_COVER, task->fade);
@@ -248,8 +248,8 @@ void FIELDSTG_closeField(FieldTask *task, FieldChildren *children) {
         }
         task->width += 8;
         layer->setClipPos(layer, task->width, task->height);
-        layer->setClipSize(layer, (FIELD_SCREEN_WIDTH / 2 - task->width) * 2, (FIELD_SCREEN_HEIGHT / 2 - task->height) * 2);
-        if (task->width > FIELD_SCREEN_WIDTH / 2) {
+        layer->setClipSize(layer, (SCREEN_WIDTH / 2 - task->width) * 2, (SCREEN_HEIGHT / 2 - task->height) * 2);
+        if (task->width > SCREEN_WIDTH / 2) {
             GAME.funcs.requestMode(task->nextMode, task->nextModeArg);
             GAME.fieldMode = GAME.funcs.getMode();
             GAME.fieldPos = children->actors[0]->pos;
@@ -304,11 +304,11 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
             }
             GFX.funcs.reset();
             GFX.funcs.allocPrimBuffers(0x6400);
-            GFX.funcs.setDisplayMode(FIELD_SCREEN_WIDTH, FIELD_SCREEN_HEIGHT, 0, 0);
+            GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
             rect.x = 0;
             rect.y = 0;
-            rect.w = FIELD_SCREEN_WIDTH;
-            rect.h = FIELD_SCREEN_HEIGHT;
+            rect.w = SCREEN_WIDTH;
+            rect.h = SCREEN_HEIGHT;
             layer = GFX.funcs.createLayer(&rect, 1, FIELD_LAYER_BACK);
             layer->setBgColor(layer, 1, 1, 1);
             GFX.funcs.createLayer(&rect, 1, FIELD_LAYER_COVER);
@@ -334,11 +334,11 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
             FLAGS_00.updateModeFlags();
             FLAGS_00.applyAction(FIELD_VISITED_FLAG(GAME.funcs.getMode()), 1);
             mode = GAME.funcs.getPrevMode();
-            /* from other than a field (0x2xx, 0x3xx), STDWTITL (0xExx),
-               STPLNMET (0x500) or STAGSLCT (0x1500), the player comes back
+            /* from other than a field (0x2xx, 0x3xx), STDWTITL,
+               STPLNMET or STAGSLCT, the player comes back
                where the field was left */
-            if ((mode & 0xFF00) != 0x200 && (mode & 0xFF00) != 0x300 && (mode & 0xFF00) != 0xE00 &&
-                mode != 0x1500 && mode != 0x500) {
+            if ((mode & 0xFF00) != 0x200 && (mode & 0xFF00) != 0x300 && MODE_OVERLAY(mode) != MODE_TITLE &&
+                mode != MODE_STAGE_SELECT && mode != MODE_PLAYER_NAME) {
                 GAME.modeArg = -1;
                 FIELDSTG_state.defaultStart = GAME.fieldPos;
                 FIELDSTG_state.defaultStartDir = GAME.fieldDir;
@@ -550,8 +550,8 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
                 break;
             case 3:
                 if (children->cutscene->state == TASK_DONE) {
-                    GAME.unk44 = task->warp->place;
-                    GAME.unk46 = task->warp->unkC;
+                    GAME.place = task->warp->place;
+                    GAME.placeArg = task->warp->unkC;
                     FIELDSTG_leaveField(task->warp->mode, -1, task->warp->x << 8, task->warp->y << 8, task->warp->dir);
                 }
                 break;
@@ -617,7 +617,7 @@ void FIELDSTG_leaveField(s32 mode, s32 arg, s32 x, s32 y, s32 dir) {
 
 /*
  * Starts encounter FIELDSTG_encounters[encounter]: the field task
- * (FIELD_TASK_FIELD) leaves for the battle (FIELD_MODE_BATTLE, after a movie in the chapter
+ * (FIELD_TASK_FIELD) leaves for the battle (MODE_BATTLE, after a movie in the chapter
  * FIELD_PROGRESS_MOVIE_BATTLES), and BATTLE_SETUP takes the encounter's
  * enemies and bytes. A battle led by one of the prize fighters always gives
  * an item, which the field's stage (named in each case by the stage its mode
@@ -635,9 +635,9 @@ void FIELDSTG_startEncounter(s32 encounter) {
     if (task != NULL) {
         FIELDSTG_state.busy = 1;
         FIELDSTG_state.battleStarting = 1;
-        next = FIELD_MODE_BATTLE_MOVIE;
+        next = MODE_BATTLE_MOVIE;
         if (GAME.progress != FIELD_PROGRESS_MOVIE_BATTLES) {
-            next = FIELD_MODE_BATTLE;
+            next = MODE_BATTLE;
         }
         task->nextMode = next;
         task->nextModeArg = 0;

@@ -73,7 +73,7 @@ void FIELDSTG_updateActor(Actor *actor, ActorChildren *children) {
         case TASK_DONE:
             break;
         case TASK_KILL:
-            GAME.unk26EC = actor->z;
+            GAME.flightZ = actor->z;
             if (actor->voice != -1) {
                 SOUND.keyOff(SOUND_SUB_MOVE, actor->voice);
             }
@@ -144,7 +144,7 @@ Actor *FIELDSTG_createActor(s32 key1, s32 kind, s32 image, FieldActorEntry *entr
             if (GAME.clearTempFlags) {
                 actor->z = 0x3000;
             } else {
-                actor->z = GAME.unk26EC;
+                actor->z = GAME.flightZ;
             }
             actor->flying = 1;
         } else {
@@ -162,9 +162,9 @@ Actor *FIELDSTG_createActor(s32 key1, s32 kind, s32 image, FieldActorEntry *entr
         actor->tile.y = actor->pos.y >> 8;
         if (GAME.clearTempFlags) {
             actor->depth = 4;
-            GAME.unk26E0 = 4;
+            GAME.playerDepth = 4;
         } else {
-            actor->depth = GAME.unk26E0;
+            actor->depth = GAME.playerDepth;
         }
     } else if (kind & 0xE) {
         actor->trail = HEAP.allocZeroed(sizeof(Trail), 2);
@@ -178,9 +178,9 @@ Actor *FIELDSTG_createActor(s32 key1, s32 kind, s32 image, FieldActorEntry *entr
         }
         if (GAME.clearTempFlags) {
             actor->depth = 4;
-            GAME.unk26E0 = 4;
+            GAME.playerDepth = 4;
         } else {
-            actor->depth = GAME.unk26E0;
+            actor->depth = GAME.playerDepth;
         }
     } else {
         isLarge = key1 == 0x28;

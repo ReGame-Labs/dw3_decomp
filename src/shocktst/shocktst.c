@@ -23,12 +23,12 @@ void SHOCKTST_updateScene(Task *task, Task **items) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0x5000);
-        GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         rect.x = 0;
         rect.y = 0;
         rect.w = 0x140;
         rect.h = 0xF0;
-        res = GFX.funcs.createLayer(&rect, 1, 0x1000);
+        res = GFX.funcs.createLayer(&rect, 1, SCREEN_LAYER);
         res->setBgColor(res, 0, 0, 0);
         items[0] = SHOCKTST_createLoader();
         task->nextState(task);
@@ -47,48 +47,48 @@ Task *SHOCKTST_start(void) {
 void SHOCKTST_highlight(ShockTest *task, ShockTestWindows *win, s32 highlight) {
     s32 i;
 
-    win->pattern->setPalette(win->pattern, 0);
+    win->pattern->setPalette(win->pattern, PALETTE_WHITE);
     for (i = 0; i < 2; i++) {
-        win->times[i]->setPalette(win->times[i], 0);
-        win->powers[i]->setPalette(win->powers[i], 0);
+        win->times[i]->setPalette(win->times[i], PALETTE_WHITE);
+        win->powers[i]->setPalette(win->powers[i], PALETTE_WHITE);
     }
-    win->play->setPalette(win->play, 0);
+    win->play->setPalette(win->play, PALETTE_WHITE);
     switch (highlight) {
     default:
-        win->pattern->setPalette(win->pattern, 3);
+        win->pattern->setPalette(win->pattern, PALETTE_YELLOW);
         break;
     case 2:
-        win->times[0]->setPalette(win->times[0], 3);
+        win->times[0]->setPalette(win->times[0], PALETTE_YELLOW);
         break;
     case 3:
-        win->times[1]->setPalette(win->times[1], 3);
+        win->times[1]->setPalette(win->times[1], PALETTE_YELLOW);
         break;
     case 4:
-        win->powers[0]->setPalette(win->powers[0], 3);
+        win->powers[0]->setPalette(win->powers[0], PALETTE_YELLOW);
         break;
     case 5:
-        win->powers[1]->setPalette(win->powers[1], 3);
+        win->powers[1]->setPalette(win->powers[1], PALETTE_YELLOW);
         break;
     case 10:
-        win->play->setPalette(win->play, 3);
+        win->play->setPalette(win->play, PALETTE_YELLOW);
         break;
     case 0:
-        win->pattern->setPalette(win->pattern, 1);
+        win->pattern->setPalette(win->pattern, PALETTE_BLUE);
         break;
     case 6:
-        win->times[0]->setPalette(win->times[0], 1);
+        win->times[0]->setPalette(win->times[0], PALETTE_BLUE);
         break;
     case 7:
-        win->times[1]->setPalette(win->times[1], 1);
+        win->times[1]->setPalette(win->times[1], PALETTE_BLUE);
         break;
     case 8:
-        win->powers[0]->setPalette(win->powers[0], 1);
+        win->powers[0]->setPalette(win->powers[0], PALETTE_BLUE);
         break;
     case 9:
-        win->powers[1]->setPalette(win->powers[1], 1);
+        win->powers[1]->setPalette(win->powers[1], PALETTE_BLUE);
         break;
     case 11:
-        win->play->setPalette(win->play, 1);
+        win->play->setPalette(win->play, PALETTE_BLUE);
         break;
     }
 }
@@ -483,10 +483,10 @@ void SHOCKTST_convertText(ShockLoader *task) {
             }
         }
     }
-    fd = func_80024CB8("sim:C:\\DEVELOP\\DLSKDATA.BIN", 0x200);
+    fd = open("sim:C:\\DEVELOP\\DLSKDATA.BIN", 0x200);
     if (fd != -1) {
         write(fd, task->file, count * 8 + sizeof(ShockFile));
-        func_80024CE8(fd);
+        close(fd);
     }
 }
 
@@ -497,11 +497,11 @@ void SHOCKTST_updateLoader(ShockLoader *task, ShockLoaderWindows *win) {
     case 0:
     default:
         task->nextState(task);
-        win->title = createTextWindow(0x1000, 0, 0x14, 0x1E);
+        win->title = createTextWindow(SCREEN_LAYER, 0, 0x14, 0x1E);
         win->title->setText(win->title, "\x82\xB5\x82\xF1\x82\xC7\x82\xA4\x83\x65\x83\x58\x83\x67"); /* "しんどうテスト" */
-        win->help[0] = createTextWindow(0x1000, 1, 0xDC, 0xB4);
+        win->help[0] = createTextWindow(SCREEN_LAYER, 1, 0xDC, 0xB4);
         win->help[0]->setText(win->help[0], "\x81\x7E\x81\x46\x82\xB6\x82\xC1\x82\xB1\x82\xA4\x82\xC4\x82\xA2\x82\xB5"); /* "×：じっこうていし" */
-        win->help[1] = createTextWindow(0x1000, 1, 0xDC, 0xC8);
+        win->help[1] = createTextWindow(SCREEN_LAYER, 1, 0xDC, 0xC8);
         win->help[1]->setText(win->help[1], SHOCKTST_STR_START_BACK);
         task->text = HEAP.allocZeroed(0x4000, 2);
         task->file = HEAP.allocZeroed(0x4000, 2);
@@ -509,13 +509,13 @@ void SHOCKTST_updateLoader(ShockLoader *task, ShockLoaderWindows *win) {
             task->setState(task, 3);
             break;
         }
-        fd = func_80024CB8(SHOCKTST_textPath, 1);
+        fd = open(SHOCKTST_textPath, 1);
         if (fd == -1) {
             task->setState(task, 3);
             break;
         }
-        func_80024CC8(fd, task->text, 0x4000);
-        func_80024CE8(fd);
+        read(fd, task->text, 0x4000);
+        close(fd);
         SHOCKTST_convertText(task);
         if (task->file != NULL) {
             win->test = SHOCKTST_createEditor(task->file->count);
@@ -538,7 +538,7 @@ void SHOCKTST_updateLoader(ShockLoader *task, ShockLoaderWindows *win) {
         if (task->text != NULL) {
             HEAP.free(task->text);
         }
-        GAME.funcs.requestMode(0x1500, 0);
+        GAME.funcs.requestMode(MODE_STAGE_SELECT, 0);
         break;
     }
 }

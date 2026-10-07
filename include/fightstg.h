@@ -253,8 +253,8 @@ typedef struct BattleTableAction {
 #define BATTLE_STAT_WISDOM 3 /* magic accuracy, statuses and heals */
 #define BATTLE_STAT_SPEED 4 /* physical accuracy, evasion and running away */
 
-/* The elements (TechData.unk7, BattleStats.element) and the families
-   (TechData.unk9, BattleStats.family) start at 2: under it, none */
+/* The elements (TechData.element, BattleStats.element) and the families
+   (TechData.family, BattleStats.family) start at 2: under it, none */
 #define ELEMENT_FIRST 2
 #define ELEMENT_COUNT 7
 #define FAMILY_FIRST 2
@@ -327,7 +327,7 @@ typedef struct FightStage {
     /* 0xB4 */ SVECTOR colorFrom; /* the model's */
     /* 0xBC */ SVECTOR colorTo;
     /* 0xC4 */ SVECTOR color;
-    /* 0xCC */ SVECTOR bgFrom; /* layer 0x1000's background */
+    /* 0xCC */ SVECTOR bgFrom; /* SCREEN_LAYER's background */
     /* 0xD4 */ SVECTOR bgTo;
     /* 0xDC */ SVECTOR bg;
     /* 0xE4 */ s16 voice; /* the music's */
@@ -1398,7 +1398,7 @@ typedef struct Battle {
     /* 0xF4 */ void (*drawBlendedQuad)(s32 layerId, s32 depth, DVECTOR *xy, CVECTOR *colors);
 } Battle;
 
-/* A technique's effect (TechData.unkA), which FIGHTSTG_applyTechEffect
+/* A technique's effect (TechData.effect), which FIGHTSTG_applyTechEffect
    carries out when its hit lands, and BattleAction.effects' index */
 #define TECH_EFFECT_FIRST 2 /* under it, the technique has none */
 #define TECH_EFFECT_POISON 2
@@ -1440,7 +1440,7 @@ typedef struct BattleAction {
 } BattleAction;
 
 /* A side's stats as FIGHTSTG_computeStats works them out. A family is the
-   kind of Digimon that a technique (TechData.unk9) or a weapon does half again
+   kind of Digimon that a technique (TechData.family) or a weapon does half again
    the damage to, and to which it lands critical hits more often. */
 typedef struct BattleStats {
     /* 0x00 */ s16 level;

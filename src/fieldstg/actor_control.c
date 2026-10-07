@@ -17,7 +17,7 @@ s32 FIELDSTG_checkFlightProbe(Actor *actor, s32 x, s32 y, Point offset) {
     pos.y = (actor->pos.y >> 8) + y;
     cell = FIELDSTG_map.isTileFree(&pos);
     if (cell != 0) {
-        cell = FIELDSTG_map.getCell(GAME.unk26D8, &pos);
+        cell = FIELDSTG_map.getCell(GAME.mapIndex, &pos);
     }
     if (actor->z != 0 && cell != FLIGHT_OPEN) {
         switch (cell) {
@@ -278,7 +278,7 @@ void FIELDSTG_controlFlight(Actor *actor) {
     height = 0;
     pos.x = actor->pos.x >> 8;
     pos.y = actor->pos.y >> 8;
-    cell = FIELDSTG_map.getCell(GAME.unk26D8, &pos);
+    cell = FIELDSTG_map.getCell(GAME.mapIndex, &pos);
     actor->z += actor->zSpeed;
     if (actor->zSpeed > 4) {
         switch ((u8)cell) {
@@ -1472,7 +1472,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
                 break;
             }
             FIELDSTG_setActorAnim(actor, ACTOR_ANIM_USED);
-            SOUND.playSound(0x800446C9); /* COMEX113 */
+            SOUND.playSound(SOUND_COMEX113);
 #if VERSION_EU
             switch (actor->key1) {
             case 0x148:

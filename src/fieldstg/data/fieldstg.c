@@ -2007,7 +2007,7 @@ u8 FIELDSTG_gaugeRow8[] = {
 };
 #endif
 /* The rows of FIELDSTG_runGauge's gauges, 2 bits a cell. The USA version has no
-   row 8 (for GAME.unk26F8 used up) and reads past the table, a null
+   row 8 (for GAME.randomGauges used up) and reads past the table, a null
    pointer */
 u8 *FIELDSTG_gaugeRows[] = {
     FIELDSTG_gaugeRow0, FIELDSTG_gaugeRow1, FIELDSTG_gaugeRow2, FIELDSTG_gaugeRow3,

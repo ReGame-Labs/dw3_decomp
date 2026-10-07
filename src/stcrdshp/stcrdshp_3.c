@@ -9,12 +9,12 @@ void STCRDSHP_updateScene(Task *task, Task **children) {
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0xF000);
-        GFX.funcs.setDisplayMode(0x140, 0xF0, 0, 0);
+        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
         rect.x = 0;
         rect.y = 0;
         rect.w = 0x140;
         rect.h = 0xF0;
-        layer = GFX.funcs.createLayer(&rect, 3, 0x1000);
+        layer = GFX.funcs.createLayer(&rect, 3, SCREEN_LAYER);
         layer->setBgColor(layer, 0, 0, 0);
         children[0] = (Task *)STCRDSHP_createShop();
         task->nextState(task);
@@ -217,7 +217,7 @@ void STCRDSHP_runShop(CardShop *shop, CardShopWindows *win) {
         break;
     case 20:
         win->cursor->setStill(win->cursor, 1);
-        win->cursor->setPalette(win->cursor, 7);
+        win->cursor->setPalette(win->cursor, PALETTE_GREY);
         STCRDSHP_funcs.startFade(&shop->fades[2], 1);
         shop->substate++;
         break;
@@ -238,7 +238,7 @@ void STCRDSHP_runShop(CardShop *shop, CardShopWindows *win) {
     case 23:
         if (STCRDSHP_funcs.updateFade(&shop->fades[2]) != 0) {
             win->cursor->setStill(win->cursor, 0);
-            win->cursor->setPalette(win->cursor, 0);
+            win->cursor->setPalette(win->cursor, PALETTE_WHITE);
             shop->substate = 3;
         }
         break;
@@ -321,7 +321,7 @@ void STCRDSHP_updateShop(CardShop *shop, CardShopWindows *win) {
         break;
     case TASK_KILL:
         if (shop->toItemShop != 0) {
-            GAME.funcs.requestMode(0x400, GAME.funcs.getModeArg());
+            GAME.funcs.requestMode(MODE_DECK_EDITOR, GAME.funcs.getModeArg());
         } else {
             GAME.funcs.requestMode(GAME.fieldMode, 0);
         }
@@ -335,7 +335,7 @@ CardShop *STCRDSHP_createShop(void) {
     s32 i;
 
     shop->showMoney = STCRDSHP_showMoney;
-    shop->layer = 0x1000;
+    shop->layer = SCREEN_LAYER;
     shop->depth = 7;
     shop->shop = GAME.funcs.getModeArg();
     mode = GAME.fieldMode;
@@ -347,7 +347,7 @@ CardShop *STCRDSHP_createShop(void) {
     if (shop->title == 0) {
         shop->title = 0x1F;
     }
-    if (GAME.funcs.getPrevMode() == 0x400) {
+    if (GAME.funcs.getPrevMode() == MODE_DECK_EDITOR) {
         shop->cursor = 2;
     }
     FILE_CACHE.request(FILE_CARD_DATA);

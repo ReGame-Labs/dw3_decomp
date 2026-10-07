@@ -82,7 +82,7 @@ s32 STSTATUS_getTechHealing(s32 partner, s32 tech) {
 
     GAME.funcs.computeStats(partner, &stats);
     info = TECHS + tech - 1; /* the match depends on this pointer */
-    power = info->power;
+    power = info->effectPower;
     return (power << 6) + power * stats.fields.battle[3] / 8;
 }
 
@@ -553,12 +553,12 @@ void STSTATUS_runTechScreen(TechScreen *screen, TechScreenWindows *windows) {
                 if (TECHS[tech - 1].kind == 3) {
                     SOUND.playSound(SOUND_SELECT);
                     screen->targetShown = 1;
-                    windows->cursor->setPalette(windows->cursor, 7);
+                    windows->cursor->setPalette(windows->cursor, PALETTE_GREY);
                     windows->cursor->setStill(windows->cursor, 1);
                     windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2B);
                     screen->substate++;
                 } else {
-                    windows->cursor->setPalette(windows->cursor, 7);
+                    windows->cursor->setPalette(windows->cursor, PALETTE_GREY);
                     windows->cursor->setStill(windows->cursor, 1);
                     STSTATUS_showChosenTech(screen, windows, 0);
                     screen->step = screen->substate;
@@ -568,7 +568,7 @@ void STSTATUS_runTechScreen(TechScreen *screen, TechScreenWindows *windows) {
                 }
             } else {
                 SOUND.playSound(SOUND_SELECT);
-                windows->cursor->setPalette(windows->cursor, 7);
+                windows->cursor->setPalette(windows->cursor, PALETTE_GREY);
                 windows->cursor->setStill(windows->cursor, 1);
                 STSTATUS_showChosenTech(screen, windows, 0);
                 windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x69);
@@ -619,7 +619,7 @@ void STSTATUS_runTechScreen(TechScreen *screen, TechScreenWindows *windows) {
             SOUND.playSound(SOUND_MENU_CANCEL);
             screen->substate = 0x1F;
             screen->targetShown = 0;
-            windows->cursor->setPalette(windows->cursor, 0);
+            windows->cursor->setPalette(windows->cursor, PALETTE_WHITE);
             windows->cursor->setStill(windows->cursor, 0);
             windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2A);
         }
@@ -628,7 +628,7 @@ void STSTATUS_runTechScreen(TechScreen *screen, TechScreenWindows *windows) {
         if (PAD_PRESSED(PAD_CROSS)) {
             SOUND.playSound(SOUND_MENU_CONFIRM);
             STSTATUS_showChosenTech(screen, windows, 1);
-            windows->cursor->setPalette(windows->cursor, 0);
+            windows->cursor->setPalette(windows->cursor, PALETTE_WHITE);
             windows->cursor->setStill(windows->cursor, 0);
             screen->substate = 0x1F;
             screen->blink = 0;
@@ -641,7 +641,7 @@ void STSTATUS_runTechScreen(TechScreen *screen, TechScreenWindows *windows) {
             screen->substate = screen->step;
             /* the match depends on testing step, not substate */
             if (screen->step == 0x1F) {
-                windows->cursor->setPalette(windows->cursor, 0);
+                windows->cursor->setPalette(windows->cursor, PALETTE_WHITE);
                 windows->cursor->setStill(windows->cursor, 0);
             } else {
                 screen->targetShown = 1;
@@ -749,7 +749,7 @@ void STSTATUS_updateTechScreen(TechScreen *screen, TechScreenWindows *windows) {
 Task *STSTATUS_createTechScreen(FieldMenuScreen *menu, s32 extra) {
     TechScreen *screen = createTask(STSTATUS_updateTechScreen, sizeof(TechScreen), sizeof(TechScreenWindows));
 
-    screen->layer = 0x1000;
+    screen->layer = SCREEN_LAYER;
     screen->depth = 6;
     screen->menu = menu;
     return (Task *)screen;

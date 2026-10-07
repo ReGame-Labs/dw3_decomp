@@ -467,7 +467,7 @@ void STSTATUS_updateSortScreen(SortScreen *screen, SortScreenWindows *windows) {
 Task *STSTATUS_createSortScreen(FieldMenuScreen *menu, s32 extra) {
     SortScreen *screen = createTask(STSTATUS_updateSortScreen, sizeof(SortScreen), sizeof(SortScreenWindows));
 
-    screen->layer = 0x1000;
+    screen->layer = SCREEN_LAYER;
     screen->depth = 2;
     screen->menu = menu;
     return (Task *)screen;

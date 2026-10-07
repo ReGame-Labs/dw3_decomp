@@ -28,4 +28,10 @@ char *strcpy(char *dst, const char *src);
 char *strncpy(char *dst, const char *src, s32 n);
 void *memcpy(void *dst, const void *src, int size);
 
+/* The kernel's file functions (libapi.h); the sim: device is the PC's */
+long open(char *name, unsigned long mode);
+long read(long fd, void *buf, long n);
+long write(long fd, void *buf, long n);
+long close(long fd);
+
 #endif /* GAME_H */

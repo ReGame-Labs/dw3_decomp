@@ -561,7 +561,7 @@ void STCRDSHP_updatePackOpen(CardPackOpen *open, void *win) {
 CardPackOpen *STCRDSHP_createPackOpen(CardShop *shop) {
     CardPackOpen *open = createTask(STCRDSHP_updatePackOpen, sizeof(CardPackOpen), sizeof(CardPackOpenWindows));
 
-    open->layer = 0x1000;
+    open->layer = SCREEN_LAYER;
     open->depth = 6;
     open->shop = shop;
     return open;
@@ -793,7 +793,7 @@ CardPackGrid *STCRDSHP_createGrid(Task *owner, s32 *cards) {
 
     grid->setCards = STCRDSHP_setCards;
     grid->hide = STCRDSHP_hideCards;
-    grid->layer = 0x1000;
+    grid->layer = SCREEN_LAYER;
     grid->depth = 6;
     grid->owner = owner;
     for (i = 0; i < 6; i++, cards++) {

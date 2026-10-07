@@ -83,7 +83,7 @@ void func_800A4D38(StageListMenu *task, StageListMenuChildren *children) {
             break;
         case 3:
             children->cursor->setStill(children->cursor, 1);
-            children->cursor->setPalette(children->cursor, 7);
+            children->cursor->setPalette(children->cursor, PALETTE_GREY);
             stageFuncs.start(&task->tweens[1], 1);
             task->substate++;
             break;
@@ -116,7 +116,7 @@ void func_800A4D38(StageListMenu *task, StageListMenuChildren *children) {
         case 7:
             if (stageFuncs.update(&task->tweens[1])) {
                 children->cursor->setStill(children->cursor, 0);
-                children->cursor->setPalette(children->cursor, 0);
+                children->cursor->setPalette(children->cursor, PALETTE_WHITE);
                 task->substate = 2;
             }
             break;

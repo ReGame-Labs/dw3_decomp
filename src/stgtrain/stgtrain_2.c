@@ -190,7 +190,7 @@ void STGTRAIN_applyTry(TrainResult *result, s32 i) {
             win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), 0x5C);
             win->message[0]->setSubString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), entry->stat + 0x46, 1);
             win->message[0]->setNumber(win->message[0], 2, result->gains[i]);
-            win->message[0]->setPalette(win->message[0], 1);
+            win->message[0]->setPalette(win->message[0], PALETTE_BLUE);
             win->message[1]->setVisible(win->message[1], 0);
         } else {
             s16 other;
@@ -198,7 +198,7 @@ void STGTRAIN_applyTry(TrainResult *result, s32 i) {
             win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), 0x5C);
             win->message[0]->setSubString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), entry->stat + 0x4D, 1);
             win->message[0]->setNumber(win->message[0], 2, result->gains[i]);
-            win->message[0]->setPalette(win->message[0], 1);
+            win->message[0]->setPalette(win->message[0], PALETTE_BLUE);
             other = entry->other;
             if (other != 0) {
                 if ((u16)other - 1 < 5u) {
@@ -206,7 +206,7 @@ void STGTRAIN_applyTry(TrainResult *result, s32 i) {
                         win->message[1]->setString(win->message[1], FILE_CACHE.load(STGTRAIN_TEXT), 0x5D);
                         win->message[1]->setSubString(win->message[1], FILE_CACHE.load(STGTRAIN_TEXT), entry->other + 0x46, 1);
                         win->message[1]->setNumber(win->message[1], 2, result->losses[i]);
-                        win->message[1]->setPalette(win->message[1], 5);
+                        win->message[1]->setPalette(win->message[1], PALETTE_RED);
                     } else {
                         win->message[1]->setVisible(win->message[1], 0);
                     }
@@ -214,13 +214,13 @@ void STGTRAIN_applyTry(TrainResult *result, s32 i) {
                     win->message[1]->setString(win->message[1], FILE_CACHE.load(STGTRAIN_TEXT), 0x5C);
                     win->message[1]->setSubString(win->message[1], FILE_CACHE.load(STGTRAIN_TEXT), entry->other + 0x44, 1);
                     win->message[1]->setNumber(win->message[1], 2, result->losses[i]);
-                    win->message[1]->setPalette(win->message[1], 1);
+                    win->message[1]->setPalette(win->message[1], PALETTE_BLUE);
                 }
             }
         }
     } else {
         win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), 0x46);
-        win->message[0]->setPalette(win->message[0], 0);
+        win->message[0]->setPalette(win->message[0], PALETTE_WHITE);
         win->message[1]->setVisible(win->message[1], 0);
     }
 }
@@ -509,7 +509,7 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
 #endif
                 }
             }
-            win->message[0]->setPalette(win->message[0], 0);
+            win->message[0]->setPalette(win->message[0], PALETTE_WHITE);
             win->message[0]->setTypeDelay(win->message[0], 6);
             win->message[1]->setVisible(win->message[1], 0);
             result->substate++;
@@ -608,10 +608,10 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
                 win->actor->play(win->actor);
                 result->bonusSound = SOUND.playSound(0xA084603C);
                 stats = GAME.funcs.getPartnerStats(result->partner);
-                if (stats->unk3CC[0] != 0 && stats->unk3CC[0] == result->training) {
+                if (stats->lastBonus != 0 && stats->lastBonus == result->training) {
                     win->actor->setChance(win->actor, 0);
                 } else {
-                    stats->unk3CC[0] = 0;
+                    stats->lastBonus = 0;
                     win->actor->setChance(win->actor, 0x32);
                 }
             } else {
@@ -625,10 +625,10 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
         if (result->trained[3] != -1) {
             stats = GAME.funcs.getPartnerStats(result->partner);
             if (result->trained[3] != 0) {
-                stats->unk3CC[0] = result->training;
+                stats->lastBonus = result->training;
                 result->bonusWorked = 1;
             } else {
-                stats->unk3CC[0] = 0;
+                stats->lastBonus = 0;
             }
             if (result->trained[3] != 0) {
                 SOUND.playSound(0x840001);
@@ -688,7 +688,7 @@ void STGTRAIN_updateResult(TrainResult *result, TrainResultWindows *win) {
 TrainResult *STGTRAIN_createResult(TrainScreen *screen, s32 partner, s32 training) {
     TrainResult *result = createTask(STGTRAIN_updateResult, sizeof(TrainResult), sizeof(TrainResultWindows));
 
-    result->layerId = 0x1000;
+    result->layerId = SCREEN_LAYER;
     result->depth = 6;
     result->screen = screen;
     result->partner = partner;
@@ -739,7 +739,7 @@ void STGTRAIN_updateIdle(TrainIdle *task, void *children) {
 TrainIdle *STGTRAIN_createIdle(TrainScreen *screen) {
     TrainIdle *task = createTask(STGTRAIN_updateIdle, sizeof(TrainIdle), 0);
 
-    task->layerId = 0x1000;
+    task->layerId = SCREEN_LAYER;
     task->depth = 6;
     task->screen = screen;
     return task;

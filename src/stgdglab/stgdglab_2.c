@@ -53,10 +53,10 @@ void STGDGLAB_showEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windows
         for (i = 0; i < 10; i++) {
             id = panel->entries[panel->scroll * 2 + i];
             if (id >= 3) {
-                windows->entries[i]->setPalette(windows->entries[i], 0);
+                windows->entries[i]->setPalette(windows->entries[i], PALETTE_WHITE);
                 for (j = 0; j < 3; j++) {
                     if (panel->slots[j] == id) {
-                        windows->entries[i]->setPalette(windows->entries[i], 7);
+                        windows->entries[i]->setPalette(windows->entries[i], PALETTE_GREY);
                         break;
                     }
                 }
@@ -83,13 +83,13 @@ void STGDGLAB_showEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windows
                 windows->values[i]->setNumber(windows->values[i], 0, value);
             }
             if (totals.fields.lowered[0] != 0) {
-                windows->values[0]->setPalette(windows->values[0], 6);
+                windows->values[0]->setPalette(windows->values[0], PALETTE_PURPLE);
             }
             if (totals.fields.lowered[1] != 0) {
-                windows->values[1]->setPalette(windows->values[1], 6);
+                windows->values[1]->setPalette(windows->values[1], PALETTE_PURPLE);
             }
             if (totals.fields.lowered[2] != 0) {
-                windows->values[4]->setPalette(windows->values[4], 6);
+                windows->values[4]->setPalette(windows->values[4], PALETTE_PURPLE);
             }
             stats = totals.stats;
             for (i = 0; i < 7; i++) {
@@ -104,11 +104,11 @@ void STGDGLAB_showEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windows
                     windows->skills[i]->setString(windows->skills[i], FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)),
                                                   entry.skills[i] & SKILL_ID);
                     if (entry.skills[i] & SKILL_LAST) {
-                        windows->skills[i]->setPalette(windows->skills[i], 3);
+                        windows->skills[i]->setPalette(windows->skills[i], PALETTE_YELLOW);
                     } else if (entry.skills[i] & SKILL_MARKED) {
-                        windows->skills[i]->setPalette(windows->skills[i], 4);
+                        windows->skills[i]->setPalette(windows->skills[i], PALETTE_GREEN);
                     } else {
-                        windows->skills[i]->setPalette(windows->skills[i], 0);
+                        windows->skills[i]->setPalette(windows->skills[i], PALETTE_WHITE);
                     }
                 } else {
                     windows->skills[i]->setVisible(windows->skills[i], 0);
@@ -341,7 +341,7 @@ void STGDGLAB_updateEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windo
         case 2:
             panel->fades[1].duration = 10;
             STGDGLAB_data.funcs.startFade(&panel->fades[1], 1);
-            windows->cursor->setPalette(windows->cursor, 7);
+            windows->cursor->setPalette(windows->cursor, PALETTE_GREY);
             windows->cursor->setStill(windows->cursor, 1);
             panel->substate++;
             break;
@@ -462,7 +462,7 @@ void STGDGLAB_updateEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windo
 LabEntryPanel *STGDGLAB_createEntryPanel(s32 partner, s32 slot) {
     LabEntryPanel *panel = createTask(STGDGLAB_updateEntryPanel, sizeof(LabEntryPanel), 0xA0);
 
-    panel->layer = 0x1000;
+    panel->layer = SCREEN_LAYER;
     panel->depth = 6;
     panel->partner = partner;
     panel->slot = slot;

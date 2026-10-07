@@ -379,8 +379,8 @@ void FIELDSTG_drawCover(s32 id, s32 level) {
     s32 y;
 
     if (layer != NULL) {
-        for (y = 0; y < FIELD_SCREEN_HEIGHT; y += 0x80) {
-            for (x = 0; x < FIELD_SCREEN_WIDTH; x += 0x80) {
+        for (y = 0; y < SCREEN_HEIGHT; y += 0x80) {
+            for (x = 0; x < SCREEN_WIDTH; x += 0x80) {
                 FIELDSTG_drawCoverBlock(layer, x, y, level);
             }
         }
