@@ -15,7 +15,7 @@ void func_800A5DFC(StageTileLift *task) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        for (rec = D_800990B4.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
             switch (rec->anim) {
             case 2:
                 task->tiles[1] = rec;
@@ -152,27 +152,27 @@ StageTask *startStage(void *owner) {
     return task;
 }
 
-/* the color the setup copies to D_800990B4.spriteColor */
+/* the color the setup copies to FIELDSTG_state.spriteColor */
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0 };
 
 void setupStage(void) {
-    D_800990B4.textFile = LANGUAGE + 0xFD;
-    D_800990B4.mapFile = 0x1AC;
-    D_800990B4.sheetEntry = 0x8FB0000;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = 0x8FA;
-    D_800990B4.start = (Vec2){0x6700, 0x12300};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 0x42;
-    D_800990B4.startDir = 0;
-    D_800990B4.music = 0x61080002;
-    D_800990B4.actors = stageActors;
-    D_800990B4.spriteColor = stageColor;
-    D_8009A70C.setFile(0, 0x8FB0001);
-    D_8009A70C.setFile(1, 0x8FB0002);
-    D_8009A70C.setFile(7, 0x8FB0003);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = LANGUAGE + 0xFD;
+    FIELDSTG_state.mapFile = 0x1AC;
+    FIELDSTG_state.sheetEntry = 0x8FB0000;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = 0x8FA;
+    FIELDSTG_state.start = (Vec2){0x6700, 0x12300};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 0x42;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.music = 0x61080002;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.spriteColor = stageColor;
+    FIELDSTG_map.setFile(0, 0x8FB0001);
+    FIELDSTG_map.setFile(1, 0x8FB0002);
+    FIELDSTG_map.setFile(7, 0x8FB0003);
+    FIELDSTG_map.setFirstMap(0);
 }
 
 #include "common/start_tween.inc.c"

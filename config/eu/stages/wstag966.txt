@@ -6,7 +6,7 @@ setupStage = 0x800A5FB4; // type:func
 placePoints = 0x800A61F0; // size:0x1C
 stageFuncs = 0x800A6558; // size:0x4
 
-// named by their use (D_800990B4, the field state, in setupStage)
+// named by their use (FIELDSTG_state, the field state, in setupStage)
 stageObjects = 0x800A6298;
 stageSlots = 0x800A6510;
 stageImages = 0x800A620C;

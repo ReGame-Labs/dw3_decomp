@@ -18,28 +18,28 @@ extern FieldBattles D_800A54F4[];
 #define STAGE_ARCHIVE 0x3D5
 #endif
 void setupStage(void) {
-    D_800990B4.textFile = STAGE_TEXT;
-    D_800990B4.mapFile = STAGE_FILE - 1;
-    D_800990B4.sheetEntry = STAGE_FILE << 16 | 1;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = STAGE_ARCHIVE;
-    D_800990B4.start = (Vec2){0x13800, 0x27100};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 0x2D;
-    D_800990B4.music = 0x60B40000;
-    D_800990B4.startDir = 0;
-    D_800990B4.actors = stageActors;
-    D_8009A70C.setFile(0, STAGE_FILE << 16);
-    D_8009A70C.setFile(7, STAGE_FILE << 16 | 2);
-    D_8009A70C.setFile(4, STAGE_FILE << 16 | 3);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE - 1;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16 | 1;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = STAGE_ARCHIVE;
+    FIELDSTG_state.start = (Vec2){0x13800, 0x27100};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 0x2D;
+    FIELDSTG_state.music = 0x60B40000;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_map.setFile(0, STAGE_FILE << 16);
+    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFirstMap(0);
     if (GAME.progress < 0xB) {
-        D_800990B4.battles = D_800A54BC;
+        FIELDSTG_state.battles = D_800A54BC;
     } else if (GAME.progress < 0x18) {
-        D_800990B4.battles = D_800A54D8;
+        FIELDSTG_state.battles = D_800A54D8;
     } else {
-        D_800990B4.battles = D_800A54F4;
+        FIELDSTG_state.battles = D_800A54F4;
     }
 }
 

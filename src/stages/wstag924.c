@@ -14,23 +14,23 @@ extern s32 D_800A7A44[];
 #include "common/start_stage.inc.c"
 
 void setupStage(void) {
-    D_800990B4.textFile = LANGUAGE + 0xFD;
-    D_800990B4.mapFile = 0x19C;
-    D_800990B4.sheetEntry = 0x8E70000;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = 0x8E5;
-    D_800990B4.start = (Vec2){0x10200, 0x15700};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 0x33;
-    D_800990B4.music = 0x60CC0000;
-    D_800990B4.actors = stageActors;
-    D_800990B4.startDir = 0;
-    D_800990B4.spriteColor = stageColor;
-    D_800990B4.events = stageEvents;
-    D_8009A70C.setFile(0, 0x8E70001);
-    D_8009A70C.setFile(7, 0x8E70002);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = LANGUAGE + 0xFD;
+    FIELDSTG_state.mapFile = 0x19C;
+    FIELDSTG_state.sheetEntry = 0x8E70000;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = 0x8E5;
+    FIELDSTG_state.start = (Vec2){0x10200, 0x15700};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 0x33;
+    FIELDSTG_state.music = 0x60CC0000;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.spriteColor = stageColor;
+    FIELDSTG_state.events = stageEvents;
+    FIELDSTG_map.setFile(0, 0x8E70001);
+    FIELDSTG_map.setFile(7, 0x8E70002);
+    FIELDSTG_map.setFirstMap(0);
 }
 
 #include "common/start_tween.inc.c"

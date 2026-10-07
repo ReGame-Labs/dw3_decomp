@@ -41,28 +41,28 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #define STAGE_FILE 0x46E
 #endif
 void setupStage(void) {
-    D_800990B4.textFile = STAGE_TEXT;
-    D_800990B4.mapFile = STAGE_FILE - 1;
-    D_800990B4.sheetEntry = STAGE_FILE << 16;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = STAGE_FILE - 2;
-    D_800990B4.start = (Vec2){0x11600, 0x10600};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 0x14;
-    D_800990B4.music = 0x60500000;
-    D_800990B4.actors = stageActors;
-    D_800990B4.startDir = 0;
-    D_800990B4.spriteColor = stageColor;
-    D_800990B4.events = stageEvents;
-    D_800990B4.battles = stageBattles;
-    D_8009A70C.setFile(0, STAGE_FILE << 16 | 1);
-    D_8009A70C.setFile(7, STAGE_FILE << 16 | 2);
-    D_8009A70C.setFile(4, STAGE_FILE << 16 | 3);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE - 1;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = STAGE_FILE - 2;
+    FIELDSTG_state.start = (Vec2){0x11600, 0x10600};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 0x14;
+    FIELDSTG_state.music = 0x60500000;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.spriteColor = stageColor;
+    FIELDSTG_state.events = stageEvents;
+    FIELDSTG_state.battles = stageBattles;
+    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
-        D_800990B4.soundBank = 0x1F;
-        D_800990B4.music = 0x607C0000;
+        FIELDSTG_state.soundBank = 0x1F;
+        FIELDSTG_state.music = 0x607C0000;
     }
 }
 
@@ -442,6 +442,6 @@ FieldEvent stageEvents[] = {
     { 1225, D_800A4F9C, EVENT_TEXT(0xA), NULL, NULL },
     { 1269, D_800A5010, EVENT_TEXT(0xE), NULL, func_800A4DA4 },
     { 1270, D_800A5080, EVENT_TEXT(0xF), NULL, func_800A4DF0 },
-    { 9000, NULL, 0, func_8008B258, NULL },
+    { 9000, NULL, 0, FIELDSTG_startEventBattle5, NULL },
     { -1, NULL, 0, NULL, NULL },
 };

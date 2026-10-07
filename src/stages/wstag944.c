@@ -5,23 +5,23 @@
 #include "common/start_stage.inc.c"
 
 void setupStage(void) {
-    D_800990B4.textFile = LANGUAGE + 0x104;
-    D_800990B4.mapFile = 0x1B8;
-    D_800990B4.sheetEntry = 0x90F0000;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = 0x90E;
-    D_800990B4.start = (Vec2){0x2D600, 0x8000};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 0x2D;
-    D_800990B4.music = 0x60B40000;
-    D_800990B4.actors = stageActors;
-    D_800990B4.startDir = 0;
-    D_800990B4.battles = stageBattles;
-    D_8009A70C.setFile(0, 0x90F0002);
-    D_8009A70C.setFile(7, 0x90F0003);
-    D_8009A70C.setFile(4, 0x90F0001);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = LANGUAGE + 0x104;
+    FIELDSTG_state.mapFile = 0x1B8;
+    FIELDSTG_state.sheetEntry = 0x90F0000;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = 0x90E;
+    FIELDSTG_state.start = (Vec2){0x2D600, 0x8000};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 0x2D;
+    FIELDSTG_state.music = 0x60B40000;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.battles = stageBattles;
+    FIELDSTG_map.setFile(0, 0x90F0002);
+    FIELDSTG_map.setFile(7, 0x90F0003);
+    FIELDSTG_map.setFile(4, 0x90F0001);
+    FIELDSTG_map.setFirstMap(0);
 }
 
 extern u16 D_800A6020[];

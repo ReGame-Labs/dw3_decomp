@@ -67,10 +67,9 @@ C_SRC += src/stcrdshp/stcrdshp_2.c src/stcrdshp/stcrdshp_3.c
 C_SRC += src/shocktst/shocktst.c src/cnty_sel/cnty_sel.c src/stcrdabm/stcrdabm.c
 C_SRC += src/stagslct/stagslct.c src/stdgname/stdgname.c src/stdgname/stdgname_2.c
 C_SRC += src/stdwtitl/stdwtitl.c src/stdwtitl/stdwtitl_2.c src/stdwtitl/data/movie.c
-C_SRC += src/fieldstg/fieldstg.c
 C_SRC += src/stcrddek/stcrddek.c src/stgtrain/stgtrain.c src/fightstg/fightstg.c
-# fieldstg's other objects
-C_SRC += $(addprefix src/fieldstg/, fieldstg_2.c fieldstg_3.c fieldstg_4.c fieldstg_5.c)
+# fieldstg's modules, and its data
+C_SRC += $(wildcard src/fieldstg/*.c) src/fieldstg/data/fieldstg.c
 # stgtrain's other objects
 C_SRC += src/stgtrain/stgtrain_2.c src/stgtrain/stgtrain_3.c
 

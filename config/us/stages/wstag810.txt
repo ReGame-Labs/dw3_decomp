@@ -14,7 +14,7 @@ effectClutFrames = 0x800A6398; // size:0x18
 effectFrames = 0x800A63B0; // size:0x58
 stageFuncs = 0x800A6E90; // size:0x4
 
-// named by their use (D_800990B4, the field state, in setupStage)
+// named by their use (FIELDSTG_state, the field state, in setupStage)
 stageObjects = 0x800A6770;
 stageImages = 0x800A6634;
 stageActors = 0x800A6760;

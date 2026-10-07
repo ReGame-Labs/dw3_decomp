@@ -171,7 +171,7 @@ void func_800A5344(StageEffect *task, void *arg) {
         drawer.setTexture(0x140, 0x100);
         drawer.setLayer(layer, 4);
         drawer.setClutRow(0);
-        drawer.draw(FILE_CACHE.getEntry(D_800990B4.sheetEntry), task->frame, task->x, task->y);
+        drawer.draw(FILE_CACHE.getEntry(FIELDSTG_state.sheetEntry), task->frame, task->x, task->y);
     }
 }
 
@@ -246,7 +246,7 @@ void func_800A5668(StageTileLoop2 *task) {
         task->tiles[0].anim.timer = D_800A73C4[0][0].duration;
         task->tiles[1].anim.index = 0;
         task->tiles[1].anim.timer = D_800A73C4[1][0].duration;
-        for (t = D_800990B4.objects; t->unk2 != 0; t++) {
+        for (t = FIELDSTG_state.objects; t->unk2 != 0; t++) {
             switch (t->anim) {
             case 1:
                 task->tiles[0].tile = t;
@@ -635,32 +635,32 @@ void func_800A7644(void) {
 #define STAGE_ARCHIVE 0x320
 #endif
 void setupStage(void) {
-    D_800990B4.textFile = STAGE_TEXT;
-    D_800990B4.mapFile = STAGE_FILE - 1;
-    D_800990B4.sheetEntry = STAGE_FILE << 16;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.imageFile = STAGE_ARCHIVE;
-    D_800990B4.start = (Vec2){0x1C700, 0x12C00};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.startDir = 0;
-    D_800990B4.soundBank = 0x29;
-    D_800990B4.music = 0x60A40000;
-    D_800990B4.actors = stageActors;
-    D_800990B4.events = stageEvents;
-    D_8009A70C.setFile(0, STAGE_FILE << 16 | 1);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE - 1;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.imageFile = STAGE_ARCHIVE;
+    FIELDSTG_state.start = (Vec2){0x1C700, 0x12C00};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.soundBank = 0x29;
+    FIELDSTG_state.music = 0x60A40000;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.events = stageEvents;
+    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFirstMap(0);
     switch (GAME.progress) {
     case 0x1B:
-        D_800990B4.soundBank = 0x29;
-        D_800990B4.music = 0x60A40001;
+        FIELDSTG_state.soundBank = 0x29;
+        FIELDSTG_state.music = 0x60A40001;
         break;
     case 0x20:
-        D_800990B4.soundBank = 0x29;
-        D_800990B4.music = 0x60A40002;
+        FIELDSTG_state.soundBank = 0x29;
+        FIELDSTG_state.music = 0x60A40002;
         break;
     case 0x27:
-        D_800990B4.soundBank = 0x29;
-        D_800990B4.music = 0x60A40003;
+        FIELDSTG_state.soundBank = 0x29;
+        FIELDSTG_state.music = 0x60A40003;
         break;
     }
 }

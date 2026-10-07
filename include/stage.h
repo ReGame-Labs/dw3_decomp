@@ -11,7 +11,7 @@
  *   FIELDSTG_stages, which links it as WSTAGnnn_startStage, include/stages.h):
  *   creates the StageTask, updateStage, and runs the stage's setup through
  *   its stageFuncs;
- * - setupStage(), the first of stageFuncs: fills D_800990B4 (FieldState)
+ * - setupStage(), the first of stageFuncs: fills FIELDSTG_state (FieldState)
  *   with the stage's file, text, map objects, triggers and battles;
  * - stepAnimation and its kin, the animation steppers.
  *
@@ -104,7 +104,7 @@ typedef struct StageTween {
  * (startTween and updateTween)
  */
 typedef struct StageFuncs {
-    /* 0x0 */ void (*setup)(void); /* fills D_800990B4 */
+    /* 0x0 */ void (*setup)(void); /* fills FIELDSTG_state */
     /* 0x4 */ void (*start)(StageTween *tween, s32 up);
     /* 0x8 */ s32 (*update)(StageTween *tween); /* whether it has ended */
 } StageFuncs;
@@ -750,7 +750,7 @@ typedef struct StageListMenuChildren {
  * The files a stage's setup function gives FIELDSTG, numbered differently in
  * each version, are the stage's own defines: STAGE_TEXT, its text file (the
  * European version adds the language), and STAGE_FILE, the file whose
- * entries go to D_8009A70C.setFile (STAGE_FILE << 16 | n), its neighbours
+ * entries go to FIELDSTG_map.setFile (STAGE_FILE << 16 | n), its neighbours
  * usually the files at mapFile and imageFile (STAGE_FILE_8 and STAGE_ARCHIVE
  * otherwise). EVENT_TEXT_FILE is the text file of the stage's events,
  * counted from TEXT_FILE(1) as FieldEvent.text is.
@@ -775,7 +775,7 @@ extern StageFuncs stageFuncs;
 extern void (*stageFuncs[])(void);
 #endif
 
-/* The tables and color setupStage gives D_800990B4 (FieldState) */
+/* The tables and color setupStage gives FIELDSTG_state (FieldState) */
 extern StageTile stageObjects[];
 extern StageSlot stageSlots[];
 extern ActorImage stageImages[];

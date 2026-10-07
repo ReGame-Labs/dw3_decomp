@@ -71,7 +71,6 @@ stageObjects = 0x800A78B4;
 D_800A6968 = 0x800A7AAC;
 D_800A6C68 = 0x800A7DAC;
 stageEvents = 0x800A7FD8;
-D_8009A70C = 0x8009B6C4;
 
 // the names the stages share (the same code or data in each)
 stepTileAnimation = 0x800A5DE0; // type:func

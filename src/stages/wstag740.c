@@ -131,7 +131,7 @@ void func_800A5130(StageSpritePair *task, void *arg, s32 idx) {
     drawer.setTexture(0x140, 0x100);
     drawer.setLayer(layer, 4);
     drawer.setClutRow(sprite->clutRow);
-    drawer.draw(FILE_CACHE.getEntry(D_800990B4.sheetEntry), sprite->frame, task->x, task->y);
+    drawer.draw(FILE_CACHE.getEntry(FIELDSTG_state.sheetEntry), sprite->frame, task->x, task->y);
 }
 
 void func_800A51E8(StageSpritePair *task) {
@@ -282,25 +282,25 @@ void func_800A56F4(void) {
 #define STAGE_FILE 0x6DD
 #endif
 void setupStage(void) {
-    D_800990B4.textFile = STAGE_TEXT;
-    D_800990B4.mapFile = STAGE_FILE - 1;
-    D_800990B4.sheetEntry = STAGE_FILE << 16;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = STAGE_FILE - 2;
-    D_800990B4.start = (Vec2){0x12200, 0x2F400};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 0x19;
-    D_800990B4.music = 0x60640000;
-    D_800990B4.actors = stageActors;
-    D_800990B4.startDir = 0;
-    D_800990B4.spriteColor = stageColor;
-    D_800990B4.battles = stageBattles;
-    D_800990B4.events = stageEvents;
-    D_8009A70C.setFile(0, STAGE_FILE << 16 | 1);
-    D_8009A70C.setFile(7, STAGE_FILE << 16 | 2);
-    D_8009A70C.setFile(4, STAGE_FILE << 16 | 3);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE - 1;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = STAGE_FILE - 2;
+    FIELDSTG_state.start = (Vec2){0x12200, 0x2F400};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 0x19;
+    FIELDSTG_state.music = 0x60640000;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.spriteColor = stageColor;
+    FIELDSTG_state.battles = stageBattles;
+    FIELDSTG_state.events = stageEvents;
+    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(4, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFirstMap(0);
 }
 
 void func_800A5414();
@@ -596,6 +596,6 @@ FieldEvent stageEvents[] = {
     { 9013, NULL, 0, func_800A4F30, func_800A569C },
     { 9014, NULL, 0, func_800A4F30, func_800A56C8 },
     { 9015, NULL, 0, func_800A4F30, func_800A56F4 },
-    { 9016, NULL, 0, func_8008B258, NULL },
+    { 9016, NULL, 0, FIELDSTG_startEventBattle5, NULL },
     { -1, NULL, 0, NULL, NULL },
 };

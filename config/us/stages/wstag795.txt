@@ -7,7 +7,7 @@ startStage = 0x800A5518; // type:func
 setupStage = 0x800A55EC; // type:func
 stageFuncs = 0x800A61E4; // size:0x4
 
-// named by their use (D_800990B4, the field state, in setupStage)
+// named by their use (FIELDSTG_state, the field state, in setupStage)
 stageObjects = 0x800A5FB0;
 stageSlots = 0x800A613C;
 stageImages = 0x800A5B6C;

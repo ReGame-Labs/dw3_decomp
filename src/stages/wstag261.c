@@ -15,7 +15,7 @@ void func_800A4CC0(StageTileLift *task) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        for (rec = D_800990B4.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
             switch (rec->anim) {
             case 2:
                 task->tiles[1] = rec;
@@ -161,7 +161,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-/* the color the setup copies to D_800990B4.spriteColor */
+/* the color the setup copies to FIELDSTG_state.spriteColor */
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0 };
 
 #if VERSION_US
@@ -174,24 +174,24 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0 };
 #define STAGE_FILE 0x527
 #endif
 void setupStage(void) {
-    D_800990B4.textFile = STAGE_TEXT;
-    D_800990B4.mapFile = STAGE_FILE - 1;
-    D_800990B4.sheetEntry = STAGE_FILE << 16;
-    D_800990B4.objects = stageObjects;
-    D_800990B4.slots = stageSlots;
-    D_800990B4.imageFile = STAGE_FILE - 2;
-    D_800990B4.start = (Vec2){0x10300, 0x18500};
-    D_800990B4.images.actors = stageImages;
-    D_800990B4.soundBank = 0x42;
-    D_800990B4.actors = stageActors;
-    D_800990B4.startDir = 0;
-    D_800990B4.music = 0x61080002;
-    D_800990B4.spriteColor = stageColor;
-    D_800990B4.events = stageEvents;
-    D_8009A70C.setFile(0, STAGE_FILE << 16 | 1);
-    D_8009A70C.setFile(1, STAGE_FILE << 16 | 3);
-    D_8009A70C.setFile(7, STAGE_FILE << 16 | 2);
-    D_8009A70C.unk50(0);
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE - 1;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
+    FIELDSTG_state.objects = stageObjects;
+    FIELDSTG_state.slots = stageSlots;
+    FIELDSTG_state.imageFile = STAGE_FILE - 2;
+    FIELDSTG_state.start = (Vec2){0x10300, 0x18500};
+    FIELDSTG_state.images.actors = stageImages;
+    FIELDSTG_state.soundBank = 0x42;
+    FIELDSTG_state.actors = stageActors;
+    FIELDSTG_state.startDir = 0;
+    FIELDSTG_state.music = 0x61080002;
+    FIELDSTG_state.spriteColor = stageColor;
+    FIELDSTG_state.events = stageEvents;
+    FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(1, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFirstMap(0);
 }
 
 extern u16 D_800A55E0[];

@@ -2,8 +2,10 @@
 #define FIELD_MAP_H
 
 /*
- * FIELDSTG's map and the functions that read it, which the stages call too,
- * and the records of the tables that each stage gives FIELDSTG.
+ * What the stage overlays and the executable use of FIELDSTG (fieldstg.h has
+ * the rest): its layers and task ids, the map and the functions that read
+ * it, the records of the tables that each stage gives FIELDSTG, the field's
+ * state, and the functions the stages and the executable call.
  * The map is a tree of cells: a grid of 128-pixel cells, then levels of 64,
  * 32, 16 and 8 pixels, each cell four of the next level's, then a byte for
  * each pixel of the 8x8 blocks.
@@ -12,6 +14,29 @@
 #include "game.h"
 
 struct Point; /* fieldstg.h */
+
+/* The field's drawing layers, by their ids (GFX.funcs.createLayer), as
+   FIELDSTG_updateField creates them */
+#define FIELD_LAYER_BACK 0x1000 /* the background's color */
+#define FIELD_LAYER_COVER 0x1001 /* the cover that fades the screen (FIELDSTG_drawCover) */
+#define FIELD_LAYER_MAP 0x1002 /* the map, its objects and characters, and the menus */
+#define FIELD_LAYER_BANNER 0x1003 /* the area name banner */
+#define FIELD_LAYER_TEXT 0x1004 /* the message and talk boxes */
+
+/* The ids of the field's tasks (createTaskWithId, TASK_REGISTRY.funcs.find) */
+#define FIELD_TASK_MAP 4 /* FIELDSTG_createMapStreamer's */
+#define FIELD_TASK_ACTOR 5 /* every character (FIELDSTG_createActor) */
+#define FIELD_TASK_FIELD 7 /* the field's main task (FIELDSTG_createField) */
+#define FIELD_TASK_BANNER 9 /* the area name banner */
+#define FIELD_TASK_HIDDEN_SPOTS 0xB
+#define FIELD_TASK_CAMERA 0x10
+#define FIELD_TASK_ICON 0x16 /* the icon over the player's head */
+#define FIELD_TASK_LAUNCHER 0x17 /* a stage's launchers (FIELDSTG_runLaunch) */
+
+/* Some of FieldMap's maps (files): those of the floors the player walks on
+   come first, and GAME.unk26D8 picks one */
+#define FIELD_MAP_AREAS 4 /* a cell's value: its battle area (FieldBattles), or 0 */
+#define FIELD_MAP_TRIGGERS 7 /* a cell's value: a direction (3 bits) and a StageSlot (5) */
 
 typedef struct FieldMap {
     /* 0x00 */ s32 files[8]; /* the file entry of each map, set by setFile */
@@ -23,16 +48,17 @@ typedef struct FieldMap {
     /* 0x34 */ s16 *cells16;
     /* 0x38 */ s16 *cells8;
     /* 0x3C */ u8 *pixels;
-    /* 0x40 */ void (*setFile)(s32 index, s32 file); /* func_80091B78 */
-    /* 0x44 */ s32 (*getCell)(s32 index, struct Point *pos); /* func_80091BC0 */
-    /* 0x48 */ void (*unk48)(struct Point *pos, s32 scale, s32 index, struct Point *out);
-    /* 0x4C */ void (*unk4C)(struct Point *pos, s32 scale, s32 index, struct Point *out);
-    /* 0x50 */ void (*unk50)(s32 arg0); /* func_80091B90: sets GAME.unk26D8 if GAME.clearTempFlags */
-    /* 0x54 */ void (*unk54)(s32 arg0); /* func_80091BB4: sets GAME.unk26D8 */
-    /* 0x58 */ s32 (*unk58)(struct Point *pos); /* FIELDSTG_isTileFree: 0 where a character or an object stands */
+    /* 0x40 */ void (*setFile)(s32 index, s32 file); /* FIELDSTG_setMapFile */
+    /* 0x44 */ s32 (*getCell)(s32 index, struct Point *pos); /* FIELDSTG_getMapCell */
+    /* 0x48 */ void (*getWalkStep)(struct Point *pos, s32 scale, s32 dir, struct Point *out); /* FIELDSTG_getWalkStep */
+    /* 0x4C */ void (*getFlyStep)(struct Point *pos, s32 scale, s32 dir, struct Point *out); /* FIELDSTG_getFlyStep */
+    /* 0x50 */ void (*setFirstMap)(s32 index); /* FIELDSTG_setFirstMap: the map the player starts on
+                                                  (GAME.unk26D8), when the mode is new */
+    /* 0x54 */ void (*setMap)(s32 index); /* FIELDSTG_setMap: the map the player is on */
+    /* 0x58 */ s32 (*isTileFree)(struct Point *pos); /* FIELDSTG_isTileFree: 0 where a character or an object stands */
 } FieldMap;
 
-extern FieldMap D_8009A70C;
+extern FieldMap FIELDSTG_map;
 
 /* Where an actor's frames go in VRAM: one of the records after the
    FieldImage (Actor.image) */
@@ -80,7 +106,7 @@ typedef struct FieldTalk {
     /* 0x8 */ s32 unk8; /* FIELDSTG_createTalk's */
 } FieldTalk;
 
-/* A character of the field (FieldState.actors, a list of pointers up to NULL), which func_8008A154 creates
+/* A character of the field (FieldState.actors, a list of pointers up to NULL), which FIELDSTG_updateField creates
    unless its conditions fail. Ids 1, 0x6A, 0x146 and 0x147 are the player's. */
 typedef struct FieldActorEntry {
     /* 0x00 */ u16 *conditions; /* FLAGS_00.checkConditions's, or NULL */
@@ -116,28 +142,50 @@ typedef struct StageTile {
     /* 0x10 */ s16 cycleTime; /* in 1/256 frames; bit 15: going back */
 } StageTile;
 
+/* The kinds of StageSlot (type). SLOT_DEPTH, SLOT_MAP, SLOT_EVENT, the slides
+   and SLOT_LAUNCH act as the player steps on them; the others show a balloon
+   and wait for cross, and those up to SLOT_GAUGE only while the player faces
+   them (FIELDSTG_findTrigger) */
+#define SLOT_EXIT 1 /* leaves for mode unkA at (unkC, unkE), facing unk10 */
+#define SLOT_CLIMB_UP 2
+#define SLOT_CLIMB_DOWN 3
+#define SLOT_DROP 4
+#define SLOT_DEPTH 5 /* the player's depth, unkA */
+#define SLOT_MAP 6 /* the map the player is on, unkA (FieldMap.setMap) */
+#define SLOT_GAUGE 7 /* the gauge game */
+#define SLOT_EVENT 8 /* starts the event unkA */
+#define SLOT_WARP1 9 /* a warp (FieldWarp at unkA) with effect and cutscene 1 */
+#define SLOT_WARP0 10 /* the same with effect and cutscene 0 */
+#define SLOT_SLIDE 11
+#define SLOT_STOP_SLIDE 12
+#define SLOT_LAUNCH 13 /* sends the player flying (FIELDSTG_launchActor) */
+#define SLOT_LAUNCH_OUT 14 /* the same, then leaves for mode unkA */
+
 /*
  * What the player can trigger on a map (FIELDSTG_updateTriggers): a record
  * of the table at FieldState.slots, which ends with type 0,
- * where the points are copied to
+ * where the points are copied to. The stages also fill unkA to unk16 by
+ * name (copyPlacePoints, in src/stages/common), so those keep their offsets'
+ * names until the stages are renamed with them.
  */
 typedef struct StageSlot {
     /* 0x00 */ u16 conditions[2][2]; /* flag code and value, or code 0xFFFF */
-    /* 0x08 */ u16 type;
-    /* 0x0A */ u16 unkA;
-    /* 0x0C */ u16 unkC;
-    /* 0x0E */ u16 unkE;
-    /* 0x10 */ u16 unk10;
-    /* 0x12 */ u16 unk12; /* the id of the map objects to clear, or 0 */
-    /* 0x14 */ u16 unk14;
-    /* 0x16 */ u16 unk16;
+    /* 0x08 */ u16 type; /* SLOT_EXIT... */
+    /* 0x0A */ u16 unkA; /* by type: a mode, a depth, a map, an event or a height (in 16
+                            pixels, plus 1 for a climb); a warp's FieldWarp starts here */
+    /* 0x0C */ u16 unkC; /* x */
+    /* 0x0E */ u16 unkE; /* y */
+    /* 0x10 */ u16 unk10; /* the direction */
+    /* 0x12 */ u16 unk12; /* the animation of the map objects to hide, or 0 */
+    /* 0x14 */ u16 unk14; /* copied to GAME.unk44, the place (FieldBattles.id) */
+    /* 0x16 */ u16 unk16; /* copied to GAME.unk46 */
 } StageSlot;
 
 /* A battle that can start on the field (see FIELDSTG_startEncounter) */
 typedef struct Battle {
-    /* 0x0 */ s32 unk0; /* the encounter, of FIELDSTG_encounters */
-    /* 0x4 */ s32 unk4; /* the fight stage, for BATTLE_SETUP.stage */
-    /* 0x8 */ s32 unk8; /* the music, for BATTLE_SETUP.music */
+    /* 0x0 */ s32 encounter; /* of FIELDSTG_encounters */
+    /* 0x4 */ s32 stage; /* the fight stage, for BATTLE_SETUP.stage */
+    /* 0x8 */ s32 music; /* for BATTLE_SETUP.music */
 } Battle;
 
 /* The battles of an area of the map (its cells' value at FieldMap.files[4]),
@@ -150,7 +198,7 @@ typedef struct BattleList {
 /*
  * The battles of a place (FieldState.battles), by
  * area of the map: the fourth area's are also the ones that events start
- * (func_8008B258, FIELDSTG_startEventBattle). A stage with several places has a list of
+ * (FIELDSTG_startEventBattle5, FIELDSTG_startEventBattle). A stage with several places has a list of
  * them, which FieldState.findBattles searches for the id.
  */
 typedef struct FieldBattles {
@@ -161,7 +209,7 @@ typedef struct FieldBattles {
 } FieldBattles;
 
 /*
- * The field's state (D_800990B4): what a stage tells FIELDSTG about itself,
+ * The field's state (FIELDSTG_state): what a stage tells FIELDSTG about itself,
  * filled by its setup function (stageFuncs[0], FIELDSTG_setupField for the
  * field's own), then what FIELDSTG keeps of the field. The first 0x64 bytes
  * are cleared by FIELDSTG_pickStage, which also picks the stage overlay for
@@ -169,7 +217,7 @@ typedef struct FieldBattles {
  *
  * The setup functions set start with a constructor, (Vec2){x, y}: GCC
  * clobbers the whole field before its two stores, which keeps the stores to
- * D_800990B4 on either side of it but lets the constants rise above it. The
+ * FIELDSTG_state on either side of it but lets the constants rise above it. The
  * match depends on that form: two stores of their own schedule otherwise.
  */
 typedef struct FieldState {
@@ -208,19 +256,19 @@ typedef struct FieldState {
     /* 0x7C */ FieldBattles *(*findBattles)(FieldBattles *list, s32 id); /* the place of the list with that id */
 } FieldState;
 
-extern FieldState D_800990B4;
+extern FieldState FIELDSTG_state;
 
 /* FIELDSTG functions the stages call */
 struct EventTask *FIELDSTG_startEvent(s32 id); /* creates the task of an event object */
 StageTile *FIELDSTG_findObject(s32 anim); /* the first map object with that animation */
 StageTile *FIELDSTG_findNextObject(void); /* and the next, or NULL */
-void *func_8008B258(void); /* starts a battle: the handler of the stages' events 9000 */
+void *FIELDSTG_startEventBattle5(void); /* starts a battle: the handler of the stages' events 9000 */
 
-/* FIELDSTG's functions and data that the executable calls (game3.c), by
+/* FIELDSTG's functions and data that the executable calls (game/events.c, system/overlay.c), by
    these names in its link (config/eu/undefined_syms.txt) */
-void func_8008AEB4(s32 mode, s32 arg, s32 x, s32 y, s32 dir); /* leaves the field for a mode */
-void func_8008B2C4(s32 index); /* starts the event FIELDSTG_eventIds[index] */
-void func_8008B320(void); /* opens the inn */
+void FIELDSTG_leaveField(s32 mode, s32 arg, s32 x, s32 y, s32 dir); /* leaves the field for a mode */
+void FIELDSTG_startListedEvent(s32 index); /* starts the event FIELDSTG_eventIds[index] */
+void FIELDSTG_openInn(void); /* opens the inn */
 typedef struct FieldBattleFuncs {
     void (*startEventBattle)(s32 index); /* FIELDSTG_startEventBattle */
     void (*startAreaBattle)(void); /* FIELDSTG_startAreaBattle */
