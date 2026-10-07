@@ -3,10 +3,10 @@
 #include "fightstg.h"
 
 /* Draws the white flash: a full-screen quad of the task's level, added to the
-   screen on layer 0x1006 */
+   screen on layer BATTLE_LAYER_FRONT */
 void FIGHTSTG_drawWhiteFlash(WhiteFlash *task) {
-    Layer *layer = GFX.funcs.getLayer(0x1006);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, 0);
+    Layer *layer = GFX.funcs.getLayer(BATTLE_LAYER_FRONT);
+    u_long *ot = layer->getOtEntry(layer, 0);
     POLY_F4 *poly = GFX.funcs.getPrim();
     DR_TPAGE *mode;
 

@@ -3,7 +3,57 @@
 
 #include "cardgame.h"
 
-/* Draws a side's panel (CardScreen.panels): its lights, bars, numbers and parts, which blink by its flags */
+/* Draws a side's panel image of its wins, its parts blinking by its flags,
+   and its frame */
+static inline void drawPanelParts(CardPanel *panel, s32 side, s32 y, s32 imageY) {
+    SpriteDrawer drawer;
+    s32 t;
+    s32 frame;
+    s32 boxFrame;
+    s32 iconT;
+    s32 iconFrame;
+    s32 i;
+
+    initSpriteDrawer(&drawer);
+    drawer.setLayerId(0x100, 1);
+    drawer.setTexture(0x280, 0);
+    drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_panelLayouts[side].winsSprite + panel->wins, panel->winsX, imageY);
+    t = panel->blinkTime % 30;
+    if (panel->flags[7] != 0) {
+        frame = t / 6;
+    } else {
+        frame = 0;
+    }
+    drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_flag7Frames[frame] + 9, panel->x + CARDGAME_panelLayouts[side].flag7Part.x, y + CARDGAME_panelLayouts[side].flag7Part.y);
+    t = panel->blinkTime % 30;
+    if (panel->flags[6] != 0) {
+        frame = t / 6;
+    } else {
+        frame = 0;
+    }
+    drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_flag6Frames[frame] + 6, panel->x + CARDGAME_panelLayouts[side].flag6Part.x, y + CARDGAME_panelLayouts[side].flag6Part.y);
+    t = panel->blinkTime % 30;
+    if (panel->flags[5] != 0) {
+        boxFrame = t / 6;
+    } else {
+        boxFrame = 0;
+    }
+    drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_boxFrames[boxFrame] + 0x31, panel->boxX, panel->boxY);
+    iconT = panel->blinkTime % 30;
+    for (i = 0; i < 5; i++) {
+        if (panel->flags[i] != 0) {
+            iconFrame = iconT / 6;
+        } else {
+            iconFrame = 0;
+        }
+        drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_flagIconSprites[i] + CARDGAME_flagIconFrames[iconFrame], panel->x + CARDGAME_panelLayouts[side].flagIcons.x + i * 0x2A, y + CARDGAME_panelLayouts[side].flagIcons.y);
+    }
+    drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_panelLayouts[side].boxLabelSprite, panel->boxX + CARDGAME_panelLayouts[side].boxLabel.x, panel->boxY + CARDGAME_panelLayouts[side].boxLabel.y);
+    drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_panelLayouts[side].frame, panel->x, y);
+}
+
+/* Draws a side's panel (CardScreen.panels): its lights, bars, numbers and
+   parts (drawPanelParts), which blink by its flags */
 void CARDGAME_drawPanel(CardPanel *panel, CardScreenItems *items, s32 side) {
     s32 y;
     s32 imageY;
@@ -125,57 +175,63 @@ void CARDGAME_drawPanel(CardPanel *panel, CardScreenItems *items, s32 side) {
         number.value = panel->discardCount;
         CARDGAME_drawNumber(&number, 0);
     }
-    /* the image, the blinking parts and the frame */
-    {
-        SpriteDrawer drawer;
-        s32 t;
-        s32 frame;
-        s32 boxFrame;
-        s32 iconT;
-        s32 iconFrame;
-        s32 i;
-
-        initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x100, 1);
-        drawer.setTexture(0x280, 0);
-        drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_panelLayouts[side].winsSprite + panel->wins, panel->winsX, imageY);
-        t = panel->blinkTime % 30;
-        if (panel->flags[7] != 0) {
-            frame = t / 6;
-        } else {
-            frame = 0;
-        }
-        drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_flag7Frames[frame] + 9, panel->x + CARDGAME_panelLayouts[side].flag7Part.x, y + CARDGAME_panelLayouts[side].flag7Part.y);
-        t = panel->blinkTime % 30;
-        if (panel->flags[6] != 0) {
-            frame = t / 6;
-        } else {
-            frame = 0;
-        }
-        drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_flag6Frames[frame] + 6, panel->x + CARDGAME_panelLayouts[side].flag6Part.x, y + CARDGAME_panelLayouts[side].flag6Part.y);
-        t = panel->blinkTime % 30;
-        if (panel->flags[5] != 0) {
-            boxFrame = t / 6;
-        } else {
-            boxFrame = 0;
-        }
-        drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_boxFrames[boxFrame] + 0x31, panel->boxX, panel->boxY);
-        iconT = panel->blinkTime % 30;
-        for (i = 0; i < 5; i++) {
-            if (panel->flags[i] != 0) {
-                iconFrame = iconT / 6;
-            } else {
-                iconFrame = 0;
-            }
-            drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_flagIconSprites[i] + CARDGAME_flagIconFrames[iconFrame], panel->x + CARDGAME_panelLayouts[side].flagIcons.x + i * 0x2A, y + CARDGAME_panelLayouts[side].flagIcons.y);
-        }
-        drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_panelLayouts[side].boxLabelSprite, panel->boxX + CARDGAME_panelLayouts[side].boxLabel.x, panel->boxY + CARDGAME_panelLayouts[side].boxLabel.y);
-        drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), CARDGAME_panelLayouts[side].frame, panel->x, y);
-    }
+    drawPanelParts(panel, side, y, imageY);
     panel->blinkTime = (panel->blinkTime + GFX.funcs.getFrameTime()) & 0xFFFF;
 }
 
-/* Moves a side's panel between its shown and hidden places: in (state 1), out (3), or only x/y in or out (4, 5) */
+/* Slides a side's whole panel in from its hidden places to its shown ones,
+   where it stays (state 2) */
+static inline void slidePanelIn(CardPanel *panel, s32 shownX, s32 shownY, s32 hiddenX, s32 hiddenY,
+                                 s32 shownBoxX, s32 hiddenBoxX, s32 shownBoxY, s32 hiddenBoxY,
+                                 s32 shownWinsX, s32 hiddenWinsX, s32 shownWinsY, s32 hiddenWinsY) {
+    if ((panel->time -= GFX.funcs.getFrameTime()) > 0) {
+        panel->x = shownX - (shownX - hiddenX) * panel->time / panel->duration;
+        panel->y = shownY - (shownY - hiddenY) * panel->time / panel->duration;
+        panel->boxX = shownBoxX - (shownBoxX - hiddenBoxX) * panel->time / panel->duration;
+        panel->boxY = shownBoxY - (shownBoxY - hiddenBoxY) * panel->time / panel->duration;
+        panel->winsX = shownWinsX - (shownWinsX - hiddenWinsX) * panel->time / panel->duration;
+        panel->winsY = shownWinsY - (shownWinsY - hiddenWinsY) * panel->time / panel->duration;
+    } else {
+        panel->state = 2;
+        panel->time = 0;
+        panel->duration = 0;
+        panel->x = shownX;
+        panel->y = shownY;
+        panel->boxX = shownBoxX;
+        panel->boxY = shownBoxY;
+        panel->winsX = shownWinsX;
+        panel->winsY = shownWinsY;
+    }
+}
+
+/* Slides a side's whole panel out from its shown places to its hidden ones,
+   where it's gone (state 0) */
+static inline void slidePanelOut(CardPanel *panel, s32 shownX, s32 shownY, s32 hiddenX, s32 hiddenY,
+                                  s32 shownBoxX, s32 hiddenBoxX, s32 shownBoxY, s32 hiddenBoxY,
+                                  s32 shownWinsX, s32 hiddenWinsX, s32 shownWinsY, s32 hiddenWinsY) {
+    if ((panel->time -= GFX.funcs.getFrameTime()) > 0) {
+        panel->x = hiddenX - (hiddenX - shownX) * panel->time / panel->duration;
+        panel->y = hiddenY - (hiddenY - shownY) * panel->time / panel->duration;
+        panel->boxX = hiddenBoxX - (hiddenBoxX - shownBoxX) * panel->time / panel->duration;
+        panel->boxY = hiddenBoxY - (hiddenBoxY - shownBoxY) * panel->time / panel->duration;
+        panel->winsX = hiddenWinsX - (hiddenWinsX - shownWinsX) * panel->time / panel->duration;
+        panel->winsY = hiddenWinsY - (hiddenWinsY - shownWinsY) * panel->time / panel->duration;
+    } else {
+        panel->state = 0;
+        panel->event = 1;
+        panel->time = 0;
+        panel->duration = 0;
+        panel->x = hiddenX;
+        panel->y = hiddenY;
+        panel->boxX = hiddenBoxX;
+        panel->boxY = hiddenBoxY;
+        panel->winsX = hiddenWinsX;
+        panel->winsY = hiddenWinsX; /* not hiddenWinsY */
+    }
+}
+
+/* Moves a side's panel between its shown and hidden places: in (state 1,
+   slidePanelIn), out (3, slidePanelOut), or only x/y in or out (4, 5) */
 void CARDGAME_slidePanel(CardPanel *panel, CardScreenItems *items, s32 side) {
     s32 shownX;
     s32 shownY;
@@ -231,45 +287,12 @@ void CARDGAME_slidePanel(CardPanel *panel, CardScreenItems *items, s32 side) {
     }
     switch (panel->state) {
     case 1:
-        if ((panel->time -= GFX.funcs.getFrameTime()) > 0) {
-            panel->x = shownX - (shownX - hiddenX) * panel->time / panel->duration;
-            panel->y = shownY - (shownY - hiddenY) * panel->time / panel->duration;
-            panel->boxX = shownBoxX - (shownBoxX - hiddenBoxX) * panel->time / panel->duration;
-            panel->boxY = shownBoxY - (shownBoxY - hiddenBoxY) * panel->time / panel->duration;
-            panel->winsX = shownWinsX - (shownWinsX - hiddenWinsX) * panel->time / panel->duration;
-            panel->winsY = shownWinsY - (shownWinsY - hiddenWinsY) * panel->time / panel->duration;
-        } else {
-            panel->state = 2;
-            panel->time = 0;
-            panel->duration = 0;
-            panel->x = shownX;
-            panel->y = shownY;
-            panel->boxX = shownBoxX;
-            panel->boxY = shownBoxY;
-            panel->winsX = shownWinsX;
-            panel->winsY = shownWinsY;
-        }
+        slidePanelIn(panel, shownX, shownY, hiddenX, hiddenY, shownBoxX, hiddenBoxX, shownBoxY, hiddenBoxY,
+                     shownWinsX, hiddenWinsX, shownWinsY, hiddenWinsY);
         break;
     case 3:
-        if ((panel->time -= GFX.funcs.getFrameTime()) > 0) {
-            panel->x = hiddenX - (hiddenX - shownX) * panel->time / panel->duration;
-            panel->y = hiddenY - (hiddenY - shownY) * panel->time / panel->duration;
-            panel->boxX = hiddenBoxX - (hiddenBoxX - shownBoxX) * panel->time / panel->duration;
-            panel->boxY = hiddenBoxY - (hiddenBoxY - shownBoxY) * panel->time / panel->duration;
-            panel->winsX = hiddenWinsX - (hiddenWinsX - shownWinsX) * panel->time / panel->duration;
-            panel->winsY = hiddenWinsY - (hiddenWinsY - shownWinsY) * panel->time / panel->duration;
-        } else {
-            panel->state = 0;
-            panel->event = 1;
-            panel->time = 0;
-            panel->duration = 0;
-            panel->x = hiddenX;
-            panel->y = hiddenY;
-            panel->boxX = hiddenBoxX;
-            panel->boxY = hiddenBoxY;
-            panel->winsX = hiddenWinsX;
-            panel->winsY = hiddenWinsX; /* not hiddenWinsY */
-        }
+        slidePanelOut(panel, shownX, shownY, hiddenX, hiddenY, shownBoxX, hiddenBoxX, shownBoxY, hiddenBoxY,
+                      shownWinsX, hiddenWinsX, shownWinsY, hiddenWinsY);
         break;
     case 4:
         panel->boxX = hiddenBoxX;

@@ -82,11 +82,45 @@ void CARDGAME_browseHand(CardBattle *battle, CardScreen *screen) {
     battle->effectStep.flags = 0;
 }
 
+/* Shows the card being played (sprite 15) scaling in on the slot row */
+static inline void showPlayedCard(CardBattle *battle, CardScreen *screen) {
+#if VERSION_US
+    screen->addSprite(screen, 15, 0x1800, 0x9000);
+#elif VERSION_EU
+    screen->addSprite(screen, 15, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][0], CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][1]);
+#endif
+    screen->setSpriteCard(screen, 15, battle->record.plays[battle->record.playCount].card);
+    screen->sprites[15].scaleX = 0;
+    screen->scaleSprite(screen, 15, 8, 0x1000, 0x1000);
+}
+
+/* Takes the picked card (effectStep.choice): one of the player's deck is
+   swapped to its top and the rest shuffled, one of the opponent's draws
+   gives its order */
+static inline void takePickedCard(CardBattle *battle) {
+    s32 card;
+
+    switch (battle->effectStep.vars[4]) {
+    case 7:
+        /* the picked card goes to the top of the hand */
+        card = battle->sides[0].pile.deck[battle->sides[0].pile.deckTop];
+
+        battle->sides[0].pile.deck[battle->sides[0].pile.deckTop] = battle->sides[0].pile.deck[battle->sides[0].pile.deckTop + battle->effectStep.choice];
+        battle->sides[0].pile.deck[battle->sides[0].pile.deckTop + battle->effectStep.choice] = card;
+        battle->effectStep.choice = battle->sides[0].pile.deckTop;
+        battle->shufflePile(battle, battle->sides[0].pile.deckTop + 1, battle->sides[0].pile.deckCount - 1);
+        break;
+    case 13:
+        battle->effectStep.choice = battle->opponentDraws[battle->effectStep.choice + battle->sides[1].pile.deckTop].order;
+        CARDGAME_sortOpponentCards(battle);
+        break;
+    }
+}
+
 /* Lets a player pick a card of a row (set up by CARDGAME_setupCardChoice): 2 once one is
    picked, 1 if the player backed out with triangle (mode 1), else 0 */
 s32 CARDGAME_chooseCard(CardBattle *battle, CardScreen *screen, s32 mode) {
     s32 result = 0;
-    s32 card;
 
     if (battle->effectStep.nextState != 0) {
         switch (battle->effectStep.nextState) {
@@ -148,14 +182,7 @@ s32 CARDGAME_chooseCard(CardBattle *battle, CardScreen *screen, s32 mode) {
         battle->effectStep.vars[1] = CARDGAME_openStepWindows(battle, screen, 2, CARDGAME_selectionText, battle->effectStep.time, battle->effectStep.vars[1]);
         CARDGAME_showCardInfo(battle, screen, 0);
         if (battle->effectStep.time == 2 && mode == 1) {
-#if VERSION_US
-            screen->addSprite(screen, 15, 0x1800, 0x9000);
-#elif VERSION_EU
-            screen->addSprite(screen, 15, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][0], CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][1]);
-#endif
-            screen->setSpriteCard(screen, 15, battle->record.plays[battle->record.playCount].card);
-            screen->sprites[15].scaleX = 0;
-            screen->scaleSprite(screen, 15, 8, 0x1000, 0x1000);
+            showPlayedCard(battle, screen);
         }
         if (battle->anim.count * 4 + 14 < battle->effectStep.time) {
             battle->effectStep.nextState = 2;
@@ -187,21 +214,7 @@ s32 CARDGAME_chooseCard(CardBattle *battle, CardScreen *screen, s32 mode) {
     case 4:
         if (battle->effectStep.vars[3] * 4 + 5 < battle->effectStep.time++) {
             battle->effectStep.choice = battle->effectStep.cursor;
-            switch (battle->effectStep.vars[4]) {
-            case 7:
-                /* the picked card goes to the top of the hand */
-                card = battle->sides[0].pile.deck[battle->sides[0].pile.deckTop];
-
-                battle->sides[0].pile.deck[battle->sides[0].pile.deckTop] = battle->sides[0].pile.deck[battle->sides[0].pile.deckTop + battle->effectStep.choice];
-                battle->sides[0].pile.deck[battle->sides[0].pile.deckTop + battle->effectStep.choice] = card;
-                battle->effectStep.choice = battle->sides[0].pile.deckTop;
-                battle->shufflePile(battle, battle->sides[0].pile.deckTop + 1, battle->sides[0].pile.deckCount - 1);
-                break;
-            case 13:
-                battle->effectStep.choice = battle->opponentDraws[battle->effectStep.choice + battle->sides[1].pile.deckTop].order;
-                CARDGAME_sortOpponentCards(battle);
-                break;
-            }
+            takePickedCard(battle);
             battle->effectStep.marked[battle->effectStep.choice] = 1;
             result = battle->effectStep.flags;
             battle->effectStep.nextState = 0;

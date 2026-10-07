@@ -11,7 +11,7 @@ void FIGHTSTG_drawItemMenu(ItemMenu *task) {
     s32 i;
 
     initSpriteDrawer(&drawer);
-    drawer.setLayerId(0x1005, 1);
+    drawer.setLayerId(BATTLE_LAYER_MENUS, 1);
     drawer.setTexture(0x140, 0);
     sheet = FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16);
     for (i = 0; i < ITEM_MENU_LINES; i++) {
@@ -43,19 +43,19 @@ void FIGHTSTG_createItemWindows(ItemMenu *task, ItemMenuWindows *w) {
     s32 i;
 
     text = FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU));
-    w->prevButton = createTextWindow(0x1005, 3, 0x1A, 0xA9);
+    w->prevButton = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x1A, 0xA9);
     w->prevButton->setString(w->prevButton, text, 0x11);
     w->prevButton->setPalette(w->prevButton, PALETTE_DARK_BLUE);
-    w->nextButton = createTextWindow(0x1005, 3, 0x80, 0xA9);
+    w->nextButton = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x80, 0xA9);
     w->nextButton->setString(w->nextButton, text, 0x12);
     w->nextButton->setPalette(w->nextButton, PALETTE_DARK_BLUE);
-    w->countLabel = createTextWindow(0x1005, 1, 0xAC, 0xA5);
+    w->countLabel = createTextWindow(BATTLE_LAYER_MENUS, 1, 0xAC, 0xA5);
     w->countLabel->setString(w->countLabel, text, 0xC);
     for (i = 0; i < ITEM_MENU_LINES; i++) {
-        w->names[i] = createTextWindow(0x1005, 1, 0x2A, 0x45 + i * 0xE);
+        w->names[i] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x2A, 0x45 + i * 0xE);
     }
-    w->message = createTextWindow(0x1005, 1, 0x14, 0xC2);
-    w->count = createTextWindow(0x1005, 1, 0xC6, 0xA5);
+    w->message = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x14, 0xC2);
+    w->count = createTextWindow(BATTLE_LAYER_MENUS, 1, 0xC6, 0xA5);
 }
 
 /* Shows the page's names and the description and count of the item under

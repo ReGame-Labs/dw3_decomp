@@ -3,11 +3,19 @@
 
 #include "cardgame.h"
 
+/* The colour of the last card played */
+static inline s32 lastPlayColor(CardBattle *battle) {
+    CardDrawer drawer;
+    s32 card = battle->record.plays[battle->record.playCount - 1].card;
+
+    initCardDrawer(&drawer);
+    drawer.setCard(battle->cards[card] + 1);
+    return drawer.card->color;
+}
+
 /* Checks the condition id (0x70 to 0x96) of a card for the computer; returns 1 if it holds */
 s32 CARDGAME_checkComputerCondition(CardBattle *battle, CardScreen *screen, s32 id) {
-    CardDrawer drawer;
     s32 result = 0;
-    s32 card;
 
     switch (id) {
     case 0x70:
@@ -38,10 +46,7 @@ s32 CARDGAME_checkComputerCondition(CardBattle *battle, CardScreen *screen, s32 
         break;
     case 0x84:
         if (battle->record.playCount != 0) {
-            card = battle->record.plays[battle->record.playCount - 1].card;
-            initCardDrawer(&drawer);
-            drawer.setCard(battle->cards[card] + 1);
-            if (drawer.card->color == 6) {
+            if (lastPlayColor(battle) == 6) {
                 result = 1;
             }
         }

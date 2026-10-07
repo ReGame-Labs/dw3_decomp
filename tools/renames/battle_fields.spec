@@ -37,3 +37,9 @@ StageSelectWindows unk98 debugLeftRight --via win
 CardPlay unk2 mark --via 'plays\[[^]]*\]'
 CardWindow unkE showCount --via 'windows\[[^]]*\]' --via window
 CardScreen unk5C opponent --via screen
+
+# The card opponent's level and the plays a resolve starts with
+CardOpponent unkC8 level --via opponent
+CardBattle unk2E9 opponentLevel --via battle
+CardScreen unk5E opponentLevel --via screen
+CardBattle unk4DE playsToResolve --via battle

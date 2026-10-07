@@ -25,13 +25,91 @@ void CARDGAME_drawMessageMark(CardScreen *screen, CardScreenItems *items, s32 x,
     drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 2), 0x18, x, y);
 }
 
-/* The message window: it opens at its place, shows its message with the cursor, then closes */
-void CARDGAME_updateMessageWindow(CardScreen *screen, CardScreenItems *items) {
+/* Shows the message window's prompt and cursor, or hides them when it has
+   no prompt */
+static inline void showMessagePrompt(CardScreen *screen, CardScreenItems *items) {
+#if VERSION_US
+    if (screen->message.prompt != 0) {
+        items->cursor->setVisible(items->cursor, 1);
+        items->cursor->setPos(items->cursor, 0x14, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x11 + screen->message.choice * 14);
+        items->moreTexts[7]->setString(items->moreTexts[7], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x18);
+        items->moreTexts[7]->setPos(items->moreTexts[7], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
+    } else {
+        items->moreTexts[7]->setVisible(items->moreTexts[7], 0);
+        items->cursor->setVisible(items->cursor, 0);
+    }
+#elif VERSION_EU
+    switch (screen->message.prompt) {
+    case 0:
+    default:
+        items->moreTexts[7]->setVisible(items->moreTexts[7], 0);
+        items->cursor->setVisible(items->cursor, 0);
+        break;
+    case 1:
+        items->cursor->setVisible(items->cursor, 1);
+        items->cursor->setPos(items->cursor, 0x14, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x11 + screen->message.choice * 14);
+        items->moreTexts[7]->setString(items->moreTexts[7], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x18);
+        items->moreTexts[7]->setPos(items->moreTexts[7], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
+        break;
+    case 2:
+    case 3:
+        items->cursor->setVisible(items->cursor, 1);
+        items->cursor->setPos(items->cursor, 0x14, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x11 + screen->message.choice * 14);
+        items->moreTexts[7]->setString(items->moreTexts[7], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x45);
+        if (screen->message.prompt == 3) {
+            items->moreTexts[7]->setPalette(items->moreTexts[7], PALETTE_GREY);
+        }
+        items->moreTexts[7]->setPos(items->moreTexts[7], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
+        items->texts[0]->setString(items->texts[0], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x46);
+        items->texts[0]->setRightAlign(items->texts[0], 0);
+        items->texts[0]->setPos(items->texts[0], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x20);
+        break;
+    }
+#endif
+}
+
+/* Shows the message window's text: an item's name, the message with its wins
+   or opponent numbers, or nothing */
+static inline void showMessageText(CardScreen *screen, CardScreenItems *items) {
     TextTools tools;
-    s16 scale;
-    s32 t;
     s32 i;
     s32 x;
+
+    if (screen->message.place == 3) {
+        items->moreTexts[1]->setPos(items->moreTexts[1], CARDGAME_messageWindowPositions[3][0] + 0x40, CARDGAME_messageWindowPositions[3][1] + 4);
+        items->moreTexts[1]->setString(items->moreTexts[1], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x42);
+        items->moreTexts[7]->setString(items->moreTexts[7], FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_NAMES)), screen->message.message);
+        items->moreTexts[7]->setPos(items->moreTexts[7], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x40, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
+    } else if (screen->message.message != 0) {
+        items->moreTexts[1]->setPos(items->moreTexts[1], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 4);
+        items->moreTexts[1]->setString(items->moreTexts[1], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), screen->message.message);
+        if (screen->message.message == 0x13) {
+            items->moreTexts[7]->setString(items->moreTexts[7], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x2B);
+            items->moreTexts[7]->setPos(items->moreTexts[7], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
+            initTextTools(&tools);
+            x = tools.measure(items->moreTexts[7]->text, items->moreTexts[7]->style, items->moreTexts[7]->spacingX) + 0x1B;
+            for (i = 0; i < 2; i++) {
+                items->texts[i]->setPos(items->texts[i], CARDGAME_messageWindowPositions[screen->message.place][0] + x + 0xE, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12 + i * 14);
+                items->texts[i]->setNumber(items->texts[i], 0, screen->panels[i].wins);
+                items->texts[i]->setRightAlign(items->texts[i], 0);
+            }
+        } else if (screen->message.message == 0x3E) {
+            items->texts[0]->setPos(items->texts[0], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x3E, CARDGAME_messageWindowPositions[screen->message.place][1] + 4);
+            items->texts[0]->setNumber(items->texts[0], 0, screen->opponentLevel);
+            items->texts[0]->setRightAlign(items->texts[0], 1);
+            items->texts[1]->setString(items->texts[1], FILE_CACHE.load(TEXT_FILE(TEXT_DECK_EDITOR)), (screen->opponent + 1) / 2);
+            items->texts[1]->setPos(items->texts[1], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
+        }
+    } else {
+        items->moreTexts[1]->setVisible(items->moreTexts[1], 0);
+    }
+}
+
+/* The message window: it opens at its place, shows its prompt
+   (showMessagePrompt) and message (showMessageText) with the cursor, then closes */
+void CARDGAME_updateMessageWindow(CardScreen *screen, CardScreenItems *items) {
+    s16 scale;
+    s32 t;
 
     if (screen->message.state == 0) {
         return;
@@ -44,72 +122,8 @@ void CARDGAME_updateMessageWindow(CardScreen *screen, CardScreenItems *items) {
         screen->message.time -= GFX.funcs.getFrameTime();
         if (screen->message.time <= 0) {
             screen->message.state = 2;
-#if VERSION_US
-            if (screen->message.prompt != 0) {
-                items->cursor->setVisible(items->cursor, 1);
-                items->cursor->setPos(items->cursor, 0x14, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x11 + screen->message.choice * 14);
-                items->moreTexts[7]->setString(items->moreTexts[7], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x18);
-                items->moreTexts[7]->setPos(items->moreTexts[7], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
-            } else {
-                items->moreTexts[7]->setVisible(items->moreTexts[7], 0);
-                items->cursor->setVisible(items->cursor, 0);
-            }
-#elif VERSION_EU
-            switch (screen->message.prompt) {
-            case 0:
-            default:
-                items->moreTexts[7]->setVisible(items->moreTexts[7], 0);
-                items->cursor->setVisible(items->cursor, 0);
-                break;
-            case 1:
-                items->cursor->setVisible(items->cursor, 1);
-                items->cursor->setPos(items->cursor, 0x14, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x11 + screen->message.choice * 14);
-                items->moreTexts[7]->setString(items->moreTexts[7], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x18);
-                items->moreTexts[7]->setPos(items->moreTexts[7], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
-                break;
-            case 2:
-            case 3:
-                items->cursor->setVisible(items->cursor, 1);
-                items->cursor->setPos(items->cursor, 0x14, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x11 + screen->message.choice * 14);
-                items->moreTexts[7]->setString(items->moreTexts[7], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x45);
-                if (screen->message.prompt == 3) {
-                    items->moreTexts[7]->setPalette(items->moreTexts[7], PALETTE_GREY);
-                }
-                items->moreTexts[7]->setPos(items->moreTexts[7], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
-                items->texts[0]->setString(items->texts[0], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x46);
-                items->texts[0]->setRightAlign(items->texts[0], 0);
-                items->texts[0]->setPos(items->texts[0], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x20);
-                break;
-            }
-#endif
-            if (screen->message.place == 3) {
-                items->moreTexts[1]->setPos(items->moreTexts[1], CARDGAME_messageWindowPositions[3][0] + 0x40, CARDGAME_messageWindowPositions[3][1] + 4);
-                items->moreTexts[1]->setString(items->moreTexts[1], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x42);
-                items->moreTexts[7]->setString(items->moreTexts[7], FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_NAMES)), screen->message.message);
-                items->moreTexts[7]->setPos(items->moreTexts[7], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x40, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
-            } else if (screen->message.message != 0) {
-                items->moreTexts[1]->setPos(items->moreTexts[1], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 4);
-                items->moreTexts[1]->setString(items->moreTexts[1], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), screen->message.message);
-                if (screen->message.message == 0x13) {
-                    items->moreTexts[7]->setString(items->moreTexts[7], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_GAME)), 0x2B);
-                    items->moreTexts[7]->setPos(items->moreTexts[7], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
-                    initTextTools(&tools);
-                    x = tools.measure(items->moreTexts[7]->text, items->moreTexts[7]->style, items->moreTexts[7]->spacingX) + 0x1B;
-                    for (i = 0; i < 2; i++) {
-                        items->texts[i]->setPos(items->texts[i], CARDGAME_messageWindowPositions[screen->message.place][0] + x + 0xE, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12 + i * 14);
-                        items->texts[i]->setNumber(items->texts[i], 0, screen->panels[i].wins);
-                        items->texts[i]->setRightAlign(items->texts[i], 0);
-                    }
-                } else if (screen->message.message == 0x3E) {
-                    items->texts[0]->setPos(items->texts[0], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x3E, CARDGAME_messageWindowPositions[screen->message.place][1] + 4);
-                    items->texts[0]->setNumber(items->texts[0], 0, screen->unk5E);
-                    items->texts[0]->setRightAlign(items->texts[0], 1);
-                    items->texts[1]->setString(items->texts[1], FILE_CACHE.load(TEXT_FILE(TEXT_DECK_EDITOR)), (screen->opponent + 1) / 2);
-                    items->texts[1]->setPos(items->texts[1], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
-                }
-            } else {
-                items->moreTexts[1]->setVisible(items->moreTexts[1], 0);
-            }
+            showMessagePrompt(screen, items);
+            showMessageText(screen, items);
         }
         break;
     case 2:

@@ -45,9 +45,114 @@ void WFIGHTMN_chargeGauge(u8 side, s32 damage) {
     }
 }
 
+/* Picks the script of the partner's technique: 8 with the triple hit, 6 with
+   an action effect or a weapon of the enemy's family, else its own one */
+static inline void choosePartnerScript(BattleScript *task, TechData *info, BattleStats *own, BattleStats *other) {
+    s32 i;
+    s32 j;
+
+    if (info->script == 5) {
+        if (own->tripleHit != 0) {
+            task->index = 8;
+            task->effect = info->scriptEffect;
+            task->sound = info->scriptSound;
+        } else {
+            for (i = 2; i < 13; i++) {
+                if (FIGHTSTG_action.effects[i] != 0) {
+                    task->index = 6;
+                    {
+                        s32 (*table)[2] = WFIGHTMN_actionEffects; /* match depends on the pointer */
+
+                        j = i - 2;
+                        task->effect = table[j][0];
+                        task->sound = table[j][1];
+                    }
+                    break;
+                }
+            }
+            if (task->index == 0) {
+                for (i = 0; i < 3; i++) {
+                    if (own->weaponFamilies[i] >= FAMILY_FIRST && own->weaponFamilies[i] == other->family) {
+                        task->index = 6;
+                        task->effect = info->scriptEffect;
+                        task->sound = info->scriptSound;
+                        break;
+                    }
+                }
+                if (task->index == 0) {
+                    task->index = info->script;
+                    task->effect = info->scriptEffect;
+                    task->sound = info->scriptSound;
+                }
+            }
+        }
+    } else {
+        if (info->effect < TECH_EFFECT_FIRST && info->icon == TECH_PHYSICAL && info->script == 6 && own->tripleHit != 0) {
+            task->index = 8;
+        } else {
+            task->index = info->script;
+        }
+        task->effect = info->scriptEffect;
+        task->sound = info->scriptSound;
+        if (info->element >= ELEMENT_FIRST || (info->family >= FAMILY_FIRST && info->family == other->family)) {
+            task->stage = info->scriptStage;
+        } else {
+            task->stage = -1;
+        }
+    }
+}
+
+/* Sets the fighters' idle motions for the damage a technique does; an attack
+   also counts for the final battles, anything else ends the enemy's weakness */
+static inline void setTechIdleMotions(TechData *info, u8 actor, s32 id, s32 damage) {
+    if (info->icon == TECH_PHYSICAL || info->icon == TECH_MAGIC) {
+        WFIGHTMN_recordTech(actor, id);
+        WFIGHTMN_countHit(actor, damage);
+        WFIGHTMN_setIdleMotion(SIDE_ENEMY - actor, damage);
+        if (FIGHTSTG_action.effects[TECH_EFFECT_DRAIN] != 0) {
+            WFIGHTMN_setIdleMotion(actor, -FIGHTSTG_action.drain);
+        }
+    } else {
+        WFIGHTMN_endWeakness(actor);
+        WFIGHTMN_setIdleMotion(actor, damage);
+    }
+}
+
+/* Returns what a technique that does not attack heals, as negative damage */
+static inline s32 getHealDamage(u8 actor, s32 id) {
+    switch (id) {
+    case 0x64:
+    case 0x177:
+        return -9999;
+    case 0xB8:
+    case 0xB9:
+    case 0xBA:
+    case 0xBB:
+    case 0xBC:
+    case 0x190:
+        return -FIGHTSTG_battleFuncs.computeHeal(actor, id);
+    default:
+        return 0;
+    }
+}
+
+/* Gives the enemy's technique its own script, and its stage effect when it
+   has an element or the target's family */
+static inline void chooseEnemyScript(BattleScript *task, TechData *info, BattleStats *other) {
+    task->index = info->script;
+    task->effect = info->scriptEffect;
+    task->sound = info->scriptSound;
+    if (info->element >= ELEMENT_FIRST || (info->family >= FAMILY_FIRST && info->family == other->family)) {
+        task->stage = info->scriptStage;
+    } else {
+        task->stage = -1;
+    }
+}
+
 /* Starts the effect of actor's move id (FIGHTSTG's FIGHTSTG_createBattleScript): its kind
-   and motions from TECHS, which hits land from FIGHTSTG_action, then sets
-   the fighters' idle motions for the damage it does */
+   and motions from TECHS (choosePartnerScript, chooseEnemyScript), which hits
+   land from FIGHTSTG_action, then sets the fighters' idle motions for the
+   damage it does (setTechIdleMotions) */
 BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
     TechData *info;
     s32 side;
@@ -57,7 +162,6 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
     BattleFighter *units;
     s32 damage;
     s32 i;
-    s32 j;
 
     side = actor != 0;
     info = &TECHS[id - 1];
@@ -66,55 +170,7 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
     task = FIGHTSTG_createBattleScript();
     task->enemy = actor;
     if (actor == 0) {
-        if (info->script == 5) {
-            if (own->tripleHit != 0) {
-                task->index = 8;
-                task->effect = info->scriptEffect;
-                task->sound = info->scriptSound;
-            } else {
-                for (i = 2; i < 13; i++) {
-                    if (FIGHTSTG_action.effects[i] != 0) {
-                        task->index = 6;
-                        {
-                            s32 (*table)[2] = WFIGHTMN_actionEffects; /* match depends on the pointer */
-
-                            j = i - 2;
-                            task->effect = table[j][0];
-                            task->sound = table[j][1];
-                        }
-                        break;
-                    }
-                }
-                if (task->index == 0) {
-                    for (i = 0; i < 3; i++) {
-                        if (own->weaponFamilies[i] >= FAMILY_FIRST && own->weaponFamilies[i] == other->family) {
-                            task->index = 6;
-                            task->effect = info->scriptEffect;
-                            task->sound = info->scriptSound;
-                            break;
-                        }
-                    }
-                    if (task->index == 0) {
-                        task->index = info->script;
-                        task->effect = info->scriptEffect;
-                        task->sound = info->scriptSound;
-                    }
-                }
-            }
-        } else {
-            if (info->effect < TECH_EFFECT_FIRST && info->icon == TECH_PHYSICAL && info->script == 6 && own->tripleHit != 0) {
-                task->index = 8;
-            } else {
-                task->index = info->script;
-            }
-            task->effect = info->scriptEffect;
-            task->sound = info->scriptSound;
-            if (info->element >= ELEMENT_FIRST || (info->family >= FAMILY_FIRST && info->family == other->family)) {
-                task->stage = info->scriptStage;
-            } else {
-                task->stage = -1;
-            }
-        }
+        choosePartnerScript(task, info, own, other);
         if (task->stage <= 0) {
             if (own->element >= ELEMENT_FIRST) {
                 s32 n;
@@ -145,14 +201,7 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
             }
         }
     } else {
-        task->index = info->script;
-        task->effect = info->scriptEffect;
-        task->sound = info->scriptSound;
-        if (info->element >= ELEMENT_FIRST || (info->family >= FAMILY_FIRST && info->family == other->family)) {
-            task->stage = info->scriptStage;
-        } else {
-            task->stage = -1;
-        }
+        chooseEnemyScript(task, info, other);
     }
     units = FIGHTSTG_battle.fighters[1 - side];
     if (id == 0x1B5) {
@@ -226,35 +275,9 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
             damage = 0;
         }
     } else {
-        switch (id) {
-        case 0x64:
-        case 0x177:
-            damage = -9999;
-            break;
-        case 0xB8:
-        case 0xB9:
-        case 0xBA:
-        case 0xBB:
-        case 0xBC:
-        case 0x190:
-            damage = -FIGHTSTG_battleFuncs.computeHeal(actor, id);
-            break;
-        default:
-            damage = 0;
-            break;
-        }
+        damage = getHealDamage(actor, id);
     }
-    if (info->icon == TECH_PHYSICAL || info->icon == TECH_MAGIC) {
-        WFIGHTMN_recordTech(actor, id);
-        WFIGHTMN_countHit(actor, damage);
-        WFIGHTMN_setIdleMotion(SIDE_ENEMY - actor, damage);
-        if (FIGHTSTG_action.effects[TECH_EFFECT_DRAIN] != 0) {
-            WFIGHTMN_setIdleMotion(actor, -FIGHTSTG_action.drain);
-        }
-    } else {
-        WFIGHTMN_endWeakness(actor);
-        WFIGHTMN_setIdleMotion(actor, damage);
-    }
+    setTechIdleMotions(info, actor, id, damage);
     return task;
 }
 

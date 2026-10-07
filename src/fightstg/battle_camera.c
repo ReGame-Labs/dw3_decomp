@@ -97,7 +97,7 @@ void FIGHTSTG_updateBattleCamera(BattleCamera *task) {
             view.vrz = task->current.vrz;
             view.rz = task->current.rz << 12;
             view.super = &coord;
-            func_80029DB8(&view);
+            GsSetRefView2(&view);
             layer = GFX.funcs.getLayer(task->layerId);
             layer->setKeepView(layer, 1, task->current.proj);
             if (task->t == 0x1000) {

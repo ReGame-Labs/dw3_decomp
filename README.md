@@ -12,7 +12,7 @@
 [![Platform](https://img.shields.io/badge/platform-PlayStation-003791)](docs/binaries.md#the-games-binaries)
 [![Versions](https://img.shields.io/badge/versions-USA%20%7C%20Europe-blue)](docs/binaries.md#how-the-versions-are-organised)
 [![Compiler](https://img.shields.io/badge/compiler-GCC%202.8.1-orange)](docs/toolchain.md#toolchain)
-[![Fake matches | hacks](https://img.shields.io/badge/fake%20matches%20%7C%20hacks-0%20%7C%20184-yellow)](docs/status.md#fake-matches-and-hacks)
+[![Fake matches | hacks](https://img.shields.io/badge/fake%20matches%20%7C%20hacks-0%20%7C%20183-yellow)](docs/status.md#fake-matches-and-hacks)
 [![License](https://img.shields.io/github/license/ReGame-Labs/dw3_decomp)](LICENSE)
 
 A work in progress matching decompilation of **Digimon World 3** for the

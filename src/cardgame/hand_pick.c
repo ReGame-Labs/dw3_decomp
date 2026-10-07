@@ -272,163 +272,300 @@ s32 CARDGAME_stepPulseCard(CardBattle *battle, CardScreen *screen) {
     return done;
 }
 
-/* Choosing cards of PILE's hand to play: effectStep.nextState queues the next step. -1 while it runs, then 0 or 1 */
-s32 CARDGAME_stepChooseCards(CardBattle *battle, CardScreen *screen, CardPile *pile) {
-    s32 result = -1;
-    /* the match depends on a loop variable of its own for most loops:
-       sharing them gives GCC 2.8.1 other registers */
+/* Hides the hand and the choice's windows for the battle menu */
+static inline void hideHandForMenu(CardBattle *battle, CardScreen *screen, CardPile *pile) {
+    battle->anim.next = battle->anim.hide;
+    CARDGAME_promptText = screen->windows[0].value;
+    battle->effectStep.time = battle->anim.hide;
+    screen->closeWindow(screen, 4);
+    screen->closeWindow(screen, 0);
+    screen->closeWindow(screen, 1);
+    screen->closeWindow(screen, 2);
+    screen->closeWindow(screen, 3);
+    if (battle->effectStep.id == 0x9A) {
+        screen->closeWindow(screen, 5);
+    }
+    if (pile->side == 0) {
+        screen->closePanel(screen, 0);
+    }
+}
+
+/* Back from the battle menu: shows the hand again, the cards that can't be
+   played dimmed, and reopens the choice's windows */
+static inline void showHandAfterMenu(CardBattle *battle, CardScreen *screen, CardPile *pile) {
+    s32 j;
+
+    CARDGAME_promptText = 0x19;
+    battle->effectStep.vars[0] = 0;
+    battle->anim.next = battle->effectStep.time - 1;
+    switch (battle->effectStep.id) {
+    case 0x99:
+    case 0x9A:
+    case 0x9D:
+        for (j = 0; j < pile->handCount; j++) {
+            if (CARDGAME_canPlayCard(battle, pile->points, pile->hand[j])) {
+                battle->anim.dimmed[j] = 0;
+            } else {
+                battle->anim.dimmed[j] = 1;
+            }
+        }
+        break;
+    }
+    screen->openWindow(screen, 0, 0, CARDGAME_promptText, 0, 0x42);
+    screen->openWindow(screen, 2, 1, 0, 0x82, 0xA5);
+    screen->openWindow(screen, 4, 2, 0, 0x86, 0x31);
+    screen->openWindow(screen, 3, 1, 0, 0x82, 0x90);
+    screen->openWindow(screen, 1, 3, 0, 0xFD, 0x90);
+    if (battle->effectStep.id == 0x9A) {
+        screen->openWindow(screen, 5, 4, 0x24, 0, 0x14);
+    }
+    if (pile->side == 0) {
+        screen->openPanel(screen, 0);
+    }
+}
+
+/* Starts the state of the card choice effectStep.nextState asks for: its
+   prompt, windows and dimmed cards */
+static inline void startChooseState(CardBattle *battle, CardScreen *screen, CardPile *pile) {
     s32 i;
     s32 j;
-    s32 k;
-    s32 m;
-    s32 n;
-    s32 count;
 
-    if (battle->effectStep.nextState != 0) {
-        switch (battle->effectStep.nextState) {
-        case 1:
-        case 2:
-            switch (battle->effectStep.id) {
-            case 0x99:
-                if (pile->side != 0) {
-                    CARDGAME_promptText = 0x1C;
-                } else {
-                    CARDGAME_promptText = 0x19;
-                }
-                break;
-            case 0x9D:
+    switch (battle->effectStep.nextState) {
+    case 1:
+    case 2:
+        switch (battle->effectStep.id) {
+        case 0x99:
+            if (pile->side != 0) {
                 CARDGAME_promptText = 0x1C;
-                break;
-            case 0x9C:
-                CARDGAME_promptText = 0x1B;
-                break;
-            case 0x9A:
-            case 0x9B:
-                CARDGAME_promptText = 0x19;
-                break;
-            }
-            battle->effectStep.vars[1] = 0;
-            battle->effectStep.vars[0] = 0;
-            battle->effectStep.time = 0;
-            battle->effectStep.choice = 0;
-            battle->effectStep.count = 0;
-            break;
-        case 5:
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            battle->effectStep.vars[0] = 0;
-            battle->effectStep.time = 0;
-            break;
-        case 4:
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            break;
-        case 14:
-            if (pile->side == 0) {
-                battle->anim.next = CARD_ANIM_HIDE_HAND;
-                screen->closePanel(screen, 0);
             } else {
-                battle->anim.next = CARD_ANIM_HIDE_OPPONENT_HAND;
-            }
-            battle->effectStep.vars[0] = 0;
-            battle->effectStep.time = 0;
-            screen->closeWindow(screen, 4);
-            screen->closeWindow(screen, 0);
-            screen->closeWindow(screen, 1);
-            screen->closeWindow(screen, 2);
-            screen->closeWindow(screen, 3);
-            break;
-        case 10:
-            battle->effectStep.vars[0] = 0;
-            battle->effectStep.time = 0;
-            battle->anim.next = battle->anim.hide;
-            screen->closeWindow(screen, 4);
-            screen->closeWindow(screen, 0);
-            screen->closeWindow(screen, 1);
-            screen->closeWindow(screen, 2);
-            screen->closeWindow(screen, 3);
-            break;
-        case 6:
-            battle->effectStep.vars[0] = 0;
-            battle->effectStep.time = 0;
-            CARDGAME_promptText = screen->windows[0].value;
-            for (i = 0; i < pile->handCount; i++) {
-                if (battle->effectStep.marked[i] != 0) {
-                    screen->sprites[i].dimmed = 0;
-                    screen->sprites[i].highlight |= 4;
-                } else {
-                    screen->sprites[i].dimmed = 1;
-                }
+                CARDGAME_promptText = 0x19;
             }
             break;
-        case 7:
-            battle->effectStep.choice = 0;
-            battle->effectStep.time = 0;
+        case 0x9D:
+            CARDGAME_promptText = 0x1C;
             break;
-        case 3:
-        case 8:
-            battle->effectStep.vars[0] = 0;
-            battle->effectStep.time = 0;
+        case 0x9C:
+            CARDGAME_promptText = 0x1B;
             break;
-        case 11:
-            battle->anim.next = battle->anim.hide;
-            CARDGAME_promptText = screen->windows[0].value;
-            battle->effectStep.time = battle->anim.hide;
-            screen->closeWindow(screen, 4);
-            screen->closeWindow(screen, 0);
-            screen->closeWindow(screen, 1);
-            screen->closeWindow(screen, 2);
-            screen->closeWindow(screen, 3);
-            if (battle->effectStep.id == 0x9A) {
-                screen->closeWindow(screen, 5);
-            }
-            if (pile->side == 0) {
-                screen->closePanel(screen, 0);
-            }
-            break;
-        case 13:
+        case 0x9A:
+        case 0x9B:
             CARDGAME_promptText = 0x19;
-            battle->effectStep.vars[0] = 0;
-            battle->anim.next = battle->effectStep.time - 1;
-            switch (battle->effectStep.id) {
-            case 0x99:
-            case 0x9A:
-            case 0x9D:
-                for (j = 0; j < pile->handCount; j++) {
-                    if (CARDGAME_canPlayCard(battle, pile->points, pile->hand[j])) {
-                        battle->anim.dimmed[j] = 0;
-                    } else {
-                        battle->anim.dimmed[j] = 1;
-                    }
-                }
-                break;
-            }
-            screen->openWindow(screen, 0, 0, CARDGAME_promptText, 0, 0x42);
-            screen->openWindow(screen, 2, 1, 0, 0x82, 0xA5);
-            screen->openWindow(screen, 4, 2, 0, 0x86, 0x31);
-            screen->openWindow(screen, 3, 1, 0, 0x82, 0x90);
-            screen->openWindow(screen, 1, 3, 0, 0xFD, 0x90);
-            if (battle->effectStep.id == 0x9A) {
-                screen->openWindow(screen, 5, 4, 0x24, 0, 0x14);
-            }
-            if (pile->side == 0) {
-                screen->openPanel(screen, 0);
-            }
-            break;
-        case 9:
-            battle->effectStep.vars[0] = 0;
-            battle->effectStep.time = 0;
-            for (j = 0; j < pile->handCount; j++) {
-                if (CARDGAME_canPlayCard(battle, pile->points, pile->hand[j])) {
-                    screen->sprites[j].dimmed = 0;
-                } else {
-                    screen->sprites[j].dimmed = 1;
-                }
-                if (battle->effectStep.marked[j] != 0) {
-                    screen->sprites[j].dimmed = 0;
-                    screen->sprites[j].highlight &= ~4;
-                }
-            }
             break;
         }
+        battle->effectStep.vars[1] = 0;
+        battle->effectStep.vars[0] = 0;
+        battle->effectStep.time = 0;
+        battle->effectStep.choice = 0;
+        battle->effectStep.count = 0;
+        break;
+    case 5:
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+        battle->effectStep.vars[0] = 0;
+        battle->effectStep.time = 0;
+        break;
+    case 4:
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+        break;
+    case 14:
+        if (pile->side == 0) {
+            battle->anim.next = CARD_ANIM_HIDE_HAND;
+            screen->closePanel(screen, 0);
+        } else {
+            battle->anim.next = CARD_ANIM_HIDE_OPPONENT_HAND;
+        }
+        battle->effectStep.vars[0] = 0;
+        battle->effectStep.time = 0;
+        screen->closeWindow(screen, 4);
+        screen->closeWindow(screen, 0);
+        screen->closeWindow(screen, 1);
+        screen->closeWindow(screen, 2);
+        screen->closeWindow(screen, 3);
+        break;
+    case 10:
+        battle->effectStep.vars[0] = 0;
+        battle->effectStep.time = 0;
+        battle->anim.next = battle->anim.hide;
+        screen->closeWindow(screen, 4);
+        screen->closeWindow(screen, 0);
+        screen->closeWindow(screen, 1);
+        screen->closeWindow(screen, 2);
+        screen->closeWindow(screen, 3);
+        break;
+    case 6:
+        battle->effectStep.vars[0] = 0;
+        battle->effectStep.time = 0;
+        CARDGAME_promptText = screen->windows[0].value;
+        for (i = 0; i < pile->handCount; i++) {
+            if (battle->effectStep.marked[i] != 0) {
+                screen->sprites[i].dimmed = 0;
+                screen->sprites[i].highlight |= 4;
+            } else {
+                screen->sprites[i].dimmed = 1;
+            }
+        }
+        break;
+    case 7:
+        battle->effectStep.choice = 0;
+        battle->effectStep.time = 0;
+        break;
+    case 3:
+    case 8:
+        battle->effectStep.vars[0] = 0;
+        battle->effectStep.time = 0;
+        break;
+    case 11:
+        hideHandForMenu(battle, screen, pile);
+        break;
+    case 13:
+        showHandAfterMenu(battle, screen, pile);
+        break;
+    case 9:
+        battle->effectStep.vars[0] = 0;
+        battle->effectStep.time = 0;
+        for (j = 0; j < pile->handCount; j++) {
+            if (CARDGAME_canPlayCard(battle, pile->points, pile->hand[j])) {
+                screen->sprites[j].dimmed = 0;
+            } else {
+                screen->sprites[j].dimmed = 1;
+            }
+            if (battle->effectStep.marked[j] != 0) {
+                screen->sprites[j].dimmed = 0;
+                screen->sprites[j].highlight &= ~4;
+            }
+        }
+        break;
+    }
+}
+
+/* Puts the highlighted card back in the hand and opens the confirm message */
+static inline void askToConfirm(CardBattle *battle, CardScreen *screen, CardPile *pile) {
+    switch (battle->effectStep.time) {
+    case 0:
+        screen->closeWindow(screen, 4);
+        screen->closeWindow(screen, 0);
+        screen->closeWindow(screen, 5);
+        screen->startMove(screen, battle->effectStep.cursor, 5, screen->getHandOffset(pile->handCount, battle->effectStep.cursor) + 0x1800, 0x6100);
+        screen->sprites[battle->effectStep.cursor].highlight &= ~1;
+        screen->sprites[battle->effectStep.cursor].moving = 0;
+        break;
+    case 6:
+        screen->openMessage(screen, 15, 1, 0, 2);
+        break;
+    }
+}
+
+/* After a no to the confirm message: reopens the choice's windows, then
+   lifts the highlighted card again and choosing goes on (state 3) */
+static inline void backToChoosing(CardBattle *battle, CardScreen *screen, CardPile *pile) {
+    switch (battle->effectStep.time) {
+    case 6:
+        break;
+    case 18:
+        screen->openWindow(screen, 0, 0, CARDGAME_promptText, 0, 0x42);
+        screen->openWindow(screen, 4, 2, 0, 0x86, 0x31);
+        screen->openWindow(screen, 5, 4, 0x24, 0, 0x14);
+        CARDGAME_showCardInfo(battle, screen, 0);
+        break;
+    }
+    if (++battle->effectStep.time > 30) {
+        battle->effectStep.nextState = 3;
+        screen->startMove(screen, battle->effectStep.cursor, 5, screen->getHandOffset(pile->handCount, battle->effectStep.cursor) + 0x1800, 0x5C00);
+        screen->sprites[battle->effectStep.cursor].highlight |= 1;
+        screen->sprites[battle->effectStep.cursor].moving = 1;
+    }
+}
+
+/* The answer to the confirm message: yes (effectStep.choice 0) ends the choice
+   (state 8), no or triangle goes back to choosing (state 9) */
+static inline void readConfirmInput(CardBattle *battle, CardScreen *screen) {
+    if (PAD_PRESSED(PAD_CROSS)) {
+        screen->confirmMessage(screen);
+        if (battle->effectStep.choice == 0) {
+            battle->effectStep.nextState = 8;
+        } else {
+            battle->effectStep.nextState = 9;
+        }
+    } else if (PAD_PRESSED(PAD_UP) || PAD_PRESSED(PAD_DOWN)) {
+        battle->effectStep.choice ^= 1;
+        SOUND.playSound(SOUND_CURSOR);
+        screen->setMessageChoice(screen, battle->effectStep.choice);
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        battle->effectStep.choice = 1;
+        screen->setMessageChoice(screen, 1);
+        screen->confirmMessage(screen);
+        battle->effectStep.nextState = 9;
+    }
+}
+
+/* The chosen cards pulse with a sound, then the hand and its windows close */
+static inline void showChosenCards(CardBattle *battle, CardScreen *screen, CardPile *pile) {
+    /* the match depends on a loop variable of its own for most loops:
+       sharing them gives GCC 2.8.1 other registers */
+    s32 k;
+    s32 m;
+    s32 count;
+
+    switch (battle->effectStep.time) {
+    case 20:
+        count = 0;
+        for (k = 0; k < pile->handCount; k++) {
+            if (battle->effectStep.marked[k] != 0) {
+                screen->scaleSprite(screen, k, 6, 0x1400, 0x1400);
+                count++;
+            }
+        }
+        if (count != 0) {
+            SOUND.playSound(SOUND_MENU_CONFIRM);
+        }
+        break;
+    case 25:
+        for (m = 0; m < pile->handCount; m++) {
+            if (battle->effectStep.marked[m] != 0) {
+                screen->scaleSprite(screen, m, 6, 0x1000, 0x1000);
+            }
+        }
+        break;
+    case 35:
+        if (pile->side == 0) {
+            battle->anim.next = CARD_ANIM_HIDE_HAND;
+            screen->closePanel(screen, 0);
+        } else {
+            battle->anim.next = CARD_ANIM_HIDE_OPPONENT_HAND;
+        }
+        screen->closeWindow(screen, 1);
+        screen->closeWindow(screen, 2);
+        screen->closeWindow(screen, 3);
+        break;
+    }
+}
+
+/* Back from the battle menu: once the hand is shown again, choosing goes on
+   with the picked cards highlighted */
+static inline void resumeChoosing(CardBattle *battle, CardScreen *screen, CardPile *pile) {
+    s32 n;
+
+    if (((pile->side == 0 && screen->panels[0].state == 2) || (pile->side != 0 && ++battle->effectStep.vars[0] > 10)) &&
+        battle->anim.current == CARD_ANIM_NONE) {
+        battle->effectStep.nextState = 3;
+        screen->startSlide(screen, battle->effectStep.cursor, 5, screen->getHandOffset(pile->handCount, battle->effectStep.cursor) + 0x1800, 0x5C00);
+        screen->sprites[battle->effectStep.cursor].highlight |= 1;
+        screen->sprites[battle->effectStep.cursor].moving = 1;
+        for (n = 0; n < pile->handCount; n++) {
+            if (battle->effectStep.marked[n] == 1) {
+                screen->sprites[n].dimmed = 0;
+                screen->sprites[n].highlight |= 2;
+            }
+        }
+    }
+}
+
+/* Choosing cards of PILE's hand to play: effectStep.nextState queues the next step (startChooseState). -1 while it runs, then 0 or 1 */
+s32 CARDGAME_stepChooseCards(CardBattle *battle, CardScreen *screen, CardPile *pile) {
+    s32 result = -1;
+
+    if (battle->effectStep.nextState != 0) {
+        startChooseState(battle, screen, pile);
         battle->effectStep.state = battle->effectStep.nextState;
         battle->effectStep.nextState = 0;
     }
@@ -509,97 +646,22 @@ s32 CARDGAME_stepChooseCards(CardBattle *battle, CardScreen *screen, CardPile *p
         battle->effectStep.time += GFX.funcs.getFrameTime();
         break;
     case 6:
-        switch (battle->effectStep.time) {
-        case 0:
-            screen->closeWindow(screen, 4);
-            screen->closeWindow(screen, 0);
-            screen->closeWindow(screen, 5);
-            screen->startMove(screen, battle->effectStep.cursor, 5, screen->getHandOffset(pile->handCount, battle->effectStep.cursor) + 0x1800, 0x6100);
-            screen->sprites[battle->effectStep.cursor].highlight &= ~1;
-            screen->sprites[battle->effectStep.cursor].moving = 0;
-            break;
-        case 6:
-            screen->openMessage(screen, 15, 1, 0, 2);
-            break;
-        }
+        askToConfirm(battle, screen, pile);
         if (++battle->effectStep.time > 18) {
             battle->effectStep.nextState = 7;
         }
         break;
     case 7:
-        if (PAD_PRESSED(PAD_CROSS)) {
-            screen->confirmMessage(screen);
-            if (battle->effectStep.choice == 0) {
-                battle->effectStep.nextState = 8;
-            } else {
-                battle->effectStep.nextState = 9;
-            }
-        } else if (PAD_PRESSED(PAD_UP) || PAD_PRESSED(PAD_DOWN)) {
-            battle->effectStep.choice ^= 1;
-            SOUND.playSound(SOUND_CURSOR);
-            screen->setMessageChoice(screen, battle->effectStep.choice);
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            battle->effectStep.choice = 1;
-            screen->setMessageChoice(screen, 1);
-            screen->confirmMessage(screen);
-            battle->effectStep.nextState = 9;
-        }
+        readConfirmInput(battle, screen);
         break;
     case 8:
-        switch (battle->effectStep.time) {
-        case 20:
-            count = 0;
-            for (k = 0; k < pile->handCount; k++) {
-                if (battle->effectStep.marked[k] != 0) {
-                    screen->scaleSprite(screen, k, 6, 0x1400, 0x1400);
-                    count++;
-                }
-            }
-            if (count != 0) {
-                SOUND.playSound(SOUND_MENU_CONFIRM);
-            }
-            break;
-        case 25:
-            for (m = 0; m < pile->handCount; m++) {
-                if (battle->effectStep.marked[m] != 0) {
-                    screen->scaleSprite(screen, m, 6, 0x1000, 0x1000);
-                }
-            }
-            break;
-        case 35:
-            if (pile->side == 0) {
-                battle->anim.next = CARD_ANIM_HIDE_HAND;
-                screen->closePanel(screen, 0);
-            } else {
-                battle->anim.next = CARD_ANIM_HIDE_OPPONENT_HAND;
-            }
-            screen->closeWindow(screen, 1);
-            screen->closeWindow(screen, 2);
-            screen->closeWindow(screen, 3);
-            break;
-        }
+        showChosenCards(battle, screen, pile);
         if (++battle->effectStep.time > 45 && battle->anim.current == CARD_ANIM_NONE) {
             result = 1;
         }
         break;
     case 9:
-        switch (battle->effectStep.time) {
-        case 6:
-            break;
-        case 18:
-            screen->openWindow(screen, 0, 0, CARDGAME_promptText, 0, 0x42);
-            screen->openWindow(screen, 4, 2, 0, 0x86, 0x31);
-            screen->openWindow(screen, 5, 4, 0x24, 0, 0x14);
-            CARDGAME_showCardInfo(battle, screen, 0);
-            break;
-        }
-        if (++battle->effectStep.time > 30) {
-            battle->effectStep.nextState = 3;
-            screen->startMove(screen, battle->effectStep.cursor, 5, screen->getHandOffset(pile->handCount, battle->effectStep.cursor) + 0x1800, 0x5C00);
-            screen->sprites[battle->effectStep.cursor].highlight |= 1;
-            screen->sprites[battle->effectStep.cursor].moving = 1;
-        }
+        backToChoosing(battle, screen, pile);
         break;
     case 11:
         if (screen->panels[0].state == 0 && battle->anim.current == CARD_ANIM_NONE) {
@@ -612,19 +674,7 @@ s32 CARDGAME_stepChooseCards(CardBattle *battle, CardScreen *screen, CardPile *p
         battle->effectStep.nextState = 13;
         break;
     case 13:
-        if (((pile->side == 0 && screen->panels[0].state == 2) || (pile->side != 0 && ++battle->effectStep.vars[0] > 10)) &&
-            battle->anim.current == CARD_ANIM_NONE) {
-            battle->effectStep.nextState = 3;
-            screen->startSlide(screen, battle->effectStep.cursor, 5, screen->getHandOffset(pile->handCount, battle->effectStep.cursor) + 0x1800, 0x5C00);
-            screen->sprites[battle->effectStep.cursor].highlight |= 1;
-            screen->sprites[battle->effectStep.cursor].moving = 1;
-            for (n = 0; n < pile->handCount; n++) {
-                if (battle->effectStep.marked[n] == 1) {
-                    screen->sprites[n].dimmed = 0;
-                    screen->sprites[n].highlight |= 2;
-                }
-            }
-        }
+        resumeChoosing(battle, screen, pile);
         CARDGAME_showCardInfo(battle, screen, 0);
         break;
     }

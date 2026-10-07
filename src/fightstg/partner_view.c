@@ -7,7 +7,7 @@ void FIGHTSTG_drawPartnerViewFrame(PartnerView *task, FighterCamera **cameras) {
     SpriteDrawer drawer;
 
     initSpriteDrawer(&drawer);
-    drawer.setLayerId(0x1005, 0);
+    drawer.setLayerId(BATTLE_LAYER_MENUS, 0);
     drawer.setTexture(0x200, 0);
     drawer.draw(FILE_CACHE.getEntry(FILE_BATTLE_MENU << 16), 10, 246, 74);
 }

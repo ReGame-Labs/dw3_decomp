@@ -90,9 +90,9 @@ typedef struct CameraShots {
     /* 0x5E */ s16 shot;
     /* 0x60 */ s16 ry; /* where the turn of substate 6 starts */
     /* 0x62 */ s16 rx;
-    /* 0x64 */ s32 unk64;
+    /* 0x64 */ s32 pad64; /* nothing uses it */
     /* 0x68 */ s32 time;
-    /* 0x6C */ s32 unk6C;
+    /* 0x6C */ s32 pad6C; /* nothing uses it */
     /* 0x70 */ struct CameraView to; /* where substates 4 and 5 fade to */
 } CameraShots;
 
@@ -118,7 +118,6 @@ void FIGHTSTG_updateBattleCamera(BattleCamera *task);
 void FIGHTSTG_fadeBattleCamera(BattleCamera *task, CameraView *from, CameraView *to, s32 time);
 CameraView *FIGHTSTG_getFighterView(BattleCamera *task, s32 id, s32 camera);
 CameraView *FIGHTSTG_getEnemyView(BattleCamera *task);
-void func_80029DB8(GsRVIEW2 *view); /* GsSetRefView2 */
 extern CameraView FIGHTSTG_fighterView;
 extern CameraShot FIGHTSTG_cameraShots[4][6];
 extern u8 FIGHTSTG_nextShotLists[8][3];

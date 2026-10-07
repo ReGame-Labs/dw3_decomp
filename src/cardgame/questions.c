@@ -80,6 +80,77 @@ void CARDGAME_startQuestion(CardBattle *battle, CardScreen *screen, s32 value) {
 #endif
 }
 
+/* The yes/no window's buttons: cross answers, triangle answers the second
+   choice, up and down change the choice, L1 or R1 moves the window and
+   circle opens the battle menu */
+static inline void readYesNoInput(CardBattle *battle, CardScreen *screen) {
+    if (PAD_PRESSED(PAD_CROSS)) {
+        screen->confirmMessage(screen);
+        battle->effectStep.state = 7;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        battle->effectStep.choice = 1;
+        screen->setMessageChoice(screen, 1);
+        screen->confirmMessage(screen);
+        battle->effectStep.state = 7;
+#if VERSION_US
+    } else if (PAD_PRESSED(PAD_UP) || PAD_PRESSED(PAD_DOWN)) {
+#elif VERSION_EU
+    } else if ((PAD_PRESSED(PAD_UP) || PAD_PRESSED(PAD_DOWN)) && battle->effectStep.vars[4] == 2) {
+#endif
+        SOUND.playSound(SOUND_CURSOR);
+        battle->effectStep.choice ^= 1;
+        screen->setMessageChoice(screen, battle->effectStep.choice);
+    } else if ((!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) || (!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1))) {
+        screen->closeMessage(screen);
+        battle->effectStep.state = 6;
+    } else if (PAD_PRESSED(PAD_CIRCLE)) {
+        screen->closeMessage(screen);
+        battle->effectStep.time = 0;
+        battle->effectStep.state = 3;
+    }
+}
+
+/* Closes the panels and opens the battle menu once they are closed */
+static inline void hideForMenu(CardBattle *battle, CardScreen *screen) {
+    switch (battle->effectStep.time) {
+    case 0:
+        if (screen->message.state == 0) {
+            battle->anim.next = CARD_ANIM_HIDE_SLOTS;
+            screen->closePanels(screen);
+            battle->effectStep.time = 1;
+        }
+        break;
+    case 1:
+        if (screen->panels[0].state == 0 && battle->anim.current == CARD_ANIM_NONE) {
+            battle->run = CARD_RUN_MENU;
+            battle->record.menuState = 0;
+            battle->effectStep.state = 4;
+        }
+        break;
+    }
+}
+
+/* Back from the battle menu: reopens the yes/no window once the panels are open again */
+static inline void showAfterMenu(CardBattle *battle, CardScreen *screen) {
+    switch (battle->effectStep.time) {
+    case 0:
+        if (battle->anim.current == CARD_ANIM_NONE && screen->panels[0].state == 2) {
+#if VERSION_US
+            screen->openMessage(screen, screen->message.message, 1, screen->message.choice, screen->message.place);
+#elif VERSION_EU
+            screen->openMessage(screen, screen->message.message, battle->effectStep.vars[4], screen->message.choice, screen->message.place);
+#endif
+            battle->effectStep.time = 1;
+        }
+        break;
+    case 1:
+        if (screen->message.state == 2) {
+            battle->effectStep.state = 2;
+        }
+        break;
+    }
+}
+
 /* Runs the yes/no window that CARDGAME_startQuestion sets up: 1 for the first choice, 2 for the second, 0 until then */
 s32 CARDGAME_stepYesNo(CardBattle *battle, CardScreen *screen) {
     s32 result = 0;
@@ -104,30 +175,7 @@ s32 CARDGAME_stepYesNo(CardBattle *battle, CardScreen *screen) {
         }
         break;
     case 2:
-        if (PAD_PRESSED(PAD_CROSS)) {
-            screen->confirmMessage(screen);
-            battle->effectStep.state = 7;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            battle->effectStep.choice = 1;
-            screen->setMessageChoice(screen, 1);
-            screen->confirmMessage(screen);
-            battle->effectStep.state = 7;
-#if VERSION_US
-        } else if (PAD_PRESSED(PAD_UP) || PAD_PRESSED(PAD_DOWN)) {
-#elif VERSION_EU
-        } else if ((PAD_PRESSED(PAD_UP) || PAD_PRESSED(PAD_DOWN)) && battle->effectStep.vars[4] == 2) {
-#endif
-            SOUND.playSound(SOUND_CURSOR);
-            battle->effectStep.choice ^= 1;
-            screen->setMessageChoice(screen, battle->effectStep.choice);
-        } else if ((!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) || (!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1))) {
-            screen->closeMessage(screen);
-            battle->effectStep.state = 6;
-        } else if (PAD_PRESSED(PAD_CIRCLE)) {
-            screen->closeMessage(screen);
-            battle->effectStep.time = 0;
-            battle->effectStep.state = 3;
-        }
+        readYesNoInput(battle, screen);
         break;
     case 6:
         if (screen->message.state == 0) {
@@ -152,22 +200,7 @@ s32 CARDGAME_stepYesNo(CardBattle *battle, CardScreen *screen) {
         }
         break;
     case 3:
-        switch (battle->effectStep.time) {
-        case 0:
-            if (screen->message.state == 0) {
-                battle->anim.next = CARD_ANIM_HIDE_SLOTS;
-                screen->closePanels(screen);
-                battle->effectStep.time = 1;
-            }
-            break;
-        case 1:
-            if (screen->panels[0].state == 0 && battle->anim.current == CARD_ANIM_NONE) {
-                battle->run = CARD_RUN_MENU;
-                battle->record.menuState = 0;
-                battle->effectStep.state = 4;
-            }
-            break;
-        }
+        hideForMenu(battle, screen);
         break;
     case 4:
         battle->anim.dimAll = CARD_ANIM_UNDIM_ALL;
@@ -177,23 +210,7 @@ s32 CARDGAME_stepYesNo(CardBattle *battle, CardScreen *screen) {
         battle->effectStep.time = 0;
         break;
     case 5:
-        switch (battle->effectStep.time) {
-        case 0:
-            if (battle->anim.current == CARD_ANIM_NONE && screen->panels[0].state == 2) {
-#if VERSION_US
-                screen->openMessage(screen, screen->message.message, 1, screen->message.choice, screen->message.place);
-#elif VERSION_EU
-                screen->openMessage(screen, screen->message.message, battle->effectStep.vars[4], screen->message.choice, screen->message.place);
-#endif
-                battle->effectStep.time = 1;
-            }
-            break;
-        case 1:
-            if (screen->message.state == 2) {
-                battle->effectStep.state = 2;
-            }
-            break;
-        }
+        showAfterMenu(battle, screen);
         break;
     case 1:
         if (screen->message.state == 2) {

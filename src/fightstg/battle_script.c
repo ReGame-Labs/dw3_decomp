@@ -71,6 +71,65 @@ void FIGHTSTG_runScriptHits(BattleScript *script, BattleScriptChildren *children
     }
 }
 
+/* Model command 0 with 1: puts the model back to its idle motion. */
+static inline void playIdleMotion(ModelControl *control) {
+    control->motionDone = 0;
+    control->motion = control->idleMotion + 1;
+}
+
+/* Model command 0 with any other MOTION: plays the model's motion MOTION
+   from its start. */
+static inline void playMotion(ModelControl *control, s32 motion) {
+    control->motion = motion + 1;
+    control->restart = 1;
+    control->motionDone = 0;
+}
+
+/* Model command 4: sets the model's rotation from the script. */
+static inline void turnModel(BattleScript *script, ModelControl *control) {
+    control->rot.x = *script->pc++;
+    control->rot.y = -*script->pc++;
+    control->rot.z = -*script->pc++;
+    script->pc++;
+}
+
+/* Model command 5: replaces the model's jump with a new one of kind KIND
+   (DISTANCE only for kind 4). */
+static inline void startModelJump(BattleScriptChildren *children, ModelControl *control, s32 kind, s32 distance) {
+    if (children->jump != NULL) {
+        children->jump->destroy(children->jump);
+    }
+    children->jump = FIGHTSTG_startJump(control, kind, distance);
+}
+
+/* Model command 6: adds fighter FIGHTER's model to the battle as model ID. */
+static inline void addModel(s32 id, s32 fighter) {
+    Models *models = TASK_REGISTRY.funcs.find(BATTLE_TASK_MODELS, -1, -1);
+
+    models->add(models, id, fighter, 0);
+}
+
+/* Model command 7: moves the model back home over the script's time, or at
+   once when it is 0. */
+static inline void moveModelHome(BattleScript *script, BattleScriptChildren *children, ModelControl *control) {
+    s32 time = *script->pc++;
+
+    if (time != 0) {
+        children->move = FIGHTSTG_startMove(control, &control->homePos, time);
+    } else {
+        control->pos.x = control->homePos.x;
+        control->pos.y = control->homePos.y;
+        control->pos.z = control->homePos.z;
+    }
+}
+
+/* Model command 9: removes model ID from the battle. */
+static inline void removeModel(s32 id) {
+    Models *models = TASK_REGISTRY.funcs.find(BATTLE_TASK_MODELS, -1, -1);
+
+    models->remove(models, id);
+}
+
 /* The battle script's model command, on the model given by FIGHTSTG_getScriptModel:
    0 plays a motion (0 waits for the one playing, 1 goes back to idle), 1
    and 2 turn layers[0] on and off, 3 moves it to a position in the script
@@ -85,7 +144,6 @@ s32 FIGHTSTG_runScriptModel(BattleScript *script, BattleScriptChildren *children
     ModelControl *control = NULL;
     s32 cmd = *script->pc++;
     s32 id = FIGHTSTG_getScriptModel(script, *script->pc++);
-    Models *models;
 
     switch (cmd) {
     case 1:
@@ -113,13 +171,10 @@ s32 FIGHTSTG_runScriptModel(BattleScript *script, BattleScriptChildren *children
             }
             return 1;
         case 1:
-            control->motionDone = 0;
-            control->motion = control->idleMotion + 1;
+            playIdleMotion(control);
             break;
         default:
-            control->motion = arg + 1;
-            control->restart = 1;
-            control->motionDone = 0;
+            playMotion(control, arg);
             break;
         }
         break;
@@ -139,20 +194,11 @@ s32 FIGHTSTG_runScriptModel(BattleScript *script, BattleScriptChildren *children
         case 3:
         case 5:
         case 6:
-            if (children->jump != NULL) {
-                children->jump->destroy(children->jump);
-            }
-            children->jump = FIGHTSTG_startJump(control, arg, 0);
+            startModelJump(children, control, arg, 0);
             break;
-        case 4: {
-            s32 distance = *script->pc++;
-
-            if (children->jump != NULL) {
-                children->jump->destroy(children->jump);
-            }
-            children->jump = FIGHTSTG_startJump(control, arg, distance);
+        case 4:
+            startModelJump(children, control, arg, *script->pc++);
             break;
-        }
         }
         break;
     case 1:
@@ -178,31 +224,18 @@ s32 FIGHTSTG_runScriptModel(BattleScript *script, BattleScriptChildren *children
         break;
     }
     case 4:
-        control->rot.x = *script->pc++;
-        control->rot.y = -*script->pc++;
-        control->rot.z = -*script->pc++;
-        script->pc++;
+        turnModel(script, control);
         break;
     case 6:
         if (script->index == 12 && FILE_CACHE.isLoading(FIGHTSTG_fighterCache.funcs.getInfo(arg)->model >> 16)) {
             script->pc -= 4;
             return 0;
         }
-        models = TASK_REGISTRY.funcs.find(BATTLE_TASK_MODELS, -1, -1);
-        models->add(models, id, arg, 0);
+        addModel(id, arg);
         return 1;
-    case 7: {
-        s32 time = *script->pc++;
-
-        if (time != 0) {
-            children->move = FIGHTSTG_startMove(control, &control->homePos, time);
-        } else {
-            control->pos.x = control->homePos.x;
-            control->pos.y = control->homePos.y;
-            control->pos.z = control->homePos.z;
-        }
+    case 7:
+        moveModelHome(script, children, control);
         break;
-    }
     case 8: {
         s32 time = *script->pc++;
 
@@ -223,8 +256,7 @@ s32 FIGHTSTG_runScriptModel(BattleScript *script, BattleScriptChildren *children
         break;
     }
     case 9:
-        models = TASK_REGISTRY.funcs.find(BATTLE_TASK_MODELS, -1, -1);
-        models->remove(models, id);
+        removeModel(id);
         break;
     }
     return 1;

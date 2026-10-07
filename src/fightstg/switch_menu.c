@@ -36,7 +36,7 @@ void FIGHTSTG_drawSwitchMenu(SwitchMenu *task) {
     s32 i;
 
     initSpriteDrawer(&drawer);
-    drawer.setLayerId(0x1005, 1);
+    drawer.setLayerId(BATTLE_LAYER_MENUS, 1);
     sheet = FILE_CACHE.getEntry(FILE_BATTLE_MENU << 16);
     drawer.setTexture(0x200, 0);
     for (i = 0; i < task->count; i++) {
@@ -54,19 +54,19 @@ void FIGHTSTG_createSwitchWindows(SwitchMenu *task, SwitchMenuWindows *w) {
 
     text = FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU));
     for (i = 0; i < task->count; i++) {
-        w->hpLabel[i] = createTextWindow(0x1005, 3, 0x6C, 0x4E + i * 0x20);
+        w->hpLabel[i] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x6C, 0x4E + i * 0x20);
         w->hpLabel[i]->setString(w->hpLabel[i], text, 14);
-        w->hpSlash[i] = createTextWindow(0x1005, 3, 0x99, 0x4E + i * 0x20);
+        w->hpSlash[i] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x99, 0x4E + i * 0x20);
         w->hpSlash[i]->setString(w->hpSlash[i], text, 16);
-        w->mpLabel[i] = createTextWindow(0x1005, 3, 0x6C, 0x5C + i * 0x20);
+        w->mpLabel[i] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x6C, 0x5C + i * 0x20);
         w->mpLabel[i]->setString(w->mpLabel[i], text, 13);
-        w->mpSlash[i] = createTextWindow(0x1005, 3, 0x99, 0x5C + i * 0x20);
+        w->mpSlash[i] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x99, 0x5C + i * 0x20);
         w->mpSlash[i]->setString(w->mpSlash[i], text, 16);
-        w->hp[i] = createTextWindow(0x1005, 3, 0x98, 0x4E + i * 0x20);
-        w->maxHp[i] = createTextWindow(0x1005, 3, 0xBB, 0x4E + i * 0x20);
-        w->mp[i] = createTextWindow(0x1005, 3, 0x98, 0x5C + i * 0x20);
-        w->maxMp[i] = createTextWindow(0x1005, 3, 0xBB, 0x5C + i * 0x20);
-        w->name[i] = createTextWindow(0x1005, 1, 0x24, 0x4C + i * 0x20);
+        w->hp[i] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x98, 0x4E + i * 0x20);
+        w->maxHp[i] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0xBB, 0x4E + i * 0x20);
+        w->mp[i] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x98, 0x5C + i * 0x20);
+        w->maxMp[i] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0xBB, 0x5C + i * 0x20);
+        w->name[i] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x24, 0x4C + i * 0x20);
     }
 }
 
@@ -132,7 +132,7 @@ void FIGHTSTG_updateSwitchMenu(SwitchMenu *task, SwitchMenuWindows *w) {
             FIGHTSTG_showSwitchFighters(task, w);
             task->nextState(task);
         } else {
-            w->message = createTextWindow(0x1005, 1, 0x14, 0xC2);
+            w->message = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x14, 0xC2);
             w->message->setVisible(w->message, 0);
             task->setState(task, 2);
         }
@@ -170,7 +170,7 @@ void FIGHTSTG_updateSwitchMenu(SwitchMenu *task, SwitchMenuWindows *w) {
             break;
         }
         initSpriteDrawer(&drawer);
-        drawer.setLayerId(0x1005, 1);
+        drawer.setLayerId(BATTLE_LAYER_MENUS, 1);
         if (task->arrowShown != 0) {
             if (GFX.funcs.getTime() - task->arrowTime >= 4) {
                 task->arrowTime = GFX.funcs.getTime();

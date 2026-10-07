@@ -55,7 +55,7 @@ void FIGHTSTG_drawCursorSprites(MenuCursor *task) {
 
     initSpriteDrawer(&drawer);
     i = 0;
-    drawer.setLayerId(0x1005, 1);
+    drawer.setLayerId(BATTLE_LAYER_MENUS, 1);
     drawer.setTexture(0x200, i);
     sheet = FILE_CACHE.getEntry(FILE_BATTLE_MENU << 16);
     y = task->params.spriteY;

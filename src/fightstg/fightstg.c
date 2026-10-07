@@ -145,18 +145,17 @@ void FIGHTSTG_poseBones(Model *model, Mesh **children) {
     VECTOR moved;
     s32 i;
 
-    /* vx and vy as one word */
-    if (*(s32 *)&model->move != 0 || model->move.vz != 0) {
+    if (model->move.xy != 0 || model->move.v.vz != 0) {
         gte_SetRotMatrix(&bone->local);
-        gte_ldv0(&model->move);
+        gte_ldv0(&model->move.v);
         gte_rtv0();
         gte_stlvnl(&moved);
         model->bones->pos.vx += moved.vx;
         model->bones->pos.vy += moved.vy;
         model->bones->pos.vz += moved.vz;
-        model->move.vz = 0;
-        model->move.vy = 0;
-        model->move.vx = 0;
+        model->move.v.vz = 0;
+        model->move.v.vy = 0;
+        model->move.v.vx = 0;
     }
     bone = model->bones;
     if (model->blending == 0) {
@@ -299,6 +298,7 @@ void FIGHTSTG_updateModel(Model *model, Mesh **children) {
     VECTOR scale;
     ModelBone *bone;
     void *archive;
+    MotionStep *idle;
     s32 i;
     s32 j;
     ModelBone *drawn;
@@ -330,8 +330,11 @@ void FIGHTSTG_updateModel(Model *model, Mesh **children) {
         model->motion = 1;
         if (model->hasIdle != 0) {
             archive = FILE_CACHE.getEntry(model->motionFile);
-            model->idleFrames[0] = ((s16 *)FILE_CACHE.getArchiveEntry(0, archive))[2];
-            model->idleFrames[1] = ((s16 *)FILE_CACHE.getArchiveEntry(1, archive))[2];
+            /* where the first step of each idle motion starts */
+            idle = FILE_CACHE.getArchiveEntry(0, archive);
+            model->idleFrames[0] = idle->frame;
+            idle = FILE_CACHE.getArchiveEntry(1, archive);
+            model->idleFrames[1] = idle->frame;
         }
         FIGHTSTG_setMotion(model, model->control->idleMotion + 1, 1);
         model->control->motion = model->control->idleMotion + 1;
@@ -502,7 +505,7 @@ Model *FIGHTSTG_createPlainModel(s32 file, s32 motionFile, Vec2 texPos, ModelCon
 
 /* The colors of a Mesh's normals under the lights, through its matrix */
 void FIGHTSTG_lightMesh(Mesh *mesh) {
-    ShortVec3 *normal = (ShortVec3 *)mesh->normals;
+    ShortVec3 *normal = mesh->normals;
     s32 count = normal->x;
     MATRIX light;
     CVECTOR *color;
@@ -536,7 +539,7 @@ void FIGHTSTG_lightMesh(Mesh *mesh) {
 /* The screen positions of a Mesh's vertices and their depths in the layer's
    ordering table */
 void FIGHTSTG_projectMesh(Mesh *mesh, Layer *layer) {
-    ShortVec3 *vertex = (ShortVec3 *)mesh->vertices;
+    ShortVec3 *vertex = mesh->vertices;
     s32 shift = 14 - layer->getOtShift(layer);
     s32 count = vertex->x;
     s32 *screen;
@@ -659,7 +662,7 @@ s32 FIGHTSTG_isMeshOnScreen(Mesh *mesh, Layer *layer) {
     if (mesh->noBoundsCheck != 0) {
         return 1;
     }
-    corner = (ShortVec3 *)mesh->bounds;
+    corner = mesh->bounds;
     left = 0;
     right = 0;
     top = 0;
@@ -688,28 +691,135 @@ s32 FIGHTSTG_isMeshOnScreen(Mesh *mesh, Layer *layer) {
     return 0;
 }
 
-/* A layer callback that draws a Mesh: walks its command bytes (see
-   MeshDrawState) and adds each polygon that faces the camera to the layer's
-   ordering table. The match depends on the mesh coming in as a void *, on
-   the ?: for q and on each polygon's checks and drawing being a do-while (0)
-   with breaks. */
-void FIGHTSTG_drawMesh(void *arg, Layer *layer) {
-    Mesh *mesh = arg;
-    MATRIX m;
-    MeshDrawState state;
+/* Sets the texture page, the CLUT and the UV offset from a command's bytes */
+static inline void setMeshTexture(MeshDrawState *state) {
+    s32 x, y;
+    s32 cx, cy, tp;
+
+    x = state->texPos.x;
+    y = state->texPos.y;
+    state->u = state->cmd[1] + (state->cmd[2] << 8);
+    state->v = state->cmd[3];
+    cx = state->cmd[4];
+    cx += x;
+    cy = state->cmd[5] + y;
+    tp = state->cmd[6];
+    state->clut = getClut(cx, cy);
+    state->tpage = getTPage(tp, state->abr ? state->abr - 1 : 0, x + (state->cmd[2] << 6), y);
+    state->cmd += 7;
+}
+
+/* Draws a run of polygons: adds each one that faces the camera to the
+   ordering table, then steps past its indices and UVs */
+static inline void drawMeshPolygons(MeshDrawState *state) {
     s32 opz;
     s32 otz;
-    u32 op;
-    s32 hi;
-    s32 lo;
     s32 i0, i1, i2, i3;
     s32 z1, z2;
     s32 n;
     s32 k;
-    s32 x, y;
-    s32 cx, cy, tp;
     u8 *p;
     u8 *q;
+
+    do {
+        state->cmd++;
+        i0 = state->cmd[0];
+        i1 = state->cmd[1];
+        i2 = state->cmd[2];
+        i3 = 0;
+        if (state->quad) {
+            i3 = state->cmd[3];
+        }
+        state->sxy[0] = state->screen[i0];
+        state->sxy[1] = state->screen[i1];
+        state->sxy[2] = state->screen[i2];
+        if (state->quad) {
+            state->sxy[3] = state->screen[i3];
+        }
+        /* the checks and drawing are a do-while with breaks: its loop
+           notes weigh their references 4 instead of 3, so the screen
+           points outrank the screen base and the depth base outranks z1 */
+        do {
+            gte_ldsxy3(state->sxy[0], state->sxy[1], state->sxy[2]);
+            gte_nclip();
+            if (state->sxy[0] == state->sxy[1] || state->sxy[0] == state->sxy[2] ||
+                state->sxy[1] == state->sxy[2]) {
+                break;
+            }
+            if (state->quad && (state->sxy[0] == state->sxy[3] || state->sxy[1] == state->sxy[3] ||
+                               state->sxy[2] == state->sxy[3])) {
+                break;
+            }
+            gte_stopz(&opz);
+            if (opz <= 0) {
+                break;
+            }
+            if (state->lit) {
+                p = state->cmd + (state->quad + 3);
+                state->colors[0] = state->normalColors[p[0]];
+                state->colors[1] = state->normalColors[p[1]];
+                state->colors[2] = state->normalColors[p[2]];
+                if (state->quad) {
+                    state->colors[3] = state->normalColors[p[3]];
+                }
+            }
+            if (state->textured) {
+                k = state->quad + 3;
+                q = state->cmd + (state->lit ? k + (state->quad + 3) : k);
+                state->uv[0][0] = q[0] + state->u;
+                state->uv[0][1] = q[1] + state->v;
+                state->uv[1][0] = q[2] + state->u;
+                state->uv[1][1] = q[3] + state->v;
+                state->uv[2][0] = q[4] + state->u;
+                state->uv[2][1] = q[5] + state->v;
+                if (state->quad) {
+                    state->uv[3][0] = q[6] + state->u;
+                    state->uv[3][1] = q[7] + state->v;
+                }
+            }
+            otz = state->depth[i0];
+            z1 = state->depth[i1];
+            z2 = state->depth[i2];
+            if (state->quad) {
+                gte_AverageZ4(otz, z1, z2, state->depth[i3], &otz);
+            } else {
+                gte_AverageZ3(otz, z1, z2, &otz);
+            }
+            state->ot = state->otBase + otz;
+            if (state->gouraud) {
+                FIGHTSTG_addMeshPolyGT(state);
+            } else {
+                if (!state->lit) {
+                    state->colors[0] = state->color[0];
+                }
+                FIGHTSTG_addMeshPolyFT(state);
+            }
+        } while (0);
+    next:
+        n = state->quad + 3;
+        state->cmd += n;
+        if (state->lit) {
+            state->cmd += n;
+        }
+        if (state->textured) {
+            state->cmd += n * 2;
+        }
+    } while (*state->cmd == 0);
+}
+
+/* A layer callback that draws a Mesh: walks its command bytes (see
+   MeshDrawState), setting its texture (setMeshTexture), and adds each
+   polygon that faces the camera to the layer's ordering table
+   (drawMeshPolygons). The match depends on the mesh coming in as a void *,
+   on the ?: for q and on each polygon's checks and drawing being a
+   do-while (0) with breaks (both in drawMeshPolygons). */
+void FIGHTSTG_drawMesh(void *arg, Layer *layer) {
+    Mesh *mesh = arg;
+    MATRIX m;
+    MeshDrawState state;
+    u32 op;
+    s32 hi;
+    s32 lo;
 
     gte_CompMatrix(&GsWSMATRIX, &mesh->matrix, &m);
     gte_SetRotMatrix(&m);
@@ -758,17 +868,7 @@ void FIGHTSTG_drawMesh(void *arg, Layer *layer) {
         } else {
             switch (lo) {
             case 1:
-                x = state.texPos.x;
-                y = state.texPos.y;
-                state.u = state.cmd[1] + (state.cmd[2] << 8);
-                state.v = state.cmd[3];
-                cx = state.cmd[4];
-                cx += x;
-                cy = state.cmd[5] + y;
-                tp = state.cmd[6];
-                state.clut = getClut(cx, cy);
-                state.tpage = getTPage(tp, state.abr ? state.abr - 1 : 0, x + (state.cmd[2] << 6), y);
-                state.cmd += 7;
+                setMeshTexture(&state);
                 break;
             case 2:
             case 3:
@@ -786,90 +886,7 @@ void FIGHTSTG_drawMesh(void *arg, Layer *layer) {
                 state.cmd += 4;
                 break;
             case 0:
-                do {
-                    state.cmd++;
-                    i0 = state.cmd[0];
-                    i1 = state.cmd[1];
-                    i2 = state.cmd[2];
-                    i3 = 0;
-                    if (state.quad) {
-                        i3 = state.cmd[3];
-                    }
-                    state.sxy[0] = state.screen[i0];
-                    state.sxy[1] = state.screen[i1];
-                    state.sxy[2] = state.screen[i2];
-                    if (state.quad) {
-                        state.sxy[3] = state.screen[i3];
-                    }
-                    /* the checks and drawing are a do-while with breaks: its loop
-                       notes weigh their references 4 instead of 3, so the screen
-                       points outrank the screen base and the depth base outranks z1 */
-                    do {
-                        gte_ldsxy3(state.sxy[0], state.sxy[1], state.sxy[2]);
-                        gte_nclip();
-                        if (state.sxy[0] == state.sxy[1] || state.sxy[0] == state.sxy[2] ||
-                            state.sxy[1] == state.sxy[2]) {
-                            break;
-                        }
-                        if (state.quad && (state.sxy[0] == state.sxy[3] || state.sxy[1] == state.sxy[3] ||
-                                           state.sxy[2] == state.sxy[3])) {
-                            break;
-                        }
-                        gte_stopz(&opz);
-                        if (opz <= 0) {
-                            break;
-                        }
-                        if (state.lit) {
-                            p = state.cmd + (state.quad + 3);
-                            state.colors[0] = state.normalColors[p[0]];
-                            state.colors[1] = state.normalColors[p[1]];
-                            state.colors[2] = state.normalColors[p[2]];
-                            if (state.quad) {
-                                state.colors[3] = state.normalColors[p[3]];
-                            }
-                        }
-                        if (state.textured) {
-                            k = state.quad + 3;
-                            q = state.cmd + (state.lit ? k + (state.quad + 3) : k);
-                            state.uv[0][0] = q[0] + state.u;
-                            state.uv[0][1] = q[1] + state.v;
-                            state.uv[1][0] = q[2] + state.u;
-                            state.uv[1][1] = q[3] + state.v;
-                            state.uv[2][0] = q[4] + state.u;
-                            state.uv[2][1] = q[5] + state.v;
-                            if (state.quad) {
-                                state.uv[3][0] = q[6] + state.u;
-                                state.uv[3][1] = q[7] + state.v;
-                            }
-                        }
-                        otz = state.depth[i0];
-                        z1 = state.depth[i1];
-                        z2 = state.depth[i2];
-                        if (state.quad) {
-                            gte_AverageZ4(otz, z1, z2, state.depth[i3], &otz);
-                        } else {
-                            gte_AverageZ3(otz, z1, z2, &otz);
-                        }
-                        state.ot = state.otBase + otz;
-                        if (state.gouraud) {
-                            FIGHTSTG_addMeshPolyGT(&state);
-                        } else {
-                            if (!state.lit) {
-                                state.colors[0] = state.color[0];
-                            }
-                            FIGHTSTG_addMeshPolyFT(&state);
-                        }
-                    } while (0);
-                next:
-                    n = state.quad + 3;
-                    state.cmd += n;
-                    if (state.lit) {
-                        state.cmd += n;
-                    }
-                    if (state.textured) {
-                        state.cmd += n * 2;
-                    }
-                } while (*state.cmd == 0);
+                drawMeshPolygons(&state);
                 break;
             }
         }
@@ -970,8 +987,8 @@ void FIGHTSTG_drawMeshWireframe(Mesh *mesh, Layer *layer) {
                         *(s32 *)&state.prim.lineF4->x2 = state.sxy[3];
                         *(s32 *)&state.prim.lineF4->x3 = state.sxy[2];
                     }
-                    tag = *(u_long *)state.prim.ptr;
-                    *(u_long *)state.prim.ptr = linkTag(tag, getaddr(state.ot));
+                    tag = *state.prim.tag;
+                    *state.prim.tag = linkTag(tag, getaddr(state.ot));
                     tag = *state.ot;
                     *state.ot = linkTag(tag, (u_long)state.prim.ptr & 0xFFFFFF);
                     state.prim.lineF4++;
@@ -980,8 +997,8 @@ void FIGHTSTG_drawMeshWireframe(Mesh *mesh, Layer *layer) {
                         setRGB0(state.prim.lineF2, 0, 0xFF, 0);
                         *(s32 *)&state.prim.lineF2->x0 = state.sxy[2];
                         *(s32 *)&state.prim.lineF2->x1 = state.sxy[0];
-                        tag = *(u_long *)state.prim.ptr;
-                        *(u_long *)state.prim.ptr = linkTag(tag, getaddr(state.ot));
+                        tag = *state.prim.tag;
+                        *state.prim.tag = linkTag(tag, getaddr(state.ot));
                         tag = *state.ot;
                         *state.ot = linkTag(tag, (u_long)state.prim.ptr & 0xFFFFFF);
                         state.prim.lineF2++;
@@ -1057,12 +1074,13 @@ Mesh *FIGHTSTG_createMesh(void *archive, Vec2 texPos) {
 }
 
 /* the variables that end the file: zeros after fightstg_7.c's data, which
-   the objects after this one read */
-s32 D_800A342C = 0;
+   the objects after this one read; the three unused words are read and
+   written by nothing in either version */
+s32 FIGHTSTG_unused0 = 0;
 s32 FIGHTSTG_partnerIdleMotion = 0; /* the partner's idle motion while stage 0x1D is up */
-s32 D_800A3434 = 0;
+s32 FIGHTSTG_unused1 = 0;
 CameraView FIGHTSTG_fighterView = { 0 }; /* the view FIGHTSTG_getFighterView makes */
-s32 D_800A346C = 0;
+s32 FIGHTSTG_unused2 = 0;
 RECT FIGHTSTG_fighterCameraRect = { 0 }; /* FIGHTSTG_updatePartnerView's layer */
 DR_MOVE FIGHTSTG_cursorBarMoves[4] = { { 0 } }; /* FIGHTSTG_drawCursorBar draws its bar with them */
 u_long FIGHTSTG_cursorBarOt[2] = { 0 }; /* and their ordering table */

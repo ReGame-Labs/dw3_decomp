@@ -33,17 +33,90 @@ s32 FIGHTSTG_stageMusic[8] = {
     0xA004E240, 0xA004E2C1, 0xA004E342, 0xA004E3C3,
 };
 
+/* Fades the stage's lights in. */
+static inline void fadeInStageLights(FightStage *task) {
+    Lights *lights = TASK_REGISTRY.funcs.find(BATTLE_TASK_LIGHTS, -1, -1);
+
+    if (lights != NULL) {
+        lights->fade(lights, NULL, lights->getStageLights(lights, task->stage), task->fadeInTime);
+    }
+}
+
+/* Once the stage's model is in: turns off the bounds check of the stage's
+   listed bones and starts the model and the background in black. */
+static inline void prepareStageModel(FightStage *task, Model **children, FightStageInfo *stages) {
+    Model *model;
+    Layer *layer;
+    u8 color[3];
+    s32 i;
+
+    for (i = 0; i < 8; i++) {
+        if (stages[task->stage].noBoundsBones[i] == 0) {
+            break;
+        }
+        model = children[0];
+        model->setBoneNoBoundsCheck(model, stages[task->stage].noBoundsBones[i], 1);
+    }
+    color[0] = 0;
+    color[1] = 0;
+    color[2] = 0;
+    model = children[0];
+    model->setColor(model, 1, color);
+    layer = GFX.funcs.getLayer(SCREEN_LAYER);
+    layer->setBgColor(layer, 1, 1, 1);
+}
+
+/* Sets the fade of the model's color and the background in from black. */
+static inline void startStageFadeIn(FightStage *task, FightStageInfo *stages) {
+    task->colorTo.vz = 0x80;
+    task->colorTo.vy = 0x80;
+    task->colorTo.vx = 0x80;
+    task->colorFrom.vz = 0;
+    task->colorFrom.vy = 0;
+    task->colorFrom.vx = 0;
+    task->bgTo.vx = stages[task->stage].bgColor[0];
+    task->bgTo.vy = stages[task->stage].bgColor[1];
+    task->bgTo.vz = stages[task->stage].bgColor[2];
+    task->bgFrom.vz = 0;
+    task->bgFrom.vy = 0;
+    task->bgFrom.vx = 0;
+    task->fade = 0;
+    task->fadeStep = 0x1000 / task->fadeInTime;
+}
+
+/* Moves the fade on by the frame's time, up to its end (0x1000). */
+static inline void advanceStageFade(FightStage *task) {
+    task->fade += task->fadeStep * GFX.funcs.getFrameTime();
+    if (task->fade > 0x1000) {
+        task->fade = 0x1000;
+    }
+}
+
+/* Sets the fade of the model's color and the old stage's background out to
+   black. */
+static inline void startStageFadeOut(FightStage *task, FightStageInfo *stages) {
+    task->colorFrom.vz = 0x80;
+    task->colorFrom.vy = 0x80;
+    task->colorFrom.vx = 0x80;
+    task->colorTo.vz = 0;
+    task->colorTo.vy = 0;
+    task->colorTo.vx = 0;
+    task->bgTo.vz = 0;
+    task->bgTo.vy = 0;
+    task->bgTo.vx = 0;
+    task->bgFrom.vx = stages[task->prevStage].bgColor[0];
+    task->bgFrom.vy = stages[task->prevStage].bgColor[1];
+    task->bgFrom.vz = stages[task->prevStage].bgColor[2];
+    task->fade = 0;
+    task->fadeStep = 0x1000 / task->fadeOutTime;
+}
+
 /* The fight stage's task: loads the stage's model, starts its music and fades
    in its lights, then fades the model's color and the background in from
    black; setStage fades them out, frees the old model and stops its music,
    and loads the new stage */
 void FIGHTSTG_updateStage(FightStage *task, Model **children) {
     FightStageInfo *stages = FILE_CACHE.load(FILE_FIGHT_STAGES);
-    Lights *lights;
-    Model *model;
-    Layer *layer;
-    u8 color[3];
-    s32 i;
 
     switch (task->state) {
     case TASK_INIT:
@@ -54,60 +127,28 @@ void FIGHTSTG_updateStage(FightStage *task, Model **children) {
         switch (task->substate) {
         case 0:
             task->control.layers[0].enabled = 1;
-            task->control.layers[0].layerId = 0x1002;
+            task->control.layers[0].layerId = BATTLE_LAYER_STAGE;
             task->control.fighter = 0;
             task->control.layers[0].wireframe = 0;
             children[0] = FIGHTSTG_createPlainModel(stages[task->stage].model, stages[task->stage].motions, FIGHTSTG_stageTexPos, &task->control);
             if (stages[task->stage].music != -1) {
                 task->voice = SOUND.playSound(FIGHTSTG_stageMusic[stages[task->stage].music]);
             }
-            lights = TASK_REGISTRY.funcs.find(BATTLE_TASK_LIGHTS, -1, -1);
-            if (lights != NULL) {
-                lights->fade(lights, NULL, lights->getStageLights(lights, task->stage), task->fadeInTime);
-            }
+            fadeInStageLights(task);
             task->nextSubstate(task);
             /* fallthrough */
         case 1:
             if (children[0]->state == TASK_RUN) {
-                for (i = 0; i < 8; i++) {
-                    if (stages[task->stage].noBoundsBones[i] == 0) {
-                        break;
-                    }
-                    model = children[0];
-                    model->setBoneNoBoundsCheck(model, stages[task->stage].noBoundsBones[i], 1);
-                }
-                color[0] = 0;
-                color[1] = 0;
-                color[2] = 0;
-                model = children[0];
-                model->setColor(model, 1, color);
-                layer = GFX.funcs.getLayer(SCREEN_LAYER);
-                layer->setBgColor(layer, 1, 1, 1);
+                prepareStageModel(task, children, stages);
                 task->nextSubstate(task);
             }
             break;
         case 2:
-            task->colorTo.vz = 0x80;
-            task->colorTo.vy = 0x80;
-            task->colorTo.vx = 0x80;
-            task->colorFrom.vz = 0;
-            task->colorFrom.vy = 0;
-            task->colorFrom.vx = 0;
-            task->bgTo.vx = stages[task->stage].bgColor[0];
-            task->bgTo.vy = stages[task->stage].bgColor[1];
-            task->bgTo.vz = stages[task->stage].bgColor[2];
-            task->bgFrom.vz = 0;
-            task->bgFrom.vy = 0;
-            task->bgFrom.vx = 0;
-            task->fade = 0;
-            task->fadeStep = 0x1000 / task->fadeInTime;
+            startStageFadeIn(task, stages);
             task->nextSubstate(task);
             /* fallthrough */
         case 3:
-            task->fade += task->fadeStep * GFX.funcs.getFrameTime();
-            if (task->fade > 0x1000) {
-                task->fade = 0x1000;
-            }
+            advanceStageFade(task);
             FIGHTSTG_fadeStage(task, children);
             if (task->fade == 0x1000) {
                 task->nextSubstate(task);
@@ -122,27 +163,11 @@ void FIGHTSTG_updateStage(FightStage *task, Model **children) {
         case 0:
         default:
             FILE_CACHE.request((s16)(stages[task->stage].model >> 16));
-            task->colorFrom.vz = 0x80;
-            task->colorFrom.vy = 0x80;
-            task->colorFrom.vx = 0x80;
-            task->colorTo.vz = 0;
-            task->colorTo.vy = 0;
-            task->colorTo.vx = 0;
-            task->bgTo.vz = 0;
-            task->bgTo.vy = 0;
-            task->bgTo.vx = 0;
-            task->bgFrom.vx = stages[task->prevStage].bgColor[0];
-            task->bgFrom.vy = stages[task->prevStage].bgColor[1];
-            task->bgFrom.vz = stages[task->prevStage].bgColor[2];
-            task->fade = 0;
-            task->fadeStep = 0x1000 / task->fadeOutTime;
+            startStageFadeOut(task, stages);
             task->nextSubstate(task);
             /* fallthrough */
         case 1:
-            task->fade += task->fadeStep * GFX.funcs.getFrameTime();
-            if (task->fade > 0x1000) {
-                task->fade = 0x1000;
-            }
+            advanceStageFade(task);
             FIGHTSTG_fadeStage(task, children);
             if (task->fade == 0x1000) {
                 children[0]->setState(children[0], TASK_KILL);

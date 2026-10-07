@@ -51,6 +51,10 @@ typedef struct BattleTableAction {
 #define RESIST_KNOCK_OUT 11
 #define RESIST_COUNT 12
 
+/* BattleTableEntry.actions' last one, which the enemy takes when none of
+   the others' conditions holds: its own is never tested */
+#define BATTLE_TABLE_FALLBACK 3
+
 typedef struct BattleTableEntry {
     /* 0x00 */ s16 id;
     /* 0x02 */ s16 item; /* what the enemy may leave */
@@ -60,9 +64,7 @@ typedef struct BattleTableEntry {
     /* 0x0E */ s16 stats[5]; /* by BATTLE_STAT_*, scaled by the enemy's strength / 16 */
     /* 0x18 */ s16 resist[RESIST_COUNT];
     /* 0x30 */ u8 family; /* FAMILY_*, the enemy's stats' */
-    /* 0x31 */ u8 unk31;
-    /* 0x32 */ BattleTableAction actions[3]; /* the first whose condition holds (FIGHTSTG_testEnemyCondition) */
-    /* 0x3E */ u8 unk3E[4];
+    /* 0x32 */ BattleTableAction actions[BATTLE_TABLE_FALLBACK + 1]; /* the first whose condition holds (FIGHTSTG_testEnemyCondition) */
     /* 0x42 */ BattleTableAction counter; /* its counterattack (FIGHTSTG_updateCounterattack) */
 } BattleTableEntry;
 
@@ -161,7 +163,7 @@ extern EventDelay FIGHTSTG_eventDelays[];
 /* The battle's events (FIGHTSTG_events) */
 typedef struct EventQueue {
     /* 0x000 */ QueuedEvent events[99];
-    /* 0xAD4 */ u8 unkAD4[0x1C];
+    /* 0xAD4 */ u8 pad[0x1C]; /* nothing uses it */
     /* 0xAF0 */ s8 curType; /* the type of the event popped last */
     /* 0xAF1 */ s8 curIndex; /* and where it is */
     /* 0xAF2 */ s8 findType; /* what first and next look for, 1-24 */
@@ -213,7 +215,7 @@ typedef struct BattleSpeed {
 
 /* FIGHTSTG_battle: the battle */
 typedef struct Battle {
-    /* 0x00 */ s32 unk0;
+    /* 0x00 */ s32 pad; /* nothing uses it */
     /* 0x04 */ s32 frames; /* since the last update */
     /* 0x08 */ s32 active[2]; /* each side's fighter */
     /* 0x10 */ BattleFighter fighters[2][3];
@@ -258,9 +260,7 @@ typedef struct Battle {
 
 /* FIGHTSTG_action: the technique being carried out */
 typedef struct BattleAction {
-    /* 0x00 */ s16 unk0[0xE];
-    /* 0x1C */ u8 unk1C;
-    /* 0x1D */ u8 unk1D[3];
+    /* 0x00 */ u8 pad[0x20]; /* nothing uses it */
     /* 0x20 */ u8 side; /* the acting side, SIDE_PLAYER or SIDE_ENEMY */
     /* 0x24 */ s32 tech; /* the technique */
     /* 0x28 */ s32 damage; /* per hit */
@@ -370,6 +370,8 @@ void FIGHTSTG_endEnemyWeakness(void);
 /* Shared between the overlay's objects */
 extern Battle FIGHTSTG_battle;
 extern BattleAction FIGHTSTG_action;
+/* FIGHTSTG_action's bytes before start, which a new action clears */
+#define BATTLE_ACTION_STATE_SIZE ((u8 *)&FIGHTSTG_action.start - (u8 *)&FIGHTSTG_action)
 extern BattleFuncs FIGHTSTG_battleFuncs;
 extern s16 FIGHTSTG_boostStats[];
 extern EventQueue FIGHTSTG_events;

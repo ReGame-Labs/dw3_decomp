@@ -192,12 +192,136 @@ s32 STFGTREP_rollExp(ReportPartner *partner) {
     return 1;
 }
 
-/* A panel's steps: it fades in and out, gives each slot's Digimon its exp,
-   with the levels and skills that brings, then the partner's exp and the
-   Digimon it learns, each with its message */
-void STFGTREP_runPartner(ReportPartner *partner, ReportPartnerWindows *windows) {
+/* Gives the slot's Digimon its share of the battle's exp, if it was used
+   in the battle, and blinks the slot when its level goes up */
+static inline void giveDigimonExp(ReportPartner *partner) {
+    s32 member;
+
+    member = GAME.funcs.getPartyMember(partner->index);
+    GAME.funcs.getPartnerSlots(member, partner->slots);
+    if (BATTLE_RESULT.partners[partner->index].used[partner->slot] != 0 && partner->slots[partner->slot] >= 4) {
+        partner->slotBlinks[partner->slot].blink.on = STFGTREP_funcs.addDigimonExp(
+            member, partner->slots[partner->slot],
+            STFGTREP_funcs.getDigimonExp(member, partner->slots[partner->slot],
+                                         STFGTREP_rewards[BATTLE_RESULT.battle].digimonExp, partner->report->used));
+    }
+    partner->substate++;
+}
+
+/* When the slot's Digimon went up a level, plays its sound and shows it in
+   the message */
+static inline void showDigimonLevelUp(ReportPartner *partner, ReportPartnerWindows *windows) {
+    if (partner->slotBlinks[partner->slot].blink.on != 0) {
+        if (partner->voice != -1) {
+            SOUND.keyOff(partner->sound, partner->voice);
+            partner->voice = -1;
+        }
+        partner->voice = SOUND.playSound(0x4000C);
+        partner->sound = 0x4000C;
+        windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 4);
+        windows->message->setTypeDelay(windows->message, 6);
+        STFGTREP_fillPartnerWindows(partner, windows, 1);
+        partner->substate = 25;
+        partner->step = 0;
+    } else {
+        partner->substate = 24;
+    }
+}
+
+/* Gives the slot's Digimon its next skill and shows it in the message */
+static inline void giveNextSkill(ReportPartner *partner, ReportPartnerWindows *windows) {
     s32 member;
     s32 id;
+
+    member = GAME.funcs.getPartyMember(partner->index);
+    GAME.funcs.getPartnerSlots(member, partner->slots);
+    id = STFGTREP_funcs.addSkill(member, partner->slots[partner->slot]);
+    if (id != 0) {
+        windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 5);
+        windows->message->setSubString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), id, 1);
+        windows->message->setTypeDelay(windows->message, 6);
+        partner->substate = 25;
+        partner->step = 1;
+    } else {
+        partner->substate = 23;
+    }
+}
+
+/* Marks known the next skill of the slot's Digimon and shows it in the
+   message */
+static inline void markNextSkillKnown(ReportPartner *partner, ReportPartnerWindows *windows) {
+    s32 member;
+    s32 id;
+
+    member = GAME.funcs.getPartyMember(partner->index);
+    GAME.funcs.getPartnerSlots(member, partner->slots);
+    id = STFGTREP_funcs.learnSkill(member, partner->slots[partner->slot]);
+    if (id != 0) {
+        windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 6);
+        windows->message->setSubString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), id, 1);
+        windows->message->setTypeDelay(windows->message, 6);
+        partner->substate = 25;
+        partner->step = 2;
+    } else {
+        partner->substate = 24;
+    }
+}
+
+/* Gives the partner its exp; when its level goes up, blinks the level and
+   shows the new level in the message */
+static inline void raisePartnerLevel(ReportPartner *partner, ReportPartnerWindows *windows) {
+    s32 member = GAME.funcs.getPartyMember(partner->index);
+    PartnerStats *stats;
+
+    if (STFGTREP_funcs.addExp(member, partner->exp) != 0) {
+        stats = GAME.funcs.getPartnerStats(member);
+        partner->levelBlink.on = 1;
+        if (partner->voice != -1) {
+            SOUND.keyOff(partner->sound, partner->voice);
+            partner->voice = -1;
+        }
+        partner->voice = SOUND.playSound(0x4000B);
+        partner->sound = 0x4000B;
+        windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 7);
+        windows->message->setSubString(windows->message, stats->name, -1, 1);
+        windows->message->setNumber(windows->message, 2, stats->stats[STAT_LEVEL]);
+        windows->message->setTypeDelay(windows->message, 6);
+        partner->substate = 45;
+        partner->step = 3;
+    } else {
+        partner->substate = 41;
+    }
+    STFGTREP_fillPartnerWindows(partner, windows, 1);
+}
+
+/* Gives the partner the next Digimon of its evolution list and shows it in
+   the message */
+static inline void learnNextDigimon(ReportPartner *partner, ReportPartnerWindows *windows) {
+    s32 learnt;
+    DigimonData *digimon;
+
+    learnt = STFGTREP_funcs.learnDigimon(GAME.funcs.getPartyMember(partner->index));
+    if (learnt != 0) {
+        digimon = GET_DIGIMON(learnt);
+        windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 8);
+        windows->message->setSubString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), digimon->nameId, 1);
+        windows->message->setTypeDelay(windows->message, 6);
+        STFGTREP_fillPartnerWindows(partner, windows, 1);
+        partner->substate = 45;
+        partner->step = 4;
+        partner->learned = 1;
+    } else if (partner->learned != 0) {
+        partner->substate = 42;
+    } else {
+        partner->substate = 50;
+    }
+}
+
+/* A panel's steps: it fades in and out, gives each slot's Digimon its exp,
+   with the levels and skills that brings (giveDigimonExp, showDigimonLevelUp,
+   giveNextSkill, markNextSkillKnown), then the partner's exp and the Digimon it
+   learns (raisePartnerLevel, learnNextDigimon), each with its message */
+void STFGTREP_runPartner(ReportPartner *partner, ReportPartnerWindows *windows) {
     s32 done;
     s32 i;
 
@@ -225,60 +349,16 @@ void STFGTREP_runPartner(ReportPartner *partner, ReportPartnerWindows *windows) 
         }
         break;
     case 20:
-        member = GAME.funcs.getPartyMember(partner->index);
-        GAME.funcs.getPartnerSlots(member, partner->slots);
-        if (BATTLE_RESULT.partners[partner->index].used[partner->slot] != 0 && partner->slots[partner->slot] >= 4) {
-            partner->slotBlinks[partner->slot].blink.on = STFGTREP_funcs.addDigimonExp(
-                member, partner->slots[partner->slot],
-                STFGTREP_funcs.getDigimonExp(member, partner->slots[partner->slot],
-                                             STFGTREP_rewards[BATTLE_RESULT.battle].digimonExp, partner->report->used));
-        }
-        partner->substate++;
+        giveDigimonExp(partner);
         break;
     case 21:
-        if (partner->slotBlinks[partner->slot].blink.on != 0) {
-            if (partner->voice != -1) {
-                SOUND.keyOff(partner->sound, partner->voice);
-                partner->voice = -1;
-            }
-            partner->voice = SOUND.playSound(0x4000C);
-            partner->sound = 0x4000C;
-            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 4);
-            windows->message->setTypeDelay(windows->message, 6);
-            STFGTREP_fillPartnerWindows(partner, windows, 1);
-            partner->substate = 25;
-            partner->step = 0;
-        } else {
-            partner->substate = 24;
-        }
+        showDigimonLevelUp(partner, windows);
         break;
     case 22:
-        member = GAME.funcs.getPartyMember(partner->index);
-        GAME.funcs.getPartnerSlots(member, partner->slots);
-        id = STFGTREP_funcs.addSkill(member, partner->slots[partner->slot]);
-        if (id != 0) {
-            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 5);
-            windows->message->setSubString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), id, 1);
-            windows->message->setTypeDelay(windows->message, 6);
-            partner->substate = 25;
-            partner->step = 1;
-        } else {
-            partner->substate = 23;
-        }
+        giveNextSkill(partner, windows);
         break;
     case 23:
-        member = GAME.funcs.getPartyMember(partner->index);
-        GAME.funcs.getPartnerSlots(member, partner->slots);
-        id = STFGTREP_funcs.learnSkill(member, partner->slots[partner->slot]);
-        if (id != 0) {
-            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 6);
-            windows->message->setSubString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), id, 1);
-            windows->message->setTypeDelay(windows->message, 6);
-            partner->substate = 25;
-            partner->step = 2;
-        } else {
-            partner->substate = 24;
-        }
+        markNextSkillKnown(partner, windows);
         break;
     case 24:
         if (++partner->slot >= 3) {
@@ -320,55 +400,12 @@ void STFGTREP_runPartner(ReportPartner *partner, ReportPartnerWindows *windows) 
             windows->message->showPage(windows->message);
         }
         break;
-    case 40: {
-        /* this case's and the next one's own locals: the match depends on
-           them, which keep the partner and the Digimon learnt out of the
-           registers member and id get */
-        s32 raised = GAME.funcs.getPartyMember(partner->index);
-        PartnerStats *stats;
-
-        if (STFGTREP_funcs.addExp(raised, partner->exp) != 0) {
-            stats = GAME.funcs.getPartnerStats(raised);
-            partner->levelBlink.on = 1;
-            if (partner->voice != -1) {
-                SOUND.keyOff(partner->sound, partner->voice);
-                partner->voice = -1;
-            }
-            partner->voice = SOUND.playSound(0x4000B);
-            partner->sound = 0x4000B;
-            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 7);
-            windows->message->setSubString(windows->message, stats->name, -1, 1);
-            windows->message->setNumber(windows->message, 2, stats->stats[STAT_LEVEL]);
-            windows->message->setTypeDelay(windows->message, 6);
-            partner->substate = 45;
-            partner->step = 3;
-        } else {
-            partner->substate = 41;
-        }
-        STFGTREP_fillPartnerWindows(partner, windows, 1);
+    case 40:
+        raisePartnerLevel(partner, windows);
         break;
-    }
-    case 41: {
-        s32 learnt;
-        DigimonData *digimon;
-
-        learnt = STFGTREP_funcs.learnDigimon(GAME.funcs.getPartyMember(partner->index));
-        if (learnt != 0) {
-            digimon = GET_DIGIMON(learnt);
-            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 8);
-            windows->message->setSubString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), digimon->nameId, 1);
-            windows->message->setTypeDelay(windows->message, 6);
-            STFGTREP_fillPartnerWindows(partner, windows, 1);
-            partner->substate = 45;
-            partner->step = 4;
-            partner->learned = 1;
-        } else if (partner->learned != 0) {
-            partner->substate = 42;
-        } else {
-            partner->substate = 50;
-        }
+    case 41:
+        learnNextDigimon(partner, windows);
         break;
-    }
     case 42:
         if (GAME.funcs.listPartnerEntries(GAME.funcs.getPartyMember(partner->index), partner->entries) >= 4) {
             windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 9);

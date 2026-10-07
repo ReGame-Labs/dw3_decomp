@@ -61,13 +61,12 @@ typedef struct ReportPartner {
     /* 0x070 */ s32 frameTime;
     /* 0x074 */ s16 slots[3];
     /* 0x07A */ s16 entries[44]; /* listPartnerEntries */
-    /* 0x0D2 */ s16 unkD2;
     /* 0x0D4 */ PartnerEntry entry;
     /* 0x0E8 */ s32 slot; /* whose Digimon gets its exp, -1 for none */
-    /* 0x0EC */ s32 unkEC;
+    /* 0x0EC */ s32 padEC; /* nothing uses it */
     /* 0x0F0 */ ReportBlink levelBlink;
     /* 0x0FC */ struct {
-        s32 unk0;
+        s32 pad; /* nothing uses it */
         ReportBlink blink;
     } slotBlinks[3];
     /* 0x12C */ s32 learned;
@@ -76,7 +75,7 @@ typedef struct ReportPartner {
     /* 0x138 */ s32 shownExp;
     /* 0x13C */ s32 targetExp;
     /* 0x140 */ s32 rollTime;
-    /* 0x144 */ s32 unk144;
+    /* 0x144 */ s32 pad144; /* nothing uses it */
     /* 0x148 */ PanelAnim fade;
     /* 0x158 */ s32 cursorFrame;
     /* 0x15C */ s32 cursorTime;

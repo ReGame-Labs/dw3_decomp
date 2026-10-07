@@ -10,7 +10,7 @@ s32 FIGHTSTG_techEvents[] = {
 
 /* the command being carried out */
 BattleAction FIGHTSTG_action = {
-    { 0 }, 0, { 0 }, 0, 0, 0, 0, { 0 }, 0, 0, { 0 }, { 0 }, FIGHTSTG_startAction,
+    { 0 }, 0, 0, 0, 0, { 0 }, 0, 0, { 0 }, { 0 }, FIGHTSTG_startAction,
 };
 /* the battle: its fighters, speed and drawing functions */
 Battle FIGHTSTG_battle = {

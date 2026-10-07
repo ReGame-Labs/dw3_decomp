@@ -5,30 +5,7 @@
 
 /* Sets up the display and the battle's layers */
 void WFIGHTMN_createLayers(void) {
-    Layer *layer;
-
-    GFX.funcs.reset();
-    GFX.funcs.allocPrimBuffers(0x19000);
-    GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
-    layer = GFX.funcs.createLayer(&WFIGHTMN_screen, 1, SCREEN_LAYER);
-    layer->setOffset(layer, 0xA0, 0x78);
-    layer = GFX.funcs.createLayer(&WFIGHTMN_screen, 1, 0x1001);
-    layer->setOffset(layer, 0xA0, 0x78);
-    layer->allocCallbacks(layer, 100);
-    layer = GFX.funcs.createLayer(&WFIGHTMN_screen, 8, 0x1002);
-    layer->setOffset(layer, WFIGHTMN_screen.w / 2, WFIGHTMN_screen.h / 2);
-    layer->allocCallbacks(layer, 40);
-    layer = GFX.funcs.createLayer(&WFIGHTMN_screen, 1, 0x1003);
-    layer->setOffset(layer, 0xA0, 0x78);
-    layer->allocCallbacks(layer, 100);
-    layer = GFX.funcs.createLayer(&WFIGHTMN_screen, 12, 0x1004);
-    layer->setOffset(layer, 0xA0, 0x78);
-    layer->allocCallbacks(layer, 100);
-    layer = GFX.funcs.createLayer(&WFIGHTMN_screen, 1, 0x1005);
-    layer->setOffset(layer, 0, 0);
-    layer = GFX.funcs.createLayer(&WFIGHTMN_screen, 1, 0x1006);
-    layer->setOffset(layer, 0, 0);
-    layer->allocCallbacks(layer, 10);
+    FIGHTSTG_CREATE_LAYERS(WFIGHTMN_screen, 10);
 }
 
 /* Sets a stat and its maximum. The match depends on the pointers: stores

@@ -46,7 +46,6 @@ typedef struct CardPlay {
     /* 0x4 */ u8 side; /* who played it */
     /* 0x5 */ u8 targetKind; /* its effect's (CardEffect.target) */
     /* 0x6 */ u8 target; /* the slot's order, or the card, it was played on */
-    /* 0x7 */ u8 unk7;
 } CardPlay;
 
 /* A card's effect (CARDGAME_cardEffects), read through
@@ -116,7 +115,6 @@ typedef struct CardPile {
     /* 0x0C */ u8 points[5]; /* one per card colour */
     /* 0x11 */ u8 side; /* its panel */
     /* 0x12 */ u8 wins; /* rounds won: two win the battle */
-    /* 0x13 */ u8 unk13;
     /* 0x14 */ s16 deck[40]; /* deckTop on are left */
     /* 0x64 */ s16 hand[10]; /* handCount in use */
     /* 0x78 */ s16 discards[10]; /* the cards played and lost from the slots, discardCount in use */
@@ -127,7 +125,7 @@ typedef struct CardPile {
 typedef struct CardRecord {
     /* 0x00 */ u8 menuState; /* CARDGAME_runBattleMenu's state */
     /* 0x01 */ u8 menuCursor; /* CARDGAME_runBattleMenu's cursor, 0-4 */
-    /* 0x02 */ u8 unk2[0xA];
+    /* 0x02 */ u8 pad2[0xA]; /* nothing uses it */
     /* 0x0C */ u8 turnState; /* CARDGAME_playRounds' state */
     /* 0x0D */ s8 playCount; /* the plays in use */
     /* 0x0E */ u8 turns; /* the turns of plays this round */
@@ -135,10 +133,9 @@ typedef struct CardRecord {
     /* 0x10 */ u8 starter; /* the side that starts the round */
     /* 0x11 */ u8 turnSide; /* the side whose turn it is */
     /* 0x12 */ s8 answer; /* a step's result: -1 while waiting, then 0 or 1 */
-    /* 0x13 */ u8 unk13;
     /* 0x14 */ s32 waitTime;
     /* 0x18 */ CardPlay plays[3]; /* the cards played this turn, up to three */
-    /* 0x30 */ u8 unk30[4];
+    /* 0x30 */ u8 pad30[4]; /* nothing uses it */
 } CardRecord;
 
 /* The effect step that runs (CARDGAME_runEffectStep) and its values, which
@@ -161,7 +158,7 @@ typedef struct CardStep {
 /* Each player's side of a card battle (CardBattle.sides) */
 typedef struct CardSide {
     /* 0x00 */ CardPile pile;
-    /* 0x8C */ u8 unk8C[0x3C];
+    /* 0x8C */ u8 pad[0x3C]; /* nothing uses it */
 } CardSide;
 
 /* The animations of the cards on the table (CardBattle.anim): the slots,
@@ -196,7 +193,7 @@ enum CardAnimId {
 typedef struct CardAnim {
     /* 0x00 */ u8 current; /* a CardAnimId */
     /* 0x01 */ u8 next; /* the one to start */
-    /* 0x02 */ u8 unk2;
+    /* 0x02 */ u8 pad; /* nothing uses it */
     /* 0x03 */ u8 hide; /* the one that hides what the last one showed */
     /* 0x04 */ u8 faceDown; /* the next pile or slots are laid out face down */
     /* 0x05 */ u8 dimAll; /* sets dimmed of the first 15 sprites once */
@@ -220,8 +217,7 @@ typedef struct CardDeckCard {
 typedef struct CardOpponent {
     /* 0x00 */ CardDeckCard cards[40];
     /* 0xA0 */ s16 counterCards[20]; /* from 1, up to a 0: CardBattle.counterCards before the usual ones */
-    /* 0xC8 */ u8 unkC8;
-    /* 0xC9 */ u8 unkC9[3];
+    /* 0xC8 */ u8 level; /* shown after "LV" (card text 0x3E), 4-92 */
     /* 0xCC */ s32 prize; /* its index in CARDGAME_prizeItems */
 } CardOpponent;
 
@@ -231,11 +227,11 @@ struct CardBattle {
     TASK_HEADER(CardBattle);
     /* 0x050 */ s16 cards[250]; /* card ids, minus one (CARDGAME_loadCardImages) */
     /* 0x244 */ u8 cardCount; /* in cards */
-    /* 0x245 */ u8 unk245[3];
+    /* 0x245 */ u8 pad245[3]; /* nothing uses it */
     /* 0x248 */ s16 opponentDeck[40]; /* the opponent's deck */
     /* 0x298 */ s16 playerDeck[40]; /* the player's deck */
     /* 0x2E8 */ u8 arg; /* the mode argument: the opponent, from 1 */
-    /* 0x2E9 */ u8 unk2E9;
+    /* 0x2E9 */ u8 opponentLevel; /* CardOpponent.level */
     /* 0x2EA */ s16 deckChoice; /* the player's deck (GAME.decks) */
     /* 0x2EC */ s32 prize; /* the item the player wins (GAME.items) */
     /* 0x2F0 */ CardOpponent *opponents; /* file FILE_CARDGAME_OPPONENTS */
@@ -245,7 +241,6 @@ struct CardBattle {
     /* 0x2F7 */ u8 nextPhase; /* the phase to switch to, if not 0 */
     /* 0x2F8 */ u8 phase; /* a CARD_PHASE_* */
     /* 0x2F9 */ u8 phaseStep; /* the phase's own state */
-    /* 0x2FA */ u8 unk2FA[2];
     /* 0x2FC */ s32 phaseTime; /* a frame count, or the phase's own counter */
     /* 0x300 */ u8 round; /* from 0 */
     /* 0x301 */ u8 roundWinner; /* the side that won the round */
@@ -254,22 +249,21 @@ struct CardBattle {
     /* 0x304 */ u8 keptCard; /* the card CARDGAME_keepLastCard kept, plus one */
     /* 0x305 */ u8 keptCount; /* and how many times */
     /* 0x306 */ u8 fade; /* the fade to start (CARDGAME_fadeColors), plus one */
-    /* 0x307 */ u8 unk307;
+    /* 0x307 */ u8 pad307; /* nothing uses it */
     /* 0x308 */ u8 slotCount; /* the slots added so far */
-    /* 0x309 */ u8 unk309;
+    /* 0x309 */ u8 pad309; /* nothing uses it */
     /* 0x30A */ CardDraw opponentDraws[40]; /* by the opponent's deck card */
-    /* 0x35A */ u8 unk35A[2];
+    /* 0x35A */ u8 pad35A[2]; /* nothing uses it */
     /* 0x35C */ CardPlan opponentPlans[40]; /* one per card of side 1 (40-79) */
-    /* 0x3FC */ u8 unk3FC[4];
+    /* 0x3FC */ u8 pad3FC[4]; /* nothing uses it */
     /* 0x400 */ u8 counterCards[0x1B]; /* the cards the computer answers with a kind 4 card, up to an 0xFF */
     /* 0x41B */ u8 drawEnd; /* the first card of the opponent's deck above the round's group */
     /* 0x41C */ u8 reserveStart; /* the first card of the opponent's deck held back (group 7) */
-    /* 0x41D */ u8 unk41D[3];
     /* 0x420 */ CardStep effectStep;
     /* 0x498 */ CardAnim anim;
     /* 0x4DC */ u8 resolveState; /* CARDGAME_resolveCard's */
     /* 0x4DD */ u8 prevDiscarded; /* the card before the last one played went off too */
-    /* 0x4DE */ u8 unk4DE;
+    /* 0x4DE */ u8 playsToResolve; /* record.playCount, as CARDGAME_resolveCard starts; nothing reads it */
     /* 0x4E0 */ s16 effectPos; /* the step of the card's effect script to run next */
     /* 0x4E2 */ s16 loopCount; /* the effect script's loop: the runs left */
     /* 0x4E4 */ s16 loopStart; /* and where it starts again */

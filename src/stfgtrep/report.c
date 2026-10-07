@@ -60,12 +60,110 @@ void STFGTREP_drawReport(FightReport *report) {
     }
 }
 
-/* The report while it runs: shows the panels, then for each partner that
-   got exp its message and the raise, then the money and the item won, and
-   fades out */
-void STFGTREP_runReport(FightReport *report, FightReportChildren *children) {
+/* Selects the next partner that got exp and fades the header in; after the
+   last one goes on to the money */
+static inline void selectNextPartner(FightReport *report, FightReportChildren *children) {
+    if (report->step < report->count) {
+        if (report->exp[report->step] == 0) {
+            report->step++;
+        } else {
+            STFGTREP_funcs.startFade(&report->header, 1);
+            children->partners[report->step]->select(children->partners[report->step]);
+            report->substate++;
+        }
+    } else {
+        report->setSubstate(report, 0x14);
+    }
+}
+
+/* Shows the current partner's exp in the message and in the exp window */
+static inline void showExp(FightReport *report, FightReportChildren *children) {
+    children->message->setString(children->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 2);
+    children->message->setNumber(children->message, 1, report->exp[report->step]);
+    children->message->setTypeDelay(children->message, 6);
+    children->exp->setNumber(children->exp, 0, report->exp[report->step]);
+    children->exp->setRightAlign(children->exp, 1);
+    children->expLabel->setString(children->expLabel, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 1);
+}
+
+/* While the message types, cross shows its whole page; at a page end the
+   arrow shows until cross, which plays the confirm sound */
+static inline void turnMessagePage(FightReport *report, FightReportChildren *children) {
+    if (children->message->isWaitingForButton(children->message) != 0) {
+        if (PAD_PRESSED(PAD_CROSS)) {
+            SOUND.playSound(SOUND_MENU_CONFIRM);
+        } else {
+            report->arrowOn = 1;
+        }
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        children->message->showPage(children->message);
+    }
+}
+
+/* Fades the header out and hides the exp once the partner's raise is shown,
+   moving on to the next partner */
+static inline void hideExp(FightReport *report, FightReportChildren *children) {
+    STFGTREP_funcs.startFade(&report->header, 0);
+    children->exp->setVisible(children->exp, 0);
+    children->expLabel->setVisible(children->expLabel, 0);
+    report->substate++;
+    report->step++;
+}
+
+/* Gives the money the battle won, a fifth more with item 0x142 equipped,
+   and shows it in the message */
+static inline void giveMoney(FightReport *report, FightReportChildren *children) {
     PartnerStats *stats;
     s32 money;
+
+    stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(BATTLE_RESULT.member));
+    money = STFGTREP_rewards[BATTLE_RESULT.battle].money;
+    if (stats->equip[4] == 0x142 || stats->equip[5] == 0x142) {
+        money += STFGTREP_rewards[BATTLE_RESULT.battle].money / 5;
+    }
+    children->message->setString(children->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 10);
+    children->message->setNumber(children->message, 1, money);
+    children->message->setTypeDelay(children->message, 6);
+    report->substate = 0x19;
+    report->step = 0;
+    GAME.money += money;
+    if (GAME.money > 9999999) {
+        GAME.money = 9999999;
+    }
+}
+
+/* Gives the item the battle won, up to 99, and shows it in the message;
+   with none the report ends */
+static inline void giveItem(FightReport *report, FightReportChildren *children) {
+    if (BATTLE_RESULT.item != 0) {
+        children->message->setString(children->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 11);
+        children->message->setSubString(children->message, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_NAMES)), BATTLE_RESULT.item, 1);
+        children->message->setTypeDelay(children->message, 6);
+        report->substate = 0x19;
+        report->step = 1;
+        GAME.items[BATTLE_RESULT.item]++;
+        if (GAME.items[BATTLE_RESULT.item] >= 100) {
+            GAME.items[BATTLE_RESULT.item] = 99;
+        }
+    } else {
+        report->substate = 0x32;
+    }
+}
+
+/* Starts fading the screen and the footer out and hides the message */
+static inline void startFadeOut(FightReport *report, FightReportChildren *children) {
+    children->fade = STFGTREP_createFader();
+    children->fade->start(children->fade, 0, 30);
+    STFGTREP_funcs.startFade(&report->footer, 0);
+    children->message->setVisible(children->message, 0);
+    report->substate++;
+}
+
+/* The report while it runs: shows the panels, then for each partner that
+   got exp its message and the raise (selectNextPartner, showExp, hideExp),
+   then the money and the item won (giveMoney, giveItem), and fades out
+   (startFadeOut) */
+void STFGTREP_runReport(FightReport *report, FightReportChildren *children) {
     s32 shown;
     s32 hidden;
     s32 i;
@@ -99,26 +197,11 @@ void STFGTREP_runReport(FightReport *report, FightReportChildren *children) {
         }
         break;
     case 6:
-        if (report->step < report->count) {
-            if (report->exp[report->step] == 0) {
-                report->step++;
-            } else {
-                STFGTREP_funcs.startFade(&report->header, 1);
-                children->partners[report->step]->select(children->partners[report->step]);
-                report->substate++;
-            }
-        } else {
-            report->setSubstate(report, 0x14);
-        }
+        selectNextPartner(report, children);
         break;
     case 7:
         if (STFGTREP_funcs.updateFade(&report->header) != 0) {
-            children->message->setString(children->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 2);
-            children->message->setNumber(children->message, 1, report->exp[report->step]);
-            children->message->setTypeDelay(children->message, 6);
-            children->exp->setNumber(children->exp, 0, report->exp[report->step]);
-            children->exp->setRightAlign(children->exp, 1);
-            children->expLabel->setString(children->expLabel, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 1);
+            showExp(report, children);
             report->substate++;
         }
         break;
@@ -127,14 +210,8 @@ void STFGTREP_runReport(FightReport *report, FightReportChildren *children) {
             report->arrowOn = 0;
             children->message->setVisible(children->message, 0);
             report->substate = 10;
-        } else if (children->message->isWaitingForButton(children->message) != 0) {
-            if (PAD_PRESSED(PAD_CROSS)) {
-                SOUND.playSound(SOUND_MENU_CONFIRM);
-            } else {
-                report->arrowOn = 1;
-            }
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            children->message->showPage(children->message);
+        } else {
+            turnMessagePage(report, children);
         }
         break;
     case 10:
@@ -143,11 +220,7 @@ void STFGTREP_runReport(FightReport *report, FightReportChildren *children) {
         break;
     case 11:
         if (children->partners[report->step]->substate == 5) {
-            STFGTREP_funcs.startFade(&report->header, 0);
-            children->exp->setVisible(children->exp, 0);
-            children->expLabel->setVisible(children->expLabel, 0);
-            report->substate++;
-            report->step++;
+            hideExp(report, children);
         }
         break;
     case 12:
@@ -156,35 +229,10 @@ void STFGTREP_runReport(FightReport *report, FightReportChildren *children) {
         }
         break;
     case 0x14:
-        stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(BATTLE_RESULT.member));
-        money = STFGTREP_rewards[BATTLE_RESULT.battle].money;
-        if (stats->equip[4] == 0x142 || stats->equip[5] == 0x142) {
-            money += STFGTREP_rewards[BATTLE_RESULT.battle].money / 5;
-        }
-        children->message->setString(children->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 10);
-        children->message->setNumber(children->message, 1, money);
-        children->message->setTypeDelay(children->message, 6);
-        report->substate = 0x19;
-        report->step = 0;
-        GAME.money += money;
-        if (GAME.money > 9999999) {
-            GAME.money = 9999999;
-        }
+        giveMoney(report, children);
         break;
     case 0x15:
-        if (BATTLE_RESULT.item != 0) {
-            children->message->setString(children->message, FILE_CACHE.load(TEXT_FILE(TEXT_FIGHT_REPORT)), 11);
-            children->message->setSubString(children->message, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_NAMES)), BATTLE_RESULT.item, 1);
-            children->message->setTypeDelay(children->message, 6);
-            report->substate = 0x19;
-            report->step = 1;
-            GAME.items[BATTLE_RESULT.item]++;
-            if (GAME.items[BATTLE_RESULT.item] >= 100) {
-                GAME.items[BATTLE_RESULT.item] = 99;
-            }
-        } else {
-            report->substate = 0x32;
-        }
+        giveItem(report, children);
         break;
     case 0x19:
         if (children->message->isFinished(children->message) != 0) {
@@ -199,22 +247,12 @@ void STFGTREP_runReport(FightReport *report, FightReportChildren *children) {
                 report->substate = 0x32;
                 break;
             }
-        } else if (children->message->isWaitingForButton(children->message) != 0) {
-            if (PAD_PRESSED(PAD_CROSS)) {
-                SOUND.playSound(SOUND_MENU_CONFIRM);
-            } else {
-                report->arrowOn = 1;
-            }
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            children->message->showPage(children->message);
+        } else {
+            turnMessagePage(report, children);
         }
         break;
     case 0x32:
-        children->fade = STFGTREP_createFader();
-        children->fade->start(children->fade, 0, 30);
-        STFGTREP_funcs.startFade(&report->footer, 0);
-        children->message->setVisible(children->message, 0);
-        report->substate++;
+        startFadeOut(report, children);
         break;
     case 0x33:
         if (STFGTREP_funcs.updateFade(&report->footer) != 0) {

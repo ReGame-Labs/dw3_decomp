@@ -13,7 +13,7 @@ void FIGHTSTG_applyCamera(FighterCamera *task) {
     task->coord.coord.t[0] = task->trans.vx;
     task->coord.coord.t[1] = task->trans.vy;
     task->coord.coord.t[2] = task->trans.vz;
-    func_80029DB8(&task->view);
+    GsSetRefView2(&task->view);
     layer = GFX.funcs.getLayer(0x1009);
     layer->setKeepView(layer, 1, task->proj);
     task->frames--;

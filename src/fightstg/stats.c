@@ -2,9 +2,40 @@
 
 #include "fightstg.h"
 
+/* Works out an enemy's stats from its table entry, its strength and the
+   fighter's boosts */
+static inline void computeEnemyStats(BattleStats *stats, BattleFighter *fighter, s32 index) {
+    BattleTableEntry *entry;
+    s32 j;
+
+    entry = FIGHTSTG_battleTableFunc(fighter->id);
+    stats->level = BATTLE_SETUP.enemies[index].level;
+    for (j = 0; j < 5; j++) {
+        stats->stats[j] = entry->stats[j] * BATTLE_SETUP.enemies[index].strength / 16;
+    }
+    for (j = 0; j < 12; j++) {
+        stats->resist[j] = entry->resist[j];
+    }
+    stats->flags = fighter->flags;
+    if (fighter->boosts[0] != 0) {
+        stats->stats[BATTLE_STAT_ATTACK] += fighter->boosts[0];
+    }
+    if (fighter->boosts[1] != 0) {
+        stats->stats[BATTLE_STAT_DEFENSE] += fighter->boosts[1];
+    }
+    if (fighter->boosts[2] != 0) {
+        stats->stats[BATTLE_STAT_SPEED] += fighter->boosts[2];
+    }
+    if (fighter->boosts[3] != 0) {
+        stats->stats[BATTLE_STAT_SPIRIT] += fighter->boosts[3];
+    }
+    stats->family = entry->family;
+    stats->damageBonus = fighter->charge;
+}
+
 /* Works out a side's stats into its BattleStats: the partner's totals with
    the fighter's boosts, its resistances and what its equipment and
-   accessories add, or the enemy's from its table entry. The match depends on
+   accessories add, or the enemy's (computeEnemyStats). The match depends on
    one s16 pointer walking the totals, the accessories and the equipment
    alike: its extra sets give it the references that put it before found in
    the global allocator. */
@@ -15,7 +46,6 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
     DigimonData *digimon;
     DigimonData *other;
     PartnerStats *partner;
-    BattleTableEntry *entry;
     ItemInfo *info;
     u8 *data;
     AccessoryData *acc;
@@ -24,7 +54,6 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
     s32 count;
     s32 found;
     s32 i;
-    s32 j;
 
     if (which) {
         stats = &FIGHTSTG_battleFuncs.stats[0];
@@ -212,29 +241,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
         }
     } else {
         fighter = &FIGHTSTG_battle.fighters[1][index];
-        entry = FIGHTSTG_battleTableFunc(fighter->id);
-        stats->level = BATTLE_SETUP.enemies[index].level;
-        for (j = 0; j < 5; j++) {
-            stats->stats[j] = entry->stats[j] * BATTLE_SETUP.enemies[index].strength / 16;
-        }
-        for (j = 0; j < 12; j++) {
-            stats->resist[j] = entry->resist[j];
-        }
-        stats->flags = fighter->flags;
-        if (fighter->boosts[0] != 0) {
-            stats->stats[BATTLE_STAT_ATTACK] += fighter->boosts[0];
-        }
-        if (fighter->boosts[1] != 0) {
-            stats->stats[BATTLE_STAT_DEFENSE] += fighter->boosts[1];
-        }
-        if (fighter->boosts[2] != 0) {
-            stats->stats[BATTLE_STAT_SPEED] += fighter->boosts[2];
-        }
-        if (fighter->boosts[3] != 0) {
-            stats->stats[BATTLE_STAT_SPIRIT] += fighter->boosts[3];
-        }
-        stats->family = entry->family;
-        stats->damageBonus = fighter->charge;
+        computeEnemyStats(stats, fighter, index);
     }
     if (which) {
         return &FIGHTSTG_battleFuncs.stats[0];

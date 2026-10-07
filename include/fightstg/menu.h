@@ -159,7 +159,7 @@ typedef struct CommandMenuWindows {
 typedef struct PartnerView {
     TASK_HEADER(PartnerView);
     /* 0x50 */ Layer *layer;
-    /* 0x54 */ s32 unk54;
+    /* 0x54 */ s32 pad; /* nothing uses it */
 } PartnerView;
 
 /* A battle message box (FIGHTSTG_createMessage): shows its messages a line
@@ -173,7 +173,7 @@ typedef struct BattleMessageBox {
     /* 0x80 */ s32 interval; /* the time between them */
     /* 0x84 */ s32 shownTime;
     /* 0x88 */ s32 next; /* in queue */
-    /* 0x8C */ s32 unk8C;
+    /* 0x8C */ s32 pad; /* nothing uses it */
     /* 0x90 */ s32 arrowPalette; /* the arrow's palette, 0-4 */
     /* 0x94 */ s32 arrowTime; /* when it last changed */
     /* 0x98 */ s32 showArrow; /* show the arrow */
@@ -199,7 +199,7 @@ typedef struct BattleMessage {
    its stats, its techniques, or the techniques its other Digimon can pass on */
 typedef struct PartnerInfo {
     TASK_HEADER(PartnerInfo);
-    /* 0x50 */ s32 unk50;
+    /* 0x50 */ s32 pad; /* nothing uses it */
     /* 0x54 */ s32 partner;
     /* 0x58 */ s32 page; /* what it shows: 0 the stats, 1 and 2 techniques */
     /* 0x5C */ s32 slot; /* from 1, or 0 for the partner itself */
@@ -268,11 +268,11 @@ typedef struct ConfusedMenu {
     /* 0x94 */ s32 delay; /* the time between them */
     /* 0x98 */ s32 time;
     /* 0x9C */ s32 next; /* in queue */
-    /* 0xA0 */ s32 unkA0;
+    /* 0xA0 */ s32 padA0; /* nothing uses it */
     /* 0xA4 */ s32 arrowPalette; /* 0-4 */
     /* 0xA8 */ s32 arrowTime; /* when it last changed */
     /* 0xAC */ s32 showArrow;
-    /* 0xB0 */ s32 unkB0[4];
+    /* 0xB0 */ s32 padB0[4]; /* nothing uses it */
     /* 0xC0 */ void (*show)(); /* like BattleMessageBox's, but never set: the queue ends first */
 } ConfusedMenu;
 
@@ -307,7 +307,7 @@ typedef struct MenuCursor {
     /* 0x78 */ s32 prevSel; /* where the bar was drawn last */
     /* 0x7C */ s32 frame; /* of the bar, 0-11 */
     /* 0x80 */ s32 blink[6]; /* the time of each line's sprite */
-    /* 0x98 */ u8 unk98[0x10];
+    /* 0x98 */ u8 pad[0x10]; /* nothing uses it */
 } MenuCursor;
 
 /* One of FIGHTSTG_updateTechMenu's children: the cursor first, then the text windows */

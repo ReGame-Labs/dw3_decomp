@@ -3,13 +3,13 @@
 #include "fightstg.h"
 
 /* An effect model's task: creates its model at its position and rotation on
-   layer 0x1004 and ends when its motion is over */
+   layer BATTLE_LAYER_MODELS and ends when its motion is over */
 void FIGHTSTG_updateEffectModel(EffectModel *task, Model **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
         task->control.layers[0].enabled = 1;
-        task->control.layers[0].layerId = 0x1004;
+        task->control.layers[0].layerId = BATTLE_LAYER_MODELS;
         task->control.fighter = 0;
         task->control.layers[0].wireframe = 0;
         task->control.pos.x = task->pos.vx;

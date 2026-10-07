@@ -2,20 +2,109 @@
 
 #include "fightstg.h"
 
+/* Starts the battle script of the counterattack's technique, with its
+   element's stage, and its hit result, and empties the countering fighter's
+   charge. */
+static inline void playCounterTech(Counterattack *task, BattleChild *children) {
+    TechData *tech = &TECHS[task->tech - 1];
+    s32 other = task->side != 0;
+    BattleFighter *row;
+    s32 element;
+
+    children[0].script = FIGHTSTG_createBattleScript();
+    children[0].script->enemy = task->side;
+    if (task->side == 0 && tech->script == 5) {
+        children[0].script->index = 6;
+    } else {
+        children[0].script->index = tech->script;
+    }
+    if (tech->scriptSound != 0) {
+        children[0].script->sound = tech->scriptSound;
+    }
+    {
+        BattleStats *stats = FIGHTSTG_battleFuncs.computeStats(task->side, 1, FIGHTSTG_battle.active[other]);
+
+        if (tech->element >= ELEMENT_FIRST || stats->element >= ELEMENT_FIRST) {
+            if (tech->element >= ELEMENT_FIRST) {
+                element = tech->element - ELEMENT_FIRST;
+            } else {
+                element = stats->element - ELEMENT_FIRST;
+            }
+            element = element * 3 + 0x21;
+            if (stats->elementPower >= 0x40) {
+                children[0].script->stage = element + 1;
+            } else {
+                children[0].script->stage = element;
+            }
+        } else {
+            children[0].script->stage = -1;
+        }
+    }
+    if (tech->scriptEffect != 0) {
+        children[0].script->effect = tech->scriptEffect;
+    } else if (tech->script == 5) {
+        children[0].script->effect = 0x2E;
+        children[0].script->sound = 0x1E;
+    }
+    row = FIGHTSTG_battle.fighters[1 - other];
+    if (task->hit != 0) {
+        if (row[FIGHTSTG_battle.active[1 - other]].hp - task->damage <= 0) {
+            children[0].script->hits[3] = 2;
+        } else {
+            children[0].script->hits[3] = 1;
+            WFIGHTMN_countHit(task->side, task->damage);
+            WFIGHTMN_setIdleMotion(SIDE_ENEMY - task->side, task->damage);
+        }
+    } else {
+        children[0].script->hits[3] = 3;
+    }
+    row = FIGHTSTG_battle.fighters[0];
+    if (task->side != 0) {
+        row = FIGHTSTG_battle.fighters[1];
+    }
+    row[FIGHTSTG_battle.active[task->side != 0]].charge = 0;
+}
+
+/* Shows whether the counterattack hit and for how much, and takes the damage
+   from the countered fighter's HP (queueing its knockout at 0). */
+static inline void showCounterResult(Counterattack *task, BattleChild *children) {
+    children[0].message = FIGHTSTG_createMessage();
+    if (task->hit != 0) {
+        task->lines[0] = (task->side == 0) << 4;
+        task->lines[1] = task->damage;
+        children[0].message->show(children[0].message, 4, task->lines);
+    } else {
+        task->lines[0] = 0x1D;
+        task->lines[1] = (task->side == 0) << 4;
+        children[0].message->show(children[0].message, 2, task->lines);
+    }
+    if (task->damage != 0) {
+        s32 index = task->side == 0;
+        BattleFighter *fighter = &FIGHTSTG_battle.fighters[index][FIGHTSTG_battle.active[index]];
+
+        fighter->hp -= task->damage;
+        if (fighter->hp <= 0) {
+            fighter->hp = 0;
+            if (task->noKnockOutEvent == 0) {
+                FIGHTSTG_queueKnockOut(index << 4);
+            }
+        }
+    }
+}
+
 /* A counterattack (FIGHTSTG_startCounterattack): the player's from an event of type 8 or
    the partner's first technique, the enemy's from its table entry; substate
-   0 plays the technique, 1 shows the damage and takes the HP, 2 hands
-   received to WFIGHTMN_chargeGauge. The match depends on substate 0's technique and
-   side being declared in its `if`, on the event index and the stats being
-   variables of their own, on the stage being written element * 3 + 0x21 and
-   one more, on the enemy's fighter being found as a pointer sum and on one
-   row variable for both of substate 0's rows. */
+   0 plays the technique (playCounterTech), 1 shows the damage and takes the
+   HP (showCounterResult), 2 hands received to WFIGHTMN_chargeGauge. The
+   match depends on playCounterTech's technique and side being declared in
+   it, on the event index and the stats being variables of their own, on the
+   stage being written element * 3 + 0x21 and one more, on the enemy's
+   fighter being found as a pointer sum and on one row variable for both of
+   playCounterTech's rows. */
 void FIGHTSTG_updateCounterattack(Counterattack *task, BattleChild *children) {
     BattleFighter *fighter;
-    BattleFighter *row;
     BattleTableEntry *entry;
     s32 other;
-    s32 element;
 
     switch (task->state) {
     case TASK_INIT:
@@ -83,86 +172,13 @@ void FIGHTSTG_updateCounterattack(Counterattack *task, BattleChild *children) {
         case 0:
         default:
             if (children[0].message == NULL) {
-                TechData *tech = &TECHS[task->tech - 1];
-                s32 other = task->side != 0;
-                children[0].script = FIGHTSTG_createBattleScript();
-                children[0].script->enemy = task->side;
-                if (task->side == 0 && tech->script == 5) {
-                    children[0].script->index = 6;
-                } else {
-                    children[0].script->index = tech->script;
-                }
-                if (tech->scriptSound != 0) {
-                    children[0].script->sound = tech->scriptSound;
-                }
-                {
-                    BattleStats *stats = FIGHTSTG_battleFuncs.computeStats(task->side, 1, FIGHTSTG_battle.active[other]);
-
-                    if (tech->element >= ELEMENT_FIRST || stats->element >= ELEMENT_FIRST) {
-                        if (tech->element >= ELEMENT_FIRST) {
-                            element = tech->element - ELEMENT_FIRST;
-                        } else {
-                            element = stats->element - ELEMENT_FIRST;
-                        }
-                        element = element * 3 + 0x21;
-                        if (stats->elementPower >= 0x40) {
-                            children[0].script->stage = element + 1;
-                        } else {
-                            children[0].script->stage = element;
-                        }
-                    } else {
-                        children[0].script->stage = -1;
-                    }
-                }
-                if (tech->scriptEffect != 0) {
-                    children[0].script->effect = tech->scriptEffect;
-                } else if (tech->script == 5) {
-                    children[0].script->effect = 0x2E;
-                    children[0].script->sound = 0x1E;
-                }
-                row = FIGHTSTG_battle.fighters[1 - other];
-                if (task->hit != 0) {
-                    if (row[FIGHTSTG_battle.active[1 - other]].hp - task->damage <= 0) {
-                        children[0].script->hits[3] = 2;
-                    } else {
-                        children[0].script->hits[3] = 1;
-                        WFIGHTMN_countHit(task->side, task->damage);
-                        WFIGHTMN_setIdleMotion(SIDE_ENEMY - task->side, task->damage);
-                    }
-                } else {
-                    children[0].script->hits[3] = 3;
-                }
-                row = FIGHTSTG_battle.fighters[0];
-                if (task->side != 0) {
-                    row = FIGHTSTG_battle.fighters[1];
-                }
-                row[FIGHTSTG_battle.active[task->side != 0]].charge = 0;
+                playCounterTech(task, children);
                 task->substate++;
             }
             break;
         case 1:
             if (children[0].script == NULL) {
-                children[0].message = FIGHTSTG_createMessage();
-                if (task->hit != 0) {
-                    task->lines[0] = (task->side == 0) << 4;
-                    task->lines[1] = task->damage;
-                    children[0].message->show(children[0].message, 4, task->lines);
-                } else {
-                    task->lines[0] = 0x1D;
-                    task->lines[1] = (task->side == 0) << 4;
-                    children[0].message->show(children[0].message, 2, task->lines);
-                }
-                if (task->damage != 0) {
-                    s32 index = task->side == 0;
-                    BattleFighter *fighter = &FIGHTSTG_battle.fighters[index][FIGHTSTG_battle.active[index]];
-                    fighter->hp -= task->damage;
-                    if (fighter->hp <= 0) {
-                        fighter->hp = 0;
-                        if (task->noKnockOutEvent == 0) {
-                            FIGHTSTG_queueKnockOut(index << 4);
-                        }
-                    }
-                }
+                showCounterResult(task, children);
                 task->substate++;
             }
             break;

@@ -94,7 +94,7 @@ typedef struct HitEffect {
     /* 0x50 */ struct Models *models;
     /* 0x54 */ struct BattleCamera *camera;
     /* 0x58 */ s32 result; /* 1 a hit, 2 a knockout: the script is result + 1 */
-    /* 0x5C */ s32 unk5C; /* the script's unk74 */
+    /* 0x5C */ s32 unk5C; /* FIGHTSTG_startHitEffect's second argument: 1 from WFIGHTMN, 0 from WFIGHTTS; the script's unk74 */
     /* 0x60 */ s32 effectImages; /* FIGHTSTG_findEffectSheet's */
     /* 0x64 */ s32 sheet; /* its file in the high half */
     /* 0x68 */ Vec2 texPos;
@@ -116,14 +116,14 @@ typedef struct DigimonChange {
     /* 0x54 */ struct BattleCamera *camera;
     /* 0x58 */ struct FightStage *stage;
     /* 0x5C */ s32 idleMotion; /* the old Digimon's */
-    /* 0x60 */ RECT clip0; /* layer 0x1004's */
-    /* 0x68 */ RECT clip1; /* layer 0x1003's */
+    /* 0x60 */ RECT clip0; /* BATTLE_LAYER_MODELS's */
+    /* 0x68 */ RECT clip1; /* BATTLE_LAYER_WIREFRAME's */
     /* 0x70 */ s32 file; /* the new Digimon's model's */
 } DigimonChange;
 
 typedef struct DigimonChangeChildren {
     /* 0x00 */ struct WhiteFlash *fade;
-    /* 0x04 */ Task *unk4;
+    /* 0x04 */ Task *unused; /* a child slot nothing fills */
     /* 0x08 */ struct SpriteEffect *effects[4];
 } DigimonChangeChildren;
 
@@ -149,11 +149,11 @@ struct BattleScript {
     /* 0x68 */ s32 stage; /* what the stage command's 0x38 stands for */
     /* 0x6C */ s32 effect; /* the sprite effect the effect command's 9999 stands for */
     /* 0x70 */ s32 sound; /* what the sound commands' 0x62 and 0x63 stand for on a hit */
-    /* 0x74 */ s32 unk74;
+    /* 0x74 */ s32 unk74; /* HitEffect.unk5C; nothing reads it */
     /* 0x78 */ s32 fighter;
     /* 0x7C */ s32 model; /* the Models task's id */
     /* 0x80 */ s32 archive;
-    /* 0x84 */ s32 unk84;
+    /* 0x84 */ s32 pad; /* nothing uses it */
     /* 0x88 */ Models *models;
     /* 0x8C */ s16 *pc;
     /* 0x90 */ s32 scripts; /* how many hits command 5 has played */

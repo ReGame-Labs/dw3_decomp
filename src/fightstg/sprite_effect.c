@@ -437,8 +437,8 @@ s32 FIGHTSTG_findEffectSheet(s32 effect, s32 *images, s32 *sheet, Vec2 *texPos) 
 }
 
 /* A 2D effect's task: starts a sprite animation for each entry of its
-   archive (up to 30), on layer 0x1006 for effects 1000 to 1002 and 1007,
-   else 0x1004, and ends once they all have */
+   archive (up to 30), on BATTLE_LAYER_FRONT for effects 1000 to 1002 and
+   1007, else on BATTLE_LAYER_MODELS, and ends once they all have */
 void FIGHTSTG_updateSpriteEffect(SpriteEffect *task, SpriteAnim **children) {
     s32 *archive;
     s32 layerId;
@@ -453,12 +453,12 @@ void FIGHTSTG_updateSpriteEffect(SpriteEffect *task, SpriteAnim **children) {
         /* getEntry gives the archive's address as a number, getArchiveEntry
            an entry's as a u8 * */
         archive = FILE_CACHE.getEntry(task->file);
-        layerId = 0x1004;
+        layerId = BATTLE_LAYER_MODELS;
         if (task->effect >= 1000 && task->effect < 1003) {
-            layerId = 0x1006;
+            layerId = BATTLE_LAYER_FRONT;
         }
         if (task->effect == 1007) {
-            layerId = 0x1006;
+            layerId = BATTLE_LAYER_FRONT;
         }
         for (count = 0; count < 30; count++) {
             if (archive[count] == 0) {
