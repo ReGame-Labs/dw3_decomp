@@ -37,9 +37,9 @@ void setupStage(void) {
 StagePoint placePoints1_1Point1 = { 0x2E5, 1, 1, 0x3B0, 216, 1, NULL };
 StagePoint placePoints1_1Point0 = { 0x2E0, 1, 1, 176, 0x178, 5, &placePoints1_1Point1 };
 StagePoints placePoints1_1 = { 1, 1, &placePoints1_1Point0 };
-StagePoint D_800A4FD8 = { 0x2E2, 3, 1, 0x330, 248, 1, NULL };
-StagePoint D_800A4FE8 = { 0x2E3, 3, 1, 160, 0x180, 5, &D_800A4FD8 };
-StagePoints placePoints3_1 = { 3, 1, &D_800A4FE8 };
+StagePoint placePoints3_1Point1 = { 0x2E2, 3, 1, 0x330, 248, 1, NULL };
+StagePoint placePoints3_1Point0 = { 0x2E3, 3, 1, 160, 0x180, 5, &placePoints3_1Point1 };
+StagePoints placePoints3_1 = { 3, 1, &placePoints3_1Point0 };
 StagePoint placePoints5_1Point1 = { 0x2E2, 5, 1, 0x330, 248, 1, NULL };
 StagePoint placePoints5_1Point0 = { 0x2E4, 5, 1, 192, 0x180, 5, &placePoints5_1Point1 };
 StagePoints placePoints5_1 = { 5, 1, &placePoints5_1Point0 };
@@ -58,7 +58,7 @@ StagePoints placePoints15_1 = { 15, 1, &placePoints15_1Point0 };
 StagePoint placePoints19_1Point1 = { 0x2E2, 19, 1, 0x330, 248, 1, NULL };
 StagePoint placePoints19_1Point0 = { 0x2E3, 19, 1, 160, 0x180, 5, &placePoints19_1Point1 };
 StagePoints placePoints19_1 = { 19, 1, &placePoints19_1Point0 };
-StagePoints placePoints0_0 = { 0, 0, &D_800A4FE8 };
+StagePoints placePoints0_0 = { 0, 0, &placePoints3_1Point0 };
 StagePoints *placePoints[] = {
     &placePoints1_1, &placePoints3_1, &placePoints5_1, &placePoints9_1,
     &placePoints11_1, &placePoints13_1, &placePoints15_1, &placePoints19_1,

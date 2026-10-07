@@ -1,5 +1,6 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern AnimFrame updateTileAnimsFrames0[];
 extern AnimFrame updateTileAnimsFrames1[];
 
@@ -59,6 +60,7 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
+/* Defined below, after the tables that use them */
 extern s16 script1608[];
 extern s16 script1610[];
 

@@ -55,14 +55,14 @@ void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
     }
     switch (command) {
     case FIELD_COMMAND_HIDE_OBJECTS(0) ... FIELD_COMMAND_HIDE_OBJECTS(FIELD_OBJECT_GROUPS - 1):
-        for (object = FIELDSTG_state.objects; object->unk2 != 0; object++) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
             if (object->anim == command - FIELD_COMMAND_HIDE_OBJECTS(0) + FIELD_OBJECT_GROUP_ANIM) {
                 object->visible = 0;
             }
         }
         break;
     case FIELD_COMMAND_SHOW_OBJECTS(0) ... FIELD_COMMAND_SHOW_OBJECTS(FIELD_OBJECT_GROUPS - 1):
-        for (object = FIELDSTG_state.objects; object->unk2 != 0; object++) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
             if (object->anim == command - FIELD_COMMAND_SHOW_OBJECTS(0) + FIELD_OBJECT_GROUP_ANIM) {
                 object->visible = 1;
             }

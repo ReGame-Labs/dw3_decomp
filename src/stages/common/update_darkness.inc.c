@@ -1,6 +1,6 @@
 /*
  * The darkness: the screen drawn black (a white quad subtracted from it,
- * blend mode 2) while in TASK_DONE (GAME.unk26E8 is set then)
+ * blend mode 2) while in TASK_DONE (GAME.dark is set then)
  */
 void updateDarkness(StageTask *task) {
     Layer *layer;
@@ -9,7 +9,7 @@ void updateDarkness(StageTask *task) {
     DR_TPAGE *mode;
 
     if (task->state == TASK_INIT) {
-        if (GAME.unk26E8 != 0) {
+        if (GAME.dark != 0) {
             task->setState(task, TASK_DONE);
         } else {
             task->setState(task, TASK_RUN);
@@ -26,7 +26,7 @@ void updateDarkness(StageTask *task) {
                 SOUND.playSound(SOUND_SWITCH02);
             }
         }
-        GAME.unk26E8 = 0;
+        GAME.dark = 0;
         break;
     case TASK_DONE:
         layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
@@ -45,7 +45,7 @@ void updateDarkness(StageTask *task) {
         mode->code[0] = 0xE1000245;
         addPrim(ot, mode);
         GFX.funcs.setPrim(mode + 1);
-        GAME.unk26E8 = 1;
+        GAME.dark = 1;
         break;
     case TASK_INIT:
     case TASK_KILL:

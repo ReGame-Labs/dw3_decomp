@@ -1,6 +1,8 @@
 #include "common.h"
 #include "stage.h"
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
+
+/* Defined below, after the code that uses them */
 extern AnimFrame updateTileTaskFrames[];
 
 #include "common/step_animation_once.inc.c"
@@ -17,7 +19,7 @@ void updateTileTask(StageTileTask *task) {
         task->nextState(task);
         task->obj.anim.index = 0;
         task->obj.anim.timer = updateTileTaskFrames[0].duration;
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == 1) {
                 task->obj.tile = rec;
             }
@@ -47,7 +49,7 @@ void updateTileTask(StageTileTask *task) {
 }
 
 void *createCommand828(s32 arg) {
-    return createTaskWithId(updateTileTask, 0x58, 0, arg);
+    return createTaskWithId(updateTileTask, sizeof(StageTileTask), 0, arg);
 }
 
 /* Creates the event object of story progress 14 */

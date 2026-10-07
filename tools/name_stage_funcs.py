@@ -5,15 +5,19 @@ Names a stage's functions after what calls them.
 splat named the stages' functions by address (func_800A67B0). This names
 each one by the place a table or a call gives it, and nothing else:
 
-    stageEvents[k].start, .end        startEvent<id>, endEvent<id>  (the event's id)
+    stageEvents[k].start, .end        startEvent<id>, endEvent<id>  (the event's id;
+                                        startEvents<a>To<b> for a run of events)
     FIELDSTG_scriptCommands[k]        createCommand<id>, handleCommand<id>
-      .create, .handle                  (the command's id, for the stage's functions)
+      .create, .handle                  (the command's id, for the stage's functions;
+                                        handleCommands<a>To<b> for a run of commands)
     the update a function gives       update<Task>, and create<Task> for the function
       createTask(WithId)                that creates it (the task's struct, without
                                         Stage; not for StageTask or Task)
     the update of a StageTask or Task  updateEvent<id>, updateCommand<id>
       that an event's start or a
       command's create function creates
+      (or of a task that several
+      updates of the stage have)
 
 A few functions no table or call names have names given by reading their
 code (GIVEN). An event's or a command's name comes before the name of the
@@ -53,6 +57,110 @@ GIVEN = {
     },
     ("wstag480", "wstag481"): {"func_800A4CBC": "stepTileSequences"},
     ("wstag740", "wstag741"): {"func_800A5130": "drawPairSprite"},
+    # the records that wander about their place, and fade out when told
+    ("wstag460",): {
+        "func_800A51D0": "fadeOutTileSolo",  # mode 2, wait 20
+        "func_800A521C": "createTileSoloTask",  # createTileSolo takes an id
+        "func_800A5630": "fadeOutTileDuo",
+        "func_800A567C": "createTileDuoTask",
+        "func_800A57C8": "isFarFromHome",  # more than dist from home, in x + y
+        "func_800A5804": "getAngle",  # of (x, y), 0x100 a turn, from a table of tangents
+        "func_800A5974": "moveWanderer",
+        "func_800A5DCC": "fadeOutWanderer",
+        "func_800A5E18": "createWandererTask",
+    },
+    ("wstag526",): {
+        "func_800A503C": "updateClutTile",  # cycles the CLUT row of record 0x15
+        "func_800A5228": "fadeOutClutTile",
+        "func_800A5244": "createClutTile",
+        "func_800A5274": "createClutTileTask",
+        "func_800A5668": "fadeOutTileDuo",
+        "func_800A56B4": "createTileDuoTask",
+        "func_800A5800": "updateStillTile",  # shows record 0x16 with one frame
+        "func_800A59B8": "fadeOutStillTile",
+        "func_800A59D4": "createStillTile",
+        "func_800A5A04": "createStillTileTask",
+        "func_800A5B50": "isFarFromHome",
+        "func_800A5B8C": "getAngle",
+        "func_800A5CFC": "moveWanderPair",
+        "func_800A6210": "fadeOutWanderPair",
+        "func_800A625C": "createWanderPairTask",
+    },
+    # wstag310's two sets of six records, which wstag311 has unused
+    ("wstag311",): {
+        "func_800A5094": "updateTileSix",
+        "func_800A5458": "restartTileSix",  # its first two records' animations, for mode 1 or 3
+        "func_800A54C8": "createTileSixWithId",
+        "func_800A54F8": "createTileSix",
+        "func_800A5644": "updateTileSixW",
+        "func_800A5A08": "restartTileSixW",
+        "func_800A5A78": "createTileSixWWithId",
+        "func_800A5AA8": "createTileSixW",
+    },
+    # the three records that a map object's event plays at a place
+    ("wstag212",): {"func_800A4D80": "resetTileEffect"},
+    ("wstag225", "wstag226", "wstag750"): {"func_800A4D7C": "resetTileEffect"},
+    ("wstag925",): {"func_800A60D8": "resetTileEffect"},
+    ("wstag226",): {
+        "func_800A5028": "startTileEffect",  # at the place of map 0 or 1
+        "func_800A50C0": "createTileEffectTask",  # createTileEffect takes an id
+    },
+    ("wstag934",): {"func_800A6218": "handleTileLift"},  # wstag261's handleCommand827, for maps 0x348 and 0x349
+    # 36 sprites scrolled at 1/8 of the map, far behind it
+    ("wstag375",): {"func_800A4CA8": "updateFarSprites", "func_800A4DFC": "createFarSprites"},
+    ("wstag949",): {"func_800A5DE4": "updateFarSprites", "func_800A5F38": "createFarSprites"},
+    # the timer of GAME.countdown, and the tile pair started in TASK_DONE
+    ("wstag795",): {
+        "func_800A50C4": "createTilePairDone",
+        "func_800A50F8": "drawTimer",
+        "func_800A5240": "updateTimer",
+        "func_800A5410": "createTimer",
+    },
+    ("wstag800",): {
+        "func_800A50B4": "createTilePair16Done",
+        "func_800A5404": "drawTimer",
+        "func_800A554C": "updateTimer",
+        "func_800A571C": "createTimer",
+    },
+    ("wstag810",): {
+        "func_800A5088": "createTilePairN1",  # of animations 1 and 2
+        "func_800A50C4": "createTilePairN3",
+        "func_800A5100": "createTilePairN5",
+        "func_800A513C": "createTilePairNDone",
+    },
+    ("wstag805",): {
+        "func_800A4E90": "stepTileLoop",
+        "func_800A5310": "stepFloaterPart",
+        "func_800A5528": "drawFloaterPart",
+    },
+    ("wstag785",): {"func_800A50CC": "drawActorMark"},
+    ("wstag415",): {
+        "func_800A4CB8": "stepFallBody",
+        "func_800A4DAC": "drawFaller",
+        "func_800A5320": "stepMoverBody",
+        "func_800A59C8": "drawScroller",
+    },
+    ("wstag545",): {"func_800A4CDC": "stepHeldAnimation"},  # holds its last frame
+    ("wstag680",): {"func_800A4DA0": "stepRiser"},
+    ("wstag780",): {
+        "func_800A4CA4": "drawFlyer",
+        "func_800A4FF4": "drawGlow",
+        "func_800A5344": "drawEffect",
+        "func_800A5574": "stepTileLoopAnimation",
+        "func_800A5804": "updateEffectSet",  # the six effects and the looping records
+        "func_800A589C": "createEffectSet",
+        "func_800A58C8": "releaseFlyers",
+        "func_800A5A10": "drawFlyerGate",
+        "func_800A5E80": "drawByteAnims",
+    },
+    ("wstag310",): {"func_800A5DBC": "drawEffect"},
+    # the background drawn at 2/3 of the map's scroll
+    ("wstag815",): {
+        "func_800A4CA4": "drawBackground",
+        "func_800A4E08": "updateBackground",
+        "func_800A4F10": "createBackground",
+    },
+    ("wstag820",): {"func_800A5638": "createStageEffectWithId"},
 }
 
 
@@ -81,12 +189,20 @@ def script_commands():
     m = re.search(r"^ScriptCommand FIELDSTG_scriptCommands\[\] = \{\n(.*?)^\};", text, re.M | re.S)
     if not m:
         return out
+    ids = {}
     for row in re.finditer(r"\{(\d+), (\w+), (\w+)\}", m.group(1)):
         command = int(row.group(1))
         for leaf, kind in ((row.group(2), "create"), (row.group(3), "handle")):
             f = re.fullmatch(r"(WSTAG\d+)_(\w+)", leaf)
             if f:
-                out.setdefault(f.group(1).lower(), []).append((f.group(2), f"{kind}Command{command}"))
+                ids.setdefault((f.group(1).lower(), f.group(2), kind), []).append(command)
+    for (stage, function, kind), numbers in ids.items():
+        first, last = min(numbers), max(numbers)
+        if len(numbers) == 1:
+            out.setdefault(stage, []).append((function, f"{kind}Command{first}"))
+        elif sorted(numbers) == list(range(first, last + 1)):
+            # the function of a run of commands
+            out.setdefault(stage, []).append((function, f"{kind}Commands{first}To{last}"))
     return out
 
 
@@ -98,12 +214,20 @@ def structural_names(text, commands, stage):
 
     events = defs.get("stageEvents")
     if events and isinstance(events[2], list):
+        ids = {}
         for event in events[2]:
             if isinstance(event, list) and len(event) == 5 and re.fullmatch(r"\d+", event[0]):
                 for leaf, kind in ((event[3], "start"), (event[4], "end")):
                     f = target(leaf)
                     if f in funcs:
-                        out.append((f, f"{kind}Event{int(event[0])}", True))
+                        ids.setdefault((f, kind), []).append(int(event[0]))
+        for (f, kind), numbers in ids.items():
+            first, last = min(numbers), max(numbers)
+            if len(numbers) == 1:
+                out.append((f, f"{kind}Event{first}", True))
+            elif sorted(numbers) == list(range(first, last + 1)):
+                # the start or the end of a run of events
+                out.append((f, f"{kind}Events{first}To{last}", True))
 
     out.extend((f, name, True) for f, name in commands if f in funcs)
     for stages, given in GIVEN.items():
@@ -111,6 +235,7 @@ def structural_names(text, commands, stage):
             out.extend((f, name, True) for f, name in given.items() if f in funcs)
 
     tables = {f: name for f, name, _ in out}
+    tasks = []
     for creator, (_, body) in funcs.items():
         calls = [m.group(1) for line in body for m in re.finditer(r"createTask(?:WithId)?\((\w+),", line)]
         if len(set(calls)) != 1 or calls[0] not in funcs:
@@ -126,6 +251,14 @@ def structural_names(text, commands, stage):
                 out.append((update, f"update{starter.group(1)}{starter.group(2)}", False))
             continue
         task = re.sub(r"^Stage(?=[A-Z])", "", m.group(1))
+        starter = re.fullmatch(r"(?:start|create)(Event|Command)(\d+)", tables.get(creator, creator))
+        tasks.append((update, creator, task, starter))
+    # A task that several updates of the stage have is named after the event
+    # or the command whose start creates it
+    for update, creator, task, starter in tasks:
+        if starter and sum(other == task for _, _, other, _ in tasks) > 1:
+            out.append((update, f"update{starter.group(1)}{starter.group(2)}", False))
+            continue
         out.append((update, f"update{task}", False))
         out.append((creator, f"create{task}", False))
     return out

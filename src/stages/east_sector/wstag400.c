@@ -44,7 +44,7 @@ void endEvent1304(void) {
 }
 
 /* Clears flags 0x1A26 and 0x1C4B to 0x1C4E */
-void func_800A4EA8(void) {
+void endEvents1507To1509(void) {
     FLAGS_00.applyAction(FLAG(0x1A, 0x26), 0);
     FLAGS_00.applyAction(FLAG(0x1C, 0x4B), 0);
     FLAGS_00.applyAction(FLAG(0x1C, 0x4C), 0);
@@ -52,6 +52,7 @@ void func_800A4EA8(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x4E), 0);
 }
 
+/* Defined below, after the code that uses them */
 extern FieldBattles stageBattles0[];
 extern FieldBattles stageBattles1[];
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
@@ -844,9 +845,9 @@ FieldEvent stageEvents[] = {
     { 1302, script1302, EVENT_TEXT(0x24), NULL, endEvent1302 },
     { 1303, script1303, EVENT_TEXT(0x25), NULL, endEvent1303 },
     { 1304, script1304, EVENT_TEXT(0x26), NULL, endEvent1304 },
-    { 1507, script1507, EVENT_TEXT(0x2E), NULL, func_800A4EA8 },
-    { 1508, script1508, EVENT_TEXT(0x2F), NULL, func_800A4EA8 },
-    { 1509, script1509, EVENT_TEXT(0x30), NULL, func_800A4EA8 },
+    { 1507, script1507, EVENT_TEXT(0x2E), NULL, endEvents1507To1509 },
+    { 1508, script1508, EVENT_TEXT(0x2F), NULL, endEvents1507To1509 },
+    { 1509, script1509, EVENT_TEXT(0x30), NULL, endEvents1507To1509 },
     { 9000, NULL, 0, FIELDSTG_startEventBattle5, NULL },
     { -1, NULL, 0, NULL, NULL },
 };

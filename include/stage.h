@@ -142,9 +142,11 @@ typedef struct StageActor {
     /* 0x58 */ s32 tileX;
     /* 0x5C */ s32 tileY;
     /* 0x60 */ s32 dir;
-    /* 0x64 */ s32 unk64;
-    /* 0x68 */ s32 unk68[3];
-    /* 0x74 */ s32 unk74;
+    /* 0x64 */ s32 z; /* how high it is off the ground, in 1/256 pixels */
+    /* 0x68 */ s32 speed;
+    /* 0x6C */ struct ActorImage *image;
+    /* 0x70 */ struct FieldImage *fieldImage; /* the field's image, for the shadow */
+    /* 0x74 */ s32 hasShadow; /* drawn with a shadow */
 } StageActor;
 
 /* The children of a task with one per party slot */

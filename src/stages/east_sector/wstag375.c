@@ -1,6 +1,7 @@
 #include "common.h"
 #include "stage.h"
-extern s32 D_800A5284[][2];
+/* Defined below, after the tables that use them */
+extern s32 farSpriteSpots[][2];
 
 /* The file of the sprites, which the versions number differently */
 #if VERSION_US
@@ -9,8 +10,8 @@ extern s32 D_800A5284[][2];
 #define SPRITES 0x1BF
 #endif
 
-/* Draws 36 sprites of file SPRITES at the positions of D_800A5284, scrolled at 1/8 */
-void func_800A4CA8(StageTask *task) {
+/* Draws 36 sprites of file SPRITES at the positions of farSpriteSpots, scrolled at 1/8 */
+void updateFarSprites(StageTask *task) {
     SpriteDrawer drawer;
     s32 pos[2];
     s32 scroll[2];
@@ -32,7 +33,7 @@ void func_800A4CA8(StageTask *task) {
         pos[0] = (scroll[0] - 0x2C0) >> 3;
         pos[1] = (scroll[1] - 0x280) >> 3;
         for (i = 0; i < 0x24; i++) {
-            drawer.draw(FILE_CACHE.getEntry(SPRITES << 16), 0, D_800A5284[i][0] + pos[0], D_800A5284[i][1] + pos[1]);
+            drawer.draw(FILE_CACHE.getEntry(SPRITES << 16), 0, farSpriteSpots[i][0] + pos[0], farSpriteSpots[i][1] + pos[1]);
         }
         break;
     case TASK_DONE:
@@ -41,8 +42,8 @@ void func_800A4CA8(StageTask *task) {
     }
 }
 
-void *func_800A4DFC(void) {
-    return createTask(func_800A4CA8, 0x50, 0);
+void *createFarSprites(void) {
+    return createTask(updateFarSprites, 0x50, 0);
 }
 
 /* Creates the stage helper task, and the event object when flag 0x4053 is set and 0x4054 is not */
@@ -50,7 +51,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        children[0] = func_800A4DFC();
+        children[0] = createFarSprites();
         if (FLAGS_00.checkCondition(FLAG(0x40, 0x53), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x54), 0)) {
             children[1] = FIELDSTG_startEvent(0x4ED);
         }
@@ -77,6 +78,7 @@ void endEvent1261(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x54), 1);
 }
 
+/* Defined below, after the code that uses them */
 extern FieldBattles stageBattles0[];
 extern FieldBattles stageBattles1[];
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
@@ -179,7 +181,7 @@ s16 script1261[] = {
     0x300, 0x3C,
     0,
 };
-s32 D_800A5284[][2] = {
+s32 farSpriteSpots[][2] = {
     596, 399, 809, 564,
     820, 832, 1143, 1009,
     738, 1035, 416, 1055,

@@ -152,7 +152,7 @@ void FIELDSTG_setOffTrigger(Triggers *task) {
             if (task->entry->hideAnim != 0) {
                 object = FIELDSTG_state.objects;
                 id = task->entry->hideAnim;
-                for (; object->unk2 != 0; object++) {
+                for (; object->margin != 0; object++) {
                     if (object->anim == id) {
                         object->visible = 0;
                     }

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern StageEffectSpot updateStageSpots[];
 
 /* Creates the stage's ten effects and the event object of flags 0x4082/0x4083 */

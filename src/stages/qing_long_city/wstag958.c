@@ -28,6 +28,7 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
+/* Defined below, after the tables that use them */
 extern s16 script1646[];
 
 ActorImage stageImages[] = {

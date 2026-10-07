@@ -1,6 +1,7 @@
 #include "common.h"
 #include "stage.h"
-extern AnimFrame D_800A6EB8[];
+/* Defined below, after the code that uses them */
+extern AnimFrame updateSoundTileFrames[];
 
 #include "common/step_animation_once.inc.c"
 
@@ -12,10 +13,10 @@ void updateSoundTile(StageSoundTile *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == 1) {
                 task->obj.anim.index = 0;
-                task->obj.anim.timer = D_800A6EB8[0].duration;
+                task->obj.anim.timer = updateSoundTileFrames[0].duration;
                 task->obj.tile = rec;
             }
         }
@@ -31,7 +32,7 @@ void updateSoundTile(StageSoundTile *task) {
             break;
         case 1:
             tile->visible = 1;
-            frame = stepAnimationOnce(&task->obj, D_800A6EB8, 0);
+            frame = stepAnimationOnce(&task->obj, updateSoundTileFrames, 0);
             if (frame != 0xFF) {
                 tile->frame = frame;
             } else {
@@ -57,13 +58,13 @@ void handleCommand850(StageSoundTile *task, s32 id) {
     if (task != NULL && id == 0x335) {
         task->voice = SOUND.playSound(SOUND_COMCD115);
         task->obj.anim.index = 0;
-        task->obj.anim.timer = D_800A6EB8[0].duration;
+        task->obj.anim.timer = updateSoundTileFrames[0].duration;
         task->setSubstate(task, 1);
     }
 }
 
 void *createSoundTile(s32 arg) {
-    return createTaskWithId(updateSoundTile, 0x5C, 0, arg);
+    return createTaskWithId(updateSoundTile, sizeof(StageSoundTile), 0, arg);
 }
 
 /* Creates the event objects of the story so far, the first that applies */
@@ -1214,7 +1215,7 @@ s16 script1450[] = {
     0x304, 0x218, 0x138, 0x11D, 5,
     0,
 };
-AnimFrame D_800A6EB8[] = {
+AnimFrame updateSoundTileFrames[] = {
     { 5, 4 }, { 6, 4 }, { 7, 4 }, { 8, 4 },
     { 9, 4 }, { 255, 0x3E7 },
 };

@@ -1,33 +1,34 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern AnimFrame updateTileAnimsFrames0[];
 extern AnimFrame updateTileAnimsFrames1[];
 extern AnimFrame updateTileAnimsFrames2[];
 extern AnimFrame updateTileAnimsFrames3[];
 extern StageEffectSpot updateStageSpots[];
-extern AnimFrame D_800A708C[];
-extern AnimFrame D_800A70C0[];
-extern AnimFrame D_800A7100[];
-extern AnimFrame D_800A7170[];
-extern AnimFrame D_800A70F4[];
-extern AnimFrame D_800A71A4[];
-extern AnimFrame D_800A71D8[];
-extern AnimFrame D_800A720C[];
-extern AnimFrame D_800A7218[];
-extern AnimFrame D_800A727C[];
+extern AnimFrame updateTileSixFrames0[];
+extern AnimFrame updateTileSixFrames1[];
+extern AnimFrame updateTileSixFrames3[];
+extern AnimFrame updateTileSixFrames4[];
+extern AnimFrame updateTileSixFrames2[];
+extern AnimFrame updateTileSixWFrames0[];
+extern AnimFrame updateTileSixWFrames1[];
+extern AnimFrame updateTileSixWFrames2[];
+extern AnimFrame updateTileSixWFrames3[];
+extern AnimFrame updateTileSixWFrames4[];
 
 #include "common/step_looping_animation.inc.c"
 
 #include "common/update_tile_anims4.inc.c"
 
 void *createTileAnims(void) {
-    return createTask(updateTileAnims, 0x60, 0);
+    return createTask(updateTileAnims, sizeof(StageTileAnims), 0);
 }
 
 #include "common/step_tile_animation.inc.c"
 
 /* Animates the records with animations 5 to 10 by mode (0: hidden, 1 and 3: the first two once, then mode 2 or 0; 2: the other four) */
-void func_800A5094(StageTileSix *task) {
+void updateTileSix(StageTileSix *task) {
     StageTile *rec;
     StageTile *tile;
     s32 done;
@@ -37,28 +38,28 @@ void func_800A5094(StageTileSix *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim >= 5 && rec->anim <= 10) {
                 switch (rec->anim) {
                 case 5:
                     task->tiles[0].tile = rec;
                     task->tiles[0].anim.index = 0;
-                    task->tiles[0].anim.timer = D_800A708C[0].duration;
+                    task->tiles[0].anim.timer = updateTileSixFrames0[0].duration;
                     break;
                 case 6:
                     task->tiles[1].tile = rec;
                     task->tiles[1].anim.index = 0;
-                    task->tiles[1].anim.timer = D_800A70C0[0].duration;
+                    task->tiles[1].anim.timer = updateTileSixFrames1[0].duration;
                     break;
                 case 7:
                     task->tiles[2].tile = rec;
                     task->tiles[2].anim.index = 0;
-                    task->tiles[2].anim.timer = D_800A70F4[0].duration;
+                    task->tiles[2].anim.timer = updateTileSixFrames2[0].duration;
                     break;
                 case 8:
                     task->tiles[3].tile = rec;
                     task->tiles[3].anim.index = 0;
-                    task->tiles[3].anim.timer = D_800A7100[0].duration;
+                    task->tiles[3].anim.timer = updateTileSixFrames3[0].duration;
                     break;
                 case 9:
                     task->tiles[4].tile = rec;
@@ -87,7 +88,7 @@ void func_800A5094(StageTileSix *task) {
             case 1:
                 switch (i) {
                 case 0:
-                    frame = stepTileAnimation(&task->tiles[0], D_800A708C, 1, 0);
+                    frame = stepTileAnimation(&task->tiles[0], updateTileSixFrames0, 1, 0);
                     if (frame != 0xFF) {
                         tile->frame = frame;
                         tile->visible = 1;
@@ -98,7 +99,7 @@ void func_800A5094(StageTileSix *task) {
                     }
                     break;
                 case 1:
-                    frame = stepTileAnimation(&task->tiles[1], D_800A70C0, 1, 0);
+                    frame = stepTileAnimation(&task->tiles[1], updateTileSixFrames1, 1, 0);
                     if (frame != 0xFF) {
                         tile->frame = frame;
                         tile->visible = 1;
@@ -124,12 +125,12 @@ void func_800A5094(StageTileSix *task) {
                     break;
                 case 2:
                     tile->frame = 0x28;
-                    tile->clutRow = stepTileAnimation(&task->tiles[i], D_800A70F4, 0, 0);
+                    tile->clutRow = stepTileAnimation(&task->tiles[i], updateTileSixFrames2, 0, 0);
                     tile->visible = 1;
                     break;
                 case 3:
                     tile->frame = 2;
-                    tile->clutRow = stepTileAnimation(&task->tiles[i], D_800A7100, 0, 0);
+                    tile->clutRow = stepTileAnimation(&task->tiles[i], updateTileSixFrames3, 0, 0);
                     tile->visible = 1;
                     break;
                 case 4:
@@ -147,7 +148,7 @@ void func_800A5094(StageTileSix *task) {
             case 3:
                 switch (i) {
                 case 0:
-                    frame = stepTileAnimation(&task->tiles[0], D_800A7170, 1, 0);
+                    frame = stepTileAnimation(&task->tiles[0], updateTileSixFrames4, 1, 0);
                     if (frame != 0xFF) {
                         tile->frame = frame;
                         tile->visible = 1;
@@ -158,7 +159,7 @@ void func_800A5094(StageTileSix *task) {
                     }
                     break;
                 case 1:
-                    frame = stepTileAnimation(&task->tiles[1], D_800A7170, 1, 0);
+                    frame = stepTileAnimation(&task->tiles[1], updateTileSixFrames4, 1, 0);
                     if (frame != 0xFF) {
                         tile->frame = frame;
                         tile->visible = 1;
@@ -196,33 +197,33 @@ void func_800A5094(StageTileSix *task) {
 }
 
 /* Restarts the first two records' animations for mode 1 (id 0) or 3 (id 1) */
-void func_800A5458(StageTileSix *task, s32 id) {
+void restartTileSix(StageTileSix *task, s32 id) {
     if (task != NULL) {
         switch (id) {
         case 0:
             task->tiles[0].anim.index = 0;
-            task->tiles[0].anim.timer = D_800A708C[0].duration;
+            task->tiles[0].anim.timer = updateTileSixFrames0[0].duration;
             task->tiles[1].anim.index = 0;
-            task->tiles[1].anim.timer = D_800A70C0[0].duration;
+            task->tiles[1].anim.timer = updateTileSixFrames1[0].duration;
             task->mode = 1;
             break;
         case 1:
             task->tiles[0].anim.index = 0;
-            task->tiles[0].anim.timer = D_800A7100[15].duration; /* the animation after D_800A7100's */
+            task->tiles[0].anim.timer = updateTileSixFrames3[15].duration; /* the animation after updateTileSixFrames3's */
             task->tiles[1].anim.index = 0;
-            task->tiles[1].anim.timer = D_800A7170[0].duration;
+            task->tiles[1].anim.timer = updateTileSixFrames4[0].duration;
             task->mode = 3;
             break;
         }
     }
 }
 
-void *func_800A54C8(s32 arg) {
-    return createTaskWithId(func_800A5094, 0x84, 0, arg);
+void *createTileSixWithId(s32 arg) {
+    return createTaskWithId(updateTileSix, sizeof(StageTileSix), 0, arg);
 }
 
-void *func_800A54F8(void) {
-    return createTask(func_800A5094, 0x84, 0);
+void *createTileSix(void) {
+    return createTask(updateTileSix, sizeof(StageTileSix), 0);
 }
 
 s32 stepTileAnimation2(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 depth) {
@@ -254,7 +255,7 @@ s32 stepTileAnimation2(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 dept
 }
 
 /* Animates the records with animations 11 to 16 by mode (0: hidden, 1 and 3: the first two once, then mode 2 or 0; 2: the other four) */
-void func_800A5644(StageTileSix *task) {
+void updateTileSixW(StageTileSix *task) {
     StageTile *rec;
     StageTile *tile;
     s32 done;
@@ -264,28 +265,28 @@ void func_800A5644(StageTileSix *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim >= 11 && rec->anim <= 16) {
                 switch (rec->anim) {
                 case 11:
                     task->tiles[0].tile = rec;
                     task->tiles[0].anim.index = 0;
-                    task->tiles[0].anim.timer = D_800A71A4[0].duration;
+                    task->tiles[0].anim.timer = updateTileSixWFrames0[0].duration;
                     break;
                 case 12:
                     task->tiles[1].tile = rec;
                     task->tiles[1].anim.index = 0;
-                    task->tiles[1].anim.timer = D_800A71D8[0].duration;
+                    task->tiles[1].anim.timer = updateTileSixWFrames1[0].duration;
                     break;
                 case 13:
                     task->tiles[2].tile = rec;
                     task->tiles[2].anim.index = 0;
-                    task->tiles[2].anim.timer = D_800A720C[0].duration;
+                    task->tiles[2].anim.timer = updateTileSixWFrames2[0].duration;
                     break;
                 case 14:
                     task->tiles[3].tile = rec;
                     task->tiles[3].anim.index = 0;
-                    task->tiles[3].anim.timer = D_800A7218[0].duration;
+                    task->tiles[3].anim.timer = updateTileSixWFrames3[0].duration;
                     break;
                 case 15:
                     task->tiles[4].tile = rec;
@@ -314,7 +315,7 @@ void func_800A5644(StageTileSix *task) {
             case 1:
                 switch (i) {
                 case 0:
-                    frame = stepTileAnimation2(&task->tiles[0], D_800A71A4, 1, 0);
+                    frame = stepTileAnimation2(&task->tiles[0], updateTileSixWFrames0, 1, 0);
                     if (frame != 0xFF) {
                         tile->frame = frame;
                         tile->visible = 1;
@@ -325,7 +326,7 @@ void func_800A5644(StageTileSix *task) {
                     }
                     break;
                 case 1:
-                    frame = stepTileAnimation2(&task->tiles[1], D_800A71D8, 1, 0);
+                    frame = stepTileAnimation2(&task->tiles[1], updateTileSixWFrames1, 1, 0);
                     if (frame != 0xFF) {
                         tile->frame = frame;
                         tile->visible = 1;
@@ -351,12 +352,12 @@ void func_800A5644(StageTileSix *task) {
                     break;
                 case 2:
                     tile->frame = 0x29;
-                    tile->clutRow = stepTileAnimation2(&task->tiles[i], D_800A720C, 0, 0);
+                    tile->clutRow = stepTileAnimation2(&task->tiles[i], updateTileSixWFrames2, 0, 0);
                     tile->visible = 1;
                     break;
                 case 3:
                     tile->frame = 0x11;
-                    tile->clutRow = stepTileAnimation2(&task->tiles[i], D_800A7218, 0, 0);
+                    tile->clutRow = stepTileAnimation2(&task->tiles[i], updateTileSixWFrames3, 0, 0);
                     tile->visible = 1;
                     break;
                 case 4:
@@ -374,7 +375,7 @@ void func_800A5644(StageTileSix *task) {
             case 3:
                 switch (i) {
                 case 0:
-                    frame = stepTileAnimation2(&task->tiles[0], D_800A727C, 1, 0);
+                    frame = stepTileAnimation2(&task->tiles[0], updateTileSixWFrames4, 1, 0);
                     if (frame != 0xFF) {
                         tile->frame = frame;
                         tile->visible = 1;
@@ -385,7 +386,7 @@ void func_800A5644(StageTileSix *task) {
                     }
                     break;
                 case 1:
-                    frame = stepTileAnimation2(&task->tiles[1], D_800A727C, 1, 0);
+                    frame = stepTileAnimation2(&task->tiles[1], updateTileSixWFrames4, 1, 0);
                     if (frame != 0xFF) {
                         tile->frame = frame;
                         tile->visible = 1;
@@ -423,33 +424,33 @@ void func_800A5644(StageTileSix *task) {
 }
 
 /* Restarts the first two records' animations for mode 1 (id 0) or 3 (id 1) */
-void func_800A5A08(StageTileSix *task, s32 id) {
+void restartTileSixW(StageTileSix *task, s32 id) {
     if (task != NULL) {
         switch (id) {
         case 0:
             task->tiles[0].anim.index = 0;
-            task->tiles[0].anim.timer = D_800A71A4[0].duration;
+            task->tiles[0].anim.timer = updateTileSixWFrames0[0].duration;
             task->tiles[1].anim.index = 0;
-            task->tiles[1].anim.timer = D_800A71D8[0].duration;
+            task->tiles[1].anim.timer = updateTileSixWFrames1[0].duration;
             task->mode = 1;
             break;
         case 1:
             task->tiles[0].anim.index = 0;
-            task->tiles[0].anim.timer = D_800A7218[12].duration; /* the animation after D_800A7218's */
+            task->tiles[0].anim.timer = updateTileSixWFrames3[12].duration; /* the animation after updateTileSixWFrames3's */
             task->tiles[1].anim.index = 0;
-            task->tiles[1].anim.timer = D_800A727C[0].duration;
+            task->tiles[1].anim.timer = updateTileSixWFrames4[0].duration;
             task->mode = 3;
             break;
         }
     }
 }
 
-void *func_800A5A78(s32 arg) {
-    return createTaskWithId(func_800A5644, 0x84, 0, arg);
+void *createTileSixWWithId(s32 arg) {
+    return createTaskWithId(updateTileSixW, sizeof(StageTileSix), 0, arg);
 }
 
-void *func_800A5AA8(void) {
-    return createTask(func_800A5644, 0x84, 0);
+void *createTileSixW(void) {
+    return createTask(updateTileSixW, sizeof(StageTileSix), 0);
 }
 
 /* Creates the stage helper task, the sprite effects and the event object of the story so far */
@@ -1019,22 +1020,22 @@ AnimFrame updateTileAnimsFrames3[] = {
     { 69, 8 }, { 70, 8 }, { 71, 8 }, { 72, 8 },
     { 73, 8 }, { 74, 8 }, { 75, 40 }, { 255, 0 },
 };
-AnimFrame D_800A708C[] = {
+AnimFrame updateTileSixFrames0[] = {
     { 5, 4 }, { 6, 4 }, { 7, 4 }, { 8, 4 },
     { 9, 4 }, { 10, 4 }, { 11, 4 }, { 12, 4 },
     { 13, 4 }, { 14, 4 }, { 15, 4 }, { 16, 4 },
     { 255, 0x3E7 },
 };
-AnimFrame D_800A70C0[] = {
+AnimFrame updateTileSixFrames1[] = {
     { 28, 4 }, { 29, 4 }, { 30, 4 }, { 31, 4 },
     { 32, 4 }, { 33, 4 }, { 34, 4 }, { 35, 4 },
     { 36, 4 }, { 37, 4 }, { 38, 4 }, { 39, 4 },
     { 255, 0x3E7 },
 };
-AnimFrame D_800A70F4[] = {
+AnimFrame updateTileSixFrames2[] = {
     { 0, 4 }, { 1, 4 }, { 255, 0 },
 };
-AnimFrame D_800A7100[] = {
+AnimFrame updateTileSixFrames3[] = {
     { 0, 12 }, { 1, 12 }, { 2, 12 }, { 3, 12 },
     { 4, 12 }, { 5, 12 }, { 6, 12 }, { 7, 12 },
     { 8, 12 }, { 9, 12 }, { 10, 12 }, { 11, 12 },
@@ -1043,28 +1044,28 @@ AnimFrame D_800A7100[] = {
     { 11, 4 }, { 10, 4 }, { 9, 4 }, { 8, 4 },
     { 7, 4 }, { 6, 4 }, { 5, 4 }, { 255, 0x3E7 },
 };
-AnimFrame D_800A7170[] = {
+AnimFrame updateTileSixFrames4[] = {
     { 39, 4 }, { 38, 4 }, { 37, 4 }, { 36, 4 },
     { 35, 4 }, { 34, 4 }, { 33, 4 }, { 32, 4 },
     { 31, 4 }, { 30, 4 }, { 29, 4 }, { 28, 4 },
     { 255, 0x3E7 },
 };
-AnimFrame D_800A71A4[] = {
+AnimFrame updateTileSixWFrames0[] = {
     { 76, 4 }, { 77, 4 }, { 78, 4 }, { 79, 4 },
     { 80, 4 }, { 81, 4 }, { 82, 4 }, { 83, 4 },
     { 84, 4 }, { 85, 4 }, { 86, 4 }, { 87, 4 },
     { 255, 0x3E7 },
 };
-AnimFrame D_800A71D8[] = {
+AnimFrame updateTileSixWFrames1[] = {
     { 88, 4 }, { 89, 4 }, { 90, 4 }, { 91, 4 },
     { 92, 4 }, { 93, 4 }, { 94, 4 }, { 95, 4 },
     { 96, 4 }, { 97, 4 }, { 98, 4 }, { 99, 4 },
     { 255, 0x3E7 },
 };
-AnimFrame D_800A720C[] = {
+AnimFrame updateTileSixWFrames2[] = {
     { 0, 4 }, { 1, 4 }, { 255, 0 },
 };
-AnimFrame D_800A7218[] = {
+AnimFrame updateTileSixWFrames3[] = {
     { 0, 12 }, { 1, 12 }, { 2, 12 }, { 3, 12 },
     { 4, 12 }, { 5, 12 }, { 6, 12 }, { 7, 12 },
     { 8, 12 }, { 9, 12 }, { 10, 12 }, { 255, 0 },
@@ -1073,7 +1074,7 @@ AnimFrame D_800A7218[] = {
     { 79, 4 }, { 78, 4 }, { 77, 4 }, { 76, 4 },
     { 255, 0x3E7 },
 };
-AnimFrame D_800A727C[] = {
+AnimFrame updateTileSixWFrames4[] = {
     { 99, 4 }, { 98, 4 }, { 97, 4 }, { 96, 4 },
     { 95, 4 }, { 94, 4 }, { 93, 4 }, { 92, 4 },
     { 91, 4 }, { 90, 4 }, { 89, 4 }, { 88, 4 },

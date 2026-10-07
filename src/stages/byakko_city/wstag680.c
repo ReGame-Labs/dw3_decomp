@@ -1,9 +1,10 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern StageRiserFrame *updateRisersFrames[];
 
 /* Steps a mover's looping animation, its last frame setting how far it moves */
-s32 func_800A4DA0(StageRiser *obj, StageRiserFrame *frames, s32 depth) {
+s32 stepRiser(StageRiser *obj, StageRiserFrame *frames, s32 depth) {
     StageRiserFrame *frame = &frames[obj->anim.index];
     s32 dt = GFX.funcs.getFrameTime();
 
@@ -23,7 +24,7 @@ s32 func_800A4DA0(StageRiser *obj, StageRiserFrame *frames, s32 depth) {
             obj->anim.index = 0;
             obj->anim.timer += frame->duration;
         }
-        func_800A4DA0(obj, frames, depth + 1);
+        stepRiser(obj, frames, depth + 1);
     }
     return frame->frame;
 }
@@ -41,7 +42,7 @@ void updateRisers(StageRisers *task) {
     default:
         i = 0;
         j = 0;
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             switch (rec->anim) {
             case 0:
                 break;
@@ -70,7 +71,7 @@ void updateRisers(StageRisers *task) {
         for (i = 0; i < 11; i++) {
             if (task->risers[i].active) {
                 tile = task->risers[i].tile;
-                tile->frame = func_800A4DA0(&task->risers[i], updateRisersFrames[i], 0);
+                tile->frame = stepRiser(&task->risers[i], updateRisersFrames[i], 0);
                 tile->y += task->risers[i].move;
                 task->risers[i].move = 0;
                 if (tile->y > 0x190) {
@@ -140,7 +141,7 @@ void handleCommand814(void *arg, s32 event) {
         case 0x343:
             anim = 7;
             task->lifts[1].active = 1;
-            player->unk74 = 0;
+            player->hasShadow = 0;
             break;
         case 0x37B:
             task->pushing = 1;
@@ -158,7 +159,7 @@ void handleCommand814(void *arg, s32 event) {
 }
 
 void *createCommand814(s32 arg) {
-    return createTaskWithId(updateRisers, 0x14C, 0, arg);
+    return createTaskWithId(updateRisers, sizeof(StageRisers), 0, arg);
 }
 
 /* Creates the event object of story progress 15 */
@@ -288,19 +289,19 @@ s16 script412[] = {
     0x304, 0x260, 0x330, 0x108, 0,
     0,
 };
-StageRiserFrame D_800A5618[] = {
+StageRiserFrame updateRisersFrames_0[] = {
     { 14, 6, 0 },
     { 15, 6, 0 },
     { 16, 6, 0 },
     { 255, 0, 72 },
 };
-StageRiserFrame D_800A5628[] = {
+StageRiserFrame updateRisersFrames_1[] = {
     { 10, 6, 0 },
     { 11, 6, 0 },
     { 12, 6, 0 },
     { 255, 0, 80 },
 };
-StageRiserFrame D_800A5638[] = {
+StageRiserFrame updateRisersFrames_6[] = {
     { 5, 6, 0 },
     { 6, 6, 0 },
     { 7, 6, 0 },
@@ -308,17 +309,17 @@ StageRiserFrame D_800A5638[] = {
     { 255, 0, 80 },
 };
 StageRiserFrame *updateRisersFrames[] = {
-    D_800A5618,
-    D_800A5628,
-    D_800A5618,
-    D_800A5628,
-    D_800A5628,
-    D_800A5618,
-    D_800A5638,
-    D_800A5618,
-    D_800A5628,
-    D_800A5638,
-    D_800A5638,
+    updateRisersFrames_0,
+    updateRisersFrames_1,
+    updateRisersFrames_0,
+    updateRisersFrames_1,
+    updateRisersFrames_1,
+    updateRisersFrames_0,
+    updateRisersFrames_6,
+    updateRisersFrames_0,
+    updateRisersFrames_1,
+    updateRisersFrames_6,
+    updateRisersFrames_6,
 };
 ActorImage stageImages[] = {
     { 0x200, 0x100, 0x21C, 0x1A6, 0x70, 0xA6, 0x230, 0x1FE },

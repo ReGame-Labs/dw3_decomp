@@ -1,17 +1,18 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 StageFloater *createFloater(s32 x, s32 y, s32 up);
 extern StageFloaterSpot updateFloaterChainSpots[];
-extern s16 D_800A609C[];
+extern s16 floaterChainTimes[];
 extern StageTileLoopFrame *updateTileQuadFrames[];
 extern StageFloaterFrame updateFloaterFrames0[];
 extern StageFloaterFrame updateFloaterFrames2[];
 extern StageFloaterFrame updateFloaterFrames3[];
 extern StageFloaterFrame updateFloaterFrames1[];
-extern StageTileLoopFrame D_800A610C[];
-extern StageTileLoopFrame D_800A60D4[];
-extern StageTileLoopFrame D_800A6128[];
-extern StageTileLoopFrame D_800A6144[];
+extern StageTileLoopFrame updateTileQuadFrames_3[];
+extern StageTileLoopFrame updateTileQuadFrames_0[];
+extern StageTileLoopFrame updateTileQuadFrames_1[];
+extern StageTileLoopFrame updateTileQuadFrames_2[];
 
 /* Creates the 27 floaters; in TASK_DONE sets them moving one after the other */
 void updateFloaterChain(StageFloaterChain *task, StageFloaters *children) {
@@ -28,10 +29,10 @@ void updateFloaterChain(StageFloaterChain *task, StageFloaters *children) {
     case TASK_RUN:
         break;
     case TASK_DONE:
-        if (task->timer >= D_800A609C[task->next] && task->timer < D_800A609C[task->next + 1]) {
+        if (task->timer >= floaterChainTimes[task->next] && task->timer < floaterChainTimes[task->next + 1]) {
             children->floaters[task->next]->setState(children->floaters[task->next], TASK_DONE);
             task->next++;
-            if (D_800A609C[task->next] == 0x1000) {
+            if (floaterChainTimes[task->next] == 0x1000) {
                 task->setState(task, TASK_RUN);
             }
         }
@@ -57,7 +58,7 @@ void *createFloaterChain(s32 arg) {
 }
 
 /* Advances a looping animation, returns its frame */
-s32 func_800A4E90(StageTileAnim *obj, StageTileLoopFrame *frames, s32 depth) {
+s32 stepTileLoop(StageTileAnim *obj, StageTileLoopFrame *frames, s32 depth) {
     StageTileLoopFrame *frame = &frames[obj->anim.index];
     s32 dt = GFX.funcs.getFrameTime();
     s32 loop;
@@ -78,7 +79,7 @@ s32 func_800A4E90(StageTileAnim *obj, StageTileLoopFrame *frames, s32 depth) {
             obj->anim.index = loop;
             obj->anim.timer += frame->duration;
         }
-        func_800A4E90(obj, frames, depth + 1);
+        stepTileLoop(obj, frames, depth + 1);
     }
     return frame->frame;
 }
@@ -93,7 +94,7 @@ void updateTileQuad(StageTileQuad *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             switch (rec->anim) {
             case 1:
                 task->anims[0].anim.index = 0;
@@ -137,7 +138,7 @@ void updateTileQuad(StageTileQuad *task) {
             case 3:
                 tile->visible = 1;
                 tile->frame = 0x13;
-                tile->clutRow = func_800A4E90(&task->anims[3], D_800A610C, 0);
+                tile->clutRow = stepTileLoop(&task->anims[3], updateTileQuadFrames_3, 0);
                 break;
             }
         }
@@ -148,18 +149,18 @@ void updateTileQuad(StageTileQuad *task) {
             switch (i) {
             case 0:
                 tile->visible = 1;
-                tile->frame = func_800A4E90(&task->anims[0], D_800A60D4, 0);
+                tile->frame = stepTileLoop(&task->anims[0], updateTileQuadFrames_0, 0);
                 tile->clutRow = 0;
                 break;
             case 1:
                 tile->visible = 1;
                 tile->frame = 0x15;
-                tile->clutRow = func_800A4E90(&task->anims[1], D_800A6128, 0);
+                tile->clutRow = stepTileLoop(&task->anims[1], updateTileQuadFrames_1, 0);
                 break;
             case 2:
                 tile->visible = 1;
                 tile->frame = 0x16;
-                frame = func_800A4E90(&task->anims[2], D_800A6144, 0);
+                frame = stepTileLoop(&task->anims[2], updateTileQuadFrames_2, 0);
                 if (frame == 0x12C) {
                     tile->clutRow = 0;
                 } else {
@@ -186,11 +187,11 @@ void handleCommand840(StageTileQuad *task, s32 id) {
 }
 
 void *createTileQuad(s32 arg) {
-    return createTaskWithId(updateTileQuad, 0x70, 0, arg);
+    return createTaskWithId(updateTileQuad, sizeof(StageTileQuad), 0, arg);
 }
 
 /* Advances a part's animation (adding up its deltas when once), returns its frame */
-s32 func_800A5310(StageFloaterPart *obj, StageFloaterFrame *frames, s32 once, s32 depth) {
+s32 stepFloaterPart(StageFloaterPart *obj, StageFloaterFrame *frames, s32 once, s32 depth) {
     StageFloaterFrame *frame = &frames[obj->anim.index];
     s32 dt = GFX.funcs.getFrameTime();
 
@@ -218,7 +219,7 @@ s32 func_800A5310(StageFloaterPart *obj, StageFloaterFrame *frames, s32 once, s3
             obj->anim.index = 0;
             obj->anim.timer += frame->duration;
         }
-        func_800A5310(obj, frames, once, depth + 1);
+        stepFloaterPart(obj, frames, once, depth + 1);
     }
     return frame->frame;
 }
@@ -226,7 +227,7 @@ s32 func_800A5310(StageFloaterPart *obj, StageFloaterFrame *frames, s32 once, s3
 #include "common/is_on_screen.inc.c"
 
 /* Draws a part of a floater */
-void func_800A5528(StageFloater *task, Layer *layer, s32 idx) {
+void drawFloaterPart(StageFloater *task, Layer *layer, s32 idx) {
     SpriteDrawer drawer;
     StageFloaterPart *part = &task->parts[idx];
 
@@ -258,15 +259,15 @@ void updateFloater(StageFloater *task) {
             task->parts[2].anim.timer = updateFloaterFrames2[0].duration;
             task->setSubstate(task, 1);
         }
-        task->parts[0].sprite.frame = func_800A5310(&task->parts[0], updateFloaterFrames0, 0, 0);
-        task->parts[0].sprite.clutRow = func_800A5310(&task->parts[2], updateFloaterFrames2, 0, 0);
+        task->parts[0].sprite.frame = stepFloaterPart(&task->parts[0], updateFloaterFrames0, 0, 0);
+        task->parts[0].sprite.clutRow = stepFloaterPart(&task->parts[2], updateFloaterFrames2, 0, 0);
         task->parts[1].sprite.frame = 0x28;
-        task->parts[1].sprite.clutRow = func_800A5310(&task->parts[1], updateFloaterFrames1, 0, 0);
+        task->parts[1].sprite.clutRow = stepFloaterPart(&task->parts[1], updateFloaterFrames1, 0, 0);
         if (task->parts[0].sprite.frame != 0 && isOnScreen(task->x, task->y, 0x20, 0x64)) {
-            func_800A5528(task, layer, 0);
+            drawFloaterPart(task, layer, 0);
         }
         if (task->parts[1].sprite.frame != 0 && isOnScreen(task->x, task->y, 0x20, 0x64)) {
-            func_800A5528(task, layer, 1);
+            drawFloaterPart(task, layer, 1);
         }
         break;
     case TASK_DONE:
@@ -277,7 +278,7 @@ void updateFloater(StageFloater *task) {
             task->setSubstate(task, 1);
             SOUND.playSound(SOUND_COMAT103);
         }
-        task->parts[0].sprite.frame = func_800A5310(&task->parts[0], updateFloaterFrames3, 1, 0);
+        task->parts[0].sprite.frame = stepFloaterPart(&task->parts[0], updateFloaterFrames3, 1, 0);
         task->parts[0].sprite.clutRow = 0;
         if (task->y >= -100 && task->y <= 1000) {
             value = task->parts[0].value;
@@ -286,7 +287,7 @@ void updateFloater(StageFloater *task) {
             task->y = task->y8 >> 8;
         }
         if (task->parts[0].sprite.frame != 0 && isOnScreen(task->x, task->y, 0x20, 0x64)) {
-            func_800A5528(task, layer, 0);
+            drawFloaterPart(task, layer, 0);
         }
         break;
     case TASK_KILL:
@@ -562,13 +563,13 @@ StageFloaterSpot updateFloaterChainSpots[] = {
     { 0x274, 0, 1 },
     { 0x29C, -0x14, 1 },
 };
-s16 D_800A609C[] = {
+s16 floaterChainTimes[] = {
     0, 4, 12, 16, 24, 28, 36, 40,
     48, 52, 60, 64, 72, 84, 96, 100,
     108, 112, 120, 124, 132, 136, 148, 160,
     172, 184, 196, 0x1000,
 };
-StageTileLoopFrame D_800A60D4[] = {
+StageTileLoopFrame updateTileQuadFrames_0[] = {
     { 23, 4, 0 },
     { 24, 4, 0 },
     { 25, 4, 0 },
@@ -584,7 +585,7 @@ StageTileLoopFrame D_800A60D4[] = {
     { 35, 8, 0 },
     { 255, 0, 11 },
 };
-StageTileLoopFrame D_800A610C[] = {
+StageTileLoopFrame updateTileQuadFrames_3[] = {
     { 0, 8, 0 },
     { 1, 8, 0 },
     { 2, 8, 0 },
@@ -593,7 +594,7 @@ StageTileLoopFrame D_800A610C[] = {
     { 5, 8, 0 },
     { 255, 0, 0 },
 };
-StageTileLoopFrame D_800A6128[] = {
+StageTileLoopFrame updateTileQuadFrames_1[] = {
     { 0, 8, 0 },
     { 1, 8, 0 },
     { 2, 8, 0 },
@@ -602,7 +603,7 @@ StageTileLoopFrame D_800A6128[] = {
     { 5, 6, 0 },
     { 255, 0, 0 },
 };
-StageTileLoopFrame D_800A6144[] = {
+StageTileLoopFrame updateTileQuadFrames_2[] = {
     { 0x12C, 4, 0 },
     { 0, 8, 0 },
     { 1, 8, 0 },
@@ -613,10 +614,10 @@ StageTileLoopFrame D_800A6144[] = {
     { 255, 0, 1 },
 };
 StageTileLoopFrame *updateTileQuadFrames[] = {
-    D_800A60D4,
-    D_800A6128,
-    D_800A6144,
-    D_800A610C,
+    updateTileQuadFrames_0,
+    updateTileQuadFrames_1,
+    updateTileQuadFrames_2,
+    updateTileQuadFrames_3,
 };
 StageFloaterFrame updateFloaterFrames0[] = {
     { 42, 4, 0 },

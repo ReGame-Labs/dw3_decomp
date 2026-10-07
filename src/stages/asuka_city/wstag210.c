@@ -1,7 +1,8 @@
 #include "common.h"
 #define STAGE_TWEEN /* stageFuncs is a StageFuncs (stage.h) */
 #include "stage.h"
-extern s32 D_800A6DE8[];
+/* Defined below, after the code that uses them */
+extern s32 updateListMenuCountFrames[];
 
 /* The text file of the menus, which the versions number differently */
 #if VERSION_US
@@ -154,7 +155,7 @@ void updateListMenu(StageListMenu *task, StageListMenuChildren *children) {
                 drawer.setScale(task->tweens[0].value, 0x1000, 0x1000);
                 drawer.setPivot(0x140, 0x56);
             }
-            drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), D_800A6DE8[task->count - 5], 0xA8, 0x18);
+            drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), updateListMenuCountFrames[task->count - 5], 0xA8, 0x18);
         }
         if (task->tweens[1].value != 0) {
             if (task->tweens[1].value != 0x1000) {
@@ -174,11 +175,11 @@ void updateListMenu(StageListMenu *task, StageListMenuChildren *children) {
 }
 
 void *startEvent8(void) {
-    return createTask(updateListMenu, 0x84, 0x28);
+    return createTask(updateListMenu, sizeof(StageListMenu), sizeof(StageListMenuChildren));
 }
 
 /* A two-option menu: creates the event object of the chosen option */
-void func_800A56B8(StageMenu *task, StageMenuChildren *children) {
+void updateEvent9(StageMenu *task, StageMenuChildren *children) {
     SpriteDrawer drawer;
     s32 prev;
     s32 i;
@@ -287,11 +288,11 @@ void func_800A56B8(StageMenu *task, StageMenuChildren *children) {
 }
 
 void *startEvent9(void) {
-    return createTask(func_800A56B8, 0x64, 0x14);
+    return createTask(updateEvent9, sizeof(StageMenu), sizeof(StageMenuChildren));
 }
 
 /* A two-option menu: creates the event object of the chosen option */
-void func_800A5C80(StageMenu *task, StageMenuChildren *children) {
+void updateEvent1510(StageMenu *task, StageMenuChildren *children) {
     SpriteDrawer drawer;
     s32 prev;
     s32 i;
@@ -400,7 +401,7 @@ void func_800A5C80(StageMenu *task, StageMenuChildren *children) {
 }
 
 void *startEvent1510(void) {
-    return createTask(func_800A5C80, 0x64, 0x14);
+    return createTask(updateEvent1510, sizeof(StageMenu), sizeof(StageMenuChildren));
 }
 
 /* Creates the event object of the story so far, the first that applies */
@@ -824,7 +825,7 @@ s16 script1511[] = {
     0x300, 0x1E,
     0,
 };
-s32 D_800A6DE8[] = {
+s32 updateListMenuCountFrames[] = {
     28, 27, 25, 36,
 };
 Battle area0Battle0 = { 0, 0, MUSIC(1, 0) };

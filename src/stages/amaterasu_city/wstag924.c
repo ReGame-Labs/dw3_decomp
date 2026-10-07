@@ -1,8 +1,9 @@
 #include "common.h"
 #define STAGE_TWEEN /* stageFuncs is a StageFuncs (stage.h) */
 #include "stage.h"
-extern s32 D_800A7A34[];
-extern s32 D_800A7A44[];
+/* Defined below, after the code that uses them */
+extern s32 updateEvent1602CountFrames[];
+extern s32 updateEvent1604CountFrames[];
 
 /* The text file of the menus */
 #define MENU_TEXT 0x158
@@ -35,7 +36,7 @@ void setupStage(void) {
 #include "common/update_tween.inc.c"
 
 /* A list of up to eight options that each open a message */
-void func_800A60FC(StageListMenu *task, StageListMenuChildren *children) {
+void updateEvent1602(StageListMenu *task, StageListMenuChildren *children) {
     SpriteDrawer drawer;
     s32 prev;
     s32 i;
@@ -178,7 +179,7 @@ void func_800A60FC(StageListMenu *task, StageListMenuChildren *children) {
                 drawer.setScale(task->tweens[0].value, 0x1000, 0x1000);
                 drawer.setPivot(0x140, 0x56);
             }
-            drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), D_800A7A34[task->count - 5], 0xA8, 0x18);
+            drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), updateEvent1602CountFrames[task->count - 5], 0xA8, 0x18);
         }
         if (task->tweens[1].value != 0) {
             if (task->tweens[1].value != 0x1000) {
@@ -198,11 +199,11 @@ void func_800A60FC(StageListMenu *task, StageListMenuChildren *children) {
 }
 
 void *startEvent1602(void) {
-    return createTask(func_800A60FC, 0x84, 0x28);
+    return createTask(updateEvent1602, sizeof(StageListMenu), sizeof(StageListMenuChildren));
 }
 
 /* A list of up to eight options that each open a message */
-void func_800A6A94(StageListMenu *task, StageListMenuChildren *children) {
+void updateEvent1604(StageListMenu *task, StageListMenuChildren *children) {
     SpriteDrawer drawer;
     s32 prev;
     s32 i;
@@ -345,7 +346,7 @@ void func_800A6A94(StageListMenu *task, StageListMenuChildren *children) {
                 drawer.setScale(task->tweens[0].value, 0x1000, 0x1000);
                 drawer.setPivot(0x140, 0x56);
             }
-            drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), D_800A7A44[task->count - 5], 0xA8, 0x18);
+            drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), updateEvent1604CountFrames[task->count - 5], 0xA8, 0x18);
         }
         if (task->tweens[1].value != 0) {
             if (task->tweens[1].value != 0x1000) {
@@ -365,7 +366,7 @@ void func_800A6A94(StageListMenu *task, StageListMenuChildren *children) {
 }
 
 void *startEvent1604(void) {
-    return createTask(func_800A6A94, 0x84, 0x28);
+    return createTask(updateEvent1604, sizeof(StageListMenu), sizeof(StageListMenuChildren));
 }
 
 ActorImage stageImages[] = {
@@ -483,9 +484,9 @@ FieldEvent stageEvents[] = {
     { 1604, NULL, EVENT_TEXT(2), startEvent1604, NULL },
     { -1, NULL, 0, NULL, NULL },
 };
-s32 D_800A7A34[] = {
+s32 updateEvent1602CountFrames[] = {
     28, 27, 25, 36,
 };
-s32 D_800A7A44[] = {
+s32 updateEvent1604CountFrames[] = {
     28, 27, 25, 36,
 };

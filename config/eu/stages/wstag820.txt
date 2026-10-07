@@ -1,7 +1,7 @@
 // names from the C of the modules this version builds (tools/version_symbols.py)
 updateTileTask = 0x800A5EB8; // type:func
 createCommand853 = 0x800A5FB4; // type:func
-func_800A5638 = 0x800A6774; // type:func
+createStageEffectWithId = 0x800A6774; // type:func
 handleCommand845 = 0x800A67BC; // type:func
 endEvent1060 = 0x800A67F4; // type:func
 endEvent1070 = 0x800A6840; // type:func

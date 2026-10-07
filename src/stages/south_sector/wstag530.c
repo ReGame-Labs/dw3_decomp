@@ -4,6 +4,7 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+/* Defined below, after the code that uses them */
 extern StageSlot stageSlots0[];
 extern StageSlot stageSlots1[];
 #if VERSION_US

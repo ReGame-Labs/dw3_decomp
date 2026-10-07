@@ -16,7 +16,7 @@ void updateTileAnims(StageTileAnims *task) {
     case TASK_RUN:
         tile = FIELDSTG_state.objects;
         frame = stepLoopingAnimation(&task->anims[0], updateTileAnimsFrames, 0);
-        for (; tile->unk2 != 0; tile++) {
+        for (; tile->margin != 0; tile++) {
             if (tile->anim == 1) {
                 tile->frame = frame;
             }

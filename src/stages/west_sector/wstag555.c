@@ -1,5 +1,6 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern AnimFrame updateTileAnimsFrames0[];
 extern AnimFrame updateTileAnimsFrames1[];
 extern AnimFrame updateTileAnimsFrames2[];

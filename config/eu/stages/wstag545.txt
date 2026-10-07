@@ -1,5 +1,5 @@
 // names from the C of the modules this version builds (tools/version_symbols.py)
-func_800A4CDC = 0x800A5E18; // type:func
+stepHeldAnimation = 0x800A5E18; // type:func
 updateTileAt = 0x800A5F20; // type:func
 createTileAt = 0x800A6054; // type:func
 updateTileTask = 0x800A6184; // type:func

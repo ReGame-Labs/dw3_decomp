@@ -1,7 +1,8 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern StageEffectSpot updateStageSpots[];
-void *func_800A5638(s32 arg);
+void *createStageEffectWithId(s32 arg);
 extern AnimFrame updateTileTaskFrames[];
 
 #include "common/step_animation_once.inc.c"
@@ -16,7 +17,7 @@ void updateTileTask(StageTileTask *task) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == 1) {
                 task->obj.tile = rec;
             }
@@ -43,7 +44,7 @@ void updateTileTask(StageTileTask *task) {
 
 /* Creates the task of updateTileTask with the given id, with a sound */
 void *createCommand853(s32 id) {
-    void *task = createTaskWithId(updateTileTask, 0x58, 0, id);
+    void *task = createTaskWithId(updateTileTask, sizeof(StageTileTask), 0, id);
 
     SOUND.playSound(SOUND_TELEPORT);
     return task;
@@ -60,7 +61,7 @@ void updateStage(StageTask *task, void **children) {
             if (updateStageSpots[i].kind == 0) {
                 children[i + 1] = createStageEffect(updateStageSpots[i].x, updateStageSpots[i].y, updateStageSpots[i].frame);
             } else if (updateStageSpots[i].kind == 2) {
-                children[i + 1] = func_800A5638(0x34D);
+                children[i + 1] = createStageEffectWithId(0x34D);
             }
         }
         do {
@@ -91,7 +92,7 @@ void updateStage(StageTask *task, void **children) {
 #include "common/create_stage_effect.inc.c"
 
 /* Creates the StageEffect of updateStageEffect at (0x1CC, 0x1B4) with frame 0x3C */
-void *func_800A5638(s32 id) {
+void *createStageEffectWithId(s32 id) {
     StageEffect *task = createTaskWithId(updateStageEffect, sizeof(StageEffect), 0, id);
 
     task->x = 0x1CC;
@@ -116,9 +117,9 @@ void endEvent1070(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x75), 1);
 }
 
-/* Sets the progress to 43 and applies flag action 0x7401 */
+/* Moves the story on to FIELD_PROGRESS_MOVIE_BATTLES and applies EVENT_BATTLE(1) */
 void endEvent1080(void) {
-    GAME.progress = 43;
+    GAME.progress = FIELD_PROGRESS_MOVIE_BATTLES;
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 

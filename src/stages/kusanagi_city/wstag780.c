@@ -1,12 +1,13 @@
 #include "common.h"
 #include "stage.h"
-extern u8 D_800A726C[];
-extern s32 D_800A7274[2][2][2][2];
+/* Defined below, after the code that uses them */
+extern u8 flyerFrames[];
+extern s32 flyerStarts[2][2][2][2];
 extern StageAnimSpot updateEffectSpots[];
 extern AnimFrame *updateTileLoop2Frames[];
-extern StageQuadTexture D_800A73CC[];
-extern StageQuad D_800A78FC[];
-extern u8 *D_800A7CC0[];
+extern StageQuadTexture drawByteAnimsTextures[];
+extern StageQuad drawByteAnimsQuads[];
+extern u8 *byteAnims[];
 
 /* The file of the stage's sprites, which the versions number differently */
 #if VERSION_US
@@ -16,7 +17,7 @@ extern u8 *D_800A7CC0[];
 #endif
 
 /* Draws the sprite at (x, y), flipped when it goes right */
-void func_800A4CA4(StageFlyer *task) {
+void drawFlyer(StageFlyer *task) {
     SpriteDrawer drawer;
     s32 pos[2];
 
@@ -60,7 +61,7 @@ void updateFlyer(StageFlyer *task) {
         if (task->anim != 0 && task->still) {
             task->frame = 0x3B;
         } else {
-            task->frame = D_800A726C[(task->timer >> 2) + task->up * 2 + task->anim * 4];
+            task->frame = flyerFrames[(task->timer >> 2) + task->up * 2 + task->anim * 4];
         }
         if (task->right) {
             if (task->x >= 0x28000) {
@@ -69,7 +70,7 @@ void updateFlyer(StageFlyer *task) {
         } else if (task->x <= 0) {
             task->setState(task, TASK_KILL);
         }
-        func_800A4CA4(task);
+        drawFlyer(task);
         break;
     case TASK_DONE:
     case TASK_KILL:
@@ -79,14 +80,14 @@ void updateFlyer(StageFlyer *task) {
 
 /* Creates a flyer at the start the direction and stillness pick */
 void *createFlyer(s32 up, s32 right, s32 still, s32 anim) {
-    StageFlyer *task = createTask(updateFlyer, 0x70, 0);
+    StageFlyer *task = createTask(updateFlyer, sizeof(StageFlyer), 0);
 
     task->up = up;
     task->right = right;
     task->still = still;
     task->anim = anim;
-    task->x = D_800A7274[up][right][still][0] << 8;
-    task->y = D_800A7274[up][right][still][1] << 8;
+    task->x = flyerStarts[up][right][still][0] << 8;
+    task->y = flyerStarts[up][right][still][1] << 8;
     if (still && anim) {
         task->x += 0x3200;
         task->y -= 0x1900;
@@ -95,7 +96,7 @@ void *createFlyer(s32 up, s32 right, s32 still, s32 anim) {
 }
 
 /* Draws the picture of file SPRITES with the frame of the level */
-void func_800A4FF4(StageGlow *task) {
+void drawGlow(StageGlow *task) {
     SpriteDrawer drawer;
 
     initSpriteDrawer(&drawer);
@@ -142,7 +143,7 @@ void updateGlow(StageGlow *task) {
             }
             break;
         }
-        func_800A4FF4(task);
+        drawGlow(task);
         break;
     case TASK_DONE:
     case TASK_KILL:
@@ -151,13 +152,13 @@ void updateGlow(StageGlow *task) {
 }
 
 void *createCommand802(s32 arg) {
-    return createTaskWithId(updateGlow, 0x54, 0, arg);
+    return createTaskWithId(updateGlow, sizeof(StageGlow), 0, arg);
 }
 
 #include "common/step_looping_animation.inc.c"
 
 /* Draws the sprite of the effect at (x, y) at depth 4 of LAYER while it runs */
-void func_800A5344(StageEffect *task, void *arg) {
+void drawEffect(StageEffect *task, void *arg) {
     SpriteDrawer drawer;
     Layer *layer = arg;
 
@@ -187,7 +188,7 @@ void updateEffect(StageEffect *task) {
     case TASK_RUN:
         task->frame = stepLoopingAnimation(&task->anim, updateEffectSpots[task->key1].frames, 0);
         if (task->frame != 0) {
-            layer->addSortedCallback(layer, func_800A5344, task, task->y, 0);
+            layer->addSortedCallback(layer, drawEffect, task, task->y, 0);
         }
         break;
     case TASK_DONE:
@@ -204,7 +205,7 @@ void *createEffect(s32 key) {
     return task;
 }
 
-s32 func_800A5574(StageTileAnim *obj, AnimFrame *frames, s32 depth) {
+s32 stepTileLoopAnimation(StageTileAnim *obj, AnimFrame *frames, s32 depth) {
     AnimFrame *frame = &frames[obj->anim.index];
     s32 dt = GFX.funcs.getFrameTime();
 
@@ -223,7 +224,7 @@ s32 func_800A5574(StageTileAnim *obj, AnimFrame *frames, s32 depth) {
             obj->anim.index = 0;
             obj->anim.timer += frame->duration;
         }
-        func_800A5574(obj, frames, depth + 1);
+        stepTileLoopAnimation(obj, frames, depth + 1);
     }
     return frame->frame;
 }
@@ -241,7 +242,7 @@ void updateTileLoop2(StageTileLoop2 *task) {
         task->tiles[0].anim.timer = updateTileLoop2Frames[0][0].duration;
         task->tiles[1].anim.index = 0;
         task->tiles[1].anim.timer = updateTileLoop2Frames[1][0].duration;
-        for (t = FIELDSTG_state.objects; t->unk2 != 0; t++) {
+        for (t = FIELDSTG_state.objects; t->margin != 0; t++) {
             switch (t->anim) {
             case 1:
                 task->tiles[0].tile = t;
@@ -257,7 +258,7 @@ void updateTileLoop2(StageTileLoop2 *task) {
         for (i = 0; i < 2; i++) {
             tile = task->tiles[i].tile;
             tile->visible = 1;
-            tile->frame = func_800A5574(&task->tiles[i], updateTileLoop2Frames[i], 0);
+            tile->frame = stepTileLoopAnimation(&task->tiles[i], updateTileLoop2Frames[i], 0);
             tile->clutRow = 0;
         }
         break;
@@ -268,11 +269,11 @@ void updateTileLoop2(StageTileLoop2 *task) {
 }
 
 void *createTileLoop2(void) {
-    return createTask(updateTileLoop2, 0x60, 0);
+    return createTask(updateTileLoop2, sizeof(StageTileLoop2), 0);
 }
 
 /* Creates the six objects of updateEffect (keys 0-5) and the object of updateTileLoop2 */
-void func_800A5804(StageTask *task, void **children) {
+void updateEffectSet(StageTask *task, void **children) {
     s32 i;
 
     switch (task->state) {
@@ -291,12 +292,12 @@ void func_800A5804(StageTask *task, void **children) {
     }
 }
 
-void *func_800A589C(void) {
-    return createTask(func_800A5804, 0x50, 0x1C);
+void *createEffectSet(void) {
+    return createTask(updateEffectSet, 0x50, 0x1C);
 }
 
 /* Lets out the flyers of the sets that are on, where their children are free */
-void func_800A58C8(StageFlyerGate *task, void **children) {
+void releaseFlyers(StageFlyerGate *task, void **children) {
     s32 animA;
     s32 animB;
 
@@ -327,7 +328,7 @@ void func_800A58C8(StageFlyerGate *task, void **children) {
 }
 
 /* Draws the three pictures of the gate */
-void func_800A5A10(StageFlyerGate *task) {
+void drawFlyerGate(StageFlyerGate *task) {
     SpriteDrawer drawer;
 
     initSpriteDrawer(&drawer);
@@ -419,8 +420,8 @@ void updateFlyerGate(StageFlyerGate *task, void **children) {
             task->spawnB = 1;
             break;
         }
-        func_800A5A10(task);
-        func_800A58C8(task, children);
+        drawFlyerGate(task);
+        releaseFlyers(task, children);
         break;
     case TASK_DONE:
     case TASK_KILL:
@@ -444,11 +445,11 @@ void handleCommand800(Task *task, s32 id) {
 
 /* Creates the task of updateFlyerGate with id ARG */
 void *createCommand800(s32 arg) {
-    return createTaskWithId(updateFlyerGate, 0x60, 0x10, arg);
+    return createTaskWithId(updateFlyerGate, sizeof(StageFlyerGate), 0x10, arg);
 }
 
 /* Draws the 40 quads, those of kind 0 and 1 with the frames of the animations */
-void func_800A5E80(StageByteAnims *task) {
+void drawByteAnims(StageByteAnims *task) {
     Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
     u_long *ot = (u_long *)layer->getOtEntry(layer, 2);
     s32 scroll[2];
@@ -461,14 +462,14 @@ void func_800A5E80(StageByteAnims *task) {
     layer->getScroll(layer, scroll);
     poly = GFX.funcs.getPrim();
     for (i = 0; i < 40; i++) {
-        quad = &D_800A78FC[i];
+        quad = &drawByteAnimsQuads[i];
         switch (quad->kind) {
         case 0:
         case 1:
-            tex = &D_800A73CC[task->anims[quad->kind].frame];
+            tex = &drawByteAnimsTextures[task->anims[quad->kind].frame];
             break;
         default:
-            tex = &D_800A73CC[quad->kind];
+            tex = &drawByteAnimsTextures[quad->kind];
             break;
         }
         size = 0x28;
@@ -530,14 +531,14 @@ void updateByteAnims(StageByteAnims *task) {
             a->timer -= GFX.funcs.getFrameTime();
             if (a->timer <= 0) {
                 a->index++;
-                if (D_800A7CC0[a->anim][a->index * 2 + 1] == 0) {
-                    a->index = D_800A7CC0[a->anim][a->index * 2];
+                if (byteAnims[a->anim][a->index * 2 + 1] == 0) {
+                    a->index = byteAnims[a->anim][a->index * 2];
                 }
-                a->frame = D_800A7CC0[a->anim][a->index * 2];
-                a->timer = D_800A7CC0[a->anim][a->index * 2 + 1];
+                a->frame = byteAnims[a->anim][a->index * 2];
+                a->timer = byteAnims[a->anim][a->index * 2 + 1];
             }
         }
-        func_800A5E80(task);
+        drawByteAnims(task);
         break;
     case TASK_DONE:
     case TASK_KILL:
@@ -555,7 +556,7 @@ void handleCommand801(StageByteAnims *task, s32 id) {
 }
 
 void *createCommand801(s32 arg) {
-    return createTaskWithId(updateByteAnims, 0x78, 0, arg);
+    return createTaskWithId(updateByteAnims, sizeof(StageByteAnims), 0, arg);
 }
 
 /* Creates an object and the event object of the story progress */
@@ -575,7 +576,7 @@ void updateStage(StageTask *task, void **children) {
             }
             if (GAME.progress == 0x1B) {
                 children[0] = FIELDSTG_startEvent(0x2E6);
-                children[2] = func_800A589C();
+                children[2] = createEffectSet();
                 break;
             }
             if (GAME.progress == 0x20) {
@@ -586,7 +587,7 @@ void updateStage(StageTask *task, void **children) {
                 children[0] = FIELDSTG_startEvent(0x3CB);
                 break;
             }
-            if (GAME.progress == 0x2B) {
+            if (GAME.progress == FIELD_PROGRESS_MOVIE_BATTLES) {
                 children[0] = FIELDSTG_startEvent(0x5DC);
                 break;
             }
@@ -614,7 +615,7 @@ void endEvent885(void) {
 
 #if VERSION_EU
 void func_800A7644(void) {
-    GAME.progress = 45;
+    GAME.progress = FIELD_PROGRESS_EXTRA;
 }
 #endif
 
@@ -1148,26 +1149,26 @@ s16 script1500[] = {
 #endif
     0,
 };
-u8 D_800A726C[] = {
+u8 flyerFrames[] = {
     50, 52, 53, 55, 56, 57, 56, 57,
 };
-s32 D_800A7274[2][2][2][2] = {
+s32 flyerStarts[2][2][2][2] = {
     { { { 640, 72 }, { 432, 176 } }, { { 0, 224 }, { 0, 0 } } },
     { { { 448, 392 }, { 0, 0 } }, { { 112, 392 }, { 0, 0 } } },
 };
-AnimFrame D_800A72B4[] = {
+AnimFrame updateEffectSpots_4[] = {
     { 50, 4 }, { 51, 4 }, { 255, 0 },
 };
-AnimFrame D_800A72C0[] = {
+AnimFrame updateEffectSpots_0[] = {
     { 53, 4 }, { 54, 4 }, { 255, 0 },
 };
 StageAnimSpot updateEffectSpots[] = {
-    { D_800A72C0, 20, 130 },
-    { D_800A72C0, 80, 180 },
-    { D_800A72C0, 120, 230 },
-    { D_800A72C0, 170, 0x118 },
-    { D_800A72B4, 0x15E, 210 },
-    { D_800A72B4, 0x12C, 240 },
+    { updateEffectSpots_0, 20, 130 },
+    { updateEffectSpots_0, 80, 180 },
+    { updateEffectSpots_0, 120, 230 },
+    { updateEffectSpots_0, 170, 0x118 },
+    { updateEffectSpots_4, 0x15E, 210 },
+    { updateEffectSpots_4, 0x12C, 240 },
     { NULL, 0, 0 },
     { NULL, 0, 0 },
     { NULL, 0, 0 },
@@ -1191,7 +1192,7 @@ AnimFrame updateTileLoop2Frames_1[] = {
 AnimFrame *updateTileLoop2Frames[] = {
     updateTileLoop2Frames_0, updateTileLoop2Frames_1,
 };
-StageQuadTexture D_800A73CC[] = {
+StageQuadTexture drawByteAnimsTextures[] = {
     { 0x180, 0x100, 0x1B2, 0x130, 0x1C8, 48, 0x170, 0x1DE },
     { 0x180, 0x100, 0x180, 0x14C, 0x100, 76, 0x170, 0x1DE },
     { 0x180, 0x100, 0x18A, 0x14C, 0x128, 76, 0x170, 0x1DE },
@@ -1276,7 +1277,7 @@ StageQuadTexture D_800A73CC[] = {
     { 0x180, 0x100, 0x194, 0x100, 0x150, 0, 0x170, 0x1F6 },
     { 0x1C0, 0x100, 0x1D7, 0x178, 0x25C, 120, 0x170, 0x1F4 },
 };
-StageQuad D_800A78FC[] = {
+StageQuad drawByteAnimsQuads[] = {
     { 121, 76, 168, 53, 121, 123, 168, 100, 80 },
     { 121, 77, 160, 58, 121, 116, 160, 97, 0 },
 #if VERSION_US
@@ -1338,17 +1339,17 @@ StageQuad D_800A78FC[] = {
     { 180, 91, 196, 83, 180, 105, 196, 97, 82 },
     { 180, 91, 192, 85, 180, 101, 192, 95, 1 },
 };
-u8 D_800A7BCC[] = {
+u8 byteAnims_0[] = {
     0, 4, 1, 4, 2, 4, 3, 4,
     4, 4, 5, 4, 6, 4, 7, 4,
     8, 4, 9, 4, 10, 4, 11, 4,
     0, 0, 0, 0,
 };
-u8 D_800A7BE8[] = {
+u8 byteAnims_1[] = {
     31, 8, 32, 8, 33, 8, 34, 8,
     35, 8, 36, 8, 37, 8, 0, 0,
 };
-u8 D_800A7BF8[] = {
+u8 byteAnims_2[] = {
     12, 10, 13, 4, 14, 4, 15, 4,
     16, 4, 17, 4, 18, 4, 19, 8,
     20, 8, 19, 8, 20, 8, 19, 8,
@@ -1358,17 +1359,17 @@ u8 D_800A7BF8[] = {
     29, 12, 29, 12, 30, 12, 29, 12,
     28, 12, 26, 12, 19, 0, 0, 0,
 };
-u8 D_800A7C38[] = {
+u8 byteAnims_3[] = {
     38, 4, 39, 4, 40, 4, 41, 4,
     42, 4, 43, 4, 44, 4, 45, 4,
     46, 4, 47, 4, 48, 4, 49, 4,
     0, 0, 0, 0,
 };
-u8 D_800A7C54[] = {
+u8 byteAnims_4[] = {
     69, 4, 70, 4, 71, 4, 72, 4,
     73, 4, 74, 4, 75, 4, 0, 0,
 };
-u8 D_800A7C64[] = {
+u8 byteAnims_5[] = {
     50, 10, 51, 4, 52, 4, 53, 4,
     54, 4, 55, 4, 56, 4, 57, 8,
     58, 8, 57, 8, 58, 8, 57, 8,
@@ -1382,13 +1383,13 @@ u8 D_800A7C64[] = {
     67, 12, 66, 12, 64, 12, 78, 120,
     79, 120, 19, 0,
 };
-u8 *D_800A7CC0[] = {
-    D_800A7BCC,
-    D_800A7BE8,
-    D_800A7BF8,
-    D_800A7C38,
-    D_800A7C54,
-    D_800A7C64,
+u8 *byteAnims[] = {
+    byteAnims_0,
+    byteAnims_1,
+    byteAnims_2,
+    byteAnims_3,
+    byteAnims_4,
+    byteAnims_5,
     NULL,
 };
 ActorImage stageImages[] = {

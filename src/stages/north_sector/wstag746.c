@@ -1,5 +1,6 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern StageEffectSpot updateStageSpots[];
 
 #include "common/update_darkness.inc.c"
@@ -123,7 +124,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.clearTempFlags != 0) {
-        GAME.unk26E8 = 0;
+        GAME.dark = 0;
     }
 }
 

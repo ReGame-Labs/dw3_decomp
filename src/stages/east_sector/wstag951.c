@@ -26,6 +26,7 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
+/* Defined below, after the tables that use them */
 extern s16 script1620[];
 extern s16 script1622[];
 extern s16 script1624[];

@@ -5,6 +5,7 @@
 #define STAGE_CHILDREN_SIZE 0x50
 #include "common/start_stage.inc.c"
 
+/* Defined below, after the code that uses them */
 extern FieldBattles stageBattles0[];
 extern FieldBattles stageBattles1[];
 extern FieldBattles stageBattles2[];

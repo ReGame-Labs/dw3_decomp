@@ -22,7 +22,7 @@ void updateTileAnims(StageTileAnims *task) {
         frames[0] = stepLoopingAnimation(&task->anims[0], updateTileAnimsFrames0, 0);
         frames[1] = stepLoopingAnimation(&task->anims[1], updateTileAnimsFrames1, 0);
         frames[2] = stepLoopingAnimation(&task->anims[2], updateTileAnimsFrames2, 0);
-        for (; tile->unk2 != 0; tile++) {
+        for (; tile->margin != 0; tile++) {
             switch (tile->anim) {
             case 1:
                 tile->frame = frames[0];

@@ -34,3 +34,6 @@ actor1 = 0x800A569C;
 updateTileLift = 0x800A4CC0; // type:func
 handleCommand827 = 0x800A50DC; // type:func
 createCommand827 = 0x800A5150; // type:func
+
+// named by the function or table that uses them (tools/name_stage_uses.py)
+tileLiftShake = 0x800A555C;

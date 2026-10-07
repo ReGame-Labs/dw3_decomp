@@ -1,5 +1,6 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern AnimFrame updateTileAnimsFrames0[];
 extern AnimFrame updateTileAnimsFrames1[];
 extern AnimFrame updateTileAnimsFrames2[];
@@ -8,10 +9,10 @@ extern AnimFrame updateEffectFrames1[];
 extern AnimFrame updateEffectFrames0[];
 extern StageEffectSpot updateStageSpots[];
 StageEffect *createEffect(s32 x, s32 y, s32 frame);
-extern AnimFrame D_800A7210[];
-extern AnimFrame D_800A7280[];
-extern AnimFrame D_800A7328[];
-extern AnimFrame D_800A738C[];
+extern AnimFrame updateTileSixFrames3[];
+extern AnimFrame updateTileSixFrames4[];
+extern AnimFrame updateTileSixWFrames3[];
+extern AnimFrame updateTileSixWFrames4[];
 extern AnimFrame updateTileSixFrames0[];
 extern AnimFrame updateTileSixFrames1[];
 extern AnimFrame updateTileSixFrames2[];
@@ -24,7 +25,7 @@ extern AnimFrame updateTileSixWFrames2[];
 #include "common/update_tile_anims4.inc.c"
 
 void *createTileAnims(void) {
-    return createTask(updateTileAnims, 0x60, 0);
+    return createTask(updateTileAnims, sizeof(StageTileAnims), 0);
 }
 
 #include "common/step_tile_animation.inc.c"
@@ -40,7 +41,7 @@ void updateTileSix(StageTileSix *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim >= 5 && rec->anim <= 10) {
                 switch (rec->anim) {
                 case 5:
@@ -61,7 +62,7 @@ void updateTileSix(StageTileSix *task) {
                 case 8:
                     task->tiles[3].tile = rec;
                     task->tiles[3].anim.index = 0;
-                    task->tiles[3].anim.timer = D_800A7210[0].duration;
+                    task->tiles[3].anim.timer = updateTileSixFrames3[0].duration;
                     break;
                 case 9:
                     task->tiles[4].tile = rec;
@@ -132,7 +133,7 @@ void updateTileSix(StageTileSix *task) {
                     break;
                 case 3:
                     tile->frame = 2;
-                    tile->clutRow = stepTileAnimation(&task->tiles[i], D_800A7210, 0, 0);
+                    tile->clutRow = stepTileAnimation(&task->tiles[i], updateTileSixFrames3, 0, 0);
                     tile->visible = 1;
                     break;
                 case 4:
@@ -150,7 +151,7 @@ void updateTileSix(StageTileSix *task) {
             case 3:
                 switch (i) {
                 case 0:
-                    frame = stepTileAnimation(&task->tiles[0], D_800A7280, 1, 0);
+                    frame = stepTileAnimation(&task->tiles[0], updateTileSixFrames4, 1, 0);
                     if (frame != 0xFF) {
                         tile->frame = frame;
                         tile->visible = 1;
@@ -161,7 +162,7 @@ void updateTileSix(StageTileSix *task) {
                     }
                     break;
                 case 1:
-                    frame = stepTileAnimation(&task->tiles[1], D_800A7280, 1, 0);
+                    frame = stepTileAnimation(&task->tiles[1], updateTileSixFrames4, 1, 0);
                     if (frame != 0xFF) {
                         tile->frame = frame;
                         tile->visible = 1;
@@ -202,23 +203,23 @@ void updateTileSix(StageTileSix *task) {
 void handleCommand831(StageTileSix *task, s32 id) {
     if (task != NULL && id == 0x359) {
         task->tiles[0].anim.index = 0;
-        task->tiles[0].anim.timer = D_800A7210[15].duration;
+        task->tiles[0].anim.timer = updateTileSixFrames3[15].duration;
         task->tiles[1].anim.index = 0;
-        task->tiles[1].anim.timer = D_800A7280[0].duration;
+        task->tiles[1].anim.timer = updateTileSixFrames4[0].duration;
         task->mode = 3;
     }
 }
 
 /* Creates the task of the six records with id ID, in mode 2 */
 void *createCommand831(s32 id) {
-    StageTileSix *task = createTaskWithId(updateTileSix, 0x84, 0, id);
+    StageTileSix *task = createTaskWithId(updateTileSix, sizeof(StageTileSix), 0, id);
 
     task->mode = 2;
     return task;
 }
 
 void *createTileSix(void) {
-    return createTask(updateTileSix, 0x84, 0);
+    return createTask(updateTileSix, sizeof(StageTileSix), 0);
 }
 
 s32 stepTileAnimation2(StageTileAnimFlag *obj, AnimFrame *frames, s32 once, s32 depth) {
@@ -260,7 +261,7 @@ void updateTileSixW(StageTileSixW *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim >= 11 && rec->anim <= 16) {
                 switch (rec->anim) {
                 case 11:
@@ -281,7 +282,7 @@ void updateTileSixW(StageTileSixW *task) {
                 case 14:
                     task->tiles[3].tile = rec;
                     task->tiles[3].anim.index = 0;
-                    task->tiles[3].anim.timer = D_800A7328[0].duration;
+                    task->tiles[3].anim.timer = updateTileSixWFrames3[0].duration;
                     break;
                 case 15:
                     task->tiles[4].tile = rec;
@@ -352,7 +353,7 @@ void updateTileSixW(StageTileSixW *task) {
                     break;
                 case 3:
                     tile->frame = 0x11;
-                    tile->clutRow = stepTileAnimation2(&task->tiles[i], D_800A7328, 0, 0);
+                    tile->clutRow = stepTileAnimation2(&task->tiles[i], updateTileSixWFrames3, 0, 0);
                     tile->visible = 1;
                     break;
                 case 4:
@@ -370,7 +371,7 @@ void updateTileSixW(StageTileSixW *task) {
             case 3:
                 switch (i) {
                 case 0:
-                    frame = stepTileAnimation2(&task->tiles[0], D_800A738C, 1, 0);
+                    frame = stepTileAnimation2(&task->tiles[0], updateTileSixWFrames4, 1, 0);
                     if (frame != 0xFF) {
                         tile->frame = frame;
                         tile->visible = 1;
@@ -381,7 +382,7 @@ void updateTileSixW(StageTileSixW *task) {
                     }
                     break;
                 case 1:
-                    frame = stepTileAnimation2(&task->tiles[1], D_800A738C, 1, 0);
+                    frame = stepTileAnimation2(&task->tiles[1], updateTileSixWFrames4, 1, 0);
                     if (frame != 0xFF) {
                         tile->frame = frame;
                         tile->visible = 1;
@@ -422,23 +423,23 @@ void updateTileSixW(StageTileSixW *task) {
 void handleCommand832(StageTileSixW *task, s32 id) {
     if (task != NULL && id == 0x359) {
         task->tiles[0].anim.index = 0;
-        task->tiles[0].anim.timer = D_800A7328[12].duration;
+        task->tiles[0].anim.timer = updateTileSixWFrames3[12].duration;
         task->tiles[1].anim.index = 0;
-        task->tiles[1].anim.timer = D_800A738C[0].duration;
+        task->tiles[1].anim.timer = updateTileSixWFrames4[0].duration;
         task->mode = 3;
     }
 }
 
 /* Creates the task of the six records with id ID, in mode 2 */
 void *createCommand832(s32 id) {
-    StageTileSixW *task = createTaskWithId(updateTileSixW, 0x9C, 0, id);
+    StageTileSixW *task = createTaskWithId(updateTileSixW, sizeof(StageTileSixW), 0, id);
 
     task->mode = 2;
     return task;
 }
 
 void *createTileSixW(void) {
-    return createTask(updateTileSixW, 0x9C, 0);
+    return createTask(updateTileSixW, sizeof(StageTileSixW), 0);
 }
 
 /* Creates the stage tasks, the sprite effects and the event object of the story so far */
@@ -488,7 +489,7 @@ void updateStage(StageTask *task, void **children) {
 #include "common/step_animation.inc.c"
 
 /* Draws sprite IDX of the effect while it plays (a draw callback) */
-void func_800A5DBC(StageEffect *task, void *arg, s32 idx) {
+void drawEffect(StageEffect *task, void *arg, s32 idx) {
     SpriteDrawer drawer;
     Layer *layer = arg;
     StageSprite *sprite;
@@ -561,10 +562,10 @@ void updateEffect(StageEffect *task) {
             task->setState(task, TASK_KILL);
         }
         if (task->sprites[0].frame != 0 && isOnScreen(task->x, task->y, 0x20, 0x20)) {
-            layer->addSortedCallback(layer, func_800A5DBC, task, task->y, 0);
+            layer->addSortedCallback(layer, drawEffect, task, task->y, 0);
         }
         if (task->sprites[1].frame != 0 && isOnScreen(task->x, task->y - 0x20, 0x20, 0x40)) {
-            layer->addSortedCallback(layer, func_800A5DBC, task, task->y + 0x12, 1);
+            layer->addSortedCallback(layer, drawEffect, task, task->y + 0x12, 1);
         }
         break;
     case TASK_DONE:
@@ -1084,7 +1085,7 @@ AnimFrame updateTileSixFrames1[] = {
 AnimFrame updateTileSixFrames2[] = {
     { 0, 4 }, { 1, 4 }, { 255, 0 },
 };
-AnimFrame D_800A7210[] = {
+AnimFrame updateTileSixFrames3[] = {
     { 0, 12 }, { 1, 12 }, { 2, 12 }, { 3, 12 },
     { 4, 12 }, { 5, 12 }, { 6, 12 }, { 7, 12 },
     { 8, 12 }, { 9, 12 }, { 10, 12 }, { 11, 12 },
@@ -1093,7 +1094,7 @@ AnimFrame D_800A7210[] = {
     { 11, 4 }, { 10, 4 }, { 9, 4 }, { 8, 4 },
     { 7, 4 }, { 6, 4 }, { 5, 4 }, { 255, 0x3E7 },
 };
-AnimFrame D_800A7280[] = {
+AnimFrame updateTileSixFrames4[] = {
     { 39, 4 }, { 38, 4 }, { 37, 4 }, { 36, 4 },
     { 35, 4 }, { 34, 4 }, { 33, 4 }, { 32, 4 },
     { 31, 4 }, { 30, 4 }, { 29, 4 }, { 28, 4 },
@@ -1114,7 +1115,7 @@ AnimFrame updateTileSixWFrames1[] = {
 AnimFrame updateTileSixWFrames2[] = {
     { 0, 4 }, { 1, 4 }, { 255, 0 },
 };
-AnimFrame D_800A7328[] = {
+AnimFrame updateTileSixWFrames3[] = {
     { 0, 12 }, { 1, 12 }, { 2, 12 }, { 3, 12 },
     { 4, 12 }, { 5, 12 }, { 6, 12 }, { 7, 12 },
     { 8, 12 }, { 9, 12 }, { 10, 12 }, { 255, 0 },
@@ -1123,7 +1124,7 @@ AnimFrame D_800A7328[] = {
     { 79, 4 }, { 78, 4 }, { 77, 4 }, { 76, 4 },
     { 255, 0x3E7 },
 };
-AnimFrame D_800A738C[] = {
+AnimFrame updateTileSixWFrames4[] = {
     { 99, 4 }, { 98, 4 }, { 97, 4 }, { 96, 4 },
     { 95, 4 }, { 94, 4 }, { 93, 4 }, { 92, 4 },
     { 91, 4 }, { 90, 4 }, { 89, 4 }, { 88, 4 },

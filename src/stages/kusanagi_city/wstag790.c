@@ -88,7 +88,7 @@ void handleCommand809(StageTask *task, s32 id) {
 
 /* Creates the task of updateTileGroup with id 0x329 */
 void *createCommand809(s32 arg) {
-    return createTaskWithId(updateTileGroup, 0x70, 0, 0x329);
+    return createTaskWithId(updateTileGroup, sizeof(StageTileGroup), 0, 0x329);
 }
 
 /* Once the substate is set to 1, animates the frame of the record of animation 1 for 20 frames, then plays a sound */
@@ -135,7 +135,7 @@ void handleCommand808(StageTask *task, s32 id) {
 }
 
 void *createCommand808(s32 arg) {
-    return createTaskWithId(updateFrameTask, 0x5C, 0, arg);
+    return createTaskWithId(updateFrameTask, sizeof(StageFrameTask), 0, arg);
 }
 
 /* Creates two objects and the event object of story progress 1 */

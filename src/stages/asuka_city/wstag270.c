@@ -10,7 +10,7 @@
 #endif
 
 /* A two-option menu: creates the event object of the chosen option */
-void func_800A4D04(StageMenu *task, StageMenuChildren *children) {
+void updateEvent1518(StageMenu *task, StageMenuChildren *children) {
     SpriteDrawer drawer;
     s32 prev;
     s32 i;
@@ -119,11 +119,11 @@ void func_800A4D04(StageMenu *task, StageMenuChildren *children) {
 }
 
 void *startEvent1518(void) {
-    return createTask(func_800A4D04, 0x64, 0x14);
+    return createTask(updateEvent1518, sizeof(StageMenu), sizeof(StageMenuChildren));
 }
 
 /* A two-option menu: creates the event object of the chosen option */
-void func_800A52CC(StageMenu *task, StageMenuChildren *children) {
+void updateEvent1520(StageMenu *task, StageMenuChildren *children) {
     SpriteDrawer drawer;
     s32 prev;
     s32 i;
@@ -232,7 +232,7 @@ void func_800A52CC(StageMenu *task, StageMenuChildren *children) {
 }
 
 void *startEvent1520(void) {
-    return createTask(func_800A52CC, 0x64, 0x14);
+    return createTask(updateEvent1520, sizeof(StageMenu), sizeof(StageMenuChildren));
 }
 
 #include "common/update_stage.inc.c"

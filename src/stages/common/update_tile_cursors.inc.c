@@ -23,7 +23,7 @@ void updateTileCursors(StageTileCursors *task) {
         task->nextState(task);
         break;
     case TASK_RUN:
-        for (tile = FIELDSTG_state.objects; tile->unk2 != 0; tile++) {
+        for (tile = FIELDSTG_state.objects; tile->margin != 0; tile++) {
             switch (tile->anim) {
             case 1:
                 stepTileSequences(tile, updateTileCursorsFrames[0], &task->cursors[0], 0);
