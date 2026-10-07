@@ -276,6 +276,15 @@ does:
 - One folder per binary under `src/`: `src/main/` for the executable,
   `src/<overlay>/` for each overlay, and `src/stages/` with one
   `wstag###.c` per stage.
+- Code that several binaries have, each its own copy of the same C, is one
+  `.inc.c` file that their C files include where the function is, named
+  after it: `src/stages/common/` for the stages, `src/menu_common/` for the
+  menu overlays. An overlay's copy keeps the overlay's prefix: its header
+  defines `OVL_NAME(name)` (`STGMCARD_##name`), and the shared file names
+  its functions with it (`void OVL_NAME(drawFader)(ScreenFade *task)` is
+  `STGMCARD_drawFader` in STGMCARD). A copy that differs in a constant
+  takes it from a macro that the including file defines just before the
+  include (`FADER_DEPTH` for `create_fader.inc.c`).
 - The executable's files follow its original objects (`inn.c`, `system.c`,
   `memcard.c`, ...). The SDK, Sony's code, isn't in `src/`: the build takes
   it from the original as splat's disassembly (`asm/<version>/main/psyq/`),

@@ -8,7 +8,7 @@ void STGDGLAB_createSlotScreenWindows(LabSlotScreen *screen, LabSlotScreenWindow
 
     windows->title = createTextWindow(screen->layer, 1, 0xAE, 0x57);
     for (i = 0; i < 3; i++) {
-        windows->unk38[i] = createTextWindow(screen->layer, 1, 0xA7, i * 0xE + 0x16);
+        windows->slotNames[i] = createTextWindow(screen->layer, 1, 0xA7, i * 0xE + 0x16);
     }
     for (i = 0; i < 2; i++) {
         windows->options[i] = createTextWindow(screen->layer, 1, 0xA7, i * 0xE + 0x73);
@@ -46,17 +46,17 @@ void STGDGLAB_showSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *window
         for (i = 0; i < 3; i++) {
             if (screen->slots[i] < 2) {
                 if (i == 0) {
-                    windows->unk38[0]->setString(windows->unk38[0], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x1B);
+                    windows->slotNames[0]->setString(windows->slotNames[0], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x1B);
                 } else {
-                    windows->unk38[i]->setVisible(windows->unk38[i], 0);
+                    windows->slotNames[i]->setVisible(windows->slotNames[i], 0);
                 }
             } else {
-                windows->unk38[i]->setString(windows->unk38[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)),
+                windows->slotNames[i]->setString(windows->slotNames[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)),
                                              GET_DIGIMON(screen->slots[i])->nameId);
                 if (partner->battleDigivolve == screen->slots[i]) {
-                    windows->unk38[i]->setPalette(windows->unk38[i], 1);
+                    windows->slotNames[i]->setPalette(windows->slotNames[i], 1);
                 } else {
-                    windows->unk38[i]->setPalette(windows->unk38[i], 0);
+                    windows->slotNames[i]->setPalette(windows->slotNames[i], 0);
                 }
             }
         }
@@ -276,11 +276,11 @@ void STGDGLAB_runSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *windows
         break;
     case 30:
         if (STGDGLAB_data.funcs.updateFade(&screen->panels[4])) {
-            if (windows->unk4C == NULL) {
-                windows->unk4C = createTextWindow(screen->layer, 1, 0xA4, 0xB8);
+            if (windows->message == NULL) {
+                windows->message = createTextWindow(screen->layer, 1, 0xA4, 0xB8);
             }
-            windows->unk4C->setDepth(windows->unk4C, screen->depth - 1);
-            windows->unk4C->setString(windows->unk4C, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), screen->choice + 0x24);
+            windows->message->setDepth(windows->message, screen->depth - 1);
+            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), screen->choice + 0x24);
             screen->substate++;
         }
         break;
@@ -288,7 +288,7 @@ void STGDGLAB_runSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *windows
         if (PAD_PRESSED(PAD_CROSS)) {
             SOUND.playSound(SOUND_MENU_CONFIRM);
             STGDGLAB_data.funcs.startFade(&screen->panels[4], 0);
-            windows->unk4C->setVisible(windows->unk4C, 0);
+            windows->message->setVisible(windows->message, 0);
             screen->substate++;
         }
         break;
@@ -300,11 +300,11 @@ void STGDGLAB_runSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *windows
         break;
     case 50:
         if (STGDGLAB_data.funcs.updateFade(&screen->panels[5])) {
-            if (windows->unk4C == NULL) {
-                windows->unk4C = createTextWindow(screen->layer, 1, 0xA4, 0xB8);
+            if (windows->message == NULL) {
+                windows->message = createTextWindow(screen->layer, 1, 0xA4, 0xB8);
             }
-            windows->unk4C->setDepth(windows->unk4C, 0);
-            windows->unk4C->setString(windows->unk4C, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x25);
+            windows->message->setDepth(windows->message, 0);
+            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x25);
             screen->substate++;
         }
         break;
@@ -312,7 +312,7 @@ void STGDGLAB_runSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *windows
         if (PAD_PRESSED(PAD_CROSS)) {
             SOUND.playSound(SOUND_MENU_CONFIRM);
             STGDGLAB_data.funcs.startFade(&screen->panels[5], 0);
-            windows->unk4C->setVisible(windows->unk4C, 0);
+            windows->message->setVisible(windows->message, 0);
             screen->substate++;
         }
         break;
@@ -334,50 +334,50 @@ void STGDGLAB_drawSlotScreen(LabSlotScreen *screen, void *children) {
     sprite.setLayerId(screen->layer, screen->depth);
     if (screen->panels[5].level != 0) {
         sprite.setLayerId(screen->layer, 1);
-        if (screen->panels[5].level != 0x1000) {
-            sprite.setScale(screen->panels[5].level, 0x1000, 0x1000);
+        if (screen->panels[5].level != ONE) {
+            sprite.setScale(screen->panels[5].level, ONE, ONE);
             sprite.setPivot(0x140, 0xBE);
         }
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x25, 0x92, 0xB0);
     }
-    if (screen->panels[0].level != 0x1000) {
-        sprite.setScale(screen->panels[0].level, 0x1000, 0x1000);
+    if (screen->panels[0].level != ONE) {
+        sprite.setScale(screen->panels[0].level, ONE, ONE);
         sprite.setPivot(0, 0x7F);
     } else {
-        sprite.setScale(0x1000, 0x1000, 0x1000);
+        sprite.setScale(ONE, ONE, ONE);
     }
     sprite.setTexture(0x140, 0);
     sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0xF, 0, 0x4B);
     sprite.setTexture(0x280, 0x100);
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x1F, 0, 0x4B);
-    if (screen->panels[1].level != 0x1000) {
-        sprite.setScale(screen->panels[1].level, 0x1000, 0x1000);
+    if (screen->panels[1].level != ONE) {
+        sprite.setScale(screen->panels[1].level, ONE, ONE);
         sprite.setPivot(0x140, 0x2A);
     } else {
-        sprite.setScale(0x1000, 0x1000, 0x1000);
+        sprite.setScale(ONE, ONE, ONE);
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x22, 0x92, 0xF);
-    if (screen->panels[2].level != 0x1000) {
-        sprite.setScale(screen->panels[3].level, 0x1000, 0x1000);
+    if (screen->panels[2].level != ONE) {
+        sprite.setScale(screen->panels[3].level, ONE, ONE);
         sprite.setPivot(0x140, 0x5C);
     } else {
-        sprite.setScale(0x1000, 0x1000, 0x1000);
+        sprite.setScale(ONE, ONE, ONE);
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x20, 0x92, 0x51);
-    if (screen->panels[3].level != 0x1000) {
-        sprite.setScale(screen->panels[3].level, 0x1000, 0x1000);
+    if (screen->panels[3].level != ONE) {
+        sprite.setScale(screen->panels[3].level, ONE, ONE);
         sprite.setPivot(0x140, 0x87);
     } else {
-        sprite.setScale(0x1000, 0x1000, 0x1000);
+        sprite.setScale(ONE, ONE, ONE);
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x23, 0x92, 0x6C);
     if (screen->panels[4].level != 0) {
-        if (screen->panels[4].level != 0x1000) {
-            sprite.setScale(screen->panels[4].level, 0x1000, 0x1000);
+        if (screen->panels[4].level != ONE) {
+            sprite.setScale(screen->panels[4].level, ONE, ONE);
             sprite.setPivot(0x140, 0xBE);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x25, 0x92, 0xB0);
     }

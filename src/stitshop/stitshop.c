@@ -1,40 +1,5 @@
 #include "stitshop.h"
 
-void STITSHOP_drawBuy(ShopBuy *buy, ShopBuyWindows *win);
-void STITSHOP_runBuy(ShopBuy *buy, ShopBuyWindows *win);
-void STITSHOP_drawSell(ShopSell *sell, ShopSellWindows *win);
-void STITSHOP_runSell(ShopSell *sell, ShopSellWindows *win);
-ShopItemList *STITSHOP_createItemList(ShopDialog *dialog, s32 type, s32 selling);
-ShopInfo *STITSHOP_createInfo(s32 selling, s32 item);
-void STITSHOP_showItemPage(ShopItemList *list, ShopItemListWindows *win, s32 show);
-void STITSHOP_updateItemList(ShopItemList *list, ShopItemListWindows *win);
-void STITSHOP_freezeListCursor(ShopItemList *list, s32 frozen);
-void STITSHOP_showListCursor(ShopItemList *list, s32 visible);
-void STITSHOP_listSellable(ShopItemList *list);
-void STITSHOP_fillPartnerRows(ShopInfo *info, ShopInfoWindows *win, s32 member);
-void STITSHOP_showItemRows(ShopInfo *info, ShopInfoWindows *win, s32 show);
-void STITSHOP_showItemDesc(ShopInfo *info, ShopInfoWindows *win, s32 show);
-void STITSHOP_showPartnerStats(ShopInfo *info, ShopInfoWindows *win, s32 show);
-void STITSHOP_updateInfo(ShopInfo *info, ShopInfoWindows *win);
-void STITSHOP_createInfoWindows(ShopInfo *info, ShopInfoWindows *win);
-void STITSHOP_runBuyInfo(ShopInfo *info, ShopInfoWindows *win);
-void STITSHOP_drawStatsPage(ShopInfo *info, ShopInfoWindows *win);
-void STITSHOP_runSellInfo(ShopInfo *info, ShopInfoWindows *win);
-void STITSHOP_addStat(s16 *p, s32 stat, s32 delta);
-void STITSHOP_runShop(ItemShop *shop, ItemShopWindows *win);
-ItemShop *STITSHOP_createShop(void);
-void STITSHOP_updateShop();
-void STITSHOP_loadFiles(void);
-s32 STITSHOP_filesLoading(void);
-void STITSHOP_startFade(PanelAnim *fade, s32 fadeIn);
-s32 STITSHOP_updateFade(PanelAnim *fade);
-void STITSHOP_startLerp(ShopLerp *lerp, s32 from, s32 to, s32 frames);
-s32 STITSHOP_updateLerp(ShopLerp *lerp);
-s16 *STITSHOP_getShopItems(s32 shop);
-s32 STITSHOP_canEquip(s32 partner, s32 item);
-s32 STITSHOP_compareEquip(s32 partner, s32 item);
-void STITSHOP_equip(s32 partner, s32 slot, s32 item, s32 fromBag);
-
 void STITSHOP_updateScene(Task *task, Task **children) {
     RECT rect;
     Layer *layer;
@@ -65,77 +30,11 @@ Task *STITSHOP_start(void) {
     return createTask(STITSHOP_updateScene, sizeof(Task), 4);
 }
 
-void STITSHOP_startFader(ScreenFade *task, s32 fadeIn, s32 duration) {
-    task->setState(task, TASK_RUN);
-    task->substate = 1;
-    task->fadeIn = fadeIn;
-    if (fadeIn == 0) {
-        task->level = 0;
-        task->levelStep = 0xFF00 / duration;
-    } else {
-        task->level = 0xFF00;
-        task->levelStep = -(0xFF00 / duration);
-    }
-}
-
-void STITSHOP_drawFader(ScreenFade *task) {
-    Layer *layer = GFX.funcs.getLayer(task->layerId);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, task->depth);
-    POLY_F4 *poly = GFX.funcs.getPrim();
-    DR_TPAGE *mode;
-
-    setlen(poly, 5);
-    poly->code = 0x2A;
-    poly->r0 = poly->g0 = poly->b0 = task->level >> 8;
-    poly->x0 = poly->x2 = 0;
-    poly->x1 = poly->x3 = 320;
-    poly->y0 = poly->y1 = 0;
-    poly->y2 = poly->y3 = 256;
-    addPrim(ot, poly);
-    mode = (DR_TPAGE *)(poly + 1);
-    setlen(mode, 1);
-    mode->code[0] = 0xE1000245;
-    addPrim(ot, mode);
-    GFX.funcs.setPrim(mode + 1);
-}
-
-void STITSHOP_updateFader(ScreenFade *task) {
-    switch (task->state) {
-    case 0:
-    default:
-        task->nextState(task);
-        break;
-    case 1:
-        if (task->substate == 0) {
-            break;
-        }
-        task->level += task->levelStep;
-        if (task->fadeIn == 0) {
-            if (task->level > 0xFF00) {
-                task->level = 0xFF00;
-                task->state = 2;
-            }
-        } else if (task->level < 0) {
-            task->level = 0;
-            task->state = 2;
-        }
-        /* fallthrough */
-    case 2:
-        STITSHOP_drawFader(task);
-        break;
-    case 3:
-        break;
-    }
-}
-
-ScreenFade *STITSHOP_createFader(void) {
-    ScreenFade *task = createTask(STITSHOP_updateFader, sizeof(ScreenFade), 0);
-
-    task->start = STITSHOP_startFader;
-    task->layerId = 0x1000;
-    task->depth = 6;
-    return task;
-}
+#include "../menu_common/start_fader.inc.c"
+#include "../menu_common/draw_fader.inc.c"
+#include "../menu_common/update_fader.inc.c"
+#define FADER_DEPTH 6
+#include "../menu_common/create_fader.inc.c"
 
 void STITSHOP_createBuyWindows(ShopBuy *buy, ShopBuyWindows *win) {
     win->quantityLabel = createTextWindow(buy->layer, 1, 0xB9, 0x3A);
@@ -183,12 +82,12 @@ void STITSHOP_drawBuy(ShopBuy *buy, ShopBuyWindows *win) {
     sprite.setLayerId(buy->layer, buy->depth);
     sprite.setTexture(0x280, 0x100);
     if (buy->panels[0].level != 0) {
-        sprite.setScale(buy->panels[0].level, 0x1000, 0x1000);
-        if (buy->panels[0].level != 0x1000) {
+        sprite.setScale(buy->panels[0].level, ONE, ONE);
+        if (buy->panels[0].level != ONE) {
             sprite.setPivot(0x140, 0x42);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0xA, 0x9A, 0x34);
-        if (buy->panels[0].level != 0x1000) {
+        if (buy->panels[0].level != ONE) {
             sprite.setPivot(0x140, 0x59);
         } else {
             if (GFX.funcs.getTime() - buy->blinkTime >= 9) {
@@ -207,35 +106,35 @@ void STITSHOP_drawBuy(ShopBuy *buy, ShopBuyWindows *win) {
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0xB, 0xF6, 0x4F);
     }
     if (buy->panels[1].level != 0) {
-        if (buy->panels[1].level != 0x1000) {
-            sprite.setScale(buy->panels[1].level, 0x1000, 0x1000);
+        if (buy->panels[1].level != ONE) {
+            sprite.setScale(buy->panels[1].level, ONE, ONE);
             sprite.setPivot(0x140, 0x32);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0x15, 0x7B, 0x26);
-        if (buy->panels[1].level != 0x1000) {
+        if (buy->panels[1].level != ONE) {
             sprite.setPivot(0x140, 0x57);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0xC, 0xAF, 0x43);
     }
     if (buy->panels[2].level != 0) {
         sprite.setLayerId(buy->layer, buy->depth - 2);
-        if (buy->panels[2].level != 0x1000) {
-            sprite.setScale(buy->panels[2].level, 0x1000, 0x1000);
+        if (buy->panels[2].level != ONE) {
+            sprite.setScale(buy->panels[2].level, ONE, ONE);
             sprite.setPivot(0x140, 0x32);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0x15, 0x7B, 0x26);
     }
     if (buy->panels[3].level != 0) {
         sprite.setLayerId(buy->layer, buy->depth - 2);
-        if (buy->panels[3].level != 0x1000) {
-            sprite.setScale(buy->panels[3].level, 0x1000, 0x1000);
+        if (buy->panels[3].level != ONE) {
+            sprite.setScale(buy->panels[3].level, ONE, ONE);
             sprite.setPivot(0x140, 0x32);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0x15, 0x7B, 0x26);
     }
@@ -247,7 +146,7 @@ void STITSHOP_drawBuy(ShopBuy *buy, ShopBuyWindows *win) {
             }
         }
         sprite.setLayerId(buy->layer, buy->depth - 2);
-        sprite.setScale(0x1000, 0x1000, 0x1000);
+        sprite.setScale(ONE, ONE, ONE);
         sprite.setClutRow(buy->markerFrame);
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0xF, buy->partner * 0x63 + 0x10, 0x9C);
     }
@@ -765,27 +664,27 @@ void STITSHOP_drawSell(ShopSell *sell, ShopSellWindows *win) {
     sprite.setTexture(0x280, 0x100);
     if (sell->panels[3].level != 0) {
         sprite.setLayerId(sell->layer, 1);
-        if (sell->panels[3].level != 0x1000) {
-            sprite.setScale(sell->panels[3].level, 0x1000, 0x1000);
+        if (sell->panels[3].level != ONE) {
+            sprite.setScale(sell->panels[3].level, ONE, ONE);
             sprite.setPivot(0x140, 0x41);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0xD, 0xA0, 0x24);
     }
     sprite.setLayerId(sell->layer, sell->depth);
     if (sell->panels[0].level != 0) {
-        if (sell->panels[0].level != 0x1000) {
-            sprite.setScale(sell->panels[0].level, 0x1000, 0x1000);
+        if (sell->panels[0].level != ONE) {
+            sprite.setScale(sell->panels[0].level, ONE, ONE);
             sprite.setPivot(0x140, 0x4F);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 4, 0xA9, 0x26);
     }
     if (sell->panels[1].level != 0) {
-        if (sell->panels[1].level != 0x1000) {
-            sprite.setScale(sell->panels[1].level, 0x1000, 0x1000);
+        if (sell->panels[1].level != ONE) {
+            sprite.setScale(sell->panels[1].level, ONE, ONE);
             sprite.setPivot(0x140, 0x42);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0xA, 0x9A, 0x34);
-        if (sell->panels[1].level != 0x1000) {
+        if (sell->panels[1].level != ONE) {
             sprite.setPivot(0x140, 0x59);
         } else {
             if (GFX.funcs.getTime() - sell->blinkTime >= 9) {
@@ -804,19 +703,19 @@ void STITSHOP_drawSell(ShopSell *sell, ShopSellWindows *win) {
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0xB, 0xF6, 0x4F);
     }
     if (sell->panels[2].level != 0) {
-        if (sell->panels[2].level != 0x1000) {
-            sprite.setScale(sell->panels[2].level, 0x1000, 0x1000);
+        if (sell->panels[2].level != ONE) {
+            sprite.setScale(sell->panels[2].level, ONE, ONE);
             sprite.setPivot(0x140, 0x32);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0x15, 0x7B, 0x26);
-        if (sell->panels[2].level != 0x1000) {
+        if (sell->panels[2].level != ONE) {
             sprite.setPivot(0x140, 0x57);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0xC, 0xAF, 0x43);
     }
     if (sell->panels[4].level != 0) {
-        if (sell->panels[4].level != 0x1000) {
-            sprite.setScale(sell->panels[4].level, 0x1000, 0x1000);
+        if (sell->panels[4].level != ONE) {
+            sprite.setScale(sell->panels[4].level, ONE, ONE);
             sprite.setPivot(0x140, 0x8F);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0x15, 0x7B, 0x84);
@@ -1268,8 +1167,8 @@ void STITSHOP_drawItemList(ShopItemList *list) {
     sprite.setLayerId(list->layer, list->depth);
     sprite.setTexture(0x280, 0x100);
     if (list->panel.level != 0) {
-        if (list->panel.level != 0x1000) {
-            sprite.setScale(0x1000, list->panel.level, 0x1000);
+        if (list->panel.level != ONE) {
+            sprite.setScale(ONE, list->panel.level, ONE);
             sprite.setPivot(0xA0, 0x47);
         } else {
             for (i = 0; i < list->pageSize; i++) {
@@ -1999,16 +1898,16 @@ void STITSHOP_drawStatsPage(ShopInfo *info, ShopInfoWindows *win) {
     sprite.setLayerId(info->layer, info->depth);
     sprite.setTexture(0x280, 0x100);
     if (info->panels[1].level != 0) {
-        if (info->panels[1].level != 0x1000) {
-            sprite.setScale(info->panels[1].level, 0x1000, 0x1000);
+        if (info->panels[1].level != ONE) {
+            sprite.setScale(info->panels[1].level, ONE, ONE);
             sprite.setPivot(0, 0x8C);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 9, 0, 0x81);
     }
     if (info->panels[3].level != 0) {
-        sprite.setScale(0x1000, info->panels[3].level, 0x1000);
+        sprite.setScale(ONE, info->panels[3].level, ONE);
         for (i = 0; i < info->partyCount; i++) {
-            if (info->panels[3].level != 0x1000) {
+            if (info->panels[3].level != ONE) {
                 sprite.setPivot(i * 0x64 + 0x3C, 0xC0);
             } else if (STITSHOP_funcs.canEquip(GAME.funcs.getPartyMember(i), info->item)) {
                 sprite.setTexture(0x140, 0);
@@ -2264,8 +2163,8 @@ void STITSHOP_updateInfo(ShopInfo *info, ShopInfoWindows *win) {
         sprite.setLayerId(info->layer, info->depth - 1);
         sprite.setTexture(0x280, 0x100);
         if (info->panels[0].level != 0) {
-            if (info->panels[0].level != 0x1000) {
-                sprite.setScale(info->panels[0].level, 0x1000, 0x1000);
+            if (info->panels[0].level != ONE) {
+                sprite.setScale(info->panels[0].level, ONE, ONE);
                 sprite.setPivot(0x140, offset + 0x81);
             } else {
                 sprite.setTexture(0x140, 0);
@@ -2276,11 +2175,11 @@ void STITSHOP_updateInfo(ShopInfo *info, ShopInfoWindows *win) {
             sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0xE, 0xF, offset + STITSHOP_lineY(info, 0x6C));
         }
         if (info->panels[2].level != 0) {
-            if (info->panels[2].level != 0x1000) {
-                sprite.setScale(0x1000, info->panels[2].level, 0x1000);
+            if (info->panels[2].level != ONE) {
+                sprite.setScale(ONE, info->panels[2].level, ONE);
                 sprite.setPivot(0xA0, offset + 0xAE);
             } else {
-                sprite.setScale(0x1000, 0x1000, 0x1000);
+                sprite.setScale(ONE, ONE, ONE);
             }
             sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 3, 0, offset + 0x9C);
         }
@@ -2371,36 +2270,36 @@ void STITSHOP_drawShop(ItemShop *shop, ItemShopWindows *win) {
     sprite.setLayerId(shop->layer, 1);
     sprite.setTexture(0x280, 0x100);
     if (shop->panels[0].level != 0) {
-        if (shop->panels[0].level != 0x1000) {
-            sprite.setScale(shop->panels[0].level, 0x1000, 0x1000);
+        if (shop->panels[0].level != ONE) {
+            sprite.setScale(shop->panels[0].level, ONE, ONE);
             sprite.setPivot(0x57, 0x19);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 1, 0x16, 0x12);
     }
     if (shop->panels[1].level != 0) {
-        if (shop->panels[1].level != 0x1000) {
-            sprite.setScale(shop->panels[1].level, 0x1000, 0x1000);
+        if (shop->panels[1].level != ONE) {
+            sprite.setScale(shop->panels[1].level, ONE, ONE);
             sprite.setPivot(0x140, 0x18);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 2, 0xD6, 0xF);
     }
     if (shop->panels[2].level != 0) {
-        if (shop->panels[2].level != 0x1000) {
-            sprite.setScale(shop->panels[2].level, 0x1000, 0x1000);
+        if (shop->panels[2].level != ONE) {
+            sprite.setScale(shop->panels[2].level, ONE, ONE);
             sprite.setPivot(0x140, 0x3B);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 5, 0xA9, 0x26);
     }
     if (shop->panels[3].level != 0) {
-        if (shop->panels[3].level != 0x1000) {
-            sprite.setScale(shop->panels[3].level, 0x1000, 0x1000);
+        if (shop->panels[3].level != ONE) {
+            sprite.setScale(shop->panels[3].level, ONE, ONE);
             sprite.setPivot(0x140, 0xD2);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0, 0xC6, 0xC4);
     }
@@ -2412,7 +2311,7 @@ void STITSHOP_drawShop(ItemShop *shop, ItemShopWindows *win) {
     } else {
         shop->bgTick = 1;
     }
-    sprite.setScale(0x1000, 0x1000, 0x1000);
+    sprite.setScale(ONE, ONE, ONE);
     sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0x14, shop->bgScroll, shop->bgScroll);
 }
 
@@ -2600,68 +2499,10 @@ s32 STITSHOP_filesLoading(void) {
     return FILE_CACHE.isLoading(TEXT_FILE(TEXT_SHOP_NAMES)) != 0;
 }
 
-void STITSHOP_startFade(PanelAnim *fade, s32 fadeIn) {
-    fade->active = 1;
-    if (fadeIn != 0) {
-        SOUND.playSound(SOUND_MENU_OPEN);
-        fade->level = 0;
-        fade->step = 0x1000 / fade->duration;
-    } else {
-        SOUND.playSound(SOUND_MENU_CLOSE);
-        fade->level = 0x1000;
-        fade->step = -((0x1000 / fade->duration) * 2);
-    }
-}
-
-s32 STITSHOP_updateFade(PanelAnim *fade) {
-    if (fade->active == 0) {
-        return 1;
-    }
-    fade->level += fade->step;
-    if (fade->step > 0) {
-        if (fade->level > 0x1000) {
-            fade->level = 0x1000;
-            fade->active = 0;
-            return 1;
-        }
-    } else if (fade->level < 0) {
-        fade->level = 0;
-        fade->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void STITSHOP_startLerp(ShopLerp *lerp, s32 from, s32 to, s32 frames) {
-    if (from != to) {
-        lerp->duration = frames;
-        lerp->fixed = from << 8;
-        lerp->value = from;
-        lerp->target = to;
-        lerp->active = 1;
-        lerp->step = ((to - from) << 8) / lerp->duration;
-    }
-}
-
-s32 STITSHOP_updateLerp(ShopLerp *lerp) {
-    if (lerp->active == 0) {
-        return 1;
-    }
-    lerp->fixed += lerp->step;
-    lerp->value = lerp->fixed >> 8;
-    if (lerp->step > 0) {
-        if (lerp->target < lerp->value) {
-            lerp->value = lerp->target;
-            lerp->active = 0;
-            return 1;
-        }
-    } else if (lerp->value < lerp->target) {
-        lerp->value = lerp->target;
-        lerp->active = 0;
-        return 1;
-    }
-    return 0;
-}
+#include "../menu_common/start_fade.inc.c"
+#include "../menu_common/update_fade.inc.c"
+#include "../menu_common/start_lerp.inc.c"
+#include "../menu_common/update_lerp.inc.c"
 
 s16 *STITSHOP_getShopItems(s32 shop) {
     if (shop < 0 || STITSHOP_shops[shop].items == NULL) {

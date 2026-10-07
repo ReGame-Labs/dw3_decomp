@@ -9,6 +9,9 @@
 
 #include "game.h"
 
+/* The name of this overlay's copy of a function of src/menu_common/ */
+#define OVL_NAME(name) STSTATUS_##name
+
 /* The menu's sprite sheet; the next file is its texture archive */
 #if VERSION_US
 #define FILE_STATUS_SPRITES 0x3F4
@@ -151,17 +154,6 @@ typedef struct StatsScreenWindows {
     /* 0x10C */ void *panel; /* STSTATUS_createDigivolvePanel's or STSTATUS_createEquipPanel's, while open */
 } StatsScreenWindows;
 
-/* Moves a value towards a target in fixed point */
-typedef struct StatusLerp {
-    /* 0x00 */ s32 duration;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 value;
-    /* 0x0C */ s32 fixed; /* value << 8 */
-    /* 0x10 */ s32 target;
-    /* 0x14 */ s32 step;
-    /* 0x18 */ s32 active;
-} StatusLerp;
-
 /* A panel of the fifth screen (STSTATUS_createDigivolvePanel) */
 typedef struct DigivolvePanel {
     TASK_HEADER(DigivolvePanel);
@@ -177,7 +169,7 @@ typedef struct DigivolvePanel {
     /* 0x74 */ s16 slots[4]; /* getPartnerSlots */
     /* 0x7C */ s32 slotCount; /* the slots holding an entry (4 on) */
     /* 0x80 */ s32 listShown;
-    /* 0x84 */ StatusLerp scroll; /* its value is added to the list's y */
+    /* 0x84 */ MenuLerp scroll; /* its value is added to the list's y */
     /* 0xA0 */ s32 blink; /* the help arrow */
     /* 0xA4 */ s32 blinkFrame;
     /* 0xA8 */ s32 time;
@@ -282,8 +274,8 @@ typedef struct StatusFuncs {
     /* 0x04 */ s32 (*filesLoading)(void);
     /* 0x08 */ void (*startFade)(PanelAnim *fade, s32 fadeIn);
     /* 0x0C */ s32 (*updateFade)(PanelAnim *fade);
-    /* 0x10 */ void (*startLerp)(StatusLerp *lerp, s32 from, s32 to, s32 frames);
-    /* 0x14 */ s32 (*updateLerp)(StatusLerp *lerp);
+    /* 0x10 */ void (*startLerp)(MenuLerp *lerp, s32 from, s32 to, s32 frames);
+    /* 0x14 */ s32 (*updateLerp)(MenuLerp *lerp);
     /* 0x18 */ s32 *(*getList)(s32 list, s32 index);
     /* 0x1C */ s32 (*listItems)(s32 list, u16 *out); /* 6, 7: special lists; returns the count */
     /* 0x20 */ s32 (*canEquip)(s32 partner, s32 slot, s32 item);
@@ -482,8 +474,8 @@ void STSTATUS_loadFiles(void);
 s32 STSTATUS_filesLoading(void);
 void STSTATUS_startFade(PanelAnim *fade, s32 fadeIn);
 s32 STSTATUS_updateFade(PanelAnim *fade);
-void STSTATUS_startLerp(StatusLerp *lerp, s32 from, s32 to, s32 frames);
-s32 STSTATUS_updateLerp(StatusLerp *lerp);
+void STSTATUS_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
+s32 STSTATUS_updateLerp(MenuLerp *lerp);
 s32 *STSTATUS_getTowns(s32 list, s32 index);
 s32 STSTATUS_listItems(s32 list, u16 *out);
 ScrollBar *STSTATUS_createScrollBar(void);
@@ -521,6 +513,25 @@ s32 STSTATUS_listEquipItems(u16 *out);
 void STSTATUS_drawCardScreen(PartyScreen *screen);
 void STSTATUS_drawDemoScreen(PartyScreen *screen);
 s32 STSTATUS_listItemsOfKind(s32 list, u16 *out);
+void STSTATUS_moveMapCursor(StatusMapScreen *screen, s32 dx, s32 dy);
+void STSTATUS_drawMapScreen(StatusMapScreen *screen);
+void STSTATUS_drawDigivolvePanel(DigivolvePanel *panel);
+void STSTATUS_runDigivolvePanel(DigivolvePanel *panel, DigivolvePanelWindows *windows);
+void STSTATUS_createStatusWindows(StatsScreen *screen, StatsScreenWindows *windows);
+void STSTATUS_drawStatusScreen(StatsScreen *screen);
+void STSTATUS_runStatusScreen(StatsScreen *screen, StatsScreenWindows *windows);
+void STSTATUS_createItemWindows(ItemScreen *screen, ItemScreenWindows *windows);
+void STSTATUS_drawItemScreen(ItemScreen *screen);
+void STSTATUS_runItemScreen(ItemScreen *screen, ItemScreenWindows *windows);
+void STSTATUS_runItemList(ItemList *panel, ItemListWindows *windows);
+s32 STSTATUS_moveItemListCursor(ItemList *panel, ItemListWindows *windows);
+void STSTATUS_drawItemList(ItemList *panel);
+s32 STSTATUS_listFieldTechs(TechScreen *screen, s32 member);
+void STSTATUS_drawTechScreen(TechScreen *screen);
+void STSTATUS_showTechPage(TechScreen *screen, TechScreenWindows *windows, s32 member, s32 show);
+void STSTATUS_runTechScreen(TechScreen *screen, TechScreenWindows *windows);
+void STSTATUS_drawSortScreen(SortScreen *screen);
+void STSTATUS_runSortScreen(SortScreen *screen, SortScreenWindows *windows);
 
 /* A partner's equipment, copied as a whole */
 typedef struct StatusEquip {

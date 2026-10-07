@@ -169,7 +169,7 @@ void STGTRAIN_updateSprite(TrainSprite *sprite) {
             if (sprite->scale.vx == 0 && sprite->scale.vy == 0) {
                 break;
             }
-            if (sprite->scale.vx == 0x1000 && sprite->scale.vy == 0x1000) {
+            if (sprite->scale.vx == ONE && sprite->scale.vy == ONE) {
                 sprite->transformed = 0;
             } else {
                 transform = 1;
@@ -553,8 +553,8 @@ void STGTRAIN_drawScreen(TrainScreen *screen) {
     initSpriteDrawer(&sprite);
     sprite.setLayerId(screen->layerId, screen->depth);
     if (screen->panels[0].level != 0) {
-        if (screen->panels[0].level != 0x1000) {
-            sprite.setScale(screen->panels[0].level, 0x1000, 0x1000);
+        if (screen->panels[0].level != ONE) {
+            sprite.setScale(screen->panels[0].level, ONE, ONE);
             sprite.setPivot(0, 0x2B);
         } else {
             sprite.setTexture(0x240, 0x100);
@@ -566,8 +566,8 @@ void STGTRAIN_drawScreen(TrainScreen *screen) {
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x1F, 0, 0xF);
     }
     if (screen->panels[1].level != 0) {
-        if (screen->panels[1].level != 0x1000) {
-            sprite.setScale(screen->panels[1].level, 0x1000, 0x1000);
+        if (screen->panels[1].level != ONE) {
+            sprite.setScale(screen->panels[1].level, ONE, ONE);
             sprite.setPivot(0, 0x7F);
         }
         sprite.setTexture(0x140, 0);
@@ -576,16 +576,16 @@ void STGTRAIN_drawScreen(TrainScreen *screen) {
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x20, 0, 0x4B);
     }
     if (screen->panels[2].level != 0) {
-        if (screen->panels[2].level != 0x1000) {
-            sprite.setScale(screen->panels[2].level, 0x1000, 0x1000);
+        if (screen->panels[2].level != ONE) {
+            sprite.setScale(screen->panels[2].level, ONE, ONE);
             sprite.setPivot(0, 0xC1);
         }
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x21, 0, 0xB6);
     }
     if (screen->panels[5].level != 0) {
         for (i = 0; i < screen->partyCount; i++) {
-            if (screen->panels[5].level != 0x1000) {
-                sprite.setScale(screen->panels[5].level, 0x1000, 0x1000);
+            if (screen->panels[5].level != ONE) {
+                sprite.setScale(screen->panels[5].level, ONE, ONE);
                 sprite.setPivot(i * 0x30 + 0xB4, 0x8A);
             }
             partner = GAME.funcs.getPartyMember(i);
@@ -607,11 +607,11 @@ void STGTRAIN_drawScreen(TrainScreen *screen) {
         sprite.setClutRow(0);
     }
     if (screen->panels[6].level != 0) {
-        if (screen->panels[6].level != 0x1000) {
-            sprite.setScale(screen->panels[6].level, 0x1000, 0x1000);
+        if (screen->panels[6].level != ONE) {
+            sprite.setScale(screen->panels[6].level, ONE, ONE);
             sprite.setPivot(0x140, 0x8A);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.setLayerId(screen->layerId, screen->depth - 1);
         sprite.setTexture(0x140, 0);
@@ -622,17 +622,17 @@ void STGTRAIN_drawScreen(TrainScreen *screen) {
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x24, 0x8F, 0x5F);
     }
     if (screen->panels[3].level != 0) {
-        if (screen->panels[3].level != 0x1000) {
-            sprite.setScale(screen->panels[3].level, 0x1000, 0x1000);
+        if (screen->panels[3].level != ONE) {
+            sprite.setScale(screen->panels[3].level, ONE, ONE);
             sprite.setPivot(0x140, 0x1D);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x27, 0x8F, 0xF);
     }
     if (screen->panels[4].level != 0) {
-        if (screen->panels[4].level != 0x1000) {
-            sprite.setScale(screen->panels[4].level, 0x1000, 0x1000);
+        if (screen->panels[4].level != ONE) {
+            sprite.setScale(screen->panels[4].level, ONE, ONE);
             sprite.setPivot(0x140, 0x4E);
         }
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x22, 0x92, 0x43);
@@ -737,7 +737,7 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         if (win->menu == NULL) {
             screen->substate = 0x1E;
         } else if (win->menu->state == TASK_DONE) {
-            screen->unk78 = 0;
+            screen->training = 0;
             win->menu->state = TASK_KILL;
             screen->substate = 0x19;
         }
@@ -787,7 +787,7 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         if (win->session == NULL) {
             win->session = STGTRAIN_createSession(screen);
             screen->substate++;
-            STGTRAIN_state.requestFile(screen->unk78);
+            STGTRAIN_state.requestFile(screen->training);
         }
         break;
     case 0x1F:
@@ -805,7 +805,7 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         break;
     case 0x23:
         if (STGTRAIN_state.getFile() != NULL && win->result == NULL) {
-            win->result = STGTRAIN_createResult(screen, GAME.funcs.getPartyMember(screen->partner), screen->unk78);
+            win->result = STGTRAIN_createResult(screen, GAME.funcs.getPartyMember(screen->partner), screen->training);
             screen->substate++;
         }
         break;
@@ -822,7 +822,7 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         }
         break;
     case 0x32:
-        win->fade = STGTRAIN_createScreenFade();
+        win->fade = STGTRAIN_createFader();
         win->fade->start(win->fade, 0, 30);
         screen->panels[5].level = 0;
         for (i = 0; i < 3; i++) {
@@ -950,83 +950,11 @@ TrainScreen *STGTRAIN_createScreen(void) {
     return screen;
 }
 
-/* Starts darkening the screen (fadeIn 0) or brightening it, over duration
-   frames */
-void STGTRAIN_startScreenFade(ScreenFade *task, s32 fadeIn, s32 duration) {
-    task->setState(task, TASK_RUN);
-    task->substate = 1;
-    task->fadeIn = fadeIn;
-    if (fadeIn == 0) {
-        task->level = 0;
-        task->levelStep = 0xFF00 / duration;
-    } else {
-        task->level = 0xFF00;
-        task->levelStep = -(0xFF00 / duration);
-    }
-}
-
-/* Darkens the whole screen by the fade's level, with a subtractive rectangle */
-void STGTRAIN_drawScreenFade(ScreenFade *task) {
-    Layer *layer = GFX.funcs.getLayer(task->layerId);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, task->depth);
-    POLY_F4 *poly = GFX.funcs.getPrim();
-    DR_TPAGE *mode;
-
-    setlen(poly, 5);
-    poly->code = 0x2A;
-    poly->r0 = poly->g0 = poly->b0 = task->level >> 8;
-    poly->x0 = poly->x2 = 0;
-    poly->x1 = poly->x3 = 320;
-    poly->y0 = poly->y1 = 0;
-    poly->y2 = poly->y3 = 256;
-    addPrim(ot, poly);
-    mode = (DR_TPAGE *)(poly + 1);
-    setlen(mode, 1);
-    mode->code[0] = 0xE1000245;
-    addPrim(ot, mode);
-    GFX.funcs.setPrim(mode + 1);
-}
-
-/* The screen fade's task: once started, moves the level to black or back and
-   draws it */
-void STGTRAIN_updateScreenFade(ScreenFade *task) {
-    switch (task->state) {
-    case 0:
-    default:
-        task->nextState(task);
-        break;
-    case 1:
-        if (task->substate == 0) {
-            break;
-        }
-        task->level += task->levelStep;
-        if (task->fadeIn == 0) {
-            if (task->level > 0xFF00) {
-                task->level = 0xFF00;
-                task->state = 2;
-            }
-        } else if (task->level < 0) {
-            task->level = 0;
-            task->state = 2;
-        }
-        /* fallthrough */
-    case 2:
-        STGTRAIN_drawScreenFade(task);
-        break;
-    case 3:
-        break;
-    }
-}
-
-/* Creates the screen fade, on layer 0x1000 at depth 6 */
-ScreenFade *STGTRAIN_createScreenFade(void) {
-    ScreenFade *task = createTask(STGTRAIN_updateScreenFade, sizeof(ScreenFade), 0);
-
-    task->start = STGTRAIN_startScreenFade;
-    task->layerId = 0x1000;
-    task->depth = 6;
-    return task;
-}
+#include "../menu_common/start_fader.inc.c"
+#include "../menu_common/draw_fader.inc.c"
+#include "../menu_common/update_fader.inc.c"
+#define FADER_DEPTH 6
+#include "../menu_common/create_fader.inc.c"
 
 /* The partners' sprites while they wait, by partner: -1 ends a loop */
 s32 STGTRAIN_waitAnims[8][7] = {

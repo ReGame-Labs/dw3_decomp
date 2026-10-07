@@ -146,11 +146,11 @@ void STSTATUS_drawCardScreen(PartyScreen *screen) {
     for (i = 0; i < screen->count; i++) {
         level = screen->pageFades[i].level;
         if (level != 0) {
-            if (level != 0x1000) {
-                sprite.setScale(level, level, 0x1000);
+            if (level != ONE) {
+                sprite.setScale(level, level, ONE);
                 sprite.setPivot(0x7C, i * 46 + 0x27);
             } else {
-                sprite.setScale(0x1000, 0x1000, 0x1000);
+                sprite.setScale(ONE, ONE, ONE);
             }
             member = GAME.funcs.getPartyMember(i);
             sprite.setTexture(0x280, 0x100);
@@ -163,18 +163,18 @@ void STSTATUS_drawCardScreen(PartyScreen *screen) {
         level = screen->pageFades[i].level;
         if (level != 0) {
             /* both branches draw the frame's last part: the match depends on it */
-            if (level != 0x1000) {
-                sprite.setScale(level, 0x1000, 0x1000);
+            if (level != ONE) {
+                sprite.setScale(level, ONE, ONE);
                 sprite.setPivot(0, i * 46 + 0x25);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 46 + 0x11);
-                sprite.setScale(screen->pageFades[i].level, screen->pageFades[i].level, 0x1000);
+                sprite.setScale(screen->pageFades[i].level, screen->pageFades[i].level, ONE);
                 sprite.setPivot(0x7C, i * 46 + 0x27);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x16, 0x67, i * 46 + 0x13);
-                sprite.setScale(screen->pageFades[i].level, 0x1000, 0x1000);
+                sprite.setScale(screen->pageFades[i].level, ONE, ONE);
                 sprite.setPivot(0, i * 46 + 0x25);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 46 + 0x11);
             } else {
-                sprite.setScale(0x1000, 0x1000, 0x1000);
+                sprite.setScale(ONE, ONE, ONE);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 46 + 0x11);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x16, 0x67, i * 46 + 0x13);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 46 + 0x11);
@@ -183,11 +183,11 @@ void STSTATUS_drawCardScreen(PartyScreen *screen) {
     }
     level = screen->fades[1].level;
     if (level != 0) {
-        if (level != 0x1000) {
-            sprite.setScale(level, 0x1000, 0x1000);
+        if (level != ONE) {
+            sprite.setScale(level, ONE, ONE);
             sprite.setPivot(0, 0xD3);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x20, 0, 0xC2);
@@ -197,8 +197,8 @@ void STSTATUS_drawCardScreen(PartyScreen *screen) {
         sprite.setLayerId(screen->layer, screen->depth);
         sprite.setTexture(0x280, 0x100);
         level = screen->fade.level;
-        if (level != 0x1000) {
-            sprite.setScale(level, 0x1000, 0x1000);
+        if (level != ONE) {
+            sprite.setScale(level, ONE, ONE);
             sprite.setPivot(0x140, 0x40);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x3A, 0xA8, 0x28);
@@ -419,77 +419,11 @@ Task *STSTATUS_createCardScreen(FieldMenuScreen *menu, s32 extra) {
     return (Task *)screen;
 }
 
-void STSTATUS_startFader(ScreenFade *task, s32 fadeIn, s32 duration) {
-    task->setState(task, TASK_RUN);
-    task->substate = 1;
-    task->fadeIn = fadeIn;
-    if (fadeIn == 0) {
-        task->level = 0;
-        task->levelStep = 0xFF00 / duration;
-    } else {
-        task->level = 0xFF00;
-        task->levelStep = -(0xFF00 / duration);
-    }
-}
-
-void STSTATUS_drawFader(ScreenFade *task) {
-    Layer *layer = GFX.funcs.getLayer(task->layerId);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, task->depth);
-    POLY_F4 *poly = GFX.funcs.getPrim();
-    DR_TPAGE *mode;
-
-    setlen(poly, 5);
-    poly->code = 0x2A;
-    poly->r0 = poly->g0 = poly->b0 = task->level >> 8;
-    poly->x0 = poly->x2 = 0;
-    poly->x1 = poly->x3 = 320;
-    poly->y0 = poly->y1 = 0;
-    poly->y2 = poly->y3 = 256;
-    addPrim(ot, poly);
-    mode = (DR_TPAGE *)(poly + 1);
-    setlen(mode, 1);
-    mode->code[0] = 0xE1000245;
-    addPrim(ot, mode);
-    GFX.funcs.setPrim(mode + 1);
-}
-
-void STSTATUS_updateFader(ScreenFade *task) {
-    switch (task->state) {
-    case 0:
-    default:
-        task->nextState(task);
-        break;
-    case 1:
-        if (task->substate == 0) {
-            break;
-        }
-        task->level += task->levelStep;
-        if (task->fadeIn == 0) {
-            if (task->level > 0xFF00) {
-                task->level = 0xFF00;
-                task->state = 2;
-            }
-        } else if (task->level < 0) {
-            task->level = 0;
-            task->state = 2;
-        }
-        /* fallthrough */
-    case 2:
-        STSTATUS_drawFader(task);
-        break;
-    case 3:
-        break;
-    }
-}
-
-ScreenFade *STSTATUS_createFader(void) {
-    ScreenFade *task = createTask(STSTATUS_updateFader, sizeof(ScreenFade), 0);
-
-    task->start = STSTATUS_startFader;
-    task->layerId = 0x1000;
-    task->depth = 0;
-    return task;
-}
+#include "../menu_common/start_fader.inc.c"
+#include "../menu_common/draw_fader.inc.c"
+#include "../menu_common/update_fader.inc.c"
+#define FADER_DEPTH 0
+#include "../menu_common/create_fader.inc.c"
 
 /* The stats a party member's page shows, in PartnerTotals.stats (as
    STSTATUS_pageStats2, 4, 0, 8 and 9 on the other screens) */

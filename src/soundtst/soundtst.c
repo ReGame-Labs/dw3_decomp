@@ -1,7 +1,5 @@
 #include "soundtst.h"
 
-extern const char SOUNDTST_STR_CURSOR[];
-
 /* Each bank's sound list, then the bank list */
 SoundTestEntry SOUNDTST_commonSounds[] = {
     {"\x82\x61\x82\x73\x81\x51\x82\x6B\x82\x6E\x82\x6E\x82\x6F\x82\x4F", 0xA004E03C}, /* "ＢＴ＿ＬＯＯＰ０" */
@@ -609,8 +607,6 @@ SoundTestEntry SOUNDTST_banks[] = {
 };
 
 RECT SOUNDTST_screenRect = {0, 0, 320, 240};
-
-Task *SOUNDTST_createSoundTest(void);
 
 void SOUNDTST_updateScene(Task *task, Task **items) {
     switch (task->state) {

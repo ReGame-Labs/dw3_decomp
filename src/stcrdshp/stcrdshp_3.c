@@ -103,30 +103,30 @@ void STCRDSHP_drawShop(CardShop *shop) {
     sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 8, shop->scroll, shop->scroll);
     sprite.setLayerId(shop->layer, shop->depth - 1);
     if (shop->fades[0].level != 0) {
-        if (shop->fades[0].level != 0x1000) {
-            sprite.setScale(shop->fades[0].level, 0x1000, 0x1000);
+        if (shop->fades[0].level != ONE) {
+            sprite.setScale(shop->fades[0].level, ONE, ONE);
             sprite.setPivot(0x57, 0x1B);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x28, 0x16, 0x14);
-        if (shop->fades[0].level != 0x1000) {
+        if (shop->fades[0].level != ONE) {
             sprite.setPivot(0x140, 0x1D);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x29, 0xD6, 0x15);
     }
     if (shop->fades[1].level != 0) {
-        if (shop->fades[1].level != 0x1000) {
-            sprite.setScale(shop->fades[1].level, 0x1000, 0x1000);
+        if (shop->fades[1].level != ONE) {
+            sprite.setScale(shop->fades[1].level, ONE, ONE);
             sprite.setPivot(0x140, 0x49);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x2F, 0x92, 0x2E);
-        if (shop->fades[1].level != 0x1000) {
+        if (shop->fades[1].level != ONE) {
             sprite.setPivot(0x140, 0xD2);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0xF, 0xC6, 0xC4);
     }
     if (shop->fades[2].level != 0) {
-        if (shop->fades[2].level != 0x1000) {
-            sprite.setScale(shop->fades[2].level, 0x1000, 0x1000);
+        if (shop->fades[2].level != ONE) {
+            sprite.setScale(shop->fades[2].level, ONE, ONE);
             sprite.setPivot(0x140, 0x77);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x2C, 0x7B, 0x6B);
@@ -391,68 +391,10 @@ s32 STCRDSHP_filesLoading(void) {
     return FILE_CACHE.isLoading(TEXT_FILE(TEXT_ITEM_NAMES)) != 0;
 }
 
-void STCRDSHP_startFade(PanelAnim *fade, s32 fadeIn) {
-    fade->active = 1;
-    if (fadeIn != 0) {
-        SOUND.playSound(SOUND_MENU_OPEN);
-        fade->level = 0;
-        fade->step = 0x1000 / fade->duration;
-    } else {
-        SOUND.playSound(SOUND_MENU_CLOSE);
-        fade->level = 0x1000;
-        fade->step = -((0x1000 / fade->duration) * 2);
-    }
-}
-
-s32 STCRDSHP_updateFade(PanelAnim *fade) {
-    if (fade->active == 0) {
-        return 1;
-    }
-    fade->level += fade->step;
-    if (fade->step > 0) {
-        if (fade->level > 0x1000) {
-            fade->level = 0x1000;
-            fade->active = 0;
-            return 1;
-        }
-    } else if (fade->level < 0) {
-        fade->level = 0;
-        fade->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void STCRDSHP_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames) {
-    if (from != to) {
-        lerp->duration = frames;
-        lerp->fixed = from << 8;
-        lerp->value = from;
-        lerp->target = to;
-        lerp->active = 1;
-        lerp->step = ((to - from) << 8) / lerp->duration;
-    }
-}
-
-s32 STCRDSHP_updateLerp(MenuLerp *lerp) {
-    if (lerp->active == 0) {
-        return 1;
-    }
-    lerp->fixed += lerp->step;
-    lerp->value = lerp->fixed >> 8;
-    if (lerp->step > 0) {
-        if (lerp->target < lerp->value) {
-            lerp->value = lerp->target;
-            lerp->active = 0;
-            return 1;
-        }
-    } else if (lerp->value < lerp->target) {
-        lerp->value = lerp->target;
-        lerp->active = 0;
-        return 1;
-    }
-    return 0;
-}
+#include "../menu_common/start_fade.inc.c"
+#include "../menu_common/update_fade.inc.c"
+#include "../menu_common/start_lerp.inc.c"
+#include "../menu_common/update_lerp.inc.c"
 
 /* The stock of a shop (the first one's if it has none), counting its cards */
 CardShopStock *STCRDSHP_getStock(s32 shop) {

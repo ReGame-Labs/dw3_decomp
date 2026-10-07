@@ -246,7 +246,7 @@ void CNTY_SEL_drawTopPanel(PanelTask *task) {
     sprite.setLayerId(CNTY_SEL_LAYER, 1);
     sprite.setTexture(0x280, 0);
     sprite.setPivot(148, 0);
-    sprite.setScale(task->scaleX, task->scaleY, 0x1000);
+    sprite.setScale(task->scaleX, task->scaleY, ONE);
     sprite.draw(FILE_CACHE.getEntry(CNTY_SEL_SPRITES), SPRITE_TOP_PANEL, 148, 0);
 }
 
@@ -257,7 +257,7 @@ void CNTY_SEL_tickTopPanel(PanelTask *task) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        task->scaleX = 0x1000;
+        task->scaleX = ONE;
         task->scaleY = 0;
         task->phase = 0;
         break;
@@ -311,7 +311,7 @@ void CNTY_SEL_drawRightPanel(PanelTask *task) {
     sprite.setLayerId(CNTY_SEL_LAYER, 1);
     sprite.setTexture(0x280, 0);
     sprite.setPivot(320, 20);
-    sprite.setScale(task->scaleX, task->scaleY, 0x1000);
+    sprite.setScale(task->scaleX, task->scaleY, ONE);
     sprite.draw(FILE_CACHE.getEntry(CNTY_SEL_SPRITES), SPRITE_RIGHT_PANEL, 320, 20);
 }
 
@@ -322,7 +322,7 @@ void CNTY_SEL_tickRightPanel(PanelTask *task) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        task->scaleY = 0x1000;
+        task->scaleY = ONE;
         task->scaleX = 0;
         task->phase = 0;
         break;
@@ -377,7 +377,7 @@ void CNTY_SEL_drawLeftPanel(PanelTask *task) {
     sprite.setTexture(0x280, 0);
     sprite.setAltClut(0, 0x1F0);
     sprite.setPivot(0, 158);
-    sprite.setScale(task->scaleX, task->scaleY, 0x1000);
+    sprite.setScale(task->scaleX, task->scaleY, ONE);
     sprite.draw(FILE_CACHE.getEntry(CNTY_SEL_SPRITES), SPRITE_LEFT_PANEL, 0, 158);
 }
 
@@ -388,7 +388,7 @@ void CNTY_SEL_tickLeftPanel(PanelTask *task) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        task->scaleY = 0x1000;
+        task->scaleY = ONE;
         task->scaleX = 0;
         task->phase = 0;
         break;

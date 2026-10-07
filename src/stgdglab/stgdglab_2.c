@@ -9,7 +9,7 @@ void STGDGLAB_createEntryPanelWindows(LabEntryPanel *panel, LabEntryPanelWindows
     for (i = 0; i < 10; i++) {
         windows->entries[i] = createTextWindow(panel->layer, 1, (i % 2) * 0x85 + 0x27, (i / 2) * 0xE + 0x16);
     }
-    windows->unk28 = createTextWindow(panel->layer, 1, 0x5B, 0x6A);
+    windows->digimonName = createTextWindow(panel->layer, 1, 0x5B, 0x6A);
     windows->unk2C = createTextWindow(panel->layer, 1, 0xF5, 0x6A);
     windows->values[13] = createTextWindow(panel->layer, 1, 0x12D, 0x6A);
     for (i = 0; i < 6; i++) {
@@ -71,7 +71,7 @@ void STGDGLAB_showEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windows
             GAME.funcs.getPartnerEntry(panel->partner, id, &entry);
             GAME.funcs.computeStats(panel->partner, &totals);
             data = GET_DIGIMON(id);
-            windows->unk28->setString(windows->unk28, FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), data->nameId);
+            windows->digimonName->setString(windows->digimonName, FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), data->nameId);
             windows->unk2C->setString(windows->unk2C, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x13);
             windows->values[13]->setNumber(windows->values[13], 0, entry.level);
             stats = totals.stats;
@@ -105,7 +105,7 @@ void STGDGLAB_showEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windows
                                                   entry.skills[i] & SKILL_ID);
                     if (entry.skills[i] & SKILL_LAST) {
                         windows->skills[i]->setPalette(windows->skills[i], 3);
-                    } else if (entry.skills[i] & 0x4000) {
+                    } else if (entry.skills[i] & SKILL_MARKED) {
                         windows->skills[i]->setPalette(windows->skills[i], 4);
                     } else {
                         windows->skills[i]->setPalette(windows->skills[i], 0);
@@ -348,34 +348,34 @@ void STGDGLAB_updateEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windo
         case 3:
             if (STGDGLAB_data.funcs.updateFade(&panel->fades[1])) {
                 STGDGLAB_showEntryPanelOptions(panel, windows, 1);
-                panel->unkFC = 0;
+                panel->option = 0;
                 windows->optionCursor->setPos(windows->optionCursor, 0x9A, 0x83);
                 windows->optionCursor->setVisible(windows->optionCursor, 1);
                 panel->substate++;
             }
             break;
         case 4:
-            old = panel->unkFC;
+            old = panel->option;
             if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-                panel->unkFC--;
-                if (panel->unkFC < 0) {
-                    panel->unkFC = 0;
+                panel->option--;
+                if (panel->option < 0) {
+                    panel->option = 0;
                 }
             } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-                panel->unkFC++;
-                if (panel->unkFC >= 4) {
-                    panel->unkFC = 3;
+                panel->option++;
+                if (panel->option >= 4) {
+                    panel->option = 3;
                 }
             }
-            if (old != panel->unkFC) {
+            if (old != panel->option) {
                 SOUND.playSound(SOUND_CURSOR);
-                windows->optionCursor->setPos(windows->optionCursor, 0x9A, panel->unkFC * 0xE + 0x83);
+                windows->optionCursor->setPos(windows->optionCursor, 0x9A, panel->option * 0xE + 0x83);
             }
             partner = &GAME.partners[panel->partner];
             if (PAD_PRESSED(PAD_CROSS)) {
                 SOUND.playSound(SOUND_SELECT);
-                if (panel->unkFC < 3) {
-                    partner->battleDigivolve = panel->slots[panel->unkFC];
+                if (panel->option < 3) {
+                    partner->battleDigivolve = panel->slots[panel->option];
                 } else {
                     partner->battleDigivolve = 0;
                 }
@@ -402,8 +402,8 @@ void STGDGLAB_updateEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windo
         initSpriteDrawer(&sprite);
         sprite.setLayerId(panel->layer, panel->depth);
         sprite.setTexture(0x280, 0x100);
-        if (panel->fades[0].level != 0x1000) {
-            sprite.setScale(panel->fades[0].level, 0x1000, 0x1000);
+        if (panel->fades[0].level != ONE) {
+            sprite.setScale(panel->fades[0].level, ONE, ONE);
             sprite.setPivot(0x140, 0x37);
         } else {
             for (j = 0; j < 10; j++) {
@@ -417,7 +417,7 @@ void STGDGLAB_updateEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windo
             panel->blinkTime = GFX.funcs.getTime();
             panel->blink = 1 - panel->blink;
         }
-        if (panel->fades[0].level == 0x1000 && panel->blink) {
+        if (panel->fades[0].level == ONE && panel->blink) {
             if (panel->scroll > 0) {
                 sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x34, 0x123, 0x13);
             }
@@ -442,12 +442,12 @@ void STGDGLAB_updateEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windo
             initSpriteDrawer(&sprite);
             sprite.setLayerId(panel->layer, panel->depth - 2);
             sprite.setTexture(0x280, 0x100);
-            if (panel->fades[1].level != 0x1000) {
-                sprite.setScale(panel->fades[1].level, 0x1000, 0x1000);
+            if (panel->fades[1].level != ONE) {
+                sprite.setScale(panel->fades[1].level, ONE, ONE);
                 sprite.setPivot(0x140, 0x9D);
             }
             sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x2C, 0x95, 0x7C);
-            if (panel->fades[1].level != 0x1000) {
+            if (panel->fades[1].level != ONE) {
                 sprite.setPivot(0, 0xD0);
             }
             sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x2B, 0, 0xBF);

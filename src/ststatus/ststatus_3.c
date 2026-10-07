@@ -153,8 +153,8 @@ void STSTATUS_drawEquipPanel(EquipPanel *panel) {
         sprite.setTexture(0x140, 0);
         sprite.setLayerId(panel->layer, 6);
         level = panel->panels[0].level;
-        if (level != 0x1000) {
-            sprite.setScale(level, 0x1000, 0x1000);
+        if (level != ONE) {
+            sprite.setScale(level, ONE, ONE);
             sprite.setPivot(0x140, 0x19);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x18, 0x22, 0xD);
@@ -162,11 +162,11 @@ void STSTATUS_drawEquipPanel(EquipPanel *panel) {
     sprite.setLayerId(panel->layer, panel->depth);
     level = panel->panels[1].level;
     if (level != 0) {
-        if (level != 0x1000) {
-            sprite.setScale(level, 0x1000, 0x1000);
+        if (level != ONE) {
+            sprite.setScale(level, ONE, ONE);
             sprite.setPivot(0x140, 0x58);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
             sprite.setTexture(0x140, 0);
             for (i = 0; i < 6; i++) {
                 item = stats->equip[i];
@@ -180,11 +180,11 @@ void STSTATUS_drawEquipPanel(EquipPanel *panel) {
     }
     level = panel->panels[2].level;
     if (level != 0) {
-        if (level != 0x1000) {
-            sprite.setScale(level, 0x1000, 0x1000);
+        if (level != ONE) {
+            sprite.setScale(level, ONE, ONE);
             sprite.setPivot(0x140, 0x89);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
             for (i = 0; i < 8; i++) {
                 index = panel->scroll + i;
                 if (index < panel->count) {
@@ -217,18 +217,18 @@ void STSTATUS_drawEquipPanel(EquipPanel *panel) {
         }
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x2B, 0x77, 0x39);
-        if (panel->panels[2].level != 0x1000) {
+        if (panel->panels[2].level != ONE) {
             sprite.setPivot(0, 0xD3);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x20, 0, 0xC2);
     }
     level = panel->panels[3].level;
     if (level != 0) {
-        if (level != 0x1000) {
-            sprite.setScale(level, 0x1000, 0x1000);
+        if (level != ONE) {
+            sprite.setScale(level, ONE, ONE);
             sprite.setPivot(0x140, 0x20);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
             if (panel->showSlot) {
                 item = *(stats->equip + panel->slot); /* the match depends on this form */
                 if (item > 0) {

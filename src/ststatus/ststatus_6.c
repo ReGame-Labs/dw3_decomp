@@ -3,10 +3,6 @@
 
 #include "ststatus.h"
 
-void STSTATUS_createItemWindows(ItemScreen *screen, ItemScreenWindows *windows);
-void STSTATUS_drawItemScreen(ItemScreen *screen);
-void STSTATUS_runItemScreen(ItemScreen *screen, ItemScreenWindows *windows);
-
 /* Creates the first screen's windows */
 void STSTATUS_createItemWindows(ItemScreen *screen, ItemScreenWindows *windows) {
     WindowPos *pos;
@@ -265,11 +261,11 @@ void STSTATUS_drawItemScreen(ItemScreen *screen) {
     }
     for (i = 0; i < screen->count; i++) {
         if (screen->pageFades[i].level != 0) {
-            if (screen->pageFades[i].level != 0x1000) {
-                sprite.setScale(screen->pageFades[i].level, screen->pageFades[i].level, 0x1000);
+            if (screen->pageFades[i].level != ONE) {
+                sprite.setScale(screen->pageFades[i].level, screen->pageFades[i].level, ONE);
                 sprite.setPivot(0x7C, i * 0x2E + 0x27);
             } else {
-                sprite.setScale(0x1000, 0x1000, 0x1000);
+                sprite.setScale(ONE, ONE, ONE);
             }
             id = GAME.funcs.getPartyMember(i);
             sprite.setTexture(0x280, 0x100);
@@ -282,18 +278,18 @@ void STSTATUS_drawItemScreen(ItemScreen *screen) {
     for (i = 0; i < screen->count; i++) {
         if (screen->pageFades[i].level != 0) {
             /* both branches draw the frame's last part: the match depends on it */
-            if (screen->pageFades[i].level != 0x1000) {
-                sprite.setScale(screen->pageFades[i].level, 0x1000, 0x1000);
+            if (screen->pageFades[i].level != ONE) {
+                sprite.setScale(screen->pageFades[i].level, ONE, ONE);
                 sprite.setPivot(0, i * 0x2E + 0x25);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 0x2E + 0x11);
-                sprite.setScale(screen->pageFades[i].level, screen->pageFades[i].level, 0x1000);
+                sprite.setScale(screen->pageFades[i].level, screen->pageFades[i].level, ONE);
                 sprite.setPivot(0x7C, i * 0x2E + 0x27);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x16, 0x67, i * 0x2E + 0x13);
-                sprite.setScale(screen->pageFades[i].level, 0x1000, 0x1000);
+                sprite.setScale(screen->pageFades[i].level, ONE, ONE);
                 sprite.setPivot(0, i * 0x2E + 0x25);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 0x2E + 0x11);
             } else {
-                sprite.setScale(0x1000, 0x1000, 0x1000);
+                sprite.setScale(ONE, ONE, ONE);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 0x2E + 0x11);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x16, 0x67, i * 0x2E + 0x13);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 0x2E + 0x11);
@@ -301,29 +297,29 @@ void STSTATUS_drawItemScreen(ItemScreen *screen) {
         }
     }
     if (screen->fades[0].level != 0) {
-        if (screen->fades[0].level != 0x1000) {
-            sprite.setScale(screen->fades[0].level, 0x1000, 0x1000);
+        if (screen->fades[0].level != ONE) {
+            sprite.setScale(screen->fades[0].level, ONE, ONE);
             sprite.setPivot(0x140, 0x19);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x18, 0x22, 0xD);
     }
     if (screen->fades2[0].level != 0) {
-        if (screen->fades2[0].level != 0x1000) {
-            sprite.setScale(screen->fades2[0].level, 0x1000, 0x1000);
+        if (screen->fades2[0].level != ONE) {
+            sprite.setScale(screen->fades2[0].level, ONE, ONE);
             sprite.setPivot(0x140, 0x52);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x1C, 0xA8, 0x28);
     }
     if (screen->fades2[1].level != 0) {
-        if (screen->fades2[1].level != 0x1000) {
-            sprite.setScale(screen->fades2[1].level, 0x1000, 0x1000);
+        if (screen->fades2[1].level != ONE) {
+            sprite.setScale(screen->fades2[1].level, ONE, ONE);
             sprite.setPivot(0, 0xA8);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x1A, 0, 0x9E);
     }
@@ -341,21 +337,21 @@ void STSTATUS_drawItemScreen(ItemScreen *screen) {
             sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0xA, 0x123, 0xD6);
             sprite.setClutRow(0);
         }
-        if (screen->fades[1].level != 0x1000) {
-            sprite.setScale(screen->fades[1].level, 0x1000, 0x1000);
+        if (screen->fades[1].level != ONE) {
+            sprite.setScale(screen->fades[1].level, ONE, ONE);
             sprite.setPivot(0, 0xD3);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x20, 0, 0xC2);
     }
     if (screen->fade.level != 0) {
-        if (screen->fade.level != 0x1000) {
-            sprite.setScale(screen->fade.level, 0x1000, 0x1000);
+        if (screen->fade.level != ONE) {
+            sprite.setScale(screen->fade.level, ONE, ONE);
             sprite.setPivot(0x140, 0xB2);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
             sprite.setTexture(0x140, 0);
             sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS->getCategory(screen->item), 0x16, 0xAE);
         }
@@ -370,7 +366,7 @@ void STSTATUS_drawItemScreen(ItemScreen *screen) {
                 screen->cursorFrame = 0;
             }
         }
-        sprite.setScale(0x1000, 0x1000, 0x1000);
+        sprite.setScale(ONE, ONE, ONE);
         sprite.setLayerId(screen->layer, screen->depth - 1);
         sprite.setClutRow(screen->cursorFrame);
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x1E, 0, screen->member * 0x2E + 0x11);

@@ -69,8 +69,8 @@ Point16 STDWTITL_background7Positions[] = {
 s32 STDWTITL_spriteBank = 0;
 
 TitleFuncs STDWTITL_titleFuncs = {
-    STDWTITL_loadTitleImages, STDWTITL_startFade, STDWTITL_stepFade,
-    STDWTITL_startTween, STDWTITL_stepTween,
+    STDWTITL_loadTitleImages, STDWTITL_startFade, STDWTITL_updateFade,
+    STDWTITL_startLerp, STDWTITL_updateLerp,
 };
 
 /* The title's TIM archives and sprite banks; the European version picks one
@@ -509,65 +509,7 @@ void STDWTITL_loadTitleImages(void) {
     loader.loadArchive(FILE_CACHE.getEntry(STDWTITL_BACKGROUND(7)));
 }
 
-void STDWTITL_startFade(Fade *fade, s32 fadeIn) {
-    fade->active = 1;
-    if (fadeIn) {
-        SOUND.playSound(SOUND_MENU_OPEN);
-        fade->step = 0x1000 / fade->duration;
-        fade->level = 0;
-    } else {
-        SOUND.playSound(SOUND_MENU_CLOSE);
-        fade->level = 0x1000;
-        fade->step = -(0x1000 / fade->duration * 2);
-    }
-}
-
-s32 STDWTITL_stepFade(Fade *fade) {
-    if (!fade->active) {
-        return 1;
-    }
-    fade->level += fade->step;
-    if (fade->step > 0) {
-        if (fade->level > 0x1000) {
-            fade->level = 0x1000;
-            fade->active = 0;
-            return 1;
-        }
-    } else if (fade->level < 0) {
-        fade->level = 0;
-        fade->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void STDWTITL_startTween(Tween *tween, s32 from, s32 to, s32 duration) {
-    if (from != to) {
-        tween->duration = duration;
-        tween->fixed = from << 8;
-        tween->value = from;
-        tween->target = to;
-        tween->active = 1;
-        tween->step = ((to - from) << 8) / tween->duration;
-    }
-}
-
-s32 STDWTITL_stepTween(Tween *tween) {
-    if (!tween->active) {
-        return 1;
-    }
-    tween->fixed += tween->step;
-    tween->value = tween->fixed >> 8;
-    if (tween->step > 0) {
-        if (tween->target < tween->value) {
-            tween->value = tween->target;
-            tween->active = 0;
-            return 1;
-        }
-    } else if (tween->value < tween->target) {
-        tween->value = tween->target;
-        tween->active = 0;
-        return 1;
-    }
-    return 0;
-}
+#include "../menu_common/start_fade.inc.c"
+#include "../menu_common/update_fade.inc.c"
+#include "../menu_common/start_lerp.inc.c"
+#include "../menu_common/update_lerp.inc.c"

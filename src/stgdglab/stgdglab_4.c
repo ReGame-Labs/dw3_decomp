@@ -27,7 +27,7 @@ void STGDGLAB_closeMenu(LabMenu *menu) {
         windows->name->setVisible(windows->name, 0);
     }
     for (i = 4; i >= 0; i--) {
-        menu->unkFC[i] = 0;
+        menu->frames[i] = 0;
     }
 }
 
@@ -73,16 +73,16 @@ void STGDGLAB_showMenuPage(LabMenu *menu, LabMenuWindows *windows) {
     }
     if (member < 0) {
         windows->name->setString(windows->name, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x1B);
-        if (windows->unk40 != NULL) {
-            windows->unk40->setPalette(windows->unk40, 7);
+        if (windows->entriesHint != NULL) {
+            windows->entriesHint->setPalette(windows->entriesHint, 7);
         }
     } else {
         windows->name->setString(windows->name, GAME.funcs.getPartnerStats(member)->name, -1);
-        if (windows->unk40 != NULL) {
-            windows->unk40->setPalette(windows->unk40, 0);
+        if (windows->entriesHint != NULL) {
+            windows->entriesHint->setPalette(windows->entriesHint, 0);
         }
     }
-    menu->unkFC[3] = 0;
+    menu->frames[3] = 0;
 }
 
 /* The main menu's states: fades its panels in, picks one of the three
@@ -196,9 +196,9 @@ void STGDGLAB_runMenu(LabMenu *menu, LabMenuWindows *windows) {
                     STGDGLAB_data.funcs.startFade(&menu->panels[3], 1);
                     menu->lab->member = 0;
                     if (menu->choice == 0) {
-                        menu->unk110 = menu->lab->unk5C;
+                        menu->memberCount = menu->lab->partySize;
                     } else {
-                        menu->unk110 = menu->lab->partyCount;
+                        menu->memberCount = menu->lab->partyCount;
                     }
                 } else {
                     menu->setState(menu, TASK_KILL);
@@ -231,11 +231,11 @@ void STGDGLAB_runMenu(LabMenu *menu, LabMenuWindows *windows) {
         break;
     case 12:
         if (menu->choice == 0 && STGDGLAB_data.funcs.updateFade(&menu->panels[8])) {
-            if (windows->unk40 == NULL) {
-                windows->unk40 = createTextWindow(menu->layer, 1, 0xF, 0x55);
-                windows->unk40->setDepth(windows->unk40, menu->depth - 1);
+            if (windows->entriesHint == NULL) {
+                windows->entriesHint = createTextWindow(menu->layer, 1, 0xF, 0x55);
+                windows->entriesHint->setDepth(windows->entriesHint, menu->depth - 1);
             }
-            windows->unk40->setString(windows->unk40, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x14);
+            windows->entriesHint->setString(windows->entriesHint, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x14);
         }
         STGDGLAB_data.funcs.updateFade(&menu->panels[5]);
         if (STGDGLAB_data.funcs.updateFade(&menu->panels[6])) {
@@ -256,10 +256,10 @@ void STGDGLAB_runMenu(LabMenu *menu, LabMenuWindows *windows) {
         old = menu->lab->member;
         if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
             if (--menu->lab->member < 0) {
-                menu->lab->member = menu->unk110 - 1;
+                menu->lab->member = menu->memberCount - 1;
             }
         } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-            if (++menu->lab->member > menu->unk110 - 1) {
+            if (++menu->lab->member > menu->memberCount - 1) {
                 menu->lab->member = 0;
             }
         }
@@ -313,8 +313,8 @@ void STGDGLAB_runMenu(LabMenu *menu, LabMenuWindows *windows) {
             if (windows->label != NULL) {
                 windows->label->setVisible(windows->label, 0);
             }
-            if (windows->unk40 != NULL) {
-                windows->unk40->setVisible(windows->unk40, 0);
+            if (windows->entriesHint != NULL) {
+                windows->entriesHint->setVisible(windows->entriesHint, 0);
             }
             menu->substate++;
         }
@@ -372,92 +372,92 @@ void STGDGLAB_drawMenu(LabMenu *menu, void *children) {
         sprite.setTexture(0x280, 0x100);
         sprite.setLayerId(menu->layer, menu->depth);
         if (menu->panels[0].level != 0) {
-            if (menu->panels[0].level != 0x1000) {
-                sprite.setScale(menu->panels[0].level, 0x1000, 0x1000);
+            if (menu->panels[0].level != ONE) {
+                sprite.setScale(menu->panels[0].level, ONE, ONE);
                 sprite.setPivot(0x140, 0x15);
             }
             sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x20, 0x92, 0xF);
         }
         if (menu->panels[1].level != 0) {
-            if (menu->panels[1].level != 0x1000) {
-                sprite.setScale(menu->panels[1].level, 0x1000, 0x1000);
+            if (menu->panels[1].level != ONE) {
+                sprite.setScale(menu->panels[1].level, ONE, ONE);
                 sprite.setPivot(0x140, 0x45);
             } else {
-                sprite.setScale(0x1000, 0x1000, 0x1000);
+                sprite.setScale(ONE, ONE, ONE);
             }
             sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x21, 0x92, 0x2A);
         }
         if (menu->panels[2].level != 0) {
-            if (menu->panels[2].level != 0x1000) {
-                sprite.setScale(menu->panels[2].level, 0x1000, 0x1000);
+            if (menu->panels[2].level != ONE) {
+                sprite.setScale(menu->panels[2].level, ONE, ONE);
                 sprite.setPivot(0x140, 0xD2);
             } else {
-                sprite.setScale(0x1000, 0x1000, 0x1000);
+                sprite.setScale(ONE, ONE, ONE);
             }
             sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x24, 0xC6, 0xC4);
         }
         return;
     }
     member = GAME.funcs.getPartyPartner(menu->lab->member);
-    if (GFX.funcs.getTime() - menu->unkF4 >= 12) {
-        menu->unkF4 = GFX.funcs.getTime();
+    if (GFX.funcs.getTime() - menu->animTime >= 12) {
+        menu->animTime = GFX.funcs.getTime();
         if (member >= 0) {
             anim = &STGDGLAB_data.anim[member];
-            menu->unkFC[3]++;
-            if (anim->frames[menu->unkFC[3]] == -1 || menu->unkFC[3] >= 7) {
-                menu->unkFC[3] = 0;
+            menu->frames[3]++;
+            if (anim->frames[menu->frames[3]] == -1 || menu->frames[3] >= 7) {
+                menu->frames[3] = 0;
             }
         }
-        for (i = 0; i < menu->lab->unk5C; i++) {
+        for (i = 0; i < menu->lab->partySize; i++) {
             id = GAME.funcs.getPartyPartner(i);
             if (id >= 0) {
                 anim = &STGDGLAB_data.anim[id];
-                menu->unkFC[i]++;
-                if (anim->frames[menu->unkFC[i]] == -1) {
-                    menu->unkFC[i] = 0;
+                menu->frames[i]++;
+                if (anim->frames[menu->frames[i]] == -1) {
+                    menu->frames[i] = 0;
                 }
             }
         }
     }
-    if (GFX.funcs.getTime() - menu->unkF8 >= 10) {
-        menu->unkF8 = GFX.funcs.getTime();
-        menu->unkFC[4]++;
-        if (menu->unkFC[4] >= 4) {
-            menu->unkFC[4] = 0;
+    if (GFX.funcs.getTime() - menu->blinkTime >= 10) {
+        menu->blinkTime = GFX.funcs.getTime();
+        menu->frames[4]++;
+        if (menu->frames[4] >= 4) {
+            menu->frames[4] = 0;
         }
     }
     sprite.setTexture(0x280, 0x100);
     sprite.setLayerId(menu->layer, menu->depth);
     if (menu->panels[7].level != 0) {
-        if (menu->panels[7].level != 0x1000) {
-            sprite.setScale(menu->panels[7].level, 0x1000, 0x1000);
+        if (menu->panels[7].level != ONE) {
+            sprite.setScale(menu->panels[7].level, ONE, ONE);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
             sprite.setTexture(0x140, 0);
             sprite.setLayerId(menu->layer, menu->depth - 1);
-            sprite.setClutRow(menu->unkFC[4]);
+            sprite.setClutRow(menu->frames[4]);
             sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0xD, menu->lab->member * 0x30 + 0xA5, 0x65);
             sprite.setLayerId(menu->layer, menu->depth);
             sprite.setClutRow(0);
         }
         sprite.setTexture(0x280, 0x100);
-        for (i = 0; i < menu->lab->unk5C; i++) {
+        for (i = 0; i < menu->lab->partySize; i++) {
             id = GAME.funcs.getPartyPartner(i);
             if (id >= 0) {
-                if (menu->panels[7].level != 0x1000) {
+                if (menu->panels[7].level != ONE) {
                     sprite.setPivot(i * 0x30 + 0xB4, 0x8A);
                 }
                 anim = &STGDGLAB_data.anim[id];
-                sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), anim->frames[menu->unkFC[i]], i * 0x30 + 0xA5, 0x81);
+                sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), anim->frames[menu->frames[i]], i * 0x30 + 0xA5, 0x81);
             }
         }
     }
     if (menu->panels[6].level != 0) {
-        if (menu->panels[6].level != 0x1000) {
-            sprite.setScale(menu->panels[6].level, 0x1000, 0x1000);
+        if (menu->panels[6].level != ONE) {
+            sprite.setScale(menu->panels[6].level, ONE, ONE);
             sprite.setPivot(0x140, 0x8A);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.setTexture(0x140, 0);
         sprite.setLayerId(menu->layer, menu->depth - 1);
@@ -469,15 +469,15 @@ void STGDGLAB_drawMenu(LabMenu *menu, void *children) {
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x27, 0x90, 0x5F);
     }
     if (menu->panels[3].level != 0) {
-        if (menu->panels[3].level != 0x1000) {
-            sprite.setScale(menu->panels[3].level, 0x1000, 0x1000);
+        if (menu->panels[3].level != ONE) {
+            sprite.setScale(menu->panels[3].level, ONE, ONE);
             sprite.setPivot(0, 0x2F);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         if (member >= 0) {
             anim = &STGDGLAB_data.anim[member];
-            sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), anim->frames[menu->unkFC[3]], 0x10, 0x16);
+            sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), anim->frames[menu->frames[3]], 0x10, 0x16);
         }
         sprite.setTexture(0x140, 0);
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0xE, 0, 0x13);
@@ -486,29 +486,29 @@ void STGDGLAB_drawMenu(LabMenu *menu, void *children) {
     }
     sprite.setTexture(0x280, 0x100);
     if (menu->panels[4].level != 0) {
-        if (menu->panels[4].level != 0x1000) {
-            sprite.setScale(menu->panels[4].level, 0x1000, 0x1000);
+        if (menu->panels[4].level != ONE) {
+            sprite.setScale(menu->panels[4].level, ONE, ONE);
             sprite.setPivot(0x140, 0x1D);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x25, 0x8F, 0xF);
     }
     if (menu->panels[5].level != 0) {
-        if (menu->panels[5].level != 0x1000) {
-            sprite.setScale(menu->panels[5].level, 0x1000, 0x1000);
+        if (menu->panels[5].level != ONE) {
+            sprite.setScale(menu->panels[5].level, ONE, ONE);
             sprite.setPivot(0x140, 0x4E);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x20, 0x92, 0x43);
     }
     if (menu->panels[8].level != 0) {
-        if (menu->panels[8].level != 0x1000) {
-            sprite.setScale(menu->panels[8].level, 0x1000, 0x1000);
+        if (menu->panels[8].level != ONE) {
+            sprite.setScale(menu->panels[8].level, ONE, ONE);
             sprite.setPivot(0, 0x5A);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x26, 0, 0x4D);
     }
@@ -558,94 +558,13 @@ LabMenu *STGDGLAB_createMenu(Lab *lab) {
     return menu;
 }
 
-void STGDGLAB_setScrollBarX(ScrollBar *bar, s32 x, s32 width) {
-    bar->x = x;
-    bar->width = width;
-}
-
-void STGDGLAB_setScrollBarRange(ScrollBar *bar, s32 top, s32 bottom) {
-    bar->top = top;
-    bar->bottom = bottom;
-    bar->hasRange = 1;
-}
-
-void STGDGLAB_setScrollBarCount(ScrollBar *bar, s32 pageSize, s32 count) {
-    bar->pageSize = pageSize;
-    bar->count = count;
-    bar->hasCount = 1;
-}
-
-void STGDGLAB_setScrollBarPos(ScrollBar *bar, s32 pos) {
-    bar->pos = pos;
-}
-
-void STGDGLAB_updateScrollBar(ScrollBar *bar) {
-    Layer *layer;
-    u_long *ot;
-    POLY_F4 *poly;
-    s32 range;
-#if VERSION_US
-    s32 pages;
-#endif
-
-    switch (bar->state) {
-    case TASK_INIT:
-    default:
-        if (bar->hasRange != 0 && bar->hasCount != 0) {
-#if VERSION_US
-            bar->nextState(bar);
-            pages = bar->count / bar->pageSize + (bar->count % bar->pageSize != 0);
-            range = (bar->bottom - bar->top) << 8;
-            bar->size = range / pages;
-            bar->posStep = range / bar->count;
-#elif VERSION_EU
-            /* the European version sizes the thumb for the visible items */
-            range = (bar->bottom - bar->top) << 8;
-            bar->size = range / bar->count * bar->pageSize;
-            bar->posStep = range / bar->count;
-            bar->nextState(bar);
-#endif
-        }
-        break;
-    case TASK_RUN:
-        layer = GFX.funcs.getLayer(bar->layer);
-        ot = (u_long *)layer->getOtEntry(layer, bar->depth);
-        poly = GFX.funcs.getPrim();
-        if (bar->pos < bar->count - 1) {
-            bar->y = bar->top + ((bar->pos * bar->posStep) >> 8);
-            if (bar->bottom - (bar->size >> 8) < bar->y) {
-                bar->y = bar->bottom - (bar->size >> 8);
-            }
-        } else {
-            bar->y = bar->bottom - (bar->size >> 8);
-        }
-        setlen(poly, 5);
-        poly->code = 0x28;
-        poly->r0 = poly->g0 = poly->b0 = 0xFF;
-        poly->x0 = poly->x2 = bar->x;
-        poly->x1 = poly->x3 = bar->x + bar->width;
-        poly->y0 = poly->y1 = bar->y;
-        poly->y2 = poly->y3 = bar->y + (bar->size >> 8);
-        addPrim(ot, poly);
-        GFX.funcs.setPrim(poly + 1);
-        break;
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
-
-ScrollBar *STGDGLAB_createScrollBar(void) {
-    ScrollBar *bar = createTask(STGDGLAB_updateScrollBar, sizeof(ScrollBar), 0);
-
-    bar->setX = STGDGLAB_setScrollBarX;
-    bar->setRange = STGDGLAB_setScrollBarRange;
-    bar->setCount = STGDGLAB_setScrollBarCount;
-    bar->setPos = STGDGLAB_setScrollBarPos;
-    bar->layer = 0x1000;
-    bar->depth = 0;
-    return bar;
-}
+#include "../menu_common/set_scroll_bar_x.inc.c"
+#include "../menu_common/set_scroll_bar_range.inc.c"
+#include "../menu_common/set_scroll_bar_count.inc.c"
+#include "../menu_common/set_scroll_bar_pos.inc.c"
+#include "../menu_common/update_scroll_bar.inc.c"
+#define SCROLL_BAR_DEPTH 0
+#include "../menu_common/create_scroll_bar.inc.c"
 
 void STGDGLAB_showPartyPage(LabPartyScreen *screen, LabPartyScreenWindows *windows) {
     PartnerTotals totals;
@@ -660,9 +579,9 @@ void STGDGLAB_showPartyPage(LabPartyScreen *screen, LabPartyScreenWindows *windo
             windows->labels[i]->setDepth(windows->labels[i], screen->depth - 1);
         }
         windows->labels[i]->setString(windows->labels[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), pos[0]);
-        windows->labels[i]->setPos(windows->labels[i], pos[1], pos[2] + screen->unk5C * 0x7A);
+        windows->labels[i]->setPos(windows->labels[i], pos[1], pos[2] + screen->pageRow * 0x7A);
     }
-    member = screen->partners[screen->unk60];
+    member = screen->partners[screen->pick];
     if (member >= 0) {
         GAME.funcs.computeStats(member, &totals);
     }
@@ -672,7 +591,7 @@ void STGDGLAB_showPartyPage(LabPartyScreen *screen, LabPartyScreenWindows *windo
             windows->values[i] = createTextWindow(screen->layer, 3, pos[1], pos[2]);
             windows->values[i]->setDepth(windows->values[i], screen->depth - 1);
         }
-        windows->values[i]->setPos(windows->values[i], pos[1], pos[2] + screen->unk5C * 0x7A);
+        windows->values[i]->setPos(windows->values[i], pos[1], pos[2] + screen->pageRow * 0x7A);
         if (member < 0) {
             if (i == 0) {
                 windows->values[0]->setString(windows->values[0], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x1C);
@@ -691,12 +610,12 @@ void STGDGLAB_showPartyPage(LabPartyScreen *screen, LabPartyScreenWindows *windo
     }
     if (member < 0) {
         windows->name->setString(windows->name, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x1B);
-        windows->unk30->setPalette(windows->unk30, 7);
+        windows->entriesHint->setPalette(windows->entriesHint, 7);
     } else {
         windows->name->setString(windows->name, GAME.funcs.getPartnerStats(member)->name, -1);
-        windows->unk30->setPalette(windows->unk30, 0);
+        windows->entriesHint->setPalette(windows->entriesHint, 0);
     }
-    windows->name->setPos(windows->name, pos[1], pos[2] + screen->unk5C * 0x7A);
+    windows->name->setPos(windows->name, pos[1], pos[2] + screen->pageRow * 0x7A);
     screen->frame = 0;
 }
 
@@ -720,7 +639,7 @@ void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children) {
     s32 id;
     s32 i;
 
-    member = screen->partners[screen->unk60];
+    member = screen->partners[screen->pick];
     if (GFX.funcs.getTime() - screen->animTime >= 12) {
         screen->animTime = GFX.funcs.getTime();
         if (member >= 0) {
@@ -730,7 +649,7 @@ void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children) {
                 screen->frame = 0;
             }
         }
-        for (i = 0; i < screen->lab->unk5C; i++) {
+        for (i = 0; i < screen->lab->partySize; i++) {
             id = GAME.funcs.getPartyPartner(i);
             if (id >= 0) {
                 screen->frames[i]++;
@@ -756,45 +675,45 @@ void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children) {
     sprite.setTexture(0x280, 0x100);
     sprite.setLayerId(screen->layer, screen->depth);
     if (screen->panels[0].level != 0) {
-        if (screen->panels[0].level != 0x1000) {
-            sprite.setScale(screen->panels[0].level, 0x1000, 0x1000);
-            sprite.setPivot(0, screen->unk5C * 0x7A + 0x2F);
+        if (screen->panels[0].level != ONE) {
+            sprite.setScale(screen->panels[0].level, ONE, ONE);
+            sprite.setPivot(0, screen->pageRow * 0x7A + 0x2F);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         if (member >= 0) {
             anim = &STGDGLAB_data.anim[member];
             sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), anim->frames[screen->frame], 0x10,
-                        screen->unk5C * 0x7A + 0x16);
+                        screen->pageRow * 0x7A + 0x16);
         }
         sprite.setTexture(0x140, 0);
-        sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0xE, 0, screen->unk5C * 0x7A + 0x13);
+        sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0xE, 0, screen->pageRow * 0x7A + 0x13);
         sprite.setTexture(0x280, 0x100);
-        sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x1E, 0, screen->unk5C * 0x7A + 0x13);
+        sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x1E, 0, screen->pageRow * 0x7A + 0x13);
     }
     if (screen->panels[1].level != 0) {
-        if (screen->panels[1].level != 0x1000) {
-            sprite.setScale(screen->panels[1].level, 0x1000, 0x1000);
+        if (screen->panels[1].level != ONE) {
+            sprite.setScale(screen->panels[1].level, ONE, ONE);
             sprite.setPivot(0, 0xD1);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x26, 0, 0xC4);
     }
     if (screen->panels[2].level != 0) {
-        if (screen->panels[2].level != 0x1000) {
-            sprite.setScale(screen->panels[2].level, 0x1000, 0x1000);
+        if (screen->panels[2].level != ONE) {
+            sprite.setScale(screen->panels[2].level, ONE, ONE);
             sprite.setPivot(0x140, 0x15);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x20, 0x92, 0xF);
     }
     if (screen->panels[4].level != 0) {
-        if (screen->panels[4].level != 0x1000) {
-            sprite.setScale(screen->panels[4].level, 0x1000, 0x1000);
+        if (screen->panels[4].level != ONE) {
+            sprite.setScale(screen->panels[4].level, ONE, ONE);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
             if (screen->count >= 2) {
                 sprite.setLayerId(screen->layer, screen->depth - 1);
                 sprite.setClutRow(screen->clut);
@@ -804,10 +723,10 @@ void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children) {
                 sprite.setClutRow(0);
             }
         }
-        for (i = 0; i < screen->lab->unk5C; i++) {
+        for (i = 0; i < screen->lab->partySize; i++) {
             id = GAME.funcs.getPartyPartner(i);
             if (id >= 0) {
-                if (screen->panels[4].level != 0x1000) {
+                if (screen->panels[4].level != ONE) {
                     sprite.setPivot(i * 0x30 + 0xB4, 0x4E);
                 }
                 anim = &STGDGLAB_data.anim[id];
@@ -815,7 +734,7 @@ void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children) {
             }
         }
         if (member >= 0) {
-            if (screen->panels[4].level != 0x1000) {
+            if (screen->panels[4].level != ONE) {
                 sprite.setPivot(0xE4, 0xB5);
             }
             anim = &STGDGLAB_data.anim[member];
@@ -823,11 +742,11 @@ void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children) {
         }
     }
     if (screen->panels[3].level != 0) {
-        if (screen->panels[3].level != 0x1000) {
-            sprite.setScale(screen->panels[3].level, 0x1000, 0x1000);
+        if (screen->panels[3].level != ONE) {
+            sprite.setScale(screen->panels[3].level, ONE, ONE);
             sprite.setPivot(0x140, 0x85);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.setTexture(0x280, 0x100);
         sprite.setLayerId(screen->layer, screen->depth - 1);
@@ -843,7 +762,7 @@ void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children) {
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0xC, 0xD5, 0x92);
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x2D, 0x90, 0x2A);
-        if (screen->panels[3].level != 0x1000) {
+        if (screen->panels[3].level != ONE) {
             sprite.setPivot(0x48, 0x69);
         }
         sprite.setClutRow(screen->clut2);
@@ -873,14 +792,14 @@ void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *wind
                 windows->title = createTextWindow(screen->layer, 1, 0xAE, 0x15);
             }
             windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x1D);
-            if (windows->unk30 == NULL) {
-                windows->unk30 = createTextWindow(screen->layer, 1, 0xF, 0xCC);
+            if (windows->entriesHint == NULL) {
+                windows->entriesHint = createTextWindow(screen->layer, 1, 0xF, 0xCC);
             }
-            windows->unk30->setString(windows->unk30, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x14);
+            windows->entriesHint->setString(windows->entriesHint, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x14);
             if (screen->count == 0) {
-                windows->unk30->setPalette(windows->unk30, 7);
+                windows->entriesHint->setPalette(windows->entriesHint, 7);
             } else {
-                windows->unk30->setPalette(windows->unk30, 0);
+                windows->entriesHint->setPalette(windows->entriesHint, 0);
             }
             screen->substate++;
         }
@@ -899,31 +818,31 @@ void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *wind
         }
         break;
     case 4:
-        old = screen->unk60;
+        old = screen->pick;
         if (screen->count >= 2) {
             if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-                screen->unk60--;
-                if (screen->unk60 < 0) {
-                    screen->unk60 = screen->count - 1;
+                screen->pick--;
+                if (screen->pick < 0) {
+                    screen->pick = screen->count - 1;
                 }
             } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-                screen->unk60++;
-                if (screen->unk60 > screen->count - 1) {
-                    screen->unk60 = 0;
+                screen->pick++;
+                if (screen->pick > screen->count - 1) {
+                    screen->pick = 0;
                 }
             }
         }
-        if (old != screen->unk60) {
+        if (old != screen->pick) {
             SOUND.playSound(SOUND_MENU_MOVE);
             STGDGLAB_showPartyPage(screen, windows);
         } else if (PAD_PRESSED(PAD_CIRCLE)) {
-            if (screen->partners[screen->unk60] >= 0) {
+            if (screen->partners[screen->pick] >= 0) {
                 screen->step = 2;
                 screen->substate++;
                 SOUND.playSound(SOUND_MENU_CONFIRM);
             }
         } else if (PAD_PRESSED(PAD_CROSS)) {
-            if (GAME.funcs.getPartyMember(screen->lab->member) >= 0 || screen->partners[screen->unk60] >= 0) {
+            if (GAME.funcs.getPartyMember(screen->lab->member) >= 0 || screen->partners[screen->pick] >= 0) {
                 screen->step = 1;
                 screen->substate++;
                 SOUND.playSound(SOUND_MENU_CONFIRM);
@@ -963,14 +882,14 @@ void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *wind
         break;
     case 8:
         if (screen->step == 1) {
-            GAME.party[screen->lab->member] = screen->partners[screen->unk60];
+            GAME.party[screen->lab->member] = screen->partners[screen->pick];
             screen->lab->packParty(screen->lab);
         }
         if (screen->step == 2) {
-            screen->unk5C = 0;
+            screen->pageRow = 0;
             STGDGLAB_data.funcs.startFade(&screen->panels[0], 1);
             if (windows->panel == NULL) {
-                windows->panel = STGDGLAB_createEntryList(screen->partners[screen->unk60], 1, 1);
+                windows->panel = STGDGLAB_createEntryList(screen->partners[screen->pick], 1, 1);
             }
             screen->substate++;
         } else {
@@ -996,7 +915,7 @@ void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *wind
                 screen->lab->openMenu(screen->lab);
                 screen->substate++;
             }
-            screen->unk5C = 1;
+            screen->pageRow = 1;
             screen->setSubstate(screen, 0);
         }
         break;
@@ -1019,7 +938,7 @@ void STGDGLAB_updatePartyScreen(LabPartyScreen *screen, void *children) {
         screen->panels[2].duration = 10;
         screen->panels[3].duration = 10;
         screen->panels[4].duration = 8;
-        screen->unk5C = 1;
+        screen->pageRow = 1;
         for (i = 0; i < 3; i++) {
             party[i] = GAME.funcs.getPartyPartner(i);
         }
@@ -1070,27 +989,27 @@ void STGDGLAB_createSkillPanelWindows(LabSkillPanel *panel, LabSkillPanelWindows
     s32 i;
     TextWindow **items;
 
-    windows->unk0 = createTextWindow(panel->layer, 1, 0x9A, 0x46);
-    windows->unk4 = createTextWindow(panel->layer, 1, 0x122, 0x46);
-    windows->unk8 = createTextWindow(panel->layer, 1, 0x121, 0x46);
+    windows->digimonName = createTextWindow(panel->layer, 1, 0x9A, 0x46);
+    windows->learnedLabel = createTextWindow(panel->layer, 1, 0x122, 0x46);
+    windows->learned = createTextWindow(panel->layer, 1, 0x121, 0x46);
     for (i = 0; i < 6; i++) {
         windows->left[i] = createTextWindow(panel->layer, 1, 0x6B, i * 0x11 + 0x58);
         windows->right[i] = createTextWindow(panel->layer, 1, 0xF1, i * 0x11 + 0x58);
     }
-    windows->unk3C = createTextWindow(panel->layer, 1, 0x9A, 0x1A);
-    windows->unk40 = createTextWindow(panel->layer, 1, 0xC3, 0x38);
-    windows->unk44 = createTextWindow(panel->layer, 1, 0xC3, 0x48);
+    windows->message = createTextWindow(panel->layer, 1, 0x9A, 0x1A);
+    windows->yes = createTextWindow(panel->layer, 1, 0xC3, 0x38);
+    windows->no = createTextWindow(panel->layer, 1, 0xC3, 0x48);
     windows->help = createTextWindow(panel->layer, 1, 0x14, 0xC3);
     windows->help->setLines(windows->help, 2);
-    windows->unk4C = createTextWindow(panel->layer, 1, 0x109, 0xD1);
-    windows->unk50 = createTextWindow(panel->layer, 1, 0x12C, 0xD1);
+    windows->mpLabel = createTextWindow(panel->layer, 1, 0x109, 0xD1);
+    windows->mp = createTextWindow(panel->layer, 1, 0x12C, 0xD1);
     for (i = 0, items = panel->children; i < panel->childCount - 2; i++, items++) {
         if (*items != NULL) {
             (*items)->setDepth(*items, panel->depth - 1);
         }
     }
-    windows->unk40->setDepth(windows->unk40, 0);
-    windows->unk44->setDepth(windows->unk44, 0);
+    windows->yes->setDepth(windows->yes, 0);
+    windows->no->setDepth(windows->no, 0);
     windows->optionCursor = createCursor(panel->layer, 0, 0xB8, 0x38);
     windows->optionCursor->setVisible(windows->optionCursor, 0);
     windows->cursor = createCursor(panel->layer, panel->depth - 1, 0x4C, 0x58);
@@ -1105,20 +1024,20 @@ void STGDGLAB_showSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windows
 
     if (show) {
         if (panel->entry.id >= 3) {
-            windows->unk0->setString(windows->unk0, FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)),
+            windows->digimonName->setString(windows->digimonName, FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)),
                                      GET_DIGIMON(panel->entry.id)->nameId);
             panel->learned = 0;
             for (i = 0; i < panel->skillCount; i++) {
                 skill = panel->entry.skills[i];
                 if (panel->entry.skills[i] != 0) {
                     windows->left[i]->setString(windows->left[i], FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), skill & SKILL_ID);
-                    if (skill & 0x4000) {
+                    if (skill & SKILL_MARKED) {
                         windows->right[i]->setString(windows->right[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x11);
                         panel->learned++;
                     } else {
                         windows->right[i]->setString(windows->right[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x12);
                     }
-                    if (skill & 0x4000) {
+                    if (skill & SKILL_MARKED) {
                         windows->left[i]->setPalette(windows->left[i], 4);
                         windows->right[i]->setPalette(windows->right[i], 4);
                     } else if (skill & SKILL_LAST) {
@@ -1136,19 +1055,19 @@ void STGDGLAB_showSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windows
                     windows->right[i]->setVisible(windows->right[i], 0);
                 }
             }
-            windows->unk4->setString(windows->unk4, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x10);
-            windows->unk8->setNumber(windows->unk8, 0, panel->learned);
-            windows->unk8->setRightAlign(windows->unk8, 1);
+            windows->learnedLabel->setString(windows->learnedLabel, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x10);
+            windows->learned->setNumber(windows->learned, 0, panel->learned);
+            windows->learned->setRightAlign(windows->learned, 1);
             id = panel->entry.skills[panel->cursor] & SKILL_ID;
             if (id != 0) {
                 windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_INFO)), id);
-                windows->unk4C->setString(windows->unk4C, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xE);
-                windows->unk50->setNumber(windows->unk50, 0, TECHS[id - 1].mp);
-                windows->unk50->setRightAlign(windows->unk50, 1);
+                windows->mpLabel->setString(windows->mpLabel, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xE);
+                windows->mp->setNumber(windows->mp, 0, TECHS[id - 1].mp);
+                windows->mp->setRightAlign(windows->mp, 1);
             } else {
                 windows->help->setVisible(windows->help, 0);
-                windows->unk4C->setVisible(windows->unk4C, 0);
-                windows->unk50->setVisible(windows->unk50, 0);
+                windows->mpLabel->setVisible(windows->mpLabel, 0);
+                windows->mp->setVisible(windows->mp, 0);
             }
         }
     } else {
@@ -1163,7 +1082,7 @@ void STGDGLAB_showSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windows
 /* The panel of a partner's Digimon's skills: up and down pick one, cross
    marks it to pass on or unmarks it, after a yes/no, or says why it can't be
    marked, and triangle saves the entry and closes the panel */
-void func_8008C234(LabSkillPanel *panel, LabSkillPanelWindows *windows) {
+void STGDGLAB_updateSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windows) {
     SpriteDrawer sprite;
     s32 skill;
     s32 id;
@@ -1194,7 +1113,7 @@ void func_8008C234(LabSkillPanel *panel, LabSkillPanelWindows *windows) {
         case 0:
             if (STGDGLAB_data.funcs.updateFade(&panel->fade)) {
                 STGDGLAB_showSkillPanel(panel, windows, 1);
-                windows->unk3C->setString(windows->unk3C, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x26);
+                windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x26);
                 windows->cursor->setPos(windows->cursor, 0x4C, panel->cursor * 0x11 + 0x58);
                 windows->cursor->setVisible(windows->cursor, 1);
                 windows->cursor->setPalette(windows->cursor, 0);
@@ -1224,17 +1143,17 @@ void func_8008C234(LabSkillPanel *panel, LabSkillPanelWindows *windows) {
                 if (PAD_PRESSED(PAD_CROSS)) {
                     SOUND.playSound(SOUND_SELECT);
                     if (skill != 0) {
-                        if (skill & 0x4000) {
+                        if (skill & SKILL_MARKED) {
                             panel->substate = 5;
                             panel->step = 10;
                         } else if (skill & SKILL_LAST) {
-                            windows->unk3C->setString(windows->unk3C, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xB);
+                            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xB);
                             panel->substate = 30;
                         } else if (!(skill & SKILL_KNOWN)) {
-                            windows->unk3C->setString(windows->unk3C, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xA);
+                            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xA);
                             panel->substate = 30;
                         } else if (panel->learned >= 3) {
-                            windows->unk3C->setString(windows->unk3C, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 9);
+                            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 9);
                             panel->substate = 30;
                         } else {
                             panel->substate = 5;
@@ -1269,9 +1188,9 @@ void func_8008C234(LabSkillPanel *panel, LabSkillPanelWindows *windows) {
             panel->substate = 6;
             break;
         case 10:
-            windows->unk3C->setString(windows->unk3C, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 7);
-            windows->unk40->setString(windows->unk40, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xC);
-            windows->unk44->setString(windows->unk44, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xD);
+            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 7);
+            windows->yes->setString(windows->yes, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xC);
+            windows->no->setString(windows->no, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xD);
             panel->choice = 0;
             windows->optionCursor->setVisible(windows->optionCursor, 1);
             windows->optionCursor->setPos(windows->optionCursor, 0xB8, panel->choice * 0x10 + 0x38);
@@ -1291,26 +1210,26 @@ void func_8008C234(LabSkillPanel *panel, LabSkillPanelWindows *windows) {
             if (PAD_PRESSED(PAD_CROSS)) {
                 SOUND.playSound(SOUND_SELECT);
                 if (panel->choice == 0) {
-                    panel->entry.skills[panel->cursor] &= ~0x4000;
+                    panel->entry.skills[panel->cursor] &= ~SKILL_MARKED;
                 }
-                windows->unk40->setVisible(windows->unk40, 0);
-                windows->unk44->setVisible(windows->unk44, 0);
+                windows->yes->setVisible(windows->yes, 0);
+                windows->no->setVisible(windows->no, 0);
                 windows->cursor->setStill(windows->cursor, 0);
                 panel->setSubstate(panel, 7);
                 panel->step = 0;
             } else if (PAD_PRESSED(PAD_TRIANGLE)) {
                 SOUND.playSound(SOUND_MENU_CANCEL);
-                windows->unk40->setVisible(windows->unk40, 0);
-                windows->unk44->setVisible(windows->unk44, 0);
+                windows->yes->setVisible(windows->yes, 0);
+                windows->no->setVisible(windows->no, 0);
                 windows->cursor->setStill(windows->cursor, 0);
                 panel->setSubstate(panel, 7);
                 panel->step = 0;
             }
             break;
         case 20:
-            windows->unk3C->setString(windows->unk3C, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 8);
-            windows->unk40->setString(windows->unk40, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xC);
-            windows->unk44->setString(windows->unk44, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xD);
+            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 8);
+            windows->yes->setString(windows->yes, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xC);
+            windows->no->setString(windows->no, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xD);
             panel->choice = 0;
             windows->optionCursor->setVisible(windows->optionCursor, 1);
             windows->optionCursor->setPos(windows->optionCursor, 0xB8, panel->choice * 0x10 + 0x38);
@@ -1330,17 +1249,17 @@ void func_8008C234(LabSkillPanel *panel, LabSkillPanelWindows *windows) {
             if (PAD_PRESSED(PAD_CROSS)) {
                 SOUND.playSound(SOUND_SELECT);
                 if (panel->choice == 0) {
-                    panel->entry.skills[panel->cursor] |= 0x4000;
+                    panel->entry.skills[panel->cursor] |= SKILL_MARKED;
                 }
-                windows->unk40->setVisible(windows->unk40, 0);
-                windows->unk44->setVisible(windows->unk44, 0);
+                windows->yes->setVisible(windows->yes, 0);
+                windows->no->setVisible(windows->no, 0);
                 windows->cursor->setStill(windows->cursor, 0);
                 panel->setSubstate(panel, 7);
                 panel->step = 0;
             } else if (PAD_PRESSED(PAD_TRIANGLE)) {
                 SOUND.playSound(SOUND_MENU_CANCEL);
-                windows->unk40->setVisible(windows->unk40, 0);
-                windows->unk44->setVisible(windows->unk44, 0);
+                windows->yes->setVisible(windows->yes, 0);
+                windows->no->setVisible(windows->no, 0);
                 windows->cursor->setStill(windows->cursor, 0);
                 panel->setSubstate(panel, 7);
                 panel->step = 0;
@@ -1362,8 +1281,8 @@ void func_8008C234(LabSkillPanel *panel, LabSkillPanelWindows *windows) {
         }
         initSpriteDrawer(&sprite);
         sprite.setLayerId(panel->layer, panel->depth);
-        if (panel->fade.level != 0x1000) {
-            sprite.setScale(panel->fade.level, 0x1000, 0x1000);
+        if (panel->fade.level != ONE) {
+            sprite.setScale(panel->fade.level, ONE, ONE);
             sprite.setPivot(0x140, 0x7D);
         } else {
             sprite.setTexture(0x140, 0);
@@ -1377,20 +1296,20 @@ void func_8008C234(LabSkillPanel *panel, LabSkillPanelWindows *windows) {
         }
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x28, 0x46, 0x41);
-        if (panel->fade.level != 0x1000) {
+        if (panel->fade.level != ONE) {
             sprite.setPivot(0, 0xD0);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x2B, 0, 0xBF);
-        if (panel->fade.level != 0x1000) {
+        if (panel->fade.level != ONE) {
             sprite.setPivot(0x140, 0x1F);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x24, 0x92, 0x13);
         if (panel->confirm.level != 0) {
-            if (panel->confirm.level != 0x1000) {
-                sprite.setScale(panel->confirm.level, 0x1000, 0x1000);
+            if (panel->confirm.level != ONE) {
+                sprite.setScale(panel->confirm.level, ONE, ONE);
                 sprite.setPivot(0x140, 0x46);
             } else {
-                sprite.setScale(0x1000, 0x1000, 0x1000);
+                sprite.setScale(ONE, ONE, ONE);
             }
             sprite.setLayerId(panel->layer, 1);
             sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x23, 0xAE, 0x32);
@@ -1403,7 +1322,7 @@ void func_8008C234(LabSkillPanel *panel, LabSkillPanelWindows *windows) {
 }
 
 LabSkillPanel *STGDGLAB_createSkillPanel(s32 member, s32 slot) {
-    LabSkillPanel *panel = createTask(func_8008C234, sizeof(LabSkillPanel), 0x5C);
+    LabSkillPanel *panel = createTask(STGDGLAB_updateSkillPanel, sizeof(LabSkillPanel), 0x5C);
 
     panel->layer = 0x1000;
     panel->depth = 2;

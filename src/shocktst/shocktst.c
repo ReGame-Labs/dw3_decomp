@@ -1,15 +1,5 @@
 #include "shocktst.h"
 
-/* The kernel's file functions (sim: opens the file on the PC) */
-long func_80024CB8(char *name, long mode);
-long func_80024CC8(long fd, void *buf, long n);
-long write(long fd, void *buf, long n);
-long func_80024CE8(long fd);
-int atoi(u8 *s);
-int strcspn(u8 *s, char *reject);
-
-extern const char SHOCKTST_STR_START_BACK[];
-
 ShockTestRow SHOCKTST_menuRows[4] = {
     {{1, 0}, {1, 0, 0, 0}},
     {{1, 1}, {2, 3, 6, 7}},
@@ -23,10 +13,6 @@ char SHOCKTST_numberFormats[3][0x40] = {
     "\xC7\xDE\xE8\xD2\x01\x07\x02\x05\x01",
     "\x65\x89\x56\x01\x07\x02\x05\x01",
 };
-
-Task *SHOCKTST_createLoader(void);
-s32 SHOCKTST_playAllPatterns(ShockTest *task, ShockTestWindows *win);
-void SHOCKTST_convertText(ShockLoader *task);
 
 void SHOCKTST_updateScene(Task *task, Task **items) {
     RECT rect;
@@ -106,8 +92,6 @@ void SHOCKTST_highlight(ShockTest *task, ShockTestWindows *win, s32 highlight) {
         break;
     }
 }
-
-void SHOCKTST_showPattern(ShockTest *task, ShockTestWindows *win, s32 pattern);
 
 s32 SHOCKTST_selectPattern(ShockTest *task, ShockTestWindows *win) {
     if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
@@ -505,7 +489,6 @@ void SHOCKTST_convertText(ShockLoader *task) {
         func_80024CE8(fd);
     }
 }
-
 
 void SHOCKTST_updateLoader(ShockLoader *task, ShockLoaderWindows *win) {
     s32 fd;

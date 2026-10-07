@@ -6,7 +6,15 @@
  * the cards they own and renames them on the keyboard (name_entry.h).
  */
 
+/* The overlay's NameEntry and the name entry's files (name_entry.h) */
+#define NAME_ENTRY_HAS_UNK98 0
+#define NAME_ENTRY_HAS_HIDE 0
+#define NAME_ENTRY_SPRITES STCRDDEK_KEY_SPRITES
+#define NAME_ENTRY_FILE_KEYBOARD STCRDDEK_FILE_KEYBOARD
 #include "name_entry.h"
+
+/* The name of this overlay's copy of a function of src/menu_common/ */
+#define OVL_NAME(name) STCRDDEK_##name
 
 #if VERSION_US
 #define STCRDDEK_FILE_SPRITES 0x62E /* as the card shop's */
@@ -145,6 +153,32 @@ typedef struct DeckScreen {
     /* 0x0EC */ PanelAnim rowPanels[3];
     /* 0x11C */ void (*countKinds)(struct DeckScreen *task); /* STCRDDEK_countCardKinds */
 } DeckScreen;
+
+void STCRDDEK_drawDeckCards(DeckCards *task);
+void STCRDDEK_loadNextCard(DeckCards *task);
+void STCRDDEK_createEditorWindows(DeckEditor *task, DeckEditorChildren *children);
+void STCRDDEK_buildCardList(DeckEditor *task);
+void STCRDDEK_drawEditor(DeckEditor *task);
+void STCRDDEK_stepEditor(DeckEditor *task, DeckEditorChildren *children);
+void STCRDDEK_initIdle(DeckIdle *task, void *children);
+void STCRDDEK_showNameWindows(NameEntry *task, NameEntryWindows *windows, s32 show);
+void STCRDDEK_drawKeyboard(NameEntry *task);
+void STCRDDEK_updateKeyboard(NameEntry *task, NameEntryWindows *windows);
+void STCRDDEK_updateNameEntry(NameEntry *task, NameEntryWindows *windows);
+void STCRDDEK_updateScrollBar(ScrollBar *bar);
+ScrollBar *STCRDDEK_createScrollBar(void);
+void STCRDDEK_createScreenWindows(DeckScreen *task, DeckScreenChildren *children);
+void STCRDDEK_drawScreen(DeckScreen *task);
+void STCRDDEK_countCardKinds(DeckScreen *task);
+void STCRDDEK_stepScreen(DeckScreen *task, DeckScreenChildren *children);
+void STCRDDEK_updateScreen(DeckScreen *task, DeckScreenChildren *children);
+DeckScreen *STCRDDEK_createScreen(void);
+void STCRDDEK_loadFiles(void);
+s32 STCRDDEK_filesLoading(void);
+void STCRDDEK_startFade(PanelAnim *fade, s32 fadeIn);
+s32 STCRDDEK_updateFade(PanelAnim *fade);
+void STCRDDEK_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
+s32 STCRDDEK_updateLerp(MenuLerp *lerp);
 
 /* STCRDDEK's data, in its order */
 extern s32 STCRDDEK_cursorCluts[];
