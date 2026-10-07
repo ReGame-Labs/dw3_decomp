@@ -14,6 +14,10 @@ extern StageTileFrame **updateTileCursorsFrames[];
 
 #include "common/create_tile_cursors.inc.c"
 
+/*
+ * The stage task: creates the sequences of the map objects with animations 1
+ * to 5 (updateTileCursors)
+ */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -41,6 +45,7 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0 };
 #define STAGE_TEXT (LANGUAGE + 0xF6)
 #define STAGE_FILE 0x5FB
 #endif
+/* Sets the stage up: its map, actors and battles, playing BGM_0015 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

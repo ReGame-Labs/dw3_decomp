@@ -139,6 +139,10 @@ void handleCommand808(StageTask *task, s32 id) {
     }
 }
 
+/*
+ * Command 808 of the event scripts: the map object of event 4 in the Chamber
+ * Room, whose frame plays for 20 frames, then a sound (updateFrameTask)
+ */
 void *createCommand808(s32 arg) {
     return createTaskWithId(updateFrameTask, sizeof(StageFrameTask), 0, arg);
 }
@@ -176,6 +180,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_FILE 0x1C9
 #define STAGE_ARCHIVE 0x331
 #endif
+/* Sets the stage up: its map, actors and events, playing the ambience ENV_0024 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

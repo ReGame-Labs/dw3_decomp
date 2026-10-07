@@ -33,6 +33,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/* Sets the stage up: its map, actors and battles, playing the ambience ENV_0007 */
 void setupStage(void) {
     FIELDSTG_state.textFile = LANGUAGE + 0x104;
     FIELDSTG_state.mapFile = 0x256;

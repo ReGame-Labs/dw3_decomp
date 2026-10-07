@@ -25,6 +25,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 152, with the player: moves the story on to its step 7 */
 void endEvent152(void) {
     GAME.progress = 7;
 }
@@ -39,6 +40,10 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x37D
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing BGM_0012;
+ * BGM_0029 instead at story steps 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

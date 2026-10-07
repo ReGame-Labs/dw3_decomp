@@ -33,14 +33,20 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 730, with Knightmon: starts the stage's event battle 0 */
 void endEvent730(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 921, with Lisa, Leader Chuck, Resistance's Wanda, Resistance's
+ * Dew, Resistance's Meech and Teddy: keeps it from playing again
+ */
 void endEvent921(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xCA), 1);
 }
 
+/* After event 922, with Teddy and Nick: moves the story on to its step 0x25 */
 void endEvent922(void) {
     GAME.progress = 0x25;
 }
@@ -55,6 +61,10 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #define EVENT_TEXT_FILE 0x112
 #define STAGE_FILE 0x4AC
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing ASKA_BGM;
+ * BGM_0029 instead except at story step 0x26 once flag 0x1A0A is set
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

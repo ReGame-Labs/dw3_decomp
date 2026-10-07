@@ -132,12 +132,20 @@ void updateTileTask(StageTileTask *task) {
     }
 }
 
+/*
+ * Command 847 of the event scripts: told 0x35A in event 710 (Bulbmon's
+ * earthquake), ends its task
+ */
 void handleCommand847(StageTask *task, s32 id) {
     if (task != NULL && id == 0x35A) {
         task->setState(task, TASK_DONE);
     }
 }
 
+/*
+ * Creates the map object that event 710, Bulbmon's earthquake, sets off
+ * (updateTileTask), with an id
+ */
 void *createTileTask(s32 arg) {
     return createTaskWithId(updateTileTask, sizeof(StageTileTask), 0, arg);
 }
@@ -300,11 +308,16 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0xC
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 710, with the player: starts the stage's event battle 0 and
+ * keeps it from playing again
+ */
 void endEvent710(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x51), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/* After event 711, with the player: moves the story on to its step 0x1B */
 void endEvent711(void) {
     GAME.progress = 0x1B;
 }
@@ -320,6 +333,7 @@ void endEvent711(void) {
 #define STAGE_FILE 0x276
 #define STAGE_ARCHIVE 0x3DF
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0017 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

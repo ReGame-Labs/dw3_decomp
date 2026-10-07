@@ -113,6 +113,10 @@ void handleCommand810(StageTileEffect *task, s32 id) {
     }
 }
 
+/*
+ * Command 810 of the event scripts: the effect of events 10 to 12, where the
+ * Tamer Service downloads the partners
+ */
 void *createCommand810(s32 arg) {
     return createTaskWithId(updateTileEffect, sizeof(StageTileEffect), 0, arg);
 }
@@ -147,19 +151,33 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After events 10 to 12, where the Tamer Service downloads the starter pack
+ * the player chose (A, B or C): moves the story on to its step 3
+ */
 void endEvents10To12(void) {
     GAME.progress = 3;
 }
 
+/*
+ * After event 271, with Maniac Phillip, Lazy Fei, Tamer Service, Kail, Lazy
+ * Alan, Worker Jeff, Miss Misha, Game Master and Energetic Yuki: sets flag
+ * 0x4005 and keeps it from playing again
+ */
 void endEvent271(void) {
     FLAGS_00.applyAction(FLAG(0x40, 5), 1);
     FLAGS_00.applyAction(FLAG(0x40, 4), 1);
 }
 
+/* After event 273, with Kail: moves the story on to its step 0xC */
 void endEvent273(void) {
     GAME.progress = 0xC;
 }
 
+/*
+ * After event 352, with Kail: lets event 40 of WSTAG285 start and moves the
+ * story on to its step 0xE
+ */
 void endEvent352(void) {
     FLAGS_00.applyAction(FLAG(0x40, 5), 0);
     GAME.progress = 0xE;
@@ -175,6 +193,7 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #define EVENT_TEXT_FILE 0x112
 #define STAGE_FILE 0x4CE
 #endif
+/* Sets the stage up: its map, actors and events, playing the ambience ENV_0205 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;
@@ -1201,6 +1220,7 @@ s8 tileEffectSortY[] = {
 s16 tileEffectPlaces[][2] = {
     { 217, 0x124 }, { 0x101, 0x110 }, { 0x129, 252 },
 };
+/* The sound of each of the three partners' download effects */
 s32 tileEffectSounds[] = {
     SOUND_DIGI_EN0, SOUND_DIGI_EN1, SOUND_DIGI_EN2,
 };

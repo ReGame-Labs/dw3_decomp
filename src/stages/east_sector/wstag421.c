@@ -42,16 +42,25 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 740, with Qing Long Chief: starts the stage's event battle 0
+ * and keeps it from playing again
+ */
 void endEvent740(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xA3), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 741, with the player: gives the player the Blue ID Pass and
+ * keeps it from playing again
+ */
 void endEvent741(void) {
     FLAGS_00.applyAction(ITEM(0, 0x16), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0xA7), 1);
 }
 
+/* After event 743, with the player: moves the story on to its step 0x1C */
 void endEvent743(void) {
     GAME.progress = 0x1C;
 }
@@ -65,6 +74,10 @@ void endEvent743(void) {
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x787
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing SEIR_BGM;
+ * BGM_0029 instead except at story step 0x26 once flag 0x1A0A is set
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

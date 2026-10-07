@@ -90,11 +90,19 @@ void updateStage(StageTask *task, void **children) {
 #include "common/update_stage_effect.inc.c"
 #include "common/create_stage_effect.inc.c"
 
+/*
+ * After event 1297, with Dark Master: starts the stage's event battle 0 and
+ * keeps it from playing again
+ */
 void endEvent1297(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x86), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1298, with Dark Master: gives the player the EXP Adapter and
+ * keeps it from playing again
+ */
 void endEvent1298(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x87), 1);
     FLAGS_00.applyAction(ITEM(7, 0x141), 1);
@@ -109,6 +117,10 @@ void endEvent1298(void) {
 #define EVENT_TEXT_FILE 0x14A
 #define STAGE_FILE 0x6CF
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing BGM_0023,
+ * with the Dark Dungeon's darkness off when the player comes in
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

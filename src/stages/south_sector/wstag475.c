@@ -34,10 +34,15 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 180, with Voice and Sepikmon: keeps it from playing again */
 void endEvent180(void) {
     FLAGS_00.applyAction(FLAG(0x1A, 0x17), 1);
 }
 
+/*
+ * After event 230, with Sepikmon: moves the story on to its step 0xA and
+ * gives the player the Smelly Herb
+ */
 void endEvent230(void) {
     GAME.progress = 0xA;
     FLAGS_00.applyAction(ITEM(0, 0xD), 1);
@@ -54,6 +59,7 @@ void endEvent230(void) {
 #define STAGE_FILE 0x232
 #define STAGE_ARCHIVE 0x3DA
 #endif
+/* Sets the stage up: its map, actors and events, playing BGM_0013 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

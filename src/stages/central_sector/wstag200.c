@@ -27,11 +27,16 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 50, with Tamer Genji: starts the stage's event battle 1 and
+ * keeps it from playing again
+ */
 void endEvent50(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xD), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
+/* After event 52, with Tamer Genji: moves the story on to its step 4 */
 void endEvent52(void) {
     GAME.progress = 4;
 }
@@ -48,6 +53,10 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #define STAGE_FILE 0x197
 #define STAGE_ARCHIVE 0x31E
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing ASKA_BGM;
+ * BGM_0029 instead at story steps 0x14 to 0x17 and 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

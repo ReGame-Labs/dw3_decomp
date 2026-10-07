@@ -5,12 +5,14 @@
  */
 
 #include "common.h"
+#define STAGE_TWEEN /* stageFuncs is a StageFuncs (stage.h) */
 #include "stage.h"
 /* Defined below, after the code that uses them */
 extern s16 tileLiftShake[];
 
 #include "common/update_tile_lift.inc.c"
 
+/* Sends the lift up (0x348) or down (0x349) */
 void handleTileLift(StageTileLift *task, s32 id) {
     if (task != NULL) {
         switch (id) {
@@ -26,6 +28,7 @@ void handleTileLift(StageTileLift *task, s32 id) {
     }
 }
 
+/* Creates the lift (updateTileLift), down if flag 0x1C3D is set; nothing in the game calls it */
 StageTileLift *createTileLift(s32 id) {
     StageTileLift *task = createTaskWithId(updateTileLift, sizeof(StageTileLift), 0, id);
 
@@ -44,13 +47,14 @@ StageTask *startStage(void *owner) {
     StageTask *task = createTask(updateStage, 0x58, 8);
 
     task->owner = owner;
-    stageFuncs[0]();
+    stageFuncs.setup();
     return task;
 }
 
 /* the color the setup copies to FIELDSTG_state.spriteColor */
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0 };
 
+/* Sets the stage up: its map and actors, playing the ambience ENV_0204 */
 void setupStage(void) {
     FIELDSTG_state.textFile = LANGUAGE + 0xFD;
     FIELDSTG_state.mapFile = 0x1AC;
@@ -133,8 +137,4 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DEPTH, 8, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
-void (*stageFuncs[])(void) = {
-    setupStage,
-};
-s32 D_800A6874 = (s32)startTween;
-s32 D_800A6878 = (s32)updateTween;
+StageFuncs stageFuncs = { setupStage, startTween, updateTween };

@@ -25,14 +25,20 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 390: keeps it from playing again */
 void endEvent390(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x17), 1);
 }
 
+/* After event 400: keeps it from playing again */
 void endEvent400(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x1A), 1);
 }
 
+/*
+ * After event 410, with Byakko Leader: lets event 415 of WSTAG660 start,
+ * starts the stage's event battle 0 and keeps it from playing again
+ */
 void endEvent410(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x1E), 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x26), 1);
@@ -48,6 +54,11 @@ void endEvent410(void) {
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x4B0
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing the
+ * ambience ENV_0021; BGM_0029 instead at story steps 0x27 to 0x28 and 0xF to
+ * 0x17
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

@@ -9,6 +9,11 @@
 /* Defined below, after the code that uses them */
 extern StageSeqStep updateTileSeqsSteps[4][4];
 
+/*
+ * stepTileAnimation (common/step_tile_animation.inc.c) for a StageTileSeq:
+ * steps OBJ's animation through FRAMES and returns its frame, looping at the
+ * end or returning 0xFF if once
+ */
 s32 stepTileAnimation(StageTileSeq *obj, AnimFrame *frames, s32 once, s32 depth) {
     AnimFrame *frame = &frames[obj->anim.index];
     s32 dt = GFX.funcs.getFrameTime();
@@ -37,6 +42,10 @@ s32 stepTileAnimation(StageTileSeq *obj, AnimFrame *frames, s32 once, s32 depth)
     return frame->frame;
 }
 
+/*
+ * Plays the steps of updateTileSeqsSteps on the map objects with animations
+ * 1 to 4, which go on to their next step at the end
+ */
 void updateTileSeqs(StageTileSeqs *task) {
     StageTile *object;
     s32 n;
@@ -112,6 +121,7 @@ void updateTileSeqs(StageTileSeqs *task) {
     }
 }
 
+/* Creates the map objects' steps (updateTileSeqs) with an id; nothing in the game calls it */
 void *createTileSeqs(s32 arg) {
     return createTaskWithId(updateTileSeqs, sizeof(StageTileSeqs), 0, arg);
 }
@@ -136,6 +146,10 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 552, with Keith, Nick, Lisa and Kail: gives the player the
+ * Staff Pass and keeps it from playing again
+ */
 void endEvent552(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x3D), 1);
     FLAGS_00.applyAction(ITEM(0, 0x191), 1);
@@ -150,6 +164,7 @@ void endEvent552(void) {
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x48C
 #endif
+/* Sets the stage up: its map, actors and events, playing BGM_0019 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

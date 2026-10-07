@@ -5,6 +5,10 @@
 #include "common.h"
 #include "stage.h"
 
+/*
+ * Back from the battle after event 1279, starts event 1280, with Paildramon,
+ * unless it has played
+ */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -24,11 +28,16 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 1279, with Paildramon: lets event 1280 start and starts the stage's event battle 1 */
 void endEvent1279(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x31), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
+/*
+ * After event 1280, with Paildramon: gives the player the Veemon DDNA and
+ * keeps it from playing again
+ */
 void endEvent1280(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x32), 1);
     FLAGS_00.applyAction(ITEM(0, 0x23), 1);
@@ -44,6 +53,10 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x399
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing the
+ * ambience ENV_0012; battle list 0 before story step 0x18, 1 from then on
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

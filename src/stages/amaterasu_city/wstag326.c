@@ -6,6 +6,11 @@
 #include "common.h"
 #include "stage.h"
 
+/*
+ * Command 834 of the event scripts, which none of them uses: shows map
+ * objects 1 and 2 instead of 3 and 4 while running, and the other way round
+ * once done
+ */
 void updateCommand834(StageTask *task) {
     StageTile *tile;
 
@@ -55,16 +60,22 @@ void updateCommand834(StageTask *task) {
     }
 }
 
+/* Command 834 of the event scripts: creates its task (updateCommand834) with the given id */
 void *createCommand834(s32 arg) {
     return createTaskWithId(updateCommand834, 0x50, 0, arg);
 }
 
+/* Command 834 of the event scripts: told 0x35A, swaps the map objects back (TASK_DONE) */
 void handleCommand834(StageTask *task, s32 id) {
     if (task != NULL && id == 0x35A) {
         task->setState(task, TASK_DONE);
     }
 }
 
+/*
+ * Back from the battle after event 1281, starts event 1282, with BK
+ * WarGreymon, unless it has played
+ */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -84,11 +95,19 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 1281, with BK WarGreymon: lets event 1282 start and starts the
+ * stage's event battle 0
+ */
 void endEvent1281(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x76), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1282, with BK WarGreymon: gives the player the Platinum ID and
+ * keeps it from playing again
+ */
 void endEvent1282(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x77), 1);
     FLAGS_00.applyAction(ITEM(0, 0x2A), 1);
@@ -103,6 +122,7 @@ void endEvent1282(void) {
 #define EVENT_TEXT_FILE 0x127
 #define STAGE_FILE 0x53A
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0003 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

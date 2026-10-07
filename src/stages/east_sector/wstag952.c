@@ -11,6 +11,7 @@
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* Sets the stage up: its map, actors and battles, playing the ambience ENV_0006 */
 void setupStage(void) {
     FIELDSTG_state.textFile = LANGUAGE + 0x104;
     FIELDSTG_state.mapFile = 0x21A;

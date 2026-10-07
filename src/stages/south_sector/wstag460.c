@@ -12,7 +12,7 @@ extern u16 wandererSpeeds[];
 extern u16 angleTangents[];
 extern AnimFrame *updateTileDuoFrames0[];
 extern AnimFrame *updateTileDuoFrames1[];
-extern u8 tileDuoRecordFrames[2][2];
+extern u8 tileDuoObjectFrames[2][2];
 void *createTileSoloTask(void);
 void *createTileDuoTask(void);
 void fadeOutWanderer();
@@ -145,16 +145,28 @@ void fadeOutTileSolo(StageTileSolo *task, s32 arg1, s32 arg2) {
     }
 }
 
+/*
+ * Creates the color-cycling map object by the Digi-Egg of Sincerity
+ * (updateTileSolo) with an id; nothing in the game calls it
+ */
 void *createTileSolo(s32 arg) {
     return createTaskWithId(updateTileSolo, sizeof(StageTileSolo), 0, arg);
 }
 
+/*
+ * Creates the color-cycling map object by the Digi-Egg of Sincerity
+ * (updateTileSolo), the one with animation 10
+ */
 void *createTileSoloTask(void) {
     return createTask(updateTileSolo, sizeof(StageTileSolo), 0);
 }
 
 #include "common/step_tile_animation2.inc.c"
 
+/*
+ * Cycles the colors of the map objects with animations 8 and 9 by the Digi-
+ * Egg of Sincerity while mode isn't 0, and ends wait frames after mode 2
+ */
 void updateTileDuo(StageTileDuo *task) {
     StageTile *tile;
     StageTile *object;
@@ -189,7 +201,7 @@ void updateTileDuo(StageTileDuo *task) {
             if (task->mode != 0) {
                 tile->visible = 1;
                 tile->clutRow = stepTileAnimation2(&task->tiles[i], updateTileDuoFrames0[i], 0, 0);
-                tile->frame = tileDuoRecordFrames[0][i];
+                tile->frame = tileDuoObjectFrames[0][i];
             } else {
                 tile->visible = 0;
             }
@@ -222,7 +234,7 @@ void updateTileDuo(StageTileDuo *task) {
                 break;
             default:
                 fading->visible = 1;
-                fading->frame = tileDuoRecordFrames[1][j];
+                fading->frame = tileDuoObjectFrames[1][j];
                 fading->clutRow = frame;
                 break;
             }
@@ -378,6 +390,10 @@ void fadeOutWanderer(StageWanderer *task) {
     }
 }
 
+/*
+ * Creates one of the map objects that wander by the Digi-Egg of Sincerity
+ * (updateWanderer) with an id; nothing in the game calls it
+ */
 void *createWanderer(s32 arg) {
     return createTaskWithId(updateWanderer, sizeof(StageWanderer), 0, arg);
 }
@@ -412,6 +428,10 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 370, with the player: moves the story on to its step 0xF and
+ * gives the player the DE Sincerity
+ */
 void endEvent370(void) {
     GAME.progress = 0xF;
     FLAGS_00.applyAction(ITEM(0, 0x10), 1);
@@ -428,6 +448,7 @@ void endEvent370(void) {
 #define STAGE_FILE 0x363
 #define STAGE_ARCHIVE 0x45F
 #endif
+/* Sets the stage up: its map, actors and events, playing BGM_0014 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;
@@ -522,7 +543,7 @@ AnimFrame *updateTileDuoFrames0[] = {
 AnimFrame *updateTileDuoFrames1[] = {
     updateTileDuoFrames1_0, updateTileDuoFrames1_1,
 };
-u8 tileDuoRecordFrames[2][2] = {
+u8 tileDuoObjectFrames[2][2] = {
     { 62, 63 },
     { 64, 65 },
 };

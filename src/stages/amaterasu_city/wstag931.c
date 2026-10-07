@@ -11,6 +11,7 @@
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* Sets the stage up: its map, actors and events, playing SHOP1BGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = LANGUAGE + 0xFD;
     FIELDSTG_state.mapFile = 0x1A6;

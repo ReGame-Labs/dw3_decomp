@@ -110,6 +110,7 @@ void handleCommand836(StageTilePair *task, s32 id) {
     }
 }
 
+/* Creates the control panel's map objects of event 840 (updateTilePair) with an id */
 void *createTilePair(s32 arg) {
     return createTaskWithId(updateTilePair, sizeof(StageTilePair), 0, arg);
 }
@@ -185,10 +186,15 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0xC
 #include "common/start_stage.inc.c"
 
+/* After event 830, with the player: keeps it from playing again */
 void endEvent830(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x43), 1);
 }
 
+/*
+ * After event 840, with the player: lets event 850 of WSTAG800 start and
+ * keeps it from playing again
+ */
 void endEvent840(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 5), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0x63), 1);
@@ -205,6 +211,7 @@ void endEvent840(void) {
 #define STAGE_FILE 0x6F6
 #define STAGE_FILE_8 0x721
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0011 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE_8;

@@ -35,11 +35,19 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 1285, with BK Imperialdramon: lets event 1286 start and starts
+ * the stage's event battle 0
+ */
 void endEvent1285(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x7A), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1286, with BK Imperialdramon: gives the player the Hazard
+ * Helmet and keeps it from playing again
+ */
 void endEvent1286(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x7B), 1);
     FLAGS_00.applyAction(ITEM(5, 0xF5), 1);
@@ -54,6 +62,7 @@ void endEvent1286(void) {
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x744
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0007 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

@@ -6,6 +6,7 @@
 #include "stage.h"
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 
+/* Back from the battle after event 1275, starts event 1276, with Armormon, unless it has played */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -25,11 +26,16 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 1275, with Armormon: lets event 1276 start and starts the stage's event battle 0 */
 void endEvent1275(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x2D), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1276, with Armormon: gives the player the Monmon DDNA and
+ * keeps it from playing again
+ */
 void endEvent1276(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x2E), 1);
     FLAGS_00.applyAction(ITEM(0, 0x168), 1);
@@ -46,6 +52,7 @@ void endEvent1276(void) {
 #define STAGE_FILE 0x4F8
 #define STAGE_FILE_8 0x513
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0008 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE_8;

@@ -30,9 +30,10 @@ extern AnimFrame updateTileSixWFrames4[];
 
 #include "common/step_tile_animation.inc.c"
 
+#include "common/tile_six.inc.c"
+
 /* Animates the map objects with animations 5 to 10 by mode (0: hidden, 1 and 3: the first two once, then mode 2 or 0; 2: the other four) */
 void updateTileSix(StageTileSix *task) {
-    StageTile *object;
     StageTile *tile;
     s32 done;
     s32 i;
@@ -41,42 +42,7 @@ void updateTileSix(StageTileSix *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
-            if (object->anim >= 5 && object->anim <= 10) {
-                switch (object->anim) {
-                case 5:
-                    task->tiles[0].tile = object;
-                    task->tiles[0].anim.index = 0;
-                    task->tiles[0].anim.timer = updateTileSixFrames0[0].duration;
-                    break;
-                case 6:
-                    task->tiles[1].tile = object;
-                    task->tiles[1].anim.index = 0;
-                    task->tiles[1].anim.timer = updateTileSixFrames1[0].duration;
-                    break;
-                case 7:
-                    task->tiles[2].tile = object;
-                    task->tiles[2].anim.index = 0;
-                    task->tiles[2].anim.timer = updateTileSixFrames2[0].duration;
-                    break;
-                case 8:
-                    task->tiles[3].tile = object;
-                    task->tiles[3].anim.index = 0;
-                    task->tiles[3].anim.timer = updateTileSixFrames3[0].duration;
-                    break;
-                case 9:
-                    task->tiles[4].tile = object;
-                    task->tiles[4].anim.index = 0;
-                    task->tiles[4].anim.timer = 0;
-                    break;
-                case 10:
-                    task->tiles[5].tile = object;
-                    task->tiles[5].anim.index = 0;
-                    task->tiles[5].anim.timer = 0;
-                    break;
-                }
-            }
-        }
+        findTileSix(task);
         task->mode = 0;
         task->nextState(task);
         break;
@@ -121,32 +87,7 @@ void updateTileSix(StageTileSix *task) {
                 }
                 break;
             case 2:
-                switch (i) {
-                case 0:
-                case 1:
-                    tile->visible = 0;
-                    break;
-                case 2:
-                    tile->frame = 0x28;
-                    tile->clutRow = stepTileAnimation(&task->tiles[i], updateTileSixFrames2, 0, 0);
-                    tile->visible = 1;
-                    break;
-                case 3:
-                    tile->frame = 2;
-                    tile->clutRow = stepTileAnimation(&task->tiles[i], updateTileSixFrames3, 0, 0);
-                    tile->visible = 1;
-                    break;
-                case 4:
-                    tile->visible = 1;
-                    tile->frame = 3;
-                    tile->clutRow = 0;
-                    break;
-                case 5:
-                    tile->visible = 1;
-                    tile->frame = 4;
-                    tile->clutRow = 0;
-                    break;
-                }
+                showLastFourTiles(task, tile, i);
                 break;
             case 3:
                 switch (i) {
@@ -221,6 +162,10 @@ void restartTileSix(StageTileSix *task, s32 id) {
     }
 }
 
+/*
+ * Creates the first set of six map objects (updateTileSix) with an id;
+ * nothing in the game calls it
+ */
 void *createTileSixWithId(s32 arg) {
     return createTaskWithId(updateTileSix, sizeof(StageTileSix), 0, arg);
 }
@@ -229,9 +174,86 @@ void *createTileSixWithId(s32 arg) {
 
 #include "common/step_tile_animation2.inc.c"
 
+/*
+ * Finds the map objects with animations 11 to 16 and starts the
+ * animations of the first four
+ */
+static inline void findTileSixW(StageTileSix *task) {
+    StageTile *object;
+
+    for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+        if (object->anim >= 11 && object->anim <= 16) {
+            switch (object->anim) {
+            case 11:
+                task->tiles[0].tile = object;
+                task->tiles[0].anim.index = 0;
+                task->tiles[0].anim.timer = updateTileSixWFrames0[0].duration;
+                break;
+            case 12:
+                task->tiles[1].tile = object;
+                task->tiles[1].anim.index = 0;
+                task->tiles[1].anim.timer = updateTileSixWFrames1[0].duration;
+                break;
+            case 13:
+                task->tiles[2].tile = object;
+                task->tiles[2].anim.index = 0;
+                task->tiles[2].anim.timer = updateTileSixWFrames2[0].duration;
+                break;
+            case 14:
+                task->tiles[3].tile = object;
+                task->tiles[3].anim.index = 0;
+                task->tiles[3].anim.timer = updateTileSixWFrames3[0].duration;
+                break;
+            case 15:
+                task->tiles[4].tile = object;
+                task->tiles[4].anim.index = 0;
+                task->tiles[4].anim.timer = 0;
+                break;
+            case 16:
+                task->tiles[5].tile = object;
+                task->tiles[5].anim.index = 0;
+                task->tiles[5].anim.timer = 0;
+                break;
+            }
+        }
+    }
+}
+
+/*
+ * Mode 2: hides the first two map objects and shows the other four, the
+ * third and fourth with their looping palettes and the last two still
+ */
+static inline void showLastFourTilesW(StageTileSix *task, StageTile *tile, s32 i) {
+    switch (i) {
+    case 0:
+    case 1:
+        tile->visible = 0;
+        break;
+    case 2:
+        tile->frame = 0x29;
+        tile->clutRow = stepTileAnimation2(&task->tiles[i], updateTileSixWFrames2, 0, 0);
+        tile->visible = 1;
+        break;
+    case 3:
+        tile->frame = 0x11;
+        tile->clutRow = stepTileAnimation2(&task->tiles[i], updateTileSixWFrames3, 0, 0);
+        tile->visible = 1;
+        break;
+    case 4:
+        tile->visible = 1;
+        tile->frame = 0x12;
+        tile->clutRow = 0;
+        break;
+    case 5:
+        tile->visible = 1;
+        tile->frame = 0x13;
+        tile->clutRow = 0;
+        break;
+    }
+}
+
 /* Animates the map objects with animations 11 to 16 by mode (0: hidden, 1 and 3: the first two once, then mode 2 or 0; 2: the other four) */
 void updateTileSixW(StageTileSix *task) {
-    StageTile *object;
     StageTile *tile;
     s32 done;
     s32 i;
@@ -240,42 +262,7 @@ void updateTileSixW(StageTileSix *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
-            if (object->anim >= 11 && object->anim <= 16) {
-                switch (object->anim) {
-                case 11:
-                    task->tiles[0].tile = object;
-                    task->tiles[0].anim.index = 0;
-                    task->tiles[0].anim.timer = updateTileSixWFrames0[0].duration;
-                    break;
-                case 12:
-                    task->tiles[1].tile = object;
-                    task->tiles[1].anim.index = 0;
-                    task->tiles[1].anim.timer = updateTileSixWFrames1[0].duration;
-                    break;
-                case 13:
-                    task->tiles[2].tile = object;
-                    task->tiles[2].anim.index = 0;
-                    task->tiles[2].anim.timer = updateTileSixWFrames2[0].duration;
-                    break;
-                case 14:
-                    task->tiles[3].tile = object;
-                    task->tiles[3].anim.index = 0;
-                    task->tiles[3].anim.timer = updateTileSixWFrames3[0].duration;
-                    break;
-                case 15:
-                    task->tiles[4].tile = object;
-                    task->tiles[4].anim.index = 0;
-                    task->tiles[4].anim.timer = 0;
-                    break;
-                case 16:
-                    task->tiles[5].tile = object;
-                    task->tiles[5].anim.index = 0;
-                    task->tiles[5].anim.timer = 0;
-                    break;
-                }
-            }
-        }
+        findTileSixW(task);
         task->mode = 0;
         task->nextState(task);
         break;
@@ -320,32 +307,7 @@ void updateTileSixW(StageTileSix *task) {
                 }
                 break;
             case 2:
-                switch (i) {
-                case 0:
-                case 1:
-                    tile->visible = 0;
-                    break;
-                case 2:
-                    tile->frame = 0x29;
-                    tile->clutRow = stepTileAnimation2(&task->tiles[i], updateTileSixWFrames2, 0, 0);
-                    tile->visible = 1;
-                    break;
-                case 3:
-                    tile->frame = 0x11;
-                    tile->clutRow = stepTileAnimation2(&task->tiles[i], updateTileSixWFrames3, 0, 0);
-                    tile->visible = 1;
-                    break;
-                case 4:
-                    tile->visible = 1;
-                    tile->frame = 0x12;
-                    tile->clutRow = 0;
-                    break;
-                case 5:
-                    tile->visible = 1;
-                    tile->frame = 0x13;
-                    tile->clutRow = 0;
-                    break;
-                }
+                showLastFourTilesW(task, tile, i);
                 break;
             case 3:
                 switch (i) {
@@ -420,10 +382,18 @@ void restartTileSixW(StageTileSix *task, s32 id) {
     }
 }
 
+/*
+ * Creates the second set of six map objects (updateTileSixW) with an id;
+ * nothing in the game calls it
+ */
 void *createTileSixWWithId(s32 arg) {
     return createTaskWithId(updateTileSixW, sizeof(StageTileSix), 0, arg);
 }
 
+/*
+ * Creates the second set of six map objects (updateTileSixW) without an id;
+ * nothing in the game calls it
+ */
 void *createTileSixW(void) {
     return createTask(updateTileSixW, sizeof(StageTileSix), 0);
 }
@@ -486,29 +456,42 @@ StageEffect *createCommand838(s32 id) {
     return task;
 }
 
+/*
+ * After event 931, with Royal Guard: starts the stage's event battle 1, sets
+ * flag 0x0C33 (which decides whether actors 4 to 6 appear) and keeps it from
+ * playing again
+ */
 void endEvent931(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x5E), 1);
     FLAGS_00.applyAction(FLAG(0xC, 0x33), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
+/*
+ * After event 932, with Chief Officer: starts the stage's event battle 0 and
+ * keeps it from playing again
+ */
 void endEvent932(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x67), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/* After event 933, with Chief Officer, Nick, Lisa and Teddy: keeps it from playing again */
 void endEvent933(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x5F), 1);
 }
 
+/* After event 934, with Teddy and Nick: keeps it from playing again */
 void endEvent934(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x60), 1);
 }
 
+/* After event 981, with the player: keeps it from playing again */
 void endEvent981(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x6C), 1);
 }
 
+/* After event 982, with the player: moves the story on to its step 0x28 */
 void endEvent982(void) {
     GAME.progress = 0x28;
 }
@@ -522,6 +505,7 @@ void endEvent982(void) {
 #define EVENT_TEXT_FILE 0x127
 #define STAGE_FILE 0x53D
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0002 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

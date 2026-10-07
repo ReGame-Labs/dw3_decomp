@@ -39,11 +39,19 @@ void updateStage(StageTask *task, void **children) {
 #include "common/update_stage_effect.inc.c"
 #include "common/create_stage_effect.inc.c"
 
+/*
+ * After event 790, with Ice Witch: starts the stage's event battle 0 and
+ * keeps it from playing again
+ */
 void endEvent790(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xE), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 791, with Ice Witch: gives the player the Yin Yang Hat and
+ * keeps it from playing again
+ */
 void endEvent791(void) {
     FLAGS_00.applyAction(ITEM(5, 0xDD), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0x19), 1);
@@ -58,6 +66,7 @@ void endEvent791(void) {
 #define EVENT_TEXT_FILE 0x14A
 #define STAGE_FILE 0x6BB
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0023 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

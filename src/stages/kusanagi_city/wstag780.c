@@ -8,7 +8,7 @@
 #include "stage.h"
 /* Defined below, after the code that uses them */
 extern u8 flyerFrames[];
-extern s32 flyerStarts[2][2][2][2];
+extern Vec2 flyerStarts[2][2][2];
 extern StageAnimSpot updateEffectSpots[];
 extern AnimFrame *updateTileLoop2Frames[];
 extern StageQuadTexture drawByteAnimsTextures[];
@@ -92,8 +92,8 @@ void *createFlyer(s32 up, s32 right, s32 still, s32 anim) {
     task->right = right;
     task->still = still;
     task->anim = anim;
-    task->x = flyerStarts[up][right][still][0] << 8;
-    task->y = flyerStarts[up][right][still][1] << 8;
+    task->x = flyerStarts[up][right][still].x << 8;
+    task->y = flyerStarts[up][right][still].y << 8;
     if (still && anim) {
         task->x += 0x3200;
         task->y -= 0x1900;
@@ -157,6 +157,7 @@ void updateGlow(StageGlow *task) {
     }
 }
 
+/* Command 802 of the event scripts: the glow (updateGlow) of the MAGAMI Online Center's events */
 void *createCommand802(s32 arg) {
     return createTaskWithId(updateGlow, sizeof(StageGlow), 0, arg);
 }
@@ -211,6 +212,11 @@ void *createEffect(s32 key) {
     return task;
 }
 
+/*
+ * Steps OBJ's animation through FRAMES by the frame time (at most 4),
+ * looping at the end (frame 0xFF), and returns its frame. depth is 0 for the
+ * caller
+ */
 s32 stepTileLoopAnimation(StageTileAnim *obj, AnimFrame *frames, s32 depth) {
     AnimFrame *frame = &frames[obj->anim.index];
     s32 dt = GFX.funcs.getFrameTime();
@@ -274,6 +280,7 @@ void updateTileLoop2(StageTileLoop2 *task) {
     }
 }
 
+/* Creates the looping map objects with animations 1 and 2 (updateTileLoop2) */
 void *createTileLoop2(void) {
     return createTask(updateTileLoop2, sizeof(StageTileLoop2), 0);
 }
@@ -298,6 +305,7 @@ void updateEffectSet(StageTask *task, void **children) {
     }
 }
 
+/* Creates the stage's six effects and its looping map objects (updateEffectSet) */
 void *createEffectSet(void) {
     return createTask(updateEffectSet, 0x50, 0x1C);
 }
@@ -561,6 +569,10 @@ void handleCommand801(StageByteAnims *task, s32 id) {
     }
 }
 
+/*
+ * Command 801 of the event scripts: the two animations of updateByteAnims in
+ * the MAGAMI Online Center's events
+ */
 void *createCommand801(s32 arg) {
     return createTaskWithId(updateByteAnims, sizeof(StageByteAnims), 0, arg);
 }
@@ -597,16 +609,19 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0xC
 #include "common/start_stage.inc.c"
 
+/* After event 0, with Junior, Ivy and Teddy: moves the story on to its step 0 */
 void endEvent0(void) {
     GAME.progress = 0;
 }
 
+/* After event 885: lets event 886 of WSTAG750 start */
 void endEvent885(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x66), 1);
 }
 
 #if VERSION_EU
-void func_800A7644(void) {
+/* The end of event 1500, only in the European version: the story goes on to its extra chapter */
+void endEvent1500(void) {
     GAME.progress = FIELD_PROGRESS_EXTRA;
 }
 #endif
@@ -622,6 +637,10 @@ void func_800A7644(void) {
 #define STAGE_FILE 0x1C5
 #define STAGE_ARCHIVE 0x320
 #endif
+/*
+ * Sets the stage up: its map, actors and events, playing BGM00000, or
+ * BGM00001 at story step 0x1B, BGM00002 at 0x20 and BGM00003 at 0x27
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;
@@ -1144,7 +1163,7 @@ s16 script1500[] = {
 u8 flyerFrames[] = {
     50, 52, 53, 55, 56, 57, 56, 57,
 };
-s32 flyerStarts[2][2][2][2] = {
+Vec2 flyerStarts[2][2][2] = {
     { { { 640, 72 }, { 432, 176 } }, { { 0, 224 }, { 0, 0 } } },
     { { { 448, 392 }, { 0, 0 } }, { { 112, 392 }, { 0, 0 } } },
 };
@@ -1480,7 +1499,7 @@ FieldEvent stageEvents[] = {
 #if VERSION_US
     { 1500, script1500, EVENT_TEXT(0x24), NULL, NULL },
 #elif VERSION_EU
-    { 1500, script1500, EVENT_TEXT(0x24), NULL, func_800A7644 },
+    { 1500, script1500, EVENT_TEXT(0x24), NULL, endEvent1500 },
 #endif
     { -1, NULL, 0, NULL, NULL },
 };

@@ -25,6 +25,10 @@ extern AnimFrame updateTileAnimsFrames1[];
 #define STAGE_TEXT (LANGUAGE + 0xDA)
 #define STAGE_FILE 0x4DC
 #endif
+/*
+ * Sets the stage up: its map, actors and battles, playing KANRIBGM; BGM_0029
+ * instead except at story step 0x26 once flag 0x1A0A is set
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

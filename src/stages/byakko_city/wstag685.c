@@ -25,14 +25,17 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 413, with the player: moves the story on to its step 0x10 */
 void endEvent413(void) {
     GAME.progress = 0x10;
 }
 
+/* After event 421, with Numemon: sets flag 0x4020 */
 void endEvent421(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x20), 1);
 }
 
+/* After event 690, with General: moves the story on to its step 0x19 */
 void endEvent690(void) {
     GAME.progress = 0x19;
 }
@@ -46,6 +49,7 @@ void endEvent690(void) {
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x4C4
 #endif
+/* Sets the stage up: its map, actors and events, playing the ambience ENV_0020 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

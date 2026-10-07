@@ -34,11 +34,16 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/* After event 60, with MasterTyranno: lets event 61 start and starts the stage's event battle 0 */
 void endEvent60(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xF), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 61, with MasterTyranno: gives the player the Old Claw and
+ * keeps it from playing again
+ */
 void endEvent61(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x10), 1);
     FLAGS_00.applyAction(ITEM(3, 0x99), 1);
@@ -55,6 +60,7 @@ void endEvent61(void) {
 #define STAGE_FILE 0x257
 #define STAGE_ARCHIVE 0x3D9
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0007 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

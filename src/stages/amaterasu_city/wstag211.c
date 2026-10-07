@@ -9,6 +9,11 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 925, with Attacker: starts the stage's event battle 0, sets
+ * flag 0x0C23 (which decides whether actors 30 to 32 appear) and keeps it
+ * from playing again
+ */
 void endEvent925(void) {
     FLAGS_00.applyAction(FLAG(0xC, 0x23), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0xA4), 1);
@@ -25,6 +30,10 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #define EVENT_TEXT_FILE 0x112
 #define STAGE_FILE 0x4A4
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing KANRIBGM;
+ * BGM_0029 instead except at story step 0x26 once flag 0x1A0A is set
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

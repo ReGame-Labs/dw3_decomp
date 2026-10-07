@@ -28,13 +28,6 @@ typedef struct StageTask {
     /* 0x50 */ void *owner;
 } StageTask;
 
-/* An animation after two other words */
-typedef struct Anim8 {
-    /* 0x0 */ s32 unk0;
-    /* 0x4 */ s32 unk4;
-    /* 0x8 */ AnimState anim;
-} Anim8;
-
 /*
  * Carries the borrow down the digits of GAME.countdown, the timer of the
  * timed stages: a units digit that went below 0 (255) becomes 9 and takes one
@@ -179,7 +172,7 @@ typedef struct StageWanderer {
     /* 0x78 */ StageTileAnim tile;
 } StageWanderer;
 
-/* StageWanderer moving two records: tileAnim and tileAnim + 9 */
+/* StageWanderer moving two map objects: tileAnim and tileAnim + 9 */
 typedef struct StageWanderPair {
     TASK_HEADER(StageWanderPair);
     /* 0x50 */ s16 mode;
@@ -217,7 +210,7 @@ typedef struct StageTileDuo {
  */
 typedef struct StageTilePair {
     TASK_HEADER(StageTilePair);
-    /* 0x50 */ s32 playing; /* the second animation of the first record */
+    /* 0x50 */ s32 playing; /* the second animation of the first map object */
     /* 0x54 */ s32 done; /* start in TASK_DONE */
     /* 0x58 */ StageTileAnim anims[2];
 } StageTilePair;
@@ -230,22 +223,24 @@ typedef struct StageTilePair16 {
     /* 0x54 */ StageTileAnim anims[2];
 } StageTilePair16;
 
-/* StageTilePair with byte flags, for the records of two given animations */
+/* StageTilePair with byte flags, for the map objects of two given animations */
 typedef struct StageTilePairN {
     TASK_HEADER(StageTilePairN);
     /* 0x50 */ u8 playing;
     /* 0x51 */ u8 done; /* 1: start in TASK_DONE */
-    /* 0x52 */ s16 anim; /* the records' animations: anim and anim + 1 */
+    /* 0x52 */ s16 anim; /* the map objects' animations: anim and anim + 1 */
     /* 0x54 */ StageTileAnim anims[2];
 } StageTilePairN;
 
 /*
- * Two sprites from the stage's sheet at (x, y), each animated once, drawn
- * 0xF0 above and 0x14 below (what they are in the game isn't known yet)
+ * A trap's effect over a partner it leaves at 1 HP (events 9000 to 9015 of
+ * WSTAG740 and WSTAG741, on the Fire floor of the dungeon of traps): two sprites from the
+ * stage's sheet at (x, y), each animated once, drawn 0xF0 above and 0x14
+ * below
  */
 typedef struct StageSpritePair {
     TASK_HEADER(StageSpritePair);
-    /* 0x50 */ s32 unk50;
+    /* 0x50 */ s32 unk50; /* unused */
     /* 0x54 */ s32 x;
     /* 0x58 */ s32 y;
     /* 0x5C */ AnimState anims[2];
@@ -284,10 +279,10 @@ typedef struct StageTileSeqs8 {
 typedef struct StageSeqStep {
     /* 0x0 */ AnimFrame *frames;
     /* 0x4 */ s16 once; /* play once, then go to next */
-    /* 0x6 */ s16 next; /* 0: hide the record */
+    /* 0x6 */ s16 next; /* 0: hide the map object */
 } StageSeqStep;
 
-/* A frame of a StageTileFrame animation, which sets two frames of a record */
+/* A frame of a StageTileFrame animation, which sets two frames of a map object */
 typedef struct StageTileFrame {
     /* 0x0 */ u8 frame;
     /* 0x1 */ u8 duration;
@@ -326,7 +321,7 @@ typedef struct StageFallBody {
     /* 0x04 */ s32 y;
     /* 0x08 */ s32 vx;
     /* 0x0C */ s32 vy;
-    /* 0x10 */ s16 unk10;
+    /* 0x10 */ s16 unk10; /* unused */
     /* 0x12 */ s16 bounced;
     /* 0x14 */ AnimState anim;
 } StageFallBody;
@@ -387,7 +382,7 @@ typedef struct StageTileTask {
     /* 0x50 */ StageTileAnim obj;
 } StageTileTask;
 
-/* StageTileDuo with one record */
+/* StageTileDuo with one map object */
 typedef struct StageTileSolo {
     TASK_HEADER(StageTileSolo);
     /* 0x50 */ s16 mode;
@@ -427,7 +422,7 @@ typedef struct StageRiserFrame {
 /* A map object animated and moved by its animation */
 typedef struct StageRiser {
     /* 0x00 */ s32 y; /* 8.8 */
-    /* 0x04 */ s32 move; /* added to the record's unkC */
+    /* 0x04 */ s32 move; /* added to the map object's y */
     /* 0x08 */ s16 active;
     /* 0x0A */ s16 tileAnim;
     /* 0x0C */ AnimState anim;
@@ -465,7 +460,7 @@ typedef struct StageTileSix {
     /* 0x54 */ StageTileAnim tiles[6];
 } StageTileSix;
 
-/* StageTileSix with flagged records */
+/* StageTileSix with flagged map objects */
 typedef struct StageTileSixW {
     TASK_HEADER(StageTileSixW);
     /* 0x50 */ s32 mode;
@@ -541,22 +536,27 @@ typedef struct StageQuad {
     /* 0x10 */ s16 kind; /* 0-1: the frame of that animation, else the texture */
 } StageQuad;
 
-/* A texture of a StageQuad: its page, square at (u, v), and palette */
+/*
+ * A texture of a StageQuad: its page, square at (u, v), and palette. vramX
+ * and vramY, the square's place in VRAM (tpageX + (u & 0xFF) / 4, tpageY +
+ * v, the 4-bit texels four to a halfword), are in the table but nothing reads
+ * them.
+ */
 typedef struct StageQuadTexture {
     /* 0x00 */ s16 tpageX;
     /* 0x02 */ s16 tpageY;
-    /* 0x04 */ s16 unk4;
-    /* 0x06 */ s16 unk6;
+    /* 0x04 */ s16 vramX; /* unused */
+    /* 0x06 */ s16 vramY; /* unused */
     /* 0x08 */ s16 u;
     /* 0x0A */ s16 v;
     /* 0x0C */ u16 clutX;
     /* 0x0E */ u16 clutY;
 } StageQuadTexture;
 
-/* The records with animations 3 and 4, each animated once */
+/* The map objects with animations 3 and 4, each animated once */
 typedef struct StageTileOnce {
     TASK_HEADER(StageTileOnce);
-    /* 0x50 */ s32 unk50;
+    /* 0x50 */ s32 unk50; /* unused */
     /* 0x54 */ StageTileAnimFlag tiles[2];
 } StageTileOnce;
 
@@ -623,13 +623,13 @@ typedef struct StageTileQuad {
 typedef struct StageTileLift {
     TASK_HEADER(StageTileLift);
     /* 0x50 */ StageTile *tiles[2]; /* animations 3 and 2 */
-    /* 0x58 */ s16 down; /* the records are 0x7F up, and move down */
+    /* 0x58 */ s16 down; /* the map objects are 0x7F up, and move down */
     /* 0x5A */ s16 timer;
     /* 0x5C */ s16 shake; /* the step of the stage's shake table, then a frame count */
-    /* 0x5E */ s16 unk5E;
-    /* 0x60 */ s16 y[2]; /* the records' unkC when the move starts */
+    /* 0x5E */ s16 unk5E; /* unused */
+    /* 0x60 */ s16 y[2]; /* the map objects' y when the move starts */
     /* 0x64 */ s32 playerY;
-    /* 0x68 */ s16 homeY[2]; /* the records' unkC at the start */
+    /* 0x68 */ s16 homeY[2]; /* the map objects' y at the start */
 } StageTileLift;
 
 /* The map objects with animations 4 to 1, animated */
@@ -652,7 +652,7 @@ typedef struct StageActorMark {
 typedef struct StageFrameTask {
     TASK_HEADER(StageFrameTask);
     /* 0x50 */ s32 frame;
-    /* 0x54 */ u8 unk54[8];
+    /* 0x54 */ u8 unk54[8]; /* unused */
 } StageFrameTask;
 
 /* The map objects with animations 1 to 5, each playing a sequence */

@@ -6,6 +6,10 @@
 #include "common.h"
 #include "stage.h"
 
+/*
+ * Back from the battle after event 1283, starts event 1284, with BK
+ * MegaGargomon, unless it has played
+ */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -25,11 +29,19 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 1283, with BK MegaGargomon: lets event 1284 start and starts
+ * the stage's event battle 1
+ */
 void endEvent1283(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x78), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
+/*
+ * After event 1284, with BK MegaGargomon: gives the player the Wild Helmet
+ * and keeps it from playing again
+ */
 void endEvent1284(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x79), 1);
     FLAGS_00.applyAction(ITEM(5, 0xF2), 1);
@@ -45,6 +57,7 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #define EVENT_TEXT_FILE 0x127
 #define STAGE_FILE 0x589
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing PYRA_BGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

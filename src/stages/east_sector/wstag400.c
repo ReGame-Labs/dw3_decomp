@@ -25,27 +25,47 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 1300, with the player: keeps it from playing again */
 void endEvent1300(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x4B), 1);
 }
 
+/* After event 1301, with Agumon: sets flag 0x1C4C (which decides whether actors 1 and 2 appear) */
 void endEvent1301(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x4C), 1);
 }
 
+/*
+ * After event 1302, with Agumon: sets flag 0x1C4D (which decides whether
+ * actors 12 and 13 appear)
+ */
 void endEvent1302(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x4D), 1);
 }
 
+/*
+ * After event 1303, with Agumon: sets flag 0x1C4E (which decides whether
+ * actors 14 and 15 appear)
+ */
 void endEvent1303(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x4E), 1);
 }
 
+/*
+ * After event 1304, with Veemon: lets event 1305 of WSTAG395 start and
+ * clears flag 0x1A26 (which decides whether actors 1 to 3 and 12 to 15
+ * appear and what actor 2 in WSTAG395 says)
+ */
 void endEvent1304(void) {
     FLAGS_00.applyAction(FLAG(0x1A, 0x27), 1);
     FLAGS_00.applyAction(FLAG(0x1A, 0x26), 0);
 }
 
+/*
+ * After events 1507 to 1509, where the player gives up looking for Veemon
+ * and leaves the Kicking Forest: clears flags 0x1A26 and 0x1C4B to 0x1C4E,
+ * so the search starts over
+ */
 void endEvents1507To1509(void) {
     FLAGS_00.applyAction(FLAG(0x1A, 0x26), 0);
     FLAGS_00.applyAction(FLAG(0x1C, 0x4B), 0);
@@ -67,6 +87,10 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x40A
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing the
+ * ambience ENV05_00; battle list 0 before story step 0xE, 1 from then on
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

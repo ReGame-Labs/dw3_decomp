@@ -11,6 +11,7 @@
 #include "common/update_stage_places.inc.c"
 #include "common/start_stage.inc.c"
 
+/* Sets the stage up: its map, actors and battles, playing BGM_0028 */
 void setupStage(void) {
     FIELDSTG_state.textFile = LANGUAGE + 0x104;
     FIELDSTG_state.mapFile = 0x68B;

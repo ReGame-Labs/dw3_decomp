@@ -9,10 +9,12 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+/* After event 920, with Teddy: keeps it from playing again */
 void endEvent920(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x5C), 1);
 }
 
+/* After event 970, with Kail and Kurt: keeps it from playing again */
 void endEvent970(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x6A), 1);
 }
@@ -27,6 +29,10 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #define EVENT_TEXT_FILE 0x127
 #define STAGE_FILE 0x569
 #endif
+/*
+ * Sets the stage up: its map, actors, battles and events, playing FIELDBGM;
+ * BGM_0029 instead except at story step 0x26 once flag 0x1A0A is set
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;
@@ -431,7 +437,8 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1A0, 0x148, 0x180, 0x48, 0x170, 0x1FA },
     { 0x180, 0x100, 0x1A8, 0x148, 0x1A0, 0x48, 0x140, 0x1F9 },
 };
-u16 D_800A5840[] = { FLAG(2, 0x1D), 1, ITEM(1, 0x2C), 1, SPECIAL(0x13), 1, CODES_END };
+/* The Super Charge the player finds: taken (flag 0x021D), given and special action 0x13 */
+u16 superChargeActions[] = { FLAG(2, 0x1D), 1, ITEM(1, 0x2C), 1, SPECIAL(0x13), 1, CODES_END };
 u16 talks1Talk0Conditions[] = { FLAG(0, 0x11), 0, CODES_END };
 u16 talks1Talk1Conditions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 1, CODES_END };
 u16 talks1Talk1Actions[] = { FLAG(0, 0x11), 0, CODES_END };
@@ -473,13 +480,13 @@ FieldTalk talks0[] = {
 #if VERSION_US
     { NULL, NULL, 0x39A },
 #elif VERSION_EU
-    { NULL, D_800A5840, 0x17D },
+    { NULL, superChargeActions, 0x17D },
 #endif
     { NULL, NULL, 0 },
 };
 FieldTalk actor2Talks[] = {
 #if VERSION_US
-    { NULL, D_800A5840, 0x17D },
+    { NULL, superChargeActions, 0x17D },
 #elif VERSION_EU
     { NULL, NULL, 0x21 },
 #endif
@@ -573,8 +580,9 @@ FieldTalk actor13Talks[] = {
 #endif
     { NULL, NULL, 0 },
 };
+/* The sign's talks: the USA version's actor 14, the European actor 13 (actor13Talks) */
 #if VERSION_US
-FieldTalk D_800A5AA4[] = {
+FieldTalk signTalks[] = {
     { NULL, NULL, 0x13 },
     { NULL, NULL, 0 },
 };
@@ -681,10 +689,11 @@ FieldTalk talks21[] = {
     { NULL, NULL, 0x347 },
     { NULL, NULL, 0 },
 };
+/* Here the USA version has Kail's conditions, the European one Kurt's talks */
 #if VERSION_US
-u16 D_800A5D2C[] = { PROGRESS(0x27), 1, CODES_END };
+u16 kailConditions[] = { PROGRESS(0x27), 1, CODES_END };
 #elif VERSION_EU
-FieldTalk D_800A5D2C[] = {
+FieldTalk kurtTalks[] = {
     { NULL, NULL, 0x347 },
     { NULL, NULL, 0 },
 };
@@ -733,13 +742,13 @@ u16 actorConditions28[] = { FLAG(0x1A, 0xA), 0, SPECIAL(0x1E), 1, CODES_END };
 u16 actorConditions29[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actorConditions30[] = { FLAG(0x1A, 0xA), 0, SPECIAL(0x1E), 1, CODES_END };
 #if VERSION_EU
-u16 D_800A6F88[] = { PROGRESS(0x27), 1, CODES_END };
+u16 kailConditions[] = { PROGRESS(0x27), 1, CODES_END };
 #endif
 u16 actor33Conditions[] = { PROGRESS(0x28), 1, CODES_END };
 u16 actor34Conditions[] = { PROGRESS(0x28), 1, CODES_END };
 u16 actor35Conditions[] = { PROGRESS(0x27), 1, CODES_END };
 #if VERSION_US
-FieldActorEntry actor0 = { D_800A5D2C, talks0, 0xB, 4, 1448, 236, 7 };
+FieldActorEntry actor0 = { kailConditions, talks0, 0xB, 4, 1448, 236, 7 };
 #elif VERSION_EU
 FieldActorEntry actor0 = { actorConditions0, NULL, 0xC, 4, 0, 0, 1 };
 #endif
@@ -809,7 +818,7 @@ FieldActorEntry actor13 = { actorConditions12, actor13Talks, 0x3A, 0x10, 1072, 6
 FieldActorEntry actor13 = { NULL, actor13Talks, 0x3F, 0x10, 961, 681, 1 };
 #endif
 #if VERSION_US
-FieldActorEntry actor14 = { NULL, D_800A5AA4, 0x3F, 0x11, 961, 681, 1 };
+FieldActorEntry actor14 = { NULL, signTalks, 0x3F, 0x11, 961, 681, 1 };
 #elif VERSION_EU
 FieldActorEntry actor14 = { actorConditions13, talks1, 0x45, 0x11, 1152, 793, 1 };
 #endif
@@ -901,7 +910,7 @@ FieldActorEntry actor31 = { actorConditions30, talks18, 0xA2, 0x18, 688, 633, 1 
 #if VERSION_US
 FieldActorEntry actor32 = { actorConditions30, talks18, 0xA2, 0x19, 688, 633, 1 };
 #elif VERSION_EU
-FieldActorEntry actor32 = { D_800A6F88, talks19, 0xB2, 0x19, 1448, 236, 7 };
+FieldActorEntry actor32 = { kailConditions, talks19, 0xB2, 0x19, 1448, 236, 7 };
 #endif
 #if VERSION_US
 FieldActorEntry actor33 = { actor33Conditions, talks19, 0xB2, 0x1A, 1110, 595, 1 };
@@ -916,7 +925,7 @@ FieldActorEntry actor34 = { actor34Conditions, talks21, 0x13D, 0x1A, 1088, 584, 
 #if VERSION_US
 FieldActorEntry actor35 = { actor35Conditions, talks21, 0x13D, 0x1B, 1472, 224, 1 };
 #elif VERSION_EU
-FieldActorEntry actor35 = { actor35Conditions, D_800A5D2C, 0x13D, 0x1A, 1472, 224, 1 };
+FieldActorEntry actor35 = { actor35Conditions, kurtTalks, 0x13D, 0x1A, 1472, 224, 1 };
 #endif
 FieldActorEntry *stageActors[] = {
     &actor0,

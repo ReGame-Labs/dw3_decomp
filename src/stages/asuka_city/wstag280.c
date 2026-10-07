@@ -53,13 +53,11 @@ void updateMenu(StageMenu *task, StageMenuChildren *children) {
             break;
         case 2:
             prev = task->cursor;
-            if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_UP)) & 1) ||
-                ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_UP)) & 1)) {
+            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
                 if (--task->cursor < 0) {
                     task->cursor = 0;
                 }
-            } else if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1) ||
-                       ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1)) {
+            } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
                 task->cursor++;
                 if (task->cursor > 1) {
                     task->cursor = 1;
@@ -70,7 +68,7 @@ void updateMenu(StageMenu *task, StageMenuChildren *children) {
                 children->cursor->setPos(children->cursor, 0x12, task->cursor * 14 + 0xBE);
                 break;
             }
-            if ((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_CROSS)) & 1) {
+            if (PAD_PRESSED(PAD_CROSS)) {
                 SOUND.playSound(SOUND_SELECT);
                 task->substate = 10;
                 task->step = 1;
@@ -122,6 +120,10 @@ void updateMenu(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
+/*
+ * Starts event 1522, which asks whether to listen to basic item information:
+ * yes starts event 57, no event 1523
+ */
 void *startEvent1522(void) {
     return createTask(updateMenu, sizeof(StageMenu), sizeof(StageMenuChildren));
 }
@@ -157,6 +159,7 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_FILE 0x1B3
 #define STAGE_ARCHIVE 0x3D3
 #endif
+/* Sets the stage up: its map, actors and events, playing SHOP2BGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

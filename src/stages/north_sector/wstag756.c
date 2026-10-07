@@ -29,11 +29,19 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 910, with Xuen Wu Chief: starts the stage's event battle 0 and
+ * keeps it from playing again
+ */
 void endEvent910(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x5B), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 911, with the player: moves the story on to its step 0x24 and
+ * gives the player the Black ID Pass
+ */
 void endEvent911(void) {
     GAME.progress = 0x24;
     FLAGS_00.applyAction(ITEM(0, 0x19), 1);
@@ -48,6 +56,7 @@ void endEvent911(void) {
 #define EVENT_TEXT_FILE 0x14A
 #define STAGE_FILE 0x6D5
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0007 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

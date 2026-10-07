@@ -7,6 +7,10 @@
 #include "common.h"
 #include "stage.h"
 
+/*
+ * Back from the battle after event 1287, starts event 1288, with BK
+ * Seraphimon, unless it has played
+ */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -26,11 +30,19 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 1287, with BK Seraphimon: lets event 1288 start and starts the
+ * stage's event battle 0
+ */
 void endEvent1287(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x7C), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1288, with BK Seraphimon: gives the player the Sniper Suit and
+ * keeps it from playing again
+ */
 void endEvent1288(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x7D), 1);
     FLAGS_00.applyAction(ITEM(5, 0x100), 1);
@@ -45,6 +57,7 @@ void endEvent1288(void) {
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x5CE
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0015 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

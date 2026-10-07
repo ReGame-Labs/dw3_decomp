@@ -6,6 +6,10 @@
 #include "common.h"
 #include "stage.h"
 
+/*
+ * Back from the battle after event 1289, starts event 1290, with BK
+ * WarGrowlmon, unless it has played
+ */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -25,11 +29,19 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 1289, with BK WarGrowlmon: lets event 1290 start and starts
+ * the stage's event battle 0
+ */
 void endEvent1289(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x7E), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1290, with BK WarGrowlmon: gives the player the Hazard Armor
+ * and keeps it from playing again
+ */
 void endEvent1290(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x7F), 1);
     FLAGS_00.applyAction(ITEM(5, 0x10E), 1);
@@ -44,6 +56,7 @@ void endEvent1290(void) {
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x613
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0017 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

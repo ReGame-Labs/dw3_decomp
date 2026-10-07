@@ -111,6 +111,7 @@ void handleCommand837(StageTilePair16 *task, s32 id) {
     }
 }
 
+/* Creates the button's map objects of event 850 (updateTilePair16) with an id */
 void *createTilePair16(s32 arg) {
     return createTaskWithId(updateTilePair16, sizeof(StageTilePair16), 0, arg);
 }
@@ -212,6 +213,10 @@ void updateTileOnce(StageTileOnce *task) {
     }
 }
 
+/*
+ * Command 839 of the event scripts: the button the player pushes in event
+ * 871 to stop the Juggernaut (updateTileOnce)
+ */
 void *createCommand839(s32 arg) {
     return createTaskWithId(updateTileOnce, sizeof(StageTileOnce), 0, arg);
 }
@@ -291,16 +296,25 @@ void updateStage(StageTask *task, void **children) {
 #include "common/update_stage_effect.inc.c"
 #include "common/create_stage_effect.inc.c"
 
+/* After event 850, with the player: sets flag 0x1C0A and keeps it from playing again */
 void endEvent850(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0xA), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0x61), 1);
 }
 
+/*
+ * After event 870, with Mech Soldier: starts the stage's event battle 0 and
+ * keeps it from playing again
+ */
 void endEvent870(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x44), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 871, with the player: gives the player the Dramon Guard and
+ * keeps it from playing again
+ */
 void endEvent871(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x45), 1);
     FLAGS_00.applyAction(ITEM(2, 0xCB), 1);
@@ -317,6 +331,7 @@ void endEvent871(void) {
 #define STAGE_FILE 0x6FE
 #define STAGE_FILE_8 0x725
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0011 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE_8;

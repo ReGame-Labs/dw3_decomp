@@ -40,11 +40,13 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
+/* After event 1608, with Kurt: starts the stage's event battle 0 and keeps it from playing again */
 void endEvent1608(void) {
     FLAGS_00.applyAction(FLAG(0x10, 0xC), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/* Sets the stage up: its map, actors, battles and events, playing KANRIBGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = LANGUAGE + 0xFD;
     FIELDSTG_state.mapFile = 0x346;

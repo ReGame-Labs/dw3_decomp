@@ -53,13 +53,11 @@ void updateEvent1518(StageMenu *task, StageMenuChildren *children) {
             break;
         case 2:
             prev = task->cursor;
-            if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_UP)) & 1) ||
-                ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_UP)) & 1)) {
+            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
                 if (--task->cursor < 0) {
                     task->cursor = 0;
                 }
-            } else if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1) ||
-                       ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1)) {
+            } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
                 task->cursor++;
                 if (task->cursor > 1) {
                     task->cursor = 1;
@@ -70,7 +68,7 @@ void updateEvent1518(StageMenu *task, StageMenuChildren *children) {
                 children->cursor->setPos(children->cursor, 0x12, task->cursor * 14 + 0xBE);
                 break;
             }
-            if ((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_CROSS)) & 1) {
+            if (PAD_PRESSED(PAD_CROSS)) {
                 SOUND.playSound(SOUND_SELECT);
                 task->substate = 10;
                 task->step = 1;
@@ -122,6 +120,10 @@ void updateEvent1518(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
+/*
+ * Starts event 1518, which asks whether to listen to the basic card rules:
+ * yes starts event 59, no event 1519
+ */
 void *startEvent1518(void) {
     return createTask(updateEvent1518, sizeof(StageMenu), sizeof(StageMenuChildren));
 }
@@ -166,13 +168,11 @@ void updateEvent1520(StageMenu *task, StageMenuChildren *children) {
             break;
         case 2:
             prev = task->cursor;
-            if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_UP)) & 1) ||
-                ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_UP)) & 1)) {
+            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
                 if (--task->cursor < 0) {
                     task->cursor = 0;
                 }
-            } else if (((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1) ||
-                       ((PAD.getRepeated(0) >> PAD.getButtonBit(0, PAD_DOWN)) & 1)) {
+            } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
                 task->cursor++;
                 if (task->cursor > 1) {
                     task->cursor = 1;
@@ -183,7 +183,7 @@ void updateEvent1520(StageMenu *task, StageMenuChildren *children) {
                 children->cursor->setPos(children->cursor, 0x12, task->cursor * 14 + 0xBE);
                 break;
             }
-            if ((PAD.getPressed(0) >> PAD.getButtonBit(0, PAD_CROSS)) & 1) {
+            if (PAD_PRESSED(PAD_CROSS)) {
                 SOUND.playSound(SOUND_SELECT);
                 task->substate = 10;
                 task->step = 1;
@@ -235,6 +235,10 @@ void updateEvent1520(StageMenu *task, StageMenuChildren *children) {
     }
 }
 
+/*
+ * Starts event 1520, which asks whether to listen to the card rules: yes
+ * starts event 65, no event 1521
+ */
 void *startEvent1520(void) {
     return createTask(updateEvent1520, sizeof(StageMenu), sizeof(StageMenuChildren));
 }
@@ -243,6 +247,12 @@ void *startEvent1520(void) {
 
 #include "common/start_stage.inc.c"
 
+/*
+ * After event 1415, with Divermon, Tamer Nacky, Tamer Steve, Tamer Gloria
+ * and Tamer Wong: gives the player the Folder Bag and sets flags 0x1A1C
+ * (which decides what actor 30 says and what actor 15 in WSTAG425 says) and
+ * 0x40A1
+ */
 void endEvent1415(void) {
     FLAGS_00.applyAction(ITEM(0, 0x192), 1);
     FLAGS_00.applyAction(FLAG(0x1A, 0x1C), 1);
@@ -260,6 +270,7 @@ void endEvent1415(void) {
 #define STAGE_FILE 0x1AF
 #define STAGE_ARCHIVE 0x3D2
 #endif
+/* Sets the stage up: its map, actors and events, playing SHOP2BGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

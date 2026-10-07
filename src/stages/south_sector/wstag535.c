@@ -6,6 +6,7 @@
 #include "common.h"
 #include "stage.h"
 
+/* Back from the battle after event 1262, starts event 1263, with Zanbamon, unless it has played */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -25,11 +26,16 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
+/* After event 1262, with Zanbamon: lets event 1263 start and starts the stage's event battle 0 */
 void endEvent1262(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x55), 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+/*
+ * After event 1263, with Zanbamon: gives the player the Rusty Katana and
+ * keeps it from playing again
+ */
 void endEvent1263(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x56), 1);
     FLAGS_00.applyAction(ITEM(3, 0x66), 1);
@@ -46,6 +52,7 @@ void endEvent1263(void) {
 #define STAGE_FILE 0x294
 #define STAGE_ARCHIVE 0x3DE
 #endif
+/* Sets the stage up: its map, actors, battles and events, playing BGM_0015 */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

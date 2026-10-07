@@ -16,6 +16,7 @@
 #define STAGE_TEXT (LANGUAGE + 0xDA)
 #define STAGE_FILE 0x517
 #endif
+/* Sets the stage up: its map and actors, playing SHOP2BGM */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;

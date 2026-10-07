@@ -17,6 +17,10 @@
 #define STAGE_FILE 0x1A1
 #define STAGE_ARCHIVE 0x396
 #endif
+/*
+ * Sets the stage up: its map and actors, playing KANRIBGM; BGM_0029 instead
+ * at story steps 0x14 to 0x17 and 0x27 to 0x28
+ */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
     FIELDSTG_state.mapFile = STAGE_FILE - 1;
