@@ -1,9 +1,11 @@
 #include "common.h"
+#include "dw3/heap.h"
 
 extern s32 getDigimon[];
 
+MemBlock *HEAP_START = HEAP_BASE;
+
 #if VERSION_US
-s32 HEAP_START = 0x800AA800;
 s32 ITEM_EFFECT_2B = 0x1F40103;
 s32 ITEM_EFFECT_2C = 0x7D00103;
 s32 ITEM_EFFECT_2D = 0x13880103;
@@ -91,7 +93,6 @@ s32 GET_DIGIMON[] = {
     (s32)getDigimon, 2199,
 };
 #elif VERSION_EU
-s32 HEAP_START = 0x800AB800;
 s32 ITEM_EFFECT_2B = 0x1F40103;
 s32 ITEM_EFFECT_2C = 0x7D00103;
 s32 ITEM_EFFECT_2D = 0x13880103;
