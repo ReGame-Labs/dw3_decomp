@@ -175,8 +175,8 @@ typedef struct PlayerNameFuncs {
 } PlayerNameFuncs;
 
 /* stplnmet.c */
-void STPLNMET_centerLayer(Task *task, Task **children, Layer *layer, RECT *rect);
-void STPLNMET_updateScene(Task *task, Task **children);
+void STPLNMET_centerLayer(Task *task, PlayerNameScreen **screen, Layer *layer, RECT *rect);
+void STPLNMET_updateScene(Task *task, PlayerNameScreen **screen);
 Task *STPLNMET_start(void);
 
 /* backdrop.c */
@@ -233,7 +233,7 @@ void STPLNMET_showTabs(PlayerNameScreen *screen, PlayerNameScreenChildren *child
 void STPLNMET_stepScreen(PlayerNameScreen *screen, PlayerNameScreenChildren *children);
 void STPLNMET_drawTitle(PlayerNameScreen *screen);
 void STPLNMET_updateScreen(PlayerNameScreen *screen, PlayerNameScreenChildren *children);
-Task *STPLNMET_createScreen(void);
+PlayerNameScreen *STPLNMET_createScreen(void);
 void STPLNMET_loadFiles(void);
 s32 STPLNMET_filesLoading(void);
 void STPLNMET_startFade(PanelAnim *fade, s32 fadeIn);

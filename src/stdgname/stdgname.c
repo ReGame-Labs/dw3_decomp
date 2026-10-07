@@ -4,7 +4,7 @@
 
 /* The mode's root task: sets up the 320x240 display and its black layer, then
    creates the renaming screen */
-void STDGNAME_updateScene(Task *task, void **children) {
+void STDGNAME_updateScene(Task *task, ScreenTask **screen) {
     RECT rect;
     Layer *layer;
 
@@ -20,7 +20,7 @@ void STDGNAME_updateScene(Task *task, void **children) {
         rect.h = 240;
         layer = GFX.funcs.createLayer(&rect, 3, SCREEN_LAYER);
         layer->setBgColor(layer, 0, 0, 0);
-        *children = STDGNAME_createScreen();
+        *screen = STDGNAME_createScreen();
         task->nextState(task);
         break;
     case TASK_RUN:
@@ -32,7 +32,7 @@ void STDGNAME_updateScene(Task *task, void **children) {
 
 /* The mode's entry point (MODE_ENTRY_POINTS): starts the root task */
 Task *STDGNAME_start(void) {
-    return createTask(STDGNAME_updateScene, sizeof(Task), sizeof(void *));
+    return createTask(STDGNAME_updateScene, sizeof(Task), sizeof(ScreenTask *));
 }
 
 #include "../menu_common/start_fader.inc.c"

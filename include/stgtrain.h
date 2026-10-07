@@ -75,7 +75,7 @@ typedef struct TrainSprite {
     /* 0x078 */ s32 flags; /* bit 31: paused; the rest, ended */
     /* 0x07C */ s32 unk7C;
     /* 0x080 */ TrainSpriteBank *bank;
-    /* 0x084 */ u16 unk84;
+    /* 0x084 */ u16 unk84; /* the bank's unk2 and unk4: nothing reads them */
     /* 0x086 */ u16 unk86;
     /* 0x088 */ s32 bankOffset;
     /* 0x08C */ TrainAnim *anim;
@@ -136,8 +136,8 @@ typedef struct TrainScreenWindows {
     /* 0x2C */ TextWindow *stats[6];
     /* 0x44 */ TextWindow *resistances[7];
     /* 0x60 */ TextWindow *tp[2];
-    /* 0x68 */ TextWindow *unk68;
-    /* 0x6C */ TextWindow *unk6C;
+    /* 0x68 */ TextWindow *help; /* triangle stops training (string 5) */
+    /* 0x6C */ TextWindow *prompt; /* "Train which Digimon?" (string 6) */
     /* 0x70 */ struct TrainMenu *menu;
     /* 0x74 */ struct TrainSession *session;
     /* 0x78 */ struct TrainResult *result;
@@ -289,7 +289,8 @@ typedef struct TrainFile {
     /* 0x0 */ s32 file;
     /* 0x4 */ s32 x;
     /* 0x8 */ s32 y;
-    /* 0xC */ s32 unkC;
+    /* 0xC */ s32 effectSameDepth; /* 0 draws the effect one depth in front of the
+                                      Digimon (STGTRAIN_updateActor) */
 } TrainFile;
 
 /* An image set of the loaded file (STGTRAIN_readSet) */
@@ -316,6 +317,7 @@ typedef struct TrainSetHeader {
 
 /* Where readSet and its helpers read the loaded file */
 typedef union TrainCursor {
+    u8 *bytes; /* the file's offsets count bytes from its start */
     s32 *w;
     TrainSetHeader *set;
 } TrainCursor;
@@ -353,13 +355,13 @@ typedef struct TrainState {
     /* 0x304 */ s32 (*loadSet)(s32 set, s32 *pos);
     /* 0x308 */ s32 (*getFileId)(s32 index);
     /* 0x30C */ s32 (*getFilePos)(s32 index); /* y << 16 | x */
-    /* 0x310 */ s32 (*getFileUnkC)(s32 index);
+    /* 0x310 */ s32 (*getFileEffectSameDepth)(s32 index);
     /* 0x314 */ TrainSpriteBank *(*getBank)(s32 set);
     /* 0x318 */ s32 (*getBankOffset)(s32 set);
     /* 0x31C */ s32 (*getSetUnkC)(s32 set);
     /* 0x320 */ TrainAnim *(*getAnim)(s32 set, s32 i);
-    /* 0x324 */ s32 *(*getTable)(s32 index);
-    /* 0x328 */ s32 *(*findTableEntry)(s32 index, s32 id);
+    /* 0x324 */ TrainEntry *(*getTable)(s32 index);
+    /* 0x328 */ TrainEntry *(*findTableEntry)(s32 index, s32 id);
 } TrainState;
 
 extern TrainState STGTRAIN_state;
@@ -372,7 +374,7 @@ extern TrainGain STGTRAIN_statLosses[];
 extern TrainGain *STGTRAIN_resistGainTables[];
 extern TrainGain STGTRAIN_maxHpMpGains[];
 extern s32 STGTRAIN_intensityCosts[]; /* the points each intensity of a training costs */
-extern s32 STGTRAIN_gymTrainings[14][16][2];
+extern TrainEntry STGTRAIN_gymTrainings[14][16];
 extern TrainFile STGTRAIN_files[];
 extern TrainCursor STGTRAIN_bankCursor;
 extern TrainCursor STGTRAIN_animCursor;
@@ -481,12 +483,12 @@ s32 STGTRAIN_readSet(s32 set);
 s32 STGTRAIN_loadSet(s32 set, s32 *pos);
 s32 STGTRAIN_getFileId(s32 index);
 s32 STGTRAIN_getFilePos(s32 index);
-s32 STGTRAIN_getFileUnkC(s32 index);
+s32 STGTRAIN_getFileEffectSameDepth(s32 index);
 TrainSpriteBank *STGTRAIN_getBank(s32 set);
 s32 STGTRAIN_getBankOffset(s32 set);
 s32 STGTRAIN_getSetUnkC(s32 set);
 TrainAnim *STGTRAIN_getAnim(s32 set, s32 i);
-s32 *STGTRAIN_getGymTrainings(s32 index);
-s32 *STGTRAIN_findGymTraining(s32 index, s32 id);
+TrainEntry *STGTRAIN_getGymTrainings(s32 index);
+TrainEntry *STGTRAIN_findGymTraining(s32 index, s32 id);
 
 #endif /* STGTRAIN_H */

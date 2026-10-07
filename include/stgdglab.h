@@ -178,7 +178,7 @@ typedef struct LabEntryPanel {
 typedef struct LabEntryPanelWindows {
     /* 0x00 */ TextWindow *entries[10];
     /* 0x28 */ TextWindow *digimonName;
-    /* 0x2C */ TextWindow *unk2C;
+    /* 0x2C */ TextWindow *levelLabel; /* "Skill LV", left of values[13] */
     /* 0x30 */ TextWindow *skills[6];
     /* 0x48 */ TextWindow *values[14]; /* the battle stats, the resistances, the level */
     /* 0x80 */ TextWindow *help;
@@ -245,7 +245,7 @@ typedef struct LabEntryListWindows {
     /* 0x00 */ TextWindow *title;
     /* 0x04 */ TextWindow *options[3];
     /* 0x10 */ TextWindow *digimonName;
-    /* 0x14 */ TextWindow *unk14;
+    /* 0x14 */ TextWindow *levelLabel; /* "Skill LV", left of values[13] */
     /* 0x18 */ TextWindow *skills[6];
     /* 0x30 */ TextWindow *values[14]; /* the battle stats, the resistances, the level */
     /* 0x68 */ Cursor *cursor;
@@ -274,11 +274,12 @@ typedef struct LabChildren {
     /* 0x8 */ ScreenFade *fade;
 } LabChildren;
 
-/* An entry of STGDGLAB_entries */
+/* An entry of STGDGLAB_entries: a Digimon of the recipes (GET_DIGIMON) */
 typedef struct LabEntry {
     /* 0x0 */ s16 id;
     /* 0x2 */ s16 sprite;
-    /* 0x4 */ s16 b;
+    /* 0x4 */ s16 b; /* 0x100-0x135, one per Digimon; only STGDGLAB_getItemB
+                        reads it, and nothing calls that */
 } LabEntry;
 
 /* The lab's helpers (STGDGLAB_data.funcs) */
@@ -302,7 +303,7 @@ typedef struct LabData {
 } LabData;
 
 /* stgdglab.c */
-void STGDGLAB_updateScene(Task *task, Task **children);
+void STGDGLAB_updateScene(Task *task, Lab **child);
 Task *STGDGLAB_createScene(void);
 void STGDGLAB_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
 void STGDGLAB_drawFader(ScreenFade *task);
@@ -353,7 +354,7 @@ ScrollBar *STGDGLAB_createScrollBar(void);
 
 /* party_screen.c */
 void STGDGLAB_showPartyPage(LabPartyScreen *screen, LabPartyScreenWindows *windows);
-void STGDGLAB_hideWindows(Task *task);
+void STGDGLAB_hideWindows(LabPartyScreen *screen);
 void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children);
 void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *windows);
 void STGDGLAB_updatePartyScreen(LabPartyScreen *screen, void *children);
@@ -390,7 +391,7 @@ s32 STGDGLAB_updateFade(PanelAnim *fade);
 void STGDGLAB_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
 s32 STGDGLAB_updateLerp(MenuLerp *lerp);
 s32 STGDGLAB_getItemSprite(s32 id);
-s32 func_8008EC48(s32 id);
+s32 STGDGLAB_getItemB(s32 id);
 
 /* STGDGLAB's data, in its order: the recipe screen's, the menu's, the party
    screen's and the lab's */

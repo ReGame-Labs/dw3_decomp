@@ -358,17 +358,18 @@ void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
         }
         break;
     case 71:
-        status = saves->result = MEMCARD_SYSTEM.funcs.read(saves->port, (u8 *)STGMCARD_funcs.dataBuf, sizeof(GameSave), STGMCARD_funcs.slot + 2);
+        status = saves->result = MEMCARD_SYSTEM.funcs.read(saves->port, STGMCARD_funcs.dataBuf->bytes, sizeof(GameSave), STGMCARD_funcs.slot + 2);
         if (status != 0) {
             if (status == 1) {
-                if (MEMCARD_SYSTEM.funcs.computeChecksum(&STGMCARD_funcs.dataBuf->unk0[4], sizeof(GameSave) - 4) & ~STGMCARD_funcs.dataBuf->unk0[0]) {
+                if (MEMCARD_SYSTEM.funcs.computeChecksum(&STGMCARD_funcs.dataBuf->bytes[SAVE_CHECKED], sizeof(GameSave) - SAVE_CHECKED) &
+                    ~STGMCARD_funcs.dataBuf->bytes[SAVE_CHECKSUM]) {
                     saves->result = 8;
                     STGMCARD_closeMenuForError(saves, win);
-                } else if (STGMCARD_funcs.dataBuf->unk0[2] != MEMCARD_SAVE_VERSION && saves->screen->loading != 0) {
+                } else if (STGMCARD_funcs.dataBuf->bytes[SAVE_VERSION] != MEMCARD_SAVE_VERSION && saves->screen->loading != 0) {
                     saves->result = 8;
                     STGMCARD_closeMenuForError(saves, win);
                 } else {
-                    *(GameSave *)&GAME = *(GameSave *)STGMCARD_funcs.dataBuf;
+                    GAME_SAVE = STGMCARD_funcs.dataBuf->save;
                     win->panel->start(win->panel, 2, 0x14);
                     saves->substate = 500;
                     win->menu->substate = 0;
@@ -436,18 +437,20 @@ void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
         break;
     case 51:
         save = &STGMCARD_funcs.infoBuf->saves[STGMCARD_funcs.slot];
-        *(GameSave *)STGMCARD_funcs.dataBuf = *(GameSave *)&GAME;
-        STGMCARD_funcs.dataBuf->unk0[0] = MEMCARD_SYSTEM.funcs.computeChecksum(&STGMCARD_funcs.dataBuf->unk0[4], sizeof(GameSave) - 4);
-        STGMCARD_funcs.dataBuf->unk0[2] = MEMCARD_SAVE_VERSION;
-        strcpy(save->name, STGMCARD_funcs.dataBuf->name);
+        STGMCARD_funcs.dataBuf->save = GAME_SAVE;
+        STGMCARD_funcs.dataBuf->bytes[SAVE_CHECKSUM] =
+            MEMCARD_SYSTEM.funcs.computeChecksum(&STGMCARD_funcs.dataBuf->bytes[SAVE_CHECKED], sizeof(GameSave) - SAVE_CHECKED);
+        STGMCARD_funcs.dataBuf->bytes[SAVE_VERSION] = MEMCARD_SAVE_VERSION;
+        strcpy(save->name, STGMCARD_funcs.dataBuf->game.name);
         save->area = saves->screen->area;
         save->place = saves->screen->place;
-        save->money = STGMCARD_funcs.dataBuf->money;
-        save->time = *(PlayTime *)&STGMCARD_funcs.dataBuf->playFrames;
+        save->money = STGMCARD_funcs.dataBuf->game.money;
+        /* GameState keeps the play time as PlayTime's fields, from playFrames */
+        save->time = *(PlayTime *)&STGMCARD_funcs.dataBuf->game.playFrames;
         for (i = 0; i < 3; i++) {
             member = GAME.funcs.getPartyMember(i);
-            save->levels[i] = STGMCARD_funcs.dataBuf->partners[member].info.stats[STAT_LEVEL];
-            save->partners[i] = STGMCARD_funcs.dataBuf->partners[member].unlocked;
+            save->levels[i] = STGMCARD_funcs.dataBuf->game.partners[member].info.stats[STAT_LEVEL];
+            save->partners[i] = STGMCARD_funcs.dataBuf->game.partners[member].unlocked;
         }
         STGMCARD_funcs.infoBuf->last = STGMCARD_funcs.slot;
         STGMCARD_funcs.infoBuf->checksum = MEMCARD_SYSTEM.funcs.computeChecksum((u8 *)&STGMCARD_funcs.infoBuf->magic, sizeof(MemCardFile) - 4);
@@ -465,7 +468,7 @@ void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
         }
         break;
     case 53:
-        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)STGMCARD_funcs.dataBuf, sizeof(GameSave), STGMCARD_funcs.slot + 2);
+        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, STGMCARD_funcs.dataBuf->bytes, sizeof(GameSave), STGMCARD_funcs.slot + 2);
         if (status != 0) {
             if (status == 1) {
                 win->panel->start(win->panel, 2, 0x14);

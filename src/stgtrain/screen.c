@@ -26,8 +26,8 @@ void STGTRAIN_createScreenWindows(TrainScreen *screen, TrainScreenWindows *win) 
     }
     win->tp[0] = createTextWindow(screen->layerId, 1, 0x10, 0xBB);
     win->tp[1] = createTextWindow(screen->layerId, 1, 0x2C, 0xBB);
-    win->unk68 = createTextWindow(screen->layerId, 1, 0xA1, 0x17);
-    win->unk6C = createTextWindow(screen->layerId, 1, 0xAE, 0x49);
+    win->help = createTextWindow(screen->layerId, 1, 0xA1, 0x17);
+    win->prompt = createTextWindow(screen->layerId, 1, 0xAE, 0x49);
 }
 
 /* Shows or hides the selected partner's name, level, HP and MP */
@@ -349,7 +349,7 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         STGTRAIN_state.updateFade(&screen->panels[3]);
         if (STGTRAIN_state.updateFade(&screen->panels[0])) {
             STGTRAIN_showVitals(screen, win, 1);
-            win->unk68->setString(win->unk68, FILE_CACHE.load(STGTRAIN_TEXT), 5);
+            win->help->setString(win->help, FILE_CACHE.load(STGTRAIN_TEXT), 5);
             STGTRAIN_state.startFade(&screen->panels[1], 1);
             STGTRAIN_state.startFade(&screen->panels[4], 1);
             screen->substate++;
@@ -359,7 +359,7 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         STGTRAIN_state.updateFade(&screen->panels[4]);
         if (STGTRAIN_state.updateFade(&screen->panels[1])) {
             STGTRAIN_showBattleStats(screen, win, 1);
-            win->unk6C->setString(win->unk6C, FILE_CACHE.load(STGTRAIN_TEXT), 6);
+            win->prompt->setString(win->prompt, FILE_CACHE.load(STGTRAIN_TEXT), 6);
             STGTRAIN_state.startFade(&screen->panels[2], 1);
             STGTRAIN_state.startFade(&screen->panels[6], 1);
             screen->substate++;
@@ -429,9 +429,9 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         STGTRAIN_state.startFade(&screen->panels[6], 0);
         screen->cursorShown = 0;
         STGTRAIN_state.startFade(&screen->panels[4], 0);
-        win->unk6C->setVisible(win->unk6C, 0);
+        win->prompt->setVisible(win->prompt, 0);
         STGTRAIN_state.startFade(&screen->panels[3], 0);
-        win->unk68->setVisible(win->unk68, 0);
+        win->help->setVisible(win->help, 0);
         screen->substate++;
         break;
     case 0x15:
@@ -447,14 +447,14 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         break;
     case 0x1A:
         if (STGTRAIN_state.updateFade(&screen->panels[3])) {
-            win->unk68->setString(win->unk68, FILE_CACHE.load(STGTRAIN_TEXT), 5);
+            win->help->setString(win->help, FILE_CACHE.load(STGTRAIN_TEXT), 5);
             STGTRAIN_state.startFade(&screen->panels[4], 1);
             screen->substate++;
         }
         break;
     case 0x1B:
         if (STGTRAIN_state.updateFade(&screen->panels[4])) {
-            win->unk6C->setString(win->unk6C, FILE_CACHE.load(STGTRAIN_TEXT), 6);
+            win->prompt->setString(win->prompt, FILE_CACHE.load(STGTRAIN_TEXT), 6);
             STGTRAIN_state.startFade(&screen->panels[6], 1);
             screen->substate++;
         }
@@ -516,9 +516,9 @@ void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win) {
         STGTRAIN_state.startFade(&screen->panels[6], 0);
         screen->cursorShown = 0;
         STGTRAIN_state.startFade(&screen->panels[4], 0);
-        win->unk6C->setVisible(win->unk6C, 0);
+        win->prompt->setVisible(win->prompt, 0);
         STGTRAIN_state.startFade(&screen->panels[3], 0);
-        win->unk68->setVisible(win->unk68, 0);
+        win->help->setVisible(win->help, 0);
         screen->substate++;
         break;
     case 0x33:

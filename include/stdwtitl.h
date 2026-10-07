@@ -242,7 +242,7 @@ typedef struct TitleChildren {
 
 typedef struct TitleTask {
     TASK_HEADER(TitleTask);
-    /* 0x50 */ Task *parent;
+    /* 0x50 */ TitleLoaderTask *parent;
     /* 0x54 */ s32 timer;
     /* 0x58 */ s32 choice;
     /* 0x5C */ s32 layerId;
@@ -311,7 +311,7 @@ extern s32 STDWTITL_movieFile;
 extern u32 STDWTITL_movieEndFrame;
 
 /* stdwtitl.c */
-void STDWTITL_tickSplashLoader(Task *task, Task **splash);
+void STDWTITL_tickSplashLoader(Task *task, SplashTask **splash);
 Task *STDWTITL_startSplashLoaderTask(void);
 void STDWTITL_tickScreen(Task *task, ScreenChildren *children);
 Task *STDWTITL_start(void);
@@ -348,11 +348,11 @@ GlintTask *STDWTITL_startGlintTask(s32 skip);
 /* splash.c */
 void STDWTITL_drawSplash(SplashTask *task);
 void STDWTITL_tickSplash(SplashTask *task);
-Task *STDWTITL_startSplashTask(void);
+SplashTask *STDWTITL_startSplashTask(void);
 
 /* title_loader.c */
-void STDWTITL_runTitleLoader(TitleLoaderTask *task, struct TitleTask **title);
-void STDWTITL_tickTitleLoader(TitleLoaderTask *task, struct TitleTask **title);
+void STDWTITL_runTitleLoader(TitleLoaderTask *task, TitleTask **title);
+void STDWTITL_tickTitleLoader(TitleLoaderTask *task, TitleTask **title);
 TitleLoaderTask *STDWTITL_startTitleLoaderTask(void);
 
 /* slides.c */
@@ -399,7 +399,7 @@ BackgroundTask *STDWTITL_startBackgroundTask(s32 skip);
 s32 STDWTITL_leaveTitle(TitleTask *task, TitleChildren *children);
 s32 STDWTITL_stepTitle(TitleTask *task, TitleChildren *children);
 void STDWTITL_tickTitle(TitleTask *task, TitleChildren *children);
-TitleTask *STDWTITL_startTitleTask(Task *parent);
+TitleTask *STDWTITL_startTitleTask(TitleLoaderTask *parent);
 void STDWTITL_loadTitleImages(void);
 void STDWTITL_startFade(PanelAnim *fade, s32 fadeIn);
 s32 STDWTITL_updateFade(PanelAnim *fade);

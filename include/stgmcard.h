@@ -30,7 +30,7 @@ typedef struct MemCardScene {
    from it shows (STGMCARD_prevModes, which ends with a zero mode) */
 typedef struct MemCardModeEntry {
     /* 0x0 */ u8 area; /* a string of TEXT_AREA_NAMES */
-    /* 0x1 */ u8 unk1;
+    /* 0x1 */ u8 unk1; /* nothing reads it */
     /* 0x2 */ s16 mode;
 } MemCardModeEntry;
 
@@ -104,14 +104,17 @@ typedef struct MemCardFile {
 
 #define MEMCARD_FILE_MAGIC 0x33574D44
 
-/* A save's data section is GAME's first GAME_SAVE_SIZE bytes. Its bytes 0
-   and 2 hold the checksum of the rest, from byte 4, and
-   MEMCARD_SAVE_VERSION. */
+/* A save's data section is GAME's first GAME_SAVE_SIZE bytes (SaveData). Its
+   bytes SAVE_CHECKSUM and SAVE_VERSION hold the checksum of the rest, from
+   byte SAVE_CHECKED, and MEMCARD_SAVE_VERSION. */
 #if VERSION_US
 #define MEMCARD_SAVE_VERSION 3
 #elif VERSION_EU
 #define MEMCARD_SAVE_VERSION 4
 #endif
+#define SAVE_CHECKSUM 0
+#define SAVE_VERSION 2
+#define SAVE_CHECKED 4
 
 /* The durations of the panels shown while loading and saving */
 #if VERSION_US
@@ -122,12 +125,26 @@ typedef struct MemCardFile {
 #define MEMCARD_SAVE_FRAMES 1267
 #endif
 
+/* The saved part of the game state, to copy it whole */
 typedef struct GameSave {
     /* 0x0000 */ s32 data[GAME_SAVE_SIZE / 4];
 } GameSave;
 
+/* GAME's saved part, which a load overwrites and a save copies: GameState
+   (game_state.h) has no GameSave view of itself */
+#define GAME_SAVE (*(GameSave *)&GAME)
+
+/* A save's data section (STGMCARD_funcs.dataBuf): copied whole to and from
+   GAME, read by its fields, and read, written and checked as bytes */
+typedef union SaveData {
+    GameSave save;
+    GameState game;
+    u8 bytes[GAME_SAVE_SIZE];
+} SaveData;
+
 /* MEMCARD followed by MEMCARD_FUNCS, as STGMCARD_runSaves reaches the functions:
-   through MEMCARD's address */
+   through MEMCARD's address. They take every buffer as a u8 pointer, so the
+   info section, the header and the icons are cast to one. */
 typedef struct MemCardSystem {
     /* 0x000 */ MemCard card;
     /* 0x328 */ MemCardFuncs funcs;
@@ -244,7 +261,7 @@ typedef struct MemCardScreenFuncs {
     /* 0x04 */ s32 slot; /* the selected one */
     /* 0x08 */ s32 prevSlot; /* where the cursor moves from */
     /* 0x0C */ MemCardFile *infoBuf;
-    /* 0x10 */ GameState *dataBuf; /* the saved part of the game state */
+    /* 0x10 */ SaveData *dataBuf; /* the saved part of the game state */
     /* 0x14 */ s32 infoSize;
     /* 0x18 */ s32 dataSize;
     /* 0x1C */ void (*loadFiles)(void);
@@ -257,7 +274,7 @@ typedef struct MemCardScreenFuncs {
 } MemCardScreenFuncs;
 
 /* stgmcard.c */
-void STGMCARD_updateScene(MemCardScene *task, Task **children);
+void STGMCARD_updateScene(MemCardScene *task, MemCardScreen **child);
 Task *STGMCARD_start(void);
 void STGMCARD_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
 void STGMCARD_drawFader(ScreenFade *task);
@@ -282,7 +299,7 @@ MemCardPanel *STGMCARD_createPanel(s32 x, s32 y, s32 w, s32 h);
 
 /* menu.c */
 void STGMCARD_slideInHeader(MemCardMenu *menu);
-void STGMCARD_startSlotPick(MemCardMenu *menu, s32 arg);
+void STGMCARD_startSlotPick(MemCardMenu *menu, s32 slot);
 void STGMCARD_slideOutHeader(MemCardMenu *menu);
 void STGMCARD_moveSlotCursor(MemCardMenu *menu);
 void STGMCARD_slideInSlots(MemCardMenu *menu);
@@ -304,7 +321,7 @@ MemCardSaves *STGMCARD_createSaves(MemCardScreen *screen);
 
 /* screen.c */
 void STGMCARD_updateScreen(MemCardScreen *screen, MemCardScreenTasks *tasks);
-Task *STGMCARD_createScreen(void);
+MemCardScreen *STGMCARD_createScreen(void);
 void STGMCARD_loadFiles(void);
 s32 STGMCARD_filesLoading(void);
 void STGMCARD_freeBuffers(void);

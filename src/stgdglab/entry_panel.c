@@ -12,7 +12,7 @@ void STGDGLAB_createEntryPanelWindows(LabEntryPanel *panel, LabEntryPanelWindows
         windows->entries[i] = createTextWindow(panel->layer, 1, (i % 2) * 0x85 + 0x27, (i / 2) * 0xE + 0x16);
     }
     windows->digimonName = createTextWindow(panel->layer, 1, 0x5B, 0x6A);
-    windows->unk2C = createTextWindow(panel->layer, 1, 0xF5, 0x6A);
+    windows->levelLabel = createTextWindow(panel->layer, 1, 0xF5, 0x6A);
     windows->values[13] = createTextWindow(panel->layer, 1, 0x12D, 0x6A);
     for (i = 0; i < 6; i++) {
         windows->skills[i] = createTextWindow(panel->layer, 1, 0xC2, i * 0xE + 0x8B);
@@ -74,7 +74,7 @@ void STGDGLAB_showEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windows
             GAME.funcs.computeStats(panel->partner, &totals);
             data = GET_DIGIMON(id);
             windows->digimonName->setString(windows->digimonName, FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), data->nameId);
-            windows->unk2C->setString(windows->unk2C, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x13);
+            windows->levelLabel->setString(windows->levelLabel, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x13);
             windows->values[13]->setNumber(windows->values[13], 0, entry.level);
             stats = totals.stats;
             for (i = 0; i < 6; i++) {

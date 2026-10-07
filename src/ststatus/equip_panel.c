@@ -294,6 +294,7 @@ void STSTATUS_runEquipPanel(EquipPanel *panel, EquipPanelWindows *windows) {
         } else if (PAD_PRESSED(PAD_CROSS)) {
             SOUND.playSound(SOUND_SELECT);
             n = 1;
+            /* owned is s16 because it is read signed; listItems fills a u16 array */
             count = STSTATUS_data.funcs.listItems(STSTATUS_slotLists[panel->slot], (u16 *)panel->owned);
             for (i = 0; i < count; i++) {
                 if (STSTATUS_data.funcs.canEquip(panel->partner, panel->slot, panel->owned[i])) {

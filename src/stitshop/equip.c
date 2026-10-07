@@ -22,26 +22,26 @@ s32 STITSHOP_canEquip(s32 partner, s32 item) {
    one with the weaker item when both are taken), 4 or 5 for the accessories
    (the one with the same group, else the weaker one); -1 when it can't */
 s32 STITSHOP_compareEquip(s32 partner, s32 item) {
-    u8 *data = GET_ITEM[0](item)->data;
+    ItemData *data = SHOP_ITEM_DATA(GET_ITEM[0](item));
     PartnerStats *stats;
     ItemInfo *info;
-    u8 *first;
-    u8 *second;
+    ItemData *first;
+    ItemData *second;
     s32 equipped[2];
-    u8 *datas[2];
+    ItemData *datas[2];
     s32 i;
 
-    switch (data[2]) {
+    switch (data->weapon.kind) {
     case 3:
         stats = GAME.funcs.getPartnerStats(partner);
         if (stats->equip[2] > 0) {
             equipped[0] = stats->equip[2];
             if (stats->equip[3] > 0) {
                 equipped[1] = stats->equip[3];
-                first = GET_ITEM[0](equipped[0])->data;
+                first = SHOP_ITEM_DATA(GET_ITEM[0](equipped[0]));
                 info = GET_ITEM[0](equipped[1]);
-                second = info->data;
-                if (first[2] == 7 || info->type == 0x14) {
+                second = SHOP_ITEM_DATA(info);
+                if (first->weapon.kind == 7 || info->type == 0x14) {
                     return 2;
                 }
                 for (i = 0; i < 2; i++) {
@@ -50,7 +50,8 @@ s32 STITSHOP_compareEquip(s32 partner, s32 item) {
                         return -1;
                     }
                 }
-                if (*(u16 *)(first + 0xA) < *(u16 *)(second + 0xA)) {
+                /* the game compares the attacks unsigned */
+                if ((u16)first->weapon.atk < (u16)second->weapon.atk) {
                     return 2;
                 }
             }
@@ -69,9 +70,10 @@ s32 STITSHOP_compareEquip(s32 partner, s32 item) {
             equipped[0] = stats->equip[4];
             if (stats->equip[5] > 0) {
                 equipped[1] = stats->equip[5];
-                datas[0] = GET_ITEM[0](equipped[0])->data;
-                datas[1] = GET_ITEM[0](equipped[1])->data;
-                if (*(s16 *)(datas[0] + 6) < *(s16 *)(datas[1] + 6)) {
+                datas[0] = SHOP_ITEM_DATA(GET_ITEM[0](equipped[0]));
+                datas[1] = SHOP_ITEM_DATA(GET_ITEM[0](equipped[1]));
+                /* and the accessories' bonuses signed */
+                if ((s16)datas[0]->acc.amount < (s16)datas[1]->acc.amount) {
                     return 4;
                 }
             }
@@ -89,12 +91,12 @@ s32 STITSHOP_compareEquip(s32 partner, s32 item) {
                 return 5;
             }
             equipped[1] = stats->equip[5];
-            datas[0] = GET_ITEM[0](equipped[0])->data;
-            if (datas[0][2] == 8 && datas[0][3] == data[3]) {
+            datas[0] = SHOP_ITEM_DATA(GET_ITEM[0](equipped[0]));
+            if (datas[0]->acc.kind == 8 && datas[0]->acc.group == data->acc.group) {
                 return 4;
             }
-            datas[1] = GET_ITEM[0](equipped[1])->data;
-            if (datas[1][2] == 8 && datas[1][3] == data[3]) {
+            datas[1] = SHOP_ITEM_DATA(GET_ITEM[0](equipped[1]));
+            if (datas[1]->acc.kind == 8 && datas[1]->acc.group == data->acc.group) {
                 return 5;
             }
             break;
@@ -104,7 +106,7 @@ s32 STITSHOP_compareEquip(s32 partner, s32 item) {
     default:
         return -1;
     }
-    if (*(s16 *)(datas[0] + 6) < *(s16 *)(datas[1] + 6)) {
+    if ((s16)datas[0]->acc.amount < (s16)datas[1]->acc.amount) {
         return 4;
     }
     return 5;
@@ -116,7 +118,7 @@ void STITSHOP_equip(s32 partner, s32 slot, s32 item, s32 fromBag) {
     PartnerStats *stats = GAME.funcs.getPartnerStats(partner);
     s16 *equip;
     s16 *pair;
-    u8 *data;
+    ItemData *data;
     s32 group;
     s32 old;
     s32 i;
@@ -128,8 +130,8 @@ void STITSHOP_equip(s32 partner, s32 slot, s32 item, s32 fromBag) {
             GAME.equippedItems[old]--;
             GAME.items[old]++;
         }
-        data = GET_ITEM[0](old)->data;
-        if (data[2] == 7) {
+        data = SHOP_ITEM_DATA(GET_ITEM[0](old));
+        if (data->weapon.kind == 7) {
             stats->equip[2] = 0;
             stats->equip[3] = 0;
         } else {
@@ -137,8 +139,8 @@ void STITSHOP_equip(s32 partner, s32 slot, s32 item, s32 fromBag) {
         }
     }
     if (id > 0) {
-        data = GET_ITEM[0](id)->data;
-        if (data[2] == 7) {
+        data = SHOP_ITEM_DATA(GET_ITEM[0](id));
+        if (data->weapon.kind == 7) {
             pair = &stats->equip[2];
             if (stats->equip[2] == 0) {
                 pair = NULL;
@@ -153,13 +155,13 @@ void STITSHOP_equip(s32 partner, s32 slot, s32 item, s32 fromBag) {
                 }
                 *pair = 0;
             }
-        } else if (data[2] == 8) {
-            group = data[3];
+        } else if (data->acc.kind == 8) {
+            group = data->acc.group;
             for (i = 0; i < 2; i++) {
                 equip = &stats->equip[i + 4];
                 if (*equip != 0) {
-                    data = GET_ITEM[0](*equip)->data;
-                    if (data[3] == group) {
+                    data = SHOP_ITEM_DATA(GET_ITEM[0](*equip));
+                    if (data->acc.group == group) {
                         if (fromBag) {
                             GAME.equippedItems[*equip]--;
                             GAME.items[*equip]++;
@@ -173,8 +175,8 @@ void STITSHOP_equip(s32 partner, s32 slot, s32 item, s32 fromBag) {
             GAME.equippedItems[id]++;
             GAME.items[id]--;
         }
-        data = GET_ITEM[0](id)->data;
-        if (data[2] == 7) {
+        data = SHOP_ITEM_DATA(GET_ITEM[0](id));
+        if (data->weapon.kind == 7) {
             stats->equip[2] = id;
             stats->equip[3] = id;
         } else {

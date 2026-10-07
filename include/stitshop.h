@@ -19,6 +19,10 @@
 #define FILE_SHOP_SPRITES 0x402
 #endif
 
+/* The record of an item's type (ItemInfo.data is untyped: a usable item's
+   is its effect) */
+#define SHOP_ITEM_DATA(info) ((ItemData *)(info)->data)
+
 /* The main task of the shop (STITSHOP_createShop) */
 typedef struct ItemShop {
     TASK_HEADER(ItemShop);
@@ -45,11 +49,17 @@ typedef struct ItemShopWindows {
     /* 0x20 */ ScreenFade *fade;
 } ItemShopWindows;
 
+/* A partner's stats as STITSHOP_computeStats gives them (PartnerStats'
+   stats and status, copied whole) */
+typedef struct ShopStatBlock {
+    /* 0x00 */ s16 stats[19];
+    /* 0x26 */ s16 penalties[3]; /* subtracted from stats 6, 7 and 10 */
+} ShopStatBlock;
+
 /* What the details panel shows of a partner */
 typedef struct ShopPartnerInfo {
-    /* 0x00 */ s16 stats[19]; /* as computeStats gives them */
-    /* 0x26 */ s16 penalties[3]; /* subtracted from stats 6, 7 and 10 */
-    /* 0x2C */ s16 newStats[22]; /* with the item equipped */
+    /* 0x00 */ ShopStatBlock current;
+    /* 0x2C */ ShopStatBlock withItem; /* with the item equipped */
     /* 0x58 */ s32 slot;
     /* 0x5C */ s32 changes; /* how many of the stats would change */
     /* 0x60 */ s32 rows[8]; /* from 2: the stats that change (from 1) */
@@ -106,7 +116,8 @@ typedef struct ShopInfoWindows {
     /* 0xA8 */ TextWindow *pageHint;
 } ShopInfoWindows;
 
-/* What ShopBuy and ShopSell start with: the list shows its selection in it */
+/* What ShopBuy and ShopSell start with, and are passed to the item list as:
+   the list shows its selection in it */
 typedef struct ShopDialog {
     TASK_HEADER(ShopDialog);
     /* 0x50 */ void (*showItem)(struct ShopDialog *dialog, s32 item, s32 quantity);
@@ -235,18 +246,13 @@ typedef struct ItemShopFuncs {
     /* 0x28 */ void (*equip)(s32 partner, s32 slot, s32 item, s32 fromBag);
 } ItemShopFuncs;
 
-/* A partner's stats, copied whole (as main's computeStats does) */
-typedef struct ShopStatBlock {
-    s16 v[22];
-} ShopStatBlock;
-
 /* A partner's equipment, copied whole (PartnerStats.equip) */
 typedef struct ShopEquipSet {
     s16 items[6];
 } ShopEquipSet;
 
 /* stitshop.c */
-void STITSHOP_updateScene(Task *task, Task **children);
+void STITSHOP_updateScene(Task *task, ItemShop **child);
 Task *STITSHOP_start(void);
 void STITSHOP_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
 void STITSHOP_drawFader(ScreenFade *task);
@@ -285,7 +291,7 @@ void STITSHOP_listSellable(ShopItemList *list);
 ShopItemList *STITSHOP_createItemList(ShopDialog *dialog, s32 type, s32 selling);
 
 /* info.c */
-void STITSHOP_computeStats(s32 partner, s16 *out);
+void STITSHOP_computeStats(s32 partner, ShopStatBlock *out);
 void STITSHOP_addStat(s16 *p, s32 stat, s32 delta);
 void STITSHOP_showStat(ShopInfo *info, TextWindow *win, ShopStatRow *row);
 void STITSHOP_colorStat(ShopInfo *info, TextWindow *win, ShopStatRow *row);

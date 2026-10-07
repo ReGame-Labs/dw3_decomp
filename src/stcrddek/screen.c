@@ -303,9 +303,9 @@ void STCRDDEK_stepScreen(DeckScreen *task, DeckScreenChildren *children) {
     case 54:
         if (task->step) {
             if (task->renaming == 0) {
-                children->name = (NameEntry *)STCRDDEK_createEditor(task, task->deck);
+                children->child.editor = STCRDDEK_createEditor(task, task->deck);
             } else {
-                children->name = STCRDDEK_createNameEntry(GAME.decks[task->deck].name);
+                children->child.name = STCRDDEK_createNameEntry(GAME.decks[task->deck].name);
             }
             task->setState(task, TASK_DONE);
         } else {
@@ -361,20 +361,20 @@ void STCRDDEK_updateScreen(DeckScreen *task, DeckScreenChildren *children) {
             switch (task->substate) {
             case 0:
             default:
-                if (children->name->substate == 100) {
-                    children->name->getName(children->name, GAME.decks[task->deck].name);
-                    children->name->close(children->name);
+                if (children->child.name->substate == 100) {
+                    children->child.name->getName(children->child.name, GAME.decks[task->deck].name);
+                    children->child.name->close(children->child.name);
                     task->substate++;
                 }
                 break;
             case 1:
-                if (children->name->state == TASK_DONE) {
-                    children->name->state = TASK_KILL;
+                if (children->child.name->state == TASK_DONE) {
+                    children->child.name->state = TASK_KILL;
                     task->setState(task, TASK_RUN);
                 }
                 break;
             }
-        } else if (children->name == NULL) {
+        } else if (children->child.editor == NULL) {
             task->setState(task, TASK_RUN);
         }
         STCRDDEK_drawScreen(task);

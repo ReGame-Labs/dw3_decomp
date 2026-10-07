@@ -5,7 +5,7 @@
 
 /* The still screen's loader task: sets up the display and its layer, loads the
    still screen's images and creates the still screen, then idles */
-void STDWTITL_tickSplashLoader(Task *task, Task **splash) {
+void STDWTITL_tickSplashLoader(Task *task, SplashTask **splash) {
     TimLoader loader;
     Layer *layer;
 
@@ -32,7 +32,7 @@ void STDWTITL_tickSplashLoader(Task *task, Task **splash) {
 
 /* Creates the still screen's loader (task), for STDWTITL_SPLASH_MODE */
 Task *STDWTITL_startSplashLoaderTask(void) {
-    return createTask(STDWTITL_tickSplashLoader, sizeof(Task), sizeof(Task *));
+    return createTask(STDWTITL_tickSplashLoader, sizeof(Task), sizeof(SplashTask *));
 }
 
 /* The overlay's main task: by the low byte of the game mode, starts the title screen

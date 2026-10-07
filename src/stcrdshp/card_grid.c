@@ -41,10 +41,7 @@ void STCRDSHP_setCards(CardPackGrid *grid, s32 *cards) {
     grid->setState(grid, TASK_DONE);
 }
 
-/* Takes the cards off the grid one by one (grid->hide) */
-void STCRDSHP_hideCards(CardPackGrid *grid) {
-    grid->setSubstate(grid, 1);
-}
+#include "../menu_common/hide_cards.inc.c"
 
 /* Draws the cards drawn (or the ones being turned over): each card's image,
    its numbers or its kind's mark, and its frame. The match depends on the
@@ -144,28 +141,7 @@ void STCRDSHP_drawTurningSlots(CardPackGrid *grid) {
     }
 }
 
-/* Takes a card off the grid every 2 frames once hiding; state 3 when none
-   are left */
-void STCRDSHP_updateHiding(CardPackGrid *grid) {
-    switch (grid->substate) {
-    case 0:
-        break;
-    case 1:
-        if (grid->shown != 0) {
-            grid->shown--;
-            grid->nextSubstate(grid);
-            grid->counter = GFX.funcs.getTime();
-        } else {
-            grid->state = 3;
-        }
-        break;
-    case 2:
-        if (GFX.funcs.getTime() - grid->counter >= 2) {
-            grid->substate = 1;
-        }
-        break;
-    }
-}
+#include "../menu_common/update_hiding.inc.c"
 
 /* The grid's task: covers its slots one by one (every 2 frames) above the old
    cards, loads the new ones' images and steps the covers' palette over 11
@@ -229,7 +205,7 @@ void STCRDSHP_updateGrid(CardPackGrid *grid) {
 
 /* Creates the grid of six cards, copying the cards given. The match depends
    on cards++ being in the for. */
-CardPackGrid *STCRDSHP_createGrid(Task *owner, s32 *cards) {
+CardPackGrid *STCRDSHP_createGrid(CardShop *owner, s32 *cards) {
     CardPackGrid *grid = createTask(STCRDSHP_updateGrid, sizeof(CardPackGrid), 0);
     s32 i;
 

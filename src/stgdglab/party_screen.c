@@ -58,13 +58,13 @@ void STGDGLAB_showPartyPage(LabPartyScreen *screen, LabPartyScreenWindows *windo
     screen->frame = 0;
 }
 
-/* Hides a task's text windows: all its children but the last (on the first
-   screen, the entry list) */
-void STGDGLAB_hideWindows(Task *task) {
+/* Hides the first screen's text windows: all its children but the last, the
+   entry list */
+void STGDGLAB_hideWindows(LabPartyScreen *screen) {
     s32 i;
-    TextWindow **windows = task->children;
+    TextWindow **windows = screen->children;
 
-    for (i = 0; i < task->childCount - 1; i++, windows++) {
+    for (i = 0; i < screen->childCount - 1; i++, windows++) {
         TextWindow *w = *windows;
         if (w != NULL) {
             w->setVisible(w, 0);
@@ -302,7 +302,7 @@ void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *wind
         break;
     case 6:
         if (STGDGLAB_data.funcs.updateFade(&screen->panels[4])) {
-            STGDGLAB_hideWindows((Task *)screen);
+            STGDGLAB_hideWindows(screen);
             STGDGLAB_data.funcs.startFade(&screen->panels[0], 0);
             STGDGLAB_data.funcs.startFade(&screen->panels[1], 0);
             STGDGLAB_data.funcs.startFade(&screen->panels[2], 0);
@@ -346,7 +346,7 @@ void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *wind
     case 10:
         if (windows->panel->substate >= 2 && PAD_PRESSED(PAD_TRIANGLE)) {
             STGDGLAB_data.funcs.startFade(&screen->panels[0], 0);
-            STGDGLAB_hideWindows((Task *)screen);
+            STGDGLAB_hideWindows(screen);
             screen->substate++;
         }
         break;

@@ -7,6 +7,17 @@
 
 #include "game.h"
 
+/* The name of this overlay's copy of a function of src/menu_common/ */
+#define OVL_NAME(name) SHOCKTST_##name
+
+/* A file the editor loads when it starts and never reads (ShockTest.file);
+   the discs number their files differently */
+#if VERSION_US
+#define SHOCKTST_FILE 0xC5
+#elif VERSION_EU
+#define SHOCKTST_FILE 0xBE
+#endif
+
 /* DLSKDATA.BIN: a header, then the offsets are from its start */
 typedef struct ShockFile {
     /* 0x0 */ s32 count;       /* number of patterns */
@@ -38,7 +49,7 @@ typedef struct ShockStep {
 /* The pattern editor */
 typedef struct ShockTest {
     TASK_HEADER(ShockTest);
-    /* 0x50 */ u8 *unk50;
+    /* 0x50 */ u8 *file; /* SHOCKTST_FILE, never read */
     /* 0x54 */ s32 windowId;
     /* 0x58 */ s32 column; /* the motor */
     /* 0x5C */ s32 row;    /* pattern, time, power, play */

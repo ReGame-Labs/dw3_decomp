@@ -14,38 +14,13 @@ char SHOCKTST_numberFormats[3][0x40] = {
     "\x65\x89\x56\x01\x07\x02\x05\x01",
 };
 
-/* The vibration test's root task: sets up the screen and its layer, then
-   starts the loader */
-void SHOCKTST_updateScene(Task *task, Task **items) {
-    RECT rect;
-    Layer *res;
-
-    switch (task->state) {
-    case TASK_INIT:
-    default:
-        GFX.funcs.reset();
-        GFX.funcs.allocPrimBuffers(0x5000);
-        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
-        rect.x = 0;
-        rect.y = 0;
-        rect.w = 0x140;
-        rect.h = 0xF0;
-        res = GFX.funcs.createLayer(&rect, 1, SCREEN_LAYER);
-        res->setBgColor(res, 0, 0, 0);
-        items[0] = SHOCKTST_createLoader();
-        task->nextState(task);
-        break;
-    case TASK_RUN:
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
-
-/* Creates the vibration test's root task */
-Task *SHOCKTST_start(void) {
-    return createTask(SHOCKTST_updateScene, sizeof(Task), 4);
-}
+#define SCENE_TASK Task
+#define SCENE_CHILD Task
+#define SCENE_CREATE OVL_NAME(createLoader)
+#define SCENE_PRIM_BUFFERS 0x5000
+#define SCENE_OT_SHIFT 1
+#include "../menu_common/update_scene.inc.c"
+#include "../menu_common/start.inc.c"
 
 /* Colors the editor's windows: palette 3 for the one under the cursor
    (highlight 1-5 and 10), 1 for the one being edited (0 and 6-9, 11) */
@@ -320,12 +295,7 @@ void SHOCKTST_updateEditor(ShockTest *task, ShockTestWindows *win) {
         task->nextState(task);
         task->windowId = 0x1000;
         win->pattern = createTextWindow(task->windowId, 1, 0x28, 0x3C);
-        /* the discs number their files differently */
-#if VERSION_US
-        task->unk50 = FILE_CACHE.load(0xC5);
-#elif VERSION_EU
-        task->unk50 = FILE_CACHE.load(0xBE);
-#endif
+        task->file = FILE_CACHE.load(SHOCKTST_FILE);
         win->pattern->setString(win->pattern, SHOCKTST_numberFormats[0], -1);
         win->pattern->setNumber(win->pattern, 1, task->pattern);
         for (i = 0; i < 2; i++) {
@@ -400,6 +370,7 @@ void SHOCKTST_updateEditor(ShockTest *task, ShockTestWindows *win) {
 /* Copies the pattern file's times and powers into the editor */
 void SHOCKTST_loadPatterns(ShockTest *task, ShockFile *file) {
     s32 i;
+    /* the offsets count bytes from the file's start */
     u8 *times = (u8 *)file + file->timesOffset;
     u8 *powers = (u8 *)file + file->powersOffset;
 
@@ -430,6 +401,7 @@ char *SHOCKTST_textPath = "sim:C:\\DEVELOP\\DLSKDATA.TXT";
    writes it to the PC as DLSKDATA.BIN */
 void SHOCKTST_convertText(ShockLoader *task) {
     u8 *s = task->text;
+    /* the header is written a word at a time, through this pointer */
     s32 *header = (s32 *)task->file;
     s32 count;
     s32 *types;
@@ -456,8 +428,9 @@ void SHOCKTST_convertText(ShockLoader *task) {
     header++;
     *header = header[-1] + count * 2;
     s++;
-    /* the match depends on times holding the file's start until t and p
-       are copied from it, and on the branch stepping p before t */
+    /* the offsets count bytes from the file's start. The match depends on
+       times holding the file's start until t and p are copied from it, and
+       on the branch stepping p before t */
     types = (s32 *)task->file;
     times = (u8 *)types;
     types = (s32 *)((u8 *)types + ((ShockFile *)types)->typesOffset);

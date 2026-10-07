@@ -164,7 +164,7 @@ s32 STGTRAIN_raiseMaxHpMp(TrainResult *result, s32 stat) {
  */
 void STGTRAIN_applyTry(TrainResult *result, s32 i) {
     TrainResultWindows *win = result->children;
-    TrainEntry *entry = (TrainEntry *)STGTRAIN_state.findTableEntry(result->modeArg, result->training);
+    TrainEntry *entry = STGTRAIN_state.findTableEntry(result->modeArg, result->training);
 
     if (result->trained[i] != 0) {
         /* The match depends on stat (and other below) being s16 locals. */
@@ -414,7 +414,7 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
         if (PAD_PRESSED(PAD_CROSS)) {
             SOUND.playSound(SOUND_MENU_CONFIRM);
             result->prompting = 0;
-            entry = (TrainEntry *)STGTRAIN_state.findTableEntry(result->modeArg, result->training);
+            entry = STGTRAIN_state.findTableEntry(result->modeArg, result->training);
             if (entry->stat != 0) {
                 sums[0] = 0;
                 for (i = 0; i < 5; i++) {

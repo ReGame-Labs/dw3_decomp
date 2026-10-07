@@ -168,12 +168,12 @@ void STPLNMET_updateScreen(PlayerNameScreen *screen, PlayerNameScreenChildren *c
 }
 
 /* Creates the player's name screen (task) */
-Task *STPLNMET_createScreen(void) {
-    PlayerNameScreen *screen = createTask(STPLNMET_updateScreen, sizeof(PlayerNameScreen), 0x28);
+PlayerNameScreen *STPLNMET_createScreen(void) {
+    PlayerNameScreen *screen = createTask(STPLNMET_updateScreen, sizeof(PlayerNameScreen), sizeof(PlayerNameScreenChildren));
 
     screen->layer = 0x1001;
     screen->depth = 5;
-    return (Task *)screen;
+    return screen;
 }
 
 /* Loads the screen's sprites into VRAM and requests its texts and the keyboard */

@@ -373,20 +373,11 @@ typedef struct SortScreenWindows {
     /* 0x88 */ TextWindow *help;
 } SortScreenWindows;
 
-/* What getPartnerEntry gives */
-typedef struct StatusPartnerEntry {
-    /* 0x0 */ u8 unk0[2];
-    /* 0x2 */ s8 level;
-    /* 0x3 */ u8 unk3[5];
-    /* 0x8 */ s16 techs[6]; /* the low 13 bits */
-} StatusPartnerEntry;
-
 /* A party member's techniques on the tech screen */
 typedef struct TechRow {
     /* 0x00 */ s16 slots[4]; /* getPartnerSlots */
-    /* 0x08 */ StatusPartnerEntry entries[3];
+    /* 0x08 */ PartnerEntry entries[3];
     /* 0x44 */ s16 techs[5]; /* the ones it can use here */
-    /* 0x4E */ u8 unk4E[2];
     /* 0x50 */ s32 techCount;
 } TechRow;
 
@@ -460,7 +451,7 @@ typedef struct StatusData {
 } StatusData;
 
 /* ststatus.c */
-void STSTATUS_updateScene(Task *task, Task **children);
+void STSTATUS_updateScene(Task *task, FieldMenuScreen **child);
 Task *STSTATUS_start(void);
 void STSTATUS_createCardWindows(PartyScreen *screen, PartyScreenWindows *windows);
 void STSTATUS_showCardPage(PartyScreen *screen, PartyScreenWindows *windows, s32 member, s32 show);
@@ -613,7 +604,7 @@ typedef struct StatusEquip {
 
 /* What an item does (its ItemInfo.data) */
 typedef struct StatusItemEffect {
-    /* 0x0 */ u8 unk0;
+    /* 0x0 */ u8 flags; /* bit 0: usable from the first screen (STSTATUS_runItemList) */
     /* 0x1 */ u8 kind; /* 1: heals, 17: raises stats[1], others: STSTATUS_statItems */
     /* 0x2 */ u16 amount;
 } StatusItemEffect;

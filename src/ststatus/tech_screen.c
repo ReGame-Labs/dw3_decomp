@@ -22,7 +22,7 @@ void STSTATUS_fillItemList(ItemList *panel) {
    each once, and returns how many */
 s32 STSTATUS_listFieldTechs(TechScreen *screen, s32 member) {
     TechRow *row;
-    StatusPartnerEntry *entry;
+    PartnerEntry *entry;
     s16 *techs;
     s32 partner;
     s32 count;
@@ -42,7 +42,7 @@ s32 STSTATUS_listFieldTechs(TechScreen *screen, s32 member) {
             entry = &row->entries[i];
             GAME.funcs.getPartnerEntry(partner, screen->rows[member].slots[i], entry);
             for (j = 0; j < 6; j++) {
-                tech = entry->techs[j] & 0x1FFF;
+                tech = entry->skills[j] & SKILL_ID;
                 if (tech >= 0xB8 && tech < 0xBD) {
                     techs = row->techs;
                     for (k = 0, found = 0; k < 5; k++) {
@@ -245,7 +245,7 @@ void STSTATUS_showTechList(TechScreen *screen, TechScreenWindows *windows, s32 s
         windows->listTitle->setString(windows->listTitle, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 9);
         for (i = 0; i < screen->rows[screen->member].techCount; i++) {
             windows->techs[i]->setString(windows->techs[i], FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)),
-                                         screen->rows[screen->member].techs[i] & 0x1FFF);
+                                         screen->rows[screen->member].techs[i] & SKILL_ID);
         }
     } else {
         windows->listTitle->setVisible(windows->listTitle, 0);
@@ -260,7 +260,7 @@ void STSTATUS_showChosenTech(TechScreen *screen, TechScreenWindows *windows, s32
     s32 tech;
 
     if (show) {
-        tech = screen->rows[screen->member].techs[screen->cursor] & 0x1FFF;
+        tech = screen->rows[screen->member].techs[screen->cursor] & SKILL_ID;
         windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_INFO)), tech);
         windows->mpLabel->setString(windows->mpLabel, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 3);
         windows->mp->setNumber(windows->mp, 0, TECHS[tech - 1].mp);

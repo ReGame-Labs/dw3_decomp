@@ -44,10 +44,7 @@ void STCRDABM_setPage(CardAlbumGrid *grid, s32 first) {
     grid->setState(grid, TASK_DONE);
 }
 
-/* Makes the grid hide its cards one by one (grid->hide, which nothing calls) */
-void STCRDABM_hideCards(CardAlbumGrid *grid) {
-    grid->setSubstate(grid, 1);
-}
+#include "../menu_common/hide_cards.inc.c"
 
 /* Draws the page's cards, or the page being turned when previous != 0: a seen card's
    image, the sprite of its color and its AP and HP (sprite 0x1D instead for the other
@@ -168,27 +165,7 @@ s32 STCRDABM_pageHasCards(CardAlbumGrid *grid) {
     return 0;
 }
 
-/* Hides the grid's cards one every 2 frames after grid->hide, then stops drawing it */
-void STCRDABM_updateHiding(CardAlbumGrid *grid) {
-    switch (grid->substate) {
-    case 0:
-        break;
-    case 1:
-        if (grid->shown != 0) {
-            grid->shown--;
-            grid->nextSubstate(grid);
-            grid->counter = GFX.funcs.getTime();
-        } else {
-            grid->state = 3;
-        }
-        break;
-    case 2:
-        if (GFX.funcs.getTime() - grid->counter >= 2) {
-            grid->substate = 1;
-        }
-        break;
-    }
-}
+#include "../menu_common/update_hiding.inc.c"
 
 /* The card grid's task: draws the page's cards; on a page turn, turns its 12 slots one
    every 2 frames over the old cards, then loads and shows the new ones, with a sound
@@ -264,37 +241,13 @@ CardAlbumGrid *STCRDABM_createGrid(CardAlbum *album) {
     return grid;
 }
 
-/* The mode's root task: sets up the display and a black layer, then creates the album */
-void STCRDABM_updateScene(Task *task, Task **items) {
-    RECT rect;
-    Layer *res;
-
-    switch (task->state) {
-    case TASK_INIT:
-    default:
-        GFX.funcs.reset();
-        GFX.funcs.allocPrimBuffers(0xF000);
-        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
-        rect.x = 0;
-        rect.y = 0;
-        rect.w = 0x140;
-        rect.h = 0xF0;
-        res = GFX.funcs.createLayer(&rect, 3, SCREEN_LAYER);
-        res->setBgColor(res, 0, 0, 0);
-        items[0] = STCRDABM_createAlbum();
-        task->nextState(task);
-        break;
-    case TASK_RUN:
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
-
-/* The mode's entry point (MODE_ENTRY_POINTS): starts the root task */
-Task *STCRDABM_start(void) {
-    return createTask(STCRDABM_updateScene, sizeof(Task), 4);
-}
+#define SCENE_TASK Task
+#define SCENE_CHILD CardAlbum
+#define SCENE_CREATE OVL_NAME(createAlbum)
+#define SCENE_PRIM_BUFFERS 0xF000
+#define SCENE_OT_SHIFT 3
+#include "../menu_common/update_scene.inc.c"
+#include "../menu_common/start.inc.c"
 
 /* Creates the album's text windows (the page's and the selected card's), in front of
    the album */
@@ -749,12 +702,12 @@ void STCRDABM_updateAlbum(CardAlbum *album, CardAlbumWindows *win) {
 }
 
 /* Creates the album (task), on the top layer */
-Task *STCRDABM_createAlbum(void) {
+CardAlbum *STCRDABM_createAlbum(void) {
     CardAlbum *album = createTask(STCRDABM_updateAlbum, sizeof(CardAlbum), sizeof(CardAlbumWindows));
 
     album->layer = SCREEN_LAYER;
     album->depth = 7;
-    return (Task *)album;
+    return album;
 }
 
 /* Loads the album's images and requests the card data and the card names, effects and

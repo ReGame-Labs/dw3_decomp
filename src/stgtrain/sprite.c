@@ -93,13 +93,21 @@ void STGTRAIN_setSpritePaused(TrainSprite *sprite, s32 paused) {
  * The animated sprite's update: state 1 advances the animation, unless it
  * is paused, and draws the frame's sprite, its parts from the last to the
  * first, as sprites or, scaled and rotated about the pivot, as quads.
- * The match depends on frame holding the animation before its frames.
+ * The match depends on cur holding the animation before its frames.
  */
 void STGTRAIN_updateSprite(TrainSprite *sprite) {
     SVECTOR out;
     SVECTOR in[4];
-    TrainAnimFrame *frame;
-    u8 *p;
+    union {
+        TrainAnim *anim;
+        TrainAnimFrame *frame;
+    } cur; /* the animation, then its frame */
+    union {
+        TrainSpriteBank *bank;
+        u8 *bytes;
+        s32 *count;
+        TrainSpritePart *part;
+    } p; /* through the bank: each sprite is a count and its parts */
     TrainSpritePart *part;
     s32 n;
     s32 count;
@@ -139,27 +147,26 @@ void STGTRAIN_updateSprite(TrainSprite *sprite) {
         if (sprite->anim == NULL) {
             break;
         }
-        frame = (TrainAnimFrame *)sprite->anim;
-        frame = ((TrainAnim *)frame)->frames;
-        frame += sprite->frame;
-        if (sprite->flags >= 0 && GFX.funcs.getTime() - sprite->frameTime > frame->duration) {
+        cur.anim = sprite->anim;
+        cur.frame = cur.anim->frames;
+        cur.frame += sprite->frame;
+        if (sprite->flags >= 0 && GFX.funcs.getTime() - sprite->frameTime > cur.frame->duration) {
             sprite->frameTime = GFX.funcs.getTime();
             if (++sprite->frame >= sprite->frameCount - 1) {
                 sprite->frame = sprite->frameCount - 1;
                 sprite->flags = 1;
             }
-            frame = (TrainAnimFrame *)sprite->anim;
-            frame = ((TrainAnim *)frame)->frames;
-            frame += sprite->frame;
+            cur.anim = sprite->anim;
+            cur.frame = cur.anim->frames;
+            cur.frame += sprite->frame;
         }
-        p = (u8 *)sprite->bank;
-        p += sprite->bankOffset;
-        count = frame->sprite;
+        p.bank = sprite->bank;
+        p.bytes += sprite->bankOffset;
+        count = cur.frame->sprite;
         for (i = 0; i < count; i++) {
-            n = *(s32 *)p;
-            p += sizeof(s32);
+            n = *p.count++;
             for (j = 0; j < n; j++) {
-                p += sizeof(TrainSpritePart);
+                p.part++;
             }
         }
         tpage = 0;
@@ -180,12 +187,11 @@ void STGTRAIN_updateSprite(TrainSprite *sprite) {
         sprite->layer = GFX.funcs.getLayer(sprite->layerId);
         sprite->ot = (u_long *)sprite->layer->getOtEntry(sprite->layer, sprite->depth);
         prim.ptr = GFX.funcs.getPrim();
-        n = *(s32 *)p;
-        p += sizeof(s32);
+        n = *p.count++;
         for (i = 0; i < n; i++) {
-            p += sizeof(TrainSpritePart);
+            p.part++;
         }
-        part = (TrainSpritePart *)p;
+        part = p.part;
         for (i = 0; i < n; i++) {
             part--;
             info = part->tpage;
@@ -212,8 +218,8 @@ void STGTRAIN_updateSprite(TrainSprite *sprite) {
                     setSemiTrans(prim.sprt, 1);
                 }
                 setRGB0(prim.sprt, 0x80, 0x80, 0x80);
-                prim.sprt->x0 = x + (frame->x + sprite->x);
-                prim.sprt->y0 = y + (frame->y + sprite->y);
+                prim.sprt->x0 = x + (cur.frame->x + sprite->x);
+                prim.sprt->y0 = y + (cur.frame->y + sprite->y);
                 prim.sprt->u0 = u;
                 prim.sprt->v0 = v;
                 prim.sprt->w = w;
@@ -227,9 +233,9 @@ void STGTRAIN_updateSprite(TrainSprite *sprite) {
                     setSemiTrans(prim.ft4, 1);
                 }
                 setRGB0(prim.ft4, 0x80, 0x80, 0x80);
-                in[0].vx = in[2].vx = x + (frame->x + sprite->x) - sprite->pivotX;
+                in[0].vx = in[2].vx = x + (cur.frame->x + sprite->x) - sprite->pivotX;
                 in[1].vx = in[3].vx = in[0].vx + w;
-                in[0].vy = in[1].vy = y + (frame->y + sprite->y) - sprite->pivotY;
+                in[0].vy = in[1].vy = y + (cur.frame->y + sprite->y) - sprite->pivotY;
                 in[2].vy = in[3].vy = in[0].vy + h;
                 in[0].vz = in[1].vz = in[2].vz = in[3].vz = 0;
                 for (k = 0; k < 4; k++) {
