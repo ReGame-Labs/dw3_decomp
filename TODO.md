@@ -242,8 +242,9 @@ compilers, are in the history.
   align nothing after the data (`tools/stage_yaml.py`).
 - [x] `WSTAG924`'s color comes before its jump tables, which GCC would align
   to 8 bytes after it in the stage's C: `head-word` in `stages.txt` takes
-  it from a C file of its own, `src/stages/wstag924_head.c`, linked first,
-  and the report counts it with the stage (`tools/objdiff_generate.py`).
+  it from a C file of its own,
+  `src/stages/amaterasu_city/wstag924_head.c`, linked first, and the report
+  counts it with the stage (`tools/objdiff_generate.py`).
 - [ ] Most of the stages' data is still splat's words: the point paths,
   animations and tile tables the C reads have types (`include/stage.h`),
   give the rest real ones (and names) as the code that reads it is

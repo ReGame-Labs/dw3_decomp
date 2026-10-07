@@ -33,7 +33,7 @@ import re
 import sys
 
 from name_stage_data import (
-    CONFIG, ROOT, SRC, VERSIONS, definitions, elf_addresses, preprocess, stage_list, target, update_symbols,
+    CONFIG, ROOT, SRC, VERSIONS, definitions, elf_addresses, preprocess, stage_list, stage_sources, target, update_symbols,
 )
 
 AUTO = re.compile(r"^func_([0-9A-F]{8})$")
@@ -181,11 +181,12 @@ def main():
     parser.add_argument("stages", nargs="*")
     args = parser.parse_args()
     has = {v: stage_list(v) for v in VERSIONS}
-    stages = args.stages or sorted(p.stem for p in SRC.glob("wstag[0-9][0-9][0-9].c"))
+    sources = stage_sources()
+    stages = args.stages or sorted(sources)
     commands = script_commands()
     total = 0
     for stage in stages:
-        path = SRC / f"{stage}.c"
+        path = sources[stage]
         text = path.read_text()
         versions = [v for v in VERSIONS if stage in has[v]]
         if not versions:

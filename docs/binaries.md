@@ -106,8 +106,9 @@ One source tree builds every version, one at a time, picked with `VERSION`
   marked `asm-data` only its data; no stage is marked either today.
   `c-rodata` takes the bytes before the code, a color or jump tables, from
   the stage's C file too. `head-word` takes `WSTAG924`'s first word from a
-  C file of its own, `src/stages/wstag924_head.c`, linked before the
-  stage's jump tables (which GCC would align to 8 bytes after it). `data`
+  C file of its own, `src/stages/amaterasu_city/wstag924_head.c`, linked
+  before the stage's jump tables (which GCC would align to 8 bytes after
+  it). `data`
   marks the stage with no code, `WSTAG260`, all of it its C file's data.
 - The C sees `VERSION_US` and `VERSION_EU`, each 0 or 1
   (`include/version.h`), and so does the assembly (`--defsym`). Code tests

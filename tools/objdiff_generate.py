@@ -54,10 +54,12 @@ before. The executable's modules (src/main/<module>/X.c) are units of their
 own, main/<module>/X.
 An overlay split into several objects, X.c, X_2.c, X_3.c..., is not a pair
 of halves: each of its files is a unit of its own (CARDGAME, FIGHTSTG).
-A stage's head, src/stages/X_head.c (the color linked before WSTAG924's
-jump tables, tools/stage_yaml.py), is reported with the stage, its rodata
-first, and gets no unit of its own: its target is splat's rodata of it
-(asm/<version>/stages/data/X_head.rodata.s).
+A stage is a unit stages/<area>/X, from src/stages/<area>/X.c in the
+folder of its area (tools/stage_areas.py), in the category "stages" with
+the others. Its head, X_head.c next to it (the color linked before
+WSTAG924's jump tables, tools/stage_yaml.py), is reported with the stage,
+its rodata first, and gets no unit of its own: its target is splat's rodata
+of it (asm/<version>/stages/data/<area>/X_head.rodata.s).
 
 The PsyQ SDK linked into the executable and STDWTITL (libpress) is Sony's
 code, not the game's: like other PSX decomps (jype0/dw_decomp), it stays
@@ -268,7 +270,8 @@ def complete_tail(name: str, target: str) -> None:
     config = version.CONFIG_DIR / f"{binary}.yaml"
     if binary == "stages":
         # a stage's config is written by tools/stage_yaml.py
-        config = version.BUILD_DIR / "generated" / "stages" / f"{module}.yaml"
+        # (a stage's module is <area>/<stage>, tools/stage_areas.py)
+        config = version.BUILD_DIR / "generated" / "stages" / f"{module.split('/')[-1]}.yaml"
     if not config.exists():
         return
     with open(config) as f:
@@ -600,8 +603,11 @@ def asm_units(names: list) -> list:
                 for f in sorted((d / "data").glob("*.s"))]
                 for d in sorted(ASM.iterdir()) if d.is_dir() and d.name != "stages"}
     for stage in (s.lower() for s in stages):
-        binaries[f"stages/{stage}"] = [f"stages/{stage}.s"] + [
-            f"stages/data/{f.name}" for f in sorted((ASM / "stages/data").glob(f"{stage}[._]*s"))]
+        path = version.stage_path(stage)
+        data = (ASM / "stages/data" / path).parent
+        binaries[f"stages/{path}"] = [f"stages/{path}.s"] + [
+            f"stages/data/{f.relative_to(ASM / 'stages/data').as_posix()}"
+            for f in sorted(data.glob(f"{stage}[._]*s"))]
     if "main" in binaries:
         binaries["main"][0] = "main/text.s"
     units = []

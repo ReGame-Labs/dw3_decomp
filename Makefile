@@ -58,7 +58,9 @@ CC1 ?= $(BIN_DIR)/gcc-$(GCC_VERSION)-psx/cc1
 MASPSX := $(PYTHON) external/maspsx/maspsx.py
 OBJDIFF ?= $(BIN_DIR)/objdiff-cli-linux-x86_64
 
-INC := -Iinclude -Iexternal/psyq_headers/psyq_lib47/include
+# src/stages last: a stage in its area's folder includes the shared code as
+# "common/<file>.inc.c" (src/stages/common/), and src/stages has no headers
+INC := -Iinclude -Iexternal/psyq_headers/psyq_lib47/include -Isrc/stages
 
 # -DVERSION_<VERSION>: include/version.h turns it into VERSION_US and
 # VERSION_EU, each 0 or 1, for #if; -Wundef warns about an #if on a name
@@ -112,12 +114,17 @@ LDFLAGS := -nostdlib --no-check-sections --emit-relocs -Map $(MAP) \
 
 # The stage overlays the version has, from $(CONFIG_DIR)/stages.txt
 STAGES := $(shell awk '!/^\#/ && NF { print tolower($$1) }' $(CONFIG_DIR)/stages.txt)
+# and where each one is under src/stages/ (and $(ASM_DIR)/stages/):
+# STAGE_PATH_<name> is <area>/<name>, in the folder of its area
+# (tools/stage_areas.py), or <name> for one in no area (WSTAG260)
+$(foreach s,$(STAGES),$(eval STAGE_PATH_$(s) := \
+	$(or $(patsubst src/stages/%.c,%,$(wildcard src/stages/*/$(s).c)),$(s))))
 
 # C_SRC, from mk/version/<version>.mk, has every binary's C files, but of
 # src/stages/ only the version's stages' (the USA version hasn't the European
 # stages), with the head a stage may have (<name>_head.c, see
 # tools/stage_yaml.py)
-STAGE_C_SRC := $(STAGES:%=src/stages/%.c) $(STAGES:%=src/stages/%_head.c)
+STAGE_C_SRC := $(foreach s,$(STAGES),src/stages/$(STAGE_PATH_$(s)).c src/stages/$(STAGE_PATH_$(s))_head.c)
 ALL_C_SRC := $(filter-out $(filter-out $(STAGE_C_SRC),$(filter src/stages/%,$(C_SRC))),$(C_SRC))
 MAIN_C_SRC := $(filter src/main/%,$(ALL_C_SRC))
 
@@ -127,7 +134,7 @@ MAIN_C_SRC := $(filter src/main/%,$(ALL_C_SRC))
 # splat's data files), and a stage's head's rodata
 STAGE_HEADS := $(filter src/stages/%_head.c,$(ALL_C_SRC))
 DATA_STAGES := $(shell awk '!/^\#/ && $$2 == "data" { print tolower($$1) }' $(CONFIG_DIR)/stages.txt)
-TARGET_ASM := $(filter-out $(foreach b,main $(OVERLAYS),$(ASM_DIR)/$(b)/data/%) $(DATA_STAGES:%=$(ASM_DIR)/stages/%.s),\
+TARGET_ASM := $(filter-out $(foreach b,main $(OVERLAYS),$(ASM_DIR)/$(b)/data/%) $(foreach s,$(DATA_STAGES),$(ASM_DIR)/stages/$(STAGE_PATH_$(s)).s),\
 	      $(patsubst src/%.c,$(ASM_DIR)/%.s,$(filter-out $(STAGE_HEADS),$(ALL_C_SRC)))) \
 	      $(STAGE_HEADS:src/stages/%.c=$(ASM_DIR)/stages/data/%.rodata.s)
 
@@ -162,15 +169,16 @@ CHILDREN_main := $(filter-out wfightmn wfightts,$(OVERLAYS))
 
 # The stage overlays (AAA/PRO/WSTAG###.PRO), listed in
 # $(CONFIG_DIR)/stages.txt, load on top of FIELDSTG. Their splat configs are
-# made by tools/stage_yaml.py and their sources are src/stages/<name>.c and
-# $(ASM_DIR)/stages/.
+# made by tools/stage_yaml.py and their sources are src/stages/<area>/<name>.c
+# and $(ASM_DIR)/stages/ (STAGE_PATH_<name>).
 OVERLAYS += $(STAGES)
 $(foreach s,$(STAGES),\
 	$(eval OVL_FILE_$(s) := $(shell echo $(s) | tr a-z A-Z).PRO)\
 	$(eval OVL_PARENT_$(s) := fieldstg)\
 	$(eval OVL_YAML_$(s) := $(GENDIR)/stages/$(s).yaml)\
-	$(eval OVL_C_SRC_$(s) := src/stages/$(s).c src/stages/$(s)_head.c)\
-	$(eval OVL_ASM_SRC_$(s) := $(wildcard $(ASM_DIR)/stages/data/$(s).*.s $(ASM_DIR)/stages/data/$(s).s $(ASM_DIR)/stages/data/$(s)_end.s $(ASM_DIR)/stages/$(s).s))\
+	$(eval OVL_C_SRC_$(s) := src/stages/$(STAGE_PATH_$(s)).c src/stages/$(STAGE_PATH_$(s))_head.c)\
+	$(eval OVL_ASM_SRC_$(s) := $(wildcard $(ASM_DIR)/stages/data/$(STAGE_PATH_$(s)).*.s $(ASM_DIR)/stages/data/$(STAGE_PATH_$(s)).s \
+		$(ASM_DIR)/stages/data/$(s)_end.s $(ASM_DIR)/stages/$(STAGE_PATH_$(s)).s))\
 	$(eval OVL_SYMBOLS_$(s) := $(wildcard $(CONFIG_DIR)/symbols_fieldstg.txt $(CONFIG_DIR)/stages/$(s).txt)))
 
 # FIELDSTG starts the stages (FIELDSTG_stages), and links against their

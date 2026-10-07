@@ -64,7 +64,9 @@ for i,(off,name) in enumerate(syms):
     unit=parts[0]
     yaml=f'{version.CONFIG_DIR}/{unit}.yaml'
     if unit=='stages':  # configs made by tools/stage_yaml.py
-        stage=parts[2] if parts[1]=='nonmatchings' else os.path.splitext(parts[-1])[0]
+        # asm/<v>/stages/[nonmatchings/][<area>/]wstag###[.s|/<func>.s]
+        stage=next(p for p in parts if re.fullmatch(r'wstag\d{3}',os.path.splitext(p)[0]))
+        stage=os.path.splitext(stage)[0]
         yaml=f'{version.BUILD_DIR}/generated/stages/{stage}.yaml'
     target=re.search(r'target_path:\s*(\S+)',open(yaml).read()).group(1)
     binary=open(f'{D}/{target}','rb').read()

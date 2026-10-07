@@ -274,7 +274,13 @@ does:
 
 - One folder per binary under `src/`: `src/main/` for the executable,
   `src/<overlay>/` for each overlay, and `src/stages/` with one
-  `wstag###.c` per stage.
+  `wstag###.c` per stage, in the folder of the area FIELDSTG names when
+  the player enters it (`src/stages/asuka_city/wstag210.c`): the 18 areas
+  and their stages are listed in [src/stages/README.md](src/stages/README.md),
+  which `tools/stage_areas.py` writes as it moves a stage there.
+  `wstag260.c` (the story events' scripts, in no area) and `common/` stay in
+  `src/stages/`. A stage includes the shared code as `"common/<file>.inc.c"`
+  (`-Isrc/stages`).
 - Code that several binaries have, each its own copy of the same C, is one
   `.inc.c` file that their C files include where the function is, named
   after it: `src/stages/common/` for the stages, `src/menu_common/` for the

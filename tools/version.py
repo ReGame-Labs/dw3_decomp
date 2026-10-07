@@ -55,6 +55,15 @@ def stage_entries(version: str = VERSION) -> list:
     return [words for words in lines if words]
 
 
+def stage_path(stage: str) -> str:
+    """Where a stage is under src/stages/ (and asm/<version>/stages/), without
+    the .c: <area>/<stage> in the folder of its area (tools/stage_areas.py),
+    or <stage> for one in no area (wstag260), as the Makefile's
+    STAGE_PATH_<stage>."""
+    found = sorted((ROOT / "src" / "stages").glob(f"*/{stage}.c"))
+    return f"{found[0].parent.name}/{stage}" if found else stage
+
+
 def overlay_parents() -> dict:
     """{overlay: the overlay it loads on top of}, as the Makefile's
     OVL_PARENT_<name>, and "<stage>": every stage's (FIELDSTG)."""

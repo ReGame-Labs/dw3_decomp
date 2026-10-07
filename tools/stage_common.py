@@ -7,9 +7,10 @@ code (the file without its leading comment) becomes an #include of that
 file, where the copy was. It changes no bytes, and can be run again at any
 time:
 
-    tools/stage_common.py [src/stages/wstag200.c ...]
+    tools/stage_common.py [src/stages/central_sector/wstag200.c ...]
 
-With no files it goes through every src/stages/*.c.
+With no files it goes through every stage, src/stages/<area>/wstag###.c
+(and src/stages/wstag260.c).
 """
 import argparse
 import glob
@@ -50,7 +51,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[1])
     parser.add_argument("files", nargs="*")
     args = parser.parse_args()
-    files = args.files or sorted(glob.glob("src/stages/*.c"))
+    files = args.files or sorted(glob.glob("src/stages/wstag*.c") + glob.glob("src/stages/*/wstag*.c"))
     shared = shared_code()
     changed = 0
     for path in files:
