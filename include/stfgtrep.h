@@ -4,9 +4,14 @@
 /* STFGTREP.PRO: mode 0x1400, the report after a battle. WFIGHTMN requests
    it when a battle ends; it goes through the party (getPartyMember) and
    shows the partners that went up a level, with their name and new level,
-   from text file 0x56. */
+   from text file 0x56. Its one object is cut, in its link order, into
+   src/stfgtrep's scene.c, partner.c, report.c, fade.c and growth.c, with
+   its data in data/stfgtrep.c. */
 
 #include "game.h"
+
+/* The name of this overlay's copy of a function of src/menu_common/ */
+#define OVL_NAME(name) STFGTREP_##name
 
 /* The sprite archive the overlay loads */
 #if VERSION_US
@@ -155,12 +160,34 @@ extern Evolution *STFGTREP_evolutions[8]; /* each partner's (STFGTREP_learnDigim
 
 extern s32 STFGTREP_animations[][7]; /* each partner Digimon's sprite frames, -1 ending them early */
 
+/* scene.c */
+ScreenFade *STFGTREP_createFader(void);
+
+/* partner.c */
 void STFGTREP_drawPartner(ReportPartner *partner);
-s32 STFGTREP_learnDigimon(s32 partner);
 void STFGTREP_runPartner(ReportPartner *partner, ReportPartnerWindows *windows);
+void STFGTREP_updatePartner(ReportPartner *partner, ReportPartnerWindows *windows);
+ReportPartner *STFGTREP_createPartner(FightReport *report, s32 index, s32 exp);
+
+/* report.c */
 void STFGTREP_runReport(FightReport *report, FightReportChildren *children);
-void STFGTREP_updatePartner();
-void STFGTREP_updateReport();
+void STFGTREP_updateReport(FightReport *report, FightReportChildren *children);
 FightReport *STFGTREP_createScreen(void);
+void STFGTREP_loadFiles(void);
+s32 STFGTREP_filesLoading(void);
+
+/* fade.c */
+void STFGTREP_startFade(PanelAnim *fade, s32 fadeIn);
+s32 STFGTREP_updateFade(PanelAnim *fade);
+void STFGTREP_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
+s32 STFGTREP_updateLerp(MenuLerp *lerp);
+
+/* growth.c */
+s32 STFGTREP_addExp(s32 partner, s32 exp);
+s32 STFGTREP_learnDigimon(s32 partner);
+s32 STFGTREP_addDigimonExp(s32 partner, s32 id, s32 exp);
+s32 STFGTREP_addSkill(s32 partner, s32 id);
+s32 STFGTREP_learnSkill(s32 partner, s32 id);
+s32 STFGTREP_getDigimonExp(s32 partner, s32 id, s32 exp, s32 used);
 
 #endif /* STFGTREP_H */

@@ -1,7 +1,7 @@
 /* The last object of FIGHTSTG.PRO (see fightstg.c). The USA version has the
-   task of FIGHTSTG_updateCameraTurn here, which the European one has in fightstg_5.c;
-   the European version has a task of its own here instead, whose jump table
-   starts its rodata at 0x800832B8. */
+   task of FIGHTSTG_updateCameraTurn here, which the European one has in
+   battle_script.c; the European version has a task of its own here
+   instead, whose jump table starts its rodata at 0x800832B8. */
 
 #include "fightstg.h"
 

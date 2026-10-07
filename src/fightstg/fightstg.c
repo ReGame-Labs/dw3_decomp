@@ -5,8 +5,13 @@
    from 0x8008267C on. Where each object's code starts is only known to be
    between the function with the last jump table of the object before and
    the one with its first; the last object (fightstg_7.c) differs between
-   the versions. Each object's data is in its own file, in address order;
-   the zeros that end the file, after the last object's data, are here. */
+   the versions. The second object is stage.c; the third to the sixth are
+   cut into modules, in their link order (entrance.c to fader.c, lights.c
+   and face.c, battle_script.c and first_tech.c, item.c to interp.c), each
+   with its own rodata and data; a cut is only where each jump table keeps
+   its place. Each object's or module's data is in its own file, in address
+   order; the zeros that end the file, after the last object's data, are
+   here. */
 
 #include "fightstg.h"
 #include "gte.h"

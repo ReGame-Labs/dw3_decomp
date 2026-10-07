@@ -47,10 +47,40 @@ extern s32 WFIGHTMN_actionEffects[][2];
 extern void (*WFIGHTMN_states[])(BattleMenu *task, BattleMenuChildren *children);
 
 BattleLoader *WFIGHTMN_createLoader(void);
+
+/* setup.c */
+void WFIGHTMN_createLayers(void);
 void WFIGHTMN_initFighters(s32 digimon);
-void WFIGHTMN_markPicked(BattleMenu *task, BattleMenuChildren *children);
+s32 WFIGHTMN_rollAmbush(void);
+void WFIGHTMN_checkParty(void);
 void WFIGHTMN_markFought(void);
+void WFIGHTMN_markPicked(BattleMenu *task, BattleMenuChildren *children);
+
+/* menu.c */
 void WFIGHTMN_cancelBlast(void);
 void WFIGHTMN_runTurn(BattleMenu *task);
+/* The states in WFIGHTMN_states */
+void WFIGHTMN_runCommand(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_digivolve(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_tag(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_pairTech(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_endBattle(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_runAway(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_endAutoRecover(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_recover(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_clearField(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_takeDamage(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_cureStatus(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_endBoost(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_runConfusedCommand(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_endRestriction(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_blast(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_endBlast(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_knockOut(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_endSpecial(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_digidevolve(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_showWon(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_bringLastEnemy(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_restoreEnemy(BattleMenu *task, BattleMenuChildren *children);
 
 #endif /* WFIGHTMN_H */

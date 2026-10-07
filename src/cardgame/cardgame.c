@@ -4,9 +4,13 @@
    and they are 4 bytes past a multiple of 8 from 0x80082A04 (USA) to
    0x80082E30 and from 0x80083294 on. Where each object's code starts is only
    known to be between the function with the last jump table of the object
-   before and the one with its first. The data is with the objects that read
-   it: cardgame.c's table, cardgame_2.c's, then cardgame_3.c's, whose
-   variables at the end cardgame_2.c reads too. */
+   before and the one with its first. The second and third objects are cut
+   into modules, in their link order (play_checks.c to round.c, then
+   battle_steps.c to fader.c), each with its own rodata, a cut only where
+   each jump table keeps its place. The data is with the objects that read
+   it: cardgame.c's table, then the second object's (data/cardgame_2.c) and
+   the third's (data/cardgame_3.c), whose variables at the end the second
+   object reads too. */
 
 #include "cardgame.h"
 
