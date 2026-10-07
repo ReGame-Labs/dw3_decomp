@@ -1,14 +1,5 @@
 #include "stfgtrep.h"
 
-void STFGTREP_drawPartner(ReportPartner *partner);
-s32 STFGTREP_learnDigimon(s32 partner);
-void STFGTREP_runPartner(ReportPartner *partner, ReportPartnerWindows *windows);
-void STFGTREP_runReport(FightReport *report, FightReportChildren *children);
-void STFGTREP_updatePartner();
-void STFGTREP_updateReport();
-FightReport *STFGTREP_createScreen(void);
-extern s32 STFGTREP_animations[][7];
-
 void STFGTREP_updateScene(Task *task, Task **children) {
     RECT rect;
     Layer *layer;

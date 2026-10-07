@@ -179,7 +179,7 @@ void FIGHTSTG_updateRoot(Task *task, Task **children) {
         task->nextState(task);
         break;
     case TASK_RUN:
-        FIGHTSTG_battle.unkE4();
+        FIGHTSTG_battle.countFrames();
         break;
     case 2:
     case TASK_KILL:
@@ -1001,7 +1001,7 @@ s32 FIGHTSTG_testEnemyCondition(u8 condition, s16 arg) {
         }
         break;
     case 14:
-        if (fighter->unkE != 0) {
+        if (fighter->charge != 0) {
             result = 1;
         }
         break;
@@ -1021,7 +1021,7 @@ s32 FIGHTSTG_testEnemyCondition(u8 condition, s16 arg) {
         }
         break;
     case 18:
-        if (fighter->unk4 % arg == 0) {
+        if (fighter->turns % arg == 0) {
             result = 1;
         }
         break;

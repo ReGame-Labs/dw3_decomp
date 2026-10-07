@@ -292,7 +292,7 @@ void WFIGHTMN_updateMenu(BattleMenu *task, BattleMenuChildren *children) {
                     FIGHTSTG_setPlayerTurnStep(1);
                 } else {
                     stats = FIGHTSTG_battleFuncs.computeStats(0, 1, FIGHTSTG_battle.active[0]);
-                    chance = FIGHTSTG_battleFuncs.computeStats(0x10, 0, FIGHTSTG_battle.active[1])->stats[4] * 8 / stats->stats[4];
+                    chance = FIGHTSTG_battleFuncs.computeStats(0x10, 0, FIGHTSTG_battle.active[1])->stats[BATTLE_STAT_SPEED] * 8 / stats->stats[BATTLE_STAT_SPEED];
                     if (RANDOM.next() % 128 < chance) {
                         FIGHTSTG_queueEnemyTurn(0);
                         FIGHTSTG_queuePlayerTurn(FIGHTSTG_events.funcs.getDelay(0, 0) / 2);
@@ -527,8 +527,8 @@ void WFIGHTMN_tag(BattleMenu *task, BattleMenuChildren *children) {
         if (children->task.entrance->done != 0) {
             newSlot = task->args[0];
             unit = FIGHTSTG_battle.fighters[0] + FIGHTSTG_battle.active[0];
-            if (unit->unk1B != 0) {
-                unit->unk1B = 0;
+            if (unit->special != 0) {
+                unit->special = 0;
 #if VERSION_US
                 /* FIGHTSTG_queueSpecialEnd's event, built in the arguments */
                 task->args[0] = EVENT_SPECIAL_END;
@@ -1123,8 +1123,8 @@ void WFIGHTMN_knockOut(BattleMenu *task, BattleMenuChildren *children) {
         side = action->args[0] >> 4;
         fighter = FIGHTSTG_battle.fighters[side] + FIGHTSTG_battle.active[side];
         if (side == 0) {
-            if (fighter->unk1B != 0) {
-                fighter->unk1B = 0;
+            if (fighter->special != 0) {
+                fighter->special = 0;
 #if VERSION_US
                 /* FIGHTSTG_queueSpecialEnd's event, built in the arguments */
                 task->args[0] = EVENT_SPECIAL_END;
@@ -1143,7 +1143,7 @@ void WFIGHTMN_knockOut(BattleMenu *task, BattleMenuChildren *children) {
             task->args[1] = 0x10;
         }
         children->task.message->show(children->task.message, 2, task->args);
-        fighter->unkE = 0;
+        fighter->charge = 0;
         fighter->flags = 0;
         fighter->confusion = 0;
         fighter->sleep = 0;
@@ -1263,7 +1263,7 @@ void WFIGHTMN_endSpecial(BattleMenu *task, BattleMenuChildren *children) {
     BattleFighter *unit;
 
     unit = &FIGHTSTG_battle.fighters[0][action->args[1]];
-    unit->unk1B = 0;
+    unit->special = 0;
     children->task.message = FIGHTSTG_createMessage();
     task->args[0] = 0x59;
     task->args[1] = action->args[0];
@@ -1289,7 +1289,7 @@ void WFIGHTMN_digidevolve(BattleMenu *task, BattleMenuChildren *children) {
         index = GAME.funcs.getPartyMember(battle->active[0]);
         unit = units + battle->active[0];
         unit->id = DIGIMON_DATA[index].id;
-        unit->unkE = 0;
+        unit->charge = 0;
         WFIGHTMN_cancelBlast();
         actions = &FIGHTSTG_events;
         index = actions->funcs.find(EVENT_PARTNER_TECH, 0, battle->active[0]);
@@ -1370,7 +1370,7 @@ void WFIGHTMN_bringLastEnemy(BattleMenu *task, BattleMenuChildren *children) {
             if (id != 0) {
                 tech = &TECHS[id - 1];
                 if (tech->unk10 != 5 && tech->unk10 != 12) {
-                    if (tech->unkA >= 2 && !(tech->unkA == 9 || tech->unkA == 10) && tech->unkA != 12) {
+                    if (tech->unkA >= TECH_EFFECT_FIRST && !(tech->unkA == TECH_EFFECT_MULTI_HIT || tech->unkA == TECH_EFFECT_ENEMY_ONLY) && tech->unkA != TECH_EFFECT_STEAL) {
                         dst->unkA = tech->unkA;
                         dst->power = tech->power;
                         dst->unkB = tech->unkB;
@@ -1383,10 +1383,10 @@ void WFIGHTMN_bringLastEnemy(BattleMenu *task, BattleMenuChildren *children) {
                             }
                         }
                     }
-                    if (tech->unk7 >= 2) {
+                    if (tech->unk7 >= ELEMENT_FIRST) {
                         dst->unk7 = tech->unk7;
                         dst->unk8 = tech->unk8;
-                        if (dst->unkA < 2) {
+                        if (dst->unkA < TECH_EFFECT_FIRST) {
                             /* while (1), not for (;;): the match depends on it,
                                which leaves the loop's test at its top */
                             i = 0;
@@ -1493,7 +1493,7 @@ void WFIGHTMN_runTurn(BattleMenu *task) {
                 children->task.enemyAttack = FIGHTSTG_startEnemyAttack(0, 0);
                 task->setSubstate(task, 2);
             } else {
-                (FIGHTSTG_battle.fighters[1] + FIGHTSTG_battle.active[1])->unk4++;
+                (FIGHTSTG_battle.fighters[1] + FIGHTSTG_battle.active[1])->turns++;
                 children->task.enemyTurn = FIGHTSTG_startEnemyTurn(&FIGHTSTG_battle);
                 task->setSubstate(task, 2);
             }
@@ -1589,7 +1589,7 @@ void WFIGHTMN_recordTech(u8 side, s32 id) {
             if (!(kind <= 1 || (kind >= 9 && kind <= 10) || kind == 12)) {
                 flag = 1;
             }
-            if (info->unk7 >= 2) {
+            if (info->unk7 >= ELEMENT_FIRST) {
                 flag = 1;
             }
             if (flag) {
@@ -1606,7 +1606,7 @@ void WFIGHTMN_chargeGauge(u8 side, s32 damage) {
     s32 member = GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]);
 
     if (side != 0 && damage != 0 && unit->hp != 0 && unit->temporary == 0) {
-        BATTLE_SETUP.gauges[member] += FIGHTSTG_battleFuncs.unkE4(damage);
+        BATTLE_SETUP.gauges[member] += FIGHTSTG_battleFuncs.getGaugeGain(damage);
         if (BATTLE_SETUP.gauges[member] >= 1000) {
             BATTLE_SETUP.gauges[member] = 1000;
             FIGHTSTG_queueBlast();
@@ -1636,13 +1636,13 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
     task->unk50 = actor;
     if (actor == 0) {
         if (info->unk10 == 5) {
-            if (own->unk30[7] != 0) {
+            if (own->tripleHit != 0) {
                 task->index = 8;
                 task->unk6C = info->unkE;
                 task->sound = info->unkF;
             } else {
                 for (i = 2; i < 13; i++) {
-                    if (FIGHTSTG_action.unk38[i] != 0) {
+                    if (FIGHTSTG_action.effects[i] != 0) {
                         task->index = 6;
                         {
                             s32 (*table)[2] = WFIGHTMN_actionEffects; /* match depends on the pointer */
@@ -1656,7 +1656,7 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
                 }
                 if (task->index == 0) {
                     for (i = 0; i < 3; i++) {
-                        if (own->unk28[i] >= 2 && own->unk28[i] == other->unk25) {
+                        if (own->weaponFamilies[i] >= FAMILY_FIRST && own->weaponFamilies[i] == other->family) {
                             task->index = 6;
                             task->unk6C = info->unkE;
                             task->sound = info->unkF;
@@ -1671,42 +1671,42 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
                 }
             }
         } else {
-            if (info->unkA < 2 && info->icon == 2 && info->unk10 == 6 && own->unk30[7] != 0) {
+            if (info->unkA < TECH_EFFECT_FIRST && info->icon == TECH_PHYSICAL && info->unk10 == 6 && own->tripleHit != 0) {
                 task->index = 8;
             } else {
                 task->index = info->unk10;
             }
             task->unk6C = info->unkE;
             task->sound = info->unkF;
-            if (info->unk7 >= 2 || (info->unk9 >= 2 && info->unk9 == other->unk25)) {
+            if (info->unk7 >= ELEMENT_FIRST || (info->unk9 >= FAMILY_FIRST && info->unk9 == other->family)) {
                 task->stage = info->unkD;
             } else {
                 task->stage = -1;
             }
         }
         if (task->stage <= 0) {
-            if (own->unk2B >= 2) {
+            if (own->element >= ELEMENT_FIRST) {
                 s32 n;
                 s32 m;
 
-                if (info->unk7 >= 2) {
-                    n = info->unk7 - 2;
+                if (info->unk7 >= ELEMENT_FIRST) {
+                    n = info->unk7 - ELEMENT_FIRST;
                 } else {
-                    n = own->unk2B - 2;
+                    n = own->element - ELEMENT_FIRST;
                 }
                 m = n * 3 + 0x21;
-                if (own->unk2C >= 0x40) {
+                if (own->elementPower >= 0x40) {
                     task->stage = m + 1;
                 } else {
                     task->stage = m;
                 }
-            } else if (info->unk9 < 2) {
+            } else if (info->unk9 < FAMILY_FIRST) {
                 for (i = 0; i < 3; i++) {
-                    if (own->unk28[i] == 2 && other->unk25 == 2) {
+                    if (own->weaponFamilies[i] == 2 && other->family == 2) {
                         task->stage = 0x35;
                         break;
                     }
-                    if (own->unk28[i] == 10 && other->unk25 == 10) {
+                    if (own->weaponFamilies[i] == 10 && other->family == 10) {
                         task->stage = 0x36;
                         break;
                     }
@@ -1717,7 +1717,7 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
         task->index = info->unk10;
         task->unk6C = info->unkE;
         task->sound = info->unkF;
-        if (info->unk7 >= 2 || (info->unk9 >= 2 && info->unk9 == other->unk25)) {
+        if (info->unk7 >= ELEMENT_FIRST || (info->unk9 >= FAMILY_FIRST && info->unk9 == other->family)) {
             task->stage = info->unkD;
         } else {
             task->stage = -1;
@@ -1727,11 +1727,11 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
     if (id == 0x1B5) {
         damage = 9999;
         task->hits[3] = 1;
-    } else if (info->unkA == 0x1F) {
-        if (FIGHTSTG_action.unk34 != 0) {
-            damage = FIGHTSTG_action.unk60[0] + FIGHTSTG_action.unk60[1];
+    } else if (info->unkA == TECH_EFFECT_DOUBLE_MAGIC) {
+        if (FIGHTSTG_action.hitsLanded != 0) {
+            damage = FIGHTSTG_action.hitDamage[0] + FIGHTSTG_action.hitDamage[1];
             if (units[FIGHTSTG_battle.active[1 - side]].hp - damage <= 0) {
-                if (FIGHTSTG_action.unk34 == 1) {
+                if (FIGHTSTG_action.hitsLanded == 1) {
                     task->hits[0] = 3;
                 } else {
                     task->hits[0] = 0;
@@ -1751,10 +1751,10 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
             task->hits[0] = 3;
             task->hits[3] = 3;
         }
-    } else if (FIGHTSTG_action.unk38[9] != 0) {
-        damage = FIGHTSTG_action.unk34 * FIGHTSTG_action.damage;
+    } else if (FIGHTSTG_action.effects[TECH_EFFECT_MULTI_HIT] != 0) {
+        damage = FIGHTSTG_action.hitsLanded * FIGHTSTG_action.damage;
         if (units[FIGHTSTG_battle.active[1 - side]].hp - damage <= 0) {
-            for (i = 0; i < FIGHTSTG_action.unk34 - 1; i++) {
+            for (i = 0; i < FIGHTSTG_action.hitsLanded - 1; i++) {
                 if (FIGHTSTG_action.hits[i] != 0) {
                     task->hits[i] = 0;
                 } else {
@@ -1763,7 +1763,7 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
             }
             task->hits[3] = 2;
         } else {
-            for (i = 0; i < FIGHTSTG_action.unk36 - 1; i++) {
+            for (i = 0; i < FIGHTSTG_action.hitCount - 1; i++) {
                 if (FIGHTSTG_action.hits[i] != 0) {
                     task->hits[i] = 0;
                 } else {
@@ -1776,13 +1776,13 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
                 task->hits[3] = 3;
             }
         }
-    } else if (FIGHTSTG_action.unk38[6] != 0) {
+    } else if (FIGHTSTG_action.effects[TECH_EFFECT_KNOCK_OUT] != 0) {
         task->hits[3] = 2;
         damage = 9999;
-    } else if (info->unkA == 0x23 && FIGHTSTG_action.unk38[0x23] != 0) {
+    } else if (info->unkA == TECH_EFFECT_END_BATTLE && FIGHTSTG_action.effects[TECH_EFFECT_END_BATTLE] != 0) {
         task->hits[3] = 1;
         damage = FIGHTSTG_action.damage;
-    } else if (info->icon == 2 || info->icon == 3) {
+    } else if (info->icon == TECH_PHYSICAL || info->icon == TECH_MAGIC) {
         if (FIGHTSTG_action.hits[0] != 0) {
             if (units[FIGHTSTG_battle.active[1 - side]].hp - FIGHTSTG_action.damage <= 0) {
                 task->hits[3] = 2;
@@ -1806,19 +1806,19 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
         case 0xBB:
         case 0xBC:
         case 0x190:
-            damage = -FIGHTSTG_battleFuncs.unk94(actor, id);
+            damage = -FIGHTSTG_battleFuncs.computeHeal(actor, id);
             break;
         default:
             damage = 0;
             break;
         }
     }
-    if (info->icon == 2 || info->icon == 3) {
+    if (info->icon == TECH_PHYSICAL || info->icon == TECH_MAGIC) {
         WFIGHTMN_recordTech(actor, id);
         WFIGHTMN_countHit(actor, damage);
         WFIGHTMN_setIdleMotion(0x10 - actor, damage);
-        if (FIGHTSTG_action.unk38[8] != 0) {
-            WFIGHTMN_setIdleMotion(actor, -FIGHTSTG_action.unk2C);
+        if (FIGHTSTG_action.effects[TECH_EFFECT_DRAIN] != 0) {
+            WFIGHTMN_setIdleMotion(actor, -FIGHTSTG_action.drain);
         }
     } else {
         WFIGHTMN_endWeakness(actor);
@@ -1959,7 +1959,7 @@ void (*WFIGHTMN_states[])(BattleMenu *task, BattleMenuChildren *children) = {
     WFIGHTMN_showWon, WFIGHTMN_bringLastEnemy, WFIGHTMN_restoreEnemy,
 };
 /* WFIGHTMN_startTech's effects (unk6C and unk70) by the first of
-   FIGHTSTG_action.unk38[2..12] that is set: the kinds of WFIGHTMN_kindEffects */
+   FIGHTSTG_action.effects[2..12] that is set: the kinds of WFIGHTMN_kindEffects */
 s32 WFIGHTMN_actionEffects[][2] = {
     {19, 26}, {20, 26}, {21, 27}, {22, 50}, {26, 50}, {0, 0},
     {28, 39}, {0, 0}, {46, 30}, {0, 59}, {31, 58},

@@ -249,7 +249,7 @@ typedef struct BattleSetup {
     /* 0x18 */ BattleEnemy enemies[3];
     /* 0x3C */ u8 ambushChance; /* a chance that WFIGHTMN scales by level */
     /* 0x3D */ u8 unk3D;
-    /* 0x3E */ u8 unk3E[12]; /* FIGHTSTG's func_800A0400 gives 0 for side 0 when [5] is set */
+    /* 0x3E */ u8 unk3E[12]; /* FIGHTSTG_rollDrain gives 0 for side 0 when [5] is set */
     /* 0x4C */ s32 hasPrize; /* 1: the battle always gives prize */
     /* 0x50 */ s32 prize; /* an item (BattleResult.item) */
     /* 0x54 */ void (*clearGauges)(void);
