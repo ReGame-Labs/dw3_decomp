@@ -37,7 +37,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
         digimon = &DIGIMON_DATA[member];
         GAME.funcs.computeStats(member, &totals);
         for (i = RESIST_POISON; i < RESIST_COUNT; i++) {
-            stats->resist[i] = digimon->unk2C[i - RESIST_POISON];
+            stats->resist[i] = digimon->statusResists[i - RESIST_POISON];
         }
         if (digimon->id != fighter->id) {
             other = GET_DIGIMON(fighter->id);
@@ -48,7 +48,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
                 totals.fields.resist[i] += other->resistances[i];
             }
             for (i = RESIST_POISON; i < RESIST_COUNT; i++) {
-                stats->resist[i] += other->unk2C[i - RESIST_POISON];
+                stats->resist[i] += other->statusResists[i - RESIST_POISON];
             }
         }
         if (fighter->boosts[0] != 0) {
@@ -105,7 +105,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
             }
         }
         values = partner->equip;
-        stats->family = GET_DIGIMON(fighter->id)->unk56[0];
+        stats->family = GET_DIGIMON(fighter->id)->family;
         stats->damageBonus = fighter->charge;
         count = 0;
         for (i = 0; i < 4; i++) {
@@ -214,7 +214,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
         entry = FIGHTSTG_battleTableFunc(fighter->id);
         stats->level = BATTLE_SETUP.enemies[index].level;
         for (j = 0; j < 5; j++) {
-            stats->stats[j] = entry->stats[j] * BATTLE_SETUP.enemies[index].unkA / 16;
+            stats->stats[j] = entry->stats[j] * BATTLE_SETUP.enemies[index].strength / 16;
         }
         for (j = 0; j < 12; j++) {
             stats->resist[j] = entry->resist[j];

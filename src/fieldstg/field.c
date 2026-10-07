@@ -646,7 +646,7 @@ void FIELDSTG_startEncounter(s32 encounter) {
         BATTLE_SETUP.ambushChance = FIELDSTG_encounters[encounter].ambushChance;
         BATTLE_SETUP.unk3D = FIELDSTG_encounters[encounter].unkD;
         for (i = 0; i < 12; i++) {
-            BATTLE_SETUP.unk3E[i] = FIELDSTG_encounters[encounter].unkE[i];
+            BATTLE_SETUP.blocks[i] = FIELDSTG_encounters[encounter].unkE[i];
         }
         for (i = 0; i < 3; i++) {
             BATTLE_SETUP.enemies[i] = *FIELDSTG_encounters[encounter].enemies[i];

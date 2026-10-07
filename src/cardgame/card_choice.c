@@ -514,7 +514,7 @@ s32 CARDGAME_stepPreviousCardChoice(CardBattle *battle, CardScreen *screen) {
                 screen->sprites[sprite].highlight &= ~1;
                 battle->effectStep.marked[sprite] = battle->record.playCount + 1;
                 result = 1;
-                battle->record.plays[battle->record.playCount - 1].unk2 = battle->record.playCount;
+                battle->record.plays[battle->record.playCount - 1].mark = battle->record.playCount;
             }
         } else if (PAD_PRESSED(PAD_TRIANGLE)) {
             SOUND.playSound(SOUND_MENU_CANCEL);

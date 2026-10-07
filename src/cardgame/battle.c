@@ -297,8 +297,8 @@ void CARDGAME_layOutSlots(CardBattle *battle, CardBattleItems *items) {
         screen->sprites[i + 12].marks[1] = 0;
         screen->sprites[i + 12].marks[2] = 0;
         screen->sprites[i + 12].moving = 0;
-        if (battle->record.plays[i].unk2 != 0) {
-            screen->sprites[i + 12].marks[battle->record.plays[i].unk2] = 1;
+        if (battle->record.plays[i].mark != 0) {
+            screen->sprites[i + 12].marks[battle->record.plays[i].mark] = 1;
         }
         switch (battle->record.plays[i].targetKind) {
         case 0:
@@ -624,7 +624,7 @@ void CARDGAME_updateCardAnims(CardBattle *battle, CardBattleItems *items) {
 }
 
 /* Shows both sides' values on their panels: the points of each colour, the
-   deck, hand and discards, unk0 and unk2 */
+   deck, hand and discards, AP and HP */
 void CARDGAME_showPanelValues(CardBattle *battle, CardBattleItems *items) {
     s32 side;
     s32 i;
@@ -1062,9 +1062,9 @@ s32 CARDGAME_playRounds(CardBattle *battle, CardBattleItems *items) {
         battle->record.turnState = 16;
         battle->record.playCount = 0;
         battle->record.passes = 0;
-        battle->record.plays[0].unk2 = 0;
-        battle->record.plays[1].unk2 = 0;
-        battle->record.plays[2].unk2 = 0;
+        battle->record.plays[0].mark = 0;
+        battle->record.plays[1].mark = 0;
+        battle->record.plays[2].mark = 0;
         battle->anim.dimAll = CARD_ANIM_UNDIM_ALL;
         battle->anim.next = CARD_ANIM_SHOW_SLOTS;
         battle->record.starter = battle->record.turnSide = battle->firstStarter;
@@ -1126,7 +1126,7 @@ s32 CARDGAME_playRounds(CardBattle *battle, CardBattleItems *items) {
                     battle->effectStep.marked[i] = 0;
                 }
                 battle->effectStep.marked[battle->record.playCount + 11] = 1;
-                battle->record.plays[battle->record.playCount - 1].unk2 = 1;
+                battle->record.plays[battle->record.playCount - 1].mark = 1;
             }
             if (battle->record.passes != 0) {
                 SOUND.playSound(SOUND_MENU_OPEN);
@@ -1235,9 +1235,9 @@ s32 CARDGAME_playRounds(CardBattle *battle, CardBattleItems *items) {
     case 14:
         battle->record.turnState = 1;
         battle->record.playCount = 0;
-        battle->record.plays[0].unk2 = 0;
-        battle->record.plays[1].unk2 = 0;
-        battle->record.plays[2].unk2 = 0;
+        battle->record.plays[0].mark = 0;
+        battle->record.plays[1].mark = 0;
+        battle->record.plays[2].mark = 0;
         battle->record.starter ^= 1;
         battle->record.turnSide = battle->record.starter;
         battle->record.turns++;
@@ -2042,7 +2042,7 @@ u8 CARDGAME_resolveCard(CardBattle *battle, CardBattleItems *items) {
             battle->effectPos++;
         } else {
             if (battle->record.playCount >= 2) {
-                battle->record.plays[battle->record.playCount - 2].unk2 = 0;
+                battle->record.plays[battle->record.playCount - 2].mark = 0;
             }
             for (i = 0; i < 12; i++) {
                 items->screen->sprites[i].marks[battle->record.playCount - 1] = 0;
@@ -2306,7 +2306,7 @@ void CARDGAME_updateBattle(CardBattle *battle, CardBattleItems *items) {
             items->preloader = CARDGAME_startPreloader();
             items->screen->resetPanels(items->screen);
             items->screen->unk5E = battle->unk2E9;
-            items->screen->unk5C = battle->arg;
+            items->screen->opponent = battle->arg;
             initTimLoader(&tim);
             tim.setImagePos(0x280, 0);
             tim.loadArchive(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16));

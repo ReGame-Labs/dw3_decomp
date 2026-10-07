@@ -820,11 +820,11 @@ void STAGSLCT_zoomTitle(StageSelect *sel, StageSelectWindows *win) {
 
 /*
  * The stage select. Pad 1 moves the cursor (up/down), turns pages (L1/R1),
- * toggles BATTLE_SETUP.unk0 (Select), starts the entry (Cross: scene 0x300
+ * toggles BATTLE_SETUP.randomBattles (Select), starts the entry (Cross: scene 0x300
  * only sets GAME.progress) and, in the European version, cycles the language
  * (Start); L2/R2 change GAME.progress. Pad 2 changes the party's levels
- * (L1/R1) and unk32 (L2/R2), and BATTLE_SETUP.unk4 (up/down) and unk8
- * (right/left). TASK_KILL goes to the scene.
+ * (L1/R1) and unk32 (L2/R2), and BATTLE_SETUP.debugUpDown (up/down) and
+ * debugLeftRight (right/left). TASK_KILL goes to the scene.
  */
 void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
     StageSelect *sel = (StageSelect *)task;
@@ -872,10 +872,10 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
         win->progress = createTextWindow(SCREEN_LAYER, 1, 0xC0, 0x20);
         win->unk8C = createTextWindow(SCREEN_LAYER, 1, 0xD0, 0xDC);
         win->level = createTextWindow(SCREEN_LAYER, 1, 0x100, 0xDC);
-        win->unk88 = createTextWindow(SCREEN_LAYER, 1, 0x10, 0xDC);
-        win->unk88->setNumber(win->unk88, 0, BATTLE_SETUP.unk0);
-        win->unk94 = createTextWindow(SCREEN_LAYER, 1, 0x30, 0xDC);
-        win->unk98 = createTextWindow(SCREEN_LAYER, 1, 0x50, 0xDC);
+        win->randomBattles = createTextWindow(SCREEN_LAYER, 1, 0x10, 0xDC);
+        win->randomBattles->setNumber(win->randomBattles, 0, BATTLE_SETUP.randomBattles);
+        win->debugUpDown = createTextWindow(SCREEN_LAYER, 1, 0x30, 0xDC);
+        win->debugLeftRight = createTextWindow(SCREEN_LAYER, 1, 0x50, 0xDC);
         task->nextState(task);
         break;
     case TASK_RUN:
@@ -907,8 +907,8 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
             }
             STAGSLCT_showBiosVersion(sel, win);
             if (PAD_PRESSED(PAD_SELECT)) {
-                BATTLE_SETUP.unk0 = BATTLE_SETUP.unk0 == 0;
-                win->unk88->setNumber(win->unk88, 0, BATTLE_SETUP.unk0);
+                BATTLE_SETUP.randomBattles = BATTLE_SETUP.randomBattles == 0;
+                win->randomBattles->setNumber(win->randomBattles, 0, BATTLE_SETUP.randomBattles);
             }
             if (PAD_PRESSED(PAD_CROSS)) {
                 if (STAGSLCT_entries[sel->top + sel->cursor].scene != 0) {
@@ -994,33 +994,33 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
             win->unk8C->setNumber(win->unk8C, 0, unk32);
             win->level->setNumber(win->level, 0, level);
             if (PAD.getPressed(1) & (1 << PAD_UP)) {
-                if (BATTLE_SETUP.unk4 != 3) {
-                    BATTLE_SETUP.unk4++;
+                if (BATTLE_SETUP.debugUpDown != 3) {
+                    BATTLE_SETUP.debugUpDown++;
                 }
             } else if (PAD.getPressed(1) & (1 << PAD_DOWN)) {
-                if (BATTLE_SETUP.unk4 != -1) {
-                    BATTLE_SETUP.unk4--;
+                if (BATTLE_SETUP.debugUpDown != -1) {
+                    BATTLE_SETUP.debugUpDown--;
                 }
             } else if (PAD.getPressed(1) & (1 << PAD_RIGHT)) {
-                if (BATTLE_SETUP.unk8 != 7) {
-                    BATTLE_SETUP.unk8++;
+                if (BATTLE_SETUP.debugLeftRight != 7) {
+                    BATTLE_SETUP.debugLeftRight++;
                 }
             } else if (PAD.getPressed(1) & (1 << PAD_LEFT)) {
-                if (BATTLE_SETUP.unk8 != -1) {
-                    BATTLE_SETUP.unk8--;
+                if (BATTLE_SETUP.debugLeftRight != -1) {
+                    BATTLE_SETUP.debugLeftRight--;
                 }
             }
-            if (BATTLE_SETUP.unk4 != -1) {
-                win->unk94->setNumber(win->unk94, 0, BATTLE_SETUP.unk4 + 1);
-                win->unk94->setVisible(win->unk94, 1);
+            if (BATTLE_SETUP.debugUpDown != -1) {
+                win->debugUpDown->setNumber(win->debugUpDown, 0, BATTLE_SETUP.debugUpDown + 1);
+                win->debugUpDown->setVisible(win->debugUpDown, 1);
             } else {
-                win->unk94->setVisible(win->unk94, 0);
+                win->debugUpDown->setVisible(win->debugUpDown, 0);
             }
-            if (BATTLE_SETUP.unk8 != -1) {
-                win->unk98->setNumber(win->unk98, 0, BATTLE_SETUP.unk8 + 1);
-                win->unk98->setVisible(win->unk98, 1);
+            if (BATTLE_SETUP.debugLeftRight != -1) {
+                win->debugLeftRight->setNumber(win->debugLeftRight, 0, BATTLE_SETUP.debugLeftRight + 1);
+                win->debugLeftRight->setVisible(win->debugLeftRight, 1);
             } else {
-                win->unk98->setVisible(win->unk98, 0);
+                win->debugLeftRight->setVisible(win->debugLeftRight, 0);
             }
             break;
         }

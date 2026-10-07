@@ -48,7 +48,7 @@ void FIELDSTG_countBattleSteps(void) {
             rate = FIELDSTG_battleRates[FIELDSTG_state.battles->battles[area]->count];
             GAME.battleSteps -= rate;
             if (GAME.battleSteps <= 0) {
-                if (BATTLE_SETUP.unk0 != 0) {
+                if (BATTLE_SETUP.randomBattles != 0) {
                     FIELDSTG_startAreaBattle();
                 }
                 FIELDSTG_rollBattleSteps();

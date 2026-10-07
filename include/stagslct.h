@@ -36,11 +36,11 @@ typedef struct StageSelectWindows {
     /* 0x7C */ TextWindow *unk7C; /* unused */
     /* 0x80 */ TextWindow *region;
     /* 0x84 */ TextWindow *progress; /* GAME.progress */
-    /* 0x88 */ TextWindow *unk88; /* BATTLE_SETUP.unk0 */
+    /* 0x88 */ TextWindow *randomBattles; /* BATTLE_SETUP.randomBattles */
     /* 0x8C */ TextWindow *unk8C; /* party member 0: unk32 */
     /* 0x90 */ TextWindow *level; /* party member 0's */
-    /* 0x94 */ TextWindow *unk94; /* BATTLE_SETUP.unk4 */
-    /* 0x98 */ TextWindow *unk98; /* BATTLE_SETUP.unk8 */
+    /* 0x94 */ TextWindow *debugUpDown; /* BATTLE_SETUP.debugUpDown */
+    /* 0x98 */ TextWindow *debugLeftRight; /* BATTLE_SETUP.debugLeftRight */
 } StageSelectWindows;
 
 Task *STAGSLCT_createStageSelect(void);

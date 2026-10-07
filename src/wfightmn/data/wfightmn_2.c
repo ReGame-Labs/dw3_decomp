@@ -4,10 +4,10 @@
 #include "wfightmn.h"
 
 RECT WFIGHTMN_screen = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-/* A technique's effects (TechData's unkE and unkF) by its effect, for
+/* A technique's look (its scriptEffect and scriptSound) by its effect, for
    WFIGHTMN_bringLastEnemy; the list ends at -1 */
 #if VERSION_US
-s32 WFIGHTMN_kindEffects[][3] = {
+s32 WFIGHTMN_effectVisuals[][3] = {
     { 2, 19, 26 },
     { 3, 20, 26 },
     { 4, 21, 27 },
@@ -20,7 +20,7 @@ s32 WFIGHTMN_kindEffects[][3] = {
     { -1, 0, 0 },
 };
 #elif VERSION_EU
-s32 WFIGHTMN_kindEffects[][3] = {
+s32 WFIGHTMN_effectVisuals[][3] = {
     { 2, 19, 26 },
     { 3, 20, 26 },
     { 4, 21, 27 },
@@ -30,9 +30,10 @@ s32 WFIGHTMN_kindEffects[][3] = {
     { -1, 37, 49 },
 };
 #endif
-/* A technique's effects (unkE and unkF) and unkD by its unk7, for
-   WFIGHTMN_bringLastEnemy when WFIGHTMN_kindEffects gives none */
-s32 WFIGHTMN_unk7Effects[][4] = {
+/* A technique's look (its scriptEffect, scriptSound and scriptStage) by its
+   element, for WFIGHTMN_bringLastEnemy when WFIGHTMN_effectVisuals gives
+   none */
+s32 WFIGHTMN_elementVisuals[][4] = {
     { 2, 5, 64, 34 },
     { 3, 9, 45, 37 },
     { 4, 11, 44, 40 },
@@ -52,7 +53,7 @@ void (*WFIGHTMN_states[])(BattleMenu *task, BattleMenuChildren *children) = {
     WFIGHTMN_showWon, WFIGHTMN_bringLastEnemy, WFIGHTMN_restoreEnemy,
 };
 /* WFIGHTMN_startTech's effects (BattleScript.effect and sound) by the first of
-   FIGHTSTG_action.effects[2..12] that is set: the kinds of WFIGHTMN_kindEffects */
+   FIGHTSTG_action.effects[2..12] that is set: the kinds of WFIGHTMN_effectVisuals */
 s32 WFIGHTMN_actionEffects[][2] = {
     {19, 26}, {20, 26}, {21, 27}, {22, 50}, {26, 50}, {0, 0},
     {28, 39}, {0, 0}, {46, 30}, {0, 59}, {31, 58},

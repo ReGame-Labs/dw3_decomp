@@ -755,7 +755,7 @@ void WFIGHTMN_cureStatus(BattleMenu *task, BattleMenuChildren *children) {
     }
 }
 
-/* Clears the current action's unit's unk10[unkC] */
+/* Clears the boost (BattleFighter.boosts) that the current action ends */
 void WFIGHTMN_endBoost(BattleMenu *task, BattleMenuChildren *children) {
     QueuedEvent *action = &FIGHTSTG_events.events[FIGHTSTG_events.curIndex];
     BattleFighter *unit;
@@ -803,7 +803,8 @@ void WFIGHTMN_runConfusedCommand(BattleMenu *task, BattleMenuChildren *children)
     }
 }
 
-/* Clears the current action's unit's flag 0x10 << unkC */
+/* Clears the restriction that the current action ends (FIGHTER_NO_SWITCH or
+   FIGHTER_NO_DIGIVOLVE) from its unit */
 void WFIGHTMN_endRestriction(BattleMenu *task, BattleMenuChildren *children) {
     QueuedEvent *action = &FIGHTSTG_events.events[FIGHTSTG_events.curIndex];
     BattleFighter *unit;
@@ -829,7 +830,7 @@ void WFIGHTMN_endRestriction(BattleMenu *task, BattleMenuChildren *children) {
 }
 
 /* Digivolves the current partner for the battle, to the Digimon its level
-   reaches (unk50), and heals it when the change ends */
+   reaches (DigimonData.blastForms), and heals it when the change ends */
 void WFIGHTMN_blast(BattleMenu *task, BattleMenuChildren *children) {
     Models *models;
     BattleFighter *unit;
@@ -868,7 +869,7 @@ void WFIGHTMN_blast(BattleMenu *task, BattleMenuChildren *children) {
             unit = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
             digimon = GET_DIGIMON(DIGIMON_DATA[partner].id);
             unit->prevId = unit->id;
-            unit->id = DIGIMON_DATA[digimon->unk50[tier] - 1].id;
+            unit->id = DIGIMON_DATA[digimon->blastForms[tier] - 1].id;
             unit->temporary = 1;
             FIGHTSTG_queueBlastEnd(partner);
             children->task.change = FIGHTSTG_startDigimonChange(unit->id, 1);
@@ -1168,9 +1169,9 @@ void WFIGHTMN_showWon(BattleMenu *task, BattleMenuChildren *children) {
 }
 
 /* The enemy's third fighter comes in (BATTLE_KIND_FINAL_LAST), takes the first's
-   place, and technique 440 is made from 443 with FIGHTSTG_battle.tech's kind
-   (unkA, from WFIGHTMN_kindEffects) and unk7 (from WFIGHTMN_unk7Effects) before message 0x16
-   names it (?) */
+   place, and technique 440 is made from 443 with FIGHTSTG_battle.tech's
+   effect (its look from WFIGHTMN_effectVisuals) and element (from
+   WFIGHTMN_elementVisuals) before message 0x16 names it (?) */
 void WFIGHTMN_bringLastEnemy(BattleMenu *task, BattleMenuChildren *children) {
     TechData *tech;
     TechData *dst;
@@ -1202,16 +1203,16 @@ void WFIGHTMN_bringLastEnemy(BattleMenu *task, BattleMenuChildren *children) {
             *dst = dst[3];
             if (id != 0) {
                 tech = &TECHS[id - 1];
-                if (tech->unk10 != 5 && tech->unk10 != 12) {
+                if (tech->script != 5 && tech->script != 12) {
                     if (tech->effect >= TECH_EFFECT_FIRST && !(tech->effect == TECH_EFFECT_MULTI_HIT || tech->effect == TECH_EFFECT_ENEMY_ONLY) && tech->effect != TECH_EFFECT_STEAL) {
                         dst->effect = tech->effect;
                         dst->effectPower = tech->effectPower;
                         dst->effectChance = tech->effectChance;
-                        for (i = 0; WFIGHTMN_kindEffects[i][0] != -1; i++) {
-                            if (WFIGHTMN_kindEffects[i][0] == tech->effect) {
-                                dst->unkE = WFIGHTMN_kindEffects[i][1];
-                                dst->unkF = WFIGHTMN_kindEffects[i][2];
-                                dst->unkD = 0;
+                        for (i = 0; WFIGHTMN_effectVisuals[i][0] != -1; i++) {
+                            if (WFIGHTMN_effectVisuals[i][0] == tech->effect) {
+                                dst->scriptEffect = WFIGHTMN_effectVisuals[i][1];
+                                dst->scriptSound = WFIGHTMN_effectVisuals[i][2];
+                                dst->scriptStage = 0;
                                 break;
                             }
                         }
@@ -1224,10 +1225,10 @@ void WFIGHTMN_bringLastEnemy(BattleMenu *task, BattleMenuChildren *children) {
                                which leaves the loop's test at its top */
                             i = 0;
                             while (1) {
-                                if (WFIGHTMN_unk7Effects[i][0] == tech->element) {
-                                    dst->unkE = WFIGHTMN_unk7Effects[i][1];
-                                    dst->unkF = WFIGHTMN_unk7Effects[i][2];
-                                    dst->unkD = WFIGHTMN_unk7Effects[i][3];
+                                if (WFIGHTMN_elementVisuals[i][0] == tech->element) {
+                                    dst->scriptEffect = WFIGHTMN_elementVisuals[i][1];
+                                    dst->scriptSound = WFIGHTMN_elementVisuals[i][2];
+                                    dst->scriptStage = WFIGHTMN_elementVisuals[i][3];
                                     break;
                                 }
                                 i++;

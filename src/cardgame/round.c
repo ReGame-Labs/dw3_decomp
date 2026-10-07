@@ -404,7 +404,7 @@ void CARDGAME_startPlayCard(CardBattle *battle, CardScreen *screen, s32 side) {
 }
 
 /* Card 15 goes off and the marked slot cards turn over; it then lands in
-   sprite 12 + CardRecord.unk15. 1 once done */
+   sprite 12 + CardRecord.playCount. 1 once done */
 s32 CARDGAME_stepPlayCard(CardBattle *battle, CardScreen *screen) {
     s32 done = 0;
     s32 i;
@@ -425,7 +425,7 @@ s32 CARDGAME_stepPlayCard(CardBattle *battle, CardScreen *screen) {
         break;
 #elif VERSION_EU
     case 2:
-        screen->windows[1].unkE = 0;
+        screen->windows[1].showCount = 0;
         screen->windows[1].value = 0;
         screen->windows[2].value = 0;
         screen->windows[3].value = 0;
@@ -782,7 +782,8 @@ void CARDGAME_startAttack(CardBattle *battle, CardScreen *screen, s32 side) {
 }
 
 /* The side's slot cards go over one by one (every 27 frames) while the panels
-   count its attack (8) and the other side's unk2 (9) down; 1 once done */
+   count its attack (CARD_PANEL_AP) and the other side's HP (CARD_PANEL_HP)
+   down; 1 once done */
 s32 CARDGAME_stepAttack(CardBattle *battle, CardScreen *screen, s32 side) {
     s32 done = 0;
     s32 other = side ^ 1;
@@ -909,8 +910,8 @@ void CARDGAME_startSwap(CardBattle *battle, CardScreen *screen) {
 /* Swaps the two sides' pile apTotal and hpTotal, counting the panels' ap and hp over to each other, then shows message 0x2D until cross or triangle; 1 once done */
 s32 CARDGAME_stepSwap(CardBattle *battle, CardScreen *screen) {
     s32 done = 0;
-    s32 unk0;
-    s32 unk2;
+    s32 ap;
+    s32 hp;
 
     switch (battle->effectStep.state) {
     case 1:
@@ -933,12 +934,12 @@ s32 CARDGAME_stepSwap(CardBattle *battle, CardScreen *screen) {
             screen->setPanelValue(screen, 1, CARD_PANEL_AP, CARDGAME_interpolate(battle->sides[0].pile.apTotal, battle->sides[1].pile.apTotal, 15, battle->effectStep.time));
             screen->setPanelValue(screen, 1, CARD_PANEL_HP, CARDGAME_interpolate(battle->sides[0].pile.hpTotal, battle->sides[1].pile.hpTotal, 15, battle->effectStep.time));
         } else {
-            unk0 = battle->sides[0].pile.apTotal;
+            ap = battle->sides[0].pile.apTotal;
             battle->sides[0].pile.apTotal = battle->sides[1].pile.apTotal;
-            battle->sides[1].pile.apTotal = unk0;
-            unk2 = battle->sides[0].pile.hpTotal;
+            battle->sides[1].pile.apTotal = ap;
+            hp = battle->sides[0].pile.hpTotal;
             battle->sides[0].pile.hpTotal = battle->sides[1].pile.hpTotal;
-            battle->sides[1].pile.hpTotal = unk2;
+            battle->sides[1].pile.hpTotal = hp;
             screen->setPanelValue(screen, 0, CARD_PANEL_AP, battle->sides[0].pile.apTotal);
             screen->setPanelValue(screen, 0, CARD_PANEL_HP, battle->sides[0].pile.hpTotal);
             screen->setPanelValue(screen, 1, CARD_PANEL_AP, battle->sides[1].pile.apTotal);

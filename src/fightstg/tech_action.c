@@ -53,7 +53,7 @@ s32 FIGHTSTG_statusTechLines[] = {
    fighter being found as its row's offset added as an int to its slot (as
    in FIGHTSTG_updateFirstTech), on each case's variables being its own, on substate
    1's cases advancing substate themselves (case 5 once, after its switch)
-   and on the heal tests being written hp + unk5C > maxHp. */
+   and on the heal tests being written hp + heal > maxHp. */
 void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
     TechData *tech;
 
@@ -68,7 +68,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
             HEAP.zero(&FIGHTSTG_action, 0x68);
         }
         children[0].message = FIGHTSTG_createMessage();
-        if (tech->unk10 == 0xC) {
+        if (tech->script == 0xC) {
             task->lines[0] = 0x3A;
             task->lines[1] = task->side;
             children[0].message->show(children[0].message, 2, task->lines);
@@ -444,7 +444,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
                     other = task->side >> 4;
                     if (boost->amount <= 0) {
                         other ^= 1;
-                        if (task->side == 0 && BATTLE_SETUP.unk3E[boost->stat + 8]) {
+                        if (task->side == 0 && BATTLE_SETUP.blocks[boost->stat + BATTLE_BLOCK_LOWER_ATTACK]) {
                             task->lines[0] = 0x2F;
                             children[0].message->show(children[0].message, ok, task->lines);
                             ok = 0;
@@ -657,7 +657,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
                     task->state = 3;
                 }
             } else if (tech->icon == TECH_PHYSICAL) {
-                children[0].counter = FIGHTSTG_startCounterattack((task->side == 0) << 4, task->damage, tech->unk10 == 0xC);
+                children[0].counter = FIGHTSTG_startCounterattack((task->side == 0) << 4, task->damage, tech->script == 0xC);
                 task->substate = 6;
             } else {
                 task->substate = 5;
@@ -678,7 +678,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
             if (children[0].task == NULL) {
                 TechData *tech = &TECHS[task->tech - 1];
 
-                children[0].enemyAttack = FIGHTSTG_startEnemyAttack(1, tech->unk10 == 0xC);
+                children[0].enemyAttack = FIGHTSTG_startEnemyAttack(1, tech->script == 0xC);
                 task->substate++;
             }
             break;
@@ -692,7 +692,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
                 TechData *tech = &TECHS[task->tech - 1];
 
                 if (tech->icon == TECH_PHYSICAL) {
-                    children[0].counter = FIGHTSTG_startCounterattack((task->side == 0) << 4, task->damage, tech->unk10 == 0xC);
+                    children[0].counter = FIGHTSTG_startCounterattack((task->side == 0) << 4, task->damage, tech->script == 0xC);
                     task->substate = 6;
                 } else {
                     task->substate = 5;

@@ -2,7 +2,7 @@
 
 #include "fightstg.h"
 
-/* Returns the Digimon fighter index has a pair technique with (its unk3D, a
+/* Returns the Digimon fighter index has a pair technique with (its pairPartner, a
    1-based DIGIMON_DATA entry) when party member member has it among its
    digivolutions, else 0 */
 s32 FIGHTSTG_getPairDigimon(SwitchMenu *task, s32 index, s32 member) {
@@ -15,7 +15,7 @@ s32 FIGHTSTG_getPairDigimon(SwitchMenu *task, s32 index, s32 member) {
     GAME.funcs.getPartyMember(index);
     partner = GAME.funcs.getPartyMember(member);
     fighter = &FIGHTSTG_battle.fighters[0][index];
-    next = GET_DIGIMON(fighter->id)->unk3D;
+    next = GET_DIGIMON(fighter->id)->pairPartner;
     count = GAME.funcs.getPartnerSlots(partner, task->slots);
     if (count <= 0 || next == 0) {
         return 0;

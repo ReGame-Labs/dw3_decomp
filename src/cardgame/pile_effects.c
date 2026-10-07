@@ -206,7 +206,7 @@ s32 CARDGAME_discardPrevCard(CardBattle *battle, CardScreen *screen) {
             battle->effectStep.state = 3;
             n = battle->record.playCount - 1;
             if (n >= 2) {
-                battle->record.plays[battle->record.playCount - 3].unk2 = 0;
+                battle->record.plays[battle->record.playCount - 3].mark = 0;
             }
             for (i = 0; i < 15; i++) {
                 screen->sprites[i].marks[n - 1] = 0;

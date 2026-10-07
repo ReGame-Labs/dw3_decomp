@@ -15,7 +15,7 @@
 #include "cardgame.h"
 
 /* One field of card effect index (CardEffect): 0 its condition, 1 its play
-   condition, 2 unk2, 3 its target, 4 its text offset */
+   condition, 2 its message, 3 its target, 4 its script's step at offset */
 s32 CARDGAME_getEffectField(s32 index, u32 field, s32 offset) {
     u8 value = 0;
 

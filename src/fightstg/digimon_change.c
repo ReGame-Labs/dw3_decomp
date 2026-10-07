@@ -113,9 +113,9 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
                 FIGHTSTG_fighterView.vpz += z;
                 FIGHTSTG_fighterView.vrz += z;
                 camera->set(camera, &FIGHTSTG_fighterView);
-                control->unk34[1].enabled = 1;
-                control->unk34[1].alt = 1;
-                control->unk34[1].arg = 0x1003;
+                control->layers[1].enabled = 1;
+                control->layers[1].wireframe = 1;
+                control->layers[1].layerId = 0x1003;
                 control->pos.x = 0;
                 control->pos.z = 0;
                 control->rot.x = 0;
@@ -127,7 +127,7 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
                 } else {
                     control->motion = 13;
                 }
-                models->get(models, 0x10)->unk34[0].enabled = 0;
+                models->get(models, 0x10)->layers[0].enabled = 0;
                 if (task->key2 == 0) {
                     children->effects[0] = FIGHTSTG_startSpriteEffect(1000, (SVECTOR *)&FIGHTSTG_changeStartPos);
                     children->effects[1] = FIGHTSTG_startSpriteEffect(1001, (SVECTOR *)&FIGHTSTG_changeStartPos);
@@ -145,7 +145,7 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
                 task->clip0.h = 0;
                 task->clip1.h = 240;
                 task->clip1.y = 0;
-                models->get(models, 0)->unk34[0].enabled = 0;
+                models->get(models, 0)->layers[0].enabled = 0;
                 children->effects[2] = FIGHTSTG_startSpriteEffect(1002, (SVECTOR *)&FIGHTSTG_changeMidPos);
                 task->nextSubstate(task);
             }
@@ -182,12 +182,12 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
         case 6:
             models->setId(models, 1, 0);
             control = models->get(models, 0);
-            control->unk34[0].enabled = 1;
-            control->unk34[0].arg = 0x1004;
-            control->unk34[0].alt = 0;
-            control->unk34[1].enabled = 1;
-            control->unk34[1].alt = 1;
-            control->unk34[1].arg = 0x1003;
+            control->layers[0].enabled = 1;
+            control->layers[0].layerId = 0x1004;
+            control->layers[0].wireframe = 0;
+            control->layers[1].enabled = 1;
+            control->layers[1].wireframe = 1;
+            control->layers[1].layerId = 0x1003;
             models->face(models, 0);
             camera->getFighterView(camera, 0, 9);
             z = control->homePos.z;
@@ -233,7 +233,7 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
                 task->clip0.h = 240;
                 task->clip1.y = 240;
                 task->clip1.h = 0;
-                models->get(models, 0)->unk34[1].enabled = 0;
+                models->get(models, 0)->layers[1].enabled = 0;
                 children->effects[3] = FIGHTSTG_startSpriteEffect(task->key2 == 0 ? 1003 : 1008, (SVECTOR *)&FIGHTSTG_changeEndPos);
                 task->nextSubstate(task);
             }
@@ -273,7 +273,7 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
             switch (task->step) {
             case 0:
             default:
-                models->get(models, 0x10)->unk34[0].enabled = 1;
+                models->get(models, 0x10)->layers[0].enabled = 1;
                 models->get(models, 0)->motion = task->key2 != 0 || task->idleMotion == 0 ? 1 : 2;
                 camera->fade(camera, NULL, camera->getEnemyView(camera), 60);
                 SOUND.playSound(BATTLE_SETUP.music);

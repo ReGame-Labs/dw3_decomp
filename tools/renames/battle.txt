@@ -19,3 +19,7 @@ D_800824C8 FIGHTSTG_hitEffectPos
 D_80082560 FIGHTSTG_changeStartPos
 D_80082568 FIGHTSTG_changeMidPos
 D_80082570 FIGHTSTG_changeEndPos
+
+# round 3: WFIGHTMN's technique looks for the last enemy
+WFIGHTMN_kindEffects WFIGHTMN_effectVisuals
+WFIGHTMN_unk7Effects WFIGHTMN_elementVisuals

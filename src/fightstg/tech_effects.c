@@ -166,21 +166,23 @@ void FIGHTSTG_tryDrain(void) {
     }
 }
 
-/* TECH_EFFECT_ENEMY_ONLY outside its own enemy's hands: marks the effect,
-   which takes the place of the hit */
-void FIGHTSTG_markEnemyOnly(void) {
-    BattleAction *action = &FIGHTSTG_action;
-    TechData *e = &TECHS[action->tech - 1];
-
-    action->effects[e->effect] = e->effect;
-}
-
-/* TECH_EFFECT_CRITICAL: marks the effect, which rollCritical has used */
-void FIGHTSTG_markCritical(void) {
+/* Marks the action's technique's effect with the effect itself */
+static inline void markTechEffect(void) {
     BattleAction *action = &FIGHTSTG_action;
     TechData *entry = &TECHS[action->tech - 1];
 
     action->effects[entry->effect] = entry->effect;
+}
+
+/* TECH_EFFECT_ENEMY_ONLY outside its own enemy's hands: marks the effect,
+   which takes the place of the hit */
+void FIGHTSTG_markEnemyOnly(void) {
+    markTechEffect();
+}
+
+/* TECH_EFFECT_CRITICAL: marks the effect, which rollCritical has used */
+void FIGHTSTG_markCritical(void) {
+    markTechEffect();
 }
 
 /* TECH_EFFECT_STEAL: when the enemy's active fighter holds an
@@ -204,13 +206,13 @@ void FIGHTSTG_trySteal(void) {
 
 /* TECH_EFFECT_LOWER_ATTACK: lowers the attack of the other side's active
  * fighter by the technique's effectPower in 128ths and starts its event (not when
- * side 0 acts with BATTLE_SETUP.unk3E[8] set). The match depends on team
+ * side 0 acts with BATTLE_BLOCK_LOWER_ATTACK set). The match depends on team
  * being a u8. */
 void FIGHTSTG_lowerAttack(void) {
     u8 team = FIGHTSTG_action.side != 0;
     TechData *entry;
 
-    if (team == 0 && BATTLE_SETUP.unk3E[8] != 0) {
+    if (team == 0 && BATTLE_SETUP.blocks[BATTLE_BLOCK_LOWER_ATTACK] != 0) {
         return;
     }
     entry = &TECHS[FIGHTSTG_action.tech - 1];
@@ -426,7 +428,7 @@ void FIGHTSTG_startAction(u8 side, s32 tech) {
                which the compiler merges with the first and with case 3's */
             if (side == 0) {
                 if (entry->effect < TECH_EFFECT_FIRST) {
-                    if (entry->unk10 == 11 || entry->unk10 == 12) {
+                    if (entry->script == 11 || entry->script == 12) {
                         break;
                     }
                     if (FIGHTSTG_battleFuncs.stats[0].tripleHit) {

@@ -104,7 +104,7 @@ void CARDGAME_updateMessageWindow(CardScreen *screen, CardScreenItems *items) {
                     items->texts[0]->setPos(items->texts[0], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x3E, CARDGAME_messageWindowPositions[screen->message.place][1] + 4);
                     items->texts[0]->setNumber(items->texts[0], 0, screen->unk5E);
                     items->texts[0]->setRightAlign(items->texts[0], 1);
-                    items->texts[1]->setString(items->texts[1], FILE_CACHE.load(TEXT_FILE(TEXT_DECK_EDITOR)), (screen->unk5C + 1) / 2);
+                    items->texts[1]->setString(items->texts[1], FILE_CACHE.load(TEXT_FILE(TEXT_DECK_EDITOR)), (screen->opponent + 1) / 2);
                     items->texts[1]->setPos(items->texts[1], CARDGAME_messageWindowPositions[screen->message.place][0] + 0x1B, CARDGAME_messageWindowPositions[screen->message.place][1] + 0x12);
                 }
             } else {

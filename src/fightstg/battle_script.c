@@ -73,7 +73,7 @@ void FIGHTSTG_runScriptHits(BattleScript *script, BattleScriptChildren *children
 
 /* The battle script's model command, on the model given by FIGHTSTG_getScriptModel:
    0 plays a motion (0 waits for the one playing, 1 goes back to idle), 1
-   and 2 turn unk34[0] on and off, 3 moves it to a position in the script
+   and 2 turn layers[0] on and off, 3 moves it to a position in the script
    (over a time, or at once when it is 0), 4 turns it, 5 makes it jump (0
    waits for the jump), 6 adds a model (waiting while its file loads in
    script 12), 7 moves it home, 8 0x2800 from home and 9 removes it.
@@ -126,10 +126,10 @@ s32 FIGHTSTG_runScriptModel(BattleScript *script, BattleScriptChildren *children
     case 5:
         switch (arg) {
         case 0:
-            if (children->unk4 == NULL) {
+            if (children->jump == NULL) {
                 return 1;
             }
-            if (children->unk4->state < 2) {
+            if (children->jump->state < 2) {
                 script->pc -= 4;
                 return 0;
             }
@@ -139,27 +139,27 @@ s32 FIGHTSTG_runScriptModel(BattleScript *script, BattleScriptChildren *children
         case 3:
         case 5:
         case 6:
-            if (children->unk4 != NULL) {
-                children->unk4->destroy(children->unk4);
+            if (children->jump != NULL) {
+                children->jump->destroy(children->jump);
             }
-            children->unk4 = (Task *)FIGHTSTG_startJump(control, arg, 0);
+            children->jump = FIGHTSTG_startJump(control, arg, 0);
             break;
         case 4: {
             s32 distance = *script->pc++;
 
-            if (children->unk4 != NULL) {
-                children->unk4->destroy(children->unk4);
+            if (children->jump != NULL) {
+                children->jump->destroy(children->jump);
             }
-            children->unk4 = (Task *)FIGHTSTG_startJump(control, arg, distance);
+            children->jump = FIGHTSTG_startJump(control, arg, distance);
             break;
         }
         }
         break;
     case 1:
-        control->unk34[0].enabled = 1;
+        control->layers[0].enabled = 1;
         return 1;
     case 2:
-        control->unk34[0].enabled = 0;
+        control->layers[0].enabled = 0;
         break;
     case 3: {
         s32 time = script->pc[3];
@@ -169,7 +169,7 @@ s32 FIGHTSTG_runScriptModel(BattleScript *script, BattleScriptChildren *children
         pos.z = -script->pc[2];
         script->pc += 4;
         if (time != 0) {
-            children->unk8 = (Task *)FIGHTSTG_startMove(control, &pos, time);
+            children->move = FIGHTSTG_startMove(control, &pos, time);
         } else {
             control->pos.x = pos.x;
             control->pos.y = pos.y;
@@ -195,7 +195,7 @@ s32 FIGHTSTG_runScriptModel(BattleScript *script, BattleScriptChildren *children
         s32 time = *script->pc++;
 
         if (time != 0) {
-            children->unk8 = (Task *)FIGHTSTG_startMove(control, &control->homePos, time);
+            children->move = FIGHTSTG_startMove(control, &control->homePos, time);
         } else {
             control->pos.x = control->homePos.x;
             control->pos.y = control->homePos.y;
@@ -214,7 +214,7 @@ s32 FIGHTSTG_runScriptModel(BattleScript *script, BattleScriptChildren *children
             pos.z = control->homePos.z + 0x2800;
         }
         if (time != 0) {
-            children->unk8 = (Task *)FIGHTSTG_startMove(control, &pos, time);
+            children->move = FIGHTSTG_startMove(control, &pos, time);
         } else {
             control->pos.x = pos.x;
             control->pos.y = pos.y;
@@ -250,8 +250,8 @@ s32 FIGHTSTG_runScriptEffect(BattleScript *script, BattleScriptChildren *childre
         pos.vy = *script->pc++;
         pos.vz = *script->pc++;
         for (i = 0; i < 8; i++) {
-            if (children->unk10[i] == NULL) {
-                children->unk10[i] = (Task *)FIGHTSTG_startSpriteEffect(effect, &pos);
+            if (children->spriteEffects[i] == NULL) {
+                children->spriteEffects[i] = FIGHTSTG_startSpriteEffect(effect, &pos);
                 break;
             }
         }
@@ -581,14 +581,14 @@ void FIGHTSTG_updateBattleScript(BattleScript *script, BattleScriptChildren *chi
             case 0:
             case 0xFF:
                 busy = 0;
-                if (children->unk4 != NULL) {
-                    busy = children->unk4->state < 2;
+                if (children->jump != NULL) {
+                    busy = children->jump->state < 2;
                 }
                 if (children->script != NULL) {
                     busy = 1;
                 }
                 for (i = 0; i < 8; i++) {
-                    if (children->unk10[i] != NULL) {
+                    if (children->spriteEffects[i] != NULL) {
                         busy = 1;
                         break;
                     }

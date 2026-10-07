@@ -35,8 +35,8 @@ void FIGHTSTG_updateShotCamera(ShotCamera *task) {
         break;
     case 1:
         if (task->time <= 0) {
-            task->models->get(task->models, 0)->unk34[0].enabled = 1;
-            task->models->get(task->models, 0x10)->unk34[0].enabled = 1;
+            task->models->get(task->models, 0)->layers[0].enabled = 1;
+            task->models->get(task->models, 0x10)->layers[0].enabled = 1;
             if (FIGHTSTG_cameraShots[task->list][++task->shot].time == -1) {
                 task->list = FIGHTSTG_nextShotLists[task->list][RANDOM.next() % 3];
                 task->shot = 0;
@@ -80,7 +80,7 @@ void FIGHTSTG_updateShotCamera(ShotCamera *task) {
             break;
         case 3:
             if (task->step == 0) {
-                task->models->get(task->models, 0x10)->unk34[0].enabled = 0;
+                task->models->get(task->models, 0x10)->layers[0].enabled = 0;
                 task->view = task->camera->getFighterView(task->camera, 0, 8);
                 task->view->tz -= 0x1400;
                 task->view->vpz += 0x1400;
@@ -95,7 +95,7 @@ void FIGHTSTG_updateShotCamera(ShotCamera *task) {
             break;
         case 4:
             if (task->step == 0) {
-                task->models->get(task->models, 0)->unk34[0].enabled = 0;
+                task->models->get(task->models, 0)->layers[0].enabled = 0;
                 task->view = task->camera->getFighterView(task->camera, 0x10, 0);
                 task->view->tz += 0x1400;
                 task->view->vpz -= 0x1400;
@@ -110,7 +110,7 @@ void FIGHTSTG_updateShotCamera(ShotCamera *task) {
             break;
         case 5:
             if (task->step == 0) {
-                task->models->get(task->models, 0x10)->unk34[0].enabled = 0;
+                task->models->get(task->models, 0x10)->layers[0].enabled = 0;
                 task->view = task->camera->getFighterView(task->camera, 0, 8);
                 task->view->tz -= 0x1400;
                 task->view->vpz += 0x1400;
@@ -126,7 +126,7 @@ void FIGHTSTG_updateShotCamera(ShotCamera *task) {
             break;
         case 6:
             if (task->step == 0) {
-                task->models->get(task->models, 0)->unk34[0].enabled = 0;
+                task->models->get(task->models, 0)->layers[0].enabled = 0;
                 task->view = task->camera->getFighterView(task->camera, 0x10, 0);
                 task->view->tz += 0x1400;
                 task->view->vpz -= 0x1400;
@@ -142,14 +142,14 @@ void FIGHTSTG_updateShotCamera(ShotCamera *task) {
             break;
         case 7:
             if (task->step == 0) {
-                task->models->get(task->models, 0x10)->unk34[0].enabled = 0;
+                task->models->get(task->models, 0x10)->layers[0].enabled = 0;
                 task->view = task->camera->getFighterView(task->camera, 0, 10);
                 task->step++;
             }
             break;
         case 8:
             if (task->step == 0) {
-                task->models->get(task->models, 0x10)->unk34[0].enabled = 0;
+                task->models->get(task->models, 0x10)->layers[0].enabled = 0;
                 task->view = task->camera->getFighterView(task->camera, 0, 8);
                 task->step++;
             }
@@ -186,8 +186,8 @@ void FIGHTSTG_updateShotCamera(ShotCamera *task) {
         task->time -= GFX.funcs.getFrameTime();
         break;
     case 3:
-        task->models->get(task->models, 0)->unk34[0].enabled = 1;
-        task->models->get(task->models, 0x10)->unk34[0].enabled = 1;
+        task->models->get(task->models, 0)->layers[0].enabled = 1;
+        task->models->get(task->models, 0x10)->layers[0].enabled = 1;
         task->view = task->camera->getEnemyView(task->camera);
         task->camera->set(task->camera, task->view);
         break;

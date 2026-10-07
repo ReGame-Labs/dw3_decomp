@@ -87,13 +87,13 @@ void FIGHTSTG_updateCounterattack(Counterattack *task, BattleChild *children) {
                 s32 other = task->side != 0;
                 children[0].script = FIGHTSTG_createBattleScript();
                 children[0].script->enemy = task->side;
-                if (task->side == 0 && tech->unk10 == 5) {
+                if (task->side == 0 && tech->script == 5) {
                     children[0].script->index = 6;
                 } else {
-                    children[0].script->index = tech->unk10;
+                    children[0].script->index = tech->script;
                 }
-                if (tech->unkF != 0) {
-                    children[0].script->sound = tech->unkF;
+                if (tech->scriptSound != 0) {
+                    children[0].script->sound = tech->scriptSound;
                 }
                 {
                     BattleStats *stats = FIGHTSTG_battleFuncs.computeStats(task->side, 1, FIGHTSTG_battle.active[other]);
@@ -114,9 +114,9 @@ void FIGHTSTG_updateCounterattack(Counterattack *task, BattleChild *children) {
                         children[0].script->stage = -1;
                     }
                 }
-                if (tech->unkE != 0) {
-                    children[0].script->effect = tech->unkE;
-                } else if (tech->unk10 == 5) {
+                if (tech->scriptEffect != 0) {
+                    children[0].script->effect = tech->scriptEffect;
+                } else if (tech->script == 5) {
                     children[0].script->effect = 0x2E;
                     children[0].script->sound = 0x1E;
                 }
@@ -193,7 +193,7 @@ Counterattack *FIGHTSTG_startCounterattack(s32 side, s32 received, s32 noKnockOu
 
 #if VERSION_EU
 /* Revives one of the player's fighters at full HP, clearing its status
-   events, and passes tech's unkC to FIGHTSTG_battleFuncs.changeBoost */
+   events, and raises its defense by tech's effectPower (FIGHTSTG_battleFuncs.changeBoost) */
 void FIGHTSTG_reviveFighter(s32 tech, s32 fighter) {
     BattleFighter *fighters = FIGHTSTG_battle.fighters[0];
     TechData *entry = &TECHS[tech - 1];

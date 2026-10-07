@@ -265,7 +265,10 @@ does:
 - Headers: `include/game.h` includes the engine's headers, one per module in
   `include/dw3/<module>.h`, each with its own types and prototypes;
   `include/<overlay>.h` has an overlay's, and `include/stage.h` what the
-  stages share. Every header has an `#ifndef <NAME>_H` guard, and most a
+  stages share. A large overlay's are split by module into
+  `include/<overlay>/*.h` (FIGHTSTG, CARDGAME): `types.h` first, with the
+  types the others point to before they are defined, and
+  `include/<overlay>.h` includes them all. Every header has an `#ifndef <NAME>_H` guard, and most a
   comment at the top that says what the module or overlay is.
 - A `.c` file keeps the externs and prototypes only it uses at its top,
   after the includes. Anything a second file needs moves to a header.
