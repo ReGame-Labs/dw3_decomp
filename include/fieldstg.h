@@ -15,6 +15,9 @@
 #include "game.h"
 #include "field_map.h"
 
+/* Names the functions of the src/menu_common files it shares */
+#define OVL_NAME(name) FIELDSTG_##name
+
 /* --- Shared: the types several modules use --- */
 
 /* Where the field keeps its textures in VRAM: the two images of
@@ -85,16 +88,6 @@ typedef struct FieldWarp {
 #define SOUND_BEAM_HIT 0xA054583C /* held */
 #define SOUND_TRAP_ICE 0xA064683C /* held */
 #define SOUND_GAYALOOP 0xA10C703C /* held */
-
-/* --- tween.c --- */
-
-/* A linear 0-0x1000 tween (FIELDSTG_startTween, FIELDSTG_updateTween) */
-typedef struct Tween {
-    /* 0x0 */ s32 duration;
-    /* 0x4 */ s32 step;
-    /* 0x8 */ s32 value;
-    /* 0xC */ s32 active;
-} Tween;
 
 /* --- actor.c --- */
 
@@ -466,7 +459,7 @@ typedef struct ChoiceTask {
     TASK_HEADER(ChoiceTask);
     /* 0x50 */ s32 type; /* FIELDSTG_choices's */
     /* 0x54 */ s32 selection;
-    /* 0x58 */ Tween tween; /* the panel's width */
+    /* 0x58 */ PanelAnim tween; /* the panel's width */
 } ChoiceTask;
 
 typedef struct ChoiceChildren {
@@ -1033,8 +1026,8 @@ void FIELDSTG_endChoice14Answer0(void), FIELDSTG_endChoice14Answer1(void), FIELD
 void FIELDSTG_setupField(void);
 
 /* tween.c */
-void FIELDSTG_startTween(Tween *tween, s32 in);
-s32 FIELDSTG_updateTween(Tween *tween);
+void FIELDSTG_startTween(PanelAnim *tween, s32 in);
+s32 FIELDSTG_updateTween(PanelAnim *tween);
 
 /* state.c */
 s32 FIELDSTG_getFileEntry(s32 index);
@@ -1116,8 +1109,8 @@ extern FieldActorEntry *FIELDSTG_actorList[];
 extern StageTile FIELDSTG_mapObjects[];
 extern StageSlot FIELDSTG_slots[];
 extern void (*FIELDSTG_initFuncs[])(void);
-extern void (*FIELDSTG_tweenStart)(Tween *tween, s32 in); /* FIELDSTG_startTween */
-extern s32 (*FIELDSTG_tweenUpdate)(Tween *tween); /* FIELDSTG_updateTween */
+extern void (*FIELDSTG_tweenStart)(PanelAnim *tween, s32 in); /* FIELDSTG_startTween */
+extern s32 (*FIELDSTG_tweenUpdate)(PanelAnim *tween); /* FIELDSTG_updateTween */
 extern FieldEvent FIELDSTG_events[];
 extern s32 FIELDSTG_fileEntries[]; /* by character (Actor.key1) */
 extern u8 FIELDSTG_actorWidths[]; /* by character, in pixels (FieldState.getActorWidth) */

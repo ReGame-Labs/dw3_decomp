@@ -301,46 +301,83 @@ typedef struct LabData {
     /* 0x28 */ LabFuncs funcs;
 } LabData;
 
-/* The overlay's functions and data, which its five objects share */
-Task *STGDGLAB_createRecipeScreen(Lab *lab);
-Task *STGDGLAB_createSlotScreen(Lab *lab);
-LabMenu *STGDGLAB_createMenu(Lab *lab);
-Task *STGDGLAB_createPartyScreen(Lab *lab);
-ScreenFade *STGDGLAB_createFader(void);
+/* stgdglab.c */
+void STGDGLAB_updateScene(Task *task, Task **children);
+Task *STGDGLAB_createScene(void);
+void STGDGLAB_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
 void STGDGLAB_drawFader(ScreenFade *task);
+void STGDGLAB_updateFader(ScreenFade *task);
+ScreenFade *STGDGLAB_createFader(void);
+
+/* recipe_screen.c */
+s32 STGDGLAB_findRecipe(LabRecipeScreen *screen, s32 row, u32 col, s32 slot);
+s32 STGDGLAB_hasRecipeId(LabRecipeScreen *screen, s32 row, u32 col);
+s32 STGDGLAB_countRowIds(LabRecipeScreen *screen, u32 row);
+void STGDGLAB_resetRecipeCursor(LabRecipeScreen *screen);
+void STGDGLAB_drawRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *win);
+s32 STGDGLAB_moveRecipeCursor(LabRecipeScreen *screen, s32 step);
+void STGDGLAB_updateRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *win);
+Task *STGDGLAB_createRecipeScreen(Lab *lab);
+
+/* entry_panel.c */
+void STGDGLAB_createEntryPanelWindows(LabEntryPanel *panel, LabEntryPanelWindows *windows);
+void STGDGLAB_showEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windows, s32 show);
+void STGDGLAB_showEntryPanelOptions(LabEntryPanel *panel, LabEntryPanelWindows *windows, s32 show);
+void STGDGLAB_updateEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windows);
 LabEntryPanel *STGDGLAB_createEntryPanel(s32 partner, s32 slot);
+
+/* slot_screen.c */
 void STGDGLAB_createSlotScreenWindows(LabSlotScreen *screen, LabSlotScreenWindows *windows);
+void STGDGLAB_showSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *windows, s32 show);
 void STGDGLAB_runSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *windows);
-LabSkillPanel *STGDGLAB_createSkillPanel(s32 member, s32 slot);
 void STGDGLAB_drawSlotScreen(LabSlotScreen *screen, void *children);
+void STGDGLAB_updateSlotScreen(LabSlotScreen *screen, void *children);
+Task *STGDGLAB_createSlotScreen(Lab *lab);
+
+/* menu.c */
+void STGDGLAB_openMenu(LabMenu *menu);
+void STGDGLAB_closeMenu(LabMenu *menu);
 void STGDGLAB_showMenuPage(LabMenu *menu, LabMenuWindows *windows);
 void STGDGLAB_runMenu(LabMenu *menu, LabMenuWindows *windows);
 void STGDGLAB_drawMenu(LabMenu *menu, void *children);
-void STGDGLAB_updateRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *win);
-void STGDGLAB_updateEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windows);
-void STGDGLAB_updatePartyScreen(LabPartyScreen *screen, void *children);
-void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children);
-void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *windows);
-LabEntryList *STGDGLAB_createEntryList(s32 partner, s32 allEntries, s32 closable);
-void STGDGLAB_updateSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windows);
-void STGDGLAB_updateEntryList(LabEntryList *panel, LabEntryListWindows *windows);
-void STGDGLAB_createEntryListWindows(LabEntryList *panel, LabEntryListWindows *windows);
-void STGDGLAB_runEntryList(LabEntryList *panel, LabEntryListWindows *windows);
-void STGDGLAB_drawEntryList(LabEntryList *panel, LabEntryListWindows *windows);
-void STGDGLAB_showEntryList(LabEntryList *panel, LabEntryListWindows *windows, s32 arg);
-void STGDGLAB_openMenu(LabMenu *menu);
-void STGDGLAB_closeMenu(LabMenu *menu);
 void STGDGLAB_updateMenu(LabMenu *menu, void *children);
-void STGDGLAB_closeEntryList(LabEntryList *panel);
-void STGDGLAB_updateSlotScreen(LabSlotScreen *screen, void *children);
-s32 STGDGLAB_hasRecipeId(LabRecipeScreen *screen, s32 row, u32 col);
-ScrollBar *STGDGLAB_createScrollBar(void);
+LabMenu *STGDGLAB_createMenu(Lab *lab);
+
+/* scroll_bar.c */
 void STGDGLAB_setScrollBarX(ScrollBar *bar, s32 x, s32 width);
 void STGDGLAB_setScrollBarRange(ScrollBar *bar, s32 top, s32 bottom);
 void STGDGLAB_setScrollBarCount(ScrollBar *bar, s32 pageSize, s32 count);
 void STGDGLAB_setScrollBarPos(ScrollBar *bar, s32 pos);
+void STGDGLAB_updateScrollBar(ScrollBar *bar);
+ScrollBar *STGDGLAB_createScrollBar(void);
+
+/* party_screen.c */
+void STGDGLAB_showPartyPage(LabPartyScreen *screen, LabPartyScreenWindows *windows);
+void STGDGLAB_hideWindows(Task *task);
+void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children);
+void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *windows);
+void STGDGLAB_updatePartyScreen(LabPartyScreen *screen, void *children);
+Task *STGDGLAB_createPartyScreen(Lab *lab);
+
+/* skill_panel.c */
+void STGDGLAB_createSkillPanelWindows(LabSkillPanel *panel, LabSkillPanelWindows *windows);
+void STGDGLAB_showSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windows, s32 show);
+void STGDGLAB_updateSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windows);
+LabSkillPanel *STGDGLAB_createSkillPanel(s32 member, s32 slot);
+
+/* entry_list.c */
+void STGDGLAB_createEntryListWindows(LabEntryList *panel, LabEntryListWindows *windows);
+void STGDGLAB_showEntryList(LabEntryList *panel, LabEntryListWindows *windows, s32 show);
+void STGDGLAB_closeEntryList(LabEntryList *panel);
+void STGDGLAB_runEntryList(LabEntryList *panel, LabEntryListWindows *windows);
+void STGDGLAB_drawEntryList(LabEntryList *panel, LabEntryListWindows *windows);
+void STGDGLAB_updateEntryList(LabEntryList *panel, LabEntryListWindows *windows);
+LabEntryList *STGDGLAB_createEntryList(s32 partner, s32 allEntries, s32 closable);
+
+/* lab.c */
 void STGDGLAB_runLab(Lab *lab, LabChildren *children);
 void STGDGLAB_packParty(Lab *lab);
+void STGDGLAB_updateLab(Lab *lab, LabChildren *children);
 s32 STGDGLAB_openLabMenu(Lab *lab);
 s32 STGDGLAB_closeLabMenu(Lab *lab);
 s32 STGDGLAB_labMenuRunning(Lab *lab);
@@ -354,14 +391,12 @@ void STGDGLAB_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
 s32 STGDGLAB_updateLerp(MenuLerp *lerp);
 s32 STGDGLAB_getItemSprite(s32 id);
 s32 func_8008EC48(s32 id);
-s32 STGDGLAB_findRecipe(LabRecipeScreen *screen, s32 row, u32 col, s32 slot);
-void STGDGLAB_drawRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *win);
 
-/* STGDGLAB's data, in its order: the first object's, the fourth's and the
-   fifth's */
+/* STGDGLAB's data, in its order: the recipe screen's, the menu's, the party
+   screen's and the lab's */
 extern s32 STGDGLAB_tableItems[]; /* the item each table's screen shows */
 extern s32 STGDGLAB_menuStats[]; /* the stats the menu's page shows */
-extern s32 STGDGLAB_pageStats[]; /* the stats the second screen's page shows */
+extern s32 STGDGLAB_pageStats[]; /* the stats the first screen's page shows */
 extern Task *(*STGDGLAB_screens[])(Lab *lab);
 extern LabAnim STGDGLAB_partnerAnims[];
 extern s32 STGDGLAB_layout[];

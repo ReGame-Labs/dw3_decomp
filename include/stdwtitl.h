@@ -268,7 +268,8 @@ typedef struct TitleFuncs {
    game reads and clears its low byte */
 extern u_char StCdIntrFlag;
 
-/* STDWTITL data */
+/* STDWTITL's data, in its order: data/stdwtitl.c's, data/title.c's and
+   data/movie.c's */
 extern RECT STDWTITL_screenRect;
 extern s16 STDWTITL_logoFrames[2][13];
 extern s32 STDWTITL_movieWidth;
@@ -313,10 +314,15 @@ extern u32 STDWTITL_movieEndFrame;
 void STDWTITL_tickSplashLoader(Task *task, Task **splash);
 Task *STDWTITL_startSplashLoaderTask(void);
 void STDWTITL_tickScreen(Task *task, ScreenChildren *children);
+Task *STDWTITL_start(void);
+
+/* logo.c */
 void STDWTITL_drawLogo(LogoTask *task);
 void STDWTITL_tickLogo(LogoTask *task);
 void STDWTITL_showLogo(LogoTask *task);
 LogoTask *STDWTITL_startLogoTask(s32 skip);
+
+/* movie.c */
 void STDWTITL_clearVram(void);
 void STDWTITL_initDecEnv(DecEnv *dec, s16 x0, s16 y0, s16 x1, s16 y1);
 void STDWTITL_readStream(CdlLOC *loc);
@@ -329,6 +335,8 @@ void STDWTITL_tickMoviePlayer(MoviePlayerTask *task);
 MoviePlayerTask *STDWTITL_startMoviePlayerTask(s32 file, u32 endFrame);
 void STDWTITL_tickMovie(MovieTask *task, MoviePlayerTask **player);
 MovieTask *STDWTITL_startMovieTask(s32 movie);
+
+/* glint.c */
 void STDWTITL_drawGlintAlt(GlintTask *task);
 void STDWTITL_tickGlintAlt(GlintTask *task);
 void STDWTITL_showGlint(GlintTask *task);
@@ -336,12 +344,18 @@ GlintTask *STDWTITL_startGlintAltTask(s32 skip);
 void STDWTITL_drawGlint(GlintTask *task);
 void STDWTITL_tickGlint(GlintTask *task);
 GlintTask *STDWTITL_startGlintTask(s32 skip);
+
+/* splash.c */
 void STDWTITL_drawSplash(SplashTask *task);
 void STDWTITL_tickSplash(SplashTask *task);
 Task *STDWTITL_startSplashTask(void);
+
+/* title_loader.c */
 void STDWTITL_runTitleLoader(TitleLoaderTask *task, struct TitleTask **title);
 void STDWTITL_tickTitleLoader(TitleLoaderTask *task, struct TitleTask **title);
 TitleLoaderTask *STDWTITL_startTitleLoaderTask(void);
+
+/* slides.c */
 void STDWTITL_drawTitle1Alt(SlideTask *task);
 void STDWTITL_tickTitle1Alt(SlideTask *task);
 void STDWTITL_showTitle1(SlideTask *task);
@@ -356,6 +370,8 @@ SlideTask *STDWTITL_startTitle0AltTask(s32 skip);
 void STDWTITL_drawTitle0(SlideTask *task);
 void STDWTITL_tickTitle0(SlideTask *task);
 SlideTask *STDWTITL_startTitle0Task(s32 skip);
+
+/* menu.c */
 void STDWTITL_drawMenu(MenuTask *task);
 void STDWTITL_tickMenu(MenuTask *task);
 void STDWTITL_showMenu(MenuTask *task);
@@ -363,19 +379,23 @@ void STDWTITL_resetMenu(MenuTask *task);
 s32 STDWTITL_getMenuChoice(MenuTask *task);
 MenuTask *STDWTITL_startMenuTask(s16 skip);
 
-/* stdwtitl_2.c */
+/* edge_fade.c */
 s32 STDWTITL_getEdgeFadeLevel(s32 time);
 void STDWTITL_drawEdgeFade(s32 level);
 void STDWTITL_startEdgeFade(EdgeFadeTask *task);
 s32 STDWTITL_isEdgeFadeDone(EdgeFadeTask *task);
 void STDWTITL_tickEdgeFade(EdgeFadeTask *task);
 EdgeFadeTask *STDWTITL_startEdgeFadeTask(void);
+
+/* background.c */
 s32 STDWTITL_stepLoopingAnimation(AnimState *anim, AnimFrame *frames, s32 depth);
 void STDWTITL_drawBackground(BackgroundTask *task);
 void STDWTITL_drawBackgroundSprites(BackgroundTask *task);
 void STDWTITL_tickBackground(BackgroundTask *task);
 void STDWTITL_animateBackground(BackgroundTask *task);
 BackgroundTask *STDWTITL_startBackgroundTask(s32 skip);
+
+/* title.c */
 s32 STDWTITL_leaveTitle(TitleTask *task, TitleChildren *children);
 s32 STDWTITL_stepTitle(TitleTask *task, TitleChildren *children);
 void STDWTITL_tickTitle(TitleTask *task, TitleChildren *children);
@@ -383,7 +403,7 @@ TitleTask *STDWTITL_startTitleTask(Task *parent);
 void STDWTITL_loadTitleImages(void);
 void STDWTITL_startFade(PanelAnim *fade, s32 fadeIn);
 s32 STDWTITL_updateFade(PanelAnim *fade);
-void STDWTITL_startLerp(MenuLerp *tween, s32 from, s32 to, s32 duration);
-s32 STDWTITL_updateLerp(MenuLerp *tween);
+void STDWTITL_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
+s32 STDWTITL_updateLerp(MenuLerp *lerp);
 
 #endif /* STDWTITL_H */

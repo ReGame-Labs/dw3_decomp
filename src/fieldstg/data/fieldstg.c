@@ -2548,8 +2548,8 @@ StageSlot FIELDSTG_slots[] = {
     {{{0xFFFF, 0}, {0xFFFF, 0}}, 0, 0, 0, 0, 0, 0, 0, 0},
 };
 void (*FIELDSTG_initFuncs[])(void) = {FIELDSTG_setupField};
-void (*FIELDSTG_tweenStart)(Tween *tween, s32 in) = FIELDSTG_startTween;
-s32 (*FIELDSTG_tweenUpdate)(Tween *tween) = FIELDSTG_updateTween;
+void (*FIELDSTG_tweenStart)(PanelAnim *tween, s32 in) = FIELDSTG_startTween;
+s32 (*FIELDSTG_tweenUpdate)(PanelAnim *tween) = FIELDSTG_updateTween;
 /* The story events' text file, counted from TEXT_FILE(1) as FieldEvent.text is */
 #if VERSION_US
 #define STORY_TEXT_FILE 0x112

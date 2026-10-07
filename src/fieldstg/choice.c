@@ -94,9 +94,9 @@ void FIELDSTG_runChoice(ChoiceTask *task, ChoiceChildren *children) {
         drawer.setLayerId(FIELD_LAYER_MAP, 2);
         drawer.setTexture(FIELD_MENU_SPRITES_X, 0);
         drawer.setFollowScroll(0);
-        if (task->tween.value != 0) {
-            if (task->tween.value != 0x1000) {
-                drawer.setScale(task->tween.value, 0x1000, 0x1000);
+        if (task->tween.level != 0) {
+            if (task->tween.level != 0x1000) {
+                drawer.setScale(task->tween.level, 0x1000, 0x1000);
                 drawer.setPivot(0, 0xC3);
             }
             drawer.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x45, 0, 0xAC);

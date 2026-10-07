@@ -684,24 +684,28 @@ RECT STAGSLCT_screenRect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 u16 STAGSLCT_biosVersion[10] = {0};
 u16 STAGSLCT_biosVersionEnd = 0;
 
+/* The stage select's root task: starts the stage select */
 void STAGSLCT_updateScene(Task *task, Task **items) {
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         items[0] = STAGSLCT_createStageSelect();
         task->nextState(task);
         break;
-    case 1:
-    case 2:
-    case 3:
+    case TASK_RUN:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }
 
+/* Creates the stage select's root task */
 Task *STAGSLCT_start(void) {
     return createTask(STAGSLCT_updateScene, sizeof(Task), 4);
 }
 
+/* Moves the cursor by delta to the next line with a scene, scrolling the
+   list at its ends; it stays where it was when there is none */
 void STAGSLCT_moveCursor(StageSelect *sel, s32 delta) {
     s32 end = 0;
     s32 top = sel->top;
@@ -731,6 +735,7 @@ void STAGSLCT_moveCursor(StageSelect *sel, s32 delta) {
     sel->cursor = cursor;
 }
 
+/* Scrolls the list by delta lines, within its ends */
 void STAGSLCT_scrollPage(StageSelect *sel, s32 delta) {
     sel->top += delta;
     if (sel->top < 0) {
@@ -742,6 +747,8 @@ void STAGSLCT_scrollPage(StageSelect *sel, s32 delta) {
     }
 }
 
+/* Shows the console's BIOS version, read from its ROM once and turned into
+   full-width characters */
 void STAGSLCT_showBiosVersion(StageSelect *sel, StageSelectWindows *win) {
     u8 *src;
     s32 i;
@@ -786,6 +793,7 @@ void STAGSLCT_showBiosVersion(StageSelect *sel, StageSelectWindows *win) {
     win->bios->setText(win->bios, STAGSLCT_biosVersion);
 }
 
+/* Select zooms the title in or out; it then scales in 15 frames */
 void STAGSLCT_zoomTitle(StageSelect *sel, StageSelectWindows *win) {
     if (sel->fading != 0) {
         sel->fade += sel->fadeStep;
@@ -816,7 +824,7 @@ void STAGSLCT_zoomTitle(StageSelect *sel, StageSelectWindows *win) {
  * only sets GAME.progress) and, in the European version, cycles the language
  * (Start); L2/R2 change GAME.progress. Pad 2 changes the party's levels
  * (L1/R1) and unk32 (L2/R2), and BATTLE_SETUP.unk4 (up/down) and unk8
- * (right/left). State 3 goes to the scene.
+ * (right/left). TASK_KILL goes to the scene.
  */
 void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
     StageSelect *sel = (StageSelect *)task;
@@ -830,7 +838,7 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
     s32 level;
 
     switch (sel->state) {
-    case 0:
+    case TASK_INIT:
     default:
         i = 0;
         GFX.funcs.reset();
@@ -870,7 +878,7 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
         win->unk98 = createTextWindow(SCREEN_LAYER, 1, 0x50, 0xDC);
         task->nextState(task);
         break;
-    case 1:
+    case TASK_RUN:
         switch (sel->substate) {
         case 0:
             win->title->setText(win->title, STAGE_SELECT);
@@ -907,7 +915,7 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
                     if (STAGSLCT_entries[sel->top + sel->cursor].scene == 0x300) {
                         GAME.progress = STAGSLCT_entries[sel->top + sel->cursor].arg;
                     } else {
-                        task->setState(task, 3);
+                        task->setState(task, TASK_KILL);
                     }
                 }
             }
@@ -1017,7 +1025,7 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
             break;
         }
         break;
-    case 3:
+    case TASK_KILL:
         if (STAGSLCT_entries[sel->top + sel->cursor].arg & 0x8000) {
             GAME.funcs.requestMode(STAGSLCT_entries[sel->top + sel->cursor].scene, 0);
             GAME.progress = STAGSLCT_entries[sel->top + sel->cursor].arg & 0xFF;
@@ -1028,11 +1036,12 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
         GAME.stageSelectTop = sel->top;
         GAME.stageSelectCursor = sel->cursor;
         break;
-    case 2:
+    case TASK_DONE:
         break;
     }
 }
 
+/* Creates the stage select */
 Task *STAGSLCT_createStageSelect(void) {
     return createTask(STAGSLCT_updateStageSelect, 0, 0);
 }

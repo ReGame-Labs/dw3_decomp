@@ -14,12 +14,14 @@ char SHOCKTST_numberFormats[3][0x40] = {
     "\x65\x89\x56\x01\x07\x02\x05\x01",
 };
 
+/* The vibration test's root task: sets up the screen and its layer, then
+   starts the loader */
 void SHOCKTST_updateScene(Task *task, Task **items) {
     RECT rect;
     Layer *res;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         GFX.funcs.reset();
         GFX.funcs.allocPrimBuffers(0x5000);
@@ -33,17 +35,20 @@ void SHOCKTST_updateScene(Task *task, Task **items) {
         items[0] = SHOCKTST_createLoader();
         task->nextState(task);
         break;
-    case 1:
-    case 2:
-    case 3:
+    case TASK_RUN:
+    case TASK_DONE:
+    case TASK_KILL:
         break;
     }
 }
 
+/* Creates the vibration test's root task */
 Task *SHOCKTST_start(void) {
     return createTask(SHOCKTST_updateScene, sizeof(Task), 4);
 }
 
+/* Colors the editor's windows: palette 3 for the one under the cursor
+   (highlight 1-5 and 10), 1 for the one being edited (0 and 6-9, 11) */
 void SHOCKTST_highlight(ShockTest *task, ShockTestWindows *win, s32 highlight) {
     s32 i;
 
@@ -93,6 +98,7 @@ void SHOCKTST_highlight(ShockTest *task, ShockTestWindows *win, s32 highlight) {
     }
 }
 
+/* Picks the pattern with up and down: 1 on cross, -1 on triangle */
 s32 SHOCKTST_selectPattern(ShockTest *task, ShockTestWindows *win) {
     if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
         if (--task->pattern < 0) {
@@ -114,6 +120,7 @@ s32 SHOCKTST_selectPattern(ShockTest *task, ShockTestWindows *win) {
     return 0;
 }
 
+/* Shows a pattern's number and each motor's time and power */
 void SHOCKTST_showPattern(ShockTest *task, ShockTestWindows *win, s32 pattern) {
     s32 i;
 
@@ -124,6 +131,7 @@ void SHOCKTST_showPattern(ShockTest *task, ShockTestWindows *win, s32 pattern) {
     }
 }
 
+/* Shows each motor's power and the time it has left */
 void SHOCKTST_showTimers(ShockTest *task, ShockTestWindows *win, s32 pattern) {
     s32 i;
 
@@ -133,6 +141,8 @@ void SHOCKTST_showTimers(ShockTest *task, ShockTestWindows *win, s32 pattern) {
     }
 }
 
+/* Plays a pattern on both motors, one frame on: 1 once both have stopped
+   or triangle stops them */
 s32 SHOCKTST_playPattern(ShockTest *task, ShockTestWindows *win, s32 pattern) {
     s32 i;
 
@@ -192,6 +202,8 @@ s32 SHOCKTST_playAllPatterns(ShockTest *task, ShockTestWindows *win) {
     return 1;
 }
 
+/* Moves the editor's cursor over its rows and columns, skipping the empty
+   ones: 1 when cross picks a value, -1 when it picks the play row, 2 on circle */
 s32 SHOCKTST_moveCursor(ShockTest *task, ShockTestWindows *win) {
     if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
         do {
@@ -233,6 +245,8 @@ s32 SHOCKTST_moveCursor(ShockTest *task, ShockTestWindows *win) {
     return 0;
 }
 
+/* Changes a time or power with up and down (by 10 when repeating), or flips it
+   between 0 and 1 when toggle is set: 1 on cross, -1 on triangle */
 s32 SHOCKTST_editValue(ShockTest *task, ShockTestWindows *win, TextWindow **windows, u8 *value, u8 toggle) {
     if (toggle) {
         if (PAD_PRESSED(PAD_UP) || PAD_PRESSED(PAD_DOWN)) {
@@ -257,6 +271,8 @@ s32 SHOCKTST_editValue(ShockTest *task, ShockTestWindows *win, TextWindow **wind
     return 0;
 }
 
+/* Edits what the cursor picked: the pattern, or a motor's time or power (the
+   small motor's is only on or off); 1 once done */
 s32 SHOCKTST_editRow(ShockTest *task, ShockTestWindows *win) {
     switch (task->row) {
     case 0:
@@ -291,12 +307,15 @@ char *SHOCKTST_motorNames[2] = {
     "\x82\xC4\x82\xA2\x82\xBB\x82\xAD",
 };
 
+/* The editor's task: creates its windows, then edits and plays the patterns
+   (play with L1 held plays them all, circle checks the memory card); when
+   killed, frees them and stops the motors */
 void SHOCKTST_updateEditor(ShockTest *task, ShockTestWindows *win) {
     s32 i;
     s32 motor;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         task->nextState(task);
         task->windowId = 0x1000;
@@ -322,7 +341,7 @@ void SHOCKTST_updateEditor(ShockTest *task, ShockTestWindows *win) {
         win->play = createTextWindow(task->windowId, 1, 0x28, 0x8C);
         win->play->setText(win->play, "\x83\x70\x83\x5E\x81\x5B\x83\x93\x82\xB6\x82\xC1\x82\xB1\x82\xA4"); /* "パターンじっこう" */
         break;
-    case 1:
+    case TASK_RUN:
         switch (task->substate) {
         default:
             task->setSubstate(task, 0);
@@ -366,9 +385,9 @@ void SHOCKTST_updateEditor(ShockTest *task, ShockTestWindows *win) {
             break;
         }
         break;
-    case 2:
+    case TASK_DONE:
         break;
-    case 3:
+    case TASK_KILL:
         HEAP.free(task->steps[0]);
         HEAP.free(task->steps[1]);
         for (motor = 0; motor < 2; motor++) {
@@ -378,6 +397,7 @@ void SHOCKTST_updateEditor(ShockTest *task, ShockTestWindows *win) {
     }
 }
 
+/* Copies the pattern file's times and powers into the editor */
 void SHOCKTST_loadPatterns(ShockTest *task, ShockFile *file) {
     s32 i;
     u8 *times = (u8 *)file + file->timesOffset;
@@ -393,6 +413,7 @@ void SHOCKTST_loadPatterns(ShockTest *task, ShockFile *file) {
     }
 }
 
+/* Creates the editor, with room for count patterns */
 ShockTest *SHOCKTST_createEditor(s32 count) {
     ShockTest *task = createTask(SHOCKTST_updateEditor, sizeof(ShockTest), sizeof(ShockTestWindows));
 
@@ -404,6 +425,9 @@ ShockTest *SHOCKTST_createEditor(s32 count) {
 
 char *SHOCKTST_textPath = "sim:C:\\DEVELOP\\DLSKDATA.TXT";
 
+/* Turns DLSKDATA.TXT (the count, then a tab-separated row per pattern, of
+   which type 1 holds the motors' times and powers) into the pattern file, and
+   writes it to the PC as DLSKDATA.BIN */
 void SHOCKTST_convertText(ShockLoader *task) {
     u8 *s = task->text;
     s32 *header = (s32 *)task->file;
@@ -490,11 +514,14 @@ void SHOCKTST_convertText(ShockLoader *task) {
     }
 }
 
+/* The loader's task: creates the title and help windows, reads DLSKDATA.TXT
+   from the PC and starts the editor on it; START goes back to the stage
+   select (mode 0x1500) */
 void SHOCKTST_updateLoader(ShockLoader *task, ShockLoaderWindows *win) {
     s32 fd;
 
     switch (task->state) {
-    case 0:
+    case TASK_INIT:
     default:
         task->nextState(task);
         win->title = createTextWindow(SCREEN_LAYER, 0, 0x14, 0x1E);
@@ -506,12 +533,12 @@ void SHOCKTST_updateLoader(ShockLoader *task, ShockLoaderWindows *win) {
         task->text = HEAP.allocZeroed(0x4000, 2);
         task->file = HEAP.allocZeroed(0x4000, 2);
         if (task->text == NULL || task->file == NULL) {
-            task->setState(task, 3);
+            task->setState(task, TASK_KILL);
             break;
         }
         fd = open(SHOCKTST_textPath, 1);
         if (fd == -1) {
-            task->setState(task, 3);
+            task->setState(task, TASK_KILL);
             break;
         }
         read(fd, task->text, 0x4000);
@@ -524,14 +551,14 @@ void SHOCKTST_updateLoader(ShockLoader *task, ShockLoaderWindows *win) {
             win->test = SHOCKTST_createEditor(10);
         }
         break;
-    case 1:
+    case TASK_RUN:
         if (PAD_PRESSED(PAD_START)) {
-            task->setState(task, 3);
+            task->setState(task, TASK_KILL);
         }
         break;
-    case 2:
+    case TASK_DONE:
         break;
-    case 3:
+    case TASK_KILL:
         if (task->file != NULL) {
             HEAP.free(task->file);
         }
@@ -543,6 +570,7 @@ void SHOCKTST_updateLoader(ShockLoader *task, ShockLoaderWindows *win) {
     }
 }
 
+/* Creates the loader */
 Task *SHOCKTST_createLoader(void) {
     return createTask(SHOCKTST_updateLoader, sizeof(ShockLoader), sizeof(ShockLoaderWindows));
 }
