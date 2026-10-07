@@ -111,9 +111,10 @@ void FIELDSTG_runChoice(ChoiceTask *task, ChoiceChildren *children) {
 /* Asks question n of FIELDSTG_choices: the start of the FieldEvent before the
    events of its answers (FIELDSTG_events) */
 #define ASK_CHOICE(n)                                                                                  \
-    void FIELDSTG_askChoice##n(void) {                                                                 \
+    void *FIELDSTG_askChoice##n(void) {                                                                \
         ChoiceTask *task = createTask(FIELDSTG_runChoice, sizeof(ChoiceTask), sizeof(ChoiceChildren)); \
         task->type = n;                                                                                \
+        return task;                                                                                   \
     }
 
 ASK_CHOICE(0)

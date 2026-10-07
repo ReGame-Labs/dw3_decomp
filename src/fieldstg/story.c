@@ -69,10 +69,10 @@ void FIELDSTG_runStoryEvents(StoryEvents *task, StoryEventsChildren *children) {
 }
 
 /* Creates the story events, and loads the field's sound bank and files */
-StoryEvents *FIELDSTG_createStoryEvents(s32 arg0) {
+StoryEvents *FIELDSTG_createStoryEvents(void *owner) {
     StoryEvents *task = createTask(FIELDSTG_runStoryEvents, sizeof(StoryEvents), 8);
 
-    task->unk50 = arg0;
+    task->owner = owner;
     FIELDSTG_initFuncs[0]();
     return task;
 }

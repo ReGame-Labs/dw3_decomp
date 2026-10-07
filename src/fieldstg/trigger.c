@@ -72,7 +72,7 @@ s32 FIELDSTG_offerTrigger(Triggers *task, TriggerChildren *children) {
             task->actor->stopSlide(task->actor);
             return 0;
         case SLOT_LAUNCH:
-            task->actor->launch(task->actor, &task->entry->arg);
+            task->actor->launch(task->actor, SLOT_DEST(task->entry));
             return 0;
     }
 #if VERSION_US
@@ -162,7 +162,7 @@ void FIELDSTG_setOffTrigger(Triggers *task) {
             GAME.placeArg = task->entry->placeArg;
             break;
         case SLOT_LAUNCH_OUT:
-            task->actor->launch(task->actor, &task->entry->arg);
+            task->actor->launch(task->actor, SLOT_DEST(task->entry));
             FIELDSTG_leaveFieldAfter(task->entry->arg, -1, task->entry->x << 8, task->entry->y << 8, task->entry->dir,
                           0x3C);
             break;
@@ -181,10 +181,10 @@ void FIELDSTG_setOffTrigger(Triggers *task) {
             task->actor->playGauge(task->actor, task->dir, (Point){task->entry->arg, task->entry->x});
             break;
         case SLOT_WARP0:
-            task->actor->warp(task->actor, &task->entry->arg, 0);
+            task->actor->warp(task->actor, SLOT_DEST(task->entry), 0);
             break;
         case SLOT_WARP1:
-            task->actor->warp(task->actor, &task->entry->arg, 1);
+            task->actor->warp(task->actor, SLOT_DEST(task->entry), 1);
             break;
     }
 }
@@ -236,9 +236,9 @@ void FIELDSTG_updateTriggers(Triggers *task, TriggerChildren *children) {
 }
 
 /* Creates the triggers */
-Triggers *FIELDSTG_createTriggers(s32 arg0, void *entries) {
+Triggers *FIELDSTG_createTriggers(s32 sheetEntry, StageSlot *slots) {
     Triggers *task = createTask(FIELDSTG_updateTriggers, sizeof(Triggers), 8);
 
-    task->unk50 = arg0;
+    task->sheetEntry = sheetEntry;
     return task;
 }

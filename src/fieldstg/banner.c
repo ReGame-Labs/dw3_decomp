@@ -6,7 +6,7 @@
 
 /* Opens the banner's windows with the names of the mode's area and place
    (FIELDSTG_areaNames) */
-void FIELDSTG_showAreaName(Task *task, AreaNameWindows *windows) {
+void FIELDSTG_showAreaName(AreaBanner *task, AreaNameWindows *windows) {
     s16 mode = GAME.funcs.getMode();
     s32 i;
 
@@ -107,7 +107,7 @@ void FIELDSTG_drawBannerBox(AreaBanner *task, u_long *ot, DVECTOR pos, DVECTOR s
     POLY_F4 *poly = GFX.funcs.getPrim();
 
     setlen(poly, 5);
-    *(s32 *)&poly->r0 = color;
+    *(s32 *)&poly->r0 = color; /* r0, g0 and b0 in one store; code follows */
     poly->code = 0x28;
     poly->x0 = pos.vx;
     poly->x1 = pos.vx + size.vx;
@@ -142,7 +142,7 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
             for (j = 0; j < 10; j++) {
                 task->boxes[j] = FIELDSTG_bannerBoxes[j];
             }
-            FIELDSTG_showAreaName((Task *)task, windows);
+            FIELDSTG_showAreaName(task, windows);
             task->nextState(task);
         } else {
             task->setState(task, TASK_DONE);

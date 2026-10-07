@@ -164,9 +164,9 @@ void FIELDSTG_runFileLoader(Task *task) {
 }
 
 /* Creates the file loader, which starts at a step */
-Task *FIELDSTG_createFileLoader(s32 arg0) {
+Task *FIELDSTG_createFileLoader(s32 step) {
     Task *task = createTask(FIELDSTG_runFileLoader, sizeof(Task) + 4, 0); /* 4 bytes more than it uses */
 
-    task->key2 = arg0;
+    task->key2 = step;
     return task;
 }

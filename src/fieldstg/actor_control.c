@@ -688,17 +688,17 @@ void FIELDSTG_startActorGauge(Actor *actor, s32 dir, Point offset) {
 /* Warps the player (SLOT_WARP0 and SLOT_WARP1): the field task plays the
    warp's effect and cutscene of kind, then leaves for its mode
    (FIELDSTG_startWarp) */
-void FIELDSTG_warpActor(Actor *actor, FieldWarp *warp, s32 kind) {
+void FIELDSTG_warpActor(Actor *actor, SlotDest *dest, s32 kind) {
     actor->control = NULL;
     actor->setSubstate(actor, ACTOR_STAND);
     actor->dir = 0;
     FIELDSTG_state.busy = 1;
-    FIELDSTG_startWarp(kind, &actor->tile, warp);
+    FIELDSTG_startWarp(kind, &actor->tile, dest);
 }
 
 /* Sends the player flying to the tile at dest from the nearest launcher
    (FIELDSTG_createLaunch) */
-void FIELDSTG_launchActor(Actor *actor, s32 dest) {
+void FIELDSTG_launchActor(Actor *actor, SlotDest *dest) {
     void **children;
 
     actor->control = FIELDSTG_walkToGoal;
@@ -742,7 +742,7 @@ void FIELDSTG_drawActor(void *arg, void *arg2) {
     Point pos;
     Point scroll;
     u_long *ot;
-    POLY_FT4 *poly;
+    PrimPtr prim;
     FieldImage *shadow;
     s32 x;
 
@@ -752,63 +752,63 @@ void FIELDSTG_drawActor(void *arg, void *arg2) {
         layer->getScroll(layer, &scroll);
         pos.x -= scroll.x;
         pos.y -= scroll.y;
-        poly = GFX.funcs.getPrim();
+        prim.any = GFX.funcs.getPrim();
         pos.y -= actor->z >> 8;
-        setPolyFT4(poly);
-        setRGB0(poly, 0x80, 0x80, 0x80);
+        setPolyFT4(prim.ft4);
+        setRGB0(prim.ft4, 0x80, 0x80, 0x80);
         x = actor->frame[2];
         if (actor->dir >= 5) {
             x = -(actor->frameWidth + x);
         }
-        poly->x0 = pos.x + x;
-        poly->x1 = actor->frameWidth + (pos.x + x);
-        poly->x2 = pos.x + x;
-        poly->x3 = actor->frameWidth + (pos.x + x);
-        poly->y0 = actor->frame[3] + pos.y;
-        poly->y1 = actor->frame[3] + pos.y;
-        poly->y2 = actor->frameHeight + (actor->frame[3] + pos.y);
-        poly->y3 = actor->frameHeight + (actor->frame[3] + pos.y);
+        prim.ft4->x0 = pos.x + x;
+        prim.ft4->x1 = actor->frameWidth + (pos.x + x);
+        prim.ft4->x2 = pos.x + x;
+        prim.ft4->x3 = actor->frameWidth + (pos.x + x);
+        prim.ft4->y0 = actor->frame[3] + pos.y;
+        prim.ft4->y1 = actor->frame[3] + pos.y;
+        prim.ft4->y2 = actor->frameHeight + (actor->frame[3] + pos.y);
+        prim.ft4->y3 = actor->frameHeight + (actor->frame[3] + pos.y);
         if (actor->dir < 5) {
-            poly->u0 = image->u;
-            poly->u1 = actor->frameWidth + image->u;
-            poly->u2 = image->u;
-            poly->u3 = actor->frameWidth + image->u;
+            prim.ft4->u0 = image->u;
+            prim.ft4->u1 = actor->frameWidth + image->u;
+            prim.ft4->u2 = image->u;
+            prim.ft4->u3 = actor->frameWidth + image->u;
         } else {
-            poly->x1--;
-            poly->x3--;
-            poly->u0 = actor->frameWidth + image->u - 1;
-            poly->u1 = image->u;
-            poly->u2 = actor->frameWidth + image->u - 1;
-            poly->u3 = image->u;
+            prim.ft4->x1--;
+            prim.ft4->x3--;
+            prim.ft4->u0 = actor->frameWidth + image->u - 1;
+            prim.ft4->u1 = image->u;
+            prim.ft4->u2 = actor->frameWidth + image->u - 1;
+            prim.ft4->u3 = image->u;
         }
-        poly->v0 = image->v;
-        poly->v1 = image->v;
-        poly->v2 = actor->frameHeight + image->v;
-        poly->v3 = actor->frameHeight + image->v;
-        poly->clut = getClut(image->clutX, image->clutY);
-        poly->tpage = getTPage(0, 0, image->x, image->y);
-        addPrim(ot, poly);
+        prim.ft4->v0 = image->v;
+        prim.ft4->v1 = image->v;
+        prim.ft4->v2 = actor->frameHeight + image->v;
+        prim.ft4->v3 = actor->frameHeight + image->v;
+        prim.ft4->clut = getClut(image->clutX, image->clutY);
+        prim.ft4->tpage = getTPage(0, 0, image->x, image->y);
+        addPrim(ot, prim.any);
         pos.y += actor->z >> 8;
-        poly++;
+        prim.ft4++;
         if (actor->hasShadow != 0) {
             ot = (u_long *)layer->getOtEntry(layer, actor->depth + 1);
             shadow = actor->fieldImage;
-            setSprt((SPRT *)poly);
-            setRGB0((SPRT *)poly, 0x80, 0x80, 0x80);
-            ((SPRT *)poly)->x0 = pos.x - 16;
-            ((SPRT *)poly)->y0 = pos.y + (s16)((actor->climbHeight >> 8) - 8);
-            ((SPRT *)poly)->u0 = shadow->shadow.u;
-            ((SPRT *)poly)->v0 = shadow->shadow.v;
-            ((SPRT *)poly)->w = 0x20;
-            ((SPRT *)poly)->h = 0x10;
-            ((SPRT *)poly)->clut = getClut(shadow->shadow.clutX, shadow->shadow.clutY);
-            addPrim(ot, poly);
-            poly = (POLY_FT4 *)((SPRT *)poly + 1);
-            SetDrawTPage((DR_TPAGE *)poly, 0, 1, GetTPage(0, 0, shadow->shadow.x, shadow->shadow.y));
-            addPrim(ot, poly);
-            poly = (POLY_FT4 *)((DR_TPAGE *)poly + 1);
+            setSprt(prim.sprt);
+            setRGB0(prim.sprt, 0x80, 0x80, 0x80);
+            prim.sprt->x0 = pos.x - 16;
+            prim.sprt->y0 = pos.y + (s16)((actor->climbHeight >> 8) - 8);
+            prim.sprt->u0 = shadow->shadow.u;
+            prim.sprt->v0 = shadow->shadow.v;
+            prim.sprt->w = 0x20;
+            prim.sprt->h = 0x10;
+            prim.sprt->clut = getClut(shadow->shadow.clutX, shadow->shadow.clutY);
+            addPrim(ot, prim.any);
+            prim.sprt++;
+            SetDrawTPage(prim.tpage, 0, 1, GetTPage(0, 0, shadow->shadow.x, shadow->shadow.y));
+            addPrim(ot, prim.any);
+            prim.tpage++;
         }
-        GFX.funcs.setPrim(poly);
+        GFX.funcs.setPrim(prim.any);
     }
 }
 
@@ -946,45 +946,39 @@ void FIELDSTG_restorePlayerControl(Actor *actor) {
 }
 
 /* The player's footsteps, every 8 frames when it moves (every 32 for the
-   characters 0x146 and 0x147) or 32 when not, and each step can start a
-   battle (FIELDSTG_checkBattle) */
-void FIELDSTG_playStepSounds(Task *task, s32 arg1, s32 arg2) {
-    if (task->key2 == 0) {
-        if (arg1 != 0) {
-            if ((task->counter & 7) == 0) {
-                if (task->key1 != 0x146) {
-                    if (task->key1 != 0x147) {
+   characters 0x146 and 0x147) or 32 when not; with canBattle each step can
+   start a battle (FIELDSTG_checkBattle) */
+void FIELDSTG_playStepSounds(Actor *actor, s32 moving, s32 canBattle) {
+    if (actor->key2 == 0) {
+        if (moving != 0) {
+            if ((actor->counter & 7) == 0) {
+                if (actor->key1 != 0x146) {
+                    if (actor->key1 != 0x147) {
                         SOUND.playSound(SOUND_PLAYER00);
                     }
-                } else if ((task->counter & 0x1F) == 0) {
+                } else if ((actor->counter & 0x1F) == 0) {
                     SOUND.playSound(SOUND_DIG_MOVE);
                 }
-                if (arg2 != 0) {
+                if (canBattle != 0) {
                     FIELDSTG_checkBattle();
                 }
             }
-        } else if ((task->counter & 0x1F) == 0) {
+        } else if ((actor->counter & 0x1F) == 0) {
             SOUND.playSound(SOUND_PLAYER00);
         }
-        task->counter++;
+        actor->counter++;
     }
 }
 
 /* The player's climbing sound, every 16 frames */
-void FIELDSTG_playClimbSounds(Task *task) {
-    if (task->key2 == 0) {
-        if ((task->counter & 0xF) == 0) {
+void FIELDSTG_playClimbSounds(Actor *actor) {
+    if (actor->key2 == 0) {
+        if ((actor->counter & 0xF) == 0) {
             SOUND.playSound(SOUND_PLAYER01);
         }
-        task->counter++;
+        actor->counter++;
     }
 }
-
-/* The voice of the sound 0xA064683C. Declared here and not in fieldstg.h:
-   data/fieldstg.c defines it as two halfwords, for the European version's
-   padding after it, and read as an element of that array the talk's code
-   schedules otherwise. */
-extern s16 FIELDSTG_talkVoice;
 
 /*
  * Runs an actor's action, its substate (ACTOR_STAND...): the walks, the
@@ -1034,7 +1028,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
             actor->pos.x += move2.x;
             actor->pos.y += move2.y;
         }
-        FIELDSTG_playStepSounds((Task *)actor, 0, 0);
+        FIELDSTG_playStepSounds(actor, 0, 0);
         break;
     case ACTOR_RUN:
         switch (actor->step) {
@@ -1051,7 +1045,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
             actor->pos.x += move3.x;
             actor->pos.y += move3.y;
         }
-        FIELDSTG_playStepSounds((Task *)actor, 1, 1);
+        FIELDSTG_playStepSounds(actor, 1, 1);
         if (GAME.funcs.getMode() != FIELD_MODE_WSTAG415 && actor->key2 == 0) {
             FIELDSTG_checkFlightProbes(actor);
         }
@@ -1105,7 +1099,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         FIELDSTG_map.getFlyStep(&actor->tile, actor->speed, actor->dir, &move4);
         actor->pos.x += move4.x;
         actor->pos.y += move4.y;
-        FIELDSTG_playStepSounds((Task *)actor, 1, 1);
+        FIELDSTG_playStepSounds(actor, 1, 1);
         FIELDSTG_checkFlightProbes(actor);
         break;
     case ACTOR_STOP:
@@ -1137,7 +1131,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         actor->pos.x += move5.x;
         actor->pos.y += move5.y;
         if (actor->flying == 0) {
-            FIELDSTG_playStepSounds((Task *)actor, 1, 0);
+            FIELDSTG_playStepSounds(actor, 1, 0);
         }
         break;
     case ACTOR_SLIDE:
@@ -1146,7 +1140,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         default:
             FIELDSTG_state.acting = 1;
             FIELDSTG_setActorAnim(actor, ACTOR_ANIM_STAND);
-            FIELDSTG_talkVoice = SOUND.playSound(SOUND_TRAP_ICE);
+            FIELDSTG_slideVoice = SOUND.playSound(SOUND_TRAP_ICE);
             actor->nextStep(actor);
         case 1:
             break;
@@ -1157,7 +1151,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         break;
     case ACTOR_STOP_SLIDE:
         if (actor->step == 0) {
-            SOUND.keyOff(SOUND_TRAP_ICE, FIELDSTG_talkVoice);
+            SOUND.keyOff(SOUND_TRAP_ICE, FIELDSTG_slideVoice);
         }
         actor->step += GFX.funcs.getFrameTime();
         if (actor->step >= 0x1E) {
@@ -1191,7 +1185,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
             actor->setSubstate(actor, ACTOR_CLIMB_OFF_TOP);
             actor->control = NULL;
         }
-        FIELDSTG_playClimbSounds((Task *)actor);
+        FIELDSTG_playClimbSounds(actor);
         break;
     case ACTOR_CLIMB_DOWN:
         switch (actor->step) {
@@ -1208,7 +1202,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
             actor->setSubstate(actor, ACTOR_CLIMB_OFF_BOTTOM);
             actor->control = NULL;
         }
-        FIELDSTG_playClimbSounds((Task *)actor);
+        FIELDSTG_playClimbSounds(actor);
         break;
     case ACTOR_GET_ON_WALL:
         switch (actor->step) {
@@ -1405,14 +1399,14 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
                 }
                 talk++;
             }
-            actor->talkActions = (s32)talk->actions;
+            actor->talkActions = talk->actions;
             if (!isTreasure && actor->isLarge == 0) {
                 actor->dir = (actor->talkPartner->dir + 4) & 7;
             }
             if (actor->animFile != 0 && !isTreasure) {
-                children->speech = FIELDSTG_createTalk(actor, talk->unk8);
+                children->speech = FIELDSTG_createTalk(actor, talk->entry);
             } else {
-                children->speech = FIELDSTG_createTalk(actor->talkPartner, talk->unk8);
+                children->speech = FIELDSTG_createTalk(actor->talkPartner, talk->entry);
             }
             if (isTreasure) {
                 FIELDSTG_setActorAnim(actor, ACTOR_ANIM_OPEN);
@@ -1433,8 +1427,8 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
                 } else {
                     other->control = FIELDSTG_controlFlight;
                 }
-                if (actor->talkActions != 0) {
-                    FLAGS_00.applyActions((u16 *)actor->talkActions);
+                if (actor->talkActions != NULL) {
+                    FLAGS_00.applyActions(actor->talkActions);
                 }
                 FIELDSTG_state.acting = 0;
             }

@@ -154,7 +154,7 @@ typedef struct FieldEvent {
 typedef struct FieldTalk {
     /* 0x0 */ u16 *conditions; /* FLAGS_00.checkConditions's */
     /* 0x4 */ u16 *actions; /* FLAGS_00.applyActions's when it ends, or NULL */
-    /* 0x8 */ s32 unk8; /* FIELDSTG_createTalk's */
+    /* 0x8 */ s32 entry; /* its text's entry in the field's text file (FIELDSTG_createTalk) */
 } FieldTalk;
 
 /* The characters (Actor.key1, FieldActorEntry.id) that FIELDSTG_updateField
@@ -173,7 +173,7 @@ typedef struct FieldActorEntry {
     /* 0x00 */ u16 *conditions; /* FLAGS_00.checkConditions's, or NULL */
     /* 0x04 */ struct FieldTalk *talks; /* up to the first without conditions */
     /* 0x08 */ s16 id;
-    /* 0x0A */ s16 unkA;
+    /* 0x0A */ s16 image; /* its ActorImage, of FieldState.images.actors from 2 (FIELDSTG_createActor) */
     /* 0x0C */ s16 x; /* in pixels */
     /* 0x0E */ s16 y;
     /* 0x10 */ s16 dir;
@@ -237,7 +237,7 @@ typedef struct StageSlot {
     /* 0x00 */ u16 conditions[2][2]; /* flag code and value, or code 0xFFFF */
     /* 0x08 */ u16 type; /* SLOT_EXIT... */
     /* 0x0A */ u16 arg; /* by type: a mode, a depth, a map, an event or a height (in 16
-                           pixels, plus 1 for a climb); a warp's FieldWarp starts here */
+                           pixels, plus 1 for a climb); a warp's and a launch's SlotDest starts here */
     /* 0x0C */ u16 x;
     /* 0x0E */ u16 y;
     /* 0x10 */ u16 dir;
@@ -245,6 +245,21 @@ typedef struct StageSlot {
     /* 0x14 */ u16 place; /* copied to GAME.place, the place (FieldBattles.id) */
     /* 0x16 */ u16 placeArg; /* copied to GAME.placeArg: with place, the next stage's place points */
 } StageSlot;
+
+/* Where a slot leads: a StageSlot from its arg on, as the warps (FieldTask.warp)
+   and the launches (Launch.dest) read it */
+typedef struct SlotDest {
+    /* 0x0 */ s16 mode;
+    /* 0x2 */ s16 x; /* in pixels */
+    /* 0x4 */ s16 y;
+    /* 0x6 */ s16 dir;
+    /* 0x8 */ u16 hideAnim; /* which a warp doesn't read */
+    /* 0xA */ u16 place; /* copied to GAME.place, the place (FieldBattles.id) */
+    /* 0xC */ u16 placeArg; /* copied to GAME.placeArg */
+} SlotDest;
+
+/* A slot's destination: its arg on, read as signed halfwords */
+#define SLOT_DEST(slot) ((SlotDest *)&(slot)->arg)
 
 /* A battle that can start on the field (see FIELDSTG_startEncounter) */
 typedef struct Battle {
@@ -290,7 +305,7 @@ typedef struct FieldState {
     /* 0x04 */ struct Task *(*stageInit)(void *owner); /* starts the stage's task */
     /* 0x08 */ s32 mapFile; /* the file of the map's tiles (FIELDSTG_createMapStreamer) */
     /* 0x0C */ s32 sheetEntry; /* the stage's sprite sheet, loaded before the field starts, or 0 */
-    /* 0x10 */ StageTile *objects; /* the map objects, up to the first unk2 0 */
+    /* 0x10 */ StageTile *objects; /* the map objects, up to the first margin 0 */
     /* 0x14 */ StageSlot *slots; /* up to the first type 0 */
     /* 0x18 */ s32 imageEntry; /* an image archive's file entry, loaded at (0x140, 0x100), or 0 */
     /* 0x1C */ s32 imageFile; /* or an image archive file, or 0 */
