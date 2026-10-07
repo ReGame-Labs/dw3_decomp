@@ -79,9 +79,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
         }
         {
             s32 other = 1 - (task->side >> 4);
-            s32 row = other * 0x60;
-            BattleFighter *slot = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[other]];
-            BattleFighter *fighter = (BattleFighter *)(row + (s32)slot);
+            BattleFighter *fighter = FIGHTSTG_getActiveFighter(other);
 
             if (fighter->flags & FIGHTER_ASLEEP) {
                 task->asleep = 1;
@@ -152,10 +150,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
 #endif
                     }
                 } else if (FIGHTSTG_action.effects[TECH_EFFECT_KNOCK_OUT]) {
-                    s32 row = other * 0x60;
-                    BattleFighter *slot = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[other]];
-
-                    ((BattleFighter *)(row + (s32)slot))->hp = 0;
+                    FIGHTSTG_getActiveFighter(other)->hp = 0;
                     FIGHTSTG_queueKnockOut(other << 4);
                     children[0].task->state = 3;
                 } else if (FIGHTSTG_action.hits[0]) {
@@ -169,9 +164,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
                     children[0].message->show(children[0].message, 2, task->lines);
                 }
                 if (task->damage != 0) {
-                    s32 row = other * 0x60;
-                    BattleFighter *slot = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[other]];
-                    BattleFighter *fighter = (BattleFighter *)(row + (s32)slot);
+                    BattleFighter *fighter = FIGHTSTG_getActiveFighter(other);
 
                     fighter->hp -= task->damage;
                     if (fighter->hp <= 0) {
@@ -496,10 +489,8 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
                 case 0xD1:
                 case 0xD2: {
                     s32 other = task->side >> 4;
-                    s32 row = other * 0x60;
-                    BattleFighter *slot = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[other]];
 
-                    ((BattleFighter *)(row + (s32)slot))->charge = tech->effectPower;
+                    FIGHTSTG_getActiveFighter(other)->charge = tech->effectPower;
                     task->lines[0] = 0x36;
                     task->lines[1] = task->side;
                     children[0].message->show(children[0].message, 2, task->lines);
@@ -630,10 +621,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
             break;
         case 4: {
             s32 other = task->side == 0;
-            s32 row = other * 0x60;
-            BattleFighter *slot = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[other]];
-
-            BattleFighter *fighter = (BattleFighter *)(row + (s32)slot);
+            BattleFighter *fighter = FIGHTSTG_getActiveFighter(other);
             TechData *tech;
 
             tech = &TECHS[task->tech - 1];

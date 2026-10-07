@@ -18,6 +18,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
     BattleTableEntry *entry;
     ItemInfo *info;
     u8 *data;
+    AccessoryData *acc;
     s32 member;
     s16 *values;
     s32 count;
@@ -90,17 +91,17 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
         values = &partner->equip[4];
         for (i = 0; i < 2; i++) {
             if (values[i] != 0) {
-                data = GET_ITEM[0](values[i])->data;
-                if (data[8] == 17) {
-                    stats->resist[RESIST_POISON] = *(u16 *)&data[6];
-                } else if (data[8] == 18) {
-                    stats->resist[RESIST_PARALYSIS] = *(u16 *)&data[6];
-                } else if (data[8] == 19) {
-                    stats->resist[RESIST_CONFUSION] = *(u16 *)&data[6];
-                } else if (data[8] == 20) {
-                    stats->resist[RESIST_SLEEP] = *(u16 *)&data[6];
-                } else if (data[8] == 21) {
-                    stats->resist[RESIST_KNOCK_OUT] = *(u16 *)&data[6];
+                acc = (AccessoryData *)GET_ITEM[0](values[i])->data;
+                if (acc->stat == 17) {
+                    stats->resist[RESIST_POISON] = acc->amount;
+                } else if (acc->stat == 18) {
+                    stats->resist[RESIST_PARALYSIS] = acc->amount;
+                } else if (acc->stat == 19) {
+                    stats->resist[RESIST_CONFUSION] = acc->amount;
+                } else if (acc->stat == 20) {
+                    stats->resist[RESIST_SLEEP] = acc->amount;
+                } else if (acc->stat == 21) {
+                    stats->resist[RESIST_KNOCK_OUT] = acc->amount;
                 }
             }
         }
@@ -130,24 +131,24 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
             if (i != 1 && values[i] > 0) {
                 data = GET_ITEM[0](values[i])->data;
                 if (values[i] == 0x97) {
-                    stats->poisonChance = data[0x10];
-                    stats->poisonPower = data[0x11];
+                    stats->statuses[HIT_POISON].chance = data[0x10];
+                    stats->statuses[HIT_POISON].power = data[0x11];
                     found = 1;
                 } else if (values[i] == 0xD2) {
-                    stats->paralysisChance = data[0x10];
-                    stats->paralysisPower = data[0x11];
+                    stats->statuses[HIT_PARALYSIS].chance = data[0x10];
+                    stats->statuses[HIT_PARALYSIS].power = data[0x11];
                     found = 1;
                 } else if (values[i] == 0xB4 || values[i] == 0xC2) {
-                    stats->confusionChance = data[0x10];
-                    stats->confusionPower = data[0x11];
+                    stats->statuses[HIT_CONFUSION].chance = data[0x10];
+                    stats->statuses[HIT_CONFUSION].power = data[0x11];
                     found = 1;
                 } else if (values[i] == 0x6D || values[i] == 0xBA) {
-                    stats->knockOutChance = data[0x10];
-                    stats->knockOutPower = data[0x11];
+                    stats->statuses[HIT_KNOCK_OUT].chance = data[0x10];
+                    stats->statuses[HIT_KNOCK_OUT].power = data[0x11];
                     found = 1;
                 } else if (values[i] == 0x5E || values[i] == 0x93 || values[i] == 0xAD) {
-                    stats->drainChance = data[0x10];
-                    stats->drainPower = data[0x11];
+                    stats->statuses[HIT_DRAIN].chance = data[0x10];
+                    stats->statuses[HIT_DRAIN].power = data[0x11];
                     found = 1;
                 } else if (values[i] == 0x96 || values[i] == 0xBF) {
                     stats->criticalBonus = data[0x11];

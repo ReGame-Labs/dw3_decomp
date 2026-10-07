@@ -5,7 +5,7 @@
 
 /* The mode's scene: resets the graphics, makes the screen layer and creates
    the report */
-void STFGTREP_updateScene(Task *task, Task **children) {
+void STFGTREP_updateScene(Task *task, FightReport **children) {
     RECT rect;
     Layer *layer;
 
@@ -21,7 +21,7 @@ void STFGTREP_updateScene(Task *task, Task **children) {
         rect.h = 0xF0;
         layer = GFX.funcs.createLayer(&rect, 3, SCREEN_LAYER);
         layer->setBgColor(layer, 0, 0, 0);
-        children[0] = (Task *)STFGTREP_createScreen();
+        children[0] = STFGTREP_createScreen();
         task->nextState(task);
         break;
     case TASK_RUN:

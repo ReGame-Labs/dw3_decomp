@@ -85,7 +85,7 @@ typedef struct ItemMenu {
     TASK_HEADER(ItemMenu);
     /* 0x050 */ s32 *result; /* -1 until it is done, then the item or -2 */
     /* 0x054 */ s32 sel; /* the cursor's line last frame */
-    /* 0x058 */ s16 items[0x194]; /* ITEM_FUNCS->list's */
+    /* 0x058 */ s16 items[0x194]; /* ITEM_FUNCS->list's u16 ids, read as s16 */
     /* 0x380 */ s16 *usable; /* the items with flag 2 */
     /* 0x384 */ s32 count;
     /* 0x388 */ s32 page;
@@ -316,6 +316,24 @@ typedef union TechMenuChild {
     TextWindow *window;
 } TechMenuChild;
 
+/* One of FIGHTSTG_updatePlayerTurn's seven children: 0 the HUD, 1 the
+   command or the confused menu, 2 the partner's view, 3 the open command's
+   menu, 4 the pair switch or switch-in menu and 6 the shot camera, which
+   substate 0 closes alike as tasks */
+typedef union PlayerTurnChild {
+    Task *task;
+    HpDisplay *hud;
+    CommandMenu *commandMenu;
+    ConfusedMenu *confusedMenu;
+    PartnerView *partnerView;
+    DigivolveMenu *digivolveMenu;
+    ItemMenu *itemMenu;
+    TechMenu *techMenu;
+    SwitchMenu *switchMenu;
+    SwitchInMenu *switchInMenu;
+    ShotCamera *shotCamera;
+} PlayerTurnChild;
+
 /* Which fighters FIGHTSTG_findFighters looks for */
 typedef struct FighterFilter {
     /* 0x0 */ s32 side;
@@ -336,7 +354,7 @@ void FIGHTSTG_updateHpTweens(HpDisplay *task, TextWindow **windows);
 void FIGHTSTG_drawHud(HpDisplay *task, TextWindow **windows);
 void FIGHTSTG_updateHud(HpDisplay *task, TextWindow **windows);
 void FIGHTSTG_updatePartnerView(PartnerView *task, FighterCamera **cameras);
-void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, Task **children);
+void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, PlayerTurnChild *children);
 void FIGHTSTG_updateSwitchInMenu(SwitchInMenu *task, SwitchInMenuWindows *w);
 void FIGHTSTG_updateDigivolveMenu(DigivolveMenu *task, void *children);
 SwitchInMenu *FIGHTSTG_createSwitchInMenu(s32 *result);

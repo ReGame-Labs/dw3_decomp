@@ -5,7 +5,7 @@
 /* Enemy Digimon id's index in the battle table (FILE_BATTLE_TABLE: each
    enemy's stats, techniques and actions), or -1 */
 s32 FIGHTSTG_findBattleTableIndex(s32 id) {
-    BattleTableEntry *table = (BattleTableEntry *)FILE_CACHE.load(FILE_BATTLE_TABLE);
+    BattleTableEntry *table = FILE_CACHE.load(FILE_BATTLE_TABLE);
     s32 i;
 
     for (i = 0; table[i].id != 0; i++) {
@@ -18,7 +18,7 @@ s32 FIGHTSTG_findBattleTableIndex(s32 id) {
 
 /* Enemy Digimon id's entry in the battle table, or NULL */
 BattleTableEntry *FIGHTSTG_getBattleTableEntry(s32 id) {
-    BattleTableEntry *table = (BattleTableEntry *)FILE_CACHE.load(FILE_BATTLE_TABLE);
+    BattleTableEntry *table = FILE_CACHE.load(FILE_BATTLE_TABLE);
     s32 i = FIGHTSTG_findBattleTableIndex(id);
 
     if (i >= 0) {

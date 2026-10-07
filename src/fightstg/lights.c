@@ -109,7 +109,9 @@ void FIGHTSTG_fadeLights(Lights *task, LightSet *from, LightSet *to, s32 time) {
 
 /* Lights.getStageLights: fight stage STAGE's lights */
 LightSet *FIGHTSTG_getStageLights(Lights *task, s32 stage) {
-    return &((FightStageInfo *)FILE_CACHE.load(FILE_FIGHT_STAGES))[stage].lights;
+    FightStageInfo *stages = FILE_CACHE.load(FILE_FIGHT_STAGES);
+
+    return &stages[stage].lights;
 }
 
 /* Creates the stage lights (id 0x13) for layer layerId */

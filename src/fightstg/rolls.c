@@ -214,8 +214,8 @@ s32 FIGHTSTG_rollPoison(u8 side, s32 id) {
     def = &FIGHTSTG_battleFuncs.stats[1];
     entry = &TECHS[id - 1];
     if (entry->effect < TECH_EFFECT_FIRST) {
-        result = atk->poisonPower;
-        base = atk->poisonChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
+        result = atk->statuses[HIT_POISON].power;
+        base = atk->statuses[HIT_POISON].chance + atk->stats[BATTLE_STAT_WISDOM] / 8;
     } else {
         result = entry->effectPower;
         base = entry->effectChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
@@ -233,9 +233,10 @@ s32 FIGHTSTG_rollPoison(u8 side, s32 id) {
     return 0;
 }
 
-/* Whether a hit paralyzes, like rollPoison (BATTLE_BLOCK_PARALYSIS keeps the
-   player from it) */
-s32 FIGHTSTG_rollParalysis(u8 side, s32 id) {
+/* Whether a hit inflicts status, like rollPoison without its power: BLOCK
+   keeps the player from it, and the target resists it with RESIST and the
+   resistance to ELEMENT */
+static inline s32 rollStatus(u8 side, s32 id, s32 block, s32 status, s32 resist, s32 element) {
     BattleStats *atk;
     BattleStats *def;
     TechData *entry;
@@ -243,7 +244,7 @@ s32 FIGHTSTG_rollParalysis(u8 side, s32 id) {
     s32 base;
 
     if (side == 0) {
-        if (BATTLE_SETUP.blocks[BATTLE_BLOCK_PARALYSIS]) {
+        if (BATTLE_SETUP.blocks[block]) {
             return 0;
         }
         FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
@@ -256,11 +257,11 @@ s32 FIGHTSTG_rollParalysis(u8 side, s32 id) {
     def = &FIGHTSTG_battleFuncs.stats[1];
     entry = &TECHS[id - 1];
     if (entry->effect < TECH_EFFECT_FIRST) {
-        base = atk->paralysisChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
+        base = atk->statuses[status].chance + atk->stats[BATTLE_STAT_WISDOM] / 8;
     } else {
         base = entry->effectChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
     }
-    chance = base - (def->resist[RESIST_PARALYSIS] + def->resist[4] + def->stats[BATTLE_STAT_WISDOM] / 2) / 8;
+    chance = base - (def->resist[resist] + def->resist[element] + def->stats[BATTLE_STAT_WISDOM] / 2) / 8;
     if (chance <= 0) {
         chance = 1;
     }
@@ -270,41 +271,16 @@ s32 FIGHTSTG_rollParalysis(u8 side, s32 id) {
     return (RANDOM.next() & 0x7F) < chance;
 }
 
+/* Whether a hit paralyzes, like rollPoison (BATTLE_BLOCK_PARALYSIS keeps the
+   player from it) */
+s32 FIGHTSTG_rollParalysis(u8 side, s32 id) {
+    return rollStatus(side, id, BATTLE_BLOCK_PARALYSIS, HIT_PARALYSIS, RESIST_PARALYSIS, 4);
+}
+
 /* Whether a hit confuses, like rollPoison (BATTLE_BLOCK_CONFUSION keeps the
    player from it) */
 s32 FIGHTSTG_rollConfusion(u8 side, s32 id) {
-    BattleStats *atk;
-    BattleStats *def;
-    TechData *entry;
-    s32 chance;
-    s32 base;
-
-    if (side == 0) {
-        if (BATTLE_SETUP.blocks[BATTLE_BLOCK_CONFUSION]) {
-            return 0;
-        }
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
-    } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
-    }
-    atk = &FIGHTSTG_battleFuncs.stats[0];
-    def = &FIGHTSTG_battleFuncs.stats[1];
-    entry = &TECHS[id - 1];
-    if (entry->effect < TECH_EFFECT_FIRST) {
-        base = atk->confusionChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
-    } else {
-        base = entry->effectChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
-    }
-    chance = base - (def->resist[RESIST_CONFUSION] + def->resist[3] + def->stats[BATTLE_STAT_WISDOM] / 2) / 8;
-    if (chance <= 0) {
-        chance = 1;
-    }
-    if (chance >= 0x80) {
-        chance = 0x7F;
-    }
-    return (RANDOM.next() & 0x7F) < chance;
+    return rollStatus(side, id, BATTLE_BLOCK_CONFUSION, HIT_CONFUSION, RESIST_CONFUSION, 3);
 }
 
 /* Whether a hit puts the target to sleep, like rollPoison with the
@@ -341,38 +317,7 @@ s32 FIGHTSTG_rollSleep(u8 side, s32 id) {
 /* Whether a hit knocks the target out, like rollPoison
    (BATTLE_BLOCK_KNOCK_OUT keeps the player from it) */
 s32 FIGHTSTG_rollKnockOut(u8 side, s32 id) {
-    BattleStats *atk;
-    BattleStats *def;
-    TechData *entry;
-    s32 chance;
-    s32 base;
-
-    if (side == 0) {
-        if (BATTLE_SETUP.blocks[BATTLE_BLOCK_KNOCK_OUT]) {
-            return 0;
-        }
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
-    } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
-    }
-    atk = &FIGHTSTG_battleFuncs.stats[0];
-    def = &FIGHTSTG_battleFuncs.stats[1];
-    entry = &TECHS[id - 1];
-    if (entry->effect < TECH_EFFECT_FIRST) {
-        base = atk->knockOutChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
-    } else {
-        base = entry->effectChance + atk->stats[BATTLE_STAT_WISDOM] / 8;
-    }
-    chance = base - (def->resist[RESIST_KNOCK_OUT] + def->resist[6] + def->stats[BATTLE_STAT_WISDOM] / 2) / 8;
-    if (chance <= 0) {
-        chance = 1;
-    }
-    if (chance >= 0x80) {
-        chance = 0x7F;
-    }
-    return (RANDOM.next() & 0x7F) < chance;
+    return rollStatus(side, id, BATTLE_BLOCK_KNOCK_OUT, HIT_KNOCK_OUT, RESIST_KNOCK_OUT, 6);
 }
 
 /* Whether the player steals the enemy's item: its itemChance in 1024 by the
@@ -434,7 +379,7 @@ s32 FIGHTSTG_rollDrain(u8 side, s32 id) {
 #endif
     entry = &TECHS[id - 1];
     if (entry->effect < TECH_EFFECT_FIRST) {
-        chance = stats->drainChance;
+        chance = stats->statuses[HIT_DRAIN].chance;
     } else {
         chance = entry->effectChance;
     }
@@ -498,9 +443,10 @@ s32 FIGHTSTG_rollCounter(s32 arg0, s32 arg1) {
 
 /* FIGHTSTG_battleFuncs.testRunAway: a random test for side running away, from
    both sides' stats; the player can't while BATTLE_BLOCK_RUN_AWAY is set, and
-   in the European version neither can the enemy while its fighter is asleep. The match depends on the battle's runAttempts being read through a pointer to
-   its active array, taken before side is tested again, and on the flags being
-   tested with family as a halfword. */
+   in the European version neither can the enemy while its fighter is asleep.
+   The match depends on the battle's runAttempts being read through a pointer
+   to its active array, taken before side is tested again, and on the flags
+   being tested with family as a halfword. */
 s32 FIGHTSTG_testRunAway(u8 side) {
     BattleStats *atk;
     BattleStats *def;
@@ -521,7 +467,7 @@ s32 FIGHTSTG_testRunAway(u8 side) {
         if (BATTLE_SETUP.blocks[BATTLE_BLOCK_RUN_AWAY]) {
             return 0;
         }
-        if (*(u16 *)&atk->flags & 0x18) {
+        if (*(u16 *)&atk->flags & (FIGHTER_ASLEEP | FIGHTER_NO_SWITCH)) {
             return 0;
         }
         chance = (((Battle *)(active - 2))->runAttempts + 1) * 8;

@@ -39,7 +39,7 @@ void FIGHTSTG_updateHitEffect(HitEffect *task, HitEffectChildren *children) {
         switch (task->substate) {
         case 0:
             camera->set(camera, camera->getEnemyView(camera));
-            children->effect = FIGHTSTG_startSpriteEffect(0x33, (SVECTOR *)&FIGHTSTG_hitEffectPos);
+            children->effect = FIGHTSTG_startSpriteEffect(0x33, &FIGHTSTG_hitEffectPos);
             SOUND.playSound(SOUND_COMCD103);
             task->nextSubstate(task);
         case 1:

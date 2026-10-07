@@ -31,6 +31,7 @@ void FIGHTSTG_drawShadedQuad(s32 layerId, s32 depth, DVECTOR *xy, CVECTOR *color
     POLY_G4 *poly = GFX.funcs.getPrim();
     DR_TPAGE *mode;
 
+    /* each color is copied whole over r, g, b and the byte after them */
     *(CVECTOR *)&poly->r0 = colors[0];
     *(CVECTOR *)&poly->r1 = colors[1];
     *(CVECTOR *)&poly->r2 = colors[2];

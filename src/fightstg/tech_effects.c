@@ -31,7 +31,7 @@ void FIGHTSTG_tryParalysis(void) {
     if (funcs->rollParalysis(action->side, action->tech)) {
         entry = &TECHS[action->tech - 1];
         if (entry->effect < TECH_EFFECT_FIRST) {
-            value = funcs->stats[0].paralysisPower;
+            value = funcs->stats[0].statuses[HIT_PARALYSIS].power;
         } else {
             value = entry->effectPower;
         }
@@ -56,7 +56,7 @@ void FIGHTSTG_tryConfusion(void) {
     if (funcs->rollConfusion(action->side, action->tech)) {
         entry = &TECHS[action->tech - 1];
         if (entry->effect < TECH_EFFECT_FIRST) {
-            value = funcs->stats[0].confusionPower;
+            value = funcs->stats[0].statuses[HIT_CONFUSION].power;
         } else {
             value = entry->effectPower;
         }
@@ -136,7 +136,7 @@ void FIGHTSTG_rollMultiHit(void) {
 }
 
 /* When rollDrain allows it, the action's drain becomes its damage times a 128th of
- * the technique's effectPower (effect 8) or the player's drainPower, doubled when the
+ * the technique's effectPower (effect 8) or the player's HIT_DRAIN power, doubled when the
  * acting fighter is special. The match depends on each branch doubling
  * and scaling its own value. */
 void FIGHTSTG_tryDrain(void) {
@@ -156,7 +156,7 @@ void FIGHTSTG_tryDrain(void) {
             }
             action->drain = action->damage * value / 128;
         } else {
-            value = funcs->stats[0].drainPower;
+            value = funcs->stats[0].statuses[HIT_DRAIN].power;
             if (fighter->special) {
                 value *= 2;
             }
@@ -438,19 +438,19 @@ void FIGHTSTG_startAction(u8 side, s32 tech) {
                     if (FIGHTSTG_action.hits[0] == 0) {
                         break;
                     }
-                    if (FIGHTSTG_battleFuncs.stats[0].poisonChance) {
+                    if (FIGHTSTG_battleFuncs.stats[0].statuses[HIT_POISON].chance) {
                         FIGHTSTG_tryPoison();
                     }
-                    if (FIGHTSTG_battleFuncs.stats[0].paralysisChance) {
+                    if (FIGHTSTG_battleFuncs.stats[0].statuses[HIT_PARALYSIS].chance) {
                         FIGHTSTG_tryParalysis();
                     }
-                    if (FIGHTSTG_battleFuncs.stats[0].confusionChance) {
+                    if (FIGHTSTG_battleFuncs.stats[0].statuses[HIT_CONFUSION].chance) {
                         FIGHTSTG_tryConfusion();
                     }
-                    if (FIGHTSTG_battleFuncs.stats[0].knockOutChance) {
+                    if (FIGHTSTG_battleFuncs.stats[0].statuses[HIT_KNOCK_OUT].chance) {
                         FIGHTSTG_tryKnockOut();
                     }
-                    if (FIGHTSTG_battleFuncs.stats[0].drainChance) {
+                    if (FIGHTSTG_battleFuncs.stats[0].statuses[HIT_DRAIN].chance) {
                         FIGHTSTG_tryDrain();
                     }
                 } else if (entry->effect == TECH_EFFECT_MULTI_HIT) {

@@ -8,7 +8,7 @@ void CARDGAME_loadOpponent(CardBattle *battle, CardBattleItems *items) {
     CardOpponent *opponent;
     s32 i;
 
-    battle->opponents = (CardOpponent *)FILE_CACHE.load(FILE_CARDGAME_OPPONENTS);
+    battle->opponents = FILE_CACHE.load(FILE_CARDGAME_OPPONENTS);
     opponent = &battle->opponents[battle->arg - 1];
     battle->unk2E9 = opponent->unkC8;
     battle->prize = CARDGAME_prizeItems[opponent->prize];

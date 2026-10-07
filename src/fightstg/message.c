@@ -319,6 +319,8 @@ void FIGHTSTG_showMessage(BattleMessageBox *task, s32 type, s32 *data) {
         FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.active[data[0] != 0]);
         break;
     case 9:
+        /* its args are read both as which fighters to find and as what to
+           say of them */
         FIGHTSTG_findFighters(task, (FighterFilter *)data);
         FIGHTSTG_showFightersMessage(task, w, (BattleMessage *)data);
         break;

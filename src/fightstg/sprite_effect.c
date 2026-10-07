@@ -450,6 +450,8 @@ void FIGHTSTG_updateSpriteEffect(SpriteEffect *task, SpriteAnim **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
+        /* getEntry gives the archive's address as a number, getArchiveEntry
+           an entry's as a u8 * */
         archive = (s32 *)FILE_CACHE.getEntry(task->file);
         layerId = 0x1004;
         if (task->effect >= 1000 && task->effect < 1003) {
@@ -490,7 +492,7 @@ void FIGHTSTG_updateSpriteEffect(SpriteEffect *task, SpriteAnim **children) {
 
 /* Starts 2D effect effect (FIGHTSTG_spriteEffects) at pos; killed at once
    when it has no entry */
-SpriteEffect *FIGHTSTG_startSpriteEffect(s32 effect, SVECTOR *pos) {
+SpriteEffect *FIGHTSTG_startSpriteEffect(s32 effect, const SVECTOR *pos) {
     SpriteEffect *task = createTask(FIGHTSTG_updateSpriteEffect, sizeof(SpriteEffect), 30 * sizeof(Task *));
     SpriteEffectEntry *entry;
 

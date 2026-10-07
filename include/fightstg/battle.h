@@ -273,6 +273,20 @@ typedef struct BattleAction {
     /* 0x68 */ void (*start)(u8 side, s32 tech); /* FIGHTSTG_startAction */
 } BattleAction;
 
+/* The statuses a weapon's hits can inflict (BattleStats.statuses) */
+#define HIT_POISON 0
+#define HIT_PARALYSIS 1
+#define HIT_CONFUSION 2
+#define HIT_KNOCK_OUT 3 /* its power is read by nothing */
+#define HIT_DRAIN 4 /* its power is in 128ths of the damage */
+#define HIT_STATUS_COUNT 5
+
+/* A status a weapon's hits can inflict */
+typedef struct HitStatus {
+    /* 0x0 */ u8 chance; /* in 128ths */
+    /* 0x1 */ u8 power;
+} HitStatus;
+
 /* A side's stats as FIGHTSTG_computeStats works them out. A family is the
    kind of Digimon that a technique (TechData.family) or a weapon does half again
    the damage to, and to which it lands critical hits more often. */
@@ -287,16 +301,7 @@ typedef struct BattleStats {
     /* 0x28 */ u8 weaponFamilies[3]; /* from the equipment, as are the ones after */
     /* 0x2B */ u8 element; /* the accessory's, for techniques without one */
     /* 0x2C */ u8 elementPower;
-    /* 0x2D */ u8 poisonChance; /* chances are in 128ths */
-    /* 0x2E */ u8 poisonPower;
-    /* 0x2F */ u8 paralysisChance;
-    /* 0x30 */ u8 paralysisPower;
-    /* 0x31 */ u8 confusionChance;
-    /* 0x32 */ u8 confusionPower;
-    /* 0x33 */ u8 knockOutChance;
-    /* 0x34 */ u8 knockOutPower; /* read by nothing */
-    /* 0x35 */ u8 drainChance;
-    /* 0x36 */ u8 drainPower; /* in 128ths of the damage */
+    /* 0x2D */ HitStatus statuses[HIT_STATUS_COUNT]; /* by HIT_*, from the weapon */
     /* 0x37 */ u8 tripleHit; /* plain physical techniques hit 3 times for 0.4 of the damage */
     /* 0x38 */ u8 criticalBonus; /* to plain techniques' critical chance, off their accuracy */
     /* 0x39 */ u8 counter; /* answers hits with the partner's first skill */
@@ -456,5 +461,14 @@ s32 FIGHTSTG_testParalysis(u8 side);
 void FIGHTSTG_changeBoost(u8 side, s32 index, s32 stat, s32 percent);
 s32 FIGHTSTG_getGaugeGain(s32 damage);
 s32 FIGHTSTG_getTechCost(u8 side, s32 id);
+
+/* Row's active fighter (FIGHTSTG_battle.fighters[row][active[row]]), as the
+   row's offset in bytes added to the slot's fighter in row 0 */
+static inline BattleFighter *FIGHTSTG_getActiveFighter(s32 row) {
+    s32 offset = row * sizeof(FIGHTSTG_battle.fighters[0]);
+    BattleFighter *slot = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[row]];
+
+    return (BattleFighter *)(offset + (s32)slot);
+}
 
 #endif /* FIGHTSTG_BATTLE_H */
