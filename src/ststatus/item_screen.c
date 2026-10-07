@@ -134,14 +134,14 @@ void STSTATUS_showChosenItem(ItemScreen *screen, s32 show) {
 void STSTATUS_showItemHelp(ItemScreen *screen, s32 mode) {
     ItemScreenWindows *windows = screen->children;
     ItemInfo *info;
-    u8 *data;
+    ItemData *data;
 
     if (mode == 1) {
         windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_INFO)), screen->item);
         info = GET_ITEM[0](screen->item);
         if (info->type >= 2 && info->type <= 14) {
-            data = info->data;
-            windows->kind->setString(windows->kind, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), STSTATUS_kindStrings0[data[2]]);
+            data = info->data.record;
+            windows->kind->setString(windows->kind, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), STSTATUS_kindStrings0[data->weapon.kind]);
         }
     } else if (mode == -1) {
         windows->kind->setVisible(windows->kind, 0);
@@ -180,8 +180,7 @@ s32 STSTATUS_itemInfoFaded(ItemScreen *screen) {
 /* Uses the chosen item on the chosen party member */
 void STSTATUS_useItem(ItemScreen *screen, ItemScreenWindows *windows) {
     s32 amount = 0;
-    /* ItemInfo.data is bytes for every kind of item; a usable item's are its effect */
-    StatusItemEffect *effect = (StatusItemEffect *)GET_ITEM[0](screen->item)->data;
+    ItemEffect *effect = GET_ITEM[0](screen->item)->data.effect;
     PartnerStats *stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(screen->member));
     StatusStatItem *entry;
     s16 *values;
@@ -205,12 +204,12 @@ void STSTATUS_useItem(ItemScreen *screen, ItemScreenWindows *windows) {
         }
         break;
     case 17:
-        if (stats->stats[1] < 99) {
-            stats->stats[1] += effect->amount;
+        if (stats->stats[STAT_TP] < 99) {
+            stats->stats[STAT_TP] += effect->amount;
             amount = effect->amount;
             result = 1;
-            if (stats->stats[1] > 99) {
-                stats->stats[1] = 99;
+            if (stats->stats[STAT_TP] > 99) {
+                stats->stats[STAT_TP] = 99;
             }
         }
         break;
@@ -903,7 +902,7 @@ s32 STSTATUS_pageStats0[] = {
     0, 2, 3, 4,
     5,
 };
-/* The strings of the item kinds (data[2]), from 0 */
+/* The strings of the item kinds (WeaponData.kind), from 0 */
 s32 STSTATUS_kindStrings0[] = {
     0, 67, 77, 79,
     65, 66, 68, 80,

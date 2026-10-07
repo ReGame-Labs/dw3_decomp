@@ -90,8 +90,8 @@ s32 FIGHTSTG_getTechCost(u8 side, s32 id) {
         item = partner->equip[5];
     }
     if (item != 0) {
-        /* the accessory's AccessoryData.amount, read signed */
-        cost -= *(s16 *)&GET_ITEM[0](item)->data[6];
+        /* the game reads this amount signed */
+        cost -= (s16)GET_ITEM[0](item)->data.acc->amount;
         if (cost <= 0) {
             cost = 1;
         }

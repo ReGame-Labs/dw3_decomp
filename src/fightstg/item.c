@@ -160,7 +160,7 @@ s32 FIGHTSTG_runItemScript(BattleItem *task, BattleChild *children) {
                 }
             }
             if (task->item >= 0x2B && task->item < 0x2F) {
-                WFIGHTMN_setIdleMotion(0, -((BattleItemEffect *)GET_ITEM[0](task->item)->data)->amount);
+                WFIGHTMN_setIdleMotion(0, -GET_ITEM[0](task->item)->data.effect->amount);
             } else if (task->item == 0x47) {
                 WFIGHTMN_setIdleMotion(0, -((FIGHTSTG_battle.fighters[0] + FIGHTSTG_battle.active[0])->maxHp >> 1));
             }
@@ -267,11 +267,11 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
             case 0x2B ... 0x41:
             default: {
                 BattleFighter *fighter;
-                BattleItemEffect *effect;
+                ItemEffect *effect;
                 s32 heal;
 
                 fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
-                effect = (BattleItemEffect *)GET_ITEM[0](task->item)->data;
+                effect = GET_ITEM[0](task->item)->data.effect;
                 if (fighter->maxHp == fighter->hp) {
                     children[0].message = FIGHTSTG_createMessage();
                     task->lines[0] = 0x2F;
@@ -392,10 +392,10 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
             case 0x48: {
                 BattleFighter *fighter;
                 BattleStats *stats;
-                BattleItemEffect *effect;
+                ItemEffect *effect;
                 s32 max;
 
-                effect = (BattleItemEffect *)GET_ITEM[0](task->item)->data;
+                effect = GET_ITEM[0](task->item)->data.effect;
                 fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
                 stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
                 if (fighter->boosts[2] != 0) {
@@ -418,11 +418,11 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
             case 0x49: {
                 BattleFighter *fighter;
                 BattleStats *stats;
-                BattleItemEffect *effect;
+                ItemEffect *effect;
                 s32 max;
                 s32 min;
 
-                effect = (BattleItemEffect *)GET_ITEM[0](task->item)->data;
+                effect = GET_ITEM[0](task->item)->data.effect;
                 fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
                 stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
                 if (fighter->boosts[0] != 0) {
@@ -453,11 +453,11 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
             case 0x4A: {
                 BattleFighter *fighter;
                 BattleStats *stats;
-                BattleItemEffect *effect;
+                ItemEffect *effect;
                 s32 max;
                 s32 min;
 
-                effect = (BattleItemEffect *)GET_ITEM[0](task->item)->data;
+                effect = GET_ITEM[0](task->item)->data.effect;
                 fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
                 stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
                 if (fighter->boosts[0] != 0) {
@@ -498,10 +498,10 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
                 break;
             }
             case 0x4C: {
-                BattleItemEffect *effect;
+                ItemEffect *effect;
                 s32 i;
 
-                effect = (BattleItemEffect *)GET_ITEM[0](task->item)->data;
+                effect = GET_ITEM[0](task->item)->data.effect;
                 i = GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]);
                 BATTLE_SETUP.gauges[i] += effect->amount;
                 if (BATTLE_SETUP.gauges[i] >= 999) {
@@ -566,16 +566,16 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
             case 0x56: {
                 BattleFighter *fighter;
                 BattleFighter *enemy;
-                u8 *data;
+                ItemEffect *effect;
 
-                data = GET_ITEM[0](task->item)->data;
+                effect = GET_ITEM[0](task->item)->data.effect;
                 fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
                 enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
                 switch (task->step) {
                 case 0:
                 default:
                     if ((RANDOM.next() & 1) && BATTLE_SETUP.blocks[BATTLE_BLOCK_CONFUSION] == 0) {
-                        FIGHTSTG_inflictConfusion(0x10, 0, data[2]);
+                        FIGHTSTG_inflictConfusion(0x10, 0, effect->amount);
                         children[0].message = FIGHTSTG_createMessage();
                         task->lines[0] = 0x20;
                         task->lines[1] = 0x10;
@@ -596,7 +596,7 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
                 case 1:
                     if (children[0].task == NULL) {
                         fighter->flags |= FIGHTER_CONFUSED;
-                        FIGHTSTG_inflictConfusion(0, 0, data[2]);
+                        FIGHTSTG_inflictConfusion(0, 0, effect->amount);
                         children[0].message = FIGHTSTG_createMessage();
                         task->lines[0] = 0x20;
                         task->lines[1] = 0;
@@ -679,11 +679,11 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
             case 0x59: {
                 BattleFighter *enemy;
                 BattleStats *stats;
-                BattleItemEffect *effect;
+                ItemEffect *effect;
                 s32 min;
 
                 if (BATTLE_SETUP.blocks[BATTLE_BLOCK_LOWER_SPEED] == 0) {
-                    effect = (BattleItemEffect *)GET_ITEM[0](task->item)->data;
+                    effect = GET_ITEM[0](task->item)->data.effect;
                     enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
                     stats = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
                     if (enemy->boosts[2] != 0) {

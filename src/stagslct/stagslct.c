@@ -973,12 +973,12 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
                 member = GAME.funcs.getPartyMember(slot);
                 if (member >= 0) {
                     stats = GAME.funcs.getPartnerStats(member);
-                    stats->stats[11] += charismaStep;
-                    if (stats->stats[11] >= 1000) {
-                        stats->stats[11] = 999;
+                    stats->stats[STAT_CHARISMA] += charismaStep;
+                    if (stats->stats[STAT_CHARISMA] >= 1000) {
+                        stats->stats[STAT_CHARISMA] = 999;
                     }
-                    if (stats->stats[11] < 0) {
-                        stats->stats[11] = 0;
+                    if (stats->stats[STAT_CHARISMA] < 0) {
+                        stats->stats[STAT_CHARISMA] = 0;
                     }
                     stats->stats[STAT_LEVEL] += levelStep;
                     if (stats->stats[STAT_LEVEL] >= 100) {
@@ -988,7 +988,7 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
                         stats->stats[STAT_LEVEL] = 1;
                     }
                     if (slot == 0) {
-                        charisma = stats->stats[11];
+                        charisma = stats->stats[STAT_CHARISMA];
                         level = stats->stats[STAT_LEVEL];
                     }
                 }

@@ -27,13 +27,14 @@ void timLoaderSetClutPos(s32 x, s32 y) {
 void timLoaderLoad(u_long *tim) {
     RECT clut;
     RECT image;
-    u_long *p = tim;
+    TimCursor p;
     s32 flag;
     s32 mode;
     s32 hasClut;
 
-    p++;
-    flag = *p++;
+    p.word = tim;
+    p.word++;
+    flag = *p.word++;
     hasClut = flag & 8;
     mode = flag & 7;
     if (hasClut) {
@@ -42,18 +43,18 @@ void timLoaderLoad(u_long *tim) {
         case 1:
             clut.x = TIM_LOADER->clutX;
             clut.y = TIM_LOADER->clutY;
-            clut.w = ((u16 *)p)[4];
-            clut.h = ((u16 *)p)[5];
-            LoadImage(&clut, p + 3);
+            clut.w = p.block->w;
+            clut.h = p.block->h;
+            LoadImage(&clut, p.block->pixels);
             break;
         }
-        p = (u_long *)((u8 *)p + *p);
+        p.byte += p.block->size;
     }
     image.x = TIM_LOADER->imageX;
     image.y = TIM_LOADER->imageY;
-    image.w = ((u16 *)p)[4];
-    image.h = ((u16 *)p)[5];
-    LoadImage(&image, p + 3);
+    image.w = p.block->w;
+    image.h = p.block->h;
+    LoadImage(&image, p.block->pixels);
     TIM_LOADER->w = image.w;
     TIM_LOADER->h = image.h;
 }
@@ -62,7 +63,7 @@ void timLoaderLoad(u_long *tim) {
  * TIM loader method: loads every TIM of an archive side by side, 0x40 halfwords apart, unpacking
  * the RLEN ones
  */
-void timLoaderLoadArchive(s32 archive) {
+void timLoaderLoadArchive(void *archive) {
     u8 *buf = HEAP.alloc(TIM_LOADER->bufferSize, MEM_MODE);
     s32 i;
     s32 compressed;
@@ -75,11 +76,12 @@ void timLoaderLoadArchive(s32 archive) {
 
     for (i = 0;; i++) {
         data = FILE_CACHE.getArchiveEntry(i, archive);
-        if (data == (u8 *)archive) {
+        /* the table ends with an offset of 0: the entry is the archive itself */
+        if (data == archive) {
             break;
         }
         src = data;
-        compressed = *(u32 *)src == 0x4E454C52;
+        compressed = *(u32 *)src == RLEN_MAGIC;
         dst = data;
         if (compressed) {
             dst = buf;

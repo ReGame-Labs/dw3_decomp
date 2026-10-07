@@ -69,7 +69,7 @@ typedef struct TalkBoxChildren {
  */
 typedef struct TalkBox {
     TASK_HEADER(TalkBox);
-    /* 0x50 */ s32 strings;
+    /* 0x50 */ void *strings;
     /* 0x54 */ s32 layerId;
     /* 0x58 */ s32 type;
     /* 0x5C */ s32 timer;
@@ -153,7 +153,7 @@ typedef struct TextWindow {
     /* 0xC1 */ u8 visible;
     /* 0xC2 */ u8 fixedSpacing;
     /* 0xC3 */ u8 finished;
-    /* 0xC4 */ u8 unkC4;
+    /* 0xC4 */ u8 unkC4; /* only setUnkC4 writes it, and nothing calls that */
     /* 0xC5 */ u8 unkC5[3];
     /* 0xC8 */ s32 typeSound;
     /* 0xCC */ s32 scaled;
@@ -285,7 +285,7 @@ typedef struct ZoomBox {
     /* 0x5E */ u8 unk5E[2];
     /* 0x60 */ s32 zoom; /* 0-ONE */
     /* 0x64 */ s32 layerId;
-    /* 0x68 */ s32 unk68;
+    /* 0x68 */ s32 unk68; /* only cleared when the box starts */
     /* 0x6C */ u16 offsetX;
     /* 0x6E */ u16 offsetY;
     /* 0x70 */ VECTOR scale;
@@ -315,8 +315,8 @@ void updateZoomBox(struct ZoomBox *task);
 TextWindow *createTextWindow(s16 id, s16 type, s16 x, s16 y);
 void updateMessageBoxFrame(struct MessageBoxFrame *task);
 void updateTalkBoxFrame(TalkBoxFrame *task);
-Task *createMessageBox(s32 layerId, s32 strings, s32 index);
-TalkBox *createTalkBox(s32 id, s16 x, s16 y, s32 file, s32 index, u32 type);
+Task *createMessageBox(s32 layerId, void *strings, s32 index);
+TalkBox *createTalkBox(s32 id, s16 x, s16 y, void *strings, s32 index, u32 type);
 void bindTextTools(TextTools *obj);
 char *getString(s32 *table, s32 index);
 s32 measureText();

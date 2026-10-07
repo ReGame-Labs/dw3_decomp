@@ -10,8 +10,8 @@
 void FIELDSTG_runGauge(GaugeGame *task) {
     SpriteDrawer drawer;
     SpriteDrawer gauge;
-    s32 sprites;
-    s32 gaugeSprites;
+    void *sprites;
+    void *gaugeSprites;
     u8 cell;
     s32 index;
     s32 shift;

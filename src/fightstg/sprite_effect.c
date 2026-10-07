@@ -452,7 +452,7 @@ void FIGHTSTG_updateSpriteEffect(SpriteEffect *task, SpriteAnim **children) {
     default:
         /* getEntry gives the archive's address as a number, getArchiveEntry
            an entry's as a u8 * */
-        archive = (s32 *)FILE_CACHE.getEntry(task->file);
+        archive = FILE_CACHE.getEntry(task->file);
         layerId = 0x1004;
         if (task->effect >= 1000 && task->effect < 1003) {
             layerId = 0x1006;
@@ -466,7 +466,7 @@ void FIGHTSTG_updateSpriteEffect(SpriteEffect *task, SpriteAnim **children) {
             }
         }
         for (i = 0; i < count; i++) {
-            children[i] = FIGHTSTG_createSpriteAnim((s16 *)FILE_CACHE.getArchiveEntry(i, (s32)archive), &task->pos,
+            children[i] = FIGHTSTG_createSpriteAnim(FILE_CACHE.getArchiveEntry(i, archive), &task->pos,
                                         FIGHTSTG_effectSheets[task->sheet].sheet, &FIGHTSTG_effectSheets[task->sheet].texPos, layerId);
         }
         task->count = count;

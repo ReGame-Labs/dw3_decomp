@@ -28,30 +28,28 @@ s32 STSTATUS_listItems(s32 list, u16 *out) {
     }
 }
 
-/* The items whose kind (data[2]) is one of STSTATUS_equipKinds's four */
+/* The items whose kind (WeaponData.kind) is one of STSTATUS_equipKinds's four */
 s32 STSTATUS_listEquipItems(u16 *out) {
     s32 i;
     s32 j;
     s32 count;
-    u8 *data;
+    ItemData *data;
 
-    /* the lists are s16 because the code reads them signed; listItems
-       fills a u16 array */
-    STSTATUS_data.itemCount = ITEM_FUNCS->list(2, (u16 *)STSTATUS_data.items);
-    STSTATUS_data.item2Count = ITEM_FUNCS->list(3, (u16 *)STSTATUS_data.items2);
+    STSTATUS_data.itemCount = ITEM_FUNCS->list(2, STSTATUS_data.items);
+    STSTATUS_data.item2Count = ITEM_FUNCS->list(3, STSTATUS_data.items2);
     count = 0;
     for (i = 0; i < STSTATUS_data.itemCount; i++) {
-        data = GET_ITEM[0](STSTATUS_data.items[i])->data;
+        data = GET_ITEM[0](STSTATUS_data.items[i])->data.record;
         for (j = 0; j < 4; j++) {
-            if (data[2] == STSTATUS_equipKinds[j]) {
+            if (data->weapon.kind == STSTATUS_equipKinds[j]) {
                 out[count++] = STSTATUS_data.items[i];
             }
         }
     }
     for (i = 0; i < STSTATUS_data.item2Count; i++) {
-        data = GET_ITEM[0](STSTATUS_data.items2[i])->data;
+        data = GET_ITEM[0](STSTATUS_data.items2[i])->data.record;
         for (j = 0; j < 4; j++) {
-            if (data[2] == STSTATUS_equipKinds[j]) {
+            if (data->weapon.kind == STSTATUS_equipKinds[j]) {
                 out[count++] = STSTATUS_data.items2[i];
             }
         }
@@ -59,44 +57,42 @@ s32 STSTATUS_listEquipItems(u16 *out) {
     return count;
 }
 
-/* The items of one kind (data[2]) */
+/* The items of one kind (WeaponData.kind) */
 s32 STSTATUS_listItemsOfKind(s32 kind, u16 *out) {
     s32 i;
     s32 count;
 
-    /* the lists are s16 because the code reads them signed; listItems
-       fills a u16 array */
-    STSTATUS_data.itemCount = ITEM_FUNCS->list(2, (u16 *)STSTATUS_data.items);
-    STSTATUS_data.item2Count = ITEM_FUNCS->list(3, (u16 *)STSTATUS_data.items2);
+    STSTATUS_data.itemCount = ITEM_FUNCS->list(2, STSTATUS_data.items);
+    STSTATUS_data.item2Count = ITEM_FUNCS->list(3, STSTATUS_data.items2);
     count = 0;
     for (i = 0; i < STSTATUS_data.itemCount; i++) {
-        if (GET_ITEM[0](STSTATUS_data.items[i])->data[2] == kind) {
+        if (GET_ITEM[0](STSTATUS_data.items[i])->data.record->weapon.kind == kind) {
             out[count++] = STSTATUS_data.items[i];
         }
     }
     for (i = 0; i < STSTATUS_data.item2Count; i++) {
-        if (GET_ITEM[0](STSTATUS_data.items2[i])->data[2] == kind) {
+        if (GET_ITEM[0](STSTATUS_data.items2[i])->data.record->weapon.kind == kind) {
             out[count++] = STSTATUS_data.items2[i];
         }
     }
     return count;
 }
 
-/* Whether a partner can put an item in an equipment slot (-1: none): data[4]
-   has a bit per partner; data[2] 1 can't go in slot 3, nor 2 in slot 2 */
+/* Whether a partner can put an item in an equipment slot (-1: none): its
+   partners has a bit per partner; kind 1 can't go in slot 3, nor 2 in slot 2 */
 s32 STSTATUS_canEquip(s32 partner, s32 slot, s32 item) {
-    u8 *data;
+    ItemData *data;
 
     if (item != -1) {
-        data = GET_ITEM[0](item)->data;
-        if (!((data[4] >> partner) & 1)) {
+        data = GET_ITEM[0](item)->data.record;
+        if (!((data->weapon.partners >> partner) & 1)) {
             return 0;
         }
-        if (data[2] == 1) {
+        if (data->weapon.kind == 1) {
             if (slot == 3) {
                 return 0;
             }
-        } else if (data[2] == 2) {
+        } else if (data->weapon.kind == 2) {
             if (slot == 2) {
                 return 0;
             }
@@ -107,12 +103,12 @@ s32 STSTATUS_canEquip(s32 partner, s32 slot, s32 item) {
 
 /* Puts an item in a partner's equipment slot (0 or less: empties it), moving
    the counts between GAME.items and GAME.equippedItems. Kind 7 takes slots 2
-   and 3; kind 8 replaces one in slots 4 and 5 with the same data[3] */
+   and 3; kind 8 replaces one in slots 4 and 5 with the same group */
 void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
     PartnerStats *stats = GAME.funcs.getPartnerStats(partner);
     s16 *equip;
     s16 *pair;
-    u8 *data;
+    ItemData *data;
     s32 group;
     s32 old;
     s32 i;
@@ -122,8 +118,8 @@ void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
     if (old != 0) {
         GAME.equippedItems[old]--;
         GAME.items[old]++;
-        data = GET_ITEM[0](old)->data;
-        if (data[2] == 7) {
+        data = GET_ITEM[0](old)->data.record;
+        if (data->weapon.kind == 7) {
             stats->equip[2] = 0;
             stats->equip[3] = 0;
         } else {
@@ -131,8 +127,8 @@ void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
         }
     }
     if (id > 0) {
-        data = GET_ITEM[0](id)->data;
-        if (data[2] == 7) {
+        data = GET_ITEM[0](id)->data.record;
+        if (data->weapon.kind == 7) {
             pair = &stats->equip[2];
             if (stats->equip[2] == 0) {
                 pair = NULL;
@@ -145,13 +141,13 @@ void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
                 GAME.items[*pair]++;
                 *pair = 0;
             }
-        } else if (data[2] == 8) {
-            group = data[3];
+        } else if (data->weapon.kind == 8) {
+            group = data->weapon.group;
             for (i = 0; i < 2; i++) {
                 equip = &stats->equip[i + 4];
                 if (*equip != 0) {
-                    data = GET_ITEM[0](*equip)->data;
-                    if (data[3] == group) {
+                    data = GET_ITEM[0](*equip)->data.record;
+                    if (data->weapon.group == group) {
                         GAME.equippedItems[*equip]--;
                         GAME.items[*equip]++;
                         *equip = 0;
@@ -161,8 +157,8 @@ void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
         }
         GAME.equippedItems[id]++;
         GAME.items[id]--;
-        data = GET_ITEM[0](id)->data;
-        if (data[2] == 7) {
+        data = GET_ITEM[0](id)->data.record;
+        if (data->weapon.kind == 7) {
             stats->equip[2] = id;
             stats->equip[3] = id;
         } else {
@@ -371,7 +367,7 @@ StatusData STSTATUS_data = {
         STSTATUS_updateLerp, STSTATUS_getTowns, STSTATUS_listItems, STSTATUS_canEquip, STSTATUS_equip,
     },
 };
-/* The item kinds (data[2]) of item list 5 */
+/* The item kinds (WeaponData.kind) of item list 5 */
 u8 STSTATUS_equipKinds[] = {
     0x01, 0x02, 0x03, 0x07,
 };

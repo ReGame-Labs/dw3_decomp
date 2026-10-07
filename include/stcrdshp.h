@@ -76,13 +76,6 @@ typedef struct CardShopTitle {
     /* 0x4 */ s32 title; /* string of file 0x95 */
 } CardShopTitle;
 
-/* The bag's items: listItems fills them unsigned, the shop reads the ids
-   signed */
-typedef union CardShopBag {
-    u16 list[0x194]; /* listItems' */
-    s16 ids[0x194];
-} CardShopBag;
-
 /* The card shop's main task (STCRDSHP_createShop): buy cards, open packs
    or go to the item shop */
 typedef struct CardShop {
@@ -95,7 +88,7 @@ typedef struct CardShop {
     /* 0x064 */ s32 title;
     /* 0x068 */ s32 toItemShop;
     /* 0x06C */ s32 cursor;
-    /* 0x070 */ CardShopBag items; /* the bag's, to look for packs */
+    /* 0x070 */ s16 items[0x194]; /* the bag's, to look for packs */
     /* 0x398 */ PanelAnim fades[3];
     /* 0x3C8 */ void (*showMoney)(struct CardShop *shop);
 } CardShop;
@@ -132,7 +125,7 @@ typedef struct CardPackOpen {
     /* 0x094 */ s32 glowTime;
     /* 0x098 */ s16 packs[0x194]; /* the bag's card packs */
     /* 0x3C0 */ s32 packCount;
-    /* 0x3C4 */ CardShopBag items; /* the bag's items */
+    /* 0x3C4 */ s16 items[0x194]; /* the bag's items */
     /* 0x6EC */ s32 unk6EC; /* unused */
     /* 0x6F0 */ PanelAnim fades[4];
 } CardPackOpen;

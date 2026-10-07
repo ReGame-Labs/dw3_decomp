@@ -251,9 +251,9 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
     PartnerStats *stats;
     s16 *equip;
     s16 *hand;
-    u8 *data;
+    ItemData *data;
     s32 id;
-    s32 kind;
+    s32 group;
     s32 i;
     s32 j;
     s32 before;
@@ -270,8 +270,8 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
        PartnerStats.equip is a plain array */
     saved = *(StatusEquip *)stats->equip;
     if (*(stats->equip + slot) != 0) {
-        data = GET_ITEM[0](*(stats->equip + slot))->data;
-        if (data[2] == 7) {
+        data = GET_ITEM[0](*(stats->equip + slot))->data.record;
+        if (data->weapon.kind == 7) {
             stats->equip[2] = 0;
             stats->equip[3] = 0;
         } else {
@@ -279,8 +279,8 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
         }
     }
     if (item > 0) {
-        data = GET_ITEM[0](item)->data;
-        if (data[2] == 7) {
+        data = GET_ITEM[0](item)->data.record;
+        if (data->weapon.kind == 7) {
             hand = &stats->equip[2];
             if (*hand == 0) {
                 hand = NULL;
@@ -291,20 +291,20 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
             if (hand != NULL) {
                 *hand = 0;
             }
-        } else if (data[2] == 8) {
-            kind = data[3];
+        } else if (data->weapon.kind == 8) {
+            group = data->weapon.group;
             for (j = 0; j < 2; j++) {
                 equip = &stats->equip[j + 4];
                 if (*equip != 0) {
-                    data = GET_ITEM[0](*equip)->data;
-                    if (data[3] == kind) {
+                    data = GET_ITEM[0](*equip)->data.record;
+                    if (data->weapon.group == group) {
                         *equip = 0;
                     }
                 }
             }
         }
-        data = GET_ITEM[0](item)->data;
-        if (data[2] == 7) {
+        data = GET_ITEM[0](item)->data.record;
+        if (data->weapon.kind == 7) {
             stats->equip[2] = item;
             stats->equip[3] = item;
         } else {

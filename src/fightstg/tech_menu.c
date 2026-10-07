@@ -5,7 +5,7 @@
 /* Draws the page's technique icons, the page arrows (blinking) and the frame */
 void FIGHTSTG_drawTechMenu(TechMenu *task) {
     SpriteDrawer drawer;
-    s32 sheet;
+    void *sheet;
     s32 index;
     s32 tech;
     s32 i;

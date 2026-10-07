@@ -6,7 +6,7 @@
 /* Draws the switch-in menu's frames, the second one with the pair technique */
 void FIGHTSTG_drawSwitchInMenu(SwitchInMenu *task) {
     SpriteDrawer drawer;
-    s32 sheet;
+    void *sheet;
 
     sheet = FILE_CACHE.getEntry(FILE_BATTLE_MENU << 16);
     initSpriteDrawer(&drawer);

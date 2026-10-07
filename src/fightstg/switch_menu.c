@@ -32,7 +32,7 @@ s32 FIGHTSTG_getPairDigimon(SwitchMenu *task, s32 index, s32 member) {
    fighter */
 void FIGHTSTG_drawSwitchMenu(SwitchMenu *task) {
     SpriteDrawer drawer;
-    s32 sheet;
+    void *sheet;
     s32 i;
 
     initSpriteDrawer(&drawer);

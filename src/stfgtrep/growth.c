@@ -109,9 +109,9 @@ s32 STFGTREP_addExp(s32 partner, s32 exp) {
             } else {
                 stats->stats[STAT_LEVEL] = 99;
             }
-            stats->stats[1] += 5;
-            if (stats->stats[1] >= 100) {
-                stats->stats[1] = 99;
+            stats->stats[STAT_TP] += 5;
+            if (stats->stats[STAT_TP] >= 100) {
+                stats->stats[STAT_TP] = 99;
             }
             leveled = 1;
             up = 1;

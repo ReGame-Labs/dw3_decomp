@@ -22,10 +22,10 @@ s32 isDemoRecording(s32 pad) {
 }
 
 /* Replays `data` (one raw buffer a frame) as the input of pad */
-s32 startDemoPlayback(s16 pad, s32 data) {
+s32 startDemoPlayback(s16 pad, PadBuffer *data) {
     if (!(PAD.flags & (PAD_FLAG_DEMO_PLAYBACK | PAD_FLAG_DEMO_RECORDING))) {
         PAD.flags |= PAD_FLAG_DEMO_PLAYBACK;
-        if (PAD.demoData == 0) {
+        if (PAD.demoData == NULL) {
             PAD.demoPad = pad;
             PAD.demoData = data;
             PAD.demoFrame = 0;
@@ -40,7 +40,7 @@ s32 startDemoPlayback(s16 pad, s32 data) {
 void stopDemoPlayback(void) {
     if (PAD.flags & PAD_FLAG_DEMO_PLAYBACK) {
         PAD.flags &= ~PAD_FLAG_DEMO_PLAYBACK;
-        PAD.demoData = 0;
+        PAD.demoData = NULL;
         PAD.demoPad = 0;
         PAD.demoFrame = 0;
     }

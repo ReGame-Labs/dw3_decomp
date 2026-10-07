@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "dw3/gfx.h" /* Vec2 */
 
 union PartnerTotals;
 
@@ -99,18 +100,7 @@ typedef struct DigimonData {
     /* 0x50 */ u8 blastForms[5]; /* what a blast turns a partner into (from 1), by its level's tier */
     /* 0x55 */ u8 nameId; /* string in file 0x4F */
     /* 0x56 */ u8 family; /* the family it fights as (BattleStats.family) */
-    /* 0x57 */ u8 unk57;
 } DigimonData;
-
-/* An item (ITEMS, GET_ITEM) */
-typedef struct ItemInfo {
-    /* 0x0 */ u8 *data; /* the type's record (ItemData), or the usable items' effect */
-    /* 0x4 */ u16 price;
-    /* 0x6 */ u16 sellPrice; /* 0: cannot be sold */
-    /* 0x8 */ u8 unk8;
-    /* 0x9 */ u8 type; /* 2-14 weapons, 15-20 armour, 21-24 accessories */
-    /* 0xA */ u8 unkA[2];
-} ItemInfo;
 
 /* A technique (TECHS, from 1: technique n is TECHS[n - 1]) */
 typedef struct TechData {
@@ -132,12 +122,12 @@ typedef struct TechData {
     /* 0x11 */ u8 hitCount;
 } TechData;
 
-/* What ItemInfo.data points to for a weapon (types 2-14, WEAPON_DATA) */
+/* ItemInfo.data's record for a weapon (types 2-14, WEAPON_DATA) */
 typedef struct WeaponData {
-    /* 0x00 */ s16 unk0; /* computeStats adds it to the totals' [11] */
+    /* 0x00 */ s16 charisma; /* what it adds to STAT_CHARISMA (computeStats); armour and accessories too */
     /* 0x02 */ u8 kind; /* 7: held in both hands */
     /* 0x03 */ u8 group;
-    /* 0x04 */ s16 unk4;
+    /* 0x04 */ u8 partners; /* 1 << partner for each partner who can equip it (STSTATUS_canEquip) */
     /* 0x06 */ u16 amounts[2]; /* what it adds to stats[] */
     /* 0x0A */ s16 atk;
     /* 0x0C */ u8 stats[2];
@@ -146,10 +136,10 @@ typedef struct WeaponData {
 
 /* An armour's (types 15-20, ARMOR_DATA) */
 typedef struct ArmorData {
-    /* 0x00 */ s16 unk0;
+    /* 0x00 */ s16 charisma;
     /* 0x02 */ u8 kind;
     /* 0x03 */ u8 group;
-    /* 0x04 */ s16 unk4;
+    /* 0x04 */ u8 partners;
     /* 0x06 */ u16 amounts[2];
     /* 0x0A */ u8 stats[2];
     /* 0x0C */ s16 def;
@@ -158,21 +148,53 @@ typedef struct ArmorData {
 
 /* An accessory's (types 21-24, ACCESSORY_DATA) */
 typedef struct AccessoryData {
-    /* 0x0 */ s16 unk0;
+    /* 0x0 */ s16 charisma;
     /* 0x2 */ u8 kind; /* 8: one of its group at a time */
     /* 0x3 */ u8 group;
-    /* 0x4 */ s16 unk4;
+    /* 0x4 */ u8 partners;
     /* 0x6 */ u16 amount;
     /* 0x8 */ u8 stat;
     /* 0x9 */ u8 unk9[3];
 } AccessoryData;
 
-/* The record ItemInfo.data points to, by ItemInfo.type */
+/* ItemInfo.data's record, by ItemInfo.type */
 typedef union ItemData {
     WeaponData weapon;
     ArmorData armor;
     AccessoryData acc;
 } ItemData;
+
+/* ItemEffect.flags */
+#define ITEM_USE_MENU 1 /* usable from the status menu (STSTATUS) */
+#define ITEM_USE_BATTLE 2 /* usable in battle (FIGHTSTG's item menu) */
+#define ITEM_CARD_PACK 4 /* on the card boosters, which nothing tests it on */
+
+/* What a usable item does (its ItemInfo.data, an ITEM_EFFECT_*) */
+typedef struct ItemEffect {
+    /* 0x0 */ u8 flags; /* ITEM_USE_* */
+    /* 0x1 */ u8 kind; /* 1 heals amount HP, 2-17 raise a stat by up to amount (STSTATUS_useItem) */
+    /* 0x2 */ u16 amount; /* the HP it heals, the gauge it fills, a boost in 128ths */
+} ItemEffect;
+
+/* What ItemInfo.data points to: a weapon's, an armour's or an accessory's
+   record, or a usable item's effect. The overlays read both byte by byte. */
+typedef union ItemRecord {
+    u8 *bytes;
+    ItemData *record;
+    ItemEffect *effect;
+    WeaponData *weapon; /* WEAPON_DATA's, for ITEMS */
+    ArmorData *armor;
+    AccessoryData *acc;
+} ItemRecord;
+
+/* An item (ITEMS, GET_ITEM) */
+typedef struct ItemInfo {
+    /* 0x0 */ ItemRecord data; /* the type's record, or the usable items' effect */
+    /* 0x4 */ u16 price;
+    /* 0x6 */ u16 sellPrice; /* 0: cannot be sold */
+    /* 0x8 */ u8 kind; /* 3 the weapons, 4 the armour, 5 the accessories (ITEM_FUNCS->isKind), 1 and 2 the rest */
+    /* 0x9 */ u8 type; /* 2-14 weapons, 15-20 armour, 21-24 accessories */
+} ItemInfo;
 
 /* ItemInfo.type's ranges: 2-14 weapons, 15-20 armour, 21-24 accessories,
    each tested as one unsigned byte compare */
@@ -191,7 +213,6 @@ typedef union ItemData {
 typedef struct PartnerEntry {
     /* 0x00 */ s16 id; /* FIRST_ENTRY_ID and up */
     /* 0x02 */ s8 level; /* shown in the lab; 1 when added */
-    /* 0x03 */ u8 unk3;
     /* 0x04 */ s32 exp;
     /* 0x08 */ s16 skills[6]; /* SKILL_ID and the flags below, 0 for none */
 } PartnerEntry;
@@ -222,17 +243,27 @@ typedef struct Deck {
 
 /* Indices of a partner's stats (PartnerStats.stats, computeStats, setStat) */
 #define STAT_LEVEL 0
+#define STAT_TP 1 /* what the training's intensities cost */
 #define STAT_HP 2
 #define STAT_MAX_HP 3
 #define STAT_MP 4
 #define STAT_MAX_MP 5
+/* the six battle stats */
+#define STAT_STRENGTH 6
+#define STAT_DEFENSE 7
+#define STAT_SPIRIT 8
+#define STAT_WISDOM 9
+#define STAT_SPEED 10
+#define STAT_CHARISMA 11
+#define STAT_RESISTS 12 /* the first of the seven resistances */
 
 /*
  * A partner Digimon from its name on (Partner.info), as getPartnerStats gives
  * it. Stats (computeStats and setStat order): 0 level, 1 TP, 2 HP, 3 max HP,
- * 4 MP, 5 max MP, 6-11 battle stats (6 is raised by weapons, 7 by armour),
- * 12-18 seven resistances; the totals add 19-21, which are subtracted from 6,
- * 7 and 10.
+ * 4 MP, 5 max MP, 6-11 the battle stats strength, defense, spirit, wisdom,
+ * speed and charisma (STSTATUS's messages for the items that raise them;
+ * weapons raise 6, armour 7, all equipment 11), 12-18 seven resistances;
+ * the totals add 19-21, which are subtracted from 6, 7 and 10.
  */
 typedef struct PartnerStats {
     /* 0x000 */ char name[0x18];
@@ -244,7 +275,6 @@ typedef struct PartnerStats {
     /* 0x3C0 */ s16 equip[6];
     /* 0x3CC */ u8 lastBonus; /* the training whose bonus try last worked, 0 for
                                  none: its try can't work again at once */
-    /* 0x3CD */ u8 unk3CD[3];
 } PartnerStats;
 
 /* One of the eight partner Digimon */
@@ -291,7 +321,7 @@ typedef struct BattleSetup {
     /* 0x14 */ s32 music; /* the battle's music */
     /* 0x18 */ BattleEnemy enemies[3];
     /* 0x3C */ u8 ambushChance; /* a chance that WFIGHTMN scales by level */
-    /* 0x3D */ u8 unk3D;
+    /* 0x3D */ u8 unk3D; /* Encounter.unkD, 0-5 in runs of encounters; only the enemies' condition 13 reads it */
     /* 0x3E */ u8 blocks[12]; /* by BATTLE_BLOCK_*: what the player can't do in the battle */
     /* 0x4C */ s32 hasPrize; /* 1: the battle always gives prize */
     /* 0x50 */ s32 prize; /* an item (BattleResult.item) */
@@ -321,7 +351,8 @@ typedef union PartnerTotals {
         /* 0x06 */ s16 maxHp;
         /* 0x08 */ s16 mp;
         /* 0x0A */ s16 maxMp;
-        /* 0x0C */ s16 battle[6]; /* [0] raised by weapons, [1] by armour */
+        /* 0x0C */ s16 battle[6]; /* strength (raised by weapons), defense (by armour), spirit,
+                                     wisdom, speed and charisma (by all equipment) */
         /* 0x18 */ s16 resist[7];
         /* 0x26 */ s16 lowered[3]; /* taken from battle[0], [1] and [4] */
         /* 0x2C */ s32 spare; /* not filled: STGTRAIN's result keeps its yes/no answer here, 0 yes */
@@ -375,10 +406,13 @@ typedef union PartnerTotals {
  * recreates the mode task.
  */
 typedef struct GameState {
-    /* 0x0000 */ u8 unk0[4];
+    /* 0x0000 */ u8 checksum; /* a save's, of its bytes from 0x4 (STGMCARD_runSaves) */
+    /* 0x0001 */ u8 unk1; /* nothing reads it */
+    /* 0x0002 */ u8 version; /* a save's MEMCARD_SAVE_VERSION (stgmcard.h) */
+    /* 0x0003 */ u8 unk3; /* nothing reads it */
     /* 0x0004 */ s8 digivolveDemo;
     /* 0x0005 */ u8 unk5[7];
-    /* 0x000C */ s32 unkC;
+    /* 0x000C */ s32 unkC; /* only set, to -1 by newGame */
     /* 0x0010 */ u8 unk10[0x18];
     /* 0x0028 */ s32 stageSelectTop; /* the debug stage select's first line */
     /* 0x002C */ s32 stageSelectCursor;
@@ -401,7 +435,6 @@ typedef struct GameState {
     /* 0x03A2 */ s8 cards[0x13D]; /* counts, up to CARD_COPIES_MAX */
     /* 0x04DF */ u8 cardsSeen[0x149];
     /* 0x0628 */ Deck decks[DECK_COUNT];
-    /* 0x075A */ u8 unk75A[2];
     /* 0x075C */ Partner partners[PARTNER_COUNT];
     /* 0x263C */ s32 progress;
     /* 0x2640 */ s32 partySet; /* setParty's */
@@ -482,6 +515,7 @@ s32 unequipItem(s32 slot, s32 item);
 s32 checkPartner(u32 op, s32 arg);
 s32 findDigimon(s32 id);
 ItemInfo *getItem(s32 id);
+DigimonData *getDigimon(s32 id);
 void initNewGameData(void);
 void addCards(s32 item, s32 count);
 s32 findPartnerEntry(s32 slot, s32 id);
@@ -512,31 +546,31 @@ extern BattleSetup BATTLE_SETUP;
 extern BattleResult BATTLE_RESULT;
 extern ItemInfo ITEMS[];
 /* What the usable items do (their ItemInfo.data), in src/main/data/game_3.c */
-extern u8 ITEM_EFFECT_2B[], ITEM_EFFECT_2C[], ITEM_EFFECT_2D[], ITEM_EFFECT_2E[], ITEM_EFFECT_2F[],
-    ITEM_EFFECT_30[], ITEM_EFFECT_31[], ITEM_EFFECT_32[], ITEM_EFFECT_33[], ITEM_EFFECT_34[],
-    ITEM_EFFECT_35[], ITEM_EFFECT_36[], ITEM_EFFECT_37[], ITEM_EFFECT_38[], ITEM_EFFECT_39[],
-    ITEM_EFFECT_3A[], ITEM_EFFECT_3B[], ITEM_EFFECT_3C[], ITEM_EFFECT_3D[], ITEM_EFFECT_3E[],
-    ITEM_EFFECT_3F[], ITEM_EFFECT_40[], ITEM_EFFECT_41[], ITEM_EFFECT_42[], ITEM_EFFECT_43[],
-    ITEM_EFFECT_44[], ITEM_EFFECT_45[], ITEM_EFFECT_46[], ITEM_EFFECT_47[], ITEM_EFFECT_48[],
-    ITEM_EFFECT_49[], ITEM_EFFECT_4A[], ITEM_EFFECT_4B[], ITEM_EFFECT_4C[], ITEM_EFFECT_4D[],
-    ITEM_EFFECT_4E[], ITEM_EFFECT_4F[], ITEM_EFFECT_50[], ITEM_EFFECT_51[], ITEM_EFFECT_52[],
-    ITEM_EFFECT_53[], ITEM_EFFECT_54[], ITEM_EFFECT_55[], ITEM_EFFECT_56[], ITEM_EFFECT_57[],
-    ITEM_EFFECT_58[], ITEM_EFFECT_59[], ITEM_EFFECT_5A[], ITEM_EFFECT_5B[], ITEM_EFFECT_169[],
-    ITEM_EFFECT_16A[], ITEM_EFFECT_16B[], ITEM_EFFECT_16C[], ITEM_EFFECT_16D[], ITEM_EFFECT_16E[],
-    ITEM_EFFECT_16F[], ITEM_EFFECT_170[], ITEM_EFFECT_171[], ITEM_EFFECT_172[], ITEM_EFFECT_173[],
-    ITEM_EFFECT_174[], ITEM_EFFECT_175[], ITEM_EFFECT_176[], ITEM_EFFECT_177[], ITEM_EFFECT_178[],
-    ITEM_EFFECT_179[], ITEM_EFFECT_17A[], ITEM_EFFECT_17B[], ITEM_EFFECT_17C[], ITEM_EFFECT_17D[],
-    ITEM_EFFECT_17E[], ITEM_EFFECT_17F[], ITEM_EFFECT_180[], ITEM_EFFECT_181[], ITEM_EFFECT_182[],
-    ITEM_EFFECT_183[], ITEM_EFFECT_184[], ITEM_EFFECT_185[], ITEM_EFFECT_186[], ITEM_EFFECT_187[],
-    ITEM_EFFECT_188[], ITEM_EFFECT_189[], ITEM_EFFECT_18A[];
+extern ItemEffect ITEM_EFFECT_2B, ITEM_EFFECT_2C, ITEM_EFFECT_2D, ITEM_EFFECT_2E, ITEM_EFFECT_2F,
+    ITEM_EFFECT_30, ITEM_EFFECT_31, ITEM_EFFECT_32, ITEM_EFFECT_33, ITEM_EFFECT_34,
+    ITEM_EFFECT_35, ITEM_EFFECT_36, ITEM_EFFECT_37, ITEM_EFFECT_38, ITEM_EFFECT_39,
+    ITEM_EFFECT_3A, ITEM_EFFECT_3B, ITEM_EFFECT_3C, ITEM_EFFECT_3D, ITEM_EFFECT_3E,
+    ITEM_EFFECT_3F, ITEM_EFFECT_40, ITEM_EFFECT_41, ITEM_EFFECT_42, ITEM_EFFECT_43,
+    ITEM_EFFECT_44, ITEM_EFFECT_45, ITEM_EFFECT_46, ITEM_EFFECT_47, ITEM_EFFECT_48,
+    ITEM_EFFECT_49, ITEM_EFFECT_4A, ITEM_EFFECT_4B, ITEM_EFFECT_4C, ITEM_EFFECT_4D,
+    ITEM_EFFECT_4E, ITEM_EFFECT_4F, ITEM_EFFECT_50, ITEM_EFFECT_51, ITEM_EFFECT_52,
+    ITEM_EFFECT_53, ITEM_EFFECT_54, ITEM_EFFECT_55, ITEM_EFFECT_56, ITEM_EFFECT_57,
+    ITEM_EFFECT_58, ITEM_EFFECT_59, ITEM_EFFECT_5A, ITEM_EFFECT_5B, ITEM_EFFECT_169,
+    ITEM_EFFECT_16A, ITEM_EFFECT_16B, ITEM_EFFECT_16C, ITEM_EFFECT_16D, ITEM_EFFECT_16E,
+    ITEM_EFFECT_16F, ITEM_EFFECT_170, ITEM_EFFECT_171, ITEM_EFFECT_172, ITEM_EFFECT_173,
+    ITEM_EFFECT_174, ITEM_EFFECT_175, ITEM_EFFECT_176, ITEM_EFFECT_177, ITEM_EFFECT_178,
+    ITEM_EFFECT_179, ITEM_EFFECT_17A, ITEM_EFFECT_17B, ITEM_EFFECT_17C, ITEM_EFFECT_17D,
+    ITEM_EFFECT_17E, ITEM_EFFECT_17F, ITEM_EFFECT_180, ITEM_EFFECT_181, ITEM_EFFECT_182,
+    ITEM_EFFECT_183, ITEM_EFFECT_184, ITEM_EFFECT_185, ITEM_EFFECT_186, ITEM_EFFECT_187,
+    ITEM_EFFECT_188, ITEM_EFFECT_189, ITEM_EFFECT_18A;
 extern TechData TECHS[];
 extern struct ItemInfo *(*GET_ITEM[])(s32 item);
 /* GET_ITEM's entries, each with its own type */
 typedef struct ItemFuncs {
     /* 0x0 */ struct ItemInfo *(*get)(s32 item); /* getItem */
     /* 0x4 */ s32 (*getCategory)(s32 item); /* getItemCategory (u8, but the menus read an int) */
-    /* 0x8 */ s32 (*isKind)(s32 item, s32 kind); /* ItemInfo.unk8 == kind */
-    /* 0xC */ s32 (*list)(s32 type, u16 *out); /* listItems */
+    /* 0x8 */ s32 (*isKind)(s32 item, s32 kind); /* ItemInfo.kind == kind */
+    /* 0xC */ s32 (*list)(s32 type, s16 *out); /* listItems */
 } ItemFuncs;
 #define ITEM_FUNCS ((ItemFuncs *)GET_ITEM)
 extern u8 ITEM_TYPE_CATEGORIES[];

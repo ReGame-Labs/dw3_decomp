@@ -165,9 +165,8 @@ s32 STGMCARD_iconFrames[3][32] = {
         0x71222EEE, 0x22212121, 0x1722EEEE, 0x22111111,
     },
 };
-/* The CLUT and the frames are kept as words; the save header takes the frames'
-   addresses as words too (MemCardFuncs.setHeader) */
+/* The CLUT is kept as words */
 SaveIcon STGMCARD_saveIcon = {
     (CardClut *)STGMCARD_iconClut,
-    {(s32)STGMCARD_iconFrames[0], (s32)STGMCARD_iconFrames[1], (s32)STGMCARD_iconFrames[2]},
+    {STGMCARD_iconFrames[0], STGMCARD_iconFrames[1], STGMCARD_iconFrames[2]},
 };

@@ -80,7 +80,7 @@ Speech *FIELDSTG_createTalk(Actor *actor, s32 entry) {
 
     task->actor = actor;
     task->entry = entry;
-    task->text = (s32)FILE_CACHE.load(FIELDSTG_state.textFile);
+    task->text = FILE_CACHE.load(FIELDSTG_state.textFile);
     pos = actor->tile;
     FIELDSTG_scriptHelpers[0](&pos);
     switch (actor->dir) {

@@ -12,7 +12,7 @@ void decompressorFree(Decompressor *task) {
 /* Points the decompressor at data, which is RLEN-packed or plain */
 void decompressorSetData(Decompressor *task, s32 *data) {
     task->data = data;
-    if (data[0] == 0x4E454C52) {
+    if (data[0] == RLEN_MAGIC) {
         task->compressed = 1;
         task->size = data[1];
     } else {
@@ -38,7 +38,7 @@ void decompressorAllocBuffer(Decompressor *task) {
 
 /* Unpacks at least chunkSize bytes; back to substate 0 at the end */
 void decompressorStep(Decompressor *task) {
-    u8 *src = (u8 *)task->src;
+    u8 *src = task->src;
     u8 *dst = task->dst;
     s32 total = 0;
     s32 done = 0;
@@ -62,7 +62,7 @@ void decompressorStep(Decompressor *task) {
         }
         if (total >= task->chunkSize) {
             done = 1;
-            task->src = (s32 *)src;
+            task->src = src;
             task->dst = dst;
             break;
         }

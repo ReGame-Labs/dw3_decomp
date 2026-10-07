@@ -267,7 +267,7 @@ void STGTRAIN_runSession(TrainSession *session, TrainSessionWindows *win) {
             if (session->choice == 0) {
                 session->substate = 0x19;
                 stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(session->screen->partner));
-                stats->stats[1] -= STGTRAIN_intensityCosts[session->intensity];
+                stats->stats[STAT_TP] -= STGTRAIN_intensityCosts[session->intensity];
             } else {
                 session->substate++;
             }

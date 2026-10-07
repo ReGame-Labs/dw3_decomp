@@ -683,7 +683,7 @@ void WFIGHTTS_motionList(BattleTestMotions *task, BattleTestWindows *windows) {
             }
             FIGHTSTG_fighterCache.funcs.getInfo(fighter);
             /* getEntry gives the entry's address as a number */
-            motions = (s32 *)FILE_CACHE.getEntry(FIGHTSTG_fighterCache.partnerInfo->motions);
+            motions = FILE_CACHE.getEntry(FIGHTSTG_fighterCache.partnerInfo->motions);
             list->count = 0;
             for (j = 0; j < 0x3E; j++) {
                 if (motions[j] != 0) {
@@ -809,7 +809,7 @@ void WFIGHTTS_effectList(BattleTestEffects *task, BattleTestWindows *windows) {
             FIGHTSTG_fighterCache.funcs.getInfo(fighter);
             if (FIGHTSTG_fighterCache.partnerInfo->effects != 0) {
                 /* getEntry gives the entry's address as a number */
-                effects = (s32 *)FILE_CACHE.getEntry(FIGHTSTG_fighterCache.partnerInfo->effects);
+                effects = FILE_CACHE.getEntry(FIGHTSTG_fighterCache.partnerInfo->effects);
                 if (effects[0] == 0) {
                     list->effects[0] = 0;
                     list->count = 1;

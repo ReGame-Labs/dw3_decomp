@@ -259,7 +259,7 @@ void CARDGAME_showCardInfo(CardBattle *battle, CardScreen *screen, s32 offset) {
         id = battle->cards[screen->sprites[offset + battle->effectStep.cursor].index];
         initCardDrawer(&drawer);
         drawer.setCard(id + 1);
-        switch (drawer.card->unk6) {
+        switch (drawer.card->level) {
         case 0:
             screen->windows[3].value = 0;
             break;

@@ -85,7 +85,7 @@ typedef struct ItemMenu {
     TASK_HEADER(ItemMenu);
     /* 0x050 */ s32 *result; /* -1 until it is done, then the item or -2 */
     /* 0x054 */ s32 sel; /* the cursor's line last frame */
-    /* 0x058 */ s16 items[0x194]; /* ITEM_FUNCS->list's u16 ids, read as s16 */
+    /* 0x058 */ s16 items[0x194]; /* the bag's (ITEM_FUNCS->list) */
     /* 0x380 */ s16 *usable; /* the items with flag 2 */
     /* 0x384 */ s32 count;
     /* 0x388 */ s32 page;

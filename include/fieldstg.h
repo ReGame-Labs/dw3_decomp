@@ -281,7 +281,7 @@ typedef struct Speech {
     /* 0x54 */ s32 entry; /* the text's entry */
     /* 0x58 */ s32 type; /* the talk box's (createTalkBox), its corner */
     /* 0x5C */ s32 isMessage; /* a message box */
-    /* 0x60 */ s32 text; /* FILE_CACHE.getEntry */
+    /* 0x60 */ void *text; /* FILE_CACHE.getEntry's */
 } Speech;
 
 /* --- launch.c --- */

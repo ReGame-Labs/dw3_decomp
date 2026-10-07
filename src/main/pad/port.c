@@ -37,7 +37,7 @@ s32 pollPadState(u32 port) {
 }
 
 /* Builds held/pressed/repeated from the raw data (the demo record replaces all but Start) */
-void readPadButtons(s32 port, u8 *data, u8 *record) {
+void readPadButtons(s32 port, PadData *data, PadData *record) {
     u32 id = port & 0xFF;
     s32 mode = PadInfoMode(id, InfoModeCurExID, 0);
     u32 pad = (id >> 4) & 1;
@@ -48,19 +48,20 @@ void readPadButtons(s32 port, u8 *data, u8 *record) {
     s16 circle, cross, triangle;
 
     if ((PAD.flags & PAD_FLAG_DEMO_PLAYBACK) && PAD.demoPad == ((port & 3) | pad)) {
-        buttons = (~*(u16 *)(data + 2) & 1 << PAD_START) | (~*(u16 *)(record + 2) & ~(1 << PAD_START));
+        buttons = (~data->buttons & 1 << PAD_START) | (~record->buttons & ~(1 << PAD_START));
         if (mode == PAD_ID_ANALOG) {
+            /* not record->analog[i], which adds the index the other way round */
             for (i = 0; i < 4; i++) {
-                slot->analog[i] = record[4 + i];
+                slot->analog[i] = *(record->analog + i);
             }
         }
     } else {
 #if VERSION_US
-        b = ~*(u16 *)(data + 2);
+        b = ~data->buttons;
         circle = (b >> RAW_CIRCLE) & 1;
         cross = (b >> RAW_CROSS) & 1;
         triangle = (b >> RAW_TRIANGLE) & 1;
-        buttons = ~*(u16 *)(data + 2) & ~FACE_BUTTONS;
+        buttons = ~data->buttons & ~FACE_BUTTONS;
         if (cross) {
             buttons |= 1 << PAD_CROSS;
         }
@@ -72,7 +73,7 @@ void readPadButtons(s32 port, u8 *data, u8 *record) {
         }
 #elif VERSION_EU
         /* the Japanese language keeps the buttons as they are */
-        buttons = ~*(u16 *)(data + 2);
+        buttons = ~data->buttons;
         if (LANGUAGE != 0) {
             b = buttons;
             circle = (b >> RAW_CIRCLE) & 1;
@@ -91,8 +92,9 @@ void readPadButtons(s32 port, u8 *data, u8 *record) {
         }
 #endif
         if (mode == PAD_ID_ANALOG) {
+            /* as above, not data->analog[i] */
             for (i = 0; i < 4; i++) {
-                slot->analog[i] = data[4 + i];
+                slot->analog[i] = *(data->analog + i);
             }
         }
     }
@@ -138,11 +140,11 @@ void readPadButtons(s32 port, u8 *data, u8 *record) {
 }
 
 /* Reads one pad (vibration included), or clears its buttons when it is missing */
-s32 readPad(u16 port, u8 *data) {
+s32 readPad(u16 port, PadData *data) {
     u8 id = port;
     s32 mode;
 
-    if (*data != 0 || pollPadState(id & 0xFF) == 0) {
+    if (data->status != 0 || pollPadState(id & 0xFF) == 0) {
         PAD.slots[(id >> 4) & 1][port & 3].pressed = 0;
         PAD.slots[(id >> 4) & 1][port & 3].repeated = 0;
         PAD.slots[(id >> 4) & 1][port & 3].held = 0;
@@ -152,7 +154,7 @@ s32 readPad(u16 port, u8 *data) {
     if (mode == PAD_ID_DIGITAL || mode == PAD_ID_ANALOG) {
         updateVibration(id & 0xFF);
     }
-    readPadButtons(id & 0xFF, data, 0);
+    readPadButtons(id & 0xFF, data, NULL);
     return 1;
 }
 

@@ -202,7 +202,7 @@ void STSTATUS_runItemList(ItemList *panel, ItemListWindows *windows) {
                 if (panel->list == 0) {
                     panel->screen->itemIndex = panel->cursor;
                     panel->screen->item = panel->items[panel->cursor];
-                    if (*GET_ITEM[0](panel->screen->item)->data & 1) {
+                    if (GET_ITEM[0](panel->screen->item)->data.effect->flags & ITEM_USE_MENU) {
                         SOUND.playSound(SOUND_SELECT);
                         STSTATUS_showItemHelp(panel->screen, -1);
                         panel->substate++;
@@ -269,7 +269,7 @@ void STSTATUS_drawItemList(ItemList *panel) {
     sprite.setClutRow(0);
     if (panel->active) {
         info = GET_ITEM[0](panel->items[panel->cursor]);
-        if ((info->type == 25 || info->type == 26) && (*info->data & 1)) {
+        if ((info->type == 25 || info->type == 26) && (info->data.effect->flags & ITEM_USE_MENU)) {
             sprite.setTexture(0x140, 0);
             sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x40, (panel->cursor % 2) * 0x83 + 0x29,
                         (panel->cursor % 16) / 2 * 14 + 0x25);

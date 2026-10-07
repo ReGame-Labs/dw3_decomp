@@ -107,7 +107,7 @@ void STGMCARD_loadFiles(void) {
     TimLoader loader;
     TextTools conv;
     char title[0x48];
-    s32 frames[3];
+    void *frames[3];
     CardClut *clut;
 
     initTimLoader(&loader);

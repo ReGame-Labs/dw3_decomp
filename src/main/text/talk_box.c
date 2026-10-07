@@ -353,7 +353,7 @@ void updateTalkBox(TalkBox *task, TalkBoxChildren *children) {
  * A talk box with string `index` of a table (an optional speaker's name between 02 07 codes),
  * sized to the text
  */
-TalkBox *createTalkBox(s32 id, s16 x, s16 y, s32 file, s32 index, u32 type) {
+TalkBox *createTalkBox(s32 id, s16 x, s16 y, void *strings, s32 index, u32 type) {
     TextTools fn;
     char name[0x20];
     TalkBox *task;
@@ -363,7 +363,7 @@ TalkBox *createTalkBox(s32 id, s16 x, s16 y, s32 file, s32 index, u32 type) {
     s32 w;
     s32 i;
 
-    task = createTask((void (*)(void *))updateTalkBox, 0x6C, 0x18);
+    task = createTask(updateTalkBox, 0x6C, 0x18);
     task->layerId = id;
     task->x = x;
     task->y = y;
@@ -376,8 +376,8 @@ TalkBox *createTalkBox(s32 id, s16 x, s16 y, s32 file, s32 index, u32 type) {
     children->windows[0]->setLines(children->windows[0], 3);
     children->windows[1] = createTextWindow(task->layerId, 1, task->x + TALK_BOX_LAYOUTS[type].textX, task->y + TALK_BOX_LAYOUTS[type].textY);
     children->windows[1]->setLines(children->windows[1], 3);
-    task->strings = file;
-    text = (u8 *)fn.getString(file, index);
+    task->strings = strings;
+    text = fn.getString(strings, index);
     if (text[0] == 2 && text[1] == 7) {
         end = 2;
         while (text[end] != 2 && text[end + 1] != 7) {

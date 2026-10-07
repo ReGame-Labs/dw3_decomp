@@ -882,13 +882,13 @@ void FIELDSTG_animateActor(Actor *actor) {
             } while (0);
             file = actor->animFile & 0xFFFF0000;
         }
-        for (entry = (s16 *)FILE_CACHE.getEntry(actor->animFile); entry[0] != 0; entry += 6) {
+        for (entry = FILE_CACHE.getEntry(actor->animFile); entry[0] != 0; entry += 6) {
             if (entry[0] == set) {
                 break;
             }
         }
         if (entry[0] == 0) {
-            entry = (s16 *)FILE_CACHE.getEntry(actor->animFile);
+            entry = FILE_CACHE.getEntry(actor->animFile);
         }
         for (i = 0; i < 5; i++) {
             actor->setAnims[i] = entry[i + 1] | file;
@@ -901,7 +901,7 @@ void FIELDSTG_animateActor(Actor *actor) {
     } else {
         dir = 8 - actor->dir;
     }
-    frames = (s32 *)FILE_CACHE.getEntry(actor->setAnims[dir]);
+    frames = FILE_CACHE.getEntry(actor->setAnims[dir]);
     do {
         if (actor->animTime > 0) {
             break;

@@ -139,7 +139,7 @@ void updateMessageBox(MessageBoxFrame *task, MessageBox *data) {
 }
 
 /* A message box with string `index` of a table, typed out in three-line pages */
-Task *createMessageBox(s32 layerId, s32 strings, s32 index) {
+Task *createMessageBox(s32 layerId, void *strings, s32 index) {
     Task *task = createTask(updateMessageBox, 0x50, 8);
     MessageBox *data = task->children;
 

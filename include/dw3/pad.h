@@ -53,6 +53,26 @@
 #define STICK_LOW 0x40
 #define STICK_HIGH 0xC0
 
+/* What a pad sends (libpad's receive buffer) */
+typedef struct PadData {
+    /* 0x0 */ u8 status; /* 0: it answered */
+    /* 0x1 */ u8 id;
+    /* 0x2 */ u16 buttons; /* raw: a bit is clear while its button is pressed */
+    /* 0x4 */ u8 analog[4];
+} PadData;
+
+/* A port's receive buffer, and a frame of a demo: a pad, or a multitap and
+   the four pads behind it */
+typedef union PadBuffer {
+    u8 bytes[0x22];
+    PadData pad;
+    struct {
+        u8 status;
+        u8 id; /* PAD_MULTITAP_ID */
+        PadData pads[4];
+    } tap;
+} PadBuffer;
+
 /* One controller: a port, or one of the four multitap slots behind it */
 typedef struct PadSlot {
     /* 0x00 */ u16 pressed; /* this frame */
@@ -90,12 +110,12 @@ typedef struct PadSlot {
 /* Controller input (PAD) */
 typedef struct PadState {
     /* 0x000 */ s32 flags;
-    /* 0x004 */ u8 buf[2][0x22];
+    /* 0x004 */ PadBuffer buf[2];
     /* 0x048 */ PadSlot slots[2][4];
     /* 0x3C8 */ u8 act[2][6];
     /* 0x3D4 */ s16 repeatRate; /* vsyncs */
     /* 0x3D6 */ s16 demoPad;
-    /* 0x3D8 */ s32 demoData;
+    /* 0x3D8 */ PadBuffer *demoData; /* a buffer a frame */
     /* 0x3DC */ s16 demoFrame;
     /* 0x3DE */ u8 unk3DE[2];
     /* 0x3E0 */ void (*init)(); /* PAD_INIT */
@@ -112,7 +132,7 @@ typedef struct PadState {
     /* 0x40C */ s32 (*startDemoRecording)();
     /* 0x410 */ void (*stopDemoRecording)();
     /* 0x414 */ s32 (*isDemoRecording)();
-    /* 0x418 */ s32 (*startDemoPlayback)(s16 pad, s32 data);
+    /* 0x418 */ s32 (*startDemoPlayback)(s16 pad, PadBuffer *data);
     /* 0x41C */ void (*stopDemoPlayback)();
     /* 0x420 */ s32 (*isDemoPlaying)();
 } PadState;
@@ -122,7 +142,7 @@ typedef struct PadState {
 #define PAD_REPEATED(button) ((PAD.getRepeated(0) >> PAD.getButtonBit(0, button)) & 1)
 #define PAD_HELD(button) ((PAD.getHeld(0) >> PAD.getButtonBit(0, button)) & 1)
 
-void readPadButtons(s32 port, u8 *data, u8 *record);
+void readPadButtons(s32 port, PadData *data, PadData *record);
 void updateVibration(u16 port);
 void resetButtonMap(u16 port);
 void swapButtons(u16 port, s32 a, s32 b);
@@ -131,12 +151,12 @@ s32 pollPadState(u32 port);
 void stopPad(void);
 void initPad(s32 multitap, s32 repeatRate);
 s32 setVibration(u16 port, s32 motor, s16 time, u8 value);
-s32 readPad(u16 port, u8 *data);
+s32 readPad(u16 port, PadData *data);
 s32 startDemoRecording(void);
 void stopDemoRecording(void);
 s32 isDemoRecording(s32 pad);
 s32 alignActuators(u16 port);
-s32 startDemoPlayback(s16 pad, s32 data);
+s32 startDemoPlayback(s16 pad, PadBuffer *data);
 void stopDemoPlayback(void);
 s32 isDemoPlaying(s32 pad);
 s32 lockPadMode(s32 port, s32 lock);

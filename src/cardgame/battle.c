@@ -1437,7 +1437,7 @@ s32 CARDGAME_runPutOut(CardBattle *battle, CardBattleItems *items) {
     return done;
 }
 
-/* Finds three or more of one card (with a header unkA) among a side's slots, by id from start: flags them in effectStep.eligible; the index after them or -1 */
+/* Finds three or more of one card (with a CardImage.comboCard) among a side's slots, by id from start: flags them in effectStep.eligible; the index after them or -1 */
 s32 CARDGAME_findCardSet(CardBattle *battle, s32 side, s32 start) {
     CardSortEntry entries[6];
     CardSortEntry tmp;
@@ -1469,8 +1469,8 @@ s32 CARDGAME_findCardSet(CardBattle *battle, s32 side, s32 start) {
     j = 0;
     for (i = start; i < count - 1; i++) {
         drawer.setCard(entries[i].card + 1);
-        if (drawer.card->unkA != 0 && entries[i].card == entries[i + 1].card) {
-            value = drawer.card->unkA;
+        if (drawer.card->comboCard != 0 && entries[i].card == entries[i + 1].card) {
+            value = drawer.card->comboCard;
             j++;
         } else if (j < 2) {
             j = 0;

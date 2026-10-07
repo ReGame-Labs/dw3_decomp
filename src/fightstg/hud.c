@@ -125,7 +125,7 @@ void FIGHTSTG_drawHud(HpDisplay *task, TextWindow **windows) {
     SpriteDrawer drawer;
     CVECTOR colors[4];
     BattleFighter *fighter;
-    s32 sheet;
+    void *sheet;
     s32 width;
     s32 blink;
     s32 member;

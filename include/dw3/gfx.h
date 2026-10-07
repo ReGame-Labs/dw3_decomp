@@ -161,29 +161,30 @@ struct Layer {
     /* 0x168 */ void (*free)(struct Layer *);
 };
 
-/* The 12-byte header in front of a card's TIM (CardDrawer.card) */
-typedef struct CardImageHeader {
+/* A card's image (CardDrawer.card): 64 to a file, a 12-byte header and a
+   32x32 8-bit TIM */
+typedef struct CardImage {
     /* 0x0 */ u8 color; /* from 1 */
     /* 0x1 */ u8 ap;
     /* 0x2 */ u8 hp;
     /* 0x3 */ u8 kind; /* an index in CARD_KINDS */
-    /* 0x4 */ u8 unk4;
+    /* 0x4 */ u8 unk4; /* 1-4 on the 60 cards that aren't Digimon, 0 on these; nothing reads it */
     /* 0x5 */ u8 points; /* what it adds to its colour */
-    /* 0x6 */ u8 unk6;
-    /* 0x7 */ u8 unk7;
-    /* 0x8 */ s16 unk8;
-    /* 0xA */ s16 unkA;
-    /* 0xC */ u8 tim[0]; /* the card's image */
-} CardImageHeader;
+    /* 0x6 */ u8 level; /* a Digimon's, 2-5 (CARDGAME shows its name); 0 on the other cards */
+    /* 0x7 */ u8 unk7; /* 0 on every card */
+    /* 0x8 */ s16 rank; /* by strength, from 1 the strongest (0 on the two blank cards) */
+    /* 0xA */ s16 comboCard; /* the card (from 1) that three or more of it make
+                                (CARDGAME_findCardSet), 0 for none */
+    /* 0xC */ u8 tim[0x620]; /* its header, a 256-colour CLUT block and the image block */
+} CardImage;
 
 /*
- * Draws 32x32 8-bit images from files 0x7E7-0x7EB (64 per file, 0x62C bytes
- * each: a 12-byte header and a TIM). There are 320 of them, so they are
- * probably the cards (the save has counts for 317). The methods act on the
- * drawer that was set up last (CARD_DRAWER).
+ * Draws the cards' images (CardImage), from files 0x7E7-0x7EB. There are 320
+ * of them (the save has counts for 317). The methods act on the drawer that
+ * was set up last (CARD_DRAWER).
  */
 typedef struct CardDrawer {
-    /* 0x00 */ CardImageHeader *card;
+    /* 0x00 */ CardImage *card;
     /* 0x04 */ s32 imageX; /* VRAM position of the image grid */
     /* 0x08 */ s32 imageY;
     /* 0x0C */ s32 clutX;
@@ -275,6 +276,24 @@ typedef struct AnimState {
     /* 0x0 */ s16 index;
     /* 0x2 */ s16 timer;
 } AnimState;
+
+/* A TIM's CLUT or image block */
+typedef struct TimBlock {
+    /* 0x0 */ u32 size; /* in bytes, this header included */
+    /* 0x4 */ u16 x;
+    /* 0x6 */ u16 y;
+    /* 0x8 */ u16 w; /* in halfwords */
+    /* 0xA */ u16 h;
+    /* 0xC */ u_long pixels[0];
+} TimBlock;
+
+/* Where timLoaderLoad is in a TIM: its words, then its blocks, which their
+   sizes in bytes take it past */
+typedef union TimCursor {
+    u_long *word;
+    u8 *byte;
+    TimBlock *block;
+} TimCursor;
 
 /* Uploads TIM images to VRAM (initTimLoader); acts on TIM_LOADER */
 typedef struct TimLoader {

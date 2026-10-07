@@ -16,7 +16,7 @@ typedef struct Mesh {
     /* 0x50 */ s32 noBoundsCheck;
     /* 0x54 */ s32 colorMode; /* Model.setColor's */
     /* 0x58 */ CVECTOR color;
-    /* 0x5C */ s32 archive;
+    /* 0x5C */ void *archive;
     /* 0x60 */ u8 *vertices; /* a count, then ShortVec3s */
     /* 0x64 */ u8 *normals; /* a count, then ShortVec3s */
     /* 0x68 */ u8 *commands; /* see MeshDrawState */
@@ -346,7 +346,7 @@ extern FighterCache FIGHTSTG_fighterCache;
 extern InterpFuncs FIGHTSTG_interp;
 void FIGHTSTG_setMotion(Model *model, s32 motion, s32 restart);
 void FIGHTSTG_updateModel(Model *model, Mesh **children);
-Mesh *FIGHTSTG_createMesh(s32 archive, Vec2 texPos);
+Mesh *FIGHTSTG_createMesh(void *archive, Vec2 texPos);
 void FIGHTSTG_setModelColor(Model *model, s32 mode, CVECTOR *color);
 void FIGHTSTG_setBoneNoBoundsCheck(Model *model, s32 bone, s32 value);
 s32 FIGHTSTG_isMotionDone(Model *model);

@@ -79,11 +79,14 @@ typedef struct FileCache {
     /* 0x418 */ void (*free)(s32 file);
     /* 0x41C */ void (*freeAll)(void);
     /* 0x420 */ void (*freeFrom)(u32 addr);
-    /* 0x424 */ s32 (*getEntry)(u32 fileAndIndex);
-    /* 0x428 */ u8 *(*getArchiveEntry)(s32 index, s32 archive);
+    /* 0x424 */ void *(*getEntry)(u32 fileAndIndex);
+    /* 0x428 */ void *(*getArchiveEntry)(s32 index, void *archive);
     /* 0x42C */ void (*markCached)(void);
     /* 0x430 */ void (*touchMarked)(void);
 } FileCache;
+
+/* The first word of "RLEN" data, which its unpacked size follows */
+#define RLEN_MAGIC 0x4E454C52
 
 /*
  * Expands "RLEN" data (a run-length encoding: a byte n < 0x80 copies n
@@ -98,7 +101,7 @@ typedef struct Decompressor {
     /* 0x5C */ s32 size;
     /* 0x60 */ s32 bufferSize;
     /* 0x64 */ void *buffer;
-    /* 0x68 */ s32 *src;
+    /* 0x68 */ void *src; /* the next packed byte */
     /* 0x6C */ void *dst;
     /* 0x70 */ s32 chunkSize;
     /* 0x74 */ void *(*run)();
@@ -118,8 +121,8 @@ void *loadFile(u32 file);
 void freeFile(s32 file);
 void freeAllFiles(void);
 void freeFilesFrom(u32 addr);
-s32 getFileEntry(u32 fileAndIndex);
-s32 getArchiveEntry(u32 index, s32 *archive);
+void *getFileEntry(u32 fileAndIndex);
+void *getArchiveEntry(s32 index, void *archive);
 void markCachedFiles(void);
 void touchMarkedFiles(void);
 void cdSyncCallback(s32 status, u_char *result);
