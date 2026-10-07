@@ -2080,7 +2080,7 @@ KeyPage STCRDDEK_keyChars[] = {
     } },
 };
 TextStyle STCRDDEK_nameStyle = {
-    0xFF, 14, {0}, (s32)STCRDDEK_glyphs, (s32)STCRDDEK_icons,
+    0xFF, 14, {0}, STCRDDEK_glyphs, STCRDDEK_icons,
     FONT_GLYPH_MAP, FONT_ICON_MAP,
     234, 114,
 };

@@ -110,23 +110,22 @@ own.
 - [x] The game code is all C: `spriteDrawerDraw` and `convertText`
   (`graphics.c`) were the last.
 - [x] The executable's rodata is all C. `OVERLAY_ADDRESS` and
-  `SUB_OVERLAY_ADDRESS` (`system.c`) are `const` pointers in `.rodata`,
-  read with `lui`/`lw` although `system.c` is built with `-G8`: the game's
-  code is built with `-membedded-data`, which puts a small `const` in
-  `.rodata` and changes nothing else. `text_window.c`'s strings and tables
-  are C.
-- [ ] The executable's data is C. `inn.c`, `pad.c`, `text_window.c`,
-  `memcard.c`, `system.c` (the field menu's tables, `DIGIMON_DATA`, the
-  items, the techniques, `CD_READER`, `FILE_CACHE` and the file table),
-  `game3.c` (`GAME`, `FLAGS_00` and the game's tables), `game3_2.c`
-  (`HEAP` and `TASK_REGISTRY`), `sound.c` (the banks' files and `SOUND`),
-  `overlay.c` (the mode tables and `OVERLAY_LOADER`) and `graphics.c` (`GFX`, the font's maps and glyphs,
-  `GFX_STARTED`) hold their own; the rest is in `src/main/data/`:
-  `matrices.c`, the other modules' small data in `game_3.c` and the
-  `.bss` in `game_bss.c`.
+  `SUB_OVERLAY_ADDRESS` (`system/main.c`) are `const` pointers in
+  `.rodata`, read with `lui`/`lw` although the module is built with `-G8`:
+  the game's code is built with `-membedded-data`, which puts a small
+  `const` in `.rodata` and changes nothing else. The text windows' strings
+  and tables are C.
+- [ ] The executable's data is C. Each module holds its own (the field
+  menu's tables, `DIGIMON_DATA`, the items, the techniques, `CD_READER`,
+  `FILE_CACHE` and the file table, `GAME`, `FLAGS_00` and the game's
+  tables, `HEAP`, `TASK_REGISTRY`, `PAD`, `RANDOM`, the text windows',
+  the banks' files and `SOUND`, the mode tables and `OVERLAY_LOADER`,
+  `GFX`, the font's maps and glyphs, `GFX_STARTED`); the rest is in
+  `src/main/data/`: `matrices.c`, the other modules' small data in
+  `game_3.c` and the `.bss` in `game_bss.c`.
   - The usable items' effects (`ITEM_EFFECT_2B`..., 4 bytes each) are
-    system.c's small data, in `game_3.c` among the other modules' until
-    `.sdata` moves too.
+    the original `system`'s small data, in `game_3.c` among the other
+    modules' until `.sdata` moves too.
 - [x] `crt0` (`2MBYTE.OBJ`), PsyQ's startup, stays splat's disassembly (an
   `asm` segment, both versions). Its 8 bytes of `.bss`
   (`CRT0_SAVED_RA`) are in `data/game_bss.c`, which starts the `.bss`, so

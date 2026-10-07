@@ -1,4 +1,19 @@
 #include "game.h"
+#include <libgs.h>
+#include <libetc.h>
+#include <libsnd.h>
+
+/* Starts libmcrd and sets up MEMCARD: the save file name and the section sizes */
+void initMemCard(void) {
+    MemCardInit(0);
+    MemCardStart();
+    HEAP.zero(&MEMCARD, sizeof(MemCard));
+    MEMCARD.maxRetries = 3;
+    MEMCARD.iconCount = -1;
+    setSaveFileName();
+    MEMCARD.infoSize = 0x100;
+    MEMCARD.dataSize = 0x2700;
+}
 
 #if VERSION_US
 const char SAVE_FILE_NAME_JP[24] = "BISLPS-99999DMW3-JPN";
@@ -14,7 +29,7 @@ const char SAVE_FILE_NAMES[6][24] = {
 
 /* The US release saves as BASLUS-01436DMW3-USA */
 void setSaveFileName(void) {
-    MEMCARD.fileName = (char *)SAVE_FILE_NAMES[0];
+    MEMCARD.fileName = SAVE_FILE_NAMES[0];
 }
 #elif VERSION_EU
 const char SAVE_FILE_NAME_JP[24] = "BISLPS-03446DMW3-JPN";
@@ -32,25 +47,25 @@ void setSaveFileName(void) {
     switch (LANGUAGE) {
     default:
     case 0:
-        MEMCARD.fileName = (char *)SAVE_FILE_NAME_JP;
+        MEMCARD.fileName = SAVE_FILE_NAME_JP;
         break;
     case 1:
-        MEMCARD.fileName = (char *)SAVE_FILE_NAMES[0];
+        MEMCARD.fileName = SAVE_FILE_NAMES[0];
         break;
     case 2:
-        MEMCARD.fileName = (char *)SAVE_FILE_NAMES[1];
+        MEMCARD.fileName = SAVE_FILE_NAMES[1];
         break;
     case 3:
-        MEMCARD.fileName = (char *)SAVE_FILE_NAMES[1];
+        MEMCARD.fileName = SAVE_FILE_NAMES[1];
         break;
     case 4:
-        MEMCARD.fileName = (char *)SAVE_FILE_NAMES[1];
+        MEMCARD.fileName = SAVE_FILE_NAMES[1];
         break;
     case 5:
-        MEMCARD.fileName = (char *)SAVE_FILE_NAMES[1];
+        MEMCARD.fileName = SAVE_FILE_NAMES[1];
         break;
     case 6:
-        MEMCARD.fileName = (char *)SAVE_FILE_NAMES[1];
+        MEMCARD.fileName = SAVE_FILE_NAMES[1];
         break;
     }
 }

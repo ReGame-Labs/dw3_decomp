@@ -1747,7 +1747,7 @@ KeyPage STPLNMET_keyChars[] = {
 };
 /* The font of the name and the keyboard */
 TextStyle STPLNMET_nameStyle = {
-    0xFF, 14, { 0, 0 }, (s32)STPLNMET_nameGlyphs, (s32)STPLNMET_nameIcons,
+    0xFF, 14, { 0, 0 }, STPLNMET_nameGlyphs, STPLNMET_nameIcons,
     FONT_GLYPH_MAP, FONT_ICON_MAP, 0xEA, 0x72,
 };
 /* The partner's animation beside the name: 7 frames per partner, -1 ends one */

@@ -1,12 +1,14 @@
-#ifndef DW3_FILES_H
-#define DW3_FILES_H
+#ifndef DW3_FILE_H
+#define DW3_FILE_H
 
-/* The disc file table, the CD reader and the file cache (system.c) */
+/* The disc file table, the CD reader, the file cache and the decompressor
+   (file/) */
 
 #include "common.h"
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "dw3/task.h"
 
 /* The disc's file table (FILE_TABLE): files are numbered, not named */
 typedef struct FileTableFuncs {
@@ -83,6 +85,28 @@ typedef struct FileCache {
     /* 0x430 */ void (*touchMarked)(void);
 } FileCache;
 
+/*
+ * Expands "RLEN" data (a run-length encoding: a byte n < 0x80 copies n
+ * bytes, n | 0x80 repeats the next byte n times, 0 ends), all at once
+ * (run) or chunkSize bytes a frame (start, then substate 1 until done).
+ */
+typedef struct Decompressor {
+    TASK_HEADER(Decompressor);
+    /* 0x50 */ s32 *data;
+    /* 0x54 */ s32 *begin;
+    /* 0x58 */ s32 compressed;
+    /* 0x5C */ s32 size;
+    /* 0x60 */ s32 bufferSize;
+    /* 0x64 */ void *buffer;
+    /* 0x68 */ s32 *src;
+    /* 0x6C */ void *dst;
+    /* 0x70 */ s32 chunkSize;
+    /* 0x74 */ void *(*run)();
+    /* 0x78 */ void *(*getData)();
+    /* 0x7C */ void (*start)();
+    /* 0x80 */ void (*free)();
+} Decompressor;
+
 s32 isFileLoading(s32);
 FileSlot *findFileSlot(s32 file);
 FileSlot *findFreeFileSlot(void);
@@ -107,6 +131,13 @@ s32 fileExists(s32 file);
 u16 getFileSectorCount(s32 file);
 s32 getFileSector(s32 file);
 void getFilePos(s32 file, s32 offset, void *pos);
+
+void *decompressorRun(Decompressor *task, s32 *data);
+void decompressorStep(Decompressor *task);
+Decompressor *createDecompressor(void);
+void decompressorStart(Decompressor *task, s32 *data, s32 arg2);
+void *decompressorGetData(Decompressor *task);
+void updateDecompressor(Decompressor *task);
 
 extern FileTableFuncs FILE_TABLE;
 extern CdReader CD_READER;
@@ -180,4 +211,4 @@ extern s32 LANGUAGE; /* 2-5 */
 #define FILE_BATTLE_IMAGES_4 0x7E3
 #endif
 
-#endif /* DW3_FILES_H */
+#endif /* DW3_FILE_H */

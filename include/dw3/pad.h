@@ -1,22 +1,12 @@
 #ifndef DW3_PAD_H
 #define DW3_PAD_H
 
-/* Controllers and random numbers (pad.c) */
+/* Controllers and the demo recorder (pad/) */
 
 #include "common.h"
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
-
-/* The entries of RANDOM_TABLE, each 0 to RANDOM_COUNT - 1 */
-#define RANDOM_COUNT 0x1000
-
-/* Random numbers, walked in order through RANDOM_TABLE */
-typedef struct Random {
-    /* 0x0 */ s32 index; /* the entry returned last */
-    /* 0x4 */ void (*seed)(s32 seed);
-    /* 0x8 */ s32 (*next)(void); /* 0 to RANDOM_COUNT - 1 */
-} Random;
 
 /*
  * Logical buttons: bits of PadSlot.held/pressed/repeated, which readPadButtons
@@ -41,6 +31,27 @@ typedef struct Random {
 #define PAD_CROSS 13
 #define PAD_TRIANGLE 14
 #define PAD_SQUARE 15
+
+/* PadInfoMode(InfoModeCurExID) of a DualShock in digital and analog mode */
+#define PAD_ID_DIGITAL 4
+#define PAD_ID_ANALOG 7
+
+/* The second byte of the raw buffer when a multitap answers */
+#define PAD_MULTITAP_ID 0x80
+
+/* PadSetMainMode's lock: the analog button may change the mode, or not */
+#define PAD_MODE_UNLOCKED 2
+#define PAD_MODE_LOCKED 3
+
+/* Raw bits of circle, cross and triangle, which readPadButtons rotates */
+#define RAW_TRIANGLE 12
+#define RAW_CIRCLE 13
+#define RAW_CROSS 14
+#define FACE_BUTTONS (1 << PAD_CIRCLE | 1 << PAD_CROSS | 1 << PAD_TRIANGLE)
+
+/* A stick at or below LOW, or at or above HIGH, also presses the d-pad */
+#define STICK_LOW 0x40
+#define STICK_HIGH 0xC0
 
 /* One controller: a port, or one of the four multitap slots behind it */
 typedef struct PadSlot {
@@ -121,13 +132,16 @@ void stopPad(void);
 void initPad(s32 multitap, s32 repeatRate);
 s32 setVibration(u16 port, s32 motor, s16 time, u8 value);
 s32 readPad(u16 port, u8 *data);
+s32 startDemoRecording(void);
 void stopDemoRecording(void);
 s32 isDemoRecording(s32 pad);
 s32 alignActuators(u16 port);
+s32 startDemoPlayback(s16 pad, s32 data);
+void stopDemoPlayback(void);
+s32 isDemoPlaying(s32 pad);
+s32 lockPadMode(s32 port, s32 lock);
 
-extern Random RANDOM;
 extern u8 DEFAULT_BUTTON_MAP[16];
 extern PadState PAD;
-extern u16 RANDOM_TABLE[RANDOM_COUNT];
 
 #endif /* DW3_PAD_H */

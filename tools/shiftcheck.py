@@ -51,6 +51,8 @@ import sys
 from elftools.elf.elffile import ELFFile
 from elftools.elf.relocation import RelocationSection
 
+from version import overlay_parents, stage_entries
+
 RAM_LO = 0x80010000
 RAM_HI = 0x801FFF00  # the stack is at the top of the 2 MB
 
@@ -238,14 +240,6 @@ def syms_of_ld(path):
     return names
 
 
-def parents():
-    """OVL_PARENT_<name> from the Makefile (the stages' is fieldstg)"""
-    out = {}
-    for m in re.finditer(r"^OVL_PARENT_(\w+) := (\w+)", pathlib.Path("Makefile").read_text(), re.M):
-        out[m.group(1)] = m.group(2)
-    return out
-
-
 def category(name, obj, stages):
     """What kind of source the finding is in"""
     if name in stages:
@@ -290,9 +284,8 @@ def main():
     if not elfs:
         sys.exit("no ELFs in %s: run make VERSION=%s" % (build, args.version))
     main_syms = syms_of_ld(build / "main_syms.ld")
-    par = parents()
-    stages = set(l.split()[0].lower() for l in (pathlib.Path("config") / args.version / "stages.txt").read_text().splitlines()
-                 if l.strip() and not l.startswith("#"))
+    par = overlay_parents()
+    stages = set(words[0].lower() for words in stage_entries(args.version))
     binaries = []
     for e in sorted(set(elfs) | set(every)):
         name = "main" if e.stem == exe else e.stem
@@ -300,7 +293,7 @@ def main():
         imported = syms_of_ld(build / "heap.ld") if name == "main" else set()
         if name != "main":
             imported = set(main_syms)
-            p = par.get(name, "fieldstg" if name in stages else None)
+            p = par.get(name, par["<stage>"] if name in stages else None)
             if p:
                 imported |= syms_of_ld(build / ("%s_syms.ld" % p))
         # and its children's (the Makefile's CHILDREN_<name>)

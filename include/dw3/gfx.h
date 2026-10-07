@@ -1,12 +1,13 @@
-#ifndef DW3_GRAPHICS_H
-#define DW3_GRAPHICS_H
+#ifndef DW3_GFX_H
+#define DW3_GFX_H
 
-/* Display, drawing layers and the drawing helpers (graphics.c) */
+/* Display, drawing layers, the drawing helpers and the screen fade (gfx/) */
 
 #include "common.h"
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "dw3/task.h"
 
 typedef struct Layer Layer;
 typedef struct DrawCallback DrawCallback;
@@ -56,7 +57,7 @@ typedef struct GfxState {
     /* 0x14 */ s32 timeCounter;
     /* 0x18 */ s32 frameTime; /* vsyncs that the last frame took */
     /* 0x1C */ s32 frameTimeCounter;
-    /* 0x20 */ s32 prim; /* next free byte of the packet buffer */
+    /* 0x20 */ void *prim; /* next free byte of the packet buffer */
     /* 0x24 */ void *primBufs[2];
     /* 0x2C */ s32 primBufSize;
     /* 0x30 */ s32 dispBuffer;
@@ -136,7 +137,7 @@ struct Layer {
     /* 0x12C */ void (*setBgColor)(); /* no prototype: callers would truncate u8 args */
     /* 0x130 */ void (*draw)(struct Layer *);
     /* 0x134 */ void (*clearOt)(struct Layer *);
-    /* 0x138 */ s32 (*getOtEntry)(struct Layer *, s32 depth);
+    /* 0x138 */ u_long *(*getOtEntry)(struct Layer *, s32 depth);
     /* 0x13C */ u_long *(*getOtEntryZ)(struct Layer *layer, s32 z);
     /* 0x140 */ u_long *(*getOt)(struct Layer *);
     /* 0x144 */ s32 (*getOtShift)();
@@ -183,7 +184,7 @@ typedef struct CardDrawer {
     /* 0x1C */ s32 clutStride;
     /* 0x20 */ s32 semiTrans;
     /* 0x24 */ Layer *layer;
-    /* 0x28 */ s32 ot;
+    /* 0x28 */ u_long *ot;
     /* 0x2C */ void (*setCard)(); /* (id) */
     /* 0x30 */ void (*loadImage)();
     /* 0x34 */ void (*draw)(); /* (x, y) */
@@ -204,7 +205,7 @@ typedef struct CardDrawer {
  */
 typedef struct SpriteDrawer {
     /* 0x00 */ Layer *layer;
-    /* 0x04 */ s32 ot;
+    /* 0x04 */ u_long *ot;
     /* 0x08 */ s32 tpageX; /* VRAM position of the sheet's texture */
     /* 0x0C */ s32 tpageY;
     /* 0x10 */ s32 clutX;
@@ -230,7 +231,7 @@ typedef struct SpriteDrawer {
     /* 0x80 */ void (*setLayer)(); /* (layer, depth) */
     /* 0x84 */ void (*draw)(); /* (sheet, frame, x, y) */
     /* 0x88 */ void (*setClutRow)(); /* (row) */
-    /* 0x8C */ void (*setScale)(); /* (x, y, z), 0x1000 = 1.0 */
+    /* 0x8C */ void (*setScale)(); /* (x, y, z), ONE = 1.0 */
     /* 0x90 */ void (*setRotation)(); /* (x, y, z); no prototype: callers would truncate s16 args */
     /* 0x94 */ void (*setPivot)(); /* (x, y) */
     /* 0x98 */ void (*setFollowScroll)(); /* (on) */
@@ -266,13 +267,6 @@ typedef struct AnimState {
     /* 0x2 */ s16 timer;
 } AnimState;
 
-/* Text helpers (initTextTools) */
-typedef struct TextTools {
-    /* 0x0 */ char *(*getString)(); /* (table, index) */
-    /* 0x4 */ s32 (*measure)(); /* (TextBuffer *, style, spacing) */
-    /* 0x8 */ void (*convert)(); /* (dst, src, mode): font codes <-> Shift-JIS */
-} TextTools;
-
 /* Uploads TIM images to VRAM (initTimLoader); acts on TIM_LOADER */
 typedef struct TimLoader {
     /* 0x00 */ u16 w; /* size of the last image */
@@ -291,11 +285,38 @@ typedef struct TimLoader {
     /* 0x30 */ void (*setBufferSize)(); /* (size) */
 } TimLoader;
 
+/* The next free primitive of the packet buffer (getPrim), written as the
+   kind that is drawn next */
+typedef union PrimPtr {
+    void *any;
+    SPRT *sprt;
+    POLY_FT4 *ft4;
+    DR_TPAGE *tpage;
+} PrimPtr;
+
 typedef struct Vec2 {
     s32 x;
     s32 y;
 } Vec2;
 
+/* ScreenFade.level when the screen is black: 0xFF in 8.8 fixed point */
+#define FADE_LEVEL_MAX 0xFF00
+
+/* Fades the whole screen to black and back with a subtractive rectangle */
+typedef struct ScreenFade {
+    TASK_HEADER(ScreenFade);
+    /* 0x50 */ s32 layerId;
+    /* 0x54 */ s32 depth;
+    /* 0x58 */ s32 fadeIn; /* 0: to black */
+    /* 0x5C */ s32 level; /* 0-FADE_LEVEL_MAX */
+    /* 0x60 */ s32 levelStep;
+    /* 0x64 */ void (*start)(struct ScreenFade *fade, s32 fadeIn, s32 frames); /* TASK_DONE when done */
+} ScreenFade;
+
+Layer *getLayer(s32 id);
+Layer *createLayer(RECT *rect, s32 otShift, s32 id);
+s32 destroyLayer(s32 id);
+void moveLayer(s32 id, s32 targetId, s32 delta);
 u_long *layerGetOtEntryZ(Layer *layer, s32 z);
 void layerSkipEmptyOt(Layer *layer);
 Layer *newLayer(DRAWENV *env, s32 otShift);
@@ -325,11 +346,6 @@ void spriteDrawerSetRotation(s16 x, s16 y, s16 z);
 void spriteDrawerSetPivot();
 void spriteDrawerSetFollowScroll();
 void spriteDrawerSetColor(CVECTOR *color);
-void bindTextTools(TextTools *obj);
-char *getString(s32 *table, s32 index);
-s32 measureText();
-void initTextTools(TextTools *obj);
-void convertText(void *buf, void *text, s32 mode);
 void bindTimLoader(TimLoader *obj);
 void timLoaderSetImagePos();
 void timLoaderSetClutPos();
@@ -338,6 +354,10 @@ void timLoaderLoadArchive();
 void timLoaderSetBufferSize();
 void initSpriteDrawer(struct SpriteDrawer *obj);
 void initCardDrawer(CardDrawer *obj);
+void screenFadeStart(ScreenFade *task, s32 fadeIn, s32 duration);
+ScreenFade *createScreenFade(s32 layerId);
+void drawScreenFade(struct ScreenFade *task);
+void updateScreenFade(struct ScreenFade *task);
 
 extern s16 OT_LENGTHS[];
 extern s32 CARD_IMAGE_FILES[];
@@ -350,4 +370,4 @@ extern s32 SHIFT_PAL_SCREEN; /* moves both display areas 0x18 lines down */
 #endif
 extern s32 CARD_KINDS[];
 
-#endif /* DW3_GRAPHICS_H */
+#endif /* DW3_GFX_H */

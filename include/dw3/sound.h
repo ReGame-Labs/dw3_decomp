@@ -1,7 +1,7 @@
 #ifndef DW3_SOUND_H
 #define DW3_SOUND_H
 
-/* Sound banks (sound.c) */
+/* Sound banks (sound/) */
 
 #include "common.h"
 #include <sys/types.h>

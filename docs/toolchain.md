@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| Game code | GCC 2.8.1 (`-O2 -G0`; `-G8` for `inn.c`, `system.c`, `memcard.c`, `game3.c`, `game3_2.c`, `graphics.c`, `sound.c` and `overlay.c`) + ASPSX 2.86, emulated with [maspsx](https://github.com/mkst/maspsx) |
+| Game code | GCC 2.8.1 (`-O2 -G0`; `-G8` for the executable's modules cut from the original's `inn`, `system`, `memcard`, `game3`, `game3_2`, `graphics`, `sound` and `overlay`, `G8_SRC` in the Makefile) + ASPSX 2.86, emulated with [maspsx](https://github.com/mkst/maspsx) |
 | Splitting | [splat](https://github.com/ethteck/splat) 0.50.0 |
 | Diffing | [objdiff](https://github.com/encounter/objdiff) 3.8.1, [decomp.dev](https://decomp.dev) |
 
@@ -14,19 +14,21 @@
   and 2.8.1 give the same results, and so do ASPSX 2.56 to 2.86.
 - The game's divisions carry no divide-by-zero check, so maspsx runs without
   `--expand-div`.
-- `system.c` and `graphics.c` read their small variables through `$gp`
-  (`ROOT_TASK`, `CD_MODE` and `BOOT_IMAGE_RECT`; the drawers, `TEXT_TOOLS`
-  and `FLIP_PENDING`), so they are built with `-G8` in both GCC and maspsx
-  (`SDATA_LIMIT` in the Makefile). Those variables are declared `static` in
-  the C; maspsx emits them as common symbols that resolve to their
-  definitions.
-- `game3_2.c` and `overlay.c` read nothing through `$gp`, but match only at
-  `-G8` too: GCC then leaves the address of a small extern (`GET_DIGIMON` in
-  `game3_2.c`) to the assembler's macro, which loads it again for every
-  read, and that changes the scheduling and the registers. `inn.c`,
-  `memcard.c` and `game3.c` need it for the same reason in the European
-  version only, for `LANGUAGE`. `sound.c` is built with `-G8` as well, but
-  its code is the same at `-G0`. The rest of the game uses `-G0`.
+- The modules cut from the original's `system` and `graphics` read their
+  small variables through `$gp` (`ROOT_TASK` and `BOOT_IMAGE_RECT` in
+  `system/main.c`, `CD_MODE` in `file/cd_reader.c`; `FLIP_PENDING` in
+  `gfx/display.c`, the drawers and `TEXT_TOOLS` in theirs), so they are
+  built with `-G8` in both GCC and maspsx (`SDATA_LIMIT` in the Makefile).
+  Those variables are declared `static` in the C; maspsx emits them as
+  common symbols that resolve to their definitions.
+- `game3_2`'s and `overlay`'s modules read nothing through `$gp`, but match
+  only at `-G8` too: GCC then leaves the address of a small extern
+  (`GET_DIGIMON` in `game/partner.c`) to the assembler's macro, which loads
+  it again for every read, and that changes the scheduling and the
+  registers. `inn`'s, `memcard`'s and `game3`'s need it for the same reason
+  in the European version only, for `LANGUAGE`. `sound/sound.c` is built
+  with `-G8` as well, but its code is the same at `-G0`. Every module cut
+  from a `-G8` object keeps it; the rest of the game uses `-G0`.
 - The C includes the PsyQ 4.7 headers from
   [psyq_headers](https://github.com/jype0/psyq_headers). `libgte.h` names
   some parameters `$2`, hence `-fdollars-in-identifiers`. The game uses
@@ -35,8 +37,8 @@
   `free`, `alloc` and `zero`, for example) and must be called through a struct.
   GCC 2.8 assumes a struct field and a scalar global never alias, so with a
   scalar `extern` it moves stores to struct fields past the load of the
-  function pointer A store through a pointer to a field
-  isn't a struct access to it: WFIGHTMN's `setStat` keeps the load of
+  function pointer. A store through a pointer to a field
+  isn't a struct access to it: `WFIGHTMN_setStat` keeps the load of
   `FIGHTSTG_battleTableFunc` after the stores that way.
 
 To use a different binutils or objdiff, create `local.mk`:
@@ -76,11 +78,11 @@ The prebuilt tools are x86 Linux binaries, so the image is `linux/amd64`.
 
 | Path | Contents |
 |---|---|
-| `src/main/` | the executable's game code, one file per original object (see [binaries.md](binaries.md#the-games-binaries)) |
+| `src/main/<module>/` | the executable's game code, one folder per module, cut from the original objects in their link order (see [binaries.md](binaries.md#the-games-binaries)) |
 | `src/main/data/` | the executable's data as C, until it moves next to the code that uses it |
 | `src/<overlay>/` | each overlay's C; `<overlay>_2.c` is the second half of an object split in two |
 | `src/stages/` | one C file per stage, `wstag###.c` |
-| `include/game.h`, `include/dw3/` | types and declarations of the game code, one header per engine module (`task.h`, `heap.h`, `graphics.h`, `files.h`, `pad.h`, `sound.h`, `overlay.h`, `text.h`, `game_state.h`, `memcard.h`, `menus.h`) |
+| `include/game.h`, `include/dw3/` | types and declarations of the game code, one header per module of `src/main/` (`task.h`, `heap.h`, `gfx.h`, `file.h`, `pad.h`, `random.h`, `sound.h`, `overlay.h`, `text.h`, `game_state.h`, `memcard.h`, `menu.h`) |
 | `include/<overlay>.h`, `include/stage.h` | the overlays' types and declarations, and the stages' |
 | `include/` | `common.h`, `version.h`, `include_asm.h` and the assembler macros |
 | `config/<version>/` | the version's splat configs, symbols, stage list and checksums |

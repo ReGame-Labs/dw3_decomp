@@ -1,7 +1,7 @@
 #ifndef DW3_HEAP_H
 #define DW3_HEAP_H
 
-/* The heap (game3_2.c) */
+/* The heap (system/heap.c) */
 
 #include "common.h"
 #include <sys/types.h>

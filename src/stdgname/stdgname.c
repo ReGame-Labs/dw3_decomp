@@ -588,7 +588,7 @@ KeyPage STDGNAME_keyChars[] = {
 };
 
 TextStyle STDGNAME_nameStyle = {
-    0xFF, 14, {0}, (s32)STDGNAME_nameGlyphs, (s32)STDGNAME_nameIcons,
+    0xFF, 14, {0}, STDGNAME_nameGlyphs, STDGNAME_nameIcons,
     FONT_GLYPH_MAP, FONT_ICON_MAP,
     234, 114,
 };
@@ -1179,7 +1179,7 @@ Glyph STDGNAME_menuIcons[114] = {
 };
 
 TextStyle STDGNAME_menuStyle = {
-    0xFF, 14, {0}, (s32)STDGNAME_menuGlyphs, (s32)STDGNAME_menuIcons,
+    0xFF, 14, {0}, STDGNAME_menuGlyphs, STDGNAME_menuIcons,
     FONT_GLYPH_MAP, FONT_ICON_MAP,
     234, 114,
 };
@@ -1274,7 +1274,7 @@ void STDGNAME_showMenuWindow(MenuTask *task, TextWindow **window, s32 index, s32
         }
         if (index >= 2 && index <= 4) {
             name = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(index - 2))->name;
-            (*window)->style = (u8 *)STDGNAME_funcs.style;
+            (*window)->style = STDGNAME_funcs.style;
             (*window)->setString(*window, name, -1);
         } else {
             (*window)->setString(*window, FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMING)), STDGNAME_menuWindows[index].text);

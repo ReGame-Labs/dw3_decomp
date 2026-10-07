@@ -31,7 +31,7 @@ void WFIGHTMN_createLayers(void) {
 /* Sets a stat and its maximum. The match depends on the pointers: stores
    through them aren't struct accesses to GCC, so the load of
    FIGHTSTG_battleTableFunc stays after them */
-static inline void setStat(s16 *cur, s16 *max, s16 value) {
+static inline void WFIGHTMN_setStat(s16 *cur, s16 *max, s16 value) {
     *cur = *max = value;
 }
 
@@ -65,8 +65,8 @@ void WFIGHTMN_initFighters(s32 digimon) {
         fighter = &units[i];
         fighter->id = BATTLE_SETUP.enemies[i].fighter;
         if (BATTLE_SETUP.enemies[i].fighter != 0) {
-            setStat(&fighter->hp, &fighter->maxHp, BATTLE_SETUP.enemies[i].hp);
-            setStat(&fighter->mp, &fighter->maxMp, BATTLE_SETUP.enemies[i].mp);
+            WFIGHTMN_setStat(&fighter->hp, &fighter->maxHp, BATTLE_SETUP.enemies[i].hp);
+            WFIGHTMN_setStat(&fighter->mp, &fighter->maxMp, BATTLE_SETUP.enemies[i].mp);
             entry = FIGHTSTG_battleTableFunc(fighter->id);
             if (entry->item != 0) {
                 fighter->item = entry->item;

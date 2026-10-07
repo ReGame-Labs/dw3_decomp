@@ -1,7 +1,7 @@
 #ifndef DW3_TASK_H
 #define DW3_TASK_H
 
-/* The task system (system.c, game3_2.c) */
+/* The task system and its registry (task/) */
 
 #include "common.h"
 #include <sys/types.h>

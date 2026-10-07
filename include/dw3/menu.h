@@ -1,14 +1,14 @@
-#ifndef DW3_MENUS_H
-#define DW3_MENUS_H
+#ifndef DW3_MENU_H
+#define DW3_MENU_H
 
-/* The inn, the screen fade and the field menu (inn.c, system.c) */
+/* The inn and the field menu (menu/) */
 
 #include "common.h"
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include "dw3/task.h"
-#include "dw3/graphics.h"
+#include "dw3/gfx.h"
 #include "dw3/text.h"
 
 /*
@@ -21,20 +21,6 @@ typedef struct PanelAnim {
     s32 level;
     s32 active;
 } PanelAnim;
-
-/* ScreenFade.level when the screen is black: 0xFF in 8.8 fixed point */
-#define FADE_LEVEL_MAX 0xFF00
-
-/* Fades the whole screen to black and back with a subtractive rectangle */
-typedef struct ScreenFade {
-    TASK_HEADER(ScreenFade);
-    /* 0x50 */ s32 layerId;
-    /* 0x54 */ s32 depth;
-    /* 0x58 */ s32 fadeIn; /* 0: to black */
-    /* 0x5C */ s32 level; /* 0-FADE_LEVEL_MAX */
-    /* 0x60 */ s32 levelStep;
-    /* 0x64 */ void (*start)(struct ScreenFade *fade, s32 fadeIn, s32 frames); /* TASK_DONE when done */
-} ScreenFade;
 
 /* Moves a value towards a target in fixed point, as the menu overlays'
    startLerp and updateLerp do */
@@ -124,8 +110,8 @@ typedef struct WindowPos {
 /*
  * The menu opened on the field: the three party members' pages, a list of
  * options (FIELD_MENU_OPTIONS, one more when the player has item 0x192)
- * and the money. Picking an option switches to mode 0x1000 with the choice
- * in FIELD_MENU_CHOICE; from mode 0x1000, cancelling goes back to
+ * and the money. Picking an option switches to MODE_STATUS with the choice
+ * in FIELD_MENU_CHOICE; from MODE_STATUS, cancelling goes back to
  * GAME.fieldMode. `step` tells whether a mode change follows (0) or not.
  */
 typedef struct FieldMenu {
@@ -141,7 +127,7 @@ typedef struct FieldMenu {
     /* 0x70 */ PanelAnim panels[3];
 } FieldMenu;
 
-/* What the field menu picked, for STSTATUS (mode 0x1000) */
+/* What the field menu picked, for STSTATUS (MODE_STATUS) */
 typedef struct FieldMenuChoice {
     /* 0x0 */ s32 option;
     /* 0x4 */ s32 extra; /* the list had the extra option: STSTATUS_screens' row */
@@ -150,12 +136,8 @@ typedef struct FieldMenuChoice {
 extern FieldMenuChoice FIELD_MENU_CHOICE;
 
 void updateInn(struct Inn *task, struct InnChildren *data);
-void screenFadeStart(ScreenFade *task, s32 fadeIn, s32 duration);
-ScreenFade *createScreenFade(s32 layerId);
 Inn *createInn(s32 layerId);
-void drawScreenFade(struct ScreenFade *task);
-void updateScreenFade(struct ScreenFade *task);
 void updateFieldMenu(FieldMenu *task, FieldMenuWindows *win);
 FieldMenu *createFieldMenu(s32 layerId, s32 cursor);
 
-#endif /* DW3_MENUS_H */
+#endif /* DW3_MENU_H */

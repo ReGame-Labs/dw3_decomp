@@ -46,10 +46,12 @@ original's counts, and nothing else does:
 A function whose size in the target differs from its C's stops the script
 (function_sizes): splat cut it short, and the report would count it wrong.
 
-A source file X_2.c is the second half of an original object split in
-config/us/main.yaml (X.c and X_2.c come from one file before the split). Its
-unit is reported together with X's under X's name, from the two objects
-linked with `ld -r`, so progress keeps being tracked per unit as before.
+A source file X_2.c of an overlay is the second half of an original object
+split in its splat config (X.c and X_2.c come from one file before the
+split). Its unit is reported together with X's under X's name, from the two
+objects linked with `ld -r`, so progress keeps being tracked per unit as
+before. The executable's modules (src/main/<module>/X.c) are units of their
+own, main/<module>/X.
 An overlay split into several objects, X.c, X_2.c, X_3.c..., is not a pair
 of halves: each of its files is a unit of its own (CARDGAME, FIGHTSTG).
 A stage's head, src/stages/X_head.c (the color linked before WSTAG924's
@@ -593,8 +595,7 @@ def asm_units(names: list) -> list:
     code and data of the executable, an overlay or a stage linked together,
     so that the progress counts the whole of a version even before it is
     split into the USA modules (and a stage only it has)."""
-    stages = [line.split()[0] for line in open(version.CONFIG_DIR / "stages.txt")
-              if line.strip() and not line.startswith("#")]
+    stages = [words[0] for words in version.stage_entries()]
     binaries = {d.name: [f"{d.name}/{d.name}.s"] + [f"{d.name}/data/{f.name}"
                 for f in sorted((d / "data").glob("*.s"))]
                 for d in sorted(ASM.iterdir()) if d.is_dir() and d.name != "stages"}
