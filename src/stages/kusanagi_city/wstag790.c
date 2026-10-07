@@ -2,7 +2,7 @@
 #include "stage.h"
 
 /*
- * Once the substate is set to 1, moves the records of animations 2, 3, 4 and
+ * Once the substate is set to 1, moves the map objects of animations 2, 3, 4 and
  * 7 and shows those of 5 to 9 in turn
  */
 void updateTileGroup(StageTileGroup *task) {
@@ -91,7 +91,7 @@ void *createCommand809(s32 arg) {
     return createTaskWithId(updateTileGroup, sizeof(StageTileGroup), 0, 0x329);
 }
 
-/* Once the substate is set to 1, animates the frame of the record of animation 1 for 20 frames, then plays a sound */
+/* Once the substate is set to 1, animates the frame of the map object of animation 1 for 20 frames, then plays a sound */
 void updateFrameTask(StageFrameTask *task) {
     StageTile *tile;
 

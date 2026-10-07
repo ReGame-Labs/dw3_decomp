@@ -23,9 +23,9 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-/* Shows the record with animation 1 and moves it and the player down a pixel a frame for 150 frames */
+/* Shows the map object with animation 1 and moves it and the player down a pixel a frame for 150 frames */
 void updateTileTimer(StageTileTimer *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     StageActor *player;
 
@@ -33,11 +33,11 @@ void updateTileTimer(StageTileTimer *task) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == 1) {
-                task->tile = rec;
-                rec->y--;
-                rec->visible = 1;
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == 1) {
+                task->tile = object;
+                object->y--;
+                object->visible = 1;
             }
         }
         task->timer = 0;

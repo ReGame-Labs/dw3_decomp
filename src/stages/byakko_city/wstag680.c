@@ -29,9 +29,9 @@ s32 stepRiser(StageRiser *obj, StageRiserFrame *frames, s32 depth) {
     return frame->frame;
 }
 
-/* Animates and moves the records of the stage's table (lifts for animations 8-10) and pushes the player */
+/* Animates and moves the map objects of the stage's table (lifts for animations 8-10) and pushes the player */
 void updateRisers(StageRisers *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     StageActor *actor;
     s32 i;
@@ -42,8 +42,8 @@ void updateRisers(StageRisers *task) {
     default:
         i = 0;
         j = 0;
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            switch (rec->anim) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            switch (object->anim) {
             case 0:
                 break;
             case 8:
@@ -51,16 +51,16 @@ void updateRisers(StageRisers *task) {
             case 10:
                 task->lifts[j].active = 0;
                 task->lifts[j].speed = 0;
-                task->lifts[j].tile = rec;
+                task->lifts[j].tile = object;
                 j++;
                 break;
             default:
-                task->risers[i].tileAnim = rec->anim;
-                task->risers[i].y = rec->y << 8;
+                task->risers[i].tileAnim = object->anim;
+                task->risers[i].y = object->y << 8;
                 task->risers[i].active = 0;
                 task->risers[i].anim.index = 0;
                 task->risers[i].anim.timer = updateRisersFrames[i]->duration;
-                task->risers[i].tile = rec;
+                task->risers[i].tile = object;
                 i++;
                 break;
             }
@@ -104,7 +104,7 @@ void updateRisers(StageRisers *task) {
     }
 }
 
-/* Starts the records an event moves (the handler of the events the task gets) */
+/* Starts the map objects an event moves (the handler of the events the task gets) */
 void handleCommand814(void *arg, s32 event) {
     StageRisers *task = arg;
     StageActor *player;
@@ -162,7 +162,7 @@ void *createCommand814(s32 arg) {
     return createTaskWithId(updateRisers, sizeof(StageRisers), 0, arg);
 }
 
-/* Creates the event object of story progress 15 */
+/* Creates the event object of story progress 0xF */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:

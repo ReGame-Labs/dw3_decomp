@@ -53,7 +53,7 @@ u16 actor3Talk2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor3Talk2Actions[] = { 0x7A47, 1, CODES_END };
 u16 actor3Talk3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor3Talk3Actions[] = { 0x7A47, 1, CODES_END };
-u16 actor3Talk4Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor3Talk4Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor3Talk4Actions[] = { 0x7A47, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x1A3 },

@@ -31,9 +31,9 @@ s32 stepHeldAnimation(StageTileAnim *obj, AnimFrame *frames, s32 depth) {
     return frame->frame;
 }
 
-/* Moves the record with the given animation to (x, y); hidden while running, shown and animated when done */
+/* Moves the map object with the given animation to (x, y); hidden while running, shown and animated when done */
 void updateTileAt(StageTileAt *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
 
     switch (task->state) {
@@ -42,11 +42,11 @@ void updateTileAt(StageTileAt *task) {
         task->nextState(task);
         task->obj.anim.index = 0;
         task->obj.anim.timer = updateTileAtFrames[0].duration;
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == task->anim) {
-                task->obj.tile = rec;
-                rec->x = task->x;
-                rec->y = task->y;
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == task->anim) {
+                task->obj.tile = object;
+                object->x = task->x;
+                object->y = task->y;
             }
         }
         break;
@@ -68,7 +68,7 @@ void updateTileAt(StageTileAt *task) {
     }
 }
 
-/* Creates a StageTileAt for the record with the given animation */
+/* Creates a StageTileAt for the map object with the given animation */
 StageTileAt *createTileAt(s32 anim, s32 x, s32 y) {
     StageTileAt *task = createTask(updateTileAt, sizeof(StageTileAt), 0);
 
@@ -80,9 +80,9 @@ StageTileAt *createTileAt(s32 anim, s32 x, s32 y) {
 
 #include "common/step_animation_once.inc.c"
 
-/* Shows the record with animation 1 (frame 0x18); when done, animates it once with a sound and goes back to TASK_RUN */
+/* Shows the map object with animation 1 (frame 0x18); when done, animates it once with a sound and goes back to TASK_RUN */
 void updateTileTask(StageTileTask *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *shown;
     StageTile *tile;
     s32 frame;
@@ -93,9 +93,9 @@ void updateTileTask(StageTileTask *task) {
         task->nextState(task);
         task->obj.anim.index = 0;
         task->obj.anim.timer = updateTileTaskFrames[0].duration;
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == 1) {
-                task->obj.tile = rec;
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == 1) {
+                task->obj.tile = object;
             }
         }
         break;
@@ -140,20 +140,46 @@ void *createTileTask(s32 arg) {
 
 #include "common/step_tile_animation.inc.c"
 
-/* Animates the record with animation 2 by substate and sets the child an event picked to TASK_DONE */
+/*
+ * Plays the switch's animation N once (from its start, on step 0), then
+ * holds frame DONE and goes on to substate NEXT
+ */
+static inline void playSwitchOnce(StageTileSwitch *task, StageTile *tile, s32 n, s32 done, s32 next) {
+    s32 frame;
+
+    if (task->step == 0) {
+        task->obj.anim.index = 0;
+        task->obj.anim.timer = updateTileSwitchFrames[n][0].duration;
+        task->setStep(task, 1);
+    }
+    frame = stepTileAnimation(&task->obj, updateTileSwitchFrames[n], 1, 0);
+    tile->visible = 1;
+    if (frame == 0xFF) {
+        tile->frame = done;
+        task->setSubstate(task, next);
+    } else {
+        tile->frame = frame;
+    }
+}
+
+/*
+ * The switch, the map object with animation 2, played by substate (events
+ * 0x35D to 0x35F); also sets the child that events 0x360 to 0x364 pick to
+ * TASK_DONE
+ */
 void updateTileSwitch(StageTileSwitch *task, StageTileAts *children) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     s32 i;
 
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == 2) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == 2) {
                 task->obj.anim.index = 0;
                 task->obj.anim.timer = updateTileSwitchFrames[0][0].duration;
-                task->obj.tile = rec;
+                task->obj.tile = object;
             }
         }
         for (i = 0; i < 5; i++) {
@@ -170,40 +196,10 @@ void updateTileSwitch(StageTileSwitch *task, StageTileAts *children) {
             tile->visible = 0;
             break;
         case 1:
-            if (task->step == 0) {
-                task->obj.anim.index = 0;
-                task->obj.anim.timer = updateTileSwitchFrames[0][0].duration;
-                task->setStep(task, 1);
-            }
-            {
-                s32 frame = stepTileAnimation(&task->obj, updateTileSwitchFrames[0], 1, 0);
-
-                tile->visible = 1;
-                if (frame == 0xFF) {
-                    tile->frame = 8;
-                    task->setSubstate(task, 2);
-                } else {
-                    tile->frame = frame;
-                }
-            }
+            playSwitchOnce(task, tile, 0, 8, 2);
             break;
         case 3:
-            if (task->step == 0) {
-                task->obj.anim.index = 0;
-                task->obj.anim.timer = updateTileSwitchFrames[1][0].duration;
-                task->setStep(task, 1);
-            }
-            {
-                s32 frame = stepTileAnimation(&task->obj, updateTileSwitchFrames[1], 1, 0);
-
-                tile->visible = 1;
-                if (frame == 0xFF) {
-                    tile->frame = 9;
-                    task->setSubstate(task, 4);
-                } else {
-                    tile->frame = frame;
-                }
-            }
+            playSwitchOnce(task, tile, 1, 9, 4);
             break;
         case 5:
             if (task->step == 0) {
@@ -234,7 +230,7 @@ void updateTileSwitch(StageTileSwitch *task, StageTileAts *children) {
     }
 }
 
-/* Events 0x35D to 0x364: animate the record (substates 1, 3, 5) or pick a child to set to TASK_DONE */
+/* Events 0x35D to 0x364: animate the map object (substates 1, 3, 5) or pick a child to set to TASK_DONE */
 void handleCommand848(void *arg, s32 id) {
     StageTileSwitch *task = arg;
 
@@ -277,7 +273,7 @@ void *createCommand848(s32 id) {
     return createTaskWithId(updateTileSwitch, sizeof(StageTileSwitch), sizeof(StageTileAts), id);
 }
 
-/* Creates the stage object of flag 0x4051, and the event object of story progress 26 */
+/* Creates the stage object of flag 0x4051, and the event object of story progress 0x1A */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -306,7 +302,7 @@ void endEvent710(void) {
 }
 
 void endEvent711(void) {
-    GAME.progress = 27;
+    GAME.progress = 0x1B;
 }
 
 #if VERSION_US

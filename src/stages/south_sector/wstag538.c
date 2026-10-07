@@ -253,7 +253,7 @@ u16 actor0Conditions[] = {
     CODES_END,
 };
 u16 actor1Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(0x25), 1, CODES_END };

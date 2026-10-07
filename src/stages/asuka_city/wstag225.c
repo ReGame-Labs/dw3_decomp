@@ -8,16 +8,9 @@ extern s16 tileEffectPlaces[][2];
 
 #include "common/step_animation_once.inc.c"
 
-void resetTileEffect(StageTileEffect *task) {
-    s32 i;
+#include "common/reset_tile_effect.inc.c"
 
-    for (i = 0; i < 3; i++) {
-        task->anims[i].anim.index = 0;
-        task->anims[i].anim.timer = updateTileEffectFrames[i][0].duration;
-    }
-}
-
-/* Once the substate is set to 1, moves the records of animations 1-3 to (x, y), plays a sound and animates them once */
+/* Once the substate is set to 1, moves the map objects of animations 1-3 to (x, y), plays a sound and animates them once */
 void updateTileEffect(StageTileEffect *task) {
     StageTile *tile;
     StageTile *t;
@@ -340,7 +333,7 @@ u16 actor8Conditions[] = { PROGRESS(0xC), 1, CODES_END };
 u16 actor9Conditions[] = { PROGRESS(0xE), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x16), 1, CODES_END };
 u16 actor11Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor13Conditions[] = { PROGRESS(0x16), 1, CODES_END };
 u16 actor14Conditions[] = { PROGRESS(0xD), 1, CODES_END };
 u16 actor15Conditions[] = { SPECIAL(0x1A), 1, CODES_END };

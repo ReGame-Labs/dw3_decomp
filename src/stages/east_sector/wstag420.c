@@ -26,7 +26,6 @@ void endEvent70(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
-/* Sets flags 0x8028 and 0x8009 and the story progress to 5 */
 void endEvent71(void) {
     FLAGS_00.applyAction(ITEM(0, 0x28), 1);
     FLAGS_00.applyAction(ITEM(0, 9), 1);
@@ -761,12 +760,12 @@ FieldTalk actor69Talks[] = {
 };
 u16 actor0Conditions[] = { SPECIAL(0x22), 1, PROGRESS(4), 0, ITEM(0, 0x22), 0, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x22), 1, PROGRESS(4), 0, ITEM(0, 0x22), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x2B), 1, ITEM(0, 0x22), 0, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x2B), 1, ITEM(0, 0x22), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 0x22), 0, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 0x22), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(4), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor8Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor9Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(0xC), 1, CODES_END };
@@ -779,7 +778,7 @@ u16 actor16Conditions[] = { PROGRESS(0x26), 1, ITEM(0, 0x192), 1, FLAG(0, 0x11),
 u16 actor17Conditions[] = { ITEM(0, 0x192), 0, SPECIAL(9), 1, SPECIAL(0x1A), 0, CODES_END };
 u16 actor18Conditions[] = { FLAG(0, 0x11), 0, SPECIAL(3), 1, ITEM(0, 0x192), 1, CODES_END };
 u16 actor19Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor20Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor20Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor21Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor22Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor23Conditions[] = { PROGRESS(4), 1, CODES_END };
@@ -796,7 +795,7 @@ u16 actor33Conditions[] = { PROGRESS(0xC), 1, CODES_END };
 u16 actor34Conditions[] = { PROGRESS(0xE), 1, CODES_END };
 u16 actor35Conditions[] = { SPECIAL(0x16), 1, CODES_END };
 u16 actor36Conditions[] = { SPECIAL(0x17), 1, CODES_END };
-u16 actor37Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor37Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor38Conditions[] = { PROGRESS(4), 1, FLAG(0x1C, 0x11), 1, CODES_END };
 u16 actor39Conditions[] = { PROGRESS(4), 1, CODES_END };
 u16 actor40Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
@@ -820,7 +819,7 @@ u16 actor57Conditions[] = { PROGRESS(8), 1, FLAG(0x1A, 0x17), 1, CODES_END };
 u16 actor58Conditions[] = { FLAG(0x1C, 0x46), 1, PROGRESS(6), 1, CODES_END };
 u16 actor59Conditions[] = { PROGRESS(4), 1, FLAG(0x1C, 0x11), 1, CODES_END };
 u16 actor60Conditions[] = { PROGRESS(6), 0, SPECIAL(0x15), 1, PROGRESS(8), 0, CODES_END };
-u16 actor61Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor61Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor62Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor63Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor64Conditions[] = { SPECIAL(0x19), 1, CODES_END };

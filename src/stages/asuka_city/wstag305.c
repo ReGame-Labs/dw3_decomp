@@ -5,53 +5,7 @@ extern AnimFrame updateSoundTileFrames[];
 
 #include "common/step_animation_once.inc.c"
 
-void updateSoundTile(StageSoundTile *task) {
-    StageTile *rec;
-    StageTile *tile;
-    s32 frame;
-
-    switch (task->state) {
-    case TASK_INIT:
-    default:
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == 1) {
-                task->obj.anim.index = 0;
-                task->obj.anim.timer = updateSoundTileFrames[0].duration;
-                task->obj.tile = rec;
-            }
-        }
-        task->nextState(task);
-        break;
-    case TASK_RUN:
-        tile = task->obj.tile;
-        switch (task->substate) {
-        case 0:
-        default:
-            tile->frame = 5;
-            tile->visible = 1;
-            break;
-        case 1:
-            tile->visible = 1;
-            frame = stepAnimationOnce(&task->obj, updateSoundTileFrames, 0);
-            if (frame != 0xFF) {
-                tile->frame = frame;
-            } else {
-                tile->frame = 10;
-                task->nextSubstate(task);
-                SOUND.keyOff(SOUND_COMCD115, task->voice);
-            }
-            break;
-        case 2:
-            tile->visible = 1;
-            tile->frame = 10;
-            break;
-        }
-        break;
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
+#include "common/update_sound_tile.inc.c"
 
 /* Plays the sound and starts the animation when map object 0x335 is triggered */
 void handleCommand850(StageSoundTile *task, s32 id) {
@@ -63,9 +17,7 @@ void handleCommand850(StageSoundTile *task, s32 id) {
     }
 }
 
-void *createSoundTile(s32 arg) {
-    return createTaskWithId(updateSoundTile, sizeof(StageSoundTile), 0, arg);
-}
+#include "common/create_sound_tile.inc.c"
 
 /* Creates the event objects of the story so far, the first that applies */
 void updateStage(StageTask *task, void **children) {
@@ -135,13 +87,12 @@ void endEvent351(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0xE), 1);
 }
 
-/* Event: clears flag 0x1C36 */
 void endEvent660(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x36), 0);
 }
 
 void endEvent661(void) {
-    GAME.progress = 23;
+    GAME.progress = 0x17;
 }
 
 void endEvent890(void) {
@@ -149,7 +100,7 @@ void endEvent890(void) {
 }
 
 void endEvent893(void) {
-    GAME.progress = 34;
+    GAME.progress = 0x22;
 }
 
 void endEvent894(void) {
@@ -157,7 +108,7 @@ void endEvent894(void) {
 }
 
 void endEvent895(void) {
-    GAME.progress = 34;
+    GAME.progress = 0x22;
 }
 
 void endEvent960(void) {

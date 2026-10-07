@@ -9,9 +9,7 @@ extern AnimFrame updateTileAnimsFrames2[];
 
 #include "common/update_tile_anims3_once.inc.c"
 
-void *createTileAnims(void) {
-    return createTask(updateTileAnims, 0x5C, 0);
-}
+#include "common/create_tile_anims_5c.inc.c"
 
 #include "common/copy_place_points.inc.c"
 

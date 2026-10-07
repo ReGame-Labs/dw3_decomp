@@ -42,9 +42,7 @@ void updateFarSprites(StageTask *task) {
     }
 }
 
-void *createFarSprites(void) {
-    return createTask(updateFarSprites, 0x50, 0);
-}
+#include "common/create_far_sprites.inc.c"
 
 /* Creates the stage helper task, and the event object when flag 0x4053 is set and 0x4054 is not */
 void updateStage(StageTask *task, void **children) {
@@ -72,7 +70,6 @@ void endEvent1260(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-/* Applies flag actions 0x868D and 0x4054 */
 void endEvent1261(void) {
     FLAGS_00.applyAction(ITEM(3, 0x8D), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0x54), 1);
@@ -556,10 +553,10 @@ FieldTalk actor23Talks[] = {
 u16 actor0Conditions[] = { FLAG(0x1C, 0x11), 0, PROGRESS(4), 1, CODES_END };
 u16 actor1Conditions[] = { FLAG(0x1C, 0x11), 0, PROGRESS(4), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x3B), 1, ITEM(0, 0x23), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x2B), 1, ITEM(0, 0x23), 0, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x2B), 1, ITEM(0, 0x23), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 0x23), 0, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 0x23), 1, CODES_END };
 u16 actor5Conditions[] = { ITEM(0, 0x23), 0, SPECIAL(0x3B), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor7Conditions[] = { PROGRESS(0xC), 1, CODES_END };
 u16 actor8Conditions[] = { PROGRESS(0xE), 1, CODES_END };
 u16 actor9Conditions[] = { SPECIAL(0x16), 1, CODES_END };

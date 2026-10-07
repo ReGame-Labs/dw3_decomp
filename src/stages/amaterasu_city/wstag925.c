@@ -25,7 +25,6 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-/* Applies flag actions 0x40CD and 0x7053 */
 void endEvent1600(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xCD), 1);
     FLAGS_00.applyAction(SPECIAL(0x53), 1);
@@ -52,18 +51,11 @@ void setupStage(void) {
 
 #include "common/step_animation_once.inc.c"
 
-void resetTileEffect(StageTileEffect *task) {
-    s32 i;
+#include "common/reset_tile_effect.inc.c"
 
-    for (i = 0; i < 3; i++) {
-        task->anims[i].anim.index = 0;
-        task->anims[i].anim.timer = updateTileEffectFrames[i][0].duration;
-    }
-}
-
-/* Moves the records with animations 1 to 3 to (x, y) and plays their animations once with a sound, then hides them and kills itself */
+/* Moves the map objects with animations 1 to 3 to (x, y) and plays their animations once with a sound, then hides them and kills itself */
 void updateTileEffect(StageTileEffect *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     s32 i;
     s32 j;
@@ -86,12 +78,12 @@ void updateTileEffect(StageTileEffect *task) {
             switch (task->step) {
             case 0:
                 i = 0;
-                for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-                    if (rec->anim >= 1 && rec->anim <= 3) {
-                        task->anims[i].tile = rec;
-                        rec->x = task->x;
-                        rec->y = task->y + tileEffectY[i];
-                        rec->sortY = task->y + tileEffectSortY[i];
+                for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+                    if (object->anim >= 1 && object->anim <= 3) {
+                        task->anims[i].tile = object;
+                        object->x = task->x;
+                        object->y = task->y + tileEffectY[i];
+                        object->sortY = task->y + tileEffectSortY[i];
                         i++;
                     }
                 }

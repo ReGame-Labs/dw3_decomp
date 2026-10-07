@@ -7,9 +7,7 @@ extern StageTileFrame **updateTileCursorsFrames[];
 
 #include "common/update_tile_cursors.inc.c"
 
-void *createTileCursors(void) {
-    return createTask(updateTileCursors, sizeof(StageTileCursors), 0);
-}
+#include "common/create_tile_cursors.inc.c"
 
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {

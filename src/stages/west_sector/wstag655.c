@@ -1,7 +1,7 @@
 #include "common.h"
 #include "stage.h"
 
-/* Creates the event object of story progress 16 */
+/* Creates the event object of story progress 0x10 */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -26,7 +26,6 @@ void endEvent430(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-/* Event: sets the progress to 17 and applies action 0x800B */
 void endEvent431(void) {
     GAME.progress = 0x11;
     FLAGS_00.applyAction(ITEM(0, 0xB), 1);

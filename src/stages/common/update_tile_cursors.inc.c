@@ -1,4 +1,4 @@
-/* Plays the sequences of the records with animations 1 to 5 */
+/* Plays the sequences of the map objects with animations 1 to 5 */
 void updateTileCursors(StageTileCursors *task) {
     StageTile *tile;
 

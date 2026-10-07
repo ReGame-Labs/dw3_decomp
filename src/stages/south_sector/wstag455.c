@@ -7,9 +7,9 @@ extern AnimFrame updateTileTaskFrames[];
 
 #include "common/step_animation_once.inc.c"
 
-/* Plays the animation of the record with animation 1 once with a sound when the substate is 0, then kills itself */
+/* Plays the animation of the map object with animation 1 once with a sound when the substate is 0, then kills itself */
 void updateTileTask(StageTileTask *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     s32 frame;
 
@@ -19,9 +19,9 @@ void updateTileTask(StageTileTask *task) {
         task->nextState(task);
         task->obj.anim.index = 0;
         task->obj.anim.timer = updateTileTaskFrames[0].duration;
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == 1) {
-                task->obj.tile = rec;
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == 1) {
+                task->obj.tile = object;
             }
         }
         break;
@@ -52,7 +52,7 @@ void *createCommand828(s32 arg) {
     return createTaskWithId(updateTileTask, sizeof(StageTileTask), 0, arg);
 }
 
-/* Creates the event object of story progress 14 */
+/* Creates the event object of story progress 0xE */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:

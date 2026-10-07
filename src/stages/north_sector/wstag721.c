@@ -334,10 +334,18 @@ u16 actor0Conditions[] = {
     CODES_END,
 };
 u16 actor1Conditions[] = { ITEM(0, 0x192), 1, SPECIAL(0x1E), 1, CODES_END };
-u16 actor2Conditions[] = { ITEM(0, 0x192), 1, PROGRESS(0x2B), 1, CODES_END };
+u16 actor2Conditions[] = {
+    ITEM(0, 0x192), 1,
+    PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1,
+    CODES_END,
+};
 u16 actor3Conditions[] = { ITEM(0, 0x192), 0, SPECIAL(0x1E), 1, CODES_END };
 u16 actor4Conditions[] = { ITEM(0, 0x192), 1, SPECIAL(0x1E), 1, CODES_END };
-u16 actor5Conditions[] = { ITEM(0, 0x192), 1, PROGRESS(0x2B), 1, CODES_END };
+u16 actor5Conditions[] = {
+    ITEM(0, 0x192), 1,
+    PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1,
+    CODES_END,
+};
 u16 actor6Conditions[] = { ITEM(0, 0x192), 0, SPECIAL(0x1E), 1, CODES_END };
 u16 actor7Conditions[] = { ITEM(0, 0x2A), 0, CODES_END };
 u16 actor8Conditions[] = { ITEM(0, 0x2A), 1, CODES_END };

@@ -9,77 +9,9 @@ extern AnimFrame updateSpritePairFrames_0[];
 extern AnimFrame updateSpritePairFrames_1[];
 extern AnimFrame *updateSpritePairFrames[];
 
-void updateEvent9015(StageTask *task, StagePartyChildren *children) {
-    StageActor *player;
-    StageActor *actor;
-    s32 i;
+#include "common/update_event9015.inc.c"
 
-    switch (task->state) {
-    case TASK_INIT:
-    default:
-        switch (task->substate) {
-        case 0:
-        default:
-            switch (task->step) {
-            case 0:
-            default:
-                player = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
-                player->setSubstate(player, 1);
-                SOUND.playSound(SOUND_SWITCH02);
-                task->nextStep(task);
-            case 1:
-                task->counter += GFX.funcs.getFrameTime();
-                if (task->counter >= 0x1E) {
-                    task->nextSubstate(task);
-                }
-                break;
-            }
-            break;
-        case 1:
-        case 2:
-        case 3:
-            switch (task->step) {
-            case 0:
-            default:
-                i = task->substate - 1;
-                actor = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, partyActorIds[i]);
-                if (actor != NULL) {
-                    children->party[i] = createSpritePair(actor->tileX, actor->tileY);
-                    SOUND.playSound(SOUND_COMEX113);
-                    actor->setSubstate(actor, 4);
-                    GAME.partners[GAME.party[i]].info.stats[STAT_HP] = 1;
-                    task->nextStep(task);
-                } else {
-                    task->nextSubstate(task);
-                }
-                break;
-            case 1:
-                task->counter += GFX.funcs.getFrameTime();
-                if (task->counter >= 0x1E) {
-                    task->nextSubstate(task);
-                }
-                break;
-            }
-            break;
-        case 4:
-            task->nextState(task);
-            break;
-        }
-        break;
-    case TASK_RUN:
-        if (children->party[0] == NULL) {
-            task->setState(task, TASK_KILL);
-        }
-        break;
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
-
-void *startEvents9000To9015(void) {
-    return createTask(updateEvent9015, sizeof(StageTask), sizeof(StagePartyChildren));
-}
+#include "common/start_events9000_to9015.inc.c"
 
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
@@ -104,60 +36,7 @@ void updateStage(StageTask *task, void **children) {
 
 #include "common/draw_pair_sprite.inc.c"
 
-void updateSpritePair(StageSpritePair *task) {
-    Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
-    s32 done;
-    s32 i;
-    s32 frame;
-    s32 y;
-    void (*draw)();
-
-    switch (task->state) {
-    case TASK_INIT:
-    default:
-        task->anims[0].index = 0;
-        task->anims[0].timer = updateSpritePairFrames_0[0].duration;
-        task->anims[1].index = 0;
-        task->anims[1].timer = updateSpritePairFrames_1[0].duration;
-        task->nextState(task);
-        break;
-    case TASK_RUN:
-        done = 0;
-        i = 0;
-        draw = drawPairSprite;
-        for (; i < 2; i++) {
-            frame = stepAnimationOnce(&task->anims[i], updateSpritePairFrames[i], 0);
-            switch (frame) {
-            case 0xFF:
-                task->sprites[i].frame = 0;
-                done++;
-                break;
-            case 0x12C:
-                task->sprites[i].frame = 0;
-                break;
-            default:
-                task->sprites[i].frame = frame;
-                break;
-            }
-            if (task->sprites[i].frame != 0) {
-                y = task->y;
-                if (i == 0) {
-                    y -= 0xF0;
-                } else {
-                    y += 0x14;
-                }
-                layer->addSortedCallback(layer, draw, task, y, i);
-            }
-        }
-        if (done == 2) {
-            task->setState(task, TASK_KILL);
-        }
-        break;
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
+#include "common/update_sprite_pair.inc.c"
 
 #include "common/create_sprite_pair.inc.c"
 
@@ -166,7 +45,6 @@ void endEvent800(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-/* Sets flags 0x8488 and 0x4040 */
 void endEvent801(void) {
     FLAGS_00.applyAction(ITEM(2, 0x88), 1);
     FLAGS_00.applyAction(FLAG(0x40, 0x40), 1);
@@ -424,7 +302,7 @@ FieldTalk actor4Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor3Conditions[] = { FLAG(0x40, 0x40), 0, SPECIAL(0x19), 1, CODES_END };
 u16 actor4Conditions[] = { FLAG(0x40, 0x40), 1, SPECIAL(0x19), 1, CODES_END };

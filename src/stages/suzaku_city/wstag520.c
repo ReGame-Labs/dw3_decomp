@@ -1,7 +1,7 @@
 #include "common.h"
 #include "stage.h"
 
-/* Creates the event object of story progress 10 */
+/* Creates the event object of story progress 0xA */
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
@@ -26,14 +26,13 @@ void endEvent260(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-/* Event: applies action 0x800A and sets the progress to 11 */
 void endEvent261(void) {
     FLAGS_00.applyAction(ITEM(0, 0xA), 1);
     GAME.progress = 0xB;
 }
 
 void endEvent695(void) {
-    GAME.progress = 26;
+    GAME.progress = 0x1A;
 }
 
 #if VERSION_US
@@ -402,7 +401,7 @@ u16 actor0Conditions[] = { PROGRESS(0x19), 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(0xC), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(0xE), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor5Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x17), 1, CODES_END };
@@ -431,7 +430,7 @@ u16 actor29Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor30Conditions[] = { PROGRESS(0xC), 1, CODES_END };
 u16 actor31Conditions[] = { PROGRESS(0xE), 1, CODES_END };
 u16 actor32Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor33Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor33Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor34Conditions[] = { SPECIAL(0x17), 1, CODES_END };
 u16 actor35Conditions[] = { PROGRESS(0x18), 1, CODES_END };
 u16 actor39Conditions[] = { SPECIAL(5), 1, CODES_END };

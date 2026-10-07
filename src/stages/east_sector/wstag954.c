@@ -7,9 +7,7 @@ extern AnimFrame updateTileAnimsFrames[];
 
 #include "common/update_tile_anims1.inc.c"
 
-void *createTileAnims(void) {
-    return createTask(updateTileAnims, 0x54, 0);
-}
+#include "common/create_tile_anims_54.inc.c"
 
 /* Creates the stage's object (its second child) */
 void updateStage(StageTask *task, void **children) {

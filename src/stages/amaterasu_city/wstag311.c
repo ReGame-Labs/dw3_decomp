@@ -21,15 +21,13 @@ extern AnimFrame updateTileSixWFrames4[];
 
 #include "common/update_tile_anims4.inc.c"
 
-void *createTileAnims(void) {
-    return createTask(updateTileAnims, sizeof(StageTileAnims), 0);
-}
+#include "common/create_tile_anims.inc.c"
 
 #include "common/step_tile_animation.inc.c"
 
-/* Animates the records with animations 5 to 10 by mode (0: hidden, 1 and 3: the first two once, then mode 2 or 0; 2: the other four) */
+/* Animates the map objects with animations 5 to 10 by mode (0: hidden, 1 and 3: the first two once, then mode 2 or 0; 2: the other four) */
 void updateTileSix(StageTileSix *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     s32 done;
     s32 i;
@@ -38,36 +36,36 @@ void updateTileSix(StageTileSix *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim >= 5 && rec->anim <= 10) {
-                switch (rec->anim) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim >= 5 && object->anim <= 10) {
+                switch (object->anim) {
                 case 5:
-                    task->tiles[0].tile = rec;
+                    task->tiles[0].tile = object;
                     task->tiles[0].anim.index = 0;
                     task->tiles[0].anim.timer = updateTileSixFrames0[0].duration;
                     break;
                 case 6:
-                    task->tiles[1].tile = rec;
+                    task->tiles[1].tile = object;
                     task->tiles[1].anim.index = 0;
                     task->tiles[1].anim.timer = updateTileSixFrames1[0].duration;
                     break;
                 case 7:
-                    task->tiles[2].tile = rec;
+                    task->tiles[2].tile = object;
                     task->tiles[2].anim.index = 0;
                     task->tiles[2].anim.timer = updateTileSixFrames2[0].duration;
                     break;
                 case 8:
-                    task->tiles[3].tile = rec;
+                    task->tiles[3].tile = object;
                     task->tiles[3].anim.index = 0;
                     task->tiles[3].anim.timer = updateTileSixFrames3[0].duration;
                     break;
                 case 9:
-                    task->tiles[4].tile = rec;
+                    task->tiles[4].tile = object;
                     task->tiles[4].anim.index = 0;
                     task->tiles[4].anim.timer = 0;
                     break;
                 case 10:
-                    task->tiles[5].tile = rec;
+                    task->tiles[5].tile = object;
                     task->tiles[5].anim.index = 0;
                     task->tiles[5].anim.timer = 0;
                     break;
@@ -196,7 +194,7 @@ void updateTileSix(StageTileSix *task) {
     }
 }
 
-/* Restarts the first two records' animations for mode 1 (id 0) or 3 (id 1) */
+/* Restarts the first two map objects' animations for mode 1 (id 0) or 3 (id 1) */
 void restartTileSix(StageTileSix *task, s32 id) {
     if (task != NULL) {
         switch (id) {
@@ -222,41 +220,13 @@ void *createTileSixWithId(s32 arg) {
     return createTaskWithId(updateTileSix, sizeof(StageTileSix), 0, arg);
 }
 
-void *createTileSix(void) {
-    return createTask(updateTileSix, sizeof(StageTileSix), 0);
-}
+#include "common/create_tile_six.inc.c"
 
-s32 stepTileAnimation2(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 depth) {
-    AnimFrame *frame = &frames[obj->anim.index];
-    s32 dt = GFX.funcs.getFrameTime();
+#include "common/step_tile_animation2.inc.c"
 
-    if (dt > 4) {
-        dt = 4;
-    }
-    if (depth == 0) {
-        obj->anim.timer -= dt;
-    }
-    if (obj->anim.timer <= 0) {
-        frame++;
-        obj->anim.index++;
-        obj->anim.timer += frame->duration;
-        if (once) {
-            if (frame->frame == 0xFF) {
-                return 0xFF;
-            }
-        } else if (frame->frame == 0xFF) {
-            frame = frames;
-            obj->anim.index = 0;
-            obj->anim.timer += frame->duration;
-        }
-        stepTileAnimation2(obj, frames, once, depth + 1);
-    }
-    return frame->frame;
-}
-
-/* Animates the records with animations 11 to 16 by mode (0: hidden, 1 and 3: the first two once, then mode 2 or 0; 2: the other four) */
+/* Animates the map objects with animations 11 to 16 by mode (0: hidden, 1 and 3: the first two once, then mode 2 or 0; 2: the other four) */
 void updateTileSixW(StageTileSix *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     s32 done;
     s32 i;
@@ -265,36 +235,36 @@ void updateTileSixW(StageTileSix *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim >= 11 && rec->anim <= 16) {
-                switch (rec->anim) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim >= 11 && object->anim <= 16) {
+                switch (object->anim) {
                 case 11:
-                    task->tiles[0].tile = rec;
+                    task->tiles[0].tile = object;
                     task->tiles[0].anim.index = 0;
                     task->tiles[0].anim.timer = updateTileSixWFrames0[0].duration;
                     break;
                 case 12:
-                    task->tiles[1].tile = rec;
+                    task->tiles[1].tile = object;
                     task->tiles[1].anim.index = 0;
                     task->tiles[1].anim.timer = updateTileSixWFrames1[0].duration;
                     break;
                 case 13:
-                    task->tiles[2].tile = rec;
+                    task->tiles[2].tile = object;
                     task->tiles[2].anim.index = 0;
                     task->tiles[2].anim.timer = updateTileSixWFrames2[0].duration;
                     break;
                 case 14:
-                    task->tiles[3].tile = rec;
+                    task->tiles[3].tile = object;
                     task->tiles[3].anim.index = 0;
                     task->tiles[3].anim.timer = updateTileSixWFrames3[0].duration;
                     break;
                 case 15:
-                    task->tiles[4].tile = rec;
+                    task->tiles[4].tile = object;
                     task->tiles[4].anim.index = 0;
                     task->tiles[4].anim.timer = 0;
                     break;
                 case 16:
-                    task->tiles[5].tile = rec;
+                    task->tiles[5].tile = object;
                     task->tiles[5].anim.index = 0;
                     task->tiles[5].anim.timer = 0;
                     break;
@@ -423,7 +393,7 @@ void updateTileSixW(StageTileSix *task) {
     }
 }
 
-/* Restarts the first two records' animations for mode 1 (id 0) or 3 (id 1) */
+/* Restarts the first two map objects' animations for mode 1 (id 0) or 3 (id 1) */
 void restartTileSixW(StageTileSix *task, s32 id) {
     if (task != NULL) {
         switch (id) {
@@ -511,7 +481,6 @@ StageEffect *createCommand838(s32 id) {
     return task;
 }
 
-/* Sets flags 0x405E, 0xC33 and 0x7401 */
 void endEvent931(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x5E), 1);
     FLAGS_00.applyAction(FLAG(0xC, 0x33), 1);
@@ -536,7 +505,7 @@ void endEvent981(void) {
 }
 
 void endEvent982(void) {
-    GAME.progress = 40;
+    GAME.progress = 0x28;
 }
 
 #if VERSION_US

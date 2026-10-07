@@ -84,9 +84,9 @@ s32 stepTileLoop(StageTileAnim *obj, StageTileLoopFrame *frames, s32 depth) {
     return frame->frame;
 }
 
-/* Animates the records with animations 1 to 4: 2 and 3 hidden while running */
+/* Animates the map objects with animations 1 to 4: 2 and 3 hidden while running */
 void updateTileQuad(StageTileQuad *task) {
-    StageTile *rec;
+    StageTile *object;
     StageTile *tile;
     s32 i;
     s32 frame;
@@ -94,27 +94,27 @@ void updateTileQuad(StageTileQuad *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            switch (rec->anim) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            switch (object->anim) {
             case 1:
                 task->anims[0].anim.index = 0;
                 task->anims[0].anim.timer = updateTileQuadFrames[0]->duration;
-                task->anims[0].tile = rec;
+                task->anims[0].tile = object;
                 break;
             case 2:
                 task->anims[1].anim.index = 0;
                 task->anims[1].anim.timer = updateTileQuadFrames[1]->duration;
-                task->anims[1].tile = rec;
+                task->anims[1].tile = object;
                 break;
             case 3:
                 task->anims[2].anim.index = 0;
                 task->anims[2].anim.timer = updateTileQuadFrames[2]->duration;
-                task->anims[2].tile = rec;
+                task->anims[2].tile = object;
                 break;
             case 4:
                 task->anims[3].anim.index = 0;
                 task->anims[3].anim.timer = updateTileQuadFrames[3]->duration;
-                task->anims[3].tile = rec;
+                task->anims[3].tile = object;
                 break;
             }
         }
@@ -178,7 +178,7 @@ void updateTileQuad(StageTileQuad *task) {
     }
 }
 
-/* Plays a sound and starts the records' TASK_DONE animations when the event of map object 0x35B happens */
+/* Plays a sound and starts the map objects' TASK_DONE animations when the event of map object 0x35B happens */
 void handleCommand840(StageTileQuad *task, s32 id) {
     if (task != NULL && id == 0x35B) {
         SOUND.playSound(SOUND_GONDRA_S);
@@ -345,7 +345,6 @@ void endEvent880(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-/* Sets flag 0x8AF0 */
 void endEvent881(void) {
     FLAGS_00.applyAction(ITEM(5, 0xF0), 1);
 }

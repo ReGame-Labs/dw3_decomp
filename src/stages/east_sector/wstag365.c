@@ -95,7 +95,7 @@ FieldTalk actor11Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { PROGRESS(4), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(0xC), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x16), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x18), 1, CODES_END };

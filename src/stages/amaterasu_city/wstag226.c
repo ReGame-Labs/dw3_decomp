@@ -8,16 +8,9 @@ extern s16 tileEffectPlaces[][2];
 
 #include "common/step_animation_once.inc.c"
 
-void resetTileEffect(StageTileEffect *task) {
-    s32 i;
+#include "common/reset_tile_effect.inc.c"
 
-    for (i = 0; i < 3; i++) {
-        task->anims[i].anim.index = 0;
-        task->anims[i].anim.timer = updateTileEffectFrames[i][0].duration;
-    }
-}
-
-/* Moves its records to (x, y) and animates them when the substate is set to 1 */
+/* Moves its map objects to (x, y) and animates them when the substate is set to 1 */
 void updateTileEffect(StageTileEffect *task) {
     StageTile *tile;
     StageTile *t;
@@ -112,9 +105,7 @@ void startTileEffect(StageTileEffect *task, s32 id) {
     }
 }
 
-void *createTileEffect(s32 arg) {
-    return createTaskWithId(updateTileEffect, sizeof(StageTileEffect), 0, arg);
-}
+#include "common/create_tile_effect.inc.c"
 
 void *createTileEffectTask(void) {
     return createTask(updateTileEffect, sizeof(StageTileEffect), 0);
@@ -145,7 +136,7 @@ void updateStage(StageTask *task, void **children) {
 #include "common/start_stage.inc.c"
 
 void endEvent935(void) {
-    GAME.progress = 38;
+    GAME.progress = 0x26;
 }
 
 #if VERSION_US
@@ -407,7 +398,7 @@ u16 actor1Conditions[] = { PROGRESS(0x25), 1, FLAG(0x40, 0x60), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(0x25), 1, FLAG(0x40, 0x60), 1, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor5Conditions[] = { ITEM(4, 0x2B), 1, PROGRESS(0x2B), 1, CODES_END };
+u16 actor5Conditions[] = { ITEM(4, 0x2B), 1, PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
 u16 actor7Conditions[] = { FLAG(0x1A, 0xA), 0, SPECIAL(0x1C), 1, CODES_END };
 u16 actor8Conditions[] = { SPECIAL(0x1A), 1, CODES_END };

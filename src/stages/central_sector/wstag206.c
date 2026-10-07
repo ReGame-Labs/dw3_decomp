@@ -37,7 +37,7 @@ void endEvent921(void) {
 }
 
 void endEvent922(void) {
-    GAME.progress = 37;
+    GAME.progress = 0x25;
 }
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
@@ -399,9 +399,9 @@ FieldTalk actor20Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { FLAG(2, 0x5E), 0, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(0x24), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(0x24), 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(0x24), 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(0x24), 1, CODES_END };

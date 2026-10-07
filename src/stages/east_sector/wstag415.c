@@ -54,7 +54,11 @@ void drawFaller(StageFaller *task, Layer *layer) {
     }
 }
 
-/* Updates a StageFaller */
+/*
+ * Updates a StageFaller of kind key1: it falls from the start of its
+ * updateFallerParams with their speed and gravity, bounces once off their
+ * floorY (if they bounce), and ends below the screen
+ */
 void updateFaller(StageFaller *task) {
     Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
     s32 dv;
@@ -98,75 +102,53 @@ void updateFaller(StageFaller *task) {
     }
 }
 
-/* Creates the task of updateFaller with the given id, kind 0 */
-Task *createCommand816(s32 id) {
+/* Creates the task of updateFaller with the given id, of kind KIND (its updateFallerParams) */
+static inline Task *createFaller(s32 id, s32 kind) {
     Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
 
-    task->key1 = 0;
+    task->key1 = kind;
     return task;
+}
+
+/* The fallers of kinds 0 to 9 */
+Task *createCommand816(s32 id) {
+    return createFaller(id, 0);
 }
 
 Task *createCommand817(s32 id) {
-    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
-
-    task->key1 = 1;
-    return task;
+    return createFaller(id, 1);
 }
 
 Task *createCommand818(s32 id) {
-    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
-
-    task->key1 = 2;
-    return task;
+    return createFaller(id, 2);
 }
 
 Task *createCommand819(s32 id) {
-    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
-
-    task->key1 = 3;
-    return task;
+    return createFaller(id, 3);
 }
 
 Task *createCommand820(s32 id) {
-    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
-
-    task->key1 = 4;
-    return task;
+    return createFaller(id, 4);
 }
 
 Task *createCommand821(s32 id) {
-    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
-
-    task->key1 = 5;
-    return task;
+    return createFaller(id, 5);
 }
 
 Task *createCommand822(s32 id) {
-    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
-
-    task->key1 = 6;
-    return task;
+    return createFaller(id, 6);
 }
 
 Task *createCommand823(s32 id) {
-    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
-
-    task->key1 = 7;
-    return task;
+    return createFaller(id, 7);
 }
 
 Task *createCommand824(s32 id) {
-    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
-
-    task->key1 = 8;
-    return task;
+    return createFaller(id, 8);
 }
 
 Task *createCommand825(s32 id) {
-    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
-
-    task->key1 = 9;
-    return task;
+    return createFaller(id, 9);
 }
 
 /* Steps the animation of a StageMoverBody, holding its last frame, and returns the frame */
@@ -197,7 +179,7 @@ s32 stepMoverBody(StageMoverBody *body, AnimFrame *frames, s32 depth) {
 /* Updates a StageMover: falls in mode 1 and plays an animation in modes 2 to 4 */
 void updateMover(StageMover *task) {
     StageTile *tile;
-    StageTile *rec;
+    StageTile *object;
 
     switch (task->state) {
     case TASK_INIT:
@@ -217,11 +199,11 @@ void updateMover(StageMover *task) {
             task->x = task->body.x >> 8;
             task->y = task->body.y >> 8;
         }
-        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
-            if (rec->anim == 1) {
-                task->tile = rec;
-                rec->x = task->x;
-                rec->x = task->y; /* x again, not y */
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
+            if (object->anim == 1) {
+                task->tile = object;
+                object->x = task->x;
+                object->x = task->y; /* x again, not y */
                 break;
             }
         }

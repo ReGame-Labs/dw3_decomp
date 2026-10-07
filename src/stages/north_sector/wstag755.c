@@ -27,9 +27,8 @@ void endEvent780(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-/* Sets the progress to 31 and applies flag action 0x800C */
 void endEvent781(void) {
-    GAME.progress = 31;
+    GAME.progress = 0x1F;
     FLAGS_00.applyAction(ITEM(0, 0xC), 1);
 }
 
@@ -255,15 +254,15 @@ FieldTalk actor12Talks[] = {
     { NULL, NULL, 0x160 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x2B), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
 u16 actor9Conditions[] = { PROGRESS(0x26), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x19), 1, SPECIAL(0x20), 0, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x20), 1, CODES_END };
