@@ -17,3 +17,10 @@ stageSlots = 0x800A6534;
 stageImages = 0x800A6340;
 stageActors = 0x800A6408;
 stageEvents = 0x800A6598;
+
+// named by their place in the stage's tables (tools/name_stage_data.py)
+script370 = 0x800A6060;
+actor0Talks = 0x800A63C0;
+actor1Conditions = 0x800A63D8;
+actor0 = 0x800A63E0;
+actor1 = 0x800A63F4;

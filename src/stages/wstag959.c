@@ -14,16 +14,13 @@ void setupStage(void) {
     FIELDSTG_state.start = (Vec2){0x15100, 0x18800};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.soundBank = 7;
-    FIELDSTG_state.music = 0x601C0000;
+    FIELDSTG_state.music = MUSIC(7, 0);
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_map.setFile(0, 0x92D0001);
     FIELDSTG_map.setFile(7, 0x92D0002);
     FIELDSTG_map.setFirstMap(0);
 }
-
-extern FieldTalk D_800A5FE0[];
-extern FieldActorEntry D_800A5FF8;
 
 ActorImage stageImages[] = {
     { 0x200, 0x100, 0x21C, 0x1A6, 0x70, 0xA6, 0x230, 0x1FE },
@@ -34,13 +31,13 @@ ActorImage stageImages[] = {
     { 0x200, 0x100, 0x200, 0x1BC, 0, 0xBC, 0x230, 0x1FD },
     { 0x140, 0x100, 0x162, 0x100, 0x88, 0, 0x150, 0x1FF },
 };
-FieldTalk D_800A5FE0[] = {
+FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x7F },
     { NULL, NULL, 0 },
 };
-FieldActorEntry D_800A5FF8 = { NULL, D_800A5FE0, 0x3E, 4, 256, 455, 1 };
+FieldActorEntry actor0 = { NULL, actor0Talks, 0x3E, 4, 256, 455, 1 };
 FieldActorEntry *stageActors[] = {
-    &D_800A5FF8,
+    &actor0,
     NULL,
 };
 StageTile stageObjects[] = {
@@ -49,8 +46,8 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { 0xFFFF, 0 }, { 0xFFFF, 0 } }, 1, 0x29C, 0x350, 0x230, 7, 0, 0, 0 },
-    { { { 0xFFFF, 0 }, { 0xFFFF, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x29C, 0x350, 0x230, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,

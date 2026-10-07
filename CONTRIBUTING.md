@@ -371,7 +371,11 @@ says what they are, as `symbols_cnty_sel.txt` does. Then
 The stages are all loaded at the same address and many have functions at the
 same addresses, so their functions keep splat's names for now; the
 Makefile already reads a stage's own symbol file,
-`config/<version>/stages/<stage>.txt`, when there is one.
+`config/<version>/stages/<stage>.txt`, when there is one. Their data is
+named after where the tables of `include/stage.h` put it (`actor3Talks`,
+`area0Battle2`, `script50`): `tools/name_stage_data.py` names it in the C
+and in both versions' symbol files, and can be run again after new data
+comes in.
 
 The versions share their names: a function or datum is called the same in
 every version, each at its own address, and a name in `eu`'s symbol files

@@ -9,3 +9,9 @@ stageObjects = 0x800A604C;
 stageSlots = 0x800A6148;
 stageImages = 0x800A5F68;
 stageActors = 0x800A6040;
+
+// named by their place in the stage's tables (tools/name_stage_data.py)
+actor0Talks = 0x800A5FE8;
+actor1Talks = 0x800A6000;
+actor0 = 0x800A6018;
+actor1 = 0x800A602C;

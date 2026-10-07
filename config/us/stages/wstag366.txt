@@ -10,3 +10,8 @@ stageSlots = 0x800A526C;
 stageImages = 0x800A50D8;
 stageActors = 0x800A5168;
 stageEvents = 0x800A52D0;
+
+// named by their place in the stage's tables (tools/name_stage_data.py)
+script720 = 0x800A4E7C;
+actor0Conditions = 0x800A5148;
+actor0 = 0x800A5154;
