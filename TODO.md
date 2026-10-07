@@ -6,27 +6,27 @@ from the same source (3,606 functions in the European version, 3,380 in the
 USA one, code and data 100 %), with no fake matches. The PsyQ libraries,
 Sony's code, stay splat's disassembly and out of the progress
 ([docs/status.md](docs/status.md)). What is left is making the C read well,
-and the tooling around it. The counts below are from commit `ab85a3a6`.
+and the tooling around it. The counts below are from commit `f5763800`.
 
 ## Names and types
 
-- [ ] 197 struct fields in `include/` still have an `unk` name. The most are
-  in `cardgame/screen.h` and `cardgame/battle.h` (18 each), `stgtrain.h`
-  (17), `ststatus.h`, `stgmcard.h` and `dw3/game_state.h` (10 each). Nearly
-  all are never read, or only written or copied, and their comments say so;
-  name them when the code or the disc's data shows what they hold. The
-  ones still read in `src/` (32 uses) are listed with what is known in
-  their headers.
-- [ ] 3 `D_` symbols are left, each with a comment on why:
-  - `FIGHTSTG`'s `D_800A342C`, `D_800A3434` and `D_800A346C` in
-    `fightstg.c`.
-- [ ] One function keeps splat's name: `func_80029DB8`, PsyQ's
-  `GsSetRefView2`, which FIGHTSTG's cameras call.
-- [ ] 184 pointer casts are left in `src/` (75 in FIGHTSTG, 33 in the
+- [ ] 30 struct fields in `include/` keep an `unk` name: `fieldstg.h` (7),
+  `stgtrain.h` and `stage.h` (5 each), `name_entry.h` and `fightstg/model.h`
+  (4 each), `fightstg/effect.h` (2), and one each in `ststatus.h`,
+  `field_map.h` and `cardgame/screen.h`. Every other field has a name or is
+  padding (`pad`, "never read or written"). These are written or copied but
+  never read, or hold a constant, and their comments give what is known
+  (the values on the disc, who sets them); name one when a reader turns up.
+- [ ] 179 pointer casts are left in `src/` (72 in FIGHTSTG, 33 in the
   executable, 14 in FIELDSTG, the rest a few per overlay). Each one says
   why it stays (another form changes the code) or is plain, like a byte
-  offset or a `Task *`; replace one when a type that keeps the bytes turns
-  up.
+  offset, a PsyQ primitive or a `Task *`.
+- [ ] 33 functions are longer than 120 lines. Each was split where a named
+  static inline keeps the bytes; the rest of each resists, because a
+  split changes the register allocation or the stack frame (the draw
+  functions, `FIELDSTG_runActorAction`, `CARDGAME_checkPlayCondition`,
+  `spriteDrawerDraw`, `textWindowDraw`...), or is a flat switch of short
+  cases (`FIGHTSTG_showMessage`, `FIGHTSTG_testEnemyCondition`).
 - [ ] Each stage's file says which map or event it is, and
   [src/stages/README.md](src/stages/README.md) lists the names
   (`tools/stage_names_doc.py` writes both). The 30 Underground tunnels
@@ -38,10 +38,10 @@ and the tooling around it. The counts below are from commit `ab85a3a6`.
 
 - [ ] Near duplicates are left as copies, because their code differs:
   - in the stages, `isFarFromHome`, `moveWanderer` / `moveWanderPair`, the
-    `handleCommand*` sets, the `fadeOut*` pairs, `updateTileSix` /
-    `updateTileSixW` and the list menus' event updates;
-  - the `stepTileAnimationN` copies, whose recursive calls name each copy;
-  - `WFIGHTMN_createLayers` and `WFIGHTTS_initLayers` (10 and 5 callbacks).
+    `handleCommand*` sets, the `fadeOut*` pairs, `updateTileSixW` (its
+    task types differ between WSTAG310 and 311) and the list menus' drawing
+    (their steps are `common/list_menu.inc.c`);
+  - the `stepTileAnimationN` copies, whose recursive calls name each copy.
   Share one when a parameter or a macro can give each copy its difference
   with the bytes unchanged.
 
@@ -51,9 +51,6 @@ and the tooling around it. The counts below are from commit `ab85a3a6`.
   non-zero padding halfword that the original has between some of a stage's
   data (event scripts, battles, images, animation frames). Write it in C
   instead, as part of the data it follows.
-- [ ] 11 tables in 9 stage files are still plain `u32` / `s32` words
-  (`WSTAG210`, `212`, `375`, `740`, `741`, `780`, `924`, `935` and `949`):
-  give them types as the code that reads them is understood.
 - [ ] The stages' data repeats between stages, and between the versions as
   `#if VERSION_US` / `VERSION_EU` rows: write what is the same once, where
   the bytes allow it.
