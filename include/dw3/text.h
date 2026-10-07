@@ -153,14 +153,13 @@ typedef struct TextWindow {
     /* 0xC1 */ u8 visible;
     /* 0xC2 */ u8 fixedSpacing;
     /* 0xC3 */ u8 finished;
-    /* 0xC4 */ u8 unkC4; /* only setUnkC4 writes it, and nothing calls that */
-    /* 0xC5 */ u8 unkC5[3];
+    /* 0xC4 */ u8 unusedC4; /* only setUnusedC4 writes it, and nothing calls that */
     /* 0xC8 */ s32 typeSound;
     /* 0xCC */ s32 scaled;
     /* 0xD0 */ s32 scaleX;
     /* 0xD4 */ s32 scaleY;
     /* 0xD8 */ s32 scaleZ;
-    /* 0xDC */ s32 unkDC;
+    /* 0xDC */ s32 padDC; /* nothing reads or writes it */
     /* 0xE0 */ s32 pivotX;
     /* 0xE4 */ s32 pivotY;
     /* 0xE8 */ SVECTOR rot;
@@ -186,7 +185,7 @@ typedef struct TextWindow {
     /* 0x158 */ void (*setPivot)();
     /* 0x15C */ void (*setDepth)();
     /* 0x160 */ void (*setLines)(); /* no prototype: callers would truncate u8 args */
-    /* 0x164 */ void (*setUnkC4)(); /* no prototype: callers would truncate u8 args */
+    /* 0x164 */ void (*setUnusedC4)(); /* no prototype: callers would truncate u8 args */
     /* 0x168 */ s32 (*isFinished)(); /* no prototype: callers would truncate a u8 return */
     /* 0x16C */ s32 (*isVisible)(); /* no prototype: callers would truncate a u8 return */
     /* 0x170 */ s32 (*isWaitingForButton)();
@@ -199,7 +198,7 @@ typedef struct TalkBoxLayout {
     /* 0x08 */ u16 zoomX;
     /* 0x0A */ u16 zoomY;
     /* 0x0C */ DVECTOR panel;
-    /* 0x10 */ DVECTOR unk10;
+    /* 0x10 */ DVECTOR unused10; /* the panel, at x 125 on the right; nothing reads it */
     /* 0x14 */ s16 nameX;
     /* 0x16 */ s16 nameY;
     /* 0x18 */ s16 textX;
@@ -230,7 +229,6 @@ typedef struct GlyphMap {
 typedef struct TextStyle {
     /* 0x00 */ u8 blend; /* 0xFF: opaque */
     /* 0x01 */ s8 lineHeight;
-    /* 0x02 */ u8 unk2[2];
     /* 0x04 */ struct Glyph *glyphs;
     /* 0x08 */ struct Glyph *icons;
     /* 0x0C */ GlyphMap *sjisMap;
@@ -251,7 +249,7 @@ typedef struct Glyph {
     /* 0x7 */ s8 dx;
     /* 0x8 */ s8 dy;
     /* 0x9 */ u8 advance;
-    /* 0xA */ u8 unkA;
+    /* 0xA */ u8 unusedA; /* h, or 10 for the 9-high glyphs; nothing reads it */
 } Glyph;
 
 /* Drawing state shared with the control-code handlers */
@@ -282,10 +280,9 @@ typedef struct ZoomBox {
     /* 0x58 */ s16 w;
     /* 0x5A */ s16 h;
     /* 0x5C */ s16 speed;
-    /* 0x5E */ u8 unk5E[2];
     /* 0x60 */ s32 zoom; /* 0-ONE */
     /* 0x64 */ s32 layerId;
-    /* 0x68 */ s32 unk68; /* only cleared when the box starts */
+    /* 0x68 */ s32 unused68; /* only cleared when the box starts; nothing reads it */
     /* 0x6C */ u16 offsetX;
     /* 0x6E */ u16 offsetY;
     /* 0x70 */ VECTOR scale;
@@ -327,10 +324,6 @@ extern const char STR_NULL_MESSAGE[];
 extern const char STR_BAD_DIGIT_BUFFER[];
 extern const char STR_BAD_EXT_BUFFER[];
 extern const char STR_MESSAGE_NOT_SET[];
-extern char CURSOR_TEXT_0[]; /* the cursor's frames */
-extern char CURSOR_TEXT_1[];
-extern char CURSOR_TEXT_2[];
-extern char CURSOR_TEXT_3[];
 extern char *CURSOR_FRAMES[];
 extern s32 TEXT_WAIT_BUTTONS[];
 extern Font FONT;

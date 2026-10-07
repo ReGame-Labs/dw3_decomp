@@ -168,7 +168,7 @@ void STCRDSHP_updateGrid(CardPackGrid *grid) {
                 grid->turned = 6;
                 grid->substate = 2;
             }
-            SOUND.playSound(0x800460BD);
+            SOUND.playSound(SOUND_CARD_001);
             break;
         case 1:
             if (GFX.funcs.getTime() - grid->counter >= 2) {

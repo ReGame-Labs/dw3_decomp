@@ -368,7 +368,7 @@ s32 memCardCommand(s32 port, s32 cmd) {
             switch (cmd) {
             case MEMCARD_OP_LIST:
             default:
-                MEMCARD.result = MemCardGetDirentry(port << 4, STR_ALL_FILES, MEMCARD.files, (long *)&MEMCARD.fileCount, 0, CARD_MAX_FILES);
+                MEMCARD.result = MemCardGetDirentry(port << 4, STR_ALL_FILES, MEMCARD.files, &MEMCARD.fileCount, 0, CARD_MAX_FILES);
                 break;
             case MEMCARD_OP_CREATE:
                 MEMCARD.result = MemCardCreateFile(port << 4, MEMCARD.fileName, SAVE_BLOCKS);

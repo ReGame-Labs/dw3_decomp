@@ -190,8 +190,9 @@ s32 checkProgressRange(s32 unused, s32 index) {
     return ret;
 }
 
-/* Special conditions 0x40: how many of a run of event flags are set */
 #if VERSION_US
+/* Special conditions 0x40: counts flags 0x27-0x2D of GAME.flags1C; mode 0 is whether any is set,
+   1 whether two or more are clear, 2 whether exactly one is clear */
 s32 checkFlagCount(s32 unused, s32 mode) {
     s32 ret = 0;
     s32 on = 0;

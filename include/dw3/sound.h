@@ -58,6 +58,7 @@
 #define SOUND_GONDRA_S 0x340004
 #define SOUND_SE000002 0xA40006
 #define SOUND_ELEVATER 0x1080001
+#define SOUND_CARD_001 0x800460BD
 
 /*
  * A field's or a battle's music (FieldState.music, Battle.music): track
@@ -134,8 +135,5 @@ extern SoundState SOUND;
 extern SoundFiles *SOUND_BANK_FILES[];
 extern s32 SOUND_SPU_ADDRS[];
 extern void *SOUND_HEAD_BUFFERS[];
-extern s32 SOUND_HEAD_BUFFER_0[];
-extern s32 SOUND_HEAD_BUFFER_1[];
-extern s32 SOUND_HEAD_BUFFER_2[];
 
 #endif /* DW3_SOUND_H */

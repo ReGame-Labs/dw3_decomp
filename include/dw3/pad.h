@@ -117,7 +117,6 @@ typedef struct PadState {
     /* 0x3D6 */ s16 demoPad;
     /* 0x3D8 */ PadBuffer *demoData; /* a buffer a frame */
     /* 0x3DC */ s16 demoFrame;
-    /* 0x3DE */ u8 unk3DE[2];
     /* 0x3E0 */ void (*init)(); /* PAD_INIT */
     /* 0x3E4 */ void (*shutdown)();
     /* 0x3E8 */ void (*update)(); /* PAD_UPDATE */

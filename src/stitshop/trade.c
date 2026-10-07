@@ -228,8 +228,8 @@ static inline void STITSHOP_confirmBuy(ShopBuy *buy, ShopBuyWindows *win) {
         SOUND.playSound(SOUND_SELECT);
         buy->setSubstate(buy, 20);
         if (buy->choice == 0) {
-            if (ITEM_FUNCS->isKind(buy->item, 3) || ITEM_FUNCS->isKind(buy->item, 4) ||
-                ITEM_FUNCS->isKind(buy->item, 5)) {
+            if (ITEM_FUNCS->isKind(buy->item, ITEM_KIND_WEAPON) || ITEM_FUNCS->isKind(buy->item, ITEM_KIND_ARMOR) ||
+                ITEM_FUNCS->isKind(buy->item, ITEM_KIND_ACCESSORY)) {
                 buy->step = 1;
             }
             if (GAME.items[buy->item] + buy->quantity >= 100) {

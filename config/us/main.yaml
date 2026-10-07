@@ -444,9 +444,18 @@ segments:
       - [0x411B0, .data, sound/sound]
       - [0x45C18, .data, system/overlay]
       - [0x45CE0, data, psyq]
-      - [0x4CAF8, .data, data/game_3]
+      # the small data (.sdata) of the -G8 units, after all the data; $gp
+      # points at HEAP_START, the first
+      - [0x4CAF8, .sdata, data/heap_start]
+      - [0x4CAFC, .sdata, game/items]
+      - [0x4CC48, .sdata, data/get_digimon]
+      - [0x4CC4C, .sdata, file/file_table]
+      - [0x4CC50, .sdata, system/main]
+      - [0x4CC5C, .sdata, data/all_files_pattern]
+      - [0x4CC6C, .sdata, text/cursor]
       - [0x4CC7C, .sdata, gfx/display]
       - { start: 0x4CC80, type: .bss, vram: 0x8005C480, name: data/game_bss }
+      - { start: 0x4CCD0, type: .bss, vram: 0x8005C4D0, name: sound/sound }
       - { start: 0x6ECD0, type: bss, vram: 0x8007E4D0, name: psyq }
 
   # psylink stores .bss in the file as zeros because a later section follows

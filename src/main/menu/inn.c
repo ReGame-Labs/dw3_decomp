@@ -104,13 +104,58 @@ InnInfo INNS[] = {
     { 0, 1, 1 }, /* the end of the list */
 };
 
+/* INN_CHOOSE: moves the cursor between yes and no; on yes pays if the party can,
+   else shows the "not enough money" message; no or a cancel closes the question */
+static inline void chooseInnAnswer(Inn *task, InnChildren *data) {
+    s32 prev;
+
+    prev = task->choice;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        task->choice = 0;
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        task->choice = 1;
+    }
+    if (prev != task->choice) {
+        SOUND.playSound(SOUND_CURSOR);
+        data->cursor->setPos(data->cursor, 0xB8, task->choice * 16 + 0x5F);
+        return;
+    }
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        if (task->choice != 0) {
+            task->substate = INN_CLOSE_QUESTION;
+        } else if (GAME.money >= INNS[task->inn].price * task->count) {
+            task->substate = INN_PAY;
+        } else {
+            task->substate = INN_CLOSE_QUESTION;
+            task->step = 1;
+        }
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        task->substate = INN_CLOSE_QUESTION;
+    }
+}
+
+/* Under the fade: hides the panels and windows, pays the night and heals the party */
+static inline void sleepAtInn(Inn *task, InnChildren *data) {
+    task->panels[0].level = 0;
+    task->panels[1].level = 0;
+    data->windows[0]->setVisible(data->windows[0], 0);
+    data->windows[1]->setVisible(data->windows[1], 0);
+    data->windows[2]->setVisible(data->windows[2], 0);
+    data->windows[3]->setVisible(data->windows[3], 0);
+    data->windows[4]->setVisible(data->windows[4], 0);
+    data->windows[5]->setVisible(data->windows[5], 0);
+    data->cursor->setVisible(data->cursor, 0);
+    GAME.money -= INNS[task->inn].price * task->count;
+    healParty();
+}
+
 /*
  * The inn's menu (INN_*): open the panels and ask (price x party size), then
  * close, pay and sleep, or show the "not enough money" message.
  */
 void updateInnMenu(Inn *task, InnChildren *data) {
-    s32 prev;
-
     switch (task->substate) {
     case INN_OPEN_NAME:
     default:
@@ -138,31 +183,7 @@ void updateInnMenu(Inn *task, InnChildren *data) {
         }
         break;
     case INN_CHOOSE:
-        prev = task->choice;
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            task->choice = 0;
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            task->choice = 1;
-        }
-        if (prev != task->choice) {
-            SOUND.playSound(SOUND_CURSOR);
-            data->cursor->setPos(data->cursor, 0xB8, task->choice * 16 + 0x5F);
-            break;
-        }
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            if (task->choice != 0) {
-                task->substate = INN_CLOSE_QUESTION;
-            } else if (GAME.money >= INNS[task->inn].price * task->count) {
-                task->substate = INN_PAY;
-            } else {
-                task->substate = INN_CLOSE_QUESTION;
-                task->step = 1;
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            task->substate = INN_CLOSE_QUESTION;
-        }
+        chooseInnAnswer(task, data);
         break;
     case INN_CLOSE_QUESTION:
         innStartPanel(&task->panels[1], 0);
@@ -201,17 +222,7 @@ void updateInnMenu(Inn *task, InnChildren *data) {
         break;
     case INN_SLEEP:
         if (data->fade->state == TASK_DONE) {
-            task->panels[0].level = 0;
-            task->panels[1].level = 0;
-            data->windows[0]->setVisible(data->windows[0], 0);
-            data->windows[1]->setVisible(data->windows[1], 0);
-            data->windows[2]->setVisible(data->windows[2], 0);
-            data->windows[3]->setVisible(data->windows[3], 0);
-            data->windows[4]->setVisible(data->windows[4], 0);
-            data->windows[5]->setVisible(data->windows[5], 0);
-            data->cursor->setVisible(data->cursor, 0);
-            GAME.money -= INNS[task->inn].price * task->count;
-            healParty();
+            sleepAtInn(task, data);
             task->substate++;
         }
         break;

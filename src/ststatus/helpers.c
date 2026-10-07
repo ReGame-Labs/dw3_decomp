@@ -88,11 +88,11 @@ s32 STSTATUS_canEquip(s32 partner, s32 slot, s32 item) {
         if (!((data->weapon.partners >> partner) & 1)) {
             return 0;
         }
-        if (data->weapon.kind == 1) {
+        if (data->weapon.kind == EQUIP_KIND_RIGHT_HAND) {
             if (slot == 3) {
                 return 0;
             }
-        } else if (data->weapon.kind == 2) {
+        } else if (data->weapon.kind == EQUIP_KIND_LEFT_HAND) {
             if (slot == 2) {
                 return 0;
             }
@@ -119,7 +119,7 @@ void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
         GAME.equippedItems[old]--;
         GAME.items[old]++;
         data = GET_ITEM[0](old)->data.record;
-        if (data->weapon.kind == 7) {
+        if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             stats->equip[2] = 0;
             stats->equip[3] = 0;
         } else {
@@ -128,7 +128,7 @@ void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
     }
     if (id > 0) {
         data = GET_ITEM[0](id)->data.record;
-        if (data->weapon.kind == 7) {
+        if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             pair = &stats->equip[2];
             if (stats->equip[2] == 0) {
                 pair = NULL;
@@ -141,7 +141,7 @@ void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
                 GAME.items[*pair]++;
                 *pair = 0;
             }
-        } else if (data->weapon.kind == 8) {
+        } else if (data->weapon.kind == EQUIP_KIND_GROUP_ACCESSORY) {
             group = data->weapon.group;
             for (i = 0; i < 2; i++) {
                 equip = &stats->equip[i + 4];
@@ -158,7 +158,7 @@ void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
         GAME.equippedItems[id]++;
         GAME.items[id]--;
         data = GET_ITEM[0](id)->data.record;
-        if (data->weapon.kind == 7) {
+        if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             stats->equip[2] = id;
             stats->equip[3] = id;
         } else {
@@ -229,22 +229,22 @@ StatusAnim STSTATUS_partnerAnims[] = {
 };
 /* Where the screens' windows go, and their strings */
 WindowPos STSTATUS_layout[] = {
-    { 12, 55, 0, 19, 0 },
-    { 1, 16, 0, 28, 0 },
-    { 2, 16, 0, 37, 0 },
-    { 4, 61, 0, 37, 0 },
-    { 3, 16, 0, 46, 0 },
-    { 4, 61, 0, 46, 0 },
-    { 13, 44, 0, 28, 0 },
-    { 14, 59, 0, 37, 0 },
-    { 14, 94, 0, 37, 0 },
-    { 14, 59, 0, 46, 0 },
-    { 14, 94, 0, 46, 0 },
-    { 14, 152, 0, 19, 0 },
-    { 14, 20, 0, 198, 0 },
-    { 3, 265, 0, 212, 0 },
-    { 14, 300, 0, 212, 0 },
-    { 22, 189, 0, 49, 0 },
+    { 12, 55, 0, 19 },
+    { 1, 16, 0, 28 },
+    { 2, 16, 0, 37 },
+    { 4, 61, 0, 37 },
+    { 3, 16, 0, 46 },
+    { 4, 61, 0, 46 },
+    { 13, 44, 0, 28 },
+    { 14, 59, 0, 37 },
+    { 14, 94, 0, 37 },
+    { 14, 59, 0, 46 },
+    { 14, 94, 0, 46 },
+    { 14, 152, 0, 19 },
+    { 14, 20, 0, 198 },
+    { 3, 265, 0, 212 },
+    { 14, 300, 0, 212 },
+    { 22, 189, 0, 49 },
 };
 /* The map's areas (STSTATUS_mapAreas), from 1 */
 StatusMapSpot STSTATUS_spots[] = {
@@ -369,7 +369,8 @@ StatusData STSTATUS_data = {
 };
 /* The item kinds (WeaponData.kind) of item list 5 */
 u8 STSTATUS_equipKinds[] = {
-    0x01, 0x02, 0x03, 0x07,
+    EQUIP_KIND_RIGHT_HAND, EQUIP_KIND_LEFT_HAND,
+    EQUIP_KIND_EITHER_HAND, EQUIP_KIND_BOTH_HANDS,
 };
 /* The map's area of each field map, by GAME.fieldMode's low byte (bit 7
    marks the late game's maps, 0x70 on; 0xFF: none) */

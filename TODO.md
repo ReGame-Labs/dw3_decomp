@@ -57,10 +57,15 @@ and the tooling around it. The counts below are from commit `ab85a3a6`.
 - [ ] The stages' data repeats between stages, and between the versions as
   `#if VERSION_US` / `VERSION_EU` rows: write what is the same once, where
   the bytes allow it.
-- [ ] `src/main/data/` still holds the executable's data that has no module
-  of its own yet: `matrices.c`, `game_3.c` (other modules' small data,
-  among them the usable items' effects) and `game_bss.c`. Move each part
-  next to the code that uses it where the link order allows.
+- [ ] `src/main/data/` holds the executable's data no module can hold yet,
+  each file with the reason: `matrices.c` (nothing in the executable reads
+  it, between `system/random.c`'s data and `text/text_window.c`'s),
+  `heap_start.c`, `get_digimon.c`, `eu_settings.c` and `all_files_pattern.c`
+  (small data whose readers reach it through its address, so not theirs,
+  and whose place in the link order names no module), and `game_bss.c`
+  (commons that the original's linker laid out 8 bytes apart, and
+  `CD_SECTOR_HEADER`, which needs `file/cd_reader.c`'s commons to leave
+  them). Move a piece when new evidence names its module.
 
 ## Tooling and docs
 

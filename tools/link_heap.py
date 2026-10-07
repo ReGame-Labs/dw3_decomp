@@ -3,13 +3,13 @@
 
     link_heap.py OUT ELF...
 
-The heap (initHeap, src/main/game3_2.c) runs from HEAP_START to 0x801FF000,
+The heap (initHeap, src/main/system/heap.c) runs from HEAP_START to 0x801FF000,
 above every overlay. The CD reader loads a file in whole 2 KB sectors
-(cdReadyCallback, src/main/system.c), so an overlay takes its size rounded
+(cdReadyCallback, src/main/file/cd_reader.c), so an overlay takes its size rounded
 up to 2 KB from its address. OUT assigns OVERLAYS_END, the highest end of the
 overlays (the ELFs) so loaded, and HEAP_BASE, that rounded up to 2 KB, which
 gives the original's HEAP_START (0x800AA800 in the USA version, 0x800AB800 in
-the European one): src/main/data/game_3.c points HEAP_START at it, so that
+the European one): src/main/data/heap_start.c points HEAP_START at it, so that
 the heap moves with the overlays in a padding build.
 """
 import argparse

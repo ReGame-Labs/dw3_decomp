@@ -26,7 +26,7 @@ typedef struct PanelAnim {
    startLerp and updateLerp do */
 typedef struct MenuLerp {
     /* 0x00 */ s32 duration;
-    /* 0x04 */ s32 unk4;
+    /* 0x04 */ s32 pad4; /* nothing reads or writes it */
     /* 0x08 */ s32 value;
     /* 0x0C */ s32 fixed; /* value << 8 */
     /* 0x10 */ s32 target;
@@ -50,7 +50,7 @@ typedef struct ScrollBar {
     /* 0x78 */ s32 hasRange;
     /* 0x7C */ s32 top;
     /* 0x80 */ s32 bottom;
-    /* 0x84 */ s32 unk84;
+    /* 0x84 */ s32 pad84; /* nothing reads or writes it */
     /* 0x88 */ s32 posStep; /* fixed point */
     /* 0x8C */ void (*setX)(struct ScrollBar *bar, s32 x, s32 width);
     /* 0x90 */ void (*setRange)(struct ScrollBar *bar, s32 top, s32 bottom);
@@ -102,9 +102,8 @@ typedef struct FieldMenuWindows {
 typedef struct WindowPos {
     /* 0x0 */ s32 string;
     /* 0x4 */ s16 x;
-    /* 0x6 */ s16 unk6;
+    /* 0x6 */ s16 pad6; /* 0 in every layout; nothing reads it */
     /* 0x8 */ s16 y;
-    /* 0xA */ s16 unkA;
 } WindowPos;
 
 /*

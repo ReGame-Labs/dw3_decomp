@@ -29,8 +29,12 @@
  */
 #define CARD_ERR_NONE 0
 #define CARD_ERR_NO_CARD 1
+#define CARD_ERR_INVALID 2 /* McErrCardInvalid: "Cannot access Memory Card" */
 #define CARD_ERR_NEW_CARD 3
 #define CARD_ERR_UNFORMATTED 4
+#define CARD_ERR_NO_FILE 5 /* McErrFileNotExist: "File cannot be found" */
+#define CARD_ERR_FILE_EXISTS 6 /* McErrAlreadyExist: "File already exists" */
+#define CARD_ERR_FULL 7 /* McErrBlockFull: "There are not enough blocks" */
 #define CARD_ERR_NOT_STARTED 8
 
 /* MemCard.state: idle, or waiting for the command each operation sent */
@@ -81,7 +85,7 @@ typedef struct CardDirEntry {
  */
 typedef struct MemCard {
     /* 0x00 */ s32 state; /* MEMCARD_* */
-    /* 0x04 */ u8 unk4[8];
+    /* 0x04 */ u8 pad4[8]; /* nothing reads or writes them */
     /* 0x0C */ const char *fileName;
     /* 0x10 */ CardHeader header;
     /* 0x90 */ s32 cmd;
@@ -89,11 +93,11 @@ typedef struct MemCard {
     /* 0x98 */ s32 retries;
     /* 0x9C */ s32 maxRetries;
     /* 0xA0 */ s32 restart; /* the command failed and must be reissued */
-    /* 0xA4 */ s32 fileCount;
+    /* 0xA4 */ long fileCount; /* long: MemCardGetDirentry writes it */
     /* 0xA8 */ CardDirEntry files[CARD_MAX_FILES];
     /* 0x300 */ s32 progress;
     /* 0x304 */ s32 offset;
-    /* 0x308 */ s32 unk308;
+    /* 0x308 */ s32 pad308; /* nothing reads or writes it */
     /* 0x30C */ s32 dataSize;
     /* 0x310 */ s32 infoSize;
     /* 0x314 */ s32 iconCount;

@@ -24,7 +24,7 @@ void timLoaderSetClutPos(s32 x, s32 y) {
 }
 
 /* TIM loader method: sends a TIM's CLUT (4 and 8-bit images) and image to VRAM */
-void timLoaderLoad(u_long *tim) {
+void timLoaderLoad(void *tim) {
     RECT clut;
     RECT image;
     TimCursor p;
@@ -81,7 +81,7 @@ void timLoaderLoadArchive(void *archive) {
             break;
         }
         src = data;
-        compressed = *(u32 *)src == RLEN_MAGIC;
+        compressed = *(u32 *)src == RLEN_MAGIC; /* the entry's first word */
         dst = data;
         if (compressed) {
             dst = buf;
@@ -103,7 +103,7 @@ void timLoaderLoadArchive(void *archive) {
             }
             dst = buf;
         }
-        timLoaderLoad((u_long *)dst);
+        timLoaderLoad(dst);
         DrawSync(0);
         TIM_LOADER->imageX += 0x40;
     }

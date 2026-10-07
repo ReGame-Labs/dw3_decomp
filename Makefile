@@ -78,7 +78,9 @@ MASPSXFLAGS = --aspsx-version=2.86 -G$(SDATA_LIMIT) --use-comm-section --use-com
 
 # Most of the game is built with -G0; the executable's modules that came from
 # a -G8 object of the original read their own small variables through $gp.
-# GFX_STARTED (gfx/display.c) is the one .sdata variable; the .sbss ones are
+# Their initialized small variables go to .sdata, which the original linked
+# after all the data (game/items.c's to gfx/display.c's, with the ones whose
+# module is unknown in src/main/data/ between them); the .sbss ones are
 # declared static, so maspsx emits them as common symbols that resolve to the
 # definitions in data/game_bss.c, 8 bytes apart as the linker laid them. With
 # -G8 GCC leaves the address of a small extern (LANGUAGE in menu/inn.c,
@@ -89,9 +91,10 @@ G8_SRC := $(addprefix src/main/, menu/inn.c gfx/screen_fade.c menu/field_menu.c 
 	game/digimon.c game/items.c file/cd_reader.c file/file_cache.c \
 	file/file_table.c task/task.c system/main.c memcard/memcard.c \
 	game/events.c game/state.c game/party.c game/play_time.c game/stats.c \
-	game/partner.c system/heap.c task/registry.c gfx/display.c gfx/layer.c \
-	gfx/card_drawer.c gfx/sprite_drawer.c text/text_tools.c gfx/tim_loader.c \
-	sound/sound.c system/overlay.c)
+	game/partner.c system/heap.c task/registry.c text/cursor.c gfx/display.c \
+	gfx/layer.c gfx/card_drawer.c gfx/sprite_drawer.c text/text_tools.c \
+	gfx/tim_loader.c sound/sound.c system/overlay.c \
+	data/heap_start.c data/get_digimon.c data/eu_settings.c)
 $(G8_SRC:%.c=$(BUILDDIR)/%.c.o): SDATA_LIMIT := 8
 # the assembly sees every version as 0 or 1 too: .if VERSION_EU
 ASFLAGS := -EL -march=r3000 -mtune=r3000 -no-pad-sections -O1 -G0 $(INC) \
@@ -342,9 +345,9 @@ smoke: $(EXE) $(OVL_BIN)
 	@command -v xvfb-run > /dev/null || { echo "make smoke runs DuckStation under xvfb-run: install xvfb (apt install xvfb)" >&2; exit 1; }
 	$(PYTHON) tools/smoke.py --disc "$(DISC)" --bios "$(BIOS)" --pad $(PAD) --emulator "$(DUCKSTATION)"
 
-# The executable's .bss in C: maspsx turns its commons into definitions in
-# order in .bss when they aren't kept as .comm
-$(BUILDDIR)/src/main/data/game_bss.c.o: MASPSXFLAGS := $(filter-out --use-comm-section,$(MASPSXFLAGS))
+# The executable's .bss in C: maspsx turns the commons of these units into
+# definitions in order in their .bss when they aren't kept as .comm
+$(BUILDDIR)/src/main/data/game_bss.c.o $(BUILDDIR)/src/main/sound/sound.c.o: MASPSXFLAGS := $(filter-out --use-comm-section,$(MASPSXFLAGS))
 
 $(BUILDDIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)

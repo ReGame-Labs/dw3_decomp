@@ -590,7 +590,7 @@ KeyPage STDGNAME_keyChars[] = {
 };
 
 TextStyle STDGNAME_nameStyle = {
-    0xFF, 14, {0}, STDGNAME_nameGlyphs, STDGNAME_nameIcons,
+    0xFF, 14, STDGNAME_nameGlyphs, STDGNAME_nameIcons,
     FONT_GLYPH_MAP, FONT_ICON_MAP,
     234, 114,
 };
@@ -1181,7 +1181,7 @@ Glyph STDGNAME_menuIcons[114] = {
 };
 
 TextStyle STDGNAME_menuStyle = {
-    0xFF, 14, {0}, STDGNAME_menuGlyphs, STDGNAME_menuIcons,
+    0xFF, 14, STDGNAME_menuGlyphs, STDGNAME_menuIcons,
     FONT_GLYPH_MAP, FONT_ICON_MAP,
     234, 114,
 };

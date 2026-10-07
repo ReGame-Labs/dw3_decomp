@@ -61,7 +61,10 @@ void addStat(s32 partner, u32 stat, s32 delta) {
     }
 }
 
-/* The stats (PartnerStats.stats), copied into PartnerTotals as one struct */
+/*
+ * PartnerStats' 19 stats and the 3 status values after them, which
+ * computeStats copies into PartnerTotals as one struct
+ */
 typedef struct StatBlock {
     s16 v[22];
 } StatBlock;

@@ -2,7 +2,7 @@
 
 /* Frees a heap block, merging it with the free blocks around it */
 void freeMem(void *ptr) {
-    MemBlock *block = (MemBlock *)ptr - 1;
+    MemBlock *block = (MemBlock *)ptr - 1; /* the header just before the data */
     MemBlock *prev;
     MemBlock *next;
 
@@ -170,7 +170,7 @@ void *allocMemZeroed(s32 size, s32 tag) {
 
 /* Keeps a block alive across mode changes, or hands it back to the mode */
 void lockMem(void *ptr, s32 lock) {
-    MemBlock *block = (MemBlock *)ptr - 1;
+    MemBlock *block = (MemBlock *)ptr - 1; /* the header just before the data */
 
     if (lock) {
         block->tag = MEM_LOCKED;

@@ -271,7 +271,7 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
     saved = *(StatusEquip *)stats->equip;
     if (*(stats->equip + slot) != 0) {
         data = GET_ITEM[0](*(stats->equip + slot))->data.record;
-        if (data->weapon.kind == 7) {
+        if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             stats->equip[2] = 0;
             stats->equip[3] = 0;
         } else {
@@ -280,7 +280,7 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
     }
     if (item > 0) {
         data = GET_ITEM[0](item)->data.record;
-        if (data->weapon.kind == 7) {
+        if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             hand = &stats->equip[2];
             if (*hand == 0) {
                 hand = NULL;
@@ -291,7 +291,7 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
             if (hand != NULL) {
                 *hand = 0;
             }
-        } else if (data->weapon.kind == 8) {
+        } else if (data->weapon.kind == EQUIP_KIND_GROUP_ACCESSORY) {
             group = data->weapon.group;
             for (j = 0; j < 2; j++) {
                 equip = &stats->equip[j + 4];
@@ -304,7 +304,7 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
             }
         }
         data = GET_ITEM[0](item)->data.record;
-        if (data->weapon.kind == 7) {
+        if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             stats->equip[2] = item;
             stats->equip[3] = item;
         } else {

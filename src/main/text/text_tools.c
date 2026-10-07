@@ -11,7 +11,7 @@ void bindTextTools(TextTools *obj) {
     TEXT_TOOLS = obj;
 }
 
-/* String `index` of a string table (a count, then offsets), or NULL */
+/* String `index` of a string table (a count, then byte offsets from its start), or NULL */
 char *getString(s32 *table, s32 index) {
     s32 count = table[0];
 

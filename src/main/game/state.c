@@ -17,7 +17,7 @@ void newGame(void) {
     GAME.countdown[3] = 60;
     GAME.modeArg = 0;
     GAME.countdown[2] = 0;
-    GAME.unkC = -1;
+    GAME.unusedC = -1;
     initNewGameData();
     GAME.battleSteps = (RANDOM.next() & 0x1FF) + 0x200;
 }

@@ -141,38 +141,195 @@ s32 FIELD_MENU_OPTIONS[2][6] = {
 
 s32 FIELD_MENU_SPRITES[6] = { 29, 30, 31, 32, 33, 34 };
 
+/* Starts the field menu: opens the panels and the windows, with the extra option
+   when the player has item 0x192 and option 2 only in a field zone */
+static inline void openFieldMenu(FieldMenu *task, FieldMenuWindows *win) {
+    task->nextState(task);
+    task->panels[0].duration = task->panels[1].duration = task->panels[2].duration = 10;
+    startPanel(&task->panels[0], 1);
+    startPanel(&task->panels[1], 1);
+    startPanel(&task->panels[2], 1);
+    if (GAME.items[0x192] != 0) {
+        FIELD_MENU_CHOICE.extra = 1;
+        task->extraOption = 1;
+    } else {
+        FIELD_MENU_CHOICE.extra = 0;
+    }
+    task->count = task->extraOption + 5;
+    if (getFieldZone() >= 0) {
+        task->option2Enabled = 1;
+    } else {
+        task->option2Enabled = 0;
+    }
+    createFieldMenuWindows(task, win);
+}
+
+/* Once the second panel is open: the options (option 2 greyed when disabled) */
+static inline void showFieldMenuOptions(FieldMenu *task, FieldMenuWindows *win) {
+    showPartnerPage(task, win, 1, 1);
+    for (task->counter = 0; task->counter < task->count; task->counter++) {
+        win->options[task->counter]->setString(win->options[task->counter], FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)),
+                                  FIELD_MENU_OPTIONS[task->extraOption][task->counter]);
+    }
+    SOUND.playSound(SOUND_MENU_OPEN);
+    if (task->option2Enabled == 0) {
+        win->options[2]->setPalette(win->options[2], PALETTE_GREY);
+    }
+}
+
+/* Once the third panel is open: the money and the cursor */
+static inline void showFieldMenuMoney(FieldMenu *task, FieldMenuWindows *win) {
+    showPartnerPage(task, win, 2, 1);
+    win->moneyLabel->setString(win->moneyLabel, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 5);
+    win->money->setNumber(win->money, 0, GAME.money);
+    win->money->setRightAlign(win->money, 1);
+    win->cursor->setVisible(win->cursor, 1);
+}
+
+/*
+ * Moves the cursor, or on a choice (option 2 only when enabled) or a cancel
+ * closes the panels, with the step that picks the next mode
+ */
+static inline void chooseFieldMenuOption(FieldMenu *task, FieldMenuWindows *win) {
+    s32 prev;
+    s32 done;
+
+    prev = task->cursor;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        if (--task->cursor < 0) {
+            task->cursor = 0;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        task->cursor++;
+        if (task->cursor > task->count - 1) {
+            task->cursor = task->count - 1;
+        }
+    }
+    if (prev != task->cursor) {
+        SOUND.playSound(SOUND_CURSOR);
+        win->cursor->setPos(win->cursor, 0xB0, task->cursor * 14 + 0x31);
+        return;
+    }
+    done = 0;
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        if (task->option2Enabled == 0 && task->cursor == 2) {
+            return;
+        }
+        done = 1;
+        if (GAME.funcs.getMode() == MODE_STATUS) {
+            task->step = 1;
+        } else {
+            task->step = 0;
+        }
+        FIELD_MENU_CHOICE.option = task->cursor;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        done = 1;
+        if (GAME.funcs.getMode() == MODE_STATUS) {
+            task->step = 0;
+        } else {
+            task->step = 1;
+        }
+    }
+    if (done) {
+        startPanel(&task->panels[0], 0);
+        startPanel(&task->panels[1], 0);
+        startPanel(&task->panels[2], 0);
+        showPartnerPage(task, win, 2, 0);
+        win->moneyLabel->setVisible(win->moneyLabel, 0);
+        win->money->setVisible(win->money, 0);
+        win->cursor->setVisible(win->cursor, 0);
+        task->substate++;
+    }
+}
+
+/*
+ * Steps the fade to the next mode, a CLUT row each 2 frames: its first three
+ * sprites through rows 0-7, the next three through rows 8-15; then it asks for the
+ * mode (the field's, from the status screen; else the status screen, with the option)
+ */
+static inline void stepFieldMenuFade(FieldMenu *task) {
+    switch (task->substate) {
+    default:
+        task->setState(task, TASK_DONE);
+    case 0:
+    case 1:
+    case 2:
+        if (GFX.funcs.getTime() - task->time >= 2) {
+            task->time = GFX.funcs.getTime();
+            if (++task->fadeRow >= 8) {
+                if (++task->substate != 3) {
+                    task->fadeRow = 0;
+                } else {
+                    task->fadeRow = 8;
+                }
+            }
+        }
+        break;
+    case 3:
+    case 4:
+    case 5:
+        if (GFX.funcs.getTime() - task->time >= 2) {
+            task->time = GFX.funcs.getTime();
+            if (++task->fadeRow >= 0x10) {
+                if (++task->substate == 6) {
+                    task->fadeRow = 0xF;
+                } else {
+                    task->fadeRow = 8;
+                }
+            }
+        }
+        break;
+    case 6:
+        if (GAME.funcs.getMode() == MODE_STATUS) {
+            GAME.funcs.requestMode(GAME.fieldMode, 0);
+        } else {
+            GAME.funcs.requestMode(MODE_STATUS, 0);
+            FIELD_MENU_CHOICE.option = task->cursor;
+        }
+        task->substate++;
+        break;
+    case 7:
+        break;
+    }
+}
+
+/* Draws the fade to the next mode: the rows already dark, and the current one at its CLUT row */
+static inline void drawFieldMenuFade(FieldMenu *task) {
+    SpriteDrawer obj2;
+    s32 j;
+
+    initSpriteDrawer(&obj2);
+    obj2.setTexture(0x140, 0);
+    obj2.setLayerId(task->layerId, task->depth);
+    obj2.setFollowScroll(0);
+    for (j = 0; j <= task->substate; j++) {
+        if (j == 6) {
+            break;
+        }
+        if (j == task->substate) {
+            obj2.setClutRow(task->fadeRow);
+        } else if (j < 3) {
+            obj2.setClutRow(7);
+        } else {
+            obj2.setClutRow(0xF);
+        }
+        obj2.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), FIELD_MENU_SPRITES[j], 0, 0);
+    }
+}
+
 /* Runs the field menu: opens its panels, moves the cursor and switches mode on a choice */
 void updateFieldMenu(FieldMenu *task, FieldMenuWindows *win) {
     SpriteDrawer obj;
-    SpriteDrawer obj2;
-    s32 prev;
-    s32 done;
     s32 i;
     s32 y;
     s32 y2;
-    s32 j;
 
     switch (task->state) {
     case 0:
     default:
-        task->nextState(task);
-        task->panels[0].duration = task->panels[1].duration = task->panels[2].duration = 10;
-        startPanel(&task->panels[0], 1);
-        startPanel(&task->panels[1], 1);
-        startPanel(&task->panels[2], 1);
-        if (GAME.items[0x192] != 0) {
-            FIELD_MENU_CHOICE.extra = 1;
-            task->extraOption = 1;
-        } else {
-            FIELD_MENU_CHOICE.extra = 0;
-        }
-        task->count = task->extraOption + 5;
-        if (getFieldZone() >= 0) {
-            task->option2Enabled = 1;
-        } else {
-            task->option2Enabled = 0;
-        }
-        createFieldMenuWindows(task, win);
+        openFieldMenu(task, win);
         break;
     case 1:
         switch (task->substate) {
@@ -187,77 +344,18 @@ void updateFieldMenu(FieldMenu *task, FieldMenuWindows *win) {
             break;
         case 1:
             if (updatePanel(&task->panels[1])) {
-                showPartnerPage(task, win, 1, 1);
-                for (task->counter = 0; task->counter < task->count; task->counter++) {
-                    win->options[task->counter]->setString(win->options[task->counter], FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)),
-                                              FIELD_MENU_OPTIONS[task->extraOption][task->counter]);
-                }
-                SOUND.playSound(SOUND_MENU_OPEN);
-                if (task->option2Enabled == 0) {
-                    win->options[2]->setPalette(win->options[2], PALETTE_GREY);
-                }
+                showFieldMenuOptions(task, win);
                 task->substate++;
             }
             break;
         case 2:
             if (updatePanel(&task->panels[2])) {
-                showPartnerPage(task, win, 2, 1);
-                win->moneyLabel->setString(win->moneyLabel, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 5);
-                win->money->setNumber(win->money, 0, GAME.money);
-                win->money->setRightAlign(win->money, 1);
-                win->cursor->setVisible(win->cursor, 1);
+                showFieldMenuMoney(task, win);
                 task->substate++;
             }
             break;
         case 3:
-            prev = task->cursor;
-            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-                if (--task->cursor < 0) {
-                    task->cursor = 0;
-                }
-            } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-                task->cursor++;
-                if (task->cursor > task->count - 1) {
-                    task->cursor = task->count - 1;
-                }
-            }
-            if (prev != task->cursor) {
-                SOUND.playSound(SOUND_CURSOR);
-                win->cursor->setPos(win->cursor, 0xB0, task->cursor * 14 + 0x31);
-                break;
-            }
-            done = 0;
-            if (PAD_PRESSED(PAD_CROSS)) {
-                SOUND.playSound(SOUND_SELECT);
-                if (task->option2Enabled == 0 && task->cursor == 2) {
-                    break;
-                }
-                done = 1;
-                if (GAME.funcs.getMode() == MODE_STATUS) {
-                    task->step = 1;
-                } else {
-                    task->step = 0;
-                }
-                FIELD_MENU_CHOICE.option = task->cursor;
-            } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-                SOUND.playSound(SOUND_MENU_CANCEL);
-                done = 1;
-                if (GAME.funcs.getMode() == MODE_STATUS) {
-                    task->step = 0;
-                } else {
-                    task->step = 1;
-                }
-            }
-            if (done) {
-                startPanel(&task->panels[0], 0);
-                startPanel(&task->panels[1], 0);
-                startPanel(&task->panels[2], 0);
-                showPartnerPage(task, win, 2, 0);
-                win->moneyLabel->setVisible(win->moneyLabel, 0);
-                win->money->setVisible(win->money, 0);
-                win->cursor->setVisible(win->cursor, 0);
-                task->substate++;
-            }
+            chooseFieldMenuOption(task, win);
             break;
         case 4:
             if (updatePanel(&task->panels[2])) {
@@ -335,66 +433,8 @@ void updateFieldMenu(FieldMenu *task, FieldMenuWindows *win) {
         }
         break;
     case 2:
-        switch (task->substate) {
-        default:
-            task->setState(task, TASK_DONE);
-        case 0:
-        case 1:
-        case 2:
-            if (GFX.funcs.getTime() - task->time >= 2) {
-                task->time = GFX.funcs.getTime();
-                if (++task->fadeRow >= 8) {
-                    if (++task->substate != 3) {
-                        task->fadeRow = 0;
-                    } else {
-                        task->fadeRow = 8;
-                    }
-                }
-            }
-            break;
-        case 3:
-        case 4:
-        case 5:
-            if (GFX.funcs.getTime() - task->time >= 2) {
-                task->time = GFX.funcs.getTime();
-                if (++task->fadeRow >= 0x10) {
-                    if (++task->substate == 6) {
-                        task->fadeRow = 0xF;
-                    } else {
-                        task->fadeRow = 8;
-                    }
-                }
-            }
-            break;
-        case 6:
-            if (GAME.funcs.getMode() == MODE_STATUS) {
-                GAME.funcs.requestMode(GAME.fieldMode, 0);
-            } else {
-                GAME.funcs.requestMode(MODE_STATUS, 0);
-                FIELD_MENU_CHOICE.option = task->cursor;
-            }
-            task->substate++;
-            break;
-        case 7:
-            break;
-        }
-        initSpriteDrawer(&obj2);
-        obj2.setTexture(0x140, 0);
-        obj2.setLayerId(task->layerId, task->depth);
-        obj2.setFollowScroll(0);
-        for (j = 0; j <= task->substate; j++) {
-            if (j == 6) {
-                break;
-            }
-            if (j == task->substate) {
-                obj2.setClutRow(task->fadeRow);
-            } else if (j < 3) {
-                obj2.setClutRow(7);
-            } else {
-                obj2.setClutRow(0xF);
-            }
-            obj2.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), FIELD_MENU_SPRITES[j], 0, 0);
-        }
+        stepFieldMenuFade(task);
+        drawFieldMenuFade(task);
         break;
     case 3:
         break;

@@ -108,5 +108,12 @@ Cursor *createCursor(s16 layerId, s32 depth, s16 x, s16 y) {
     return task;
 }
 
+/* The cursor's frames as text, each the code of one of its glyphs in the font. -G8
+   unit: they are small, so they go to the small data (.sdata) */
+static char CURSOR_TEXT_3[4] = "\x81\x88";
+static char CURSOR_TEXT_2[4] = "\x81\x87";
+static char CURSOR_TEXT_1[4] = "\x81\x86";
+static char CURSOR_TEXT_0[4] = "\x81\x85";
+
 /* The cursor's frames, the last one repeated as it swings back */
 char *CURSOR_FRAMES[5] = { CURSOR_TEXT_0, CURSOR_TEXT_1, CURSOR_TEXT_2, CURSOR_TEXT_3, CURSOR_TEXT_2 };

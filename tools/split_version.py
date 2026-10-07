@@ -32,7 +32,7 @@ A segment the version's config already has (by name: the psyq ranges, or
 modules split before) keeps its start, so running it again changes
 nothing, and a module that is C in the version's config stays C.
 Two segments of one name become one. A data-only module (such as the
-executable's data/game_3.c) has no code segment while it is asm: splat
+executable's data/heap_start.c) has no code segment while it is asm: splat
 writes nothing for an asm segment of no size; when it becomes C, add its `c`
 segment where the code ends, as in us. The rest of the config is kept.
 

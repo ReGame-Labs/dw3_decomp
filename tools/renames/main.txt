@@ -13,3 +13,6 @@ GAME.unk26F8 GAME.randomGauges
 
 # round 4: the card images (include/dw3/gfx.h), with their TIM
 CardImageHeader CardImage
+
+# final round: the text window method that sets a field nothing reads
+textWindowSetUnkC4 textWindowSetUnusedC4

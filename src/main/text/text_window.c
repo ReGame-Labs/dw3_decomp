@@ -527,9 +527,9 @@ void textWindowSetLines(TextWindow *obj, u8 lines) {
     obj->lines = lines;
 }
 
-/* Text window method: sets unkC4, which nothing reads */
-void textWindowSetUnkC4(TextWindow *obj, u8 value) {
-    obj->unkC4 = value;
+/* Text window method: sets unusedC4, which nothing reads */
+void textWindowSetUnusedC4(TextWindow *obj, u8 value) {
+    obj->unusedC4 = value;
 }
 
 /* Text window method: whether the end of the text was reached */
@@ -835,7 +835,7 @@ TextWindow *createTextWindow(s16 layerId, s16 style, s16 x, s16 y) {
     obj->setPivot = textWindowSetPivot;
     obj->setDepth = textWindowSetDepth;
     obj->setLines = textWindowSetLines;
-    obj->setUnkC4 = textWindowSetUnkC4;
+    obj->setUnusedC4 = textWindowSetUnusedC4;
     obj->isFinished = textWindowIsFinished;
     obj->isVisible = textWindowIsVisible;
     obj->isWaitingForButton = textWindowIsWaitingForButton;

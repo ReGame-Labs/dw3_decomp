@@ -768,8 +768,8 @@ void STITSHOP_updateInfo(ShopInfo *info, ShopInfoWindows *win) {
         info->panels[2].duration = 10;
         info->panels[3].duration = 10;
         if (info->selling == 0 &&
-            (ITEM_FUNCS->isKind(info->item, 3) || ITEM_FUNCS->isKind(info->item, 4) ||
-             ITEM_FUNCS->isKind(info->item, 5))) {
+            (ITEM_FUNCS->isKind(info->item, ITEM_KIND_WEAPON) || ITEM_FUNCS->isKind(info->item, ITEM_KIND_ARMOR) ||
+             ITEM_FUNCS->isKind(info->item, ITEM_KIND_ACCESSORY))) {
             info->hasStats = 1;
         }
         break;
@@ -847,8 +847,8 @@ void STITSHOP_setKindVisible(ShopInfo *info, s32 visible) {
 /* Turns the details panel between the description and the partners' stats
    (info->turnPage); only for the items of kinds 3 to 5, which have stats */
 void STITSHOP_turnInfoPage(ShopInfo *info) {
-    if (ITEM_FUNCS->isKind(info->item, 3) != 0 || ITEM_FUNCS->isKind(info->item, 4) != 0 ||
-        ITEM_FUNCS->isKind(info->item, 5) != 0) {
+    if (ITEM_FUNCS->isKind(info->item, ITEM_KIND_WEAPON) != 0 || ITEM_FUNCS->isKind(info->item, ITEM_KIND_ARMOR) != 0 ||
+        ITEM_FUNCS->isKind(info->item, ITEM_KIND_ACCESSORY) != 0) {
         SOUND.playSound(SOUND_MENU_MOVE);
         info->substate = 10;
         info->shown = 0;

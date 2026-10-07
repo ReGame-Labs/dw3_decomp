@@ -3,9 +3,10 @@
 #include <libetc.h>
 #include <libsnd.h>
 
-/* -G8 unit: small variables defined here are reached through $gp */
-static RECT BOOT_IMAGE_RECT;
-static void *ROOT_TASK;
+/* -G8 unit: small variables defined here are reached through $gp, in the small data (.sdata) */
+/* Where the boot image, the 320x480 TIM loaded after the executable, goes in VRAM */
+static RECT BOOT_IMAGE_RECT = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT * 2 };
+static void *ROOT_TASK = NULL; /* the task that runs the game mode */
 
 /* Starts the hardware, the libraries and the engine, then runs a frame per iteration */
 int main(void) {
@@ -41,6 +42,7 @@ int main(void) {
     GFX.funcs.setDisplayMode(320, 640, 1, 0);
     PutDispEnv(&GFX.disp[0]);
     VSync(0);
+    /* GsGetTimInfo takes the TIM after its ID word */
     GsGetTimInfo((u_long *)SUB_OVERLAY_ADDRESS + 1, &tim);
     VSync(0);
     LoadImage(&BOOT_IMAGE_RECT, tim.pixel);

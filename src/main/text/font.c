@@ -64,10 +64,10 @@ s16 decodeChar(u8 *s, u8 mode, TextStyle *font) {
 
 /* Style 0 is unused; the others have lines of 14, 11 and 9 pixels */
 TextStyle FONT_STYLES[4] = {
-    { 0xFF, 0, { 0, 0 }, 0, 0, NULL, NULL, 0, 0 },
-    { 0xFF, 14, { 0, 0 }, FONT_GLYPHS_1, FONT_ICONS_1, FONT_GLYPH_MAP, FONT_ICON_MAP, 234, 114 },
-    { 0xFF, 11, { 0, 0 }, FONT_GLYPHS_2, FONT_ICONS_2, FONT_GLYPH_MAP, FONT_ICON_MAP, 234, 114 },
-    { 0xFF, 9, { 0, 0 }, FONT_GLYPHS_3, FONT_ICONS_3, FONT_GLYPH_MAP, FONT_ICON_MAP, 234, 114 },
+    { 0xFF, 0, 0, 0, NULL, NULL, 0, 0 },
+    { 0xFF, 14, FONT_GLYPHS_1, FONT_ICONS_1, FONT_GLYPH_MAP, FONT_ICON_MAP, 234, 114 },
+    { 0xFF, 11, FONT_GLYPHS_2, FONT_ICONS_2, FONT_GLYPH_MAP, FONT_ICON_MAP, 234, 114 },
+    { 0xFF, 9, FONT_GLYPHS_3, FONT_ICONS_3, FONT_GLYPH_MAP, FONT_ICON_MAP, 234, 114 },
 };
 
 /* The length of each control code, with its arguments */
