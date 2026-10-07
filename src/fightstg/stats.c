@@ -47,7 +47,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
     DigimonData *other;
     PartnerStats *partner;
     ItemInfo *info;
-    u8 *data;
+    ItemData *data;
     AccessoryData *acc;
     s32 member;
     s16 *values;
@@ -142,15 +142,15 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
             if (values[i] > 0) {
                 info = GET_ITEM[0](values[i]);
                 if (info->type >= 2 && info->type <= 14) {
-                    data = info->data.bytes;
-                    stats->accuracy += data[0xE];
-                    if (data[0x12] >= FAMILY_FIRST) {
-                        stats->weaponFamilies[count++] = data[0x12];
+                    data = info->data.record;
+                    stats->accuracy += data->weapon.accuracy;
+                    if (data->weapon.family >= FAMILY_FIRST) {
+                        stats->weaponFamilies[count++] = data->weapon.family;
                     }
                 } else {
-                    data = info->data.bytes;
-                    if (data[0x10] != 0) {
-                        stats->evasion += data[0x10];
+                    data = info->data.record;
+                    if (data->armor.evasion != 0) {
+                        stats->evasion += data->armor.evasion;
                     }
                 }
             }
@@ -158,29 +158,29 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
         found = 0;
         for (i = 0; i < 4; i++) {
             if (i != 1 && values[i] > 0) {
-                data = GET_ITEM[0](values[i])->data.bytes;
+                data = GET_ITEM[0](values[i])->data.record;
                 if (values[i] == 0x97) {
-                    stats->statuses[HIT_POISON].chance = data[0x10];
-                    stats->statuses[HIT_POISON].power = data[0x11];
+                    stats->statuses[HIT_POISON].chance = data->weapon.statusChance;
+                    stats->statuses[HIT_POISON].power = data->weapon.statusPower;
                     found = 1;
                 } else if (values[i] == 0xD2) {
-                    stats->statuses[HIT_PARALYSIS].chance = data[0x10];
-                    stats->statuses[HIT_PARALYSIS].power = data[0x11];
+                    stats->statuses[HIT_PARALYSIS].chance = data->weapon.statusChance;
+                    stats->statuses[HIT_PARALYSIS].power = data->weapon.statusPower;
                     found = 1;
                 } else if (values[i] == 0xB4 || values[i] == 0xC2) {
-                    stats->statuses[HIT_CONFUSION].chance = data[0x10];
-                    stats->statuses[HIT_CONFUSION].power = data[0x11];
+                    stats->statuses[HIT_CONFUSION].chance = data->weapon.statusChance;
+                    stats->statuses[HIT_CONFUSION].power = data->weapon.statusPower;
                     found = 1;
                 } else if (values[i] == 0x6D || values[i] == 0xBA) {
-                    stats->statuses[HIT_KNOCK_OUT].chance = data[0x10];
-                    stats->statuses[HIT_KNOCK_OUT].power = data[0x11];
+                    stats->statuses[HIT_KNOCK_OUT].chance = data->weapon.statusChance;
+                    stats->statuses[HIT_KNOCK_OUT].power = data->weapon.statusPower;
                     found = 1;
                 } else if (values[i] == 0x5E || values[i] == 0x93 || values[i] == 0xAD) {
-                    stats->statuses[HIT_DRAIN].chance = data[0x10];
-                    stats->statuses[HIT_DRAIN].power = data[0x11];
+                    stats->statuses[HIT_DRAIN].chance = data->weapon.statusChance;
+                    stats->statuses[HIT_DRAIN].power = data->weapon.statusPower;
                     found = 1;
                 } else if (values[i] == 0x96 || values[i] == 0xBF) {
-                    stats->criticalBonus = data[0x11];
+                    stats->criticalBonus = data->weapon.statusPower;
                     found = 1;
                 }
             }
@@ -191,18 +191,18 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
                 if (values[i] == 0x13C) {
                     stats->tripleHit = 1;
                 } else if (values[i] == 0x13D) {
-                    data = GET_ITEM[0](0x13D)->data.bytes;
-                    stats->criticalBonus = data[6];
+                    data = GET_ITEM[0](0x13D)->data.record;
+                    stats->criticalBonus = data->acc.amount;
                 } else if (values[i] == 0x13E) {
-                    data = GET_ITEM[0](0x13E)->data.bytes;
-                    stats->counter = data[6];
+                    data = GET_ITEM[0](0x13E)->data.record;
+                    stats->counter = data->acc.amount;
                 }
             }
         }
         values = &partner->equip[4];
         for (i = 0; i < 2; i++) {
             if (values[i] >= 0x153 && values[i] <= 0x167) {
-                data = GET_ITEM[0](values[i])->data.bytes;
+                data = GET_ITEM[0](values[i])->data.record;
                 if (values[i] < 0x156) {
                     stats->element = 2;
                 } else if (values[i] < 0x159) {
@@ -218,25 +218,25 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
                 } else if (values[i] < 0x168) {
                     stats->element = 8;
                 }
-                stats->elementPower = data[6];
+                stats->elementPower = data->acc.amount;
             } else if (values[i] >= 0x145 && values[i] <= 0x146) {
-                data = GET_ITEM[0](values[i])->data.bytes;
-                stats->damageCut = data[6];
+                data = GET_ITEM[0](values[i])->data.record;
+                stats->damageCut = data->acc.amount;
             } else if (values[i] >= 0x14B && values[i] <= 0x14C) {
-                data = GET_ITEM[0](values[i])->data.bytes;
-                stats->accuracy += data[6];
+                data = GET_ITEM[0](values[i])->data.record;
+                stats->accuracy += data->acc.amount;
             } else if (values[i] >= 0x14D && values[i] <= 0x14E) {
-                data = GET_ITEM[0](values[i])->data.bytes;
-                stats->evasion += data[6];
+                data = GET_ITEM[0](values[i])->data.record;
+                stats->evasion += data->acc.amount;
             } else if (values[i] >= 0x14F && values[i] <= 0x150) {
-                data = GET_ITEM[0](values[i])->data.bytes;
-                stats->runAwayBonus = data[6];
+                data = GET_ITEM[0](values[i])->data.record;
+                stats->runAwayBonus = data->acc.amount;
             } else if (values[i] == 0x13F) {
-                data = GET_ITEM[0](values[i])->data.bytes;
+                data = GET_ITEM[0](values[i])->data.record;
                 stats->runAwayGuard = 1;
             } else if (values[i] >= 0x147 && values[i] <= 0x148) {
-                data = GET_ITEM[0](values[i])->data.bytes;
-                stats->stealBonus = data[6];
+                data = GET_ITEM[0](values[i])->data.record;
+                stats->stealBonus = data->acc.amount;
             }
         }
     } else {

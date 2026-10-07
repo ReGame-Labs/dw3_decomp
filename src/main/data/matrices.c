@@ -3,9 +3,10 @@
 #include <libgte.h>
 
 /*
- * Between pad/pad.c's data and text/text_window.c's, and read by nothing in the
- * executable: a zero vector, the identity (FIGHTSTG's root bone's parent)
- * and three scales that double x, y or both.
+ * A zero vector, the identity (FIGHTSTG's root bone's parent) and three
+ * scales that double x, y or both. Nothing in the executable reads them, so
+ * no module can claim them: they lie between system/random.c's data and
+ * text/text_window.c's, both -G0 units, as either's or a file of their own.
  */
 VECTOR ZERO_VECTOR = { 0, 0, 0 };
 MATRIX IDENTITY_MATRIX = { { { 0x1000, 0, 0 }, { 0, 0x1000, 0 }, { 0, 0, 0x1000 } } };

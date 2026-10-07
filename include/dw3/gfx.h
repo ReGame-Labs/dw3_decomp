@@ -83,12 +83,18 @@ typedef struct LayerView {
     /* 0x02 */ s16 y;
     /* 0x04 */ u16 w;
     /* 0x06 */ u16 h;
-    /* 0x08 */ u8 unk8[0x10];
+    /* 0x08 */ s16 ofs[2]; /* DRAWENV's fields on (Layer.env) */
+    /* 0x0C */ RECT tw;
+    /* 0x14 */ u16 tpage;
+    /* 0x16 */ u8 dtd;
+    /* 0x17 */ u8 dfe;
     /* 0x18 */ u8 isbg;
     /* 0x19 */ u8 bgR;
     /* 0x1A */ u8 bgG;
     /* 0x1B */ u8 bgB;
-    /* 0x1C */ u8 unk1C[0x4C];
+    /* 0x1C */ DR_ENV drEnv;
+    /* 0x5C */ u_long *ot[2];
+    /* 0x64 */ s32 otLen;
     /* 0x68 */ s32 otShift;
     /* 0x6C */ s16 offsetX;
     /* 0x6E */ s16 offsetY;
@@ -168,10 +174,11 @@ typedef struct CardImage {
     /* 0x1 */ u8 ap;
     /* 0x2 */ u8 hp;
     /* 0x3 */ u8 kind; /* an index in CARD_KINDS */
-    /* 0x4 */ u8 unk4; /* 1-4 on the 60 cards that aren't Digimon, 0 on these; nothing reads it */
+    /* 0x4 */ u8 unused4; /* 1-4 on the 60 option cards (a colour's first 4, its last two 1), 0 on the
+                             Digimon; nothing reads it */
     /* 0x5 */ u8 points; /* what it adds to its colour */
     /* 0x6 */ u8 level; /* a Digimon's, 2-5 (CARDGAME shows its name); 0 on the other cards */
-    /* 0x7 */ u8 unk7; /* 0 on every card */
+    /* 0x7 */ u8 pad7; /* 0 on every card; nothing reads it */
     /* 0x8 */ s16 rank; /* by strength, from 1 the strongest (0 on the two blank cards) */
     /* 0xA */ s16 comboCard; /* the card (from 1) that three or more of it make
                                 (CARDGAME_findCardSet), 0 for none */
@@ -231,7 +238,7 @@ typedef struct SpriteDrawer {
     /* 0x38 */ s32 scaleX;
     /* 0x3C */ s32 scaleY;
     /* 0x40 */ s32 scaleZ;
-    /* 0x44 */ u8 unk44[4];
+    /* 0x44 */ u8 pad44[4]; /* nothing reads or writes them */
     /* 0x48 */ SVECTOR rot;
     /* 0x50 */ MATRIX matrix;
     /* 0x70 */ void (*bind)(); /* (drawer) */
@@ -299,7 +306,7 @@ typedef union TimCursor {
 typedef struct TimLoader {
     /* 0x00 */ u16 w; /* size of the last image */
     /* 0x02 */ u16 h;
-    /* 0x04 */ u8 unk4[4];
+    /* 0x04 */ u8 pad4[4]; /* nothing reads or writes them */
     /* 0x08 */ s32 imageX;
     /* 0x0C */ s32 imageY;
     /* 0x10 */ s32 clutX;

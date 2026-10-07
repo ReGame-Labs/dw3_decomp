@@ -122,16 +122,36 @@ typedef struct TechData {
     /* 0x11 */ u8 hitCount;
 } TechData;
 
+/*
+ * Where an equipment item goes (its record's kind), as the shop's and
+ * STSTATUS's strings name the kinds: the slots of PartnerStats.equip are
+ * 0 head, 1 body, 2 right hand, 3 left hand, 4 and 5 accessories
+ */
+#define EQUIP_KIND_RIGHT_HAND 1
+#define EQUIP_KIND_LEFT_HAND 2
+#define EQUIP_KIND_EITHER_HAND 3
+#define EQUIP_KIND_HEAD 4
+#define EQUIP_KIND_BODY 5
+#define EQUIP_KIND_ACCESSORY 6
+#define EQUIP_KIND_BOTH_HANDS 7 /* takes slots 2 and 3 */
+#define EQUIP_KIND_GROUP_ACCESSORY 8 /* one of its group at a time */
+
 /* ItemInfo.data's record for a weapon (types 2-14, WEAPON_DATA) */
 typedef struct WeaponData {
     /* 0x00 */ s16 charisma; /* what it adds to STAT_CHARISMA (computeStats); armour and accessories too */
-    /* 0x02 */ u8 kind; /* 7: held in both hands */
+    /* 0x02 */ u8 kind; /* EQUIP_KIND_* */
     /* 0x03 */ u8 group;
     /* 0x04 */ u8 partners; /* 1 << partner for each partner who can equip it (STSTATUS_canEquip) */
     /* 0x06 */ u16 amounts[2]; /* what it adds to stats[] */
     /* 0x0A */ s16 atk;
     /* 0x0C */ u8 stats[2];
-    /* 0x0E */ u8 unkE[6];
+    /* 0x0E */ u8 accuracy; /* added to the battle's (FIGHTSTG_computeStats) */
+    /* 0x0F */ u8 hitEffect; /* 1 none, 2 poison, 3 paralysis, 4 confusion, 6 knock-out, 8 drain,
+                                11 criticals; nothing reads it: FIGHTSTG_computeStats tests the
+                                items' ids */
+    /* 0x10 */ u8 statusChance; /* of the status its hits inflict */
+    /* 0x11 */ u8 statusPower; /* the status's, or the critical bonus */
+    /* 0x12 */ u8 family; /* its hits': FAMILY_FIRST and up, under it none */
 } WeaponData;
 
 /* An armour's (types 15-20, ARMOR_DATA) */
@@ -143,18 +163,21 @@ typedef struct ArmorData {
     /* 0x06 */ u16 amounts[2];
     /* 0x0A */ u8 stats[2];
     /* 0x0C */ s16 def;
-    /* 0x0E */ u8 unkE[6];
+    /* 0x0E */ u8 padE[2]; /* 0 on every armour */
+    /* 0x10 */ u8 evasion; /* added to the battle's (FIGHTSTG_computeStats) */
+    /* 0x11 */ u8 unused11; /* 1 on every armour; nothing reads it */
+    /* 0x12 */ u8 pad12[2]; /* 0 on every armour */
 } ArmorData;
 
 /* An accessory's (types 21-24, ACCESSORY_DATA) */
 typedef struct AccessoryData {
     /* 0x0 */ s16 charisma;
-    /* 0x2 */ u8 kind; /* 8: one of its group at a time */
+    /* 0x2 */ u8 kind; /* EQUIP_KIND_ACCESSORY or EQUIP_KIND_GROUP_ACCESSORY */
     /* 0x3 */ u8 group;
     /* 0x4 */ u8 partners;
     /* 0x6 */ u16 amount;
     /* 0x8 */ u8 stat;
-    /* 0x9 */ u8 unk9[3];
+    /* 0x9 */ u8 pad[3]; /* 0 on every accessory */
 } AccessoryData;
 
 /* ItemInfo.data's record, by ItemInfo.type */
@@ -187,12 +210,19 @@ typedef union ItemRecord {
     AccessoryData *acc;
 } ItemRecord;
 
+/* ItemInfo.kind: the item list (ITEM_LISTS) an item is in, from 1 */
+#define ITEM_KIND_KEY 1 /* the key items, and the ids no item uses */
+#define ITEM_KIND_USABLE 2
+#define ITEM_KIND_WEAPON 3
+#define ITEM_KIND_ARMOR 4
+#define ITEM_KIND_ACCESSORY 5
+
 /* An item (ITEMS, GET_ITEM) */
 typedef struct ItemInfo {
     /* 0x0 */ ItemRecord data; /* the type's record, or the usable items' effect */
     /* 0x4 */ u16 price;
     /* 0x6 */ u16 sellPrice; /* 0: cannot be sold */
-    /* 0x8 */ u8 kind; /* 3 the weapons, 4 the armour, 5 the accessories (ITEM_FUNCS->isKind), 1 and 2 the rest */
+    /* 0x8 */ u8 kind; /* ITEM_KIND_* (ITEM_FUNCS->isKind) */
     /* 0x9 */ u8 type; /* 2-14 weapons, 15-20 armour, 21-24 accessories */
 } ItemInfo;
 
@@ -279,7 +309,7 @@ typedef struct PartnerStats {
 
 /* One of the eight partner Digimon */
 typedef struct Partner {
-    /* 0x000 */ u8 unk0[4];
+    /* 0x000 */ u8 pad[4]; /* nothing reads or writes it */
     /* 0x004 */ s32 unlocked; /* partner id + 3, 0 while locked */
     /* 0x008 */ s32 battleDigivolve; /* an entry id, compared with the slots': the Digimon the battle starts it as, 0 for its own */
     /* 0x00C */ PartnerStats info;
@@ -407,13 +437,13 @@ typedef union PartnerTotals {
  */
 typedef struct GameState {
     /* 0x0000 */ u8 checksum; /* a save's, of its bytes from 0x4 (STGMCARD_runSaves) */
-    /* 0x0001 */ u8 unk1; /* nothing reads it */
+    /* 0x0001 */ u8 pad1; /* nothing reads or writes it */
     /* 0x0002 */ u8 version; /* a save's MEMCARD_SAVE_VERSION (stgmcard.h) */
-    /* 0x0003 */ u8 unk3; /* nothing reads it */
+    /* 0x0003 */ u8 pad3; /* nothing reads or writes it */
     /* 0x0004 */ s8 digivolveDemo;
-    /* 0x0005 */ u8 unk5[7];
-    /* 0x000C */ s32 unkC; /* only set, to -1 by newGame */
-    /* 0x0010 */ u8 unk10[0x18];
+    /* 0x0005 */ u8 pad5[7]; /* nothing reads or writes them */
+    /* 0x000C */ s32 unusedC; /* newGame sets it to -1; nothing reads it */
+    /* 0x0010 */ u8 pad10[0x18]; /* nothing reads or writes them */
     /* 0x0028 */ s32 stageSelectTop; /* the debug stage select's first line */
     /* 0x002C */ s32 stageSelectCursor;
     /* 0x0030 */ s32 battleSteps; /* to the next random battle, which each step lowers */
@@ -545,24 +575,6 @@ extern DigimonData *(*GET_DIGIMON)(s32 id); /* getDigimon */
 extern BattleSetup BATTLE_SETUP;
 extern BattleResult BATTLE_RESULT;
 extern ItemInfo ITEMS[];
-/* What the usable items do (their ItemInfo.data), in src/main/data/game_3.c */
-extern ItemEffect ITEM_EFFECT_2B, ITEM_EFFECT_2C, ITEM_EFFECT_2D, ITEM_EFFECT_2E, ITEM_EFFECT_2F,
-    ITEM_EFFECT_30, ITEM_EFFECT_31, ITEM_EFFECT_32, ITEM_EFFECT_33, ITEM_EFFECT_34,
-    ITEM_EFFECT_35, ITEM_EFFECT_36, ITEM_EFFECT_37, ITEM_EFFECT_38, ITEM_EFFECT_39,
-    ITEM_EFFECT_3A, ITEM_EFFECT_3B, ITEM_EFFECT_3C, ITEM_EFFECT_3D, ITEM_EFFECT_3E,
-    ITEM_EFFECT_3F, ITEM_EFFECT_40, ITEM_EFFECT_41, ITEM_EFFECT_42, ITEM_EFFECT_43,
-    ITEM_EFFECT_44, ITEM_EFFECT_45, ITEM_EFFECT_46, ITEM_EFFECT_47, ITEM_EFFECT_48,
-    ITEM_EFFECT_49, ITEM_EFFECT_4A, ITEM_EFFECT_4B, ITEM_EFFECT_4C, ITEM_EFFECT_4D,
-    ITEM_EFFECT_4E, ITEM_EFFECT_4F, ITEM_EFFECT_50, ITEM_EFFECT_51, ITEM_EFFECT_52,
-    ITEM_EFFECT_53, ITEM_EFFECT_54, ITEM_EFFECT_55, ITEM_EFFECT_56, ITEM_EFFECT_57,
-    ITEM_EFFECT_58, ITEM_EFFECT_59, ITEM_EFFECT_5A, ITEM_EFFECT_5B, ITEM_EFFECT_169,
-    ITEM_EFFECT_16A, ITEM_EFFECT_16B, ITEM_EFFECT_16C, ITEM_EFFECT_16D, ITEM_EFFECT_16E,
-    ITEM_EFFECT_16F, ITEM_EFFECT_170, ITEM_EFFECT_171, ITEM_EFFECT_172, ITEM_EFFECT_173,
-    ITEM_EFFECT_174, ITEM_EFFECT_175, ITEM_EFFECT_176, ITEM_EFFECT_177, ITEM_EFFECT_178,
-    ITEM_EFFECT_179, ITEM_EFFECT_17A, ITEM_EFFECT_17B, ITEM_EFFECT_17C, ITEM_EFFECT_17D,
-    ITEM_EFFECT_17E, ITEM_EFFECT_17F, ITEM_EFFECT_180, ITEM_EFFECT_181, ITEM_EFFECT_182,
-    ITEM_EFFECT_183, ITEM_EFFECT_184, ITEM_EFFECT_185, ITEM_EFFECT_186, ITEM_EFFECT_187,
-    ITEM_EFFECT_188, ITEM_EFFECT_189, ITEM_EFFECT_18A;
 extern TechData TECHS[];
 extern struct ItemInfo *(*GET_ITEM[])(s32 item);
 /* GET_ITEM's entries, each with its own type */

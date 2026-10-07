@@ -1735,6 +1735,9 @@ u16 FILE_SECTOR_COUNTS[2382] = {
 };
 #endif
 
+/* The files in FILE_SECTORS; nothing reads it. -G8 unit: it goes to the small data (.sdata) */
+s32 FILE_COUNT = sizeof(FILE_SECTORS) / sizeof(FILE_SECTORS[0]);
+
 /* The disc's file table */
 FileTableFuncs FILE_TABLE = {
     fileExists,

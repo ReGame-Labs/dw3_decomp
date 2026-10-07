@@ -17,3 +17,9 @@ AccessoryData unk4 partners --via 'weapon|armor|acc'
 
 # round 4: the icon STGMCARD_runSaves writes (include/dw3/memcard.h)
 MemCard unk324 iconIndex --via 'MEMCARD'
+
+# final round: fields nothing reads (include/dw3/game_state.h, text.h)
+GameState unkC unusedC --via 'GAME'
+TextWindow unkC4 unusedC4 --via 'obj'
+TextWindow setUnkC4 setUnusedC4 --via 'obj'
+ZoomBox unk68 unused68 --via 'task'

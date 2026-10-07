@@ -14,12 +14,19 @@ void screenFadeStart(ScreenFade *task, s32 fadeIn, s32 duration) {
     }
 }
 
+/* The fade's primitives, one after the other in the primitive buffer */
+typedef struct FadePrims {
+    POLY_F4 poly;
+    DR_TPAGE mode;
+} FadePrims;
+
 /* A full-screen POLY_F4 with subtractive blending (tpage 0xE1000245) */
 void drawScreenFade(ScreenFade *task) {
     Layer *layer = GFX.funcs.getLayer(task->layerId);
     u_long *ot = layer->getOtEntry(layer, task->depth);
-    POLY_F4 *poly = GFX.funcs.getPrim();
-    DR_TPAGE *mode;
+    FadePrims *prims = GFX.funcs.getPrim();
+    POLY_F4 *poly = &prims->poly;
+    DR_TPAGE *mode = &prims->mode;
 
     setlen(poly, 5);
     poly->code = 0x2A;
@@ -29,11 +36,10 @@ void drawScreenFade(ScreenFade *task) {
     poly->y0 = poly->y1 = 0;
     poly->y2 = poly->y3 = 256;
     addPrim(ot, poly);
-    mode = (DR_TPAGE *)(poly + 1);
     setlen(mode, 1);
     mode->code[0] = 0xE1000245;
     addPrim(ot, mode);
-    GFX.funcs.setPrim(mode + 1);
+    GFX.funcs.setPrim(prims + 1);
 }
 
 /* Moves the fade one frame on and draws it; TASK_DONE at the end, still drawn */

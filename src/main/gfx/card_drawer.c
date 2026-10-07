@@ -97,7 +97,7 @@ void cardDrawerDraw(s32 x, s32 y) {
     /* the texture page goes right after the sprite */
     sprt++;
     SetDrawTPage((DR_TPAGE *)sprt, 0, 1, tpage);
-    end = (u8 *)base + sizeof(SPRT) + sizeof(DR_TPAGE);
+    end = (u8 *)base + sizeof(SPRT) + sizeof(DR_TPAGE); /* past both primitives */
     /* addPrim, with the tag written through the start of the block */
     setaddr(base + 1, getaddr(CARD_DRAWER->ot));
     setaddr(CARD_DRAWER->ot, sprt);

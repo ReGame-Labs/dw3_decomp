@@ -195,7 +195,7 @@ void updateZoomBox(ZoomBox *task) {
     switch (task->state) {
     case 0:
     default:
-        task->unk68 = 0;
+        task->unused68 = 0;
         if (task->closing == 0) {
             task->zoom = 0;
         } else {

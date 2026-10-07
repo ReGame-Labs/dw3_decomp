@@ -118,7 +118,8 @@ R_MIPS_32 = 2
 
 # splat's files of the executable's game data (not the SDK's psyq),
 # in address order
-GAME_DATA = ["data/matrices.data", "data/game_3.data", "data/game_bss.bss"]
+GAME_DATA = ["data/matrices.data", "data/heap_start.sdata", "data/get_digimon.sdata",
+             "data/eu_settings.sdata", "data/all_files_pattern.sdata", "data/game_bss.bss"]
 
 
 def category_for(name: str) -> str:

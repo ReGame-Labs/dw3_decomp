@@ -618,17 +618,17 @@ static inline void STGMCARD_askError(MemCardSaves *saves, MemCardSavesWindows *w
     win->windows[0]->setString(win->windows[0], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), STGMCARD_errorTexts[saves->result]);
     STGMCARD_showPort(saves, win, 1);
     if (saves->screen->loading == 0) {
-        if (saves->result == 4) {
+        if (saves->result == CARD_ERR_UNFORMATTED) {
             saves->choice = 1;
             ask = 1;
-        } else if (saves->result == 5) {
+        } else if (saves->result == CARD_ERR_NO_FILE) {
             if (MEMCARD.fileCount != 0) {
                 for (j = 0, blocks = 0; j < MEMCARD.fileCount; j++) {
                     blocks += MEMCARD.files[j].size / 0x2000;
                 }
                 if (blocks + 4 >= 16) {
                     win->windows[0]->setVisible(win->windows[0], 0);
-                    saves->result = 7;
+                    saves->result = CARD_ERR_FULL;
                     saves->substate = 100;
                     return;
                 }
@@ -637,12 +637,12 @@ static inline void STGMCARD_askError(MemCardSaves *saves, MemCardSavesWindows *w
         } else {
             saves->prompting = 1;
             ask = 0;
-            if (saves->result == 7) {
+            if (saves->result == CARD_ERR_FULL) {
                 win->windows[0]->setNumber(win->windows[0], 1, 4);
             }
         }
         if (ask) {
-            if (saves->result == 4) {
+            if (saves->result == CARD_ERR_UNFORMATTED) {
                 win->windows[1]->setString(win->windows[1], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x19);
             } else {
                 win->windows[1]->setString(win->windows[1], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x1A);
@@ -666,7 +666,7 @@ static inline void STGMCARD_answerError(MemCardSaves *saves, MemCardSavesWindows
     s32 prev;
     s32 status;
 
-    if (saves->screen->loading == 0 && (u32)(saves->result - 4) < 2) {
+    if (saves->screen->loading == 0 && (u32)(saves->result - CARD_ERR_UNFORMATTED) < 2) {
         prev = saves->choice;
         if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
             saves->choice = 0;
@@ -687,7 +687,7 @@ static inline void STGMCARD_answerError(MemCardSaves *saves, MemCardSavesWindows
             win->cursor->setVisible(win->cursor, 0);
             saves->substate = 400;
             saves->choosing = 0;
-            if (saves->result == 4) {
+            if (saves->result == CARD_ERR_UNFORMATTED) {
                 if (saves->choice == 0) {
                     saves->step = 110;
                     win->windows[0]->setString(win->windows[0], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x1E);

@@ -166,7 +166,7 @@ s32 getButtonBit(s32 pad, s32 index) {
 
 /* Controller input: cleared by initPad, then the methods */
 PadState PAD = {
-    0, { { { 0 } } }, { { { 0 } } }, { { 0 } }, 0, 0, NULL, 0, { 0 },
+    0, { { { 0 } } }, { { { 0 } } }, { { 0 } }, 0, 0, NULL, 0,
     initPad, shutdownPad, updatePad, setVibration, lockPadMode,
     getPadPressed, getPadHeld, getPadRepeated,
     resetButtonMap, swapButtons, getButtonBit,

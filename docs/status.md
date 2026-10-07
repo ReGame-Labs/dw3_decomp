@@ -7,9 +7,12 @@ matched C needs.
 ## The parts
 
 - The executable's game code is all C, and its rodata. Its data is C too:
-  each module holds its own, and `src/main/data/` the rest (`matrices.c`,
-  `game_3.c` and the `.bss`, `game_bss.c`) until it moves next to the code
-  that uses it.
+  each module holds its own, its small data (`.sdata`) included, and
+  `src/main/data/` the pieces no module can hold, each file saying why:
+  the matrices nothing in the executable reads (`matrices.c`), the small
+  data of modules the evidence doesn't name (`heap_start.c`,
+  `get_digimon.c`, `eu_settings.c`, `all_files_pattern.c`) and the commons
+  the linker laid out (`game_bss.c`).
 - The PsyQ 4.7 libraries linked into the executable, and `libpress` in
   `STDWTITL`, are Sony's code, not the game's: like other PSX decomps, the
   build takes them from the original as splat's disassembly and the progress

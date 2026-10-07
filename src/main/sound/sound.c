@@ -165,7 +165,12 @@ SoundFiles *SOUND_BANK_FILES[72] = {
     &SOUND_FILES_43, &SOUND_FILES_44, &SOUND_FILES_45, &SOUND_FILES_46, &SOUND_FILES_47,
 };
 
-/* Each slot's buffer for the VAB header and the SEPs, and its SPU address */
+/* Each slot's buffer for the VAB header and the SEPs, in this unit's .bss (see the Makefile) */
+s32 SOUND_HEAD_BUFFER_0[14336];
+s32 SOUND_HEAD_BUFFER_1[10240];
+s32 SOUND_HEAD_BUFFER_2[10240];
+
+/* Each slot's buffer, and its SPU address */
 void *SOUND_HEAD_BUFFERS[SOUND_SLOT_COUNT] = {SOUND_HEAD_BUFFER_0, SOUND_HEAD_BUFFER_1, SOUND_HEAD_BUFFER_2};
 s32 SOUND_SPU_ADDRS[SOUND_SLOT_COUNT] = {0x1010, 0x49C10, 0x62410};
 

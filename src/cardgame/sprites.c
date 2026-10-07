@@ -23,7 +23,7 @@ void CARDGAME_moveSprite(CardScreen *screen, CardSprite *sprite) {
         }
     } else {
         if (sprite->state != 3) {
-            SOUND.playSound(0x800460BD);
+            SOUND.playSound(SOUND_CARD_001);
         }
         sprite->state = 1;
         sprite->time = 0;

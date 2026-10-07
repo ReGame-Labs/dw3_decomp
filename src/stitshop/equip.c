@@ -31,7 +31,7 @@ s32 STITSHOP_compareEquip(s32 partner, s32 item) {
     s32 i;
 
     switch (data->weapon.kind) {
-    case 3:
+    case EQUIP_KIND_EITHER_HAND:
         stats = GAME.funcs.getPartnerStats(partner);
         if (stats->equip[2] > 0) {
             equipped[0] = stats->equip[2];
@@ -40,7 +40,7 @@ s32 STITSHOP_compareEquip(s32 partner, s32 item) {
                 first = GET_ITEM[0](equipped[0])->data.record;
                 info = GET_ITEM[0](equipped[1]);
                 second = info->data.record;
-                if (first->weapon.kind == 7 || info->type == 0x14) {
+                if (first->weapon.kind == EQUIP_KIND_BOTH_HANDS || info->type == 0x14) {
                     return 2;
                 }
                 for (i = 0; i < 2; i++) {
@@ -57,13 +57,13 @@ s32 STITSHOP_compareEquip(s32 partner, s32 item) {
             return 3;
         }
         return 2;
-    case 2:
+    case EQUIP_KIND_LEFT_HAND:
         return 3;
-    case 4:
+    case EQUIP_KIND_HEAD:
         return 0;
-    case 5:
+    case EQUIP_KIND_BODY:
         return 1;
-    case 6:
+    case EQUIP_KIND_ACCESSORY:
         stats = GAME.funcs.getPartnerStats(partner);
         if (stats->equip[4] > 0) {
             equipped[0] = stats->equip[4];
@@ -79,10 +79,10 @@ s32 STITSHOP_compareEquip(s32 partner, s32 item) {
             return 5;
         }
         return 4;
-    case 1:
-    case 7:
+    case EQUIP_KIND_RIGHT_HAND:
+    case EQUIP_KIND_BOTH_HANDS:
         return 2;
-    case 8:
+    case EQUIP_KIND_GROUP_ACCESSORY:
         stats = GAME.funcs.getPartnerStats(partner);
         if (stats->equip[4] > 0) {
             equipped[0] = stats->equip[4];
@@ -91,11 +91,11 @@ s32 STITSHOP_compareEquip(s32 partner, s32 item) {
             }
             equipped[1] = stats->equip[5];
             datas[0] = GET_ITEM[0](equipped[0])->data.record;
-            if (datas[0]->acc.kind == 8 && datas[0]->acc.group == data->acc.group) {
+            if (datas[0]->acc.kind == EQUIP_KIND_GROUP_ACCESSORY && datas[0]->acc.group == data->acc.group) {
                 return 4;
             }
             datas[1] = GET_ITEM[0](equipped[1])->data.record;
-            if (datas[1]->acc.kind == 8 && datas[1]->acc.group == data->acc.group) {
+            if (datas[1]->acc.kind == EQUIP_KIND_GROUP_ACCESSORY && datas[1]->acc.group == data->acc.group) {
                 return 5;
             }
             break;
@@ -130,7 +130,7 @@ void STITSHOP_equip(s32 partner, s32 slot, s32 item, s32 fromBag) {
             GAME.items[old]++;
         }
         data = GET_ITEM[0](old)->data.record;
-        if (data->weapon.kind == 7) {
+        if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             stats->equip[2] = 0;
             stats->equip[3] = 0;
         } else {
@@ -139,7 +139,7 @@ void STITSHOP_equip(s32 partner, s32 slot, s32 item, s32 fromBag) {
     }
     if (id > 0) {
         data = GET_ITEM[0](id)->data.record;
-        if (data->weapon.kind == 7) {
+        if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             pair = &stats->equip[2];
             if (stats->equip[2] == 0) {
                 pair = NULL;
@@ -154,7 +154,7 @@ void STITSHOP_equip(s32 partner, s32 slot, s32 item, s32 fromBag) {
                 }
                 *pair = 0;
             }
-        } else if (data->acc.kind == 8) {
+        } else if (data->acc.kind == EQUIP_KIND_GROUP_ACCESSORY) {
             group = data->acc.group;
             for (i = 0; i < 2; i++) {
                 equip = &stats->equip[i + 4];
@@ -175,7 +175,7 @@ void STITSHOP_equip(s32 partner, s32 slot, s32 item, s32 fromBag) {
             GAME.items[id]--;
         }
         data = GET_ITEM[0](id)->data.record;
-        if (data->weapon.kind == 7) {
+        if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             stats->equip[2] = id;
             stats->equip[3] = id;
         } else {
