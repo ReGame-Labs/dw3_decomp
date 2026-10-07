@@ -2,7 +2,7 @@
 updateTileSet = 0x800A5F04; // type:func
 createTileSet = 0x800A61A4; // type:func
 createCommand835 = 0x800A61D8; // type:func
-func_800A50CC = 0x800A6208; // type:func
+drawActorMark = 0x800A6208; // type:func
 updateActorMark = 0x800A62B4; // type:func
 createCommand807 = 0x800A6510; // type:func
 handleCommand807 = 0x800A6540; // type:func

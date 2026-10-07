@@ -1,5 +1,6 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern StageEffectSpot updateStageSpots[];
 
 /* The files of the background, which the versions number differently */
@@ -14,7 +15,7 @@ extern StageEffectSpot updateStageSpots[];
 #endif
 
 /* Draws the two background images (file BG_ARCHIVE) scrolled at 2/3 of the layer's scroll */
-void func_800A4CA4(StageTask *task) {
+void drawBackground(StageTask *task) {
     SpriteDrawer drawer;
     Vec2 scroll;
     Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
@@ -33,7 +34,7 @@ void func_800A4CA4(StageTask *task) {
 }
 
 /* Loads the background images (files BG_FILE and BG_FILE2) to VRAM, then draws them every frame */
-void func_800A4E08(StageTask *task) {
+void updateBackground(StageTask *task) {
     TimLoader loader;
 
     switch (task->state) {
@@ -49,7 +50,7 @@ void func_800A4E08(StageTask *task) {
         task->nextState(task);
         break;
     case TASK_RUN:
-        func_800A4CA4(task);
+        drawBackground(task);
         break;
     case TASK_DONE:
     case TASK_KILL:
@@ -57,18 +58,18 @@ void func_800A4E08(StageTask *task) {
     }
 }
 
-void *func_800A4F10(void) {
-    return createTask(func_800A4E08, 0x60, 0);
+void *createBackground(void) {
+    return createTask(updateBackground, 0x60, 0);
 }
 
-/* Creates an object, the stage's five effects and the event object of flags 0x4072/0x40A9 */
+/* Creates the background, the stage's five effects and the event object of flags 0x4072/0x40A9 */
 void updateStage(StageTask *task, void **children) {
     s32 i;
 
     switch (task->state) {
     case TASK_INIT:
     default:
-        children[0] = func_800A4F10();
+        children[0] = createBackground();
         for (i = 0; i < 5; i++) {
             if (updateStageSpots[i].kind == 0) {
                 children[i + 1] = createStageEffect(updateStageSpots[i].x, updateStageSpots[i].y, updateStageSpots[i].frame);

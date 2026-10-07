@@ -19,7 +19,7 @@ void FIELDSTG_updateLift(Lift *task) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        for (object = FIELDSTG_state.objects; object->unk2 != 0; object++) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
             switch (object->anim) {
             case 2:
                 task->right = object;

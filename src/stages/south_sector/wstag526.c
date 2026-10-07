@@ -1,57 +1,58 @@
 #include "common.h"
 #include "stage.h"
-extern u16 D_800A6730[];
+/* Defined below, after the code that uses them */
+extern u16 angleTangents[];
 extern AnimFrame *updateWanderPairFrames0[];
 extern AnimFrame *updateWanderPairFrames1[];
-extern u16 D_800A6728[];
-void *func_800A5274(void);
-void *func_800A56B4(void);
-void *func_800A5A04(void);
-StageWanderPair *func_800A625C(s32 tileAnim, s32 speedIndex, s32 start);
-void func_800A5228();
-void func_800A5668();
-void func_800A59B8();
-void func_800A6210();
-extern AnimFrame D_800A65A4[];
-extern AnimFrame D_800A65B8[];
+extern u16 wanderPairSpeeds[];
+void *createClutTileTask(void);
+void *createTileDuoTask(void);
+void *createStillTileTask(void);
+StageWanderPair *createWanderPairTask(s32 tileAnim, s32 speedIndex, s32 start);
+void fadeOutClutTile();
+void fadeOutTileDuo();
+void fadeOutStillTile();
+void fadeOutWanderPair();
+extern AnimFrame updateClutTileFrames0[];
+extern AnimFrame updateClutTileFrames1[];
 extern AnimFrame *updateTileDuoFrames0[];
 extern AnimFrame *updateTileDuoFrames1[];
-extern AnimFrame D_800A664C[];
+extern AnimFrame updateStillTileFrames[];
 
 /* Creates the stage's objects (three records and nine wandering pairs); in TASK_DONE tells them all to go away */
 void updateCommand829(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        children[0] = func_800A5274();
-        children[1] = func_800A56B4();
-        children[2] = func_800A5A04();
-        children[3] = func_800A625C(1, 0, 0);
-        children[4] = func_800A625C(2, 0, 5);
-        children[5] = func_800A625C(3, 1, 0);
-        children[6] = func_800A625C(4, 1, 5);
-        children[7] = func_800A625C(5, 1, 0);
-        children[8] = func_800A625C(6, 2, 0);
-        children[9] = func_800A625C(7, 2, 2);
-        children[10] = func_800A625C(8, 3, 5);
-        children[11] = func_800A625C(9, 3, 3);
+        children[0] = createClutTileTask();
+        children[1] = createTileDuoTask();
+        children[2] = createStillTileTask();
+        children[3] = createWanderPairTask(1, 0, 0);
+        children[4] = createWanderPairTask(2, 0, 5);
+        children[5] = createWanderPairTask(3, 1, 0);
+        children[6] = createWanderPairTask(4, 1, 5);
+        children[7] = createWanderPairTask(5, 1, 0);
+        children[8] = createWanderPairTask(6, 2, 0);
+        children[9] = createWanderPairTask(7, 2, 2);
+        children[10] = createWanderPairTask(8, 3, 5);
+        children[11] = createWanderPairTask(9, 3, 3);
         task->nextState(task);
         break;
     case TASK_RUN:
         break;
     case TASK_DONE:
-        func_800A5228(children[0], 0, 0);
-        func_800A5668(children[1], 0, 0);
-        func_800A59B8(children[2], 0, 0);
-        func_800A6210(children[3], 0, 0);
-        func_800A6210(children[4], 0, 0);
-        func_800A6210(children[5], 0, 0);
-        func_800A6210(children[6], 0, 0);
-        func_800A6210(children[7], 0, 0);
-        func_800A6210(children[8], 0, 0);
-        func_800A6210(children[9], 0, 0);
-        func_800A6210(children[10], 0, 0);
-        func_800A6210(children[11], 0, 0);
+        fadeOutClutTile(children[0], 0, 0);
+        fadeOutTileDuo(children[1], 0, 0);
+        fadeOutStillTile(children[2], 0, 0);
+        fadeOutWanderPair(children[3], 0, 0);
+        fadeOutWanderPair(children[4], 0, 0);
+        fadeOutWanderPair(children[5], 0, 0);
+        fadeOutWanderPair(children[6], 0, 0);
+        fadeOutWanderPair(children[7], 0, 0);
+        fadeOutWanderPair(children[8], 0, 0);
+        fadeOutWanderPair(children[9], 0, 0);
+        fadeOutWanderPair(children[10], 0, 0);
+        fadeOutWanderPair(children[11], 0, 0);
         task->setState(task, TASK_RUN);
         break;
     case TASK_KILL:
@@ -74,7 +75,7 @@ void *createCommand829(s32 arg) {
 #include "common/step_tile_animation.inc.c"
 
 /* Animates the record of animation 0x15 (frame 2) while mode isn't 0; fades it out wait frames after mode 2 */
-void func_800A503C(StageTileSolo *task) {
+void updateClutTile(StageTileSolo *task) {
     StageTile *rec;
     StageTile *tile;
     StageTile *fading;
@@ -84,9 +85,9 @@ void func_800A503C(StageTileSolo *task) {
     case TASK_INIT:
     default:
         task->tile.anim.index = 0;
-        task->tile.anim.timer = D_800A65A4[0].duration;
+        task->tile.anim.timer = updateClutTileFrames0[0].duration;
         task->mode = 1;
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == 0x15) {
                 task->tile.tile = rec;
             }
@@ -98,7 +99,7 @@ void func_800A503C(StageTileSolo *task) {
         if (task->mode != 0) {
             tile->visible = 1;
             tile->frame = 2;
-            tile->clutRow = stepTileAnimation(&task->tile, D_800A65A4, 0, 0);
+            tile->clutRow = stepTileAnimation(&task->tile, updateClutTileFrames0, 0, 0);
         } else {
             tile->visible = 0;
         }
@@ -111,11 +112,11 @@ void func_800A503C(StageTileSolo *task) {
     case TASK_DONE:
         if (task->substate == 0) {
             task->tile.anim.index = 0;
-            task->tile.anim.timer = D_800A65B8[0].duration;
+            task->tile.anim.timer = updateClutTileFrames1[0].duration;
             task->setSubstate(task, 1);
         }
         fading = task->tile.tile;
-        frame = stepTileAnimation(&task->tile, D_800A65B8, 1, 0);
+        frame = stepTileAnimation(&task->tile, updateClutTileFrames1, 1, 0);
         switch (frame) {
         case 0x12C:
             fading->visible = 0;
@@ -137,19 +138,19 @@ void func_800A503C(StageTileSolo *task) {
     }
 }
 
-void func_800A5228(StageTileDuo *task, s32 arg1, s32 arg2) {
+void fadeOutClutTile(StageTileDuo *task, s32 arg1, s32 arg2) {
     if (task != NULL) {
         task->mode = 2;
         task->wait = 0x96;
     }
 }
 
-void *func_800A5244(s32 arg) {
-    return createTaskWithId(func_800A503C, 0x5C, 0, arg);
+void *createClutTile(s32 arg) {
+    return createTaskWithId(updateClutTile, sizeof(StageTileSolo), 0, arg);
 }
 
-void *func_800A5274(void) {
-    return createTask(func_800A503C, 0x5C, 0);
+void *createClutTileTask(void) {
+    return createTask(updateClutTile, sizeof(StageTileSolo), 0);
 }
 
 s32 stepTileAnimation2(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 depth) {
@@ -197,7 +198,7 @@ void updateTileDuo(StageTileDuo *task) {
         task->tiles[1].anim.index = 0;
         task->tiles[1].anim.timer = updateTileDuoFrames0[1]->duration;
         task->mode = 1;
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             switch (rec->anim) {
             case 0x13:
                 task->tiles[0].tile = rec;
@@ -260,7 +261,7 @@ void updateTileDuo(StageTileDuo *task) {
 }
 
 /* Tells the task to go away after 90 frames (mode 2) */
-void func_800A5668(StageTileDuo *task) {
+void fadeOutTileDuo(StageTileDuo *task) {
     if (task != NULL) {
         task->mode = 2;
         task->wait = 0x5A;
@@ -268,11 +269,11 @@ void func_800A5668(StageTileDuo *task) {
 }
 
 void *createTileDuo(s32 arg) {
-    return createTaskWithId(updateTileDuo, 0x64, 0, arg);
+    return createTaskWithId(updateTileDuo, sizeof(StageTileDuo), 0, arg);
 }
 
-void *func_800A56B4(void) {
-    return createTask(updateTileDuo, 0x64, 0);
+void *createTileDuoTask(void) {
+    return createTask(updateTileDuo, sizeof(StageTileDuo), 0);
 }
 
 s32 stepTileAnimation3(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 depth) {
@@ -304,7 +305,7 @@ s32 stepTileAnimation3(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 dept
 }
 
 /* Shows the record of animation 0x16 (frame 0x21) while mode isn't 0; fades it out wait frames after mode 2 */
-void func_800A5800(StageTileSolo *task) {
+void updateStillTile(StageTileSolo *task) {
     StageTile *rec;
     StageTile *tile;
     StageTile *fading;
@@ -314,7 +315,7 @@ void func_800A5800(StageTileSolo *task) {
     case TASK_INIT:
     default:
         task->mode = 1;
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == 0x16) {
                 task->tile.tile = rec;
             }
@@ -338,11 +339,11 @@ void func_800A5800(StageTileSolo *task) {
     case TASK_DONE:
         if (task->substate == 0) {
             task->tile.anim.index = 0;
-            task->tile.anim.timer = D_800A664C[0].duration;
+            task->tile.anim.timer = updateStillTileFrames[0].duration;
             task->setSubstate(task, 1);
         }
         fading = task->tile.tile;
-        frame = stepTileAnimation3(&task->tile, D_800A664C, 1, 0);
+        frame = stepTileAnimation3(&task->tile, updateStillTileFrames, 1, 0);
         switch (frame) {
         case 0x12C:
             fading->visible = 0;
@@ -365,19 +366,19 @@ void func_800A5800(StageTileSolo *task) {
 }
 
 /* Tells the task to go away after 40 frames (mode 2) */
-void func_800A59B8(StageTileDuo *task) {
+void fadeOutStillTile(StageTileDuo *task) {
     if (task != NULL) {
         task->mode = 2;
         task->wait = 0x28;
     }
 }
 
-void *func_800A59D4(s32 arg) {
-    return createTaskWithId(func_800A5800, 0x5C, 0, arg);
+void *createStillTile(s32 arg) {
+    return createTaskWithId(updateStillTile, sizeof(StageTileSolo), 0, arg);
 }
 
-void *func_800A5A04(void) {
-    return createTask(func_800A5800, 0x5C, 0);
+void *createStillTileTask(void) {
+    return createTask(updateStillTile, sizeof(StageTileSolo), 0);
 }
 
 s32 stepTileAnimation4(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 depth) {
@@ -408,7 +409,7 @@ s32 stepTileAnimation4(StageTileAnim *obj, AnimFrame *frames, s32 once, s32 dept
     return frame->frame;
 }
 
-s32 func_800A5B50(StageWanderPair *task, s32 dist) {
+s32 isFarFromHome(StageWanderPair *task, s32 dist) {
     s32 dx = task->posX - task->homeX;
     s32 dy = task->posY - task->homeY;
 
@@ -421,7 +422,7 @@ s32 func_800A5B50(StageWanderPair *task, s32 dist) {
     return dist < dx + dy;
 }
 
-s32 func_800A5B8C(s32 x, s32 y) {
+s32 getAngle(s32 x, s32 y) {
     s32 result = 0;
     s32 ratio = 0;
     s32 base;
@@ -453,7 +454,7 @@ s32 func_800A5B8C(s32 x, s32 y) {
         ratio = x * 0xFFFF / y;
     }
     for (i = 0; i <= 0x20; i++) {
-        if (D_800A6730[i] <= ratio && ratio <= D_800A6730[i + 1]) {
+        if (angleTangents[i] <= ratio && ratio <= angleTangents[i + 1]) {
             switch (base) {
             case 0:
             case 0x80:
@@ -477,14 +478,14 @@ s32 func_800A5B8C(s32 x, s32 y) {
     return 0xFF;
 }
 
-void func_800A5CFC(StageWanderPair *task) {
+void moveWanderPair(StageWanderPair *task) {
     s32 dx;
     s32 dy;
 
     task->timer += GFX.funcs.getFrameTime();
     if (task->period < task->timer) {
-        if (func_800A5B50(task, 0x1E)) {
-            task->angle = ((func_800A5B8C(task->homeX - task->posX, task->homeY - task->posY) - 0x40) << 4) & 0xFFF;
+        if (isFarFromHome(task, 0x1E)) {
+            task->angle = ((getAngle(task->homeX - task->posX, task->homeY - task->posY) - 0x40) << 4) & 0xFFF;
         } else {
             task->angle = (RANDOM.next() & 0xFF) << 4;
         }
@@ -515,7 +516,7 @@ void updateWanderPair(StageWanderPair *task) {
         task->tiles[1].anim.index = task->start;
         task->tiles[1].anim.timer = updateWanderPairFrames0[1]->duration;
         task->mode = 1;
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == task->tileAnim) {
                 task->tiles[0].tile = rec;
                 task->homeX = rec->x;
@@ -529,13 +530,13 @@ void updateWanderPair(StageWanderPair *task) {
         }
         task->period = 0x28;
         task->timer = task->start;
-        task->speed = D_800A6728[task->speedIndex];
+        task->speed = wanderPairSpeeds[task->speedIndex];
         task->angle = (RANDOM.next() & 0xFF) << 4;
         task->nextState(task);
         break;
     case TASK_RUN:
         if (task->mode != 0) {
-            func_800A5CFC(task);
+            moveWanderPair(task);
         }
         for (i = 0; i < 2; i++) {
             tile = task->tiles[i].tile;
@@ -568,7 +569,7 @@ void updateWanderPair(StageWanderPair *task) {
             task->tiles[1].anim.timer = updateWanderPairFrames1[1]->duration;
             task->setSubstate(task, 1);
         }
-        func_800A5CFC(task);
+        moveWanderPair(task);
         for (j = 0; j < 2; j++) {
             fading = task->tiles[j].tile;
             frame = stepTileAnimation4(&task->tiles[j], updateWanderPairFrames1[j], 1, 0);
@@ -595,7 +596,7 @@ void updateWanderPair(StageWanderPair *task) {
     }
 }
 
-void func_800A6210(StageWanderer *task) {
+void fadeOutWanderPair(StageWanderer *task) {
     if (task != NULL) {
         task->mode = 2;
         task->wait = 0x3C;
@@ -603,11 +604,11 @@ void func_800A6210(StageWanderer *task) {
 }
 
 void *createWanderPair(s32 arg) {
-    return createTaskWithId(updateWanderPair, 0x88, 0, arg);
+    return createTaskWithId(updateWanderPair, sizeof(StageWanderPair), 0, arg);
 }
 
 /* Creates a pair of wandering records: tileAnim and tileAnim + 9 */
-StageWanderPair *func_800A625C(s32 tileAnim, s32 speedIndex, s32 start) {
+StageWanderPair *createWanderPairTask(s32 tileAnim, s32 speedIndex, s32 start) {
     StageWanderPair *task = createTask(updateWanderPair, sizeof(StageWanderPair), 0);
 
     task->start = start;
@@ -708,11 +709,11 @@ s16 script760[] = {
     0x304, 0x2AB, 0x41E, 0x1E8, 5,
     0,
 };
-AnimFrame D_800A65A4[] = {
+AnimFrame updateClutTileFrames0[] = {
     { 0, 12 }, { 1, 12 }, { 2, 12 }, { 1, 12 },
     { 255, 0 },
 };
-AnimFrame D_800A65B8[] = {
+AnimFrame updateClutTileFrames1[] = {
     { 0, 12 }, { 1, 12 }, { 2, 12 }, { 3, 12 },
     { 4, 12 }, { 5, 12 }, { 255, 0x3E7 },
 };
@@ -738,7 +739,7 @@ AnimFrame *updateTileDuoFrames0[] = {
 AnimFrame *updateTileDuoFrames1[] = {
     updateTileDuoFrames1_0, updateTileDuoFrames1_1,
 };
-AnimFrame D_800A664C[] = {
+AnimFrame updateStillTileFrames[] = {
     { 33, 4 }, { 34, 4 }, { 35, 4 }, { 36, 4 },
     { 255, 0x3E7 },
 };
@@ -768,10 +769,10 @@ AnimFrame *updateWanderPairFrames0[] = {
 AnimFrame *updateWanderPairFrames1[] = {
     updateWanderPairFrames1_0, updateWanderPairFrames1_1,
 };
-u16 D_800A6728[] = {
+u16 wanderPairSpeeds[] = {
     96, 80, 72, 64,
 };
-u16 D_800A6730[] = {
+u16 angleTangents[] = {
     0, 0x648, 0xC93, 0x12E2, 0x1936, 0x1F92, 0x259F, 0x2C6B,
     0x32EB, 0x39C7, 0x401F, 0x46D7, 0x4DA7, 0x5491, 0x5B98, 0x62BF,
     0x6A09, 0x7179, 0x7913, 0x80DB, 0x88B5, 0x9105, 0x9970, 0xA21B,

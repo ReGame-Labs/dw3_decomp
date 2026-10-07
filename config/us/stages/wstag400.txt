@@ -199,3 +199,4 @@ endEvent1301 = 0x800A4DD8; // type:func
 endEvent1302 = 0x800A4E04; // type:func
 endEvent1303 = 0x800A4E30; // type:func
 endEvent1304 = 0x800A4E5C; // type:func
+endEvents1507To1509 = 0x800A4EA8; // type:func

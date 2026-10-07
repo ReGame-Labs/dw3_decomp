@@ -1,8 +1,9 @@
 #include "common.h"
 #include "stage.h"
-extern AnimFrame *D_800A67B4[];
-extern s8 D_800A67C0[];
-extern s8 D_800A67C4[];
+/* Defined below, after the code that uses them */
+extern AnimFrame *updateTileEffectFrames[];
+extern s8 tileEffectSortY[];
+extern s8 tileEffectY[];
 
 /* Creates the event object of flag 0x40CD while it is clear */
 void updateStage(StageTask *task, void **children) {
@@ -51,12 +52,12 @@ void setupStage(void) {
 
 #include "common/step_animation_once.inc.c"
 
-void func_800A60D8(StageTileEffect *task) {
+void resetTileEffect(StageTileEffect *task) {
     s32 i;
 
     for (i = 0; i < 3; i++) {
         task->anims[i].anim.index = 0;
-        task->anims[i].anim.timer = D_800A67B4[i][0].duration;
+        task->anims[i].anim.timer = updateTileEffectFrames[i][0].duration;
     }
 }
 
@@ -73,7 +74,7 @@ void updateTileEffect(StageTileEffect *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        func_800A60D8(task);
+        resetTileEffect(task);
         task->nextState(task);
         task->setSubstate(task, 1);
         break;
@@ -85,12 +86,12 @@ void updateTileEffect(StageTileEffect *task) {
             switch (task->step) {
             case 0:
                 i = 0;
-                for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+                for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
                     if (rec->anim >= 1 && rec->anim <= 3) {
                         task->anims[i].tile = rec;
                         rec->x = task->x;
-                        rec->y = task->y + D_800A67C4[i];
-                        rec->unkE = task->y + D_800A67C0[i];
+                        rec->y = task->y + tileEffectY[i];
+                        rec->sortY = task->y + tileEffectSortY[i];
                         i++;
                     }
                 }
@@ -100,7 +101,7 @@ void updateTileEffect(StageTileEffect *task) {
                 done = 0;
                 for (j = 0; j < 3; j++) {
                     tile = task->anims[j].tile;
-                    frame = stepAnimationOnce(&task->anims[j], D_800A67B4[j], 0);
+                    frame = stepAnimationOnce(&task->anims[j], updateTileEffectFrames[j], 0);
                     switch (frame) {
                     case 0xFF:
                         done++;
@@ -122,7 +123,7 @@ void updateTileEffect(StageTileEffect *task) {
                 for (k = 0; k < 3; k++) {
                     task->anims[k].tile->visible = 0;
                 }
-                func_800A60D8(task);
+                resetTileEffect(task);
                 task->setState(task, TASK_KILL);
                 break;
             }
@@ -144,6 +145,7 @@ void *createCommand855(s32 id) {
     return task;
 }
 
+/* Defined below, after the tables that use them */
 extern s16 script1600[];
 
 ActorImage stageImages[] = {
@@ -243,29 +245,29 @@ s16 script1600[] = {
     0x304, 0x273, 0x2DA, 0x17E, 1,
     0,
 };
-AnimFrame D_800A6710[] = {
+AnimFrame updateTileEffectFrames_0[] = {
     { 70, 4 }, { 71, 4 }, { 70, 4 }, { 71, 4 },
     { 255, 0x3E7 },
 };
-AnimFrame D_800A6724[] = {
+AnimFrame updateTileEffectFrames_2[] = {
     { 0x12C, 56 }, { 85, 6 }, { 86, 6 }, { 87, 4 },
     { 88, 4 }, { 89, 4 }, { 90, 4 }, { 88, 4 },
     { 89, 4 }, { 90, 4 }, { 88, 4 }, { 89, 4 },
     { 90, 4 }, { 88, 4 }, { 89, 4 }, { 90, 4 },
     { 88, 4 }, { 89, 4 }, { 90, 4 }, { 255, 0x3E7 },
 };
-AnimFrame D_800A6774[] = {
+AnimFrame updateTileEffectFrames_1[] = {
     { 0x12C, 16 }, { 72, 4 }, { 73, 4 }, { 74, 4 },
     { 73, 4 }, { 75, 6 }, { 76, 6 }, { 77, 14 },
     { 78, 114 }, { 79, 6 }, { 80, 6 }, { 81, 6 },
     { 82, 6 }, { 83, 6 }, { 84, 8 }, { 255, 0x3E7 },
 };
-AnimFrame *D_800A67B4[] = {
-    D_800A6710, D_800A6774, D_800A6724,
+AnimFrame *updateTileEffectFrames[] = {
+    updateTileEffectFrames_0, updateTileEffectFrames_1, updateTileEffectFrames_2,
 };
-s8 D_800A67C0[] = {
+s8 tileEffectSortY[] = {
     30, 30, 30, 0,
 };
-s8 D_800A67C4[] = {
+s8 tileEffectY[] = {
     0, -47, -47,
 };

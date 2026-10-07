@@ -128,7 +128,7 @@ void WSTAG800_handleCommand837(s32 arg0, s32 arg1, s32 arg2);
 s32 WSTAG800_createCommand839(s32 arg);
 void WSTAG805_handleCommand841(s32 arg0, s32 arg1, s32 arg2);
 void WSTAG805_handleCommand840(s32 arg0, s32 arg1, s32 arg2);
-void WSTAG810_func_800A503C(s32 arg0, s32 arg1, s32 arg2);
+void WSTAG810_handleCommands842To844(s32 arg0, s32 arg1, s32 arg2);
 s32 WSTAG820_createCommand853(s32 arg);
 void WSTAG820_handleCommand845(s32 arg0, s32 arg1, s32 arg2);
 #if VERSION_EU

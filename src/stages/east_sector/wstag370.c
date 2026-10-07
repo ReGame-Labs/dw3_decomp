@@ -4,6 +4,7 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+/* Defined below, after the code that uses them */
 extern FieldBattles stageBattles0[];
 extern FieldBattles stageBattles1[];
 #if VERSION_US

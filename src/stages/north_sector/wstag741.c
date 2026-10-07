@@ -1,10 +1,12 @@
 #include "common.h"
 #include "stage.h"
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
-extern s32 D_800A59A0[];
+
+/* Defined below, after the code that uses them */
+extern s32 partyActorIds[];
 void *createSpritePair(s32 x, s32 y);
-extern AnimFrame D_800A59AC[];
-extern AnimFrame D_800A59C8[];
+extern AnimFrame updateSpritePairFrames_0[];
+extern AnimFrame updateSpritePairFrames_1[];
 extern AnimFrame *updateSpritePairFrames[];
 
 void updateEvent9015(StageTask *task, StagePartyChildren *children) {
@@ -40,7 +42,7 @@ void updateEvent9015(StageTask *task, StagePartyChildren *children) {
             case 0:
             default:
                 i = task->substate - 1;
-                actor = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, D_800A59A0[i]);
+                actor = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, partyActorIds[i]);
                 if (actor != NULL) {
                     children->party[i] = createSpritePair(actor->tileX, actor->tileY);
                     SOUND.playSound(SOUND_COMEX113);
@@ -75,8 +77,8 @@ void updateEvent9015(StageTask *task, StagePartyChildren *children) {
     }
 }
 
-void *func_800A4F30(void) {
-    return createTask(updateEvent9015, 0x54, 0xC);
+void *startEvents9000To9015(void) {
+    return createTask(updateEvent9015, sizeof(StageTask), sizeof(StagePartyChildren));
 }
 
 void updateStage(StageTask *task, void **children) {
@@ -114,9 +116,9 @@ void updateSpritePair(StageSpritePair *task) {
     case TASK_INIT:
     default:
         task->anims[0].index = 0;
-        task->anims[0].timer = D_800A59AC[0].duration;
+        task->anims[0].timer = updateSpritePairFrames_0[0].duration;
         task->anims[1].index = 0;
-        task->anims[1].timer = D_800A59C8[0].duration;
+        task->anims[1].timer = updateSpritePairFrames_1[0].duration;
         task->nextState(task);
         break;
     case TASK_RUN:
@@ -321,21 +323,21 @@ s16 script1296[] = {
     0x300, 0x1E,
     0,
 };
-s32 D_800A59A0[] = {
+s32 partyActorIds[] = {
     2, 4, 8,
 };
-AnimFrame D_800A59AC[] = {
+AnimFrame updateSpritePairFrames_0[] = {
     { 50, 4 }, { 51, 4 }, { 52, 4 }, { 53, 4 },
     { 54, 4 }, { 55, 4 }, { 255, 0x3E7 },
 };
-AnimFrame D_800A59C8[] = {
+AnimFrame updateSpritePairFrames_1[] = {
     { 0x12C, 4 }, { 56, 4 }, { 57, 4 }, { 58, 4 },
     { 59, 4 }, { 60, 4 }, { 61, 4 }, { 62, 4 },
     { 63, 4 }, { 64, 4 }, { 65, 4 }, { 66, 4 },
     { 67, 4 }, { 255, 0x3E7 },
 };
 AnimFrame *updateSpritePairFrames[] = {
-    D_800A59AC, D_800A59C8,
+    updateSpritePairFrames_0, updateSpritePairFrames_1,
 };
 Battle area0Battle0 = { 136, 24, MUSIC(2, 0) };
 Battle area0Battle1 = { 136, 24, MUSIC(2, 0) };
@@ -494,21 +496,21 @@ void (*stageFuncs[])(void) = {
 FieldEvent stageEvents[] = {
     { 1295, script1295, EVENT_TEXT(0x15), NULL, endEvent1295 },
     { 1296, script1296, EVENT_TEXT(0x16), NULL, endEvent1296 },
-    { 9000, NULL, 0, func_800A4F30, endEvent9000 },
-    { 9001, NULL, 0, func_800A4F30, endEvent9001 },
-    { 9002, NULL, 0, func_800A4F30, endEvent9002 },
-    { 9003, NULL, 0, func_800A4F30, endEvent9003 },
-    { 9004, NULL, 0, func_800A4F30, endEvent9004 },
-    { 9005, NULL, 0, func_800A4F30, endEvent9005 },
-    { 9006, NULL, 0, func_800A4F30, endEvent9006 },
-    { 9007, NULL, 0, func_800A4F30, endEvent9007 },
-    { 9008, NULL, 0, func_800A4F30, endEvent9008 },
-    { 9009, NULL, 0, func_800A4F30, endEvent9009 },
-    { 9010, NULL, 0, func_800A4F30, endEvent9010 },
-    { 9011, NULL, 0, func_800A4F30, endEvent9011 },
-    { 9012, NULL, 0, func_800A4F30, endEvent9012 },
-    { 9013, NULL, 0, func_800A4F30, endEvent9013 },
-    { 9014, NULL, 0, func_800A4F30, endEvent9014 },
-    { 9015, NULL, 0, func_800A4F30, endEvent9015 },
+    { 9000, NULL, 0, startEvents9000To9015, endEvent9000 },
+    { 9001, NULL, 0, startEvents9000To9015, endEvent9001 },
+    { 9002, NULL, 0, startEvents9000To9015, endEvent9002 },
+    { 9003, NULL, 0, startEvents9000To9015, endEvent9003 },
+    { 9004, NULL, 0, startEvents9000To9015, endEvent9004 },
+    { 9005, NULL, 0, startEvents9000To9015, endEvent9005 },
+    { 9006, NULL, 0, startEvents9000To9015, endEvent9006 },
+    { 9007, NULL, 0, startEvents9000To9015, endEvent9007 },
+    { 9008, NULL, 0, startEvents9000To9015, endEvent9008 },
+    { 9009, NULL, 0, startEvents9000To9015, endEvent9009 },
+    { 9010, NULL, 0, startEvents9000To9015, endEvent9010 },
+    { 9011, NULL, 0, startEvents9000To9015, endEvent9011 },
+    { 9012, NULL, 0, startEvents9000To9015, endEvent9012 },
+    { 9013, NULL, 0, startEvents9000To9015, endEvent9013 },
+    { 9014, NULL, 0, startEvents9000To9015, endEvent9014 },
+    { 9015, NULL, 0, startEvents9000To9015, endEvent9015 },
     { -1, NULL, 0, NULL, NULL },
 };

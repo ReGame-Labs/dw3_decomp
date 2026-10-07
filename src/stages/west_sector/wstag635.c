@@ -1,5 +1,6 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern AnimFrame updateTileAnimsFrames0[];
 extern AnimFrame updateTileAnimsFrames1[];
 extern AnimFrame updateTileAnimsFrames2[];
@@ -63,11 +64,11 @@ AnimFrame updateTileAnimsFrames2[] = {
     { 76, 8 }, { 77, 8 }, { 78, 8 }, { 79, 8 },
     { 80, 8 }, { 81, 8 }, { 82, 160 }, { 255, 0 },
 };
-StagePoint D_800A52B4 = { 0x259, 1, 2, 0x350, 0x2F8, 3, NULL };
-StagePoint D_800A52C4 = { 0x259, 1, 3, 0x358, 252, 1, &D_800A52B4 };
-StagePoint D_800A52D4 = { 0x259, 1, 1, 0x120, 0x100, 7, &D_800A52C4 };
-StagePoint D_800A52E4 = { 0x257, 0, 0, 0x100, 0x278, 5, &D_800A52D4 };
-StagePoints placePoints1_1 = { 1, 1, &D_800A52E4 };
+StagePoint placePoints1_1Point3 = { 0x259, 1, 2, 0x350, 0x2F8, 3, NULL };
+StagePoint placePoints1_1Point2 = { 0x259, 1, 3, 0x358, 252, 1, &placePoints1_1Point3 };
+StagePoint placePoints1_1Point1 = { 0x259, 1, 1, 0x120, 0x100, 7, &placePoints1_1Point2 };
+StagePoint placePoints1_1Point0 = { 0x257, 0, 0, 0x100, 0x278, 5, &placePoints1_1Point1 };
+StagePoints placePoints1_1 = { 1, 1, &placePoints1_1Point0 };
 StagePoint placePoints1_2Point3 = { 0x259, 1, 1, 0x350, 0x2F8, 3, NULL };
 StagePoint placePoints1_2Point2 = { 0x259, 1, 4, 0x358, 252, 1, &placePoints1_2Point3 };
 StagePoint placePoints1_2Point1 = { 0x259, 1, 2, 0x120, 0x100, 7, &placePoints1_2Point2 };
@@ -103,7 +104,7 @@ StagePoint placePoints1_8Point2 = { 0x259, 1, 2, 0x358, 252, 1, &placePoints1_8P
 StagePoint placePoints1_8Point1 = { 0x259, 1, 7, 0x120, 0x100, 7, &placePoints1_8Point2 };
 StagePoint placePoints1_8Point0 = { 0x259, 1, 6, 0x118, 0x2EC, 5, &placePoints1_8Point1 };
 StagePoints placePoints1_8 = { 1, 8, &placePoints1_8Point0 };
-StagePoints placePoints0_0 = { 0, 0, &D_800A52E4 };
+StagePoints placePoints0_0 = { 0, 0, &placePoints1_1Point0 };
 StagePoints *placePoints[] = {
     &placePoints1_1, &placePoints1_2, &placePoints1_3, &placePoints1_4,
     &placePoints1_5, &placePoints1_6, &placePoints1_7, &placePoints1_8,

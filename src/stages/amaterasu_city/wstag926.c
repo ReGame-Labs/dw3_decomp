@@ -33,7 +33,7 @@ void updateTileTimer(StageTileTimer *task) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == 1) {
                 task->tile = rec;
                 rec->y--;
@@ -59,9 +59,10 @@ void updateTileTimer(StageTileTimer *task) {
 }
 
 void *createCommand854(s32 arg) {
-    return createTaskWithId(updateTileTimer, 0x58, 0, arg);
+    return createTaskWithId(updateTileTimer, sizeof(StageTileTimer), 0, arg);
 }
 
+/* Defined below, after the tables that use them */
 extern s16 script1606[];
 
 ActorImage stageImages[] = {

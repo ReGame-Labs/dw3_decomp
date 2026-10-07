@@ -82,6 +82,7 @@ actor7 = 0x800A64E8;
 // functions named by what calls them (tools/name_stage_funcs.py)
 updateTileTask = 0x800A4D7C; // type:func
 createCommand853 = 0x800A4E78; // type:func
+createStageEffectWithId = 0x800A5638; // type:func
 handleCommand845 = 0x800A5680; // type:func
 endEvent1060 = 0x800A56B8; // type:func
 endEvent1070 = 0x800A5704; // type:func

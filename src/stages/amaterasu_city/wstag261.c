@@ -1,6 +1,7 @@
 #include "common.h"
 #include "stage.h"
-extern s16 D_800A555C[];
+/* Defined below, after the code that uses them */
+extern s16 tileLiftShake[];
 
 /* Moves the two records and the player 0x7F up or down when an event sets TASK_DONE */
 void updateTileLift(StageTileLift *task) {
@@ -14,7 +15,7 @@ void updateTileLift(StageTileLift *task) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             switch (rec->anim) {
             case 2:
                 task->tiles[1] = rec;
@@ -63,7 +64,7 @@ void updateTileLift(StageTileLift *task) {
             break;
         case 2:
         case 4:
-            d = D_800A555C[task->shake];
+            d = tileLiftShake[task->shake];
             if (d != 0x3E8) {
                 tile0->y = task->y[0] + d;
                 tile1->y = task->y[1] + d;
@@ -269,7 +270,7 @@ s16 script1326[] = {
     0x300, 0x1E,
     0,
 };
-s16 D_800A555C[] = {
+s16 tileLiftShake[] = {
     1, 2, 1, 0, -1, -2, -1, 0,
     0x3E8, 0,
 };

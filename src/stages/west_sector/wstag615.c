@@ -30,6 +30,7 @@ void endEvent531(void) {
     GAME.progress = 19;
 }
 
+/* Defined below, after the code that uses them */
 extern StageSlot stageSlots0[];
 extern StageSlot stageSlots1[];
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };

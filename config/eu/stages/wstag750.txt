@@ -1,5 +1,5 @@
 // names from the C of the modules this version builds (tools/version_symbols.py)
-func_800A4D7C = 0x800A5EB8; // type:func
+resetTileEffect = 0x800A5EB8; // type:func
 updateTileEffect = 0x800A5EF0; // type:func
 handleCommand846 = 0x800A6170; // type:func
 createTileEffect = 0x800A61C0; // type:func
@@ -15,13 +15,13 @@ script883 = 0x800A6F28;
 script884 = 0x800A7058;
 script886 = 0x800A70C4;
 script1245 = 0x800A712C;
-D_800A605C = 0x800A71A0;
-D_800A6070 = 0x800A71B4;
-D_800A60C0 = 0x800A7204;
-D_800A6100 = 0x800A7244;
-D_800A610C = 0x800A7250;
-D_800A6110 = 0x800A7254;
-D_800A6114 = 0x800A7258;
+updateTileEffectFrames_0 = 0x800A71A0;
+updateTileEffectFrames_2 = 0x800A71B4;
+updateTileEffectFrames_1 = 0x800A7204;
+updateTileEffectFrames = 0x800A7244;
+tileEffectSortY = 0x800A7250;
+tileEffectY = 0x800A7254;
+tileEffectPlaces = 0x800A7258;
 updateStageSpots = 0x800A725C;
 stageImages = 0x800A72D8;
 actor0Talk0Conditions = 0x800A7388;

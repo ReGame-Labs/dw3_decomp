@@ -1,12 +1,13 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern AnimFrame updateTileAtFrames[];
 extern AnimFrame updateTileTaskFrames[];
 extern AnimFrame *updateTileSwitchFrames[3];
 extern StageTileAtSpot updateTileSwitchSpots[];
 
 /* Steps an animation, holding its last frame, and returns the frame */
-s32 func_800A4CDC(StageTileAnim *obj, AnimFrame *frames, s32 depth) {
+s32 stepHeldAnimation(StageTileAnim *obj, AnimFrame *frames, s32 depth) {
     AnimFrame *frame = &frames[obj->anim.index];
     s32 dt = GFX.funcs.getFrameTime();
 
@@ -25,7 +26,7 @@ s32 func_800A4CDC(StageTileAnim *obj, AnimFrame *frames, s32 depth) {
             frame = &frames[obj->anim.index];
             obj->anim.timer += frame->duration;
         }
-        func_800A4CDC(obj, frames, depth + 1);
+        stepHeldAnimation(obj, frames, depth + 1);
     }
     return frame->frame;
 }
@@ -41,7 +42,7 @@ void updateTileAt(StageTileAt *task) {
         task->nextState(task);
         task->obj.anim.index = 0;
         task->obj.anim.timer = updateTileAtFrames[0].duration;
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == task->anim) {
                 task->obj.tile = rec;
                 rec->x = task->x;
@@ -60,7 +61,7 @@ void updateTileAt(StageTileAt *task) {
         }
         tile = task->obj.tile;
         tile->visible = 1;
-        tile->frame = func_800A4CDC(&task->obj, updateTileAtFrames, 0);
+        tile->frame = stepHeldAnimation(&task->obj, updateTileAtFrames, 0);
         break;
     case TASK_KILL:
         break;
@@ -92,7 +93,7 @@ void updateTileTask(StageTileTask *task) {
         task->nextState(task);
         task->obj.anim.index = 0;
         task->obj.anim.timer = updateTileTaskFrames[0].duration;
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == 1) {
                 task->obj.tile = rec;
             }
@@ -134,7 +135,7 @@ void handleCommand847(StageTask *task, s32 id) {
 }
 
 void *createTileTask(s32 arg) {
-    return createTaskWithId(updateTileTask, 0x58, 0, arg);
+    return createTaskWithId(updateTileTask, sizeof(StageTileTask), 0, arg);
 }
 
 #include "common/step_tile_animation.inc.c"
@@ -148,7 +149,7 @@ void updateTileSwitch(StageTileSwitch *task, StageTileAts *children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == 2) {
                 task->obj.anim.index = 0;
                 task->obj.anim.timer = updateTileSwitchFrames[0][0].duration;
@@ -273,7 +274,7 @@ void handleCommand848(void *arg, s32 id) {
 
 /* Creates the task of updateTileSwitch with the given id */
 void *createCommand848(s32 id) {
-    return createTaskWithId(updateTileSwitch, 0x60, 0x14, id);
+    return createTaskWithId(updateTileSwitch, sizeof(StageTileSwitch), sizeof(StageTileAts), id);
 }
 
 /* Creates the stage object of flag 0x4051, and the event object of story progress 26 */

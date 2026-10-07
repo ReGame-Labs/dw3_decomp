@@ -2,7 +2,7 @@
 #include "stage.h"
 
 /*
- * Sets unk5[0] of the map objects with animation 1 from flag
+ * Cycles the frames of the map objects with animation 1 if flag
  * 0x1A0A, and creates the event object of story progress 27
  */
 void updateStage(StageTask *task, void **children) {
@@ -13,7 +13,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         set = FLAGS_00.checkCondition(FLAG(0x1A, 0xA), 1) != 0;
-        for (tile = FIELDSTG_state.objects; tile->unk2 != 0; tile++) {
+        for (tile = FIELDSTG_state.objects; tile->margin != 0; tile++) {
             if (tile->anim == 1) {
                 tile->cycle = set;
             }

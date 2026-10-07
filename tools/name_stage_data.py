@@ -18,7 +18,8 @@ datum by the place the structure gives it, and nothing else:
       without stageSlots
     stageEvents[k].script             script<id>      (the event's id)
     placePoints[k], ids a and b       placePoints<a>_<b>  (StagePoints)
-      .points, then each next         placePoints<a>_<b>Point<n>
+      .points, then each next         placePoints<a>_<b>Point<n> (a chain that
+                                        several places share: the first's)
     the FieldTalk tables left (the    talks<k>, talks<k>Talk<j>Conditions...
       characters differ between       and actorConditions<k> for the
       versions, or share them)        characters' conditions, in order
@@ -236,13 +237,14 @@ def structural_names(defs):
         places = [p for p in places if p in defs and defs[p][0] == "StagePoints"
                   and isinstance(defs[p][2], list) and len(defs[p][2]) == 3]
         keys = [f"{int(defs[p][2][0], 0)}_{int(defs[p][2][1], 0)}" for p in places]
+        # a chain that several places share is named after the first of them
+        seen = set()
         for place, key in zip(places, keys):
             if keys.count(key) > 1:
                 continue
             name(place, f"placePoints{key}")
             point = target(defs[place][2][2])
             n = 0
-            seen = set()
             while point is not None and point in defs and point not in seen:
                 seen.add(point)
                 name(point, f"placePoints{key}Point{n}")

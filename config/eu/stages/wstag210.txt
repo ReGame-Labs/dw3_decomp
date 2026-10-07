@@ -1,9 +1,9 @@
 // names from the C of the modules this version builds (tools/version_symbols.py)
 updateListMenu = 0x800A5E74; // type:func
 startEvent8 = 0x800A67E0; // type:func
-func_800A56B8 = 0x800A680C; // type:func
+updateEvent9 = 0x800A680C; // type:func
 startEvent9 = 0x800A6DC8; // type:func
-func_800A5C80 = 0x800A6DF4; // type:func
+updateEvent1510 = 0x800A6DF4; // type:func
 startEvent1510 = 0x800A73B0; // type:func
 endEvent310 = 0x800A7500; // type:func
 endEvent685 = 0x800A754C; // type:func
@@ -17,7 +17,7 @@ script320 = 0x800A7B88;
 script330 = 0x800A7BE4;
 script685 = 0x800A7C40;
 script1511 = 0x800A7F6C;
-D_800A6DE8 = 0x800A7F84;
+updateListMenuCountFrames = 0x800A7F84;
 area0Battle0 = 0x800A7F94;
 area0Battle1 = 0x800A7FA0;
 area0Battle2 = 0x800A7FAC;

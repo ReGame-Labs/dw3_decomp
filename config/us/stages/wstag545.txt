@@ -74,6 +74,7 @@ actor3 = 0x800A6084;
 actor4 = 0x800A6098;
 
 // functions named by what calls them (tools/name_stage_funcs.py)
+stepHeldAnimation = 0x800A4CDC; // type:func
 updateTileAt = 0x800A4DE4; // type:func
 createTileAt = 0x800A4F18; // type:func
 updateTileTask = 0x800A5048; // type:func

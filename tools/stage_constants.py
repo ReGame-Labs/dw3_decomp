@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Writes the stages' sound ids and flag codes by name: MUSIC and the SOUND_ names
-(include/dw3/sound.h, include/stage.h), and the condition codes
+Writes the stages' sound ids, story points and flag codes by name: MUSIC and
+the SOUND_ names (include/dw3/sound.h, include/stage.h), the FIELD_PROGRESS_
+names (include/field_map.h), and the condition codes
 (include/dw3/game_state.h).
 
 - a field's or a battle's music (FieldState.music, the third word of a
@@ -9,6 +10,8 @@ Writes the stages' sound ids and flag codes by name: MUSIC and the SOUND_ names
 - a sound the stages play, given to SOUND.playSound, stopSound or
   fadeOutSound or in a table of them, becomes its SOUND_ name from
   include/dw3/sound.h or include/stage.h;
+- a story point that include/field_map.h names (FIELD_PROGRESS_), compared
+  with or stored in GAME.progress, becomes its name;
 - the codes of the FLAGS_00 conditions and actions (the lists of the
   characters and their talks, a StageSlot's conditions, and the codes given
   to FLAGS_00.checkCondition and applyAction) become FLAG(group, id),
@@ -40,6 +43,13 @@ def music(value):
     if v & 0xFE00FF00 != 0x60000000:
         return None
     return f"MUSIC({number(v >> 18 & 0x7F)}, {number(v & 0xFF)})"
+
+
+def progress_names():
+    """{value: FIELD_PROGRESS_ name} of include/field_map.h"""
+    text = open("include/field_map.h").read()
+    return {int(m.group(2), 0): m.group(1)
+            for m in re.finditer(r"^#define (FIELD_PROGRESS_\w+) (" + NUMBER + r")\b", text, re.M)}
 
 
 def sound_names():
@@ -176,6 +186,14 @@ def rewrite(text, sounds):
         return m.group(1) + sounds[v] + ")" if v in sounds else m.group(0)
 
     text = re.sub(r"((?:playSound|stopSound|fadeOutSound)\()(" + NUMBER + r")\)", call, text)
+
+    points = progress_names()
+
+    def progress(m):
+        v = int(m.group(2), 0)
+        return m.group(1) + points[v] if v in points else m.group(0)
+
+    text = re.sub(r"(GAME\.progress (?:==|!=|=) )(" + NUMBER + r")\b", progress, text)
 
     # a table of sounds that a function plays: s32 D_[] = { ids }
     def table(m):

@@ -17,7 +17,7 @@ void FIELDSTG_runStoryEvents(StoryEvents *task, StoryEventsChildren *children) {
     default:
         task->nextState(task);
         task->script = 0;
-        for (object = FIELDSTG_state.objects; object->unk2 != 0; object++) {
+        for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
             if (object->anim == 1) {
                 break;
             }

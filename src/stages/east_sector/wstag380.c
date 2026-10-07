@@ -8,6 +8,7 @@ void endEvent205(void) {
     GAME.progress = 9;
 }
 
+/* Defined below, after the code that uses them */
 extern FieldBattles stageBattles0[];
 extern FieldBattles stageBattles1[];
 extern FieldBattles stageBattles2[];

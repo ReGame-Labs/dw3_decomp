@@ -416,10 +416,10 @@ typedef struct GameState {
     /* 0x26D0 */ s32 clearTempFlags;
     /* 0x26D4 */ s32 lastFieldMode; /* the field mode FIELDSTG last started */
     /* 0x26D8 */ s32 mapIndex; /* which of the stage's maps the field uses */
-    /* 0x26DC */ s32 unk26DC;
+    /* 0x26DC */ s32 altTriggers; /* WSTAG810: its second triggers map is in use */
     /* 0x26E0 */ s32 playerDepth; /* the player's depth, kept while in the mode */
     /* 0x26E4 */ s32 prizeSpot; /* the hidden spot that has the prize */
-    /* 0x26E8 */ s32 unk26E8;
+    /* 0x26E8 */ s32 dark; /* the Dark Dungeon's darkness is on (WSTAG745, WSTAG746) */
     /* 0x26EC */ s32 flightZ; /* the flying player's height, kept while in the mode */
     /* 0x26F0 */ GameFuncs funcs;
 #elif VERSION_EU
@@ -444,10 +444,10 @@ typedef struct GameState {
     /* 0x26D8 */ s32 clearTempFlags;
     /* 0x26DC */ s32 lastFieldMode;
     /* 0x26E0 */ s32 mapIndex;
-    /* 0x26E4 */ s32 unk26DC;
+    /* 0x26E4 */ s32 altTriggers;
     /* 0x26E8 */ s32 playerDepth;
     /* 0x26EC */ s32 prizeSpot;
-    /* 0x26F0 */ s32 unk26E8;
+    /* 0x26F0 */ s32 dark;
     /* 0x26F4 */ s32 flightZ;
     /* 0x26F8 */ s32 randomGauges; /* gauge games left with random rows, reset with each new mode */
     /* 0x26FC */ GameFuncs funcs;

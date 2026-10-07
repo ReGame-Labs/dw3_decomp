@@ -1,5 +1,5 @@
-D_800A59AC = 0x800A59AC; // size:0x1C
-D_800A59C8 = 0x800A59C8; // size:0x38
+updateSpritePairFrames_0 = 0x800A59AC; // size:0x1C
+updateSpritePairFrames_1 = 0x800A59C8; // size:0x38
 
 // the names the stages share (the same code or data in each)
 updateStage = 0x800A4F5C; // type:func
@@ -79,6 +79,7 @@ actor3 = 0x800A5E10;
 
 // functions named by what calls them (tools/name_stage_funcs.py)
 updateEvent9015 = 0x800A4CA8; // type:func
+startEvents9000To9015 = 0x800A4F30; // type:func
 drawPairSprite = 0x800A5130; // type:func
 updateSpritePair = 0x800A51E8; // type:func
 createSpritePair = 0x800A5380; // type:func
@@ -102,4 +103,5 @@ endEvent9014 = 0x800A56C8; // type:func
 endEvent9015 = 0x800A56F4; // type:func
 
 // named by the function or table that uses them (tools/name_stage_uses.py)
+partyActorIds = 0x800A59A0;
 updateSpritePairFrames = 0x800A5A00;

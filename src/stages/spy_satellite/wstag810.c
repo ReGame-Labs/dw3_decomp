@@ -5,8 +5,10 @@
 #elif VERSION_EU
 #define STAGE_FILE 0x6ED
 #endif
+
+/* Defined below, after the code that uses them */
 extern AnimFrame updateTilePairNFrames0[];
-extern AnimFrame D_800A6058[];
+extern AnimFrame updateTilePairNFrames2[];
 extern AnimFrame updateTilePairNFrames1[];
 extern StageEffectSpot updateStageSpots[];
 extern StageSlot stageSlots0[];
@@ -24,7 +26,7 @@ void updateTilePairN(StageTilePairN *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == task->anim) {
                 task->anims[0].anim.index = 0;
                 task->anims[0].anim.timer = (u8)updateTilePairNFrames0[0].duration;
@@ -40,7 +42,7 @@ void updateTilePairN(StageTilePairN *task) {
         if (task->done == 1) {
             task->playing = 1;
             task->anims[0].anim.index = 0;
-            task->anims[0].anim.timer = (u8)D_800A6058[0].duration;
+            task->anims[0].anim.timer = (u8)updateTilePairNFrames2[0].duration;
             task->setState(task, TASK_DONE);
         } else {
             task->nextState(task);
@@ -68,7 +70,7 @@ void updateTilePairN(StageTilePairN *task) {
             case 0:
                 tile->visible = 1;
                 if (task->playing) {
-                    frame = stepTileAnimation(&task->anims[0], D_800A6058, 1, 0);
+                    frame = stepTileAnimation(&task->anims[0], updateTilePairNFrames2, 1, 0);
                     if (frame == 0xFF) {
                         tile->frame = 0x54;
                         task->playing = 0;
@@ -94,17 +96,17 @@ void updateTilePairN(StageTilePairN *task) {
 }
 
 /* Plays the first record's one-shot animation when the event of map object 0x35B happens */
-void func_800A503C(StageTilePairN *task, s32 id) {
+void handleCommands842To844(StageTilePairN *task, s32 id) {
     if (id == 0x35B) {
         task->playing = 1;
         task->anims[0].anim.index = 0;
-        task->anims[0].anim.timer = (u8)D_800A6058[0].duration;
+        task->anims[0].anim.timer = (u8)updateTilePairNFrames2[0].duration;
         task->setState(task, TASK_DONE);
     }
 }
 
 /* Creates the tile pair object of animations 1 and 2 */
-void *func_800A5088(s32 arg) {
+void *createTilePairN1(s32 arg) {
     StageTilePairN *task = createTaskWithId(updateTilePairN, 0x68, 0, arg);
 
     task->anim = 1;
@@ -113,7 +115,7 @@ void *func_800A5088(s32 arg) {
 }
 
 /* Creates the tile pair object of animations 3 and 4 */
-void *func_800A50C4(s32 arg) {
+void *createTilePairN3(s32 arg) {
     StageTilePairN *task = createTaskWithId(updateTilePairN, 0x68, 0, arg);
 
     task->anim = 3;
@@ -122,7 +124,7 @@ void *func_800A50C4(s32 arg) {
 }
 
 /* Creates the tile pair object of animations 5 and 6 */
-void *func_800A5100(s32 arg) {
+void *createTilePairN5(s32 arg) {
     StageTilePairN *task = createTaskWithId(updateTilePairN, 0x68, 0, arg);
 
     task->anim = 5;
@@ -131,7 +133,7 @@ void *func_800A5100(s32 arg) {
 }
 
 /* Creates the tile pair object of animations anim and anim + 1, started in TASK_DONE */
-void *func_800A513C(s32 anim) {
+void *createTilePairNDone(s32 anim) {
     StageTilePairN *task = createTask(updateTilePairN, 0x68, 0);
 
     task->anim = anim;
@@ -153,19 +155,19 @@ void updateStage(StageTask *task, void **children) {
             }
         }
         if (FLAGS_00.checkCondition(FLAG(0x40, 0x6E), 0)) {
-            children[62] = func_800A5088(0x34C);
+            children[62] = createTilePairN1(0x34C);
         } else {
-            children[62] = func_800A513C(1);
+            children[62] = createTilePairNDone(1);
         }
         if (FLAGS_00.checkCondition(FLAG(0x40, 0x6F), 0)) {
-            children[63] = func_800A50C4(0x34B);
+            children[63] = createTilePairN3(0x34B);
         } else {
-            children[63] = func_800A513C(3);
+            children[63] = createTilePairNDone(3);
         }
         if (FLAGS_00.checkCondition(FLAG(0x40, 0x6D), 0)) {
-            children[64] = func_800A5100(0x34A);
+            children[64] = createTilePairN5(0x34A);
         } else {
-            children[64] = func_800A513C(5);
+            children[64] = createTilePairNDone(5);
         }
         break;
     case TASK_RUN:
@@ -183,22 +185,22 @@ void updateStage(StageTask *task, void **children) {
 #include "common/update_stage_effect.inc.c"
 #include "common/create_stage_effect.inc.c"
 
-/* Puts back the first background when GAME.unk26DC is set, and clears it */
+/* Puts back the first triggers map when GAME.altTriggers is set, and clears it */
 void *startEvent9000(void) {
-    if (GAME.unk26DC != 0) {
+    if (GAME.altTriggers != 0) {
         FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 3);
         FIELDSTG_state.slots = stageSlots0;
-        GAME.unk26DC = 0;
+        GAME.altTriggers = 0;
     }
     return NULL;
 }
 
-/* Switches to the second background when GAME.unk26DC is clear, and sets it */
+/* Switches to the second triggers map when GAME.altTriggers is clear, and sets it */
 void *startEvent9001(void) {
-    if (GAME.unk26DC == 0) {
+    if (GAME.altTriggers == 0) {
         FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 4);
         FIELDSTG_state.slots = stageSlots1;
-        GAME.unk26DC = 0x20;
+        GAME.altTriggers = 0x20;
     }
     return NULL;
 }
@@ -246,11 +248,11 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.clearTempFlags != 0 || GAME.unk26DC == 0) {
-        GAME.unk26DC = 1;
+    if (GAME.clearTempFlags != 0 || GAME.altTriggers == 0) {
+        GAME.altTriggers = 1;
         startEvent9000();
     } else {
-        GAME.unk26DC = 0;
+        GAME.altTriggers = 0;
         startEvent9001();
     }
 }
@@ -448,7 +450,7 @@ s16 script1035[] = {
 AnimFrame updateTilePairNFrames0[] = {
     { 0, 6 }, { 1, 6 }, { 2, 6 }, { 255, 0 },
 };
-AnimFrame D_800A6058[] = {
+AnimFrame updateTilePairNFrames2[] = {
     { 71, 4 }, { 72, 4 }, { 73, 4 }, { 74, 4 },
     { 75, 4 }, { 76, 4 }, { 77, 4 }, { 78, 4 },
     { 79, 4 }, { 80, 4 }, { 81, 4 }, { 82, 4 },

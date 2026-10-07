@@ -34,10 +34,10 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-StagePoint D_800A4FB0 = { 0x2E4, 1, 1, 0x340, 160, 1, NULL };
-StagePoint D_800A4FC0 = { 0x2E6, 1, 1, 160, 0x150, 5, &D_800A4FB0 };
-StagePoint D_800A4FD0 = { 0x21D, 0, 0, 0x328, 0x424, 0, &D_800A4FC0 };
-StagePoints placePoints1_1 = { 1, 1, &D_800A4FD0 };
+StagePoint placePoints1_1Point2 = { 0x2E4, 1, 1, 0x340, 160, 1, NULL };
+StagePoint placePoints1_1Point1 = { 0x2E6, 1, 1, 160, 0x150, 5, &placePoints1_1Point2 };
+StagePoint placePoints1_1Point0 = { 0x21D, 0, 0, 0x328, 0x424, 0, &placePoints1_1Point1 };
+StagePoints placePoints1_1 = { 1, 1, &placePoints1_1Point0 };
 StagePoint placePoints1_2Point2 = { 0x2E7, 1, 1, 0x250, 232, 1, NULL };
 StagePoint placePoints1_2Point1 = { 0x2E4, 1, 1, 192, 0x180, 5, &placePoints1_2Point2 };
 StagePoint placePoints1_2Point0 = { 0x234, 0, 0, 0x320, 0x1C8, 0, &placePoints1_2Point1 };
@@ -58,7 +58,7 @@ StagePoint placePoints14_1Point2 = { 0x2E2, 14, 1, 0x330, 248, 1, NULL };
 StagePoint placePoints14_1Point1 = { 0x2E4, 14, 1, 192, 0x180, 5, &placePoints14_1Point2 };
 StagePoint placePoints14_1Point0 = { 0x2A8, 0, 0, 0x360, 0x12C, 0, &placePoints14_1Point1 };
 StagePoints placePoints14_1 = { 14, 1, &placePoints14_1Point0 };
-StagePoints placePoints0_0 = { 0, 0, &D_800A4FD0 };
+StagePoints placePoints0_0 = { 0, 0, &placePoints1_1Point0 };
 StagePoints *placePoints[] = {
     &placePoints1_1, &placePoints1_2, &placePoints4_1, &placePoints11_1,
     &placePoints11_2, &placePoints14_1, &placePoints0_0, NULL,

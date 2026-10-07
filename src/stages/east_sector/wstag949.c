@@ -1,9 +1,10 @@
 #include "common.h"
 #include "stage.h"
-extern s32 D_800A6174[][2];
+/* Defined below, after the code that uses them */
+extern s32 farSpriteSpots[][2];
 
 /* Draws the 36 sprites of file 0x919 at their places, scrolling at 1/8 of the layer */
-void func_800A5DE4(StageTask *task) {
+void updateFarSprites(StageTask *task) {
     SpriteDrawer drawer;
     s32 pos[2];
     s32 scroll[2];
@@ -25,7 +26,7 @@ void func_800A5DE4(StageTask *task) {
         pos[0] = (scroll[0] - 0x2C0) >> 3;
         pos[1] = (scroll[1] - 0x280) >> 3;
         for (i = 0; i < 0x24; i++) {
-            drawer.draw(FILE_CACHE.getEntry(0x9190000), 0, D_800A6174[i][0] + pos[0], D_800A6174[i][1] + pos[1]);
+            drawer.draw(FILE_CACHE.getEntry(0x9190000), 0, farSpriteSpots[i][0] + pos[0], farSpriteSpots[i][1] + pos[1]);
         }
         break;
     case TASK_DONE:
@@ -34,15 +35,15 @@ void func_800A5DE4(StageTask *task) {
     }
 }
 
-void *func_800A5F38(void) {
-    return createTask(func_800A5DE4, 0x50, 0);
+void *createFarSprites(void) {
+    return createTask(updateFarSprites, 0x50, 0);
 }
 
 void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        children[0] = func_800A5F38();
+        children[0] = createFarSprites();
         task->nextState(task);
         break;
     case TASK_RUN:
@@ -79,7 +80,7 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-s32 D_800A6174[][2] = {
+s32 farSpriteSpots[][2] = {
     596, 399, 809, 564,
     820, 832, 1143, 1009,
     738, 1035, 416, 1055,

@@ -5,14 +5,16 @@
 #elif VERSION_EU
 #define TIMER_SHEET 0x6FE
 #endif
+
+/* Defined below, after the code that uses them */
 extern AnimFrame updateTilePair16Frames0[];
-extern AnimFrame D_800A64CC[];
+extern AnimFrame updateTilePair16Frames2[];
 extern AnimFrame updateTilePair16Frames1[];
 extern StageEffectSpot updateStageSpots[];
 extern AnimFrame *updateTileOnceFrames[];
-extern s16 D_800A65B4[];
-extern AnimFrame D_800A6514[];
-extern AnimFrame D_800A6560[];
+extern s16 timerDigitX[];
+extern AnimFrame updateTileOnceFrames_0[];
+extern AnimFrame updateTileOnceFrames_1[];
 
 #include "common/step_tile_animation_u8.inc.c"
 
@@ -26,7 +28,7 @@ void updateTilePair16(StageTilePair16 *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == 1) {
                 task->anims[0].anim.index = 0;
                 task->anims[0].anim.timer = (u8)updateTilePair16Frames0[0].duration;
@@ -43,7 +45,7 @@ void updateTilePair16(StageTilePair16 *task) {
             task->nextState(task);
         } else {
             task->anims[0].anim.index = 0;
-            task->anims[0].anim.timer = (u8)D_800A64CC[0].duration;
+            task->anims[0].anim.timer = (u8)updateTilePair16Frames2[0].duration;
             task->setState(task, TASK_DONE);
         }
         break;
@@ -69,7 +71,7 @@ void updateTilePair16(StageTilePair16 *task) {
             case 0:
                 tile->visible = 1;
                 if (task->playing) {
-                    frame = stepTileAnimation(&task->anims[0], D_800A64CC, 1, 0);
+                    frame = stepTileAnimation(&task->anims[0], updateTilePair16Frames2, 1, 0);
                     if (frame == 0xFF) {
                         tile->frame = 0x50;
                         task->playing = 0;
@@ -99,17 +101,17 @@ void handleCommand837(StageTilePair16 *task, s32 id) {
     if (id == 0x35B) {
         task->playing = 1;
         task->anims[0].anim.index = 0;
-        task->anims[0].anim.timer = (u8)D_800A64CC[0].duration;
+        task->anims[0].anim.timer = (u8)updateTilePair16Frames2[0].duration;
         task->setState(task, TASK_DONE);
     }
 }
 
 void *createTilePair16(s32 arg) {
-    return createTaskWithId(updateTilePair16, 0x64, 0, arg);
+    return createTaskWithId(updateTilePair16, sizeof(StageTilePair16), 0, arg);
 }
 
 /* Creates the tile pair object, started in TASK_DONE */
-void *func_800A50B4(void) {
+void *createTilePair16Done(void) {
     StageTilePair16 *task = createTask(updateTilePair16, sizeof(StageTilePair16), 0);
 
     task->done = 1;
@@ -155,7 +157,7 @@ void updateTileOnce(StageTileOnce *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == 3) {
                 task->tiles[0].playing = 0;
                 task->tiles[0].tile = rec;
@@ -167,10 +169,10 @@ void updateTileOnce(StageTileOnce *task) {
         }
         task->tiles[0].playing = 1;
         task->tiles[0].anim.index = 0;
-        task->tiles[0].anim.timer = (u8)D_800A6514[0].duration;
+        task->tiles[0].anim.timer = (u8)updateTileOnceFrames_0[0].duration;
         task->tiles[1].playing = 1;
         task->tiles[1].anim.index = 0;
-        task->tiles[1].anim.timer = (u8)D_800A6560[0].duration;
+        task->tiles[1].anim.timer = (u8)updateTileOnceFrames_1[0].duration;
         task->nextState(task);
         break;
     case TASK_RUN:
@@ -206,11 +208,11 @@ void updateTileOnce(StageTileOnce *task) {
 }
 
 void *createCommand839(s32 arg) {
-    return createTaskWithId(updateTileOnce, 0x6C, 0, arg);
+    return createTaskWithId(updateTileOnce, sizeof(StageTileOnce), 0, arg);
 }
 
 /* Draws the timer: its frame and the three digits of GAME.countdown */
-void func_800A5404(StageTask *task) {
+void drawTimer(StageTask *task) {
     SpriteDrawer drawer;
     Vec2 scroll;
     s32 i;
@@ -224,12 +226,12 @@ void func_800A5404(StageTask *task) {
     drawer.draw(FILE_CACHE.getEntry(TIMER_SHEET << 16), 1, scroll.x + 0xE0, scroll.y + 0x16);
     scroll.y += 0x19;
     for (i = 0; i < 3; i++) {
-        drawer.draw(FILE_CACHE.getEntry(TIMER_SHEET << 16), GAME.countdown[i] + 2, scroll.x + D_800A65B4[i], scroll.y);
+        drawer.draw(FILE_CACHE.getEntry(TIMER_SHEET << 16), GAME.countdown[i] + 2, scroll.x + timerDigitX[i], scroll.y);
     }
 }
 
 /* The timer: counts GAME.countdown down while nothing stops it, then starts event 0x5E2 */
-void func_800A554C(StageTask *task, void **children) {
+void updateTimer(StageTask *task, void **children) {
     u8 *countdown;
 
     switch (task->state) {
@@ -238,7 +240,7 @@ void func_800A554C(StageTask *task, void **children) {
             FIELDSTG_state.bannerShown != 0 || FIELDSTG_state.innOpen != 0 || FIELDSTG_state.acting != 0) {
             break;
         }
-        func_800A5404(task);
+        drawTimer(task);
         countdown = GAME.countdown;
         if (countdown[0] != 0 || countdown[1] != 0 || countdown[2] != 0) {
             countdown[3] -= GFX.funcs.getFrameTime();
@@ -261,8 +263,8 @@ void func_800A554C(StageTask *task, void **children) {
     }
 }
 
-void *func_800A571C(void) {
-    return createTask(func_800A554C, 0x54, 0x4);
+void *createTimer(void) {
+    return createTask(updateTimer, sizeof(StageTask), 0x4);
 }
 
 /* Creates the timer, the stage's four effects, the event object of flags 0x4044/0x4045 and one of two objects by flag 0x4061 */
@@ -272,7 +274,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        children[0] = func_800A571C();
+        children[0] = createTimer();
         for (i = 0; i < 4; i++) {
             if (updateStageSpots[i].kind == 0) {
                 children[i + 1] = createStageEffect(updateStageSpots[i].x, updateStageSpots[i].y, updateStageSpots[i].frame);
@@ -284,7 +286,7 @@ void updateStage(StageTask *task, void **children) {
         if (FLAGS_00.checkCondition(FLAG(0x40, 0x61), 0)) {
             children[5] = createTilePair16(0x345);
         } else {
-            children[5] = func_800A50B4();
+            children[5] = createTilePair16Done();
         }
         task->nextState(task);
         break;
@@ -531,7 +533,7 @@ s16 script1506[] = {
 AnimFrame updateTilePair16Frames0[] = {
     { 0, 8 }, { 1, 8 }, { 255, 0 },
 };
-AnimFrame D_800A64CC[] = {
+AnimFrame updateTilePair16Frames2[] = {
     { 71, 4 }, { 72, 4 }, { 73, 4 }, { 74, 4 },
     { 75, 4 }, { 76, 4 }, { 77, 4 }, { 78, 4 },
     { 79, 4 }, { 80, 4 }, { 255, 0 },
@@ -540,14 +542,14 @@ AnimFrame updateTilePair16Frames1[] = {
     { 0, 6 }, { 1, 6 }, { 2, 6 }, { 3, 6 },
     { 4, 6 }, { 5, 6 }, { 255, 0 },
 };
-AnimFrame D_800A6514[] = {
+AnimFrame updateTileOnceFrames_0[] = {
     { 52, 6 }, { 53, 6 }, { 54, 6 }, { 55, 6 },
     { 56, 6 }, { 57, 6 }, { 58, 6 }, { 59, 6 },
     { 60, 6 }, { 61, 6 }, { 62, 6 }, { 63, 6 },
     { 64, 6 }, { 65, 6 }, { 66, 6 }, { 67, 6 },
     { 68, 6 }, { 69, 6 }, { 255, 0 },
 };
-AnimFrame D_800A6560[] = {
+AnimFrame updateTileOnceFrames_1[] = {
     { 0, 6 }, { 1, 6 }, { 2, 6 }, { 3, 6 },
     { 4, 6 }, { 5, 6 }, { 0, 6 }, { 1, 6 },
     { 2, 6 }, { 3, 6 }, { 4, 6 }, { 5, 6 },
@@ -555,9 +557,9 @@ AnimFrame D_800A6560[] = {
     { 4, 6 }, { 5, 6 }, { 255, 0 },
 };
 AnimFrame *updateTileOnceFrames[] = {
-    D_800A6514, D_800A6560,
+    updateTileOnceFrames_0, updateTileOnceFrames_1,
 };
-s16 D_800A65B4[] = {
+s16 timerDigitX[] = {
     226, 253, 0x118, 0,
 };
 StageEffectSpot updateStageSpots[] = {

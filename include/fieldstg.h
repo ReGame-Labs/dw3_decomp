@@ -775,11 +775,6 @@ typedef struct StageEntry {
                                        ahead (FIELDSTG_checkFlightProbes) */
 #define FIELD_MODE_WSTAG815 0x2DE
 
-/* Points of the story (GAME.progress) where the field acts differently */
-#define FIELD_PROGRESS_MOVIE_BATTLES 0x2B /* each encounter plays MODE_BATTLE_MOVIE first */
-#define FIELD_PROGRESS_EXTRA 0x2D /* the European version's extra chapter, whose stages are
-                                     its FIELDSTG_stages (WSTAG920 to WSTAG974) */
-
 /* The fighters whose battles always give an item (FIELDSTG_startEncounter) */
 #define FIELD_PRIZE_FIGHTERS 0x1C9
 #define FIELD_PRIZE_FIGHTER_COUNT 8

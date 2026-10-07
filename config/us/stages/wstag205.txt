@@ -130,4 +130,14 @@ endEvent100 = 0x800A50B4; // type:func
 endEvent101 = 0x800A5100; // type:func
 
 // named by the function or table that uses them (tools/name_stage_uses.py)
+spriteFieldAnims_0 = 0x800A54C4;
+spriteFieldAnims_1 = 0x800A54CC;
+spriteFieldAnims_2 = 0x800A54D4;
+spriteFieldAnims_3 = 0x800A54DC;
+spriteFieldAnims_4 = 0x800A54E8;
+spriteFieldAnims_5 = 0x800A54F0;
+spriteFieldAnims_6 = 0x800A54FC;
+spriteFieldAnims_7 = 0x800A5508;
+spriteFieldAnims_8 = 0x800A5510;
+spriteFieldAnims = 0x800A551C;
 updateSpriteFieldSpots = 0x800A5540;

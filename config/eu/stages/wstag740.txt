@@ -1,6 +1,6 @@
 // names from the C of the modules this version builds (tools/version_symbols.py)
 updateEvent9015 = 0x800A5DE4; // type:func
-func_800A4F30 = 0x800A606C; // type:func
+startEvents9000To9015 = 0x800A606C; // type:func
 drawPairSprite = 0x800A626C; // type:func
 updateSpritePair = 0x800A6324; // type:func
 createSpritePair = 0x800A64BC; // type:func
@@ -25,9 +25,9 @@ endEvent9015 = 0x800A6830; // type:func
 func_80084B80 = 0x800853F8;
 script800 = 0x800A6994;
 script801 = 0x800A6A3C;
-D_800A598C = 0x800A6AD0;
-D_800A5998 = 0x800A6ADC; // size:0x1C
-D_800A59B4 = 0x800A6AF8; // size:0x38
+partyActorIds = 0x800A6AD0;
+updateSpritePairFrames_0 = 0x800A6ADC; // size:0x1C
+updateSpritePairFrames_1 = 0x800A6AF8; // size:0x38
 updateSpritePairFrames = 0x800A6B30;
 area0Battle0 = 0x800A6B38;
 area0Battle1 = 0x800A6B44;

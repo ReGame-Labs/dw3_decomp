@@ -1,4 +1,4 @@
-D_800A6058 = 0x800A6058; // size:0x3C
+updateTilePairNFrames2 = 0x800A6058; // size:0x3C
 
 // the names the stages share (the same code or data in each)
 stepTileAnimation = 0x800A4CA4; // type:func
@@ -76,6 +76,11 @@ stageSlots1 = 0x800A6C68;
 
 // functions named by what calls them (tools/name_stage_funcs.py)
 updateTilePairN = 0x800A4DC4; // type:func
+handleCommands842To844 = 0x800A503C; // type:func
+createTilePairN1 = 0x800A5088; // type:func
+createTilePairN3 = 0x800A50C4; // type:func
+createTilePairN5 = 0x800A5100; // type:func
+createTilePairNDone = 0x800A513C; // type:func
 startEvent9000 = 0x800A58F0; // type:func
 startEvent9001 = 0x800A5954; // type:func
 endEvent990 = 0x800A59BC; // type:func

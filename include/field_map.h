@@ -181,7 +181,7 @@ typedef struct FieldActorEntry {
 
 /*
  * An object of a map, which FIELDSTG draws: a record of the table at
- * FieldState.objects, which ends with unk2 = 0
+ * FieldState.objects, which ends with margin = 0
  */
 typedef struct StageTile {
     /* 0x00 */ u8 visible;
@@ -189,7 +189,7 @@ typedef struct StageTile {
                            FIELDSTG finds objects by it (its lift, 2 and 3,
                            the field commands' groups, FIELD_OBJECT_GROUP_ANIM
                            on) and draws 0xFF from its effect sprites */
-    /* 0x02 */ u8 unk2; /* how far off the view it is still drawn; 0 ends the table */
+    /* 0x02 */ u8 margin; /* how far off the view it is still drawn; 0 ends the table */
     /* 0x03 */ u8 depth;
     /* 0x04 */ u8 frame;
     /* 0x05 */ u8 cycle; /* 1 cycles the frame, 2 the CLUT row, 3 the row back and forth */
@@ -199,9 +199,14 @@ typedef struct StageTile {
     /* 0x09 */ u8 clutRow;
     /* 0x0A */ s16 x;
     /* 0x0C */ s16 y;
-    /* 0x0E */ s16 unkE; /* drawn sorted at this depth, or 0 */
+    /* 0x0E */ s16 sortY; /* drawn sorted at this y, or 0 */
     /* 0x10 */ s16 cycleTime; /* in 1/256 frames; bit 15: going back */
 } StageTile;
+
+/* Points of the story (GAME.progress) where the field and the stages act differently */
+#define FIELD_PROGRESS_MOVIE_BATTLES 0x2B /* each encounter plays MODE_BATTLE_MOVIE first */
+#define FIELD_PROGRESS_EXTRA 0x2D /* the European version's extra chapter, whose stages are
+                                     its FIELDSTG_stages (WSTAG920 to WSTAG974) */
 
 /* The kinds of StageSlot (type). SLOT_DEPTH, SLOT_MAP, SLOT_EVENT, the slides
    and SLOT_LAUNCH act as the player steps on them; the others show a balloon

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern StageSeqStep updateTileSeqsSteps[4][4];
 
 s32 stepTileAnimation(StageTileSeq *obj, AnimFrame *frames, s32 once, s32 depth) {
@@ -42,7 +43,7 @@ void updateTileSeqs(StageTileSeqs *task) {
     default:
         task->nextState(task);
         n = 0;
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim >= 1 && rec->anim <= 4) {
                 task->entries[n].tile = rec;
                 n++;
@@ -106,7 +107,7 @@ void updateTileSeqs(StageTileSeqs *task) {
 }
 
 void *createTileSeqs(s32 arg) {
-    return createTaskWithId(updateTileSeqs, 0x80, 0, arg);
+    return createTaskWithId(updateTileSeqs, sizeof(StageTileSeqs), 0, arg);
 }
 
 /* Creates the event object of story progress 21 */
@@ -276,33 +277,33 @@ s16 script552[] = {
     0x304, 0x254, 0x2D4, 0xC4, 7,
     0,
 };
-AnimFrame D_800A5538[] = {
+AnimFrame updateTileSeqsSteps_0_0[] = {
     { 0, 6 }, { 1, 6 }, { 2, 6 }, { 1, 6 },
     { 0, 6 }, { 1, 6 }, { 2, 6 }, { 1, 6 },
     { 255, 0 },
 };
-AnimFrame D_800A555C[] = {
+AnimFrame updateTileSeqsSteps_0_1[] = {
     { 0, 6 }, { 0, 6 }, { 0, 6 }, { 1, 6 },
     { 2, 6 }, { 3, 6 }, { 4, 6 }, { 5, 6 },
     { 6, 6 }, { 7, 6 }, { 6, 6 }, { 5, 6 },
     { 4, 6 }, { 3, 6 }, { 2, 6 }, { 1, 6 },
     { 0, 6 }, { 0, 6 }, { 255, 0x3E7 },
 };
-AnimFrame D_800A55A8[] = {
+AnimFrame updateTileSeqsSteps_0_2[] = {
     { 0, 6 }, { 1, 6 }, { 2, 6 }, { 1, 6 },
     { 0, 6 }, { 1, 6 }, { 2, 6 }, { 1, 6 },
     { 255, 0 },
 };
-AnimFrame D_800A55CC[] = {
+AnimFrame updateTileSeqsSteps_1_0[] = {
     { 0, 12 }, { 1, 12 }, { 2, 12 }, { 1, 12 },
     { 255, 0 },
 };
-AnimFrame D_800A55E0[] = {
+AnimFrame updateTileSeqsSteps_1_1[] = {
     { 2, 12 }, { 3, 12 }, { 4, 12 }, { 5, 12 },
     { 6, 12 }, { 7, 12 }, { 8, 12 }, { 9, 12 },
     { 10, 12 }, { 255, 0x3E7 },
 };
-AnimFrame D_800A5608[] = {
+AnimFrame updateTileSeqsSteps_1_2[] = {
     { 9, 12 }, { 10, 12 }, { 9, 12 }, { 8, 12 },
     { 255, 0 },
 };
@@ -319,8 +320,8 @@ AnimFrame updateTileSeqsSteps_3[] = {
     { 58, 6 }, { 59, 6 }, { 255, 0x3E7 },
 };
 StageSeqStep updateTileSeqsSteps[4][4] = {
-    { { NULL, 0, 0 }, { D_800A5538, 0, 0 }, { D_800A555C, 1, 3 }, { D_800A55A8, 0, 0 } },
-    { { NULL, 0, 0 }, { D_800A55CC, 0, 0 }, { D_800A55E0, 1, 3 }, { D_800A5608, 0, 0 } },
+    { { NULL, 0, 0 }, { updateTileSeqsSteps_0_0, 0, 0 }, { updateTileSeqsSteps_0_1, 1, 3 }, { updateTileSeqsSteps_0_2, 0, 0 } },
+    { { NULL, 0, 0 }, { updateTileSeqsSteps_1_0, 0, 0 }, { updateTileSeqsSteps_1_1, 1, 3 }, { updateTileSeqsSteps_1_2, 0, 0 } },
     { { NULL, 0, 0 }, { updateTileSeqsSteps_2, 1, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } },
     { { NULL, 0, 0 }, { updateTileSeqsSteps_3, 1, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } },
 };

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern StageTileFrame **updateTileCursorsFrames[];
 
 #include "common/step_tile_sequences.inc.c"
@@ -7,7 +8,7 @@ extern StageTileFrame **updateTileCursorsFrames[];
 #include "common/update_tile_cursors.inc.c"
 
 void *createTileCursors(void) {
-    return createTask(updateTileCursors, 0x78, 0);
+    return createTask(updateTileCursors, sizeof(StageTileCursors), 0);
 }
 
 void updateStage(StageTask *task, void **children) {
@@ -58,35 +59,35 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-StageTileFrame D_800A5240[] = {
+StageTileFrame updateTileCursorsFrames_0_0[] = {
     { 64, 10, 0, 0 }, { 64, 10, 1, 0 }, { 64, 10, 2, 0 }, { 64, 10, 1, 1 },
 };
 StageTileFrame updateTileCursorsFrames_0_12[] = {
     { 65, 4, 2, 0 }, { 65, 4, 4, 0 }, { 65, 4, 6, 0 }, { 65, 4, 4, 0 },
     { 65, 4, 2, 0 }, { 65, 4, 0, 1 },
 };
-StageTileFrame D_800A5268[] = {
+StageTileFrame updateTileCursorsFrames_1_0[] = {
     { 66, 10, 0, 0 }, { 66, 10, 1, 0 }, { 66, 10, 2, 0 }, { 66, 10, 1, 1 },
 };
 StageTileFrame updateTileCursorsFrames_1_12[] = {
     { 67, 4, 2, 0 }, { 67, 4, 4, 0 }, { 67, 4, 6, 0 }, { 67, 4, 4, 0 },
     { 67, 4, 2, 0 }, { 67, 4, 0, 1 },
 };
-StageTileFrame D_800A5290[] = {
+StageTileFrame updateTileCursorsFrames_2_0[] = {
     { 68, 10, 0, 0 }, { 68, 10, 1, 0 }, { 68, 10, 2, 0 }, { 68, 10, 1, 1 },
 };
 StageTileFrame updateTileCursorsFrames_2_12[] = {
     { 69, 4, 2, 0 }, { 69, 4, 4, 0 }, { 69, 4, 6, 0 }, { 69, 4, 4, 0 },
     { 69, 4, 2, 0 }, { 69, 4, 0, 1 },
 };
-StageTileFrame D_800A52B8[] = {
+StageTileFrame updateTileCursorsFrames_3_0[] = {
     { 70, 10, 0, 0 }, { 70, 10, 1, 0 }, { 70, 10, 2, 0 }, { 70, 10, 1, 1 },
 };
 StageTileFrame updateTileCursorsFrames_3_12[] = {
     { 71, 4, 2, 0 }, { 71, 4, 4, 0 }, { 71, 4, 6, 0 }, { 71, 4, 4, 0 },
     { 71, 4, 2, 0 }, { 71, 4, 0, 1 },
 };
-StageTileFrame D_800A52E0[] = {
+StageTileFrame updateTileCursorsFrames_4_0[] = {
     { 72, 10, 0, 0 }, { 72, 10, 1, 0 }, { 72, 10, 2, 0 }, { 72, 10, 1, 1 },
 };
 StageTileFrame updateTileCursorsFrames_4_12[] = {
@@ -94,33 +95,33 @@ StageTileFrame updateTileCursorsFrames_4_12[] = {
     { 73, 4, 2, 0 }, { 73, 4, 0, 1 },
 };
 StageTileFrame *updateTileCursorsFrames_0[] = {
-    D_800A5240, D_800A5240, D_800A5240, D_800A5240,
-    D_800A5240, D_800A5240, D_800A5240, D_800A5240,
-    D_800A5240, D_800A5240, D_800A5240, D_800A5240,
+    updateTileCursorsFrames_0_0, updateTileCursorsFrames_0_0, updateTileCursorsFrames_0_0, updateTileCursorsFrames_0_0,
+    updateTileCursorsFrames_0_0, updateTileCursorsFrames_0_0, updateTileCursorsFrames_0_0, updateTileCursorsFrames_0_0,
+    updateTileCursorsFrames_0_0, updateTileCursorsFrames_0_0, updateTileCursorsFrames_0_0, updateTileCursorsFrames_0_0,
     updateTileCursorsFrames_0_12, NULL,
 };
 StageTileFrame *updateTileCursorsFrames_1[] = {
-    D_800A5268, D_800A5268, D_800A5268, D_800A5268,
-    D_800A5268, D_800A5268, D_800A5268, D_800A5268,
-    D_800A5268, D_800A5268, D_800A5268, D_800A5268,
+    updateTileCursorsFrames_1_0, updateTileCursorsFrames_1_0, updateTileCursorsFrames_1_0, updateTileCursorsFrames_1_0,
+    updateTileCursorsFrames_1_0, updateTileCursorsFrames_1_0, updateTileCursorsFrames_1_0, updateTileCursorsFrames_1_0,
+    updateTileCursorsFrames_1_0, updateTileCursorsFrames_1_0, updateTileCursorsFrames_1_0, updateTileCursorsFrames_1_0,
     updateTileCursorsFrames_1_12, NULL,
 };
 StageTileFrame *updateTileCursorsFrames_2[] = {
-    D_800A5290, D_800A5290, D_800A5290, D_800A5290,
-    D_800A5290, D_800A5290, D_800A5290, D_800A5290,
-    D_800A5290, D_800A5290, D_800A5290, D_800A5290,
+    updateTileCursorsFrames_2_0, updateTileCursorsFrames_2_0, updateTileCursorsFrames_2_0, updateTileCursorsFrames_2_0,
+    updateTileCursorsFrames_2_0, updateTileCursorsFrames_2_0, updateTileCursorsFrames_2_0, updateTileCursorsFrames_2_0,
+    updateTileCursorsFrames_2_0, updateTileCursorsFrames_2_0, updateTileCursorsFrames_2_0, updateTileCursorsFrames_2_0,
     updateTileCursorsFrames_2_12, NULL,
 };
 StageTileFrame *updateTileCursorsFrames_3[] = {
-    D_800A52B8, D_800A52B8, D_800A52B8, D_800A52B8,
-    D_800A52B8, D_800A52B8, D_800A52B8, D_800A52B8,
-    D_800A52B8, D_800A52B8, D_800A52B8, D_800A52B8,
+    updateTileCursorsFrames_3_0, updateTileCursorsFrames_3_0, updateTileCursorsFrames_3_0, updateTileCursorsFrames_3_0,
+    updateTileCursorsFrames_3_0, updateTileCursorsFrames_3_0, updateTileCursorsFrames_3_0, updateTileCursorsFrames_3_0,
+    updateTileCursorsFrames_3_0, updateTileCursorsFrames_3_0, updateTileCursorsFrames_3_0, updateTileCursorsFrames_3_0,
     updateTileCursorsFrames_3_12, NULL,
 };
 StageTileFrame *updateTileCursorsFrames_4[] = {
-    D_800A52E0, D_800A52E0, D_800A52E0, D_800A52E0,
-    D_800A52E0, D_800A52E0, D_800A52E0, D_800A52E0,
-    D_800A52E0, D_800A52E0, D_800A52E0, D_800A52E0,
+    updateTileCursorsFrames_4_0, updateTileCursorsFrames_4_0, updateTileCursorsFrames_4_0, updateTileCursorsFrames_4_0,
+    updateTileCursorsFrames_4_0, updateTileCursorsFrames_4_0, updateTileCursorsFrames_4_0, updateTileCursorsFrames_4_0,
+    updateTileCursorsFrames_4_0, updateTileCursorsFrames_4_0, updateTileCursorsFrames_4_0, updateTileCursorsFrames_4_0,
     updateTileCursorsFrames_4_12, NULL,
 };
 StageTileFrame **updateTileCursorsFrames[] = {

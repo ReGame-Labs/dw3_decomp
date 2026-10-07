@@ -91,7 +91,7 @@ own.
   defines; `unk7C` (`FIELDSTG`'s `FIELDSTG_findBattles`) finds a record of a list
   of 0x1C-byte records by its id.
 - [x] The 8 functions that read `GAME` fields 8 bytes later in the European
-  version (`countdown`, `unk26DC`, `unk26E8`) are C in both: `WSTAG745`/
+  version (`countdown`, `altTriggers`, `dark`) are C in both: `WSTAG745`/
   `746` `func_800A4CA4`, `WSTAG795` `func_800A50F8`/`func_800A5240`,
   `WSTAG800` `func_800A5404`/`func_800A554C`, `WSTAG810` `func_800A58F0`/
   `func_800A5954`, with `GAME.countdown` (`u8 [4]`, `0x26CC`) and the

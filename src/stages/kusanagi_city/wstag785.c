@@ -1,5 +1,6 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern AnimFrame updateTileSetFrames1[];
 extern AnimFrame updateTileSetFrames2[];
 extern AnimFrame updateTileSetFrames3[];
@@ -23,7 +24,7 @@ void updateTileSet(StageTileSet *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             switch (rec->anim) {
             case 1:
                 task->tiles[3] = rec;
@@ -106,11 +107,11 @@ StageTileSet *createTileSet(void) {
 }
 
 void *createCommand835(s32 arg) {
-    return createTaskWithId(updateTileSet, 0x6C, 0, arg);
+    return createTaskWithId(updateTileSet, sizeof(StageTileSet), 0, arg);
 }
 
 /* Draws frame FRAME of file MARKS over the character */
-void func_800A50CC(StageActorMark *task, s32 frame) {
+void drawActorMark(StageActorMark *task, s32 frame) {
     SpriteDrawer drawer;
     s32 pos[2];
 
@@ -174,7 +175,7 @@ void updateActorMark(StageActorMark *task) {
             }
             break;
         }
-        func_800A50CC(task, frame);
+        drawActorMark(task, frame);
         break;
     case TASK_DONE:
         switch (task->substate) {
@@ -195,7 +196,7 @@ void updateActorMark(StageActorMark *task) {
             task->nextState(task);
             break;
         }
-        func_800A50CC(task, frame);
+        drawActorMark(task, frame);
         break;
     case TASK_KILL:
         break;
@@ -203,7 +204,7 @@ void updateActorMark(StageActorMark *task) {
 }
 
 void *createCommand807(s32 arg) {
-    return createTaskWithId(updateActorMark, 0x58, 0, arg);
+    return createTaskWithId(updateActorMark, sizeof(StageActorMark), 0, arg);
 }
 
 /* Map objects 0x328/0x329 set the kind and the character (actor of key KEY), 0x32A ends it */

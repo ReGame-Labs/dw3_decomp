@@ -119,7 +119,7 @@ void updateMenu(StageMenu *task, StageMenuChildren *children) {
 }
 
 void *startEvent1522(void) {
-    return createTask(updateMenu, 0x64, 0x14);
+    return createTask(updateMenu, sizeof(StageMenu), sizeof(StageMenuChildren));
 }
 
 /* Creates the event object while flags 0x7201, 0x8008 and 0x701A are clear */

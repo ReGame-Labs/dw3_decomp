@@ -1,10 +1,10 @@
 // names from the C of the modules this version builds (tools/version_symbols.py)
 updateTilePairN = 0x800A5F00; // type:func
-func_800A503C = 0x800A6178; // type:func
-func_800A5088 = 0x800A61C4; // type:func
-func_800A50C4 = 0x800A6200; // type:func
-func_800A5100 = 0x800A623C; // type:func
-func_800A513C = 0x800A6278; // type:func
+handleCommands842To844 = 0x800A6178; // type:func
+createTilePairN1 = 0x800A61C4; // type:func
+createTilePairN3 = 0x800A6200; // type:func
+createTilePairN5 = 0x800A623C; // type:func
+createTilePairNDone = 0x800A6278; // type:func
 startEvent9000 = 0x800A6A2C; // type:func
 startEvent9001 = 0x800A6A90; // type:func
 endEvent990 = 0x800A6AF8; // type:func
@@ -16,7 +16,7 @@ script1000 = 0x800A6E5C;
 script1010 = 0x800A6F94;
 script1035 = 0x800A70CC;
 updateTilePairNFrames0 = 0x800A718C;
-D_800A6058 = 0x800A719C; // size:0x3C
+updateTilePairNFrames2 = 0x800A719C; // size:0x3C
 updateTilePairNFrames1 = 0x800A71D8;
 updateStageSpots = 0x800A71F4;
 area0Battle0 = 0x800A754C;

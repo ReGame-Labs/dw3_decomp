@@ -1,6 +1,7 @@
 #include "common.h"
 #include "stage.h"
-extern u8 *D_800A551C[];
+/* Defined below, after the code that uses them */
+extern u8 *spriteFieldAnims[];
 extern StageSpriteSpot updateSpriteFieldSpots[];
 
 /* The sprites, which the versions number differently */
@@ -30,16 +31,16 @@ void updateSpriteField(StageSpriteField *task) {
         for (i = 0; i < 9; i++) {
             task->anims[i].timer += GFX.funcs.getFrameTime();
             for (;;) {
-                if (D_800A551C[i][task->anims[i].index * 2] == 0) {
+                if (spriteFieldAnims[i][task->anims[i].index * 2] == 0) {
                     task->anims[i].index = 0;
                 }
-                if (D_800A551C[i][task->anims[i].index * 2 + 1] >= task->anims[i].timer) {
+                if (spriteFieldAnims[i][task->anims[i].index * 2 + 1] >= task->anims[i].timer) {
                     break;
                 }
-                task->anims[i].timer -= D_800A551C[i][task->anims[i].index * 2 + 1];
+                task->anims[i].timer -= spriteFieldAnims[i][task->anims[i].index * 2 + 1];
                 task->anims[i].index++;
             }
-            task->anims[i].frame = D_800A551C[i][task->anims[i].index * 2];
+            task->anims[i].frame = spriteFieldAnims[i][task->anims[i].index * 2];
         }
         layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
         layer->getViewRect(layer, &rect);
@@ -72,7 +73,7 @@ void updateSpriteField(StageSpriteField *task) {
 }
 
 void *createSpriteField(void) {
-    return createTask(updateSpriteField, 0xC8, 0);
+    return createTask(updateSpriteField, sizeof(StageSpriteField), 0);
 }
 
 /* Creates the event object of progress 6 when flag 0x4006 is set and 0x4016 is not */
@@ -240,47 +241,47 @@ s16 script101[] = {
     0x300, 0x1E,
     0,
 };
-u8 D_800A54C4[] = {
+u8 spriteFieldAnims_0[] = {
     0x32, 0x0A, 0x33, 0x0A, 0x34, 0x0A, 0x00, 0x00,
 };
-u8 D_800A54CC[] = {
+u8 spriteFieldAnims_1[] = {
     0x35, 0x0A, 0x36, 0x0A, 0x37, 0x0A, 0x00, 0x00,
 };
-u8 D_800A54D4[] = {
+u8 spriteFieldAnims_2[] = {
     0x38, 0x0A, 0x39, 0x0A, 0x3A, 0x0A, 0x00, 0x00,
 };
-u8 D_800A54DC[] = {
+u8 spriteFieldAnims_3[] = {
     72, 6, 73, 6, 74, 6, 75, 6,
     0, 0, 0, 0,
 };
-u8 D_800A54E8[] = {
+u8 spriteFieldAnims_4[] = {
     62, 6, 63, 6, 64, 6, 0, 0,
 };
-u8 D_800A54F0[] = {
+u8 spriteFieldAnims_5[] = {
     80, 4, 81, 4, 82, 4, 83, 4,
     0, 0, 0, 0,
 };
-u8 D_800A54FC[] = {
+u8 spriteFieldAnims_6[] = {
     76, 6, 77, 6, 78, 6, 79, 6,
     0, 0, 0, 0,
 };
-u8 D_800A5508[] = {
+u8 spriteFieldAnims_7[] = {
     65, 6, 66, 6, 67, 6, 0, 0,
 };
-u8 D_800A5510[] = {
+u8 spriteFieldAnims_8[] = {
     84, 4, 85, 4, 86, 4, 87, 4,
     0, 0, 0, 0,
 };
-u8 *D_800A551C[] = {
-    D_800A54C4,
-    D_800A54CC,
-    D_800A54D4,
-    D_800A54DC,
-    D_800A54E8,
-    D_800A54F0,
-    D_800A54FC,
-    D_800A5508,
-    D_800A5510,
+u8 *spriteFieldAnims[] = {
+    spriteFieldAnims_0,
+    spriteFieldAnims_1,
+    spriteFieldAnims_2,
+    spriteFieldAnims_3,
+    spriteFieldAnims_4,
+    spriteFieldAnims_5,
+    spriteFieldAnims_6,
+    spriteFieldAnims_7,
+    spriteFieldAnims_8,
 };
 StageSpriteSpot updateSpriteFieldSpots[] = {
     { 40, 0x1A5, 0, 0 },

@@ -1,9 +1,10 @@
 #include "common.h"
 #include "stage.h"
+/* Defined below, after the code that uses them */
 extern StageFallParams updateFallerParams[];
-extern AnimFrame D_800A62AC[];
-extern AnimFrame D_800A62D4[];
-extern AnimFrame D_800A62E4[];
+extern AnimFrame updateMoverFrames0[];
+extern AnimFrame updateMoverFrames1[];
+extern AnimFrame updateMoverFrames2[];
 
 /* The files of the background, which the versions number differently */
 #if VERSION_US
@@ -15,7 +16,7 @@ extern AnimFrame D_800A62E4[];
 #endif
 
 /* Steps the looping animation of a StageFallBody, returning its frame */
-s32 func_800A4CB8(StageFallBody *body, AnimFrame *frames, s32 depth) {
+s32 stepFallBody(StageFallBody *body, AnimFrame *frames, s32 depth) {
     AnimFrame *frame = &frames[body->anim.index];
     s32 dt = GFX.funcs.getFrameTime();
 
@@ -34,13 +35,13 @@ s32 func_800A4CB8(StageFallBody *body, AnimFrame *frames, s32 depth) {
             body->anim.index = 0;
             body->anim.timer += frame->duration;
         }
-        func_800A4CB8(body, frames, depth + 1);
+        stepFallBody(body, frames, depth + 1);
     }
     return frame->frame;
 }
 
 /* Draws a StageFaller (a layer callback) */
-void func_800A4DAC(StageFaller *task, Layer *layer) {
+void drawFaller(StageFaller *task, Layer *layer) {
     SpriteDrawer drawer;
 
     if (task->state == TASK_RUN) {
@@ -69,7 +70,7 @@ void updateFaller(StageFaller *task) {
         task->nextState(task);
         break;
     case TASK_RUN:
-        task->frame = func_800A4CB8(&task->body, updateFallerParams[task->key1].frames, 0);
+        task->frame = stepFallBody(&task->body, updateFallerParams[task->key1].frames, 0);
         dv = updateFallerParams[task->key1].gravity * GFX.funcs.getFrameTime();
         task->body.x += task->body.vx;
         task->body.vy += dv;
@@ -85,7 +86,7 @@ void updateFaller(StageFaller *task) {
             SOUND.playSound(SOUND_MTL_DOWN);
         }
         if (task->frame != 0) {
-            layer->addSortedCallback(layer, func_800A4DAC, task, task->y, 0);
+            layer->addSortedCallback(layer, drawFaller, task, task->y, 0);
         }
         if (task->y > 0x244) {
             task->setState(task, TASK_KILL);
@@ -99,77 +100,77 @@ void updateFaller(StageFaller *task) {
 
 /* Creates the task of updateFaller with the given id, kind 0 */
 Task *createCommand816(s32 id) {
-    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
+    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
 
     task->key1 = 0;
     return task;
 }
 
 Task *createCommand817(s32 id) {
-    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
+    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
 
     task->key1 = 1;
     return task;
 }
 
 Task *createCommand818(s32 id) {
-    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
+    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
 
     task->key1 = 2;
     return task;
 }
 
 Task *createCommand819(s32 id) {
-    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
+    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
 
     task->key1 = 3;
     return task;
 }
 
 Task *createCommand820(s32 id) {
-    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
+    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
 
     task->key1 = 4;
     return task;
 }
 
 Task *createCommand821(s32 id) {
-    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
+    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
 
     task->key1 = 5;
     return task;
 }
 
 Task *createCommand822(s32 id) {
-    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
+    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
 
     task->key1 = 6;
     return task;
 }
 
 Task *createCommand823(s32 id) {
-    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
+    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
 
     task->key1 = 7;
     return task;
 }
 
 Task *createCommand824(s32 id) {
-    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
+    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
 
     task->key1 = 8;
     return task;
 }
 
 Task *createCommand825(s32 id) {
-    Task *task = createTaskWithId(updateFaller, 0x74, 0, id);
+    Task *task = createTaskWithId(updateFaller, sizeof(StageFaller), 0, id);
 
     task->key1 = 9;
     return task;
 }
 
 /* Steps the animation of a StageMoverBody, holding its last frame, and returns the frame */
-s32 func_800A5320(StageMoverBody *body, AnimFrame *frames, s32 depth) {
+s32 stepMoverBody(StageMoverBody *body, AnimFrame *frames, s32 depth) {
     AnimFrame *frame = &frames[body->anim.index];
     s32 dt = GFX.funcs.getFrameTime();
 
@@ -188,7 +189,7 @@ s32 func_800A5320(StageMoverBody *body, AnimFrame *frames, s32 depth) {
             body->anim.index--;
             body->anim.timer += frame->duration;
         }
-        func_800A5320(body, frames, depth + 1);
+        stepMoverBody(body, frames, depth + 1);
     }
     return frame->frame;
 }
@@ -216,11 +217,11 @@ void updateMover(StageMover *task) {
             task->x = task->body.x >> 8;
             task->y = task->body.y >> 8;
         }
-        for (rec = FIELDSTG_state.objects; rec->unk2 != 0; rec++) {
+        for (rec = FIELDSTG_state.objects; rec->margin != 0; rec++) {
             if (rec->anim == 1) {
                 task->tile = rec;
                 rec->x = task->x;
-                rec->x = task->y; /* unkA again */
+                rec->x = task->y; /* x again, not y */
                 break;
             }
         }
@@ -249,7 +250,7 @@ void updateMover(StageMover *task) {
             task->body.timer++;
             break;
         case 2:
-            task->frame = func_800A5320(&task->body, D_800A62AC, 0);
+            task->frame = stepMoverBody(&task->body, updateMoverFrames0, 0);
             if (task->frame == 0x35 && task->substate == 0) {
                 SOUND.playSound(SOUND_COMEX112);
                 task->substate++;
@@ -260,10 +261,10 @@ void updateMover(StageMover *task) {
             }
             break;
         case 3:
-            task->frame = func_800A5320(&task->body, D_800A62D4, 0);
+            task->frame = stepMoverBody(&task->body, updateMoverFrames1, 0);
             break;
         case 4:
-            task->frame = func_800A5320(&task->body, D_800A62E4, 0);
+            task->frame = stepMoverBody(&task->body, updateMoverFrames2, 0);
             if (task->frame == 2 && task->substate == 0) {
                 SOUND.playSound(SOUND_BULB_001);
                 task->substate++;
@@ -313,20 +314,20 @@ void handleCommand811(StageMover *task, s32 id) {
         case 0x332:
             SOUND.playSound(SOUND_COMEX105);
             task->body.anim.index = 0;
-            task->body.anim.timer = D_800A62AC[0].duration;
+            task->body.anim.timer = updateMoverFrames0[0].duration;
             task->body.mode = 2;
             task->substate = 0;
             break;
         case 0x333:
             SOUND.playSound(SOUND_COMEX112);
             task->body.anim.index = 0;
-            task->body.anim.timer = D_800A62D4[0].duration;
+            task->body.anim.timer = updateMoverFrames1[0].duration;
             task->body.mode = 3;
             break;
         case 0x334:
             task->body.mode = 4;
             task->body.anim.index = 0;
-            task->body.anim.timer = D_800A62E4[0].duration;
+            task->body.anim.timer = updateMoverFrames2[0].duration;
             task->substate = 0;
             break;
         }
@@ -335,21 +336,21 @@ void handleCommand811(StageMover *task, s32 id) {
 
 /* Creates the task of updateMover with the given id, kind 0 */
 Task *createCommand811(s32 id) {
-    Task *task = createTaskWithId(updateMover, 0x78, 0, id);
+    Task *task = createTaskWithId(updateMover, sizeof(StageMover), 0, id);
 
     task->key1 = 0;
     return task;
 }
 
 Task *createMover(s32 id) {
-    Task *task = createTaskWithId(updateMover, 0x78, 0, id);
+    Task *task = createTaskWithId(updateMover, sizeof(StageMover), 0, id);
 
     task->key1 = 1;
     return task;
 }
 
 /* Draws a StageScroller: each image twice, the second 0x200 left and 0x100 down */
-void func_800A59C8(StageScroller *task) {
+void drawScroller(StageScroller *task) {
     SpriteDrawer drawer;
     s32 pos[2];
 
@@ -414,7 +415,7 @@ void updateScroller(StageScroller *task) {
             task->x -= 0x20000;
             task->y += 0x10000;
         }
-        func_800A59C8(task);
+        drawScroller(task);
         break;
     case TASK_DONE:
     case TASK_KILL:
@@ -431,7 +432,7 @@ void handleCommand812(Task *task, s32 id) {
 
 /* Creates the task of updateScroller (id 0x32C) of the given kind */
 Task *createScroller(s32 kind) {
-    Task *task = createTaskWithId(updateScroller, 0x60, 0, 0x32C);
+    Task *task = createTaskWithId(updateScroller, sizeof(StageScroller), 0, 0x32C);
 
     task->key1 = kind;
     return task;
@@ -582,35 +583,35 @@ s16 script151[] = {
     0x304, 0x232, 0x1EF, 0xB9, 1,
     0,
 };
-AnimFrame D_800A61E4[] = {
+AnimFrame updateFallerParams_0[] = {
     { 70, 8 }, { 71, 8 }, { 72, 8 }, { 73, 8 },
     { 255, 0 },
 };
-AnimFrame D_800A61F8[] = {
+AnimFrame updateFallerParams_1[] = {
     { 74, 8 }, { 75, 8 }, { 76, 8 }, { 77, 8 },
     { 255, 0 },
 };
 StageFallParams updateFallerParams[] = {
-    { D_800A61E4, -0x20, 230, 0, 0x180, 88, 0 },
-    { D_800A61F8, 0, 230, 0x1C2, 0x200, 72, 4 },
-    { D_800A61E4, 32, 230, 0x19A, 0x180, 88, 8 },
-    { D_800A61F8, 64, 230, 0, 0x200, 72, 0 },
-    { D_800A61F8, 80, 230, 0, 0x200, 72, 0 },
-    { D_800A61E4, 16, 230, 0, 96, 88, 0 },
-    { D_800A61F8, 48, 230, 0x1CC, 128, 72, 4 },
-    { D_800A61E4, 80, 230, 0x1A4, 96, 88, 8 },
-    { D_800A61F8, 112, 230, 0, 128, 72, 0 },
-    { D_800A61F8, 140, 230, 0, 128, 72, 0 },
+    { updateFallerParams_0, -0x20, 230, 0, 0x180, 88, 0 },
+    { updateFallerParams_1, 0, 230, 0x1C2, 0x200, 72, 4 },
+    { updateFallerParams_0, 32, 230, 0x19A, 0x180, 88, 8 },
+    { updateFallerParams_1, 64, 230, 0, 0x200, 72, 0 },
+    { updateFallerParams_1, 80, 230, 0, 0x200, 72, 0 },
+    { updateFallerParams_0, 16, 230, 0, 96, 88, 0 },
+    { updateFallerParams_1, 48, 230, 0x1CC, 128, 72, 4 },
+    { updateFallerParams_0, 80, 230, 0x1A4, 96, 88, 8 },
+    { updateFallerParams_1, 112, 230, 0, 128, 72, 0 },
+    { updateFallerParams_1, 140, 230, 0, 128, 72, 0 },
 };
-AnimFrame D_800A62AC[] = {
+AnimFrame updateMoverFrames0[] = {
     { 50, 5 }, { 52, 5 }, { 53, 5 }, { 54, 40 },
     { 55, 8 }, { 56, 8 }, { 57, 10 }, { 58, 12 },
     { 59, 180 }, { 255, 0 },
 };
-AnimFrame D_800A62D4[] = {
+AnimFrame updateMoverFrames1[] = {
     { 60, 4 }, { 61, 4 }, { 62, 0x3E7 }, { 255, 0 },
 };
-AnimFrame D_800A62E4[] = {
+AnimFrame updateMoverFrames2[] = {
     { 1, 4 }, { 2, 4 }, { 3, 4 }, { 4, 4 },
     { 5, 4 }, { 6, 4 }, { 7, 4 }, { 8, 4 },
     { 9, 4 }, { 10, 4 }, { 11, 4 }, { 12, 4 },

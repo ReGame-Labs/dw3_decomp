@@ -9,7 +9,7 @@ void updateStage(StageTask *task) {
     case TASK_INIT:
     default:
         if (GAME.progress >= 0x16) {
-            for (tile = FIELDSTG_state.objects; tile->unk2 != 0; tile++) {
+            for (tile = FIELDSTG_state.objects; tile->margin != 0; tile++) {
                 if (tile->anim == 10) {
                     tile->visible = 0;
                 }
