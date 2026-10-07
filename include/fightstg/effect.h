@@ -210,6 +210,6 @@ void FIGHTSTG_drawSpriteAnim(void *arg, Layer *layer);
 BattleSound *FIGHTSTG_playBattleSound(s32 index, s32 time);
 s32 FIGHTSTG_findEffectSheet(s32 effect, s32 *images, s32 *sheet, Vec2 *texPos);
 SpriteAnim *FIGHTSTG_createSpriteAnim(s16 *data, SVECTOR *pos, s32 sheet, Vec2 *texPos, s32 layerId);
-SpriteEffect *FIGHTSTG_startSpriteEffect(s32 effect, SVECTOR *pos);
+SpriteEffect *FIGHTSTG_startSpriteEffect(s32 effect, const SVECTOR *pos);
 
 #endif /* FIGHTSTG_EFFECT_H */

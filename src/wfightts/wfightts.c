@@ -57,7 +57,7 @@ void WFIGHTTS_battleTest(BattleTest *task, BattleTestChildren *children) {
     s32 pressed;
     s32 arg;
     FighterInfo *partner;
-    EnemyFighterInfo *enemy;
+    FighterInfoEnemy *enemy;
 
     switch (task->state) {
     case 0:
@@ -202,7 +202,7 @@ void WFIGHTTS_battleTest(BattleTest *task, BattleTestChildren *children) {
                             children->camera->fade(children->camera, 0, &WFIGHTTS_partnerView, 60);
                         } else {
                             /* an enemy's info, with its 3 cameras */
-                            enemy = (EnemyFighterInfo *)FIGHTSTG_fighterCache.funcs.getInfo(children->models->getFighter(children->models, 0x10));
+                            enemy = (FighterInfoEnemy *)FIGHTSTG_fighterCache.funcs.getInfo(children->models->getFighter(children->models, 0x10));
                             WFIGHTTS_enemyView.vpx = enemy->camPos[task->camera].x;
                             WFIGHTTS_enemyView.vpy = -enemy->camPos[task->camera].y;
                             WFIGHTTS_enemyView.vpz = -enemy->camPos[task->camera].z;

@@ -38,7 +38,7 @@ s32 FIGHTSTG_stageMusic[8] = {
    black; setStage fades them out, frees the old model and stops its music,
    and loads the new stage */
 void FIGHTSTG_updateStage(FightStage *task, Model **children) {
-    FightStageInfo *stages = (FightStageInfo *)FILE_CACHE.load(FILE_FIGHT_STAGES);
+    FightStageInfo *stages = FILE_CACHE.load(FILE_FIGHT_STAGES);
     Lights *lights;
     Model *model;
     Layer *layer;
@@ -178,7 +178,9 @@ s32 FIGHTSTG_randomStage(void) {
 
 /* The file of fight stage ID's motions */
 s32 FIGHTSTG_getStageMotionsFile(s32 id) {
-    return (s16)(((FightStageInfo *)FILE_CACHE.load(FILE_FIGHT_STAGES))[id].motions >> 16);
+    FightStageInfo *stages = FILE_CACHE.load(FILE_FIGHT_STAGES);
+
+    return (s16)(stages[id].motions >> 16);
 }
 
 /* Creates the fight stage (id 0x15), which loads stage id and fades it in

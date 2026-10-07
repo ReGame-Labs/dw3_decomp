@@ -46,10 +46,8 @@ void FIGHTSTG_updateFirstTech(FirstTech *task, BattleChild *children) {
         }
         {
             s32 other = 1 - (task->side >> 4);
-            s32 row = other * 0x60;
-            BattleFighter *slot = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[other]];
 
-            fighter = (BattleFighter *)(row + (s32)slot);
+            fighter = FIGHTSTG_getActiveFighter(other);
         }
         if (fighter->flags & FIGHTER_ASLEEP) {
             task->asleep = 1;
@@ -89,10 +87,8 @@ void FIGHTSTG_updateFirstTech(FirstTech *task, BattleChild *children) {
 #endif
                 } else if (FIGHTSTG_action.effects[TECH_EFFECT_KNOCK_OUT]) {
                     s32 other = task->side == 0;
-                    s32 row = other * 0x60;
-                    BattleFighter *slot = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[other]];
 
-                    ((BattleFighter *)(row + (s32)slot))->hp = 0;
+                    FIGHTSTG_getActiveFighter(other)->hp = 0;
                     FIGHTSTG_queueKnockOut(other << 4);
                     children[0].task->state = 3;
                 } else if (FIGHTSTG_action.effects[TECH_EFFECT_END_BATTLE]) {
@@ -112,10 +108,8 @@ void FIGHTSTG_updateFirstTech(FirstTech *task, BattleChild *children) {
                 }
                 if (task->damage != 0) {
                     s32 other = task->side == 0;
-                    s32 row = other * 0x60;
-                    BattleFighter *slot = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[other]];
 
-                    struck = (BattleFighter *)(row + (s32)slot);
+                    struck = FIGHTSTG_getActiveFighter(other);
                     struck->hp -= task->damage;
                     if (struck->hp <= 0) {
                         struck->hp = 0;

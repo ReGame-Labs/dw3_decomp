@@ -212,10 +212,10 @@ typedef struct FighterEntry {
 
 /* The fighters' file: offsets from its start */
 typedef struct FightersFile {
-    /* 0x0 */ s32 unk0;
+    /* 0x0 */ s32 base; /* the address FighterInfo.face assumes the file is at */
     /* 0x4 */ s32 entries; /* FighterEntry, up to an id 0 */
-    /* 0x8 */ s32 partners; /* 0xC4 bytes each */
-    /* 0xC */ s32 enemies; /* 0x48 bytes each */
+    /* 0x8 */ s32 partners; /* FighterInfo */
+    /* 0xC */ s32 enemies; /* FighterInfoEnemy */
 } FightersFile;
 
 /* A fighter's entry in its file, from FIGHTSTG_fighterCache.funcs.getInfo */
@@ -233,9 +233,17 @@ typedef struct FighterInfo {
     /* 0xAA */ s16 camProj[12];
 } FighterInfo;
 
-/* An enemy's FighterInfo: it has 3 cameras where a partner has 12 */
+/* An enemy's FighterInfo: it has 3 cameras where a partner has 12.
+   FIGHTSTG_fighterCache keeps and returns it as a FighterInfo, so its
+   readers cast it back. */
 typedef struct FighterInfoEnemy {
-    /* 0x00 */ u8 unk0[0x1A];
+    /* 0x00 */ s32 model;
+    /* 0x04 */ s32 motions;
+    /* 0x08 */ s32 effects;
+    /* 0x0C */ s32 face;
+    /* 0x10 */ s16 distance;
+    /* 0x12 */ u8 unk12[6];
+    /* 0x18 */ s16 height;
     /* 0x1A */ ShortVec3 camPos[3];
     /* 0x2C */ ShortVec3 camRef[3];
     /* 0x3E */ s16 camProj[3];

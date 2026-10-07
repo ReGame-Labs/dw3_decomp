@@ -325,6 +325,7 @@ void FIGHTSTG_updateModel(Model *model, Mesh **children) {
                 children[c + 1] = FIGHTSTG_createMesh(FILE_CACHE.getEntry(model->bones[c].file), model->texPos);
             }
         }
+        /* child 0 is the face, the others the bones' meshes */
         children[0] = (Mesh *)FIGHTSTG_createFace(model, model->control->fighter);
         model->motion = 1;
         if (model->hasIdle != 0) {

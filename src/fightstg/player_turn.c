@@ -7,12 +7,10 @@
    (FIGHTSTG_createCommandMenu) and then the menu of its command, 3 the
    confused menu (FIGHTSTG_createConfusedMenu) and 4 the switch menu after a
    knockout (FIGHTSTG_createSwitchMenu); each sets action and goes back to
-   substate 0, which closes the children. The match depends on the menus' results being switches with case
-   -1 first and on each of the two endings of the command menu's last step
-   being written out. The children are kept as Task pointers (hence the
-   casts) because child 3 is whichever command menu is open, and substate 0
-   closes them all in one loop. */
-void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, Task **children) {
+   substate 0, which closes the children. The match depends on the menus'
+   results being switches with case -1 first and on each of the two endings
+   of the command menu's last step being written out. */
+void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, PlayerTurnChild *children) {
     s32 i;
 
     switch (task->state) {
@@ -29,8 +27,8 @@ void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, Task **children) {
             default:
                 task->command = BATTLE_COMMAND_ATTACK;
                 for (i = 1; i < 7; i++) {
-                    if (children[i] != NULL) {
-                        children[i]->setState(children[i], 3);
+                    if (children[i].task != NULL) {
+                        children[i].task->setState(children[i].task, 3);
                     }
                 }
                 task->nextStep(task);
@@ -40,8 +38,8 @@ void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, Task **children) {
             }
             break;
         case 1:
-            if (children[0] == NULL) {
-                children[0] = (Task *)FIGHTSTG_createHud();
+            if (children[0].task == NULL) {
+                children[0].hud = FIGHTSTG_createHud();
             }
             task->setSubstate(task, 0);
             break;
@@ -52,17 +50,17 @@ void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, Task **children) {
                 switch (task->counter) {
                 case 0:
                 default:
-                    if (children[0] == NULL) {
-                        children[0] = (Task *)FIGHTSTG_createHud();
+                    if (children[0].task == NULL) {
+                        children[0].hud = FIGHTSTG_createHud();
                     }
-                    if (children[1] == NULL) {
-                        children[1] = (Task *)FIGHTSTG_createCommandMenu(task->command, &task->result);
+                    if (children[1].task == NULL) {
+                        children[1].commandMenu = FIGHTSTG_createCommandMenu(task->command, &task->result);
                     }
-                    if (children[2] == NULL) {
-                        children[2] = (Task *)FIGHTSTG_createPartnerView();
+                    if (children[2].task == NULL) {
+                        children[2].partnerView = FIGHTSTG_createPartnerView();
                     }
-                    if (children[6] == NULL) {
-                        children[6] = (Task *)FIGHTSTG_createShotCamera();
+                    if (children[6].task == NULL) {
+                        children[6].shotCamera = FIGHTSTG_createShotCamera();
                     }
                     task->result = -1;
                     task->tickCounter(task);
@@ -101,7 +99,7 @@ void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, Task **children) {
                 case 0:
                 default:
                     task->result = GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]);
-                    children[3] = (Task *)FIGHTSTG_createDigivolveMenu(&task->result);
+                    children[3].digivolveMenu = FIGHTSTG_createDigivolveMenu(&task->result);
                     task->tickCounter(task);
                 case 1:
                     switch (task->result) {
@@ -124,7 +122,7 @@ void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, Task **children) {
                 switch (task->counter) {
                 case 0:
                 default:
-                    children[3] = (Task *)FIGHTSTG_createItemMenu(&task->result);
+                    children[3].itemMenu = FIGHTSTG_createItemMenu(&task->result);
                     task->tickCounter(task);
                 case 1:
                     switch (task->result) {
@@ -146,7 +144,7 @@ void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, Task **children) {
                 switch (task->counter) {
                 case 0:
                 default:
-                    children[3] = (Task *)FIGHTSTG_createTechMenu(&task->result);
+                    children[3].techMenu = FIGHTSTG_createTechMenu(&task->result);
                     task->tickCounter(task);
                 case 1:
                     switch (task->result) {
@@ -168,7 +166,7 @@ void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, Task **children) {
                 switch (task->counter) {
                 case 0:
                 default:
-                    children[3] = (Task *)FIGHTSTG_createSwitchMenu(&task->result, &task->switchLine, 1);
+                    children[3].switchMenu = FIGHTSTG_createSwitchMenu(&task->result, &task->switchLine, 1);
                     task->tickCounter(task);
                 case 1:
                     switch (task->result) {
@@ -179,7 +177,7 @@ void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, Task **children) {
                         break;
                     default:
                         task->arg = task->result;
-                        children[4] = (Task *)FIGHTSTG_createPairSwitchMenu(&task->result, &task->pairTech);
+                        children[4].switchInMenu = FIGHTSTG_createPairSwitchMenu(&task->result, &task->pairTech);
                         task->tickCounter(task);
                         break;
                     }
@@ -214,14 +212,14 @@ void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, Task **children) {
             switch (task->counter) {
             case 0:
             default:
-                if (children[2] == NULL) {
-                    children[2] = (Task *)FIGHTSTG_createPartnerView();
+                if (children[2].task == NULL) {
+                    children[2].partnerView = FIGHTSTG_createPartnerView();
                 }
-                if (children[6] == NULL) {
-                    children[6] = (Task *)FIGHTSTG_createShotCamera();
+                if (children[6].task == NULL) {
+                    children[6].shotCamera = FIGHTSTG_createShotCamera();
                 }
-                if (children[1] == NULL) {
-                    children[1] = (Task *)FIGHTSTG_createConfusedMenu(&task->result, children[2], children[6]);
+                if (children[1].task == NULL) {
+                    children[1].confusedMenu = FIGHTSTG_createConfusedMenu(&task->result, children[2].task, children[6].task);
                 }
                 task->result = -1;
                 task->tickCounter(task);
@@ -245,17 +243,17 @@ void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, Task **children) {
             switch (task->counter) {
             case 0:
             default:
-                if (children[6] == NULL) {
-                    children[6] = (Task *)FIGHTSTG_createShotCamera();
+                if (children[6].task == NULL) {
+                    children[6].shotCamera = FIGHTSTG_createShotCamera();
                 }
-                if (children[3] == NULL) {
-                    children[3] = (Task *)FIGHTSTG_createSwitchMenu(&task->result, &task->switchLine, 0);
+                if (children[3].task == NULL) {
+                    children[3].switchMenu = FIGHTSTG_createSwitchMenu(&task->result, &task->switchLine, 0);
                 }
                 task->tickCounter(task);
             case 1:
                 if (task->result != -1) {
                     task->arg = task->result;
-                    children[4] = (Task *)FIGHTSTG_createSwitchInMenu(&task->result);
+                    children[4].switchInMenu = FIGHTSTG_createSwitchInMenu(&task->result);
                     task->tickCounter(task);
                 }
                 break;
@@ -302,5 +300,7 @@ void FIGHTSTG_setPlayerTurnStep(s32 substate) {
 
 /* Whether the player's turn has a menu open (its substate isn't 0) */
 s32 FIGHTSTG_isPlayerChoosing(void) {
-    return ((Task *)TASK_REGISTRY.funcs.find(BATTLE_TASK_PLAYER_TURN, -1, -1))->substate != 0;
+    PlayerTurn *turn = TASK_REGISTRY.funcs.find(BATTLE_TASK_PLAYER_TURN, -1, -1);
+
+    return turn->substate != 0;
 }

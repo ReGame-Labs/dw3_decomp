@@ -129,10 +129,10 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
                 }
                 models->get(models, 0x10)->layers[0].enabled = 0;
                 if (task->key2 == 0) {
-                    children->effects[0] = FIGHTSTG_startSpriteEffect(1000, (SVECTOR *)&FIGHTSTG_changeStartPos);
-                    children->effects[1] = FIGHTSTG_startSpriteEffect(1001, (SVECTOR *)&FIGHTSTG_changeStartPos);
+                    children->effects[0] = FIGHTSTG_startSpriteEffect(1000, &FIGHTSTG_changeStartPos);
+                    children->effects[1] = FIGHTSTG_startSpriteEffect(1001, &FIGHTSTG_changeStartPos);
                 } else {
-                    children->effects[0] = FIGHTSTG_startSpriteEffect(1007, (SVECTOR *)&FIGHTSTG_changeStartPos);
+                    children->effects[0] = FIGHTSTG_startSpriteEffect(1007, &FIGHTSTG_changeStartPos);
                 }
             }
             task->nextSubstate(task);
@@ -146,7 +146,7 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
                 task->clip1.h = 240;
                 task->clip1.y = 0;
                 models->get(models, 0)->layers[0].enabled = 0;
-                children->effects[2] = FIGHTSTG_startSpriteEffect(1002, (SVECTOR *)&FIGHTSTG_changeMidPos);
+                children->effects[2] = FIGHTSTG_startSpriteEffect(1002, &FIGHTSTG_changeMidPos);
                 task->nextSubstate(task);
             }
             {
@@ -234,7 +234,7 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
                 task->clip1.y = 240;
                 task->clip1.h = 0;
                 models->get(models, 0)->layers[1].enabled = 0;
-                children->effects[3] = FIGHTSTG_startSpriteEffect(task->key2 == 0 ? 1003 : 1008, (SVECTOR *)&FIGHTSTG_changeEndPos);
+                children->effects[3] = FIGHTSTG_startSpriteEffect(task->key2 == 0 ? 1003 : 1008, &FIGHTSTG_changeEndPos);
                 task->nextSubstate(task);
             }
             {

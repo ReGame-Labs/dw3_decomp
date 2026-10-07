@@ -7,7 +7,7 @@
    The match depends on item 0x55's damage being 20 percent, on the row
    pointer of item 0x5A, on the stage being written out in each case and on
    the table being walked by index. */
-s32 FIGHTSTG_runItemScript(BattleItem *task, BattleScript **children) {
+s32 FIGHTSTG_runItemScript(BattleItem *task, BattleChild *children) {
     BattleFighter *fighter;
     BattleFighter *enemy;
     BattleFighter *row;
@@ -21,8 +21,8 @@ s32 FIGHTSTG_runItemScript(BattleItem *task, BattleScript **children) {
     switch (task->step) {
     case 0:
     default:
-        children[0] = FIGHTSTG_createBattleScript();
-        children[0]->enemy = 0;
+        children[0].script = FIGHTSTG_createBattleScript();
+        children[0].script->enemy = 0;
         switch (task->item) {
         case 0x4D:
         case 0x4E:
@@ -31,35 +31,35 @@ s32 FIGHTSTG_runItemScript(BattleItem *task, BattleScript **children) {
         case 0x51:
         case 0x52:
         case 0x53:
-            children[0]->index = 0xF;
-            children[0]->stage = (task->item - 0x4D) * 3 + 0x22;
-            children[0]->effect = 2;
-            children[0]->sound = 0x39;
+            children[0].script->index = 0xF;
+            children[0].script->stage = (task->item - 0x4D) * 3 + 0x22;
+            children[0].script->effect = 2;
+            children[0].script->sound = 0x39;
             break;
         case 0x54:
             task->element = RANDOM.next() % ELEMENT_COUNT + ELEMENT_FIRST;
-            children[0]->index = 0xF;
-            children[0]->stage = (task->element - ELEMENT_FIRST) * 3 + 0x22;
-            children[0]->effect = 2;
-            children[0]->sound = 0x39;
+            children[0].script->index = 0xF;
+            children[0].script->stage = (task->element - ELEMENT_FIRST) * 3 + 0x22;
+            children[0].script->effect = 2;
+            children[0].script->sound = 0x39;
             break;
         case 0x56:
-            children[0]->index = 0x11;
-            children[0]->stage = -1;
-            children[0]->effect = 0x15;
-            children[0]->sound = 0x1B;
+            children[0].script->index = 0x11;
+            children[0].script->stage = -1;
+            children[0].script->effect = 0x15;
+            children[0].script->sound = 0x1B;
             break;
         case 0x57:
-            children[0]->index = 0x11;
-            children[0]->stage = -1;
-            children[0]->effect = 0x27;
-            children[0]->sound = 0x31;
+            children[0].script->index = 0x11;
+            children[0].script->stage = -1;
+            children[0].script->effect = 0x27;
+            children[0].script->sound = 0x31;
             break;
         case 0x59:
-            children[0]->index = 0x11;
-            children[0]->stage = -1;
-            children[0]->effect = 0x29;
-            children[0]->sound = 0x31;
+            children[0].script->index = 0x11;
+            children[0].script->stage = -1;
+            children[0].script->effect = 0x29;
+            children[0].script->sound = 0x31;
             break;
         case 0x58:
             fighter = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
@@ -97,70 +97,70 @@ s32 FIGHTSTG_runItemScript(BattleItem *task, BattleScript **children) {
                     }
                 }
             }
-            children[0]->index = 0x11;
-            children[0]->stage = -1;
+            children[0].script->index = 0x11;
+            children[0].script->stage = -1;
             if (task->lowered == 1) {
-                children[0]->effect = 0x25;
-                children[0]->sound = 0x31;
+                children[0].script->effect = 0x25;
+                children[0].script->sound = 0x31;
             } else if (task->lowered == 2) {
-                children[0]->effect = 0x27;
-                children[0]->sound = 0x31;
+                children[0].script->effect = 0x27;
+                children[0].script->sound = 0x31;
             } else {
-                children[0]->effect = 0x2E;
-                children[0]->sound = 0x1E;
+                children[0].script->effect = 0x2E;
+                children[0].script->sound = 0x1E;
             }
             break;
         case 0x55:
-            children[0]->index = 0xE;
-            children[0]->stage = -1;
-            children[0]->effect = 0x1C;
-            children[0]->sound = 0x27;
+            children[0].script->index = 0xE;
+            children[0].script->stage = -1;
+            children[0].script->effect = 0x1C;
+            children[0].script->sound = 0x27;
             if (BATTLE_SETUP.blocks[BATTLE_BLOCK_DRAIN] == 0) {
                 enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
                 task->damage = enemy->maxHp * 20 / 100;
                 if (enemy->hp - task->damage <= 0) {
-                    children[0]->hits[3] = 2;
+                    children[0].script->hits[3] = 2;
                     task->counter = 1;
                 } else {
-                    children[0]->hits[3] = 1;
+                    children[0].script->hits[3] = 1;
                     WFIGHTMN_setIdleMotion(SIDE_ENEMY, task->damage);
                     WFIGHTMN_setIdleMotion(0, -task->damage);
                 }
             } else {
-                children[0]->hits[3] = 3;
+                children[0].script->hits[3] = 3;
             }
             break;
         case 0x5A:
-            children[0]->index = 0xE;
+            children[0].script->index = 0xE;
             tech = &TECHS[0x88];
-            children[0]->stage = tech->scriptStage;
-            children[0]->effect = tech->scriptEffect;
-            children[0]->sound = tech->scriptSound;
+            children[0].script->stage = tech->scriptStage;
+            children[0].script->effect = tech->scriptEffect;
+            children[0].script->sound = tech->scriptSound;
             task->damage = WFIGHTMN_limitDamage(0, FIGHTSTG_battleFuncs.computeMagicDamage(0, 0x89), 0);
             row = FIGHTSTG_battle.fighters[1];
             if (task->damage > 0) {
                 if (row[FIGHTSTG_battle.active[1]].hp - task->damage <= 0) {
-                    children[0]->hits[3] = 2;
+                    children[0].script->hits[3] = 2;
                 } else {
-                    children[0]->hits[3] = 1;
+                    children[0].script->hits[3] = 1;
                     WFIGHTMN_setIdleMotion(SIDE_ENEMY, task->damage);
                 }
             } else {
-                children[0]->hits[3] = 3;
+                children[0].script->hits[3] = 3;
             }
             break;
         default:
-            children[0]->index = 0xA;
-            children[0]->stage = -1;
+            children[0].script->index = 0xA;
+            children[0].script->stage = -1;
             for (i = 0; FIGHTSTG_itemScripts[i].item != -1; i++) {
                 if (FIGHTSTG_itemScripts[i].item == task->item) {
-                    children[0]->effect = FIGHTSTG_itemScripts[i].effect;
-                    children[0]->sound = FIGHTSTG_itemScripts[i].sound;
+                    children[0].script->effect = FIGHTSTG_itemScripts[i].effect;
+                    children[0].script->sound = FIGHTSTG_itemScripts[i].sound;
                     break;
                 }
             }
             if (task->item >= 0x2B && task->item < 0x2F) {
-                WFIGHTMN_setIdleMotion(0, -*(u16 *)&GET_ITEM[0](task->item)->data[2]);
+                WFIGHTMN_setIdleMotion(0, -((BattleItemEffect *)GET_ITEM[0](task->item)->data)->amount);
             } else if (task->item == 0x47) {
                 WFIGHTMN_setIdleMotion(0, -((FIGHTSTG_battle.fighters[0] + FIGHTSTG_battle.active[0])->maxHp >> 1));
             }
@@ -176,20 +176,20 @@ s32 FIGHTSTG_runItemScript(BattleItem *task, BattleScript **children) {
         }
         break;
     case 1:
-        if (children[0] == NULL) {
+        if (children[0].script == NULL) {
             if (task->item != 0x55 || task->counter != 0 || BATTLE_SETUP.blocks[BATTLE_BLOCK_DRAIN] != 0) {
                 return 1;
             }
-            children[0] = FIGHTSTG_createBattleScript();
-            children[0]->enemy = 0;
-            children[0]->index = 0xA;
-            children[0]->effect = 0x21;
-            children[0]->sound = 0x1F;
+            children[0].script = FIGHTSTG_createBattleScript();
+            children[0].script->enemy = 0;
+            children[0].script->index = 0xA;
+            children[0].script->effect = 0x21;
+            children[0].script->sound = 0x1F;
             task->step++;
         }
         break;
     case 2:
-        if (children[0] == NULL) {
+        if (children[0].script == NULL) {
             return 1;
         }
         break;
@@ -248,7 +248,7 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
             task->substate++;
             break;
         case 1:
-            if (children[0].task == NULL && FIGHTSTG_runItemScript(task, (BattleScript **)children)) {
+            if (children[0].task == NULL && FIGHTSTG_runItemScript(task, children)) {
                 task->nextState(task);
             }
             break;
@@ -267,11 +267,11 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
             case 0x2B ... 0x41:
             default: {
                 BattleFighter *fighter;
-                u8 *data;
+                BattleItemEffect *effect;
                 s32 heal;
 
                 fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
-                data = GET_ITEM[0](task->item)->data;
+                effect = (BattleItemEffect *)GET_ITEM[0](task->item)->data;
                 if (fighter->maxHp == fighter->hp) {
                     children[0].message = FIGHTSTG_createMessage();
                     task->lines[0] = 0x2F;
@@ -279,8 +279,8 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
                     task->nextSubstate(task);
                     break;
                 }
-                if (fighter->hp + *(u16 *)&data[2] <= fighter->maxHp) {
-                    heal = *(u16 *)&data[2];
+                if (fighter->hp + effect->amount <= fighter->maxHp) {
+                    heal = effect->amount;
                     fighter->hp += heal;
                 } else {
                     heal = fighter->maxHp - fighter->hp;
@@ -392,17 +392,17 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
             case 0x48: {
                 BattleFighter *fighter;
                 BattleStats *stats;
-                u8 *data;
+                BattleItemEffect *effect;
                 s32 max;
 
-                data = GET_ITEM[0](task->item)->data;
+                effect = (BattleItemEffect *)GET_ITEM[0](task->item)->data;
                 fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
                 stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
                 if (fighter->boosts[2] != 0) {
                     stats->stats[BATTLE_STAT_SPEED] -= fighter->boosts[2];
                 }
                 max = stats->stats[BATTLE_STAT_SPEED];
-                fighter->boosts[2] += max * *(u16 *)&data[2] / 128;
+                fighter->boosts[2] += max * effect->amount / 128;
                 if (fighter->boosts[2] > max) {
                     fighter->boosts[2] = max;
                 }
@@ -418,11 +418,11 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
             case 0x49: {
                 BattleFighter *fighter;
                 BattleStats *stats;
-                u8 *data;
+                BattleItemEffect *effect;
                 s32 max;
                 s32 min;
 
-                data = GET_ITEM[0](task->item)->data;
+                effect = (BattleItemEffect *)GET_ITEM[0](task->item)->data;
                 fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
                 stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
                 if (fighter->boosts[0] != 0) {
@@ -432,12 +432,12 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
                     stats->stats[BATTLE_STAT_DEFENSE] -= fighter->boosts[1];
                 }
                 max = stats->stats[BATTLE_STAT_ATTACK];
-                fighter->boosts[0] += max * *(u16 *)&data[2] / 128;
+                fighter->boosts[0] += max * effect->amount / 128;
                 if (fighter->boosts[0] > max) {
                     fighter->boosts[0] = max;
                 }
                 min = -(stats->stats[BATTLE_STAT_DEFENSE] / 2);
-                fighter->boosts[1] -= stats->stats[BATTLE_STAT_DEFENSE] * *(u16 *)&data[2] / 512;
+                fighter->boosts[1] -= stats->stats[BATTLE_STAT_DEFENSE] * effect->amount / 512;
                 if (fighter->boosts[1] < min) {
                     fighter->boosts[1] = min;
                 }
@@ -453,11 +453,11 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
             case 0x4A: {
                 BattleFighter *fighter;
                 BattleStats *stats;
-                u8 *data;
+                BattleItemEffect *effect;
                 s32 max;
                 s32 min;
 
-                data = GET_ITEM[0](task->item)->data;
+                effect = (BattleItemEffect *)GET_ITEM[0](task->item)->data;
                 fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
                 stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
                 if (fighter->boosts[0] != 0) {
@@ -467,12 +467,12 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
                     stats->stats[BATTLE_STAT_DEFENSE] -= fighter->boosts[1];
                 }
                 max = stats->stats[BATTLE_STAT_DEFENSE];
-                fighter->boosts[1] += max * *(u16 *)&data[2] / 128;
+                fighter->boosts[1] += max * effect->amount / 128;
                 if (fighter->boosts[1] > max) {
                     fighter->boosts[1] = max;
                 }
                 min = -(stats->stats[BATTLE_STAT_ATTACK] / 2);
-                fighter->boosts[0] -= stats->stats[BATTLE_STAT_ATTACK] * *(u16 *)&data[2] / 512;
+                fighter->boosts[0] -= stats->stats[BATTLE_STAT_ATTACK] * effect->amount / 512;
                 if (fighter->boosts[0] < min) {
                     fighter->boosts[0] = min;
                 }
@@ -498,12 +498,12 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
                 break;
             }
             case 0x4C: {
-                u8 *data;
+                BattleItemEffect *effect;
                 s32 i;
 
-                data = GET_ITEM[0](task->item)->data;
+                effect = (BattleItemEffect *)GET_ITEM[0](task->item)->data;
                 i = GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]);
-                BATTLE_SETUP.gauges[i] += *(u16 *)&data[2];
+                BATTLE_SETUP.gauges[i] += effect->amount;
                 if (BATTLE_SETUP.gauges[i] >= 999) {
                     BATTLE_SETUP.gauges[i] = 999;
                 }
@@ -679,18 +679,18 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
             case 0x59: {
                 BattleFighter *enemy;
                 BattleStats *stats;
-                u8 *data;
+                BattleItemEffect *effect;
                 s32 min;
 
                 if (BATTLE_SETUP.blocks[BATTLE_BLOCK_LOWER_SPEED] == 0) {
-                    data = GET_ITEM[0](task->item)->data;
+                    effect = (BattleItemEffect *)GET_ITEM[0](task->item)->data;
                     enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
                     stats = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
                     if (enemy->boosts[2] != 0) {
                         stats->stats[BATTLE_STAT_SPEED] -= enemy->boosts[2];
                     }
                     min = -(stats->stats[BATTLE_STAT_SPEED] / 2);
-                    enemy->boosts[2] -= stats->stats[BATTLE_STAT_SPEED] * *(u16 *)&data[2] / 128;
+                    enemy->boosts[2] -= stats->stats[BATTLE_STAT_SPEED] * effect->amount / 128;
                     if (enemy->boosts[2] < min) {
                         enemy->boosts[2] = min;
                     }

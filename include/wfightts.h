@@ -101,14 +101,6 @@ typedef struct BattleTestChildren {
     /* 0x28 */ Models *models;
 } BattleTestChildren;
 
-/* An enemy's FighterInfo: its cameras are 3, where a partner has 12 */
-typedef struct EnemyFighterInfo {
-    /* 0x00 */ u8 unk0[0x1A];
-    /* 0x1A */ ShortVec3 camPos[3];
-    /* 0x2C */ ShortVec3 camRef[3];
-    /* 0x3E */ s16 camProj[3];
-} EnemyFighterInfo;
-
 /* The battle test's data, defined after its code */
 extern RECT WFIGHTTS_screen;
 extern s32 WFIGHTTS_stageCursor;

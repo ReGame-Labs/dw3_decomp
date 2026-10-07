@@ -2,6 +2,12 @@
 
 #include "cardgame.h"
 
+/* Whether sprite is scaled: its scaleX and scaleY, read as one word, aren't
+   both 0x1000 */
+static inline s32 isScaled(CardSprite *sprite) {
+    return *(s32 *)&sprite->scaleX != 0x10001000;
+}
+
 /* Moves and scales a sprite towards its targets; at the end it plays a sound (unless in state 3) and goes to state 1 */
 void CARDGAME_moveSprite(CardScreen *screen, CardSprite *sprite) {
     sprite->time -= GFX.funcs.getFrameTime();
@@ -188,6 +194,11 @@ s32 CARDGAME_flipSprite(CardScreen *screen, CardSprite *sprite) {
     return done;
 }
 
+/* The part of a sprite sheet at offset, one of the offsets it starts with */
+static inline void *getSheetPart(s32 *sheet, s32 offset) {
+    return (u8 *)sheet + offset;
+}
+
 /* Draws a card's picture: a one-part sprite sheet (CARDGAME_pictureSheet) made on the fly,
    the 32x32 cell `index` of an 8-row grid with the card's own CLUT row */
 void CARDGAME_drawCardPicture(CardSprite *sprite) {
@@ -201,14 +212,14 @@ void CARDGAME_drawCardPicture(CardSprite *sprite) {
     u = sprite->index / 8 * 32;
     v = sprite->index % 8 * 32;
     sheet = CARDGAME_pictureSheet;
-    frame = (s16 *)((u8 *)sheet + sheet[2]);
+    frame = getSheetPart(sheet, sheet[2]);
     frame[0] = 1;
     frame[2] = -1;
     frame[1] = sprite->index;
     frame[3] = 0;
     frame[4] = 4;
     frame[5] = 2;
-    part = (SpritePart *)((u8 *)sheet + sheet[0]);
+    part = getSheetPart(sheet, sheet[0]);
     part->u = u;
     part->v = v;
     part->w = 32;
@@ -217,7 +228,7 @@ void CARDGAME_drawCardPicture(CardSprite *sprite) {
     part->clutY = 0x100;
     part->mode = 1;
     initSpriteDrawer(&drawer);
-    if (*(s32 *)&sprite->scaleX != 0x10001000) {
+    if (isScaled(sprite)) {
         drawer.setPivot((sprite->x >> 8) + 0x14, (sprite->y >> 8) + 0x17);
         drawer.setScale(sprite->scaleX, sprite->scaleY, 0x1000);
     }
@@ -234,7 +245,7 @@ void CARDGAME_drawSpriteEffect(CardScreen *screen, CardSprite *sprite) {
     if (sprite->visible != 0 && sprite->effect != 0) {
         initSpriteDrawer(&drawer);
         /* both scales at 0x1000, read as one word */
-        if (*(s32 *)&sprite->scaleX != 0x10001000) {
+        if (isScaled(sprite)) {
             drawer.setPivot((sprite->x >> 8) + 0x14, (sprite->y >> 8) + 0x17);
             drawer.setScale(sprite->scaleX, sprite->scaleY, 0x1000);
         }
@@ -289,7 +300,7 @@ void CARDGAME_drawSpriteHighlights(CardScreen *screen, CardSprite *sprite) {
                 drawer.setClutRow(4);
             }
             /* both scales at 0x1000, read as one word */
-            if (*(s32 *)&sprite->scaleX != 0x10001000) {
+            if (isScaled(sprite)) {
                 drawer.setPivot((sprite->x >> 8) + 0x14, (sprite->y >> 8) + 0x17);
                 drawer.setScale(sprite->scaleX, sprite->scaleY, 0x1000);
             }
@@ -301,7 +312,7 @@ void CARDGAME_drawSpriteHighlights(CardScreen *screen, CardSprite *sprite) {
             initSpriteDrawer(&drawer);
             drawer.setClutRow(CARDGAME_highlightCluts[(screen->time >> 2) % 6]);
             /* both scales at 0x1000, read as one word */
-            if (*(s32 *)&sprite->scaleX != 0x10001000) {
+            if (isScaled(sprite)) {
                 drawer.setPivot((sprite->x >> 8) + 0x14, (sprite->y >> 8) + 0x17);
                 drawer.setScale(sprite->scaleX, sprite->scaleY, 0x1000);
             }
@@ -319,7 +330,7 @@ void CARDGAME_drawSpriteOrder(CardScreen *screen, CardSprite *sprite) {
     if (sprite->visible != 0 && sprite->order != 0) {
         initSpriteDrawer(&drawer);
         /* both scales at 0x1000, read as one word */
-        if (*(s32 *)&sprite->scaleX != 0x10001000) {
+        if (isScaled(sprite)) {
             drawer.setPivot((sprite->x >> 8) + 0x14, (sprite->y >> 8) + 0x17);
             drawer.setScale(sprite->scaleX, sprite->scaleY, 0x1000);
         }
@@ -340,7 +351,7 @@ void CARDGAME_drawSpriteMarks(CardScreen *screen, CardSprite *sprite) {
             if (sprite->marks[i] != 0) {
                 initSpriteDrawer(&drawer);
                 /* both scales at 0x1000, read as one word */
-                if (*(s32 *)&sprite->scaleX != 0x10001000) {
+                if (isScaled(sprite)) {
                     drawer.setPivot((sprite->x >> 8) + 0x14, (sprite->y >> 8) + 0x17);
                     drawer.setScale(sprite->scaleX, sprite->scaleY, 0x1000);
                 }
@@ -379,7 +390,7 @@ static inline void drawCardNumbers(CardSprite *sprite) {
     CARDGAME_drawNumber(&number, 1);
     initSpriteDrawer(&drawer);
     /* both scales at 0x1000, read as one word */
-    if (*(s32 *)&sprite->scaleX != 0x10001000) {
+    if (isScaled(sprite)) {
         drawer.setPivot((sprite->x >> 8) + 0x14, (sprite->y >> 8) + 0x17);
         drawer.setScale(sprite->scaleX, sprite->scaleY, 0x1000);
     }
@@ -394,7 +405,7 @@ static inline void drawCardMark(CardSprite *sprite) {
 
     initSpriteDrawer(&drawer);
     /* both scales at 0x1000, read as one word */
-    if (*(s32 *)&sprite->scaleX != 0x10001000) {
+    if (isScaled(sprite)) {
         drawer.setPivot((sprite->x >> 8) + 0x14, (sprite->y >> 8) + 0x17);
         drawer.setScale(sprite->scaleX, sprite->scaleY, 0x1000);
     }
@@ -423,7 +434,7 @@ void CARDGAME_drawSpriteCard(CardScreen *screen, CardSprite *sprite) {
 
             initSpriteDrawer(&drawer);
             /* both scales at 0x1000, read as one word */
-            if (*(s32 *)&sprite->scaleX != 0x10001000) {
+            if (isScaled(sprite)) {
                 drawer.setPivot((sprite->x >> 8) + 0x14, (sprite->y >> 8) + 0x17);
                 drawer.setScale(sprite->scaleX, sprite->scaleY, 0x1000);
             }
@@ -439,7 +450,7 @@ void CARDGAME_drawSpriteCard(CardScreen *screen, CardSprite *sprite) {
 
         initSpriteDrawer(&drawer);
         /* both scales at 0x1000, read as one word */
-        if (*(s32 *)&sprite->scaleX != 0x10001000) {
+        if (isScaled(sprite)) {
             drawer.setPivot((sprite->x >> 8) + 0x14, (sprite->y >> 8) + 0x17);
             drawer.setScale(sprite->scaleX, sprite->scaleY, 0x1000);
         }
@@ -453,7 +464,7 @@ void CARDGAME_drawSpriteCard(CardScreen *screen, CardSprite *sprite) {
 
         initSpriteDrawer(&drawer);
         /* both scales at 0x1000, read as one word */
-        if (*(s32 *)&sprite->scaleX != 0x10001000) {
+        if (isScaled(sprite)) {
             drawer.setPivot((sprite->x >> 8) + 0x14, (sprite->y >> 8) + 0x17);
             drawer.setScale(sprite->scaleX, sprite->scaleY, 0x1000);
         }
@@ -472,7 +483,7 @@ void CARDGAME_drawSpriteDim(CardScreen *screen, CardSprite *sprite) {
     if (sprite->visible != 0 && sprite->dimmed != 0) {
         initSpriteDrawer(&drawer);
         /* both scales at 0x1000, read as one word */
-        if (*(s32 *)&sprite->scaleX != 0x10001000) {
+        if (isScaled(sprite)) {
             drawer.setPivot((sprite->x >> 8) + 0x14, (sprite->y >> 8) + 0x17);
             drawer.setScale(sprite->scaleX, sprite->scaleY, 0x1000);
         }
