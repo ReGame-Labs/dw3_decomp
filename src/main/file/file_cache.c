@@ -16,7 +16,7 @@ FileCache FILE_CACHE = {
     freeAllFiles,
     freeFilesFrom,
     getFileEntry,
-    (u8 *(*)(s32, s32))getArchiveEntry,
+    getArchiveEntry,
     markCachedFiles,
     touchMarkedFiles,
 };
@@ -227,16 +227,19 @@ void freeFilesFrom(u32 addr) {
  * Files are often archives: a table of offsets from the start of the file.
  * getFileEntry((file << 16) | index) loads the file and returns that entry.
  */
-s32 getFileEntry(u32 fileAndIndex) {
+void *getFileEntry(u32 fileAndIndex) {
     s32 index = fileAndIndex & 0xFFFF;
     s32 *table = loadFile(fileAndIndex >> 16);
 
-    return table[index] + (s32)table;
+    /* summed as integers: as pointer arithmetic GCC swaps the operands */
+    return (void *)(table[index] + (s32)table);
 }
 
 /* Entry `index` (the low 16 bits) of an archive already in memory */
-s32 getArchiveEntry(u32 index, s32 *archive) {
-    return archive[index & 0xFFFF] + (s32)archive;
+void *getArchiveEntry(s32 index, void *archive) {
+    s32 *table = archive;
+
+    return (void *)(table[index & 0xFFFF] + (s32)table); /* as in getFileEntry */
 }
 
 /* markCachedFiles + touchMarkedFiles: refresh the files cached before a load */

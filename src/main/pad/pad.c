@@ -18,10 +18,10 @@ void initPad(s32 multitap, s32 repeatRate) {
         }
     }
     if (multitap != 0) {
-        PadInitMtap(PAD.buf[0], PAD.buf[1]);
+        PadInitMtap(PAD.buf[0].bytes, PAD.buf[1].bytes);
         PAD.flags |= PAD_FLAG_MULTITAP;
     } else {
-        PadInitDirect(PAD.buf[0], PAD.buf[1]);
+        PadInitDirect(PAD.buf[0].bytes, PAD.buf[1].bytes);
     }
     repeatRate &= 0x7F;
     PAD.repeatRate = (u8)repeatRate;
@@ -60,7 +60,7 @@ void stopPad(void) {
 
 /* Reads every pad, or the demo data while a demo plays */
 void updatePad(void) {
-    u8 *record = (u8 *)PAD.demoData + PAD.demoFrame * sizeof(PAD.buf[0]);
+    PadBuffer *record = PAD.demoData + PAD.demoFrame;
     s32 ret;
     s32 i;
     s32 j;
@@ -76,19 +76,19 @@ void updatePad(void) {
     }
     for (i = 0; i < 2; i++) {
         port = i * 16;
-        if (PAD.buf[i][1] == PAD_MULTITAP_ID) {
+        if (PAD.buf[i].tap.id == PAD_MULTITAP_ID) {
             for (j = 0; j < 4; j++) {
                 if (PAD.flags & PAD_FLAG_DEMO_PLAYBACK) {
-                    readPadButtons((u8)port, &PAD.buf[i][2 + j * 8], record + 2 + j * 8);
+                    readPadButtons((u8)port, &PAD.buf[i].tap.pads[j], &record->tap.pads[j]);
                 } else {
-                    readPad((u8)(port + j), &PAD.buf[i][2 + j * 8]);
+                    readPad((u8)(port + j), &PAD.buf[i].tap.pads[j]);
                 }
             }
         } else {
             if (PAD.flags & PAD_FLAG_DEMO_PLAYBACK) {
-                readPadButtons((u8)port, PAD.buf[i], record);
+                readPadButtons((u8)port, &PAD.buf[i].pad, &record->pad);
             } else {
-                readPad((u8)port, PAD.buf[i]);
+                readPad((u8)port, &PAD.buf[i].pad);
             }
         }
     }
@@ -166,7 +166,7 @@ s32 getButtonBit(s32 pad, s32 index) {
 
 /* Controller input: cleared by initPad, then the methods */
 PadState PAD = {
-    0, { { 0 } }, { { { 0 } } }, { { 0 } }, 0, 0, 0, 0, { 0 },
+    0, { { { 0 } } }, { { { 0 } } }, { { 0 } }, 0, 0, NULL, 0, { 0 },
     initPad, shutdownPad, updatePad, setVibration, lockPadMode,
     getPadPressed, getPadHeld, getPadRepeated,
     resetButtonMap, swapButtons, getButtonBit,

@@ -5,7 +5,7 @@
 /* Draws the message box and, once its lines are out, its blinking arrow */
 void FIGHTSTG_drawMessageBox(BattleMessageBox *task) {
     SpriteDrawer drawer;
-    s32 sheet;
+    void *sheet;
 
     initSpriteDrawer(&drawer);
     drawer.setLayerId(0x1005, 1);

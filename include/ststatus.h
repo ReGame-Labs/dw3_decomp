@@ -602,13 +602,6 @@ typedef struct StatusEquip {
     s16 items[6];
 } StatusEquip;
 
-/* What an item does (its ItemInfo.data) */
-typedef struct StatusItemEffect {
-    /* 0x0 */ u8 flags; /* bit 0: usable from the first screen (STSTATUS_runItemList) */
-    /* 0x1 */ u8 kind; /* 1: heals, 17: raises stats[1], others: STSTATUS_statItems */
-    /* 0x2 */ u16 amount;
-} StatusItemEffect;
-
 /* What the items that raise a stat raise (STSTATUS_statItems), up to a kind of -1 */
 typedef struct StatusStatItem {
     /* 0x0 */ s16 kind; /* the item's second byte */

@@ -209,7 +209,7 @@ void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
             saves->substate++;
         }
     case 21:
-        status = saves->result = MEMCARD_SYSTEM.funcs.read(saves->port, (u8 *)STGMCARD_funcs.infoBuf, sizeof(MemCardFile), 1);
+        status = saves->result = MEMCARD_SYSTEM.funcs.read(saves->port, STGMCARD_funcs.infoBuf, sizeof(MemCardFile), 1);
         if (status != 0) {
             win->panel->start(win->panel, 2, 0x14);
             saves->substate++;
@@ -222,7 +222,7 @@ void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
                     HEAP.zero(STGMCARD_funcs.infoBuf, 0x44);
                     STGMCARD_funcs.infoBuf->magic = MEMCARD_FILE_MAGIC;
                     STGMCARD_funcs.infoBuf->version = MEMCARD_SAVE_VERSION;
-                } else if (MEMCARD_SYSTEM.funcs.computeChecksum((u8 *)&STGMCARD_funcs.infoBuf->magic, sizeof(MemCardFile) - 4) & ~STGMCARD_funcs.infoBuf->checksum) {
+                } else if (MEMCARD_SYSTEM.funcs.computeChecksum(&STGMCARD_funcs.infoBuf->magic, sizeof(MemCardFile) - 4) & ~STGMCARD_funcs.infoBuf->checksum) {
                     saves->result = 9;
                     STGMCARD_showError(saves, win);
                     break;
@@ -362,10 +362,10 @@ void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
         if (status != 0) {
             if (status == 1) {
                 if (MEMCARD_SYSTEM.funcs.computeChecksum(&STGMCARD_funcs.dataBuf->bytes[SAVE_CHECKED], sizeof(GameSave) - SAVE_CHECKED) &
-                    ~STGMCARD_funcs.dataBuf->bytes[SAVE_CHECKSUM]) {
+                    ~STGMCARD_funcs.dataBuf->game.checksum) {
                     saves->result = 8;
                     STGMCARD_closeMenuForError(saves, win);
-                } else if (STGMCARD_funcs.dataBuf->bytes[SAVE_VERSION] != MEMCARD_SAVE_VERSION && saves->screen->loading != 0) {
+                } else if (STGMCARD_funcs.dataBuf->game.version != MEMCARD_SAVE_VERSION && saves->screen->loading != 0) {
                     saves->result = 8;
                     STGMCARD_closeMenuForError(saves, win);
                 } else {
@@ -438,9 +438,9 @@ void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
     case 51:
         save = &STGMCARD_funcs.infoBuf->saves[STGMCARD_funcs.slot];
         STGMCARD_funcs.dataBuf->save = GAME_SAVE;
-        STGMCARD_funcs.dataBuf->bytes[SAVE_CHECKSUM] =
+        STGMCARD_funcs.dataBuf->game.checksum =
             MEMCARD_SYSTEM.funcs.computeChecksum(&STGMCARD_funcs.dataBuf->bytes[SAVE_CHECKED], sizeof(GameSave) - SAVE_CHECKED);
-        STGMCARD_funcs.dataBuf->bytes[SAVE_VERSION] = MEMCARD_SAVE_VERSION;
+        STGMCARD_funcs.dataBuf->game.version = MEMCARD_SAVE_VERSION;
         strcpy(save->name, STGMCARD_funcs.dataBuf->game.name);
         save->area = saves->screen->area;
         save->place = saves->screen->place;
@@ -453,11 +453,11 @@ void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
             save->partners[i] = STGMCARD_funcs.dataBuf->game.partners[member].unlocked;
         }
         STGMCARD_funcs.infoBuf->last = STGMCARD_funcs.slot;
-        STGMCARD_funcs.infoBuf->checksum = MEMCARD_SYSTEM.funcs.computeChecksum((u8 *)&STGMCARD_funcs.infoBuf->magic, sizeof(MemCardFile) - 4);
+        STGMCARD_funcs.infoBuf->checksum = MEMCARD_SYSTEM.funcs.computeChecksum(&STGMCARD_funcs.infoBuf->magic, sizeof(MemCardFile) - 4);
         saves->substate++;
         break;
     case 52:
-        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)STGMCARD_funcs.infoBuf, sizeof(MemCardFile), 1);
+        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, STGMCARD_funcs.infoBuf, sizeof(MemCardFile), 1);
         if (status != 0) {
             if (status == 1) {
                 saves->substate++;
@@ -693,14 +693,14 @@ void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
         }
         break;
     case 122:
-        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)&MEMCARD.header, sizeof(CardHeader), 0);
+        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, &MEMCARD.header, sizeof(CardHeader), 0);
         if (status != 0) {
             if (status == 1) {
                 if ((u32)(MEMCARD.iconCount - 1) >= 3) {
                     saves->result = 3;
                     STGMCARD_showError(saves, win);
                 } else {
-                    MEMCARD.unk324 = 0;
+                    MEMCARD.iconIndex = 0;
                     saves->substate++;
                 }
             } else {
@@ -710,15 +710,15 @@ void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
         }
         break;
     case 123:
-        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)MEMCARD.icons[MEMCARD.unk324], 0x80, (MEMCARD.unk324 * 0x80 + 0x80) << 8);
+        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, MEMCARD.icons[MEMCARD.iconIndex], 0x80, (MEMCARD.iconIndex * 0x80 + 0x80) << 8);
         if (status != 0) {
             if (status == 1) {
-                MEMCARD.unk324++;
-                if (MEMCARD.unk324 > MEMCARD.iconCount - 1) {
+                MEMCARD.iconIndex++;
+                if (MEMCARD.iconIndex > MEMCARD.iconCount - 1) {
                     HEAP.zero(STGMCARD_funcs.infoBuf, sizeof(MemCardFile));
                     STGMCARD_funcs.infoBuf->magic = MEMCARD_FILE_MAGIC;
                     STGMCARD_funcs.infoBuf->version = MEMCARD_SAVE_VERSION;
-                    STGMCARD_funcs.infoBuf->checksum = MEMCARD_SYSTEM.funcs.computeChecksum((u8 *)&STGMCARD_funcs.infoBuf->magic, sizeof(MemCardFile) - 4);
+                    STGMCARD_funcs.infoBuf->checksum = MEMCARD_SYSTEM.funcs.computeChecksum(&STGMCARD_funcs.infoBuf->magic, sizeof(MemCardFile) - 4);
                     saves->file = *STGMCARD_funcs.infoBuf;
                     STGMCARD_funcs.lastSlot = STGMCARD_funcs.infoBuf->last;
                     saves->substate++;
@@ -730,7 +730,7 @@ void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
         }
         break;
     case 124:
-        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)STGMCARD_funcs.infoBuf, sizeof(MemCardFile), 1);
+        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, STGMCARD_funcs.infoBuf, sizeof(MemCardFile), 1);
         if (status != 0) {
             win->panel->start(win->panel, 2, 0x14);
             saves->substate++;

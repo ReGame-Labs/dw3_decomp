@@ -35,14 +35,6 @@ typedef struct ItemScript {
     /* 0x4 */ s16 sound;
 } ItemScript;
 
-/* A usable item's effect (STSTATUS's StatusItemEffect): ItemInfo.data, a u8 *,
-   which its readers cast (a helper to do it grows FIGHTSTG_updateItem's stack) */
-typedef struct BattleItemEffect {
-    /* 0x0 */ u8 unk0;
-    /* 0x1 */ u8 kind;
-    /* 0x2 */ u16 amount; /* the HP it heals, the gauge it fills, a boost in 128ths */
-} BattleItemEffect;
-
 /* A technique's boost (FIGHTSTG_techBoosts and FIGHTSTG_sideBoosts, each
    ended by -1) */
 typedef struct TechBoost {

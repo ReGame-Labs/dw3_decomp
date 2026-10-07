@@ -26,7 +26,7 @@ void initNewGameData(void) {
         GAME.partners[i].info.stats[STAT_HP] = GAME.partners[i].info.stats[STAT_MAX_HP] = e->hp;
         GAME.partners[i].info.stats[STAT_MP] = GAME.partners[i].info.stats[STAT_MAX_MP] = e->mp;
         /* the battle stats, then the resistances */
-        dst = &GAME.partners[i].info.stats[6];
+        dst = &GAME.partners[i].info.stats[STAT_STRENGTH];
         src = e->battleStats;
         for (j = 0; j < 6; j++) {
             *dst++ = *src++;

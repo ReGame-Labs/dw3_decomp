@@ -334,6 +334,7 @@ void textWindowShowPage(TextWindow *obj) {
                 pos += 2;
                 break;
             case 2:
+                /* summed as integers: as pointer arithmetic GCC swaps the operands */
                 p = (u8 *)(pos + (s32)obj->text[0].data);
                 c = p[1];
                 switch (c) {

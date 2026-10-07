@@ -181,7 +181,7 @@ s32 CARDGAME_scoreHand(CardBattle *battle, s32 side, s32 mask) {
             }
             skip = 1;
         }
-        if (drawer.card->unkA != 0 && entries[i].card == entries[i + 1 + skip].card) {
+        if (drawer.card->comboCard != 0 && entries[i].card == entries[i + 1 + skip].card) {
             j++;
             sum6 += battle->players[side].slots[entries[i + skip].slot].ap;
             sum8 += battle->players[side].slots[entries[i + skip].slot].hp;
@@ -376,7 +376,7 @@ s32 CARDGAME_unflagSlotsOver(CardBattle *battle, s32 side, s32 value, s32 keep) 
     return result;
 }
 
-/* Picks the opponent's flagged card with the lowest header value unk8; 1 if
+/* Picks the opponent's flagged card with the lowest CardImage.rank, the strongest; 1 if
    there is one */
 s32 CARDGAME_pickLowestOpponentCard(CardBattle *battle) {
     CardDrawer drawer;
@@ -392,8 +392,8 @@ s32 CARDGAME_pickLowestOpponentCard(CardBattle *battle) {
         if (flags[i] != 0) {
             drawer.setCard(battle->cards[battle->sides[1].pile.hand[i]] + 1);
             found = 1;
-            if (drawer.card->unk8 < lowest) {
-                lowest = drawer.card->unk8;
+            if (drawer.card->rank < lowest) {
+                lowest = drawer.card->rank;
                 best = i;
             }
         }
@@ -610,8 +610,8 @@ s32 CARDGAME_findOpponentHandKind(CardBattle *battle, s32 kind) {
 s32 CARDGAME_pickComputerCard(CardBattle *battle, CardScreen *screen) {
     CardDrawer drawer;
     s32 found = 0;
-    CardImageHeader *prevCard;
-    CardImageHeader *header;
+    CardImage *prevCard;
+    CardImage *header;
     s32 prev;
     s32 listed;
     s32 kind;

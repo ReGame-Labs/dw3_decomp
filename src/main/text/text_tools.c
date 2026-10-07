@@ -120,7 +120,8 @@ s32 measureText(TextBuffer *text, TextStyle *style, s32 spacing) {
 
 /*
  * Converts the string `text` to `buf`: mode 0 from font codes to Shift-JIS (a
- * code below 4 is followed by an icon's), mode 1 back. Not terminated.
+ * code below 4 is followed by an icon's), mode 1 back. Not terminated. The
+ * Shift-JIS side is a byte buffer written and read a halfword at a time.
  */
 void convertText(void *buf, void *text, s32 mode) {
     u8 *dst = buf;

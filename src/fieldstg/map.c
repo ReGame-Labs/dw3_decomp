@@ -28,7 +28,7 @@ s32 FIELDSTG_selectMap(s32 index) {
         }
         return 0;
     } while (0);
-    entry = (s32 *)FILE_CACHE.getEntry(FIELDSTG_map.files[index]);
+    entry = FILE_CACHE.getEntry(FIELDSTG_map.files[index]);
     FIELDSTG_map.grid = MAP_PART(entry, 0);
     FIELDSTG_map.cells64 = MAP_PART(entry, 1);
     FIELDSTG_map.cells32 = MAP_PART(entry, 2);

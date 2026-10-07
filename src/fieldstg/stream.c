@@ -113,7 +113,7 @@ void FIELDSTG_loadStreamSprites(StreamTask *task) {
     initTimLoader(&loader);
     loader.setImagePos(task->imageX, task->imageY);
     loader.setClutPos(task->clutX, task->clutY);
-    loader.load(FILE_CACHE.getArchiveEntry(0, (s32)data));
+    loader.load(FILE_CACHE.getArchiveEntry(0, data));
     FIELDSTG_touchStream(task);
 }
 

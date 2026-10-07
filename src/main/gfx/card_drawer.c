@@ -15,14 +15,16 @@ void bindCardDrawer(CardDrawer *obj) {
  * Card drawer method: picks the image of card `id` (0 or less: the first image of the first file)
  */
 void cardDrawerSetCard(s32 id) {
+    CardImage *images;
     s32 n;
     s32 i;
     if (id > 0) {
         n = id - 1;
         i = n >> 6;
-        CARD_DRAWER->card = (CardImageHeader *)((u8 *)FILE_CACHE.load(CARD_IMAGE_FILES[i]) + (n & 0x3F) * 0x62C);
+        images = FILE_CACHE.load(CARD_IMAGE_FILES[i]);
+        CARD_DRAWER->card = &images[n & 0x3F];
     } else {
-        CARD_DRAWER->card = (CardImageHeader *)FILE_CACHE.load(CARD_IMAGE_FILES[0]);
+        CARD_DRAWER->card = FILE_CACHE.load(CARD_IMAGE_FILES[0]);
     }
 }
 
@@ -92,9 +94,10 @@ void cardDrawerDraw(s32 x, s32 y) {
     setWH(sprt, 32, 32);
     sprt->clut = clut;
     addPrim(CARD_DRAWER->ot, sprt);
+    /* the texture page goes right after the sprite */
     sprt++;
     SetDrawTPage((DR_TPAGE *)sprt, 0, 1, tpage);
-    end = (u8 *)base + 0x1C;
+    end = (u8 *)base + sizeof(SPRT) + sizeof(DR_TPAGE);
     /* addPrim, with the tag written through the start of the block */
     setaddr(base + 1, getaddr(CARD_DRAWER->ot));
     setaddr(CARD_DRAWER->ot, sprt);

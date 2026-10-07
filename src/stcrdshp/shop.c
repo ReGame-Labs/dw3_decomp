@@ -165,9 +165,9 @@ void STCRDSHP_runShop(CardShop *shop, CardShopWindows *win) {
             shop->substate = 50;
             break;
         case 1:
-            count = ITEM_FUNCS->list(1, shop->items.list);
+            count = ITEM_FUNCS->list(1, shop->items);
             for (i = 0; i < count; i++) {
-                if (ITEM_FUNCS->getCategory(shop->items.ids[i]) == CARD_PACK_CATEGORY) {
+                if (ITEM_FUNCS->getCategory(shop->items[i]) == CARD_PACK_CATEGORY) {
                     win->dialog = (Task *)STCRDSHP_createPackOpen(shop);
                     shop->substate = 50;
                     break;

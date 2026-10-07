@@ -521,7 +521,7 @@ void FIGHTSTG_updateBattleScript(BattleScript *script, BattleScriptChildren *chi
             FIGHTSTG_fighterCache.funcs.getInfo(script->fighter);
             script->archive = FIGHTSTG_fighterCache.partnerInfo->effects;
             /* getArchiveEntry gives the entry as a u8 * */
-            script->pc = (s16 *)FILE_CACHE.getArchiveEntry(script->index, FILE_CACHE.getEntry(script->archive));
+            script->pc = FILE_CACHE.getArchiveEntry(script->index, FILE_CACHE.getEntry(script->archive));
             if (script->index != 12) {
                 script->nextState(script);
                 break;

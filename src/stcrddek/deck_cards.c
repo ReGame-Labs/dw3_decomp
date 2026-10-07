@@ -12,7 +12,7 @@ void STCRDDEK_drawDeckCards(DeckCards *task) {
     s32 row;
     s32 x;
     s32 y;
-    s32 sheet;
+    void *sheet;
 
     initSpriteDrawer(&sprite);
     sprite.setTexture(0x280, 0);

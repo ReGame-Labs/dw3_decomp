@@ -433,7 +433,7 @@ s32 checkWarpArg(s32 id, s32 arg1) {
 /* Takes item `item` off a partner (one of type 7 empties slots 2 and 3 both); 1 if it had it */
 s32 unequipItem(s32 partner, s32 item) {
     PartnerStats *d = &GAME.partners[partner].info;
-    u8 *info = GET_ITEM[0](item)->data;
+    u8 *info = GET_ITEM[0](item)->data.bytes;
     s16 *equip = d->equip;
     s32 i;
 

@@ -166,7 +166,7 @@ SoundFiles *SOUND_BANK_FILES[72] = {
 };
 
 /* Each slot's buffer for the VAB header and the SEPs, and its SPU address */
-s32 SOUND_HEAD_BUFFERS[SOUND_SLOT_COUNT] = {(s32)SOUND_HEAD_BUFFER_0, (s32)SOUND_HEAD_BUFFER_1, (s32)SOUND_HEAD_BUFFER_2};
+void *SOUND_HEAD_BUFFERS[SOUND_SLOT_COUNT] = {SOUND_HEAD_BUFFER_0, SOUND_HEAD_BUFFER_1, SOUND_HEAD_BUFFER_2};
 s32 SOUND_SPU_ADDRS[SOUND_SLOT_COUNT] = {0x1010, 0x49C10, 0x62410};
 
 /* rsin and rcos (libgte) read rsin_tbl[a - 0x800] and the like: their
@@ -359,8 +359,8 @@ void updateSoundLoading(void) {
         if (FILE_CACHE.isLoading(loader->files->headFile) != 0) {
             return;
         }
-        src = (s32 *)FILE_CACHE.load(loader->files->headFile);
-        dst = (s32 *)bank->headBuffer;
+        src = FILE_CACHE.load(loader->files->headFile);
+        dst = bank->headBuffer;
         n = FILE_TABLE.getSectorCount(loader->files->headFile) * (CD_SECTOR_SIZE / sizeof(s32));
         for (j = 0; j < n; j++) {
             *dst++ = *src++;
@@ -374,7 +374,7 @@ void updateSoundLoading(void) {
             return;
         }
         HEAP.lock(FILE_CACHE.load(loader->files->bodyFile), 1);
-        bank->vabId = SsVabTransBody((unsigned char *)FILE_CACHE.getEntry(loader->files->bodyEntry), bank->vabId);
+        bank->vabId = SsVabTransBody(FILE_CACHE.getEntry(loader->files->bodyEntry), bank->vabId);
         loader->state++;
     case SOUND_LOAD_TRANSFER:
         if (SsVabTransCompleted(0) == 0) {
@@ -384,7 +384,7 @@ void updateSoundLoading(void) {
         HEAP.lock(FILE_CACHE.load(loader->files->bodyFile), 0);
         FILE_CACHE.free(loader->files->bodyFile);
         for (; loader->files->seps[i] != 0; i++) {
-            bank->seqs[i] = SsSepOpen((unsigned long *)FILE_CACHE.getArchiveEntry(loader->files->seps[i], bank->headBuffer), bank->vabId, SOUND_SEP_COUNT);
+            bank->seqs[i] = SsSepOpen(FILE_CACHE.getArchiveEntry(loader->files->seps[i], bank->headBuffer), bank->vabId, SOUND_SEP_COUNT);
         }
         bank->numSeqs = i;
         loader->state = SOUND_LOAD_IDLE;

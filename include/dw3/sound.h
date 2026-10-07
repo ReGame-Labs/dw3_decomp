@@ -74,7 +74,7 @@ typedef struct SoundBank {
     /* 0x04 */ s16 vabId;
     /* 0x06 */ s16 numSeqs;
     /* 0x08 */ s16 seqs[4];
-    /* 0x10 */ s32 headBuffer; /* VAB header and SEPs are copied here */
+    /* 0x10 */ void *headBuffer; /* VAB header and SEPs are copied here */
     /* 0x14 */ s32 spuAddr;
 } SoundBank;
 
@@ -133,7 +133,7 @@ void initSound(void);
 extern SoundState SOUND;
 extern SoundFiles *SOUND_BANK_FILES[];
 extern s32 SOUND_SPU_ADDRS[];
-extern s32 SOUND_HEAD_BUFFERS[];
+extern void *SOUND_HEAD_BUFFERS[];
 extern s32 SOUND_HEAD_BUFFER_0[];
 extern s32 SOUND_HEAD_BUFFER_1[];
 extern s32 SOUND_HEAD_BUFFER_2[];

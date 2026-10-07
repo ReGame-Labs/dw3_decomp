@@ -234,11 +234,11 @@ s32 CARDGAME_pickComputerCards(CardBattle *battle, CardScreen *screen) {
     return 1;
 }
 
-/* Sets effectStep.choice to the effectStep.eligible-marked card of the pile effectStep.vars[4] picks with the highest image unk8 (the lowest when lowest != 0), or -1 */
+/* Sets effectStep.choice to the effectStep.eligible-marked card of the pile effectStep.vars[4] picks with the highest CardImage.rank, the weakest (the strongest when lowest != 0), or -1 */
 void CARDGAME_pickBestPileCard(CardBattle *battle, CardScreen *screen, s32 lowest) {
     CardDrawer drawer;
-    CardImageHeader *header;
-    CardImageHeader *current;
+    CardImage *header;
+    CardImage *current;
     s32 count = 0;
     s32 card;
     s32 best;
@@ -296,11 +296,11 @@ void CARDGAME_pickBestPileCard(CardBattle *battle, CardScreen *screen, s32 lowes
             current = drawer.card;
             if (best != -1) {
                 if (lowest == 0) {
-                    if (current->unk8 >= header->unk8) {
+                    if (current->rank >= header->rank) {
                         best = i;
                         header = current;
                     }
-                } else if (current->unk8 < header->unk8) {
+                } else if (current->rank < header->rank) {
                     best = i;
                     header = current;
                 }
@@ -337,7 +337,7 @@ void CARDGAME_pickComputerDeckCard(CardBattle *battle, CardScreen *screen) {
     battle->effectStep.marked[battle->effectStep.choice] = 1;
 }
 
-/* Picks the player's card with the lowest header value unk8 */
+/* Picks the player's card with the lowest CardImage.rank, the strongest */
 void CARDGAME_pickLowestPlayerCard(CardBattle *battle, CardScreen *screen) {
     CardDrawer drawer;
     s32 best = battle->sides[0].pile.deckTop;
@@ -348,8 +348,8 @@ void CARDGAME_pickLowestPlayerCard(CardBattle *battle, CardScreen *screen) {
     lowest = 400;
     for (i = battle->sides[0].pile.deckTop; i < 40; i++) {
         drawer.setCard(battle->cards[battle->sides[0].pile.deck[i]] + 1);
-        if (drawer.card->unk8 < lowest) {
-            lowest = drawer.card->unk8;
+        if (drawer.card->rank < lowest) {
+            lowest = drawer.card->rank;
             best = i;
         }
     }

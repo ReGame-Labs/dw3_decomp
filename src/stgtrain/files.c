@@ -142,7 +142,7 @@ s32 STGTRAIN_loadSet(s32 set, s32 *pos) {
            with the copy right after the load, cse puts the load in image */
         magic = *(s32 *)src;
         image = src;
-        if (magic == 0x4E454C52) {
+        if (magic == RLEN_MAGIC) {
             /* and on image set before src moves on, or src + 8 is taken
                from image */
             image = buf;

@@ -6,7 +6,7 @@
 /* Draws the page's item icons, the page arrows (blinking) and the frame */
 void FIGHTSTG_drawItemMenu(ItemMenu *task) {
     SpriteDrawer drawer;
-    s32 sheet;
+    void *sheet;
     s32 index;
     s32 i;
 
@@ -113,13 +113,13 @@ void FIGHTSTG_updateItemMenu(ItemMenu *task, ItemMenuWindows *w) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        total = ITEM_FUNCS->list(1, (u16 *)task->items);
+        total = ITEM_FUNCS->list(1, task->items);
         task->count = 0;
         for (i = 0; i < total; i++) {
             if (task->items[i] == 0) {
                 break;
             }
-            if (*GET_ITEM[0](task->items[i])->data & 2) {
+            if (GET_ITEM[0](task->items[i])->data.effect->flags & ITEM_USE_BATTLE) {
                 task->count++;
             }
         }
@@ -130,7 +130,7 @@ void FIGHTSTG_updateItemMenu(ItemMenu *task, ItemMenuWindows *w) {
                 if (task->items[i] == 0) {
                     break;
                 }
-                if (*GET_ITEM[0](task->items[i])->data & 2) {
+                if (GET_ITEM[0](task->items[i])->data.effect->flags & ITEM_USE_BATTLE) {
                     task->usable[n++] = task->items[i];
                 }
             }

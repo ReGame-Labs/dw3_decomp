@@ -48,7 +48,7 @@ void FIGHTSTG_drawCursorBar(s32 arg) {
    palettes and the one left fading out */
 void FIGHTSTG_drawCursorSprites(MenuCursor *task) {
     SpriteDrawer drawer;
-    s32 sheet;
+    void *sheet;
     s32 i;
     s32 y;
     s32 row;

@@ -19,10 +19,6 @@
 #define FILE_SHOP_SPRITES 0x402
 #endif
 
-/* The record of an item's type (ItemInfo.data is untyped: a usable item's
-   is its effect) */
-#define SHOP_ITEM_DATA(info) ((ItemData *)(info)->data)
-
 /* The main task of the shop (STITSHOP_createShop) */
 typedef struct ItemShop {
     TASK_HEADER(ItemShop);
@@ -53,7 +49,7 @@ typedef struct ItemShopWindows {
    stats and status, copied whole) */
 typedef struct ShopStatBlock {
     /* 0x00 */ s16 stats[19];
-    /* 0x26 */ s16 penalties[3]; /* subtracted from stats 6, 7 and 10 */
+    /* 0x26 */ s16 penalties[3]; /* subtracted from STAT_STRENGTH, STAT_DEFENSE and STAT_SPEED */
 } ShopStatBlock;
 
 /* What the details panel shows of a partner */

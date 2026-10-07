@@ -104,16 +104,14 @@ typedef struct MemCardFile {
 
 #define MEMCARD_FILE_MAGIC 0x33574D44
 
-/* A save's data section is GAME's first GAME_SAVE_SIZE bytes (SaveData). Its
-   bytes SAVE_CHECKSUM and SAVE_VERSION hold the checksum of the rest, from
-   byte SAVE_CHECKED, and MEMCARD_SAVE_VERSION. */
+/* A save's data section is GAME's first GAME_SAVE_SIZE bytes (SaveData).
+   GameState.checksum and .version hold the checksum of the rest, from byte
+   SAVE_CHECKED, and MEMCARD_SAVE_VERSION. */
 #if VERSION_US
 #define MEMCARD_SAVE_VERSION 3
 #elif VERSION_EU
 #define MEMCARD_SAVE_VERSION 4
 #endif
-#define SAVE_CHECKSUM 0
-#define SAVE_VERSION 2
 #define SAVE_CHECKED 4
 
 /* The durations of the panels shown while loading and saving */
@@ -143,8 +141,7 @@ typedef union SaveData {
 } SaveData;
 
 /* MEMCARD followed by MEMCARD_FUNCS, as STGMCARD_runSaves reaches the functions:
-   through MEMCARD's address. They take every buffer as a u8 pointer, so the
-   info section, the header and the icons are cast to one. */
+   through MEMCARD's address. */
 typedef struct MemCardSystem {
     /* 0x000 */ MemCard card;
     /* 0x328 */ MemCardFuncs funcs;
@@ -252,7 +249,7 @@ typedef struct MemCardPanel {
 /* The save's icon for the memory card's directory */
 typedef struct SaveIcon {
     /* 0x0 */ CardClut *clut;
-    /* 0x4 */ s32 frames[3];
+    /* 0x4 */ void *frames[3];
 } SaveIcon;
 
 /* The overlay's buffers and helpers (STGMCARD_funcs) */

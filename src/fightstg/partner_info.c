@@ -5,7 +5,7 @@
 /* Draws the PartnerInfo's blinking page arrows */
 void FIGHTSTG_drawPageArrows(PartnerInfo *task) {
     SpriteDrawer drawer;
-    s32 sheet = FILE_CACHE.getEntry(FILE_BATTLE_MENU << 16);
+    void *sheet = FILE_CACHE.getEntry(FILE_BATTLE_MENU << 16);
 
     initSpriteDrawer(&drawer);
     drawer.setLayerId(0x1005, 1);
@@ -31,7 +31,7 @@ void FIGHTSTG_showPageButtons(PartnerInfo *task, TextWindow **windows) {
 /* Draws the frame of the stats page */
 void FIGHTSTG_drawStatsFrame(PartnerInfo *task) {
     SpriteDrawer drawer;
-    s32 sheet;
+    void *sheet;
 
     initSpriteDrawer(&drawer);
     drawer.setLayerId(0x1005, 1);
@@ -90,7 +90,7 @@ void FIGHTSTG_showStats(PartnerInfo *task, TextWindow **windows) {
 /* Draws the techniques page's icons and frame */
 void FIGHTSTG_drawTechIcons(PartnerInfo *task) {
     SpriteDrawer drawer;
-    s32 sheet;
+    void *sheet;
     s32 i;
     s32 tech;
 
@@ -165,12 +165,12 @@ void FIGHTSTG_updatePartnerInfo(PartnerInfo *task, TextWindow **windows) {
             if (task->slot != 0) {
                 GAME.funcs.getPartnerSlots(partner, task->slots);
                 data = GET_DIGIMON(task->slots[task->slot - 1]);
-                /* the match depends on indexing from &task->stats[6] and [12] */
+                /* the match depends on indexing from &task->stats[STAT_STRENGTH] and [STAT_RESISTS] */
                 for (j = 0; j < 6; j++) {
-                    (&task->stats[6])[j] += data->battleStats[j];
+                    (&task->stats[STAT_STRENGTH])[j] += data->battleStats[j];
                 }
                 for (j = 0; j < 7; j++) {
-                    (&task->stats[12])[j] += data->resistances[j];
+                    (&task->stats[STAT_RESISTS])[j] += data->resistances[j];
                 }
             }
             break;

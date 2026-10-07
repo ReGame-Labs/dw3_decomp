@@ -53,13 +53,13 @@ void STSTATUS_showEquipment(EquipPanel *panel, EquipPanelWindows *windows, s32 s
 
 /* An item's name and, for slots 2 and 3, its kind (none: string 0x51) */
 void STSTATUS_showEquipItem(EquipPanel *panel, EquipPanelWindows *windows, s32 item) {
-    u8 *data;
+    ItemData *data;
 
     if (item > 0) {
         windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_INFO)), item);
         if (panel->slot == 2 || panel->slot == 3) {
-            data = GET_ITEM[0](item)->data;
-            windows->kind->setString(windows->kind, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), STSTATUS_kindStrings[data[2] - 1]);
+            data = GET_ITEM[0](item)->data.record;
+            windows->kind->setString(windows->kind, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), STSTATUS_kindStrings[data->weapon.kind - 1]);
             return;
         }
     } else {
@@ -527,7 +527,7 @@ s32 STSTATUS_slotStrings[] = {
     65, 66, 67, 77,
     68, 68,
 };
-/* The strings of the item kinds (data[2]), from 1 */
+/* The strings of the item kinds (WeaponData.kind), from 1 */
 s32 STSTATUS_kindStrings[] = {
     67, 77, 79, 65,
     66, 68, 80, 68,

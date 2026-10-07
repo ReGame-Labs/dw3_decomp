@@ -27,11 +27,11 @@ void STITSHOP_computeStats(s32 partner, ShopStatBlock *out) {
         if (equip[i] > 0) {
             info = GET_ITEM[0](equip[i]);
             type = info->type;
-            data = SHOP_ITEM_DATA(info);
+            data = info->data.record;
             if (IS_WEAPON_TYPE(type)) {
-                out->stats[6] += data->weapon.atk;
-                if (out->stats[6] >= 1000) {
-                    out->stats[6] = 999;
+                out->stats[STAT_STRENGTH] += data->weapon.atk;
+                if (out->stats[STAT_STRENGTH] >= 1000) {
+                    out->stats[STAT_STRENGTH] = 999;
                 }
                 for (j = 0; j < 2; j++) {
                     stat = *(j + data->weapon.stats);
@@ -41,9 +41,9 @@ void STITSHOP_computeStats(s32 partner, ShopStatBlock *out) {
                     }
                 }
             } else if (IS_ARMOR_TYPE(type)) {
-                out->stats[7] += data->armor.def;
-                if (out->stats[7] >= 1000) {
-                    out->stats[7] = 999;
+                out->stats[STAT_DEFENSE] += data->armor.def;
+                if (out->stats[STAT_DEFENSE] >= 1000) {
+                    out->stats[STAT_DEFENSE] = 999;
                 }
                 for (j = 0; j < 2; j++) {
                     stat = *(j + data->armor.stats);
@@ -61,23 +61,23 @@ void STITSHOP_computeStats(s32 partner, ShopStatBlock *out) {
             } else {
                 continue;
             }
-            out->stats[11] += data->weapon.unk0;
-            if (out->stats[11] >= 1000) {
-                out->stats[11] = 999;
+            out->stats[STAT_CHARISMA] += data->weapon.charisma;
+            if (out->stats[STAT_CHARISMA] >= 1000) {
+                out->stats[STAT_CHARISMA] = 999;
             }
         }
     }
-    out->stats[6] -= out->penalties[0];
-    if (out->stats[6] < 0) {
-        out->stats[6] = 0;
+    out->stats[STAT_STRENGTH] -= out->penalties[0];
+    if (out->stats[STAT_STRENGTH] < 0) {
+        out->stats[STAT_STRENGTH] = 0;
     }
-    out->stats[7] -= out->penalties[1];
-    if (out->stats[7] < 0) {
-        out->stats[7] = 0;
+    out->stats[STAT_DEFENSE] -= out->penalties[1];
+    if (out->stats[STAT_DEFENSE] < 0) {
+        out->stats[STAT_DEFENSE] = 0;
     }
-    out->stats[10] -= out->penalties[2];
-    if (out->stats[10] < 0) {
-        out->stats[10] = 0;
+    out->stats[STAT_SPEED] -= out->penalties[2];
+    if (out->stats[STAT_SPEED] < 0) {
+        out->stats[STAT_SPEED] = 0;
     }
 }
 
@@ -304,7 +304,7 @@ void STITSHOP_fillPartnerRows(ShopInfo *info, ShopInfoWindows *win, s32 member) 
         STITSHOP_showStat(info, win->partners[member].changes[2], &row);
         STITSHOP_colorStat(info, win->partners[member].changes[2], &row);
         row.skip = 5;
-        data = SHOP_ITEM_DATA(GET_ITEM[0](info->item));
+        data = GET_ITEM[0](info->item)->data.record;
         /* the row of the stat the accessory raises (7 raises them all and has
            none). The match depends on the range tests being written out: the
            inner one isn't merged with the outer one before cse */
@@ -429,7 +429,7 @@ void STITSHOP_showItemDesc(ShopInfo *info, ShopInfoWindows *win, s32 show) {
         win->desc->setString(win->desc, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_INFO)), info->item);
         item = GET_ITEM[0](info->item);
         if (item->type >= 2 && item->type < 14) {
-            data = SHOP_ITEM_DATA(item);
+            data = item->data.record;
             win->kind->setString(win->kind, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), STITSHOP_kindStrings[data->weapon.kind]);
             return;
         }

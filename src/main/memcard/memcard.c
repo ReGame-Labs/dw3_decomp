@@ -72,7 +72,7 @@ void setSaveFileName(void) {
 #endif
 
 /* The save file header: title (Shift-JIS), icon CLUT and 1-3 icon frames */
-void setSaveHeader(char *title, CardClut *clut, s32 count, s32 *icons) {
+void setSaveHeader(char *title, CardClut *clut, s32 count, void **icons) {
     s32 i;
 
     if (count >= 1 && count <= SAVE_MAX_ICONS && (u32)strlen(title) <= sizeof(MEMCARD.header.title)) {
@@ -175,7 +175,7 @@ s32 acceptMemCard(s32 port) {
 }
 
 /* Reads a section of the save (SAVE_SECTION_*, then 2-4 for the data), a sector a call */
-s32 readSave(s32 port, u8 *buf, s32 size, s32 section) {
+s32 readSave(s32 port, void *buf, s32 size, s32 section) {
     u8 *dst;
 
     if (buf == NULL || size == 0) {
@@ -256,7 +256,7 @@ s32 readSave(s32 port, u8 *buf, s32 size, s32 section) {
 }
 
 /* Writes a section (as readSave; section 0 takes the offset from bits 8 and up) */
-s32 writeSave(s32 port, u8 *buf, s32 size, s32 section) {
+s32 writeSave(s32 port, void *buf, s32 size, s32 section) {
     u8 *dst;
 
     if (buf == NULL || size == 0) {
@@ -429,23 +429,25 @@ s32 unformatMemCard(void) {
 }
 
 /* XOR of every byte */
-s32 verifyChecksum(u8 *data, s32 size, char expected) {
+s32 verifyChecksum(void *data, s32 size, char expected) {
+    u8 *byte = data;
     u8 sum = 0;
     s32 i;
 
     for (i = 0; i < size; i++) {
-        sum ^= *data++;
+        sum ^= *byte++;
     }
     return ((expected ^ sum) & 0xFF) == 0;
 }
 
 /* The XOR of every byte, which verifyChecksum checks */
-u8 computeChecksum(u8 *data, s32 size) {
+u8 computeChecksum(void *data, s32 size) {
+    u8 *byte = data;
     u8 sum = 0;
     s32 i;
 
     for (i = 0; i < size; i++) {
-        sum ^= *data++;
+        sum ^= *byte++;
     }
     return sum;
 }

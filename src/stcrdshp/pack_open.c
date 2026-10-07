@@ -282,11 +282,11 @@ void STCRDSHP_listPacks(CardPackOpen *open) {
     s32 count;
     s32 i;
 
-    count = ITEM_FUNCS->list(1, open->items.list);
+    count = ITEM_FUNCS->list(1, open->items);
     open->packCount = 0;
     for (i = 0; i < count; i++) {
-        if (ITEM_FUNCS->getCategory(open->items.ids[i]) == CARD_PACK_CATEGORY) {
-            open->packs[open->packCount++] = open->items.ids[i];
+        if (ITEM_FUNCS->getCategory(open->items[i]) == CARD_PACK_CATEGORY) {
+            open->packs[open->packCount++] = open->items[i];
         }
     }
     if (open->packCount != 0) {

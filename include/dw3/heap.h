@@ -9,7 +9,7 @@
 #include <libgpu.h>
 
 /* The heap: a doubly linked list of blocks from HEAP_START to HEAP_END */
-#define HEAP_END 0x801FF000
+#define HEAP_END ((MemBlock *)0x801FF000)
 
 /* MemBlock.tag */
 #define MEM_FREE 0
@@ -35,7 +35,8 @@ typedef struct Heap {
     /* 0x30 */ void (*nop)();
 } Heap;
 
-/* Header of a heap block; the data follows it */
+/* Header of a heap block; the data follows it. Sizes are in bytes, so the
+   allocator measures and splits blocks through u8 pointers. */
 typedef struct MemBlock {
     /* 0x0 */ struct MemBlock *prev;
     /* 0x4 */ struct MemBlock *next;

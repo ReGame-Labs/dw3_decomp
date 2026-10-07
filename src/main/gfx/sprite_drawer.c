@@ -66,6 +66,8 @@ void spriteDrawerDraw(s32 *sheet, s32 frame, s32 x, s32 y) {
     u8 v;
 
     transform = 0;
+    /* the sheet starts with byte offsets: to its parts, its frame ids, then
+       each frame's list of parts */
     ids = (u8 *)sheet + sheet[1];
     parts = (SpritePart *)((u8 *)sheet + sheet[0]);
     for (i = 0; ids[i] != frame; i++) {

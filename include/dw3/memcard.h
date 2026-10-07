@@ -97,8 +97,8 @@ typedef struct MemCard {
     /* 0x30C */ s32 dataSize;
     /* 0x310 */ s32 infoSize;
     /* 0x314 */ s32 iconCount;
-    /* 0x318 */ s32 icons[SAVE_MAX_ICONS];
-    /* 0x324 */ s32 unk324;
+    /* 0x318 */ void *icons[SAVE_MAX_ICONS]; /* each frame's image (setSaveHeader) */
+    /* 0x324 */ s32 iconIndex; /* the icon a save is writing (STGMCARD_runSaves) */
 } MemCard;
 
 /* The memory card functions (MEMCARD_FUNCS); like MemCard's operations, the
@@ -106,17 +106,17 @@ typedef struct MemCard {
 typedef struct MemCardFuncs {
     /* 0x00 */ void (*init)(void);
     /* 0x04 */ void (*setFileName)(void);
-    /* 0x08 */ void (*setHeader)(char *title, CardClut *clut, s32 count, s32 *icons);
+    /* 0x08 */ void (*setHeader)(char *title, CardClut *clut, s32 count, void **icons);
     /* 0x0C */ s32 (*check)(s32 port);
     /* 0x10 */ s32 (*accept)(s32 port);
-    /* 0x14 */ s32 (*read)(s32 port, u8 *buf, s32 size, s32 section);
-    /* 0x18 */ s32 (*write)(s32 port, u8 *buf, s32 size, s32 section);
+    /* 0x14 */ s32 (*read)(s32 port, void *buf, s32 size, s32 section);
+    /* 0x18 */ s32 (*write)(s32 port, void *buf, s32 size, s32 section);
     /* 0x1C */ s32 (*list)(s32 port);
     /* 0x20 */ s32 (*create)(s32 port);
     /* 0x24 */ s32 (*format)(s32 port);
     /* 0x28 */ s32 (*unformat)(void);
-    /* 0x2C */ s32 (*verifyChecksum)(u8 *data, s32 size, char expected);
-    /* 0x30 */ u8 (*computeChecksum)(u8 *data, s32 size);
+    /* 0x2C */ s32 (*verifyChecksum)(void *data, s32 size, char expected);
+    /* 0x30 */ u8 (*computeChecksum)(void *data, s32 size);
 } MemCardFuncs;
 
 void initMemCard(void);

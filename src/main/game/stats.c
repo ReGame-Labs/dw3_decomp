@@ -61,6 +61,7 @@ void addStat(s32 partner, u32 stat, s32 delta) {
     }
 }
 
+/* The stats (PartnerStats.stats), copied into PartnerTotals as one struct */
 typedef struct StatBlock {
     s16 v[22];
 } StatBlock;
@@ -86,7 +87,7 @@ void computeStats(s32 partner, PartnerTotals *out) {
         if (equip[i] > 0) {
             info = GET_ITEM[0](equip[i]);
             type = info->type;
-            data = (ItemData *)info->data;
+            data = info->data.record;
             if (IS_WEAPON_TYPE(type)) {
                 out->fields.battle[0] += data->weapon.atk;
                 if (out->fields.battle[0] >= 1000) {
@@ -120,7 +121,7 @@ void computeStats(s32 partner, PartnerTotals *out) {
             } else {
                 continue;
             }
-            out->fields.battle[5] += data->weapon.unk0;
+            out->fields.battle[5] += data->weapon.charisma;
             if (out->fields.battle[5] >= 1000) {
                 out->fields.battle[5] = 999;
             }

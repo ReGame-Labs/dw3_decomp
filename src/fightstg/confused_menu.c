@@ -21,7 +21,7 @@ void FIGHTSTG_showConfusedCommands(ConfusedMenu *task) {
    blinking arrow */
 void FIGHTSTG_drawConfusedMessageBox(ConfusedMenu *task) {
     SpriteDrawer drawer;
-    s32 sheet;
+    void *sheet;
 
     initSpriteDrawer(&drawer);
     drawer.setLayerId(0x1005, 1);

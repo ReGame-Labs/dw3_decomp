@@ -22,7 +22,7 @@
    is */
 void FIGHTSTG_blendBone(Model *model, ModelBone *bone) {
     s32 i;
-    s32 archive;
+    void *archive;
     SVECTOR *key;
     SVECTOR *out;
     SVECTOR cur;
@@ -32,7 +32,7 @@ void FIGHTSTG_blendBone(Model *model, ModelBone *bone) {
 
     archive = FILE_CACHE.getEntry(bone->keyFile);
     for (i = 0; i < 9; i += 3) {
-        key = (SVECTOR *)FILE_CACHE.getArchiveEntry(i / 3, archive);
+        key = FILE_CACHE.getArchiveEntry(i / 3, archive);
         switch (i) {
         case 3:
             out = &bone->rot;
@@ -82,7 +82,7 @@ void FIGHTSTG_blendBone(Model *model, ModelBone *bone) {
    interpolated between the keys around it */
 void FIGHTSTG_poseBone(Model *model, ModelBone *bone, s32 frame) {
     s32 i;
-    s32 archive;
+    void *archive;
     SVECTOR *key;
     SVECTOR *out;
     s32 found;
@@ -94,7 +94,7 @@ void FIGHTSTG_poseBone(Model *model, ModelBone *bone, s32 frame) {
 
     archive = FILE_CACHE.getEntry(bone->keyFile);
     for (i = 0; i < 9; i += 3) {
-        key = (SVECTOR *)FILE_CACHE.getArchiveEntry(i / 3, archive);
+        key = FILE_CACHE.getArchiveEntry(i / 3, archive);
         found = 0;
         switch (i) {
         case 3:
@@ -198,7 +198,7 @@ void FIGHTSTG_setMotion(Model *model, s32 motion, s32 restart) {
     model->keyframe = 1;
     model->motionDone = 0;
     model->toIdle = 0;
-    step = (MotionStep *)FILE_CACHE.getArchiveEntry(motion - 1, FILE_CACHE.getEntry(model->motionFile));
+    step = FILE_CACHE.getArchiveEntry(motion - 1, FILE_CACHE.getEntry(model->motionFile));
     count = 0;
     while (step->index != 0x7FFF) {
         n = step->count;
@@ -298,7 +298,7 @@ void FIGHTSTG_updateModel(Model *model, Mesh **children) {
     TimLoader loader;
     VECTOR scale;
     ModelBone *bone;
-    s32 archive;
+    void *archive;
     s32 i;
     s32 j;
     ModelBone *drawn;
@@ -448,7 +448,7 @@ s32 FIGHTSTG_isMotionDone(Model *model) {
    half; HASIDLE makes its motions go back to its idle motion */
 Model *FIGHTSTG_createModel(s32 file, s32 motionFile, Vec2 texPos, ModelControl *control, s32 hasIdle) {
     s32 high = file & 0xFFFF0000;
-    s32 *entry = (s32 *)FILE_CACHE.getEntry(file);
+    s32 *entry = FILE_CACHE.getEntry(file);
     s32 count = entry[1] + 1;
     Model *model = createTaskWithId(FIGHTSTG_updateModel, sizeof(Model), (entry[1] + 2) * 4, BATTLE_TASK_MODEL);
     s32 i;
@@ -1042,7 +1042,7 @@ void FIGHTSTG_updateMesh(Mesh *mesh) {
 
 /* Creates a Mesh from an archive: its vertices (entry 0), normals (1),
    commands (2) and bounds (5) */
-Mesh *FIGHTSTG_createMesh(s32 archive, Vec2 texPos) {
+Mesh *FIGHTSTG_createMesh(void *archive, Vec2 texPos) {
     Mesh *mesh = createTask(FIGHTSTG_updateMesh, sizeof(Mesh), 0);
 
     mesh->archive = archive;

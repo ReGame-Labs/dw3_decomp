@@ -10,3 +10,6 @@ GAME.unk26E0 GAME.playerDepth
 GAME.unk26E4 GAME.prizeSpot
 GAME.unk26EC GAME.flightZ
 GAME.unk26F8 GAME.randomGauges
+
+# round 4: the card images (include/dw3/gfx.h), with their TIM
+CardImageHeader CardImage

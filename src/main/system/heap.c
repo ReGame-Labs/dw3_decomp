@@ -41,8 +41,8 @@ void initHeap(void) {
     MemBlock *start;
     MemBlock *last;
 
-    HEAP.end = (MemBlock *)HEAP_END;
-    last = (MemBlock *)HEAP_END - 1;
+    HEAP.end = HEAP_END;
+    last = HEAP_END - 1;
     start = HEAP_START;
     HEAP.first = start;
     HEAP.size = (u8 *)HEAP_END - (u8 *)start;

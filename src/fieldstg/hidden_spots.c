@@ -8,7 +8,7 @@ void FIELDSTG_showSpotHint(SpotHint *task) {
     SpriteDrawer sprite;
     s32 dx;
     s32 dy;
-    s32 sprites;
+    void *sprites;
 
     switch (task->state) {
         default:
