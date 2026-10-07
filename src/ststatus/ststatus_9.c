@@ -3,9 +3,6 @@
 
 #include "ststatus.h"
 
-void STSTATUS_drawSortScreen(SortScreen *screen);
-void STSTATUS_runSortScreen(SortScreen *screen, SortScreenWindows *windows);
-
 void STSTATUS_createSortWindows(SortScreen *screen, SortScreenWindows *windows) {
     s32 i;
     s32 j;
@@ -87,7 +84,7 @@ void STSTATUS_drawSortScreen(SortScreen *screen) {
             sprite.setClutRow(8);
             sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x1E, 0, screen->first * 0x2E + 0x11);
         } else if (screen->substate == 8) {
-            sprite.setScale(0x1000, screen->fade.level, 0x1000);
+            sprite.setScale(ONE, screen->fade.level, ONE);
             sprite.setPivot(0, screen->first * 0x2E + 0x25);
             sprite.setClutRow(8);
             sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x1E, 0, screen->first * 0x2E + 0x11);
@@ -108,14 +105,14 @@ void STSTATUS_drawSortScreen(SortScreen *screen) {
     }
     for (i = 0; i < screen->count; i++) {
         if (screen->pageFades[i].level != 0) {
-            if (screen->pageFades[i].level != 0x1000) {
-                sprite.setScale(screen->pageFades[i].level, screen->pageFades[i].level, 0x1000);
+            if (screen->pageFades[i].level != ONE) {
+                sprite.setScale(screen->pageFades[i].level, screen->pageFades[i].level, ONE);
                 sprite.setPivot(0x7C, i * 0x2E + 0x27);
             } else if ((screen->substate == 8 || screen->substate == 9) && (i == screen->first || i == screen->second)) {
-                sprite.setScale(0x1000, screen->fade.level, 0x1000);
+                sprite.setScale(ONE, screen->fade.level, ONE);
                 sprite.setPivot(0x7C, i * 0x2E + 0x27);
             } else {
-                sprite.setScale(0x1000, 0x1000, 0x1000);
+                sprite.setScale(ONE, ONE, ONE);
             }
             id = GAME.funcs.getPartyMember(i);
             /* the match depends on (*&...): FILE_CACHE.getEntry would keep the
@@ -129,19 +126,19 @@ void STSTATUS_drawSortScreen(SortScreen *screen) {
        plain draws written in both elses (merged after reload) */
     for (i = 0; i < screen->count; i++) {
         if (screen->pageFades[i].level != 0) {
-            if (screen->pageFades[i].level != 0x1000) {
-                sprite.setScale(screen->pageFades[i].level, 0x1000, 0x1000);
+            if (screen->pageFades[i].level != ONE) {
+                sprite.setScale(screen->pageFades[i].level, ONE, ONE);
                 sprite.setPivot(0, i * 0x2E + 0x25);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 0x2E + 0x11);
-                sprite.setScale(screen->pageFades[i].level, screen->pageFades[i].level, 0x1000);
+                sprite.setScale(screen->pageFades[i].level, screen->pageFades[i].level, ONE);
                 sprite.setPivot(0x7C, i * 0x2E + 0x27);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x16, 0x67, i * 0x2E + 0x13);
-                sprite.setScale(screen->pageFades[i].level, 0x1000, 0x1000);
+                sprite.setScale(screen->pageFades[i].level, ONE, ONE);
                 sprite.setPivot(0, i * 0x2E + 0x25);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 0x2E + 0x11);
             } else if (screen->substate == 8 || screen->substate == 9) {
                 if (i == screen->first || i == screen->second) {
-                    sprite.setScale(0x1000, screen->fade.level, 0x1000);
+                    sprite.setScale(ONE, screen->fade.level, ONE);
                     sprite.setPivot(0, i * 0x2E + 0x25);
                     sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 0x2E + 0x11);
                     sprite.setPivot(0x7C, i * 0x2E + 0x27);
@@ -149,13 +146,13 @@ void STSTATUS_drawSortScreen(SortScreen *screen) {
                     sprite.setPivot(0, i * 0x2E + 0x25);
                     sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 0x2E + 0x11);
                 } else {
-                    sprite.setScale(0x1000, 0x1000, 0x1000);
+                    sprite.setScale(ONE, ONE, ONE);
                     sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 0x2E + 0x11);
                     sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x16, 0x67, i * 0x2E + 0x13);
                     sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 0x2E + 0x11);
                 }
             } else {
-                sprite.setScale(0x1000, 0x1000, 0x1000);
+                sprite.setScale(ONE, ONE, ONE);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 0x2E + 0x11);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x16, 0x67, i * 0x2E + 0x13);
                 sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 0x2E + 0x11);
@@ -163,20 +160,20 @@ void STSTATUS_drawSortScreen(SortScreen *screen) {
         }
     }
     if (screen->fades[0].level != 0) {
-        if (screen->fades[0].level != 0x1000) {
-            sprite.setScale(screen->fades[0].level, 0x1000, 0x1000);
+        if (screen->fades[0].level != ONE) {
+            sprite.setScale(screen->fades[0].level, ONE, ONE);
             sprite.setPivot(0x140, 0x19);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x18, 0x22, 0xD);
     }
     if (screen->fades[1].level != 0) {
-        if (screen->fades[1].level != 0x1000) {
-            sprite.setScale(screen->fades[1].level, 0x1000, 0x1000);
+        if (screen->fades[1].level != ONE) {
+            sprite.setScale(screen->fades[1].level, ONE, ONE);
             sprite.setPivot(0, 0xD3);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x20, 0, 0xC2);
@@ -217,7 +214,6 @@ void STSTATUS_drawSortScreen(SortScreen *screen) {
         }
     }
 }
-
 
 /* The party order screen's steps: the pages fade in, two members are chosen
    and swapped, then the pages fade out */

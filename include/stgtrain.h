@@ -7,6 +7,9 @@
 
 #include "game.h"
 
+/* The name of this overlay's copy of a function of src/menu_common/ */
+#define OVL_NAME(name) STGTRAIN_##name
+
 /* The overlay's files: the discs number them differently */
 #if VERSION_US
 #define STGTRAIN_TEXT 0x105 /* its strings */
@@ -111,8 +114,8 @@ typedef struct TrainScreen {
     /* 0x06C */ s32 cursorShown;
     /* 0x070 */ s32 cursorClut;
     /* 0x074 */ s32 cursorTime;
-    /* 0x078 */ s32 unk78;
-    /* 0x07C */ s32 unk7C;
+    /* 0x078 */ s32 training; /* the one picked in the menu, 0 for none */
+    /* 0x07C */ s32 intensity; /* the last one picked */
     /* 0x080 */ struct {
         s32 frame;
         s32 time;
@@ -171,11 +174,11 @@ typedef struct TrainSession {
     /* 0x050 */ TrainScreen *screen;
     /* 0x054 */ s32 layerId;
     /* 0x058 */ s32 depth;
-    /* 0x05C */ s32 intensity; /* the cursor's column, the training's intensity; from the screen's unk7C */
+    /* 0x05C */ s32 intensity; /* the cursor's column, the training's intensity; from the screen's */
     /* 0x060 */ s32 cursorClut;
     /* 0x064 */ s32 cursorTime;
     /* 0x068 */ s32 cursorShown;
-    /* 0x06C */ s32 unk6C;
+    /* 0x06C */ s32 choice; /* yes (0) or no */
     /* 0x070 */ s32 iconFrame;
     /* 0x074 */ s32 iconTime;
     /* 0x078 */ PanelAnim panels[8];
@@ -255,13 +258,13 @@ typedef struct TrainResult {
     /* 0x08C */ s32 losses[5];
     /* 0x0A0 */ s32 modeArg;
     /* 0x0A4 */ PartnerTotals before;
-    /* 0x0D4 */ s32 unkD4;
-    /* 0x0D8 */ s32 unkD8;
-    /* 0x0DC */ s32 unkDC;
-    /* 0x0E0 */ s32 unkE0;
-    /* 0x0E4 */ s32 unkE4;
-    /* 0x0E8 */ s32 unkE8;
-    /* 0x0EC */ s32 unkEC;
+    /* 0x0D4 */ s32 bonusTrying; /* the bonus try (the fourth) is on: its mark blinks */
+    /* 0x0D8 */ s32 bonusWorked; /* the gains take their better columns */
+    /* 0x0DC */ s32 bonusBlink;
+    /* 0x0E0 */ s32 bonusBlinkTime;
+    /* 0x0E4 */ s32 prompting; /* the blinking arrow: cross goes on */
+    /* 0x0E8 */ s32 arrowClut;
+    /* 0x0EC */ s32 arrowTime;
     /* 0x0F0 */ s16 bonusSound; /* the slot of the bonus try's sound */
     /* 0x0F2 */ s16 unkF2;
     /* 0x0F4 */ PanelAnim panels[4];
@@ -270,7 +273,7 @@ typedef struct TrainResult {
 /* The children of TrainResult */
 typedef struct TrainResultWindows {
     /* 0x00 */ TextWindow *message[2];
-    /* 0x08 */ TextWindow *unk8[3];
+    /* 0x08 */ TextWindow *question[3]; /* whether to make the bonus try, yes, no */
     /* 0x14 */ Cursor *cursor;
     /* 0x18 */ TrainActor *actor;
 } TrainResultWindows;
@@ -380,7 +383,7 @@ void STGTRAIN_showStatChanges(TrainScreen *screen, PartnerTotals *before);
 void STGTRAIN_drawScreen(TrainScreen *screen);
 void STGTRAIN_runScreen(TrainScreen *screen, TrainScreenWindows *win);
 TrainScreen *STGTRAIN_createScreen(void);
-ScreenFade *STGTRAIN_createScreenFade(void);
+ScreenFade *STGTRAIN_createFader(void);
 TrainResult *STGTRAIN_createResult(TrainScreen *screen, s32 partner, s32 training);
 TrainSession *STGTRAIN_createSession(TrainScreen *screen);
 TrainMenu *STGTRAIN_createMenu(TrainScreen *screen);

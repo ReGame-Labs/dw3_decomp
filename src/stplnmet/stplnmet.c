@@ -1,38 +1,5 @@
 #include "stplnmet.h"
 
-extern TextStyle STPLNMET_nameStyle;
-
-Task *STPLNMET_createScreen(void);
-void STPLNMET_updateScroll(NameScroll *task);
-void STPLNMET_updateSparkles(NameSparkle *task);
-void STPLNMET_updateShine(NameSparkle *task);
-void STPLNMET_updateWelcome(NameDialog *task, NameDialogWindows *windows);
-void STPLNMET_updateNameEntry(PlayerNameTask *task, NameEntryWindows *windows);
-void STPLNMET_showNameWindows(PlayerNameTask *task, NameEntryWindows *windows, s32 show);
-extern s32 STPLNMET_scrollEnds[];
-extern SparkleFrame STPLNMET_sparkleFrames[];
-void STPLNMET_drawKeyboard(PlayerNameTask *task);
-extern s32 STPLNMET_nameAnims[];
-extern BigKey STPLNMET_bigKeys[];
-extern s32 STPLNMET_keyArrowCluts[];
-void STPLNMET_updateKeyboard(PlayerNameTask *task, NameEntryWindows *windows);
-extern KeyTabs STPLNMET_keyPagesJp[];
-extern KeyPage STPLNMET_keyCharsJp[];
-extern KeyTabs STPLNMET_keyPages[];
-extern KeyPage STPLNMET_keyChars[];
-extern NameKeyboard STPLNMET_keyboard;
-void STPLNMET_hideNameEntry(PlayerNameTask *task, s32 hide);
-void STPLNMET_createConfirmWindows(NameConfirm *task, NameConfirmWindows *windows);
-void STPLNMET_showConfirmWindows(NameConfirm *task, NameConfirmWindows *windows, s32 show);
-void STPLNMET_drawConfirm(NameConfirm *task);
-void STPLNMET_runConfirm(NameConfirm *task, NameConfirmWindows *windows);
-void STPLNMET_createChoiceWindows(PartnerChoice *task, PartnerChoiceWindows *windows);
-void STPLNMET_showChoiceWindows(PartnerChoice *task, PartnerChoiceWindows *windows, s32 show);
-void STPLNMET_drawChoice(PartnerChoice *task);
-void STPLNMET_updateScreen(PlayerNameScreen *screen, PlayerNameScreenChildren *children);
-extern s32 STPLNMET_choiceArrowCluts[];
-extern s32 STPLNMET_tabX[];
-
 void STPLNMET_centerLayer(Task *task, Task **children, Layer *layer, RECT *rect) {
     layer->setOffset(layer, rect->w / 2, rect->h / 2);
     layer->allocCallbacks(layer, 5);
@@ -292,511 +259,21 @@ NameDialog *STPLNMET_createWelcome(PlayerNameScreen *screen) {
     return task;
 }
 
-void STPLNMET_startTween(NameTween *fade, s32 fadeIn) {
-    fade->active = 1;
-    if (fadeIn != 0) {
-        SOUND.playSound(SOUND_MENU_OPEN);
-        fade->value = 0;
-        fade->step = 0x1000 / fade->duration;
-    } else {
-        SOUND.playSound(SOUND_MENU_CLOSE);
-        fade->value = 0x1000;
-        fade->step = -((0x1000 / fade->duration) * 2);
-    }
-}
+#define START_FADE OVL_NAME(startTween)
+#include "../menu_common/start_fade.inc.c"
+#define UPDATE_FADE OVL_NAME(updateTween)
+#include "../menu_common/update_fade.inc.c"
+#include "../menu_common/name_entry/create_name_windows.inc.c"
+#include "../menu_common/name_entry/show_name_windows.inc.c"
+#include "../menu_common/name_entry/draw_keyboard.inc.c"
+#include "../menu_common/name_entry/update_keyboard.inc.c"
+#include "../menu_common/name_entry/update_name_entry.inc.c"
+#include "../menu_common/name_entry/set_name_vram.inc.c"
+#include "../menu_common/name_entry/set_name.inc.c"
+#include "../menu_common/name_entry/get_name.inc.c"
+#include "../menu_common/name_entry/close_name_entry.inc.c"
 
-s32 STPLNMET_updateTween(NameTween *fade) {
-    if (fade->active == 0) {
-        return 1;
-    }
-    fade->value += fade->step;
-    if (fade->step > 0) {
-        if (fade->value > 0x1000) {
-            fade->value = 0x1000;
-            fade->active = 0;
-            return 1;
-        }
-    } else if (fade->value < 0) {
-        fade->value = 0;
-        fade->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void STPLNMET_createNameWindows(PlayerNameTask *task, NameEntryWindows *windows) {
-    s32 i;
-
-    windows->title = createTextWindow(task->layer, 1, 0x20, 0x1A);
-    windows->title->setPalette(windows->title, 4);
-    windows->name = createTextWindow(task->layer, 1, 0x4B, 0x40);
-    windows->name->setSpacing(windows->name, 0x13, 0);
-    windows->name->style = (u8 *)&STPLNMET_nameStyle;
-    for (i = 0; i < 3; i++) {
-        windows->tabs[i] = createTextWindow(task->layer, 1, 0x2F + i * 0x4E, 0x5B);
-        windows->tabs[i]->setDepth(windows->tabs[i], task->depth - 1);
-        windows->tabs[i]->setLines(windows->tabs[i], 7);
-        windows->tabs[i]->setSpacing(windows->tabs[i], 0xE, 0x12);
-        windows->tabs[i]->style = (u8 *)&STPLNMET_nameStyle;
-    }
-    windows->leftLabel = createTextWindow(task->layer, 1, 0xCE, 0xC6);
-    windows->rightLabel = createTextWindow(task->layer, 1, 0xE1, 0xC6);
-    windows->l1Label = createTextWindow(task->layer, 1, 0x13, 0x62);
-    windows->l1Label->setDepth(windows->l1Label, task->depth - 1);
-    windows->r1Label = createTextWindow(task->layer, 1, 0x123, 0x62);
-    windows->r1Label->setDepth(windows->r1Label, task->depth - 1);
-    windows->message = createTextWindow(task->layer, 1, 0x3E, 0x72);
-}
-
-void STPLNMET_showNameWindows(PlayerNameTask *task, NameEntryWindows *windows, s32 show) {
-    s32 i;
-
-    if (show != 0) {
-        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 1);
-        windows->name->setText(windows->name, task->name);
-        windows->name->setPalette(windows->name, 1);
-        for (i = 0; i < 3; i++) {
-            windows->tabs[i]->setString(windows->tabs[i], FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), STPLNMET_keyboard.tabTexts[task->page].texts[i]);
-            windows->tabs[i]->setPalette(windows->tabs[i], 1);
-        }
-        windows->leftLabel->setString(windows->leftLabel, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0xD);
-        windows->leftLabel->setPalette(windows->leftLabel, 1);
-        windows->rightLabel->setString(windows->rightLabel, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0xE);
-        windows->rightLabel->setPalette(windows->rightLabel, 1);
-        if (STPLNMET_keyboard.pageCount >= 2) {
-            windows->l1Label->setString(windows->l1Label, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0x10);
-            windows->l1Label->setPalette(windows->l1Label, 1);
-            windows->r1Label->setString(windows->r1Label, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0x11);
-            windows->r1Label->setPalette(windows->r1Label, 1);
-        }
-    } else {
-        windows->title->setVisible(windows->title, 0);
-        windows->name->setVisible(windows->name, 0);
-        for (i = 0; i < 3; i++) {
-            windows->tabs[i]->setVisible(windows->tabs[i], 0);
-        }
-        windows->leftLabel->setVisible(windows->leftLabel, 0);
-        windows->rightLabel->setVisible(windows->rightLabel, 0);
-        windows->l1Label->setVisible(windows->l1Label, 0);
-        windows->r1Label->setVisible(windows->r1Label, 0);
-    }
-}
-
-/* Draws the keyboard, the cursor, the partner and the name entry's panels */
-void STPLNMET_drawKeyboard(PlayerNameTask *task) {
-    SpriteDrawer sprite;
-    s32 i;
-    s32 key;
-
-    initSpriteDrawer(&sprite);
-    sprite.setTexture(task->vramX, task->vramY);
-    sprite.setLayerId(task->layer, task->depth);
-    if (task->keyboardScale.value != 0) {
-        if (task->active) {
-            if (GFX.funcs.getTime() - task->keyTime >= 5) {
-                task->keyTime = GFX.funcs.getTime();
-                if (++task->keyFrame >= 4) {
-                    task->keyFrame = 0;
-                }
-            }
-            sprite.setClutRow(task->keyFrame);
-            if (task->column < 10 || task->row < 3) {
-                sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x27, task->column * 14 + 0x2F + task->column / 5 * 8,
-                            task->row * 18 + 0x5A);
-            } else {
-                for (i = 0; STPLNMET_keyboard.pages[task->page].cells[task->row][task->column + i].kind != 1; i--) {
-                }
-                switch (task->column + i + task->row * 15) {
-                case NAME_KEY_LEFT:
-                default:
-                    key = 0;
-                    break;
-                case NAME_KEY_RIGHT:
-                    key = 1;
-                    break;
-                case NAME_KEY_DELETE:
-                    key = 2;
-                    STPLNMET_bigKeys[2].sprite = NAME_ENTRY_TEXT_SPRITE(0x3C);
-                    break;
-                case NAME_KEY_SPACE:
-                    key = 3;
-                    STPLNMET_bigKeys[3].sprite = NAME_ENTRY_TEXT_SPRITE(0x44);
-                    break;
-                case NAME_KEY_END:
-                    key = 4;
-                    STPLNMET_bigKeys[4].sprite = NAME_ENTRY_TEXT_SPRITE(0x4C);
-                    break;
-                }
-                sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), STPLNMET_bigKeys[key].sprite, STPLNMET_bigKeys[key].x,
-                            STPLNMET_bigKeys[key].y);
-            }
-            sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x28, task->cursor * 19 + 0x4B, 0x40);
-            sprite.setClutRow(0);
-        }
-        if (task->keyboardScale.value != 0x1000) {
-            sprite.setScale(task->keyboardScale.value, 0x1000, 0x1000);
-        }
-        if (task->keyboardScale.value != 0x1000) {
-            sprite.setPivot(0x18, 0x20);
-        }
-        sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x1D, 0x18, 0x15);
-        if (task->mode != 2) {
-            if (task->keyboardScale.value != 0x1000) {
-                sprite.setPivot(0x20, 0x3F);
-            }
-            if (task->partner != -1) {
-                if (GFX.funcs.getTime() - task->partnerTime >= 13) {
-                    task->partnerTime = GFX.funcs.getTime();
-                    if (++task->partnerFrame >= 7 || STPLNMET_nameAnims[task->partner * 7 + task->partnerFrame] == -1) {
-                        task->partnerFrame = 0;
-                    }
-                }
-                sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), STPLNMET_nameAnims[task->partner * 7 + task->partnerFrame],
-                            0x22, 0x30);
-            } else {
-                sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x36, 0x20, 0x2E);
-            }
-            if (GFX.funcs.getTime() - task->clutTime >= 5) {
-                task->clutTime = GFX.funcs.getTime();
-                if (++task->clutRow >= 14) {
-                    task->clutRow = 0;
-                }
-            }
-            sprite.setLayerId(task->layer, task->depth - 1);
-            sprite.setClutRow(task->clutRow);
-            sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x1F, 0x20, 0x2E);
-            sprite.setClutRow(0);
-            sprite.setLayerId(task->layer, task->depth);
-            sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x1E, 0x20, 0x2E);
-        }
-        if (task->keyboardScale.value != 0x1000) {
-            sprite.setPivot(0x20, 0x49);
-        }
-        if (task->mode != 2) {
-            if (NAME_ENTRY_JAPANESE) {
-                sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x34, 0x4B, 0x40);
-            } else {
-                sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x37, 0x4B, 0x40);
-            }
-        } else {
-            sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x35, 0x4B, 0x40);
-        }
-        if (task->keyboardScale.value != 0x1000) {
-            sprite.setScale(0x1000, task->keyboardScale.value, 0x1000);
-        }
-        if (STPLNMET_keyboard.pageCount >= 2) {
-            if (GFX.funcs.getTime() - task->arrowTime >= 7) {
-                task->arrowTime = GFX.funcs.getTime();
-                if (++task->arrowFrame >= 6) {
-                    task->arrowFrame = 0;
-                }
-            }
-            sprite.setClutRow(STPLNMET_keyArrowCluts[task->arrowFrame]);
-            sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x32, 0xA, 0x5E);
-            sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x33, 0x119, 0x5E);
-            sprite.setClutRow(0);
-        }
-        sprite.setClutRow(4);
-        sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x2C, 0xCB, 0xC3);
-        sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x2D, 0xDE, 0xC3);
-        sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), NAME_ENTRY_TEXT_SPRITE(0x3C), 0xCB, 0x99);
-        sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), NAME_ENTRY_TEXT_SPRITE(0x44), 0xCB, 0xAE);
-        sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), NAME_ENTRY_TEXT_SPRITE(0x4C), 0xF6, 0xC3);
-        sprite.setClutRow(0);
-        sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x25, 0x1D, 0x54);
-    }
-    sprite.setLayerId(task->layer, task->depth - 1);
-    if (task->messageScale.value != 0) {
-        if (task->messageScale.value != 0x1000) {
-            sprite.setScale(0x1000, task->messageScale.value, 0x1000);
-            sprite.setPivot(0, 0x78);
-        }
-        sprite.draw(FILE_CACHE.getEntry(PLNMET_BANK), 0x26, 0, 0x64);
-    }
-}
-
-/* The keyboard's input: moving the cursor, turning the pages and typing the name */
-void STPLNMET_updateKeyboard(PlayerNameTask *task, NameEntryWindows *windows) {
-    s32 page;
-    s32 newPage;
-    s32 i;
-    s32 key;
-    s32 j;
-    u16 c;
-    u32 glyph; /* the match depends on this u32 copy of c, which orders the loads of the key's glyph */
-
-    switch (task->substate) {
-    case 0:
-    default:
-        STPLNMET_startTween(&task->keyboardScale, 1);
-        task->substate++;
-        break;
-    case 1:
-        if (STPLNMET_updateTween(&task->keyboardScale)) {
-            STPLNMET_showNameWindows(task, windows, 1);
-            task->active = 1;
-            task->substate++;
-        }
-        break;
-    case 2:
-        if (PAD_PRESSED(PAD_START)) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-            task->column = 13;
-            task->row = 6;
-            break;
-        }
-        if (STPLNMET_keyboard.pageCount >= 2) {
-            page = task->page;
-            if (!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) {
-                if (--task->page < 0) {
-                    task->page = STPLNMET_keyboard.pageCount - 1;
-                }
-            } else if (!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) {
-                if (++task->page > STPLNMET_keyboard.pageCount - 1) {
-                    task->page = 0;
-                }
-            }
-            if (page != task->page) {
-                SOUND.playSound(SOUND_MENU_MOVE);
-                STPLNMET_showNameWindows(task, windows, 1);
-                if (NAME_ENTRY_JAPANESE) {
-                    newPage = task->page;
-                    if (newPage == 0 || newPage == 1) {
-                        while (STPLNMET_keyboard.pages[newPage].cells[task->row][task->column].kind != 1) {
-                            if (--task->column < 0) {
-                                task->column = 14;
-                            }
-                        }
-                    } else {
-                        while (STPLNMET_keyboard.pages[newPage].cells[task->row][task->column].kind == 0) {
-                            if (--task->row < 0) {
-                                task->row = 6;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-            if (STPLNMET_keyboard.pages[task->page].cells[task->row][task->column].kind < 0) {
-                task->column += STPLNMET_keyboard.pages[task->page].cells[task->row][task->column].kind;
-            }
-            do {
-                if (--task->column < 0) {
-                    task->column = 14;
-                }
-            } while (STPLNMET_keyboard.pages[task->page].cells[task->row][task->column].kind != 1);
-            SOUND.playSound(SOUND_MENU_MOVE);
-        } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-            if (STPLNMET_keyboard.pages[task->page].cells[task->row][task->column].kind < 0) {
-                task->column += STPLNMET_keyboard.pages[task->page].cells[task->row][task->column].kind;
-            }
-            do {
-                if (++task->column >= 15) {
-                    task->column = 0;
-                }
-            } while (STPLNMET_keyboard.pages[task->page].cells[task->row][task->column].kind != 1);
-            SOUND.playSound(SOUND_MENU_MOVE);
-        }
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            do {
-                if (--task->row < 0) {
-                    task->row = 6;
-                }
-            } while (STPLNMET_keyboard.pages[task->page].cells[task->row][task->column].kind == 0);
-            SOUND.playSound(SOUND_MENU_MOVE);
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            do {
-                if (++task->row >= 7) {
-                    task->row = 0;
-                }
-            } while (STPLNMET_keyboard.pages[task->page].cells[task->row][task->column].kind == 0);
-            SOUND.playSound(SOUND_MENU_MOVE);
-        }
-        if (PAD_PRESSED(PAD_CROSS)) {
-            for (i = 0; STPLNMET_keyboard.pages[task->page].cells[task->row][task->column + i].kind != 1; i--) {
-            }
-            key = task->row * 15 + task->column + i;
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            switch (key) {
-            case NAME_KEY_LEFT:
-                if (--task->cursor < 0) {
-                    task->cursor = 0;
-                }
-                break;
-            case NAME_KEY_RIGHT:
-                if (++task->cursor > task->maxLength - 1) {
-                    task->cursor = task->maxLength - 1;
-                }
-                break;
-            case NAME_KEY_DELETE:
-                if (task->cursor <= task->maxLength - 1 && task->name[task->cursor] == SJIS_SPACE) {
-                    if (--task->cursor < 0) {
-                        task->cursor = 0;
-                    }
-                }
-                c = ((TextStyle *)windows->name->style)->iconMap[1].code;
-                task->name[task->cursor] = (c >> 8) | ((c & 0xFF) << 8);
-                windows->name->setText(windows->name, task->name);
-                break;
-            case NAME_KEY_SPACE:
-                c = ((TextStyle *)windows->name->style)->iconMap[1].code;
-                task->name[task->cursor] = (c >> 8) | ((c & 0xFF) << 8);
-                if (++task->cursor > task->maxLength - 1) {
-                    task->cursor = task->maxLength - 1;
-                }
-                windows->name->setText(windows->name, task->name);
-                break;
-            case NAME_KEY_END:
-                for (j = 0; j < task->maxLength; j++) {
-                    if (task->name[j] != SJIS_SPACE && task->name[j] != 0) {
-                        for (j = 19; j >= 0; j--) {
-                            if (task->name[j] != SJIS_SPACE) {
-                                task->substate = 100;
-                                return;
-                            }
-                            task->name[j] = 0;
-                        }
-                    }
-                }
-                task->substate = 20;
-                break;
-            default:
-                glyph = ((TextStyle *)windows->name->style)
-                            ->sjisMap[STPLNMET_keyboard.pages[task->page].cells[task->row][task->column].code]
-                            .code;
-                task->name[task->cursor] = (glyph >> 8) | ((glyph & 0xFF) << 8);
-                windows->name->setText(windows->name, task->name);
-                if (++task->cursor > task->maxLength - 1) {
-                    task->cursor = task->maxLength - 1;
-                    task->column = 13;
-                    task->row = 6;
-                }
-                break;
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            if (task->cursor <= task->maxLength - 1 && task->name[task->cursor] == SJIS_SPACE) {
-                if (--task->cursor < 0) {
-                    task->cursor = 0;
-                }
-            }
-            c = ((TextStyle *)windows->name->style)->iconMap[1].code;
-            task->name[task->cursor] = (c >> 8) | ((c & 0xFF) << 8);
-            windows->name->setText(windows->name, task->name);
-        }
-        break;
-    case 10:
-        STPLNMET_showNameWindows(task, windows, 0);
-        STPLNMET_startTween(&task->keyboardScale, 0);
-        task->active = 0;
-        task->substate++;
-        break;
-    case 11:
-        if (STPLNMET_updateTween(&task->keyboardScale)) {
-            task->state = TASK_DONE;
-        }
-        break;
-    case 20:
-        task->active = 0;
-        STPLNMET_startTween(&task->messageScale, 1);
-        task->substate++;
-        break;
-    case 21:
-        if (STPLNMET_updateTween(&task->messageScale)) {
-            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0x12);
-            task->substate++;
-        }
-        break;
-    case 22:
-        if (PAD_PRESSED(PAD_CROSS)) {
-            windows->message->setVisible(windows->message, 0);
-            STPLNMET_startTween(&task->messageScale, 0);
-            task->substate++;
-        }
-        break;
-    case 23:
-        if (STPLNMET_updateTween(&task->messageScale)) {
-            task->active = 1;
-            task->substate = 2;
-        }
-        break;
-    case 100:
-        break;
-    }
-}
-
-void STPLNMET_updateNameEntry(PlayerNameTask *task, NameEntryWindows *windows) {
-    TimLoader loader;
-
-    switch (task->state) {
-    case TASK_INIT:
-    default:
-        task->nextState(task);
-        initTimLoader(&loader);
-        loader.setImagePos(task->vramX, task->vramY);
-        loader.loadArchive(FILE_CACHE.getEntry(FILE_PLNMET_KEYBOARD << 16));
-        if (NAME_ENTRY_JAPANESE) {
-            STPLNMET_keyboard.pageCount = 3;
-            STPLNMET_keyboard.tabTexts = STPLNMET_keyPagesJp;
-            STPLNMET_keyboard.pages = STPLNMET_keyCharsJp;
-        } else {
-            STPLNMET_keyboard.pageCount = 1;
-            STPLNMET_keyboard.tabTexts = STPLNMET_keyPages;
-            STPLNMET_keyboard.pages = STPLNMET_keyChars;
-        }
-        task->unkBC.duration = 10;
-        task->messageScale.duration = 10;
-        task->keyboardScale.duration = 10;
-        STPLNMET_createNameWindows(task, windows);
-        break;
-    case TASK_RUN:
-        STPLNMET_updateKeyboard(task, windows);
-        STPLNMET_drawKeyboard(task);
-        break;
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
-
-void STPLNMET_setNameVram(PlayerNameTask *task, s32 x, s32 y) {
-    task->vramX = x;
-    task->vramY = y;
-}
-
-void STPLNMET_setName(PlayerNameTask *task, char *name) {
-    TextTools conv;
-    s32 i;
-
-    initTextTools(&conv);
-    conv.convert(task->name, name, 0);
-    for (i = strlen((char *)task->name) >> 1; i < task->maxLength; i++) {
-        task->name[i] = SJIS_SPACE;
-    }
-}
-
-void STPLNMET_getName(PlayerNameTask *task, char *out) {
-    TextTools conv;
-    s32 i;
-
-    for (i = 0; i < task->maxLength * 2; i++) {
-        out[i] = 0;
-    }
-    for (i = task->maxLength - 1; i >= 0 && task->name[i] == SJIS_SPACE; i--) {
-        task->name[i] = 0;
-    }
-    for (i = 0; i < task->maxLength && task->name[i] == SJIS_SPACE; i++) {
-    }
-    initTextTools(&conv);
-    conv.convert(out, &task->name[i], 1);
-}
-
-void STPLNMET_closeNameEntry(PlayerNameTask *task) {
-    task->substate = 10;
-}
-
-void STPLNMET_hideNameEntry(PlayerNameTask *task, s32 hide) {
+void STPLNMET_hideNameEntry(NameEntry *task, s32 hide) {
     NameEntryWindows *windows = task->children;
     s32 i;
 
@@ -817,8 +294,8 @@ void STPLNMET_hideNameEntry(PlayerNameTask *task, s32 hide) {
     }
 }
 
-PlayerNameTask *STPLNMET_createNameEntry(char *name) {
-    PlayerNameTask *task = createTask(STPLNMET_updateNameEntry, sizeof(PlayerNameTask), sizeof(NameEntryWindows));
+NameEntry *STPLNMET_createNameEntry(char *name) {
+    NameEntry *task = createTask(STPLNMET_updateNameEntry, sizeof(NameEntry), sizeof(NameEntryWindows));
 
     task->getName = STPLNMET_getName;
     task->hide = STPLNMET_hideNameEntry;
@@ -913,8 +390,8 @@ void STPLNMET_drawConfirm(NameConfirm *task) {
         }
     }
     if (task->tweenA.level != 0) {
-        if (task->tweenA.level != 0x1000) {
-            sprite.setScale(task->tweenA.level, 0x1000, 0x1000);
+        if (task->tweenA.level != ONE) {
+            sprite.setScale(task->tweenA.level, ONE, ONE);
             sprite.setPivot(0x37, 0x42);
         }
         sprite.setLayerId(task->layer, task->depth);
@@ -935,7 +412,7 @@ void STPLNMET_drawConfirm(NameConfirm *task) {
     }
     if (task->tweenB.level != 0) {
         sprite.setLayerId(task->layer, task->depth);
-        if (task->tweenB.level == 0x1000) {
+        if (task->tweenB.level == ONE) {
             sprite.setTexture(0x140, 0x100);
             for (i = 0; i < 3; i++) {
                 anim = &STPLNMET_funcs.anims[partners[i]];
@@ -943,15 +420,15 @@ void STPLNMET_drawConfirm(NameConfirm *task) {
             }
         }
         sprite.setTexture(0x280, 0x100);
-        if (task->tweenB.level != 0x1000) {
-            sprite.setScale(0x1000, task->tweenB.level, 0x1000);
+        if (task->tweenB.level != ONE) {
+            sprite.setScale(ONE, task->tweenB.level, ONE);
             sprite.setPivot(0xA0, 0x78);
         }
         sprite.setLayerId(task->layer, task->depth - 1);
         sprite.draw(FILE_CACHE.getEntry(PLNMET_MENU), 10, 0x37, 0x59);
         sprite.setLayerId(task->layer, task->depth);
         sprite.draw(FILE_CACHE.getEntry(PLNMET_MENU), 9, 0x37, 0x59);
-        if (task->tweenB.level != 0x1000) {
+        if (task->tweenB.level != ONE) {
             sprite.setPivot(0xA0, 0xBE);
         }
         sprite.draw(FILE_CACHE.getEntry(PLNMET_MENU), 1, 0, 0xA2);
@@ -959,9 +436,9 @@ void STPLNMET_drawConfirm(NameConfirm *task) {
     if (task->substate == 1 || task->substate == 2) {
         sprite.setLayerId(task->layer, task->depth - 1);
         sprite.draw(FILE_CACHE.getEntry(PLNMET_MENU), 0x37, 0x51, 0xBF);
-        task->scale.vy = task->scale.vz = 0x1000;
+        task->scale.vy = task->scale.vz = ONE;
         if (task->progress == 100) {
-            task->scale.vx = 0x1000;
+            task->scale.vx = ONE;
         } else {
             task->scale.vx = task->progress * 41;
         }
@@ -1093,9 +570,9 @@ void STPLNMET_updateConfirm(NameConfirm *task, NameConfirmWindows *windows) {
         task->nextState(task);
         STPLNMET_createConfirmWindows(task, windows);
         task->tweenA.duration = 10;
-        task->tweenA.level = 0x1000;
+        task->tweenA.level = ONE;
         task->tweenB.duration = 10;
-        task->tweenB.level = 0x1000;
+        task->tweenB.level = ONE;
         STPLNMET_hideConfirm(task, 1);
         break;
     case TASK_RUN:
@@ -1395,8 +872,8 @@ void STPLNMET_drawTitle(PlayerNameScreen *screen) {
     sprite.setTexture(0x280, 0x100);
     sprite.setLayerId(screen->layer, screen->depth);
     if (screen->fade.level != 0) {
-        if (screen->fade.level != 0x1000) {
-            sprite.setScale(screen->fade.level, 0x1000, 0x1000);
+        if (screen->fade.level != ONE) {
+            sprite.setScale(screen->fade.level, ONE, ONE);
             sprite.setPivot(0x18, 0x20);
         }
         sprite.draw(FILE_CACHE.getEntry(PLNMET_MENU), screen->page + 12, 0x18, 0x15);
@@ -1473,68 +950,10 @@ s32 STPLNMET_filesLoading(void) {
     return FILE_CACHE.isLoading(FILE_PLNMET_KEYBOARD) != 0;
 }
 
-void STPLNMET_startFade(PanelAnim *fade, s32 fadeIn) {
-    fade->active = 1;
-    if (fadeIn != 0) {
-        SOUND.playSound(SOUND_MENU_OPEN);
-        fade->level = 0;
-        fade->step = 0x1000 / fade->duration;
-    } else {
-        SOUND.playSound(SOUND_MENU_CLOSE);
-        fade->level = 0x1000;
-        fade->step = -((0x1000 / fade->duration) * 2);
-    }
-}
-
-s32 STPLNMET_updateFade(PanelAnim *fade) {
-    if (fade->active == 0) {
-        return 1;
-    }
-    fade->level += fade->step;
-    if (fade->step > 0) {
-        if (fade->level > 0x1000) {
-            fade->level = 0x1000;
-            fade->active = 0;
-            return 1;
-        }
-    } else if (fade->level < 0) {
-        fade->level = 0;
-        fade->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void STPLNMET_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames) {
-    if (from != to) {
-        lerp->duration = frames;
-        lerp->fixed = from << 8;
-        lerp->value = from;
-        lerp->target = to;
-        lerp->active = 1;
-        lerp->step = ((to - from) << 8) / lerp->duration;
-    }
-}
-
-s32 STPLNMET_updateLerp(MenuLerp *lerp) {
-    if (lerp->active == 0) {
-        return 1;
-    }
-    lerp->fixed += lerp->step;
-    lerp->value = lerp->fixed >> 8;
-    if (lerp->step > 0) {
-        if (lerp->target < lerp->value) {
-            lerp->value = lerp->target;
-            lerp->active = 0;
-            return 1;
-        }
-    } else if (lerp->value < lerp->target) {
-        lerp->value = lerp->target;
-        lerp->active = 0;
-        return 1;
-    }
-    return 0;
-}
+#include "../menu_common/start_fade.inc.c"
+#include "../menu_common/update_fade.inc.c"
+#include "../menu_common/start_lerp.inc.c"
+#include "../menu_common/update_lerp.inc.c"
 
 /* Where each scroll layer starts over (STPLNMET_updateScroll) */
 s32 STPLNMET_scrollEnds[] = {

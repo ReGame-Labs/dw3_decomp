@@ -1,25 +1,5 @@
 #include "stcrddek.h"
 
-void STCRDDEK_drawDeckCards(DeckCards *task);
-void STCRDDEK_loadNextCard(DeckCards *task);
-void STCRDDEK_createEditorWindows(DeckEditor *task, DeckEditorChildren *children);
-void STCRDDEK_buildCardList(DeckEditor *task);
-void STCRDDEK_drawEditor(DeckEditor *task);
-void STCRDDEK_stepEditor(DeckEditor *task, DeckEditorChildren *children);
-void STCRDDEK_initIdle(DeckIdle *task, void *children);
-void STCRDDEK_showNameWindows(NameEntry *task, NameEntryWindows *windows, s32 show);
-void STCRDDEK_drawKeyboard(NameEntry *task);
-void STCRDDEK_updateKeyboard(NameEntry *task, NameEntryWindows *windows);
-void STCRDDEK_updateNameEntry(NameEntry *task, NameEntryWindows *windows);
-void STCRDDEK_updateScrollBar(ScrollBar *bar);
-ScrollBar *STCRDDEK_createScrollBar(void);
-void STCRDDEK_createScreenWindows(DeckScreen *task, DeckScreenChildren *children);
-void STCRDDEK_drawScreen(DeckScreen *task);
-void STCRDDEK_countCardKinds(DeckScreen *task);
-void STCRDDEK_stepScreen(DeckScreen *task, DeckScreenChildren *children);
-void STCRDDEK_updateScreen(DeckScreen *task, DeckScreenChildren *children);
-DeckScreen *STCRDDEK_createScreen(void);
-
 void STCRDDEK_updateScene(Task *task, Task **children) {
     RECT rect;
     Layer *layer;
@@ -50,77 +30,11 @@ Task *STCRDDEK_start(void) {
     return createTask(STCRDDEK_updateScene, sizeof(Task), 4);
 }
 
-void STCRDDEK_startFader(ScreenFade *task, s32 fadeIn, s32 duration) {
-    task->setState(task, TASK_RUN);
-    task->substate = 1;
-    task->fadeIn = fadeIn;
-    if (fadeIn == 0) {
-        task->level = 0;
-        task->levelStep = 0xFF00 / duration;
-    } else {
-        task->level = 0xFF00;
-        task->levelStep = -(0xFF00 / duration);
-    }
-}
-
-void STCRDDEK_drawFader(ScreenFade *task) {
-    Layer *layer = GFX.funcs.getLayer(task->layerId);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, task->depth);
-    POLY_F4 *poly = GFX.funcs.getPrim();
-    DR_TPAGE *mode;
-
-    setlen(poly, 5);
-    poly->code = 0x2A;
-    poly->r0 = poly->g0 = poly->b0 = task->level >> 8;
-    poly->x0 = poly->x2 = 0;
-    poly->x1 = poly->x3 = 320;
-    poly->y0 = poly->y1 = 0;
-    poly->y2 = poly->y3 = 256;
-    addPrim(ot, poly);
-    mode = (DR_TPAGE *)(poly + 1);
-    setlen(mode, 1);
-    mode->code[0] = 0xE1000245;
-    addPrim(ot, mode);
-    GFX.funcs.setPrim(mode + 1);
-}
-
-void STCRDDEK_updateFader(ScreenFade *task) {
-    switch (task->state) {
-    case 0:
-    default:
-        task->nextState(task);
-        break;
-    case 1:
-        if (task->substate == 0) {
-            break;
-        }
-        task->level += task->levelStep;
-        if (task->fadeIn == 0) {
-            if (task->level > 0xFF00) {
-                task->level = 0xFF00;
-                task->state = 2;
-            }
-        } else if (task->level < 0) {
-            task->level = 0;
-            task->state = 2;
-        }
-        /* fallthrough */
-    case 2:
-        STCRDDEK_drawFader(task);
-        break;
-    case 3:
-        break;
-    }
-}
-
-ScreenFade *STCRDDEK_createFader(void) {
-    ScreenFade *task = createTask(STCRDDEK_updateFader, sizeof(ScreenFade), 0);
-
-    task->start = STCRDDEK_startFader;
-    task->layerId = 0x1000;
-    task->depth = 0;
-    return task;
-}
+#include "../menu_common/start_fader.inc.c"
+#include "../menu_common/draw_fader.inc.c"
+#include "../menu_common/update_fader.inc.c"
+#define FADER_DEPTH 0
+#include "../menu_common/create_fader.inc.c"
 
 void STCRDDEK_drawDeckCards(DeckCards *task) {
     SpriteDrawer sprite;
@@ -436,8 +350,8 @@ void STCRDDEK_drawEditor(DeckEditor *task) {
         sprite.setClutRow(0);
     }
     if (task->panels[1].level != 0) {
-        if (task->panels[1].level != 0x1000) {
-            sprite.setScale(task->panels[1].level, 0x1000, 0x1000);
+        if (task->panels[1].level != ONE) {
+            sprite.setScale(task->panels[1].level, ONE, ONE);
             sprite.setPivot(0x140, 0x25);
         }
         initCardDrawer(&card);
@@ -460,8 +374,8 @@ void STCRDDEK_drawEditor(DeckEditor *task) {
         }
     }
     if (task->panels[0].level != 0) {
-        sprite.setScale(0x1000, task->panels[0].level, 0x1000);
-        if (task->panels[0].level != 0x1000) {
+        sprite.setScale(ONE, task->panels[0].level, ONE);
+        if (task->panels[0].level != ONE) {
             sprite.setPivot(0xA0, 0x74);
         }
         sprite.setLayerId(task->layer, task->depth);
@@ -471,8 +385,8 @@ void STCRDDEK_drawEditor(DeckEditor *task) {
     sprite.setTexture(0x280, 0);
     sprite.setLayerId(task->layer, task->depth);
     if (task->panels[2].level != 0) {
-        if (task->panels[2].level != 0x1000) {
-            sprite.setScale(task->panels[2].level, 0x1000, 0x1000);
+        if (task->panels[2].level != ONE) {
+            sprite.setScale(task->panels[2].level, ONE, ONE);
             sprite.setPivot(0x140, 0x5C);
         } else {
             /* the match depends on i being set before initCardDrawer */
@@ -511,8 +425,8 @@ void STCRDDEK_drawEditor(DeckEditor *task) {
         sprite.draw(FILE_CACHE.getEntry(STCRDDEK_SPRITES), 0x3F, 0x81, 0x1E);
     }
     if (task->panels[3].level != 0) {
-        if (task->panels[3].level != 0x1000) {
-            sprite.setScale(task->panels[3].level, 0x1000, 0x1000);
+        if (task->panels[3].level != ONE) {
+            sprite.setScale(task->panels[3].level, ONE, ONE);
             sprite.setPivot(0x140, 0x25);
         }
         initCardDrawer(&card);
@@ -533,14 +447,14 @@ void STCRDDEK_drawEditor(DeckEditor *task) {
                 sprite.draw(FILE_CACHE.getEntry(STCRDDEK_SPRITES), 0xC, 0xC7, 0xB3);
             }
         }
-        if (task->panels[3].level != 0x1000) {
+        if (task->panels[3].level != ONE) {
             sprite.setPivot(0x140, 0xA8);
         }
         sprite.draw(FILE_CACHE.getEntry(STCRDDEK_SPRITES), 0xA, 0x82, 0x9D);
     }
     if (task->panels[4].level != 0) {
-        if (task->panels[4].level != 0x1000) {
-            sprite.setScale(0x1000, task->panels[4].level, 0x1000);
+        if (task->panels[4].level != ONE) {
+            sprite.setScale(ONE, task->panels[4].level, ONE);
             sprite.setPivot(0, 0x78);
         }
         sprite.setLayerId(task->layer, task->depth - 3);
@@ -951,519 +865,24 @@ DeckIdle *STCRDDEK_createIdle(void *parent) {
     return task;
 }
 
-void STCRDDEK_startTween(NameTween *fade, s32 fadeIn) {
-    fade->active = 1;
-    if (fadeIn != 0) {
-        SOUND.playSound(SOUND_MENU_OPEN);
-        fade->value = 0;
-        fade->step = 0x1000 / fade->duration;
-    } else {
-        SOUND.playSound(SOUND_MENU_CLOSE);
-        fade->value = 0x1000;
-        fade->step = -((0x1000 / fade->duration) * 2);
-    }
-}
-
-s32 STCRDDEK_updateTween(NameTween *fade) {
-    if (fade->active == 0) {
-        return 1;
-    }
-    fade->value += fade->step;
-    if (fade->step > 0) {
-        if (fade->value > 0x1000) {
-            fade->value = 0x1000;
-            fade->active = 0;
-            return 1;
-        }
-    } else if (fade->value < 0) {
-        fade->value = 0;
-        fade->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void STCRDDEK_createNameWindows(NameEntry *task, NameEntryWindows *windows) {
-    s32 i;
-
-    windows->title = createTextWindow(task->layer, 1, 0x20, 0x1A);
-    windows->title->setPalette(windows->title, 4);
-    windows->name = createTextWindow(task->layer, 1, 0x4B, 0x40);
-    windows->name->setSpacing(windows->name, 0x13, 0);
-    windows->name->style = (u8 *)&STCRDDEK_nameStyle;
-    for (i = 0; i < 3; i++) {
-        windows->tabs[i] = createTextWindow(task->layer, 1, 0x2F + i * 0x4E, 0x5B);
-        windows->tabs[i]->setDepth(windows->tabs[i], task->depth - 1);
-        windows->tabs[i]->setLines(windows->tabs[i], 7);
-        windows->tabs[i]->setSpacing(windows->tabs[i], 0xE, 0x12);
-        windows->tabs[i]->style = (u8 *)&STCRDDEK_nameStyle;
-    }
-    windows->leftLabel = createTextWindow(task->layer, 1, 0xCE, 0xC6);
-    windows->rightLabel = createTextWindow(task->layer, 1, 0xE1, 0xC6);
-    windows->l1Label = createTextWindow(task->layer, 1, 0x13, 0x62);
-    windows->l1Label->setDepth(windows->l1Label, task->depth - 1);
-    windows->r1Label = createTextWindow(task->layer, 1, 0x123, 0x62);
-    windows->r1Label->setDepth(windows->r1Label, task->depth - 1);
-    windows->message = createTextWindow(task->layer, 1, 0x3E, 0x72);
-}
-
-void STCRDDEK_showNameWindows(NameEntry *task, NameEntryWindows *windows, s32 show) {
-    s32 i;
-
-    if (show != 0) {
-        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 1);
-        windows->name->setText(windows->name, task->text);
-        windows->name->setPalette(windows->name, 1);
-        for (i = 0; i < 3; i++) {
-            windows->tabs[i]->setString(windows->tabs[i], FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)),
-                                        STCRDDEK_keyboard.tabTexts[task->page].texts[i]);
-            windows->tabs[i]->setPalette(windows->tabs[i], 1);
-        }
-        windows->leftLabel->setString(windows->leftLabel, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0xD);
-        windows->leftLabel->setPalette(windows->leftLabel, 1);
-        windows->rightLabel->setString(windows->rightLabel, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0xE);
-        windows->rightLabel->setPalette(windows->rightLabel, 1);
-        if (STCRDDEK_keyboard.pageCount >= 2) {
-            windows->l1Label->setString(windows->l1Label, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0x10);
-            windows->l1Label->setPalette(windows->l1Label, 1);
-            windows->r1Label->setString(windows->r1Label, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0x11);
-            windows->r1Label->setPalette(windows->r1Label, 1);
-        }
-    } else {
-        windows->title->setVisible(windows->title, 0);
-        windows->name->setVisible(windows->name, 0);
-        for (i = 0; i < 3; i++) {
-            windows->tabs[i]->setVisible(windows->tabs[i], 0);
-        }
-        windows->leftLabel->setVisible(windows->leftLabel, 0);
-        windows->rightLabel->setVisible(windows->rightLabel, 0);
-        windows->l1Label->setVisible(windows->l1Label, 0);
-        windows->r1Label->setVisible(windows->r1Label, 0);
-    }
-}
-
-void STCRDDEK_drawKeyboard(NameEntry *task) {
-    SpriteDrawer sprite;
-    s32 i;
-    s32 key;
-
-    initSpriteDrawer(&sprite);
-    sprite.setTexture(task->imageX, task->imageY);
-    sprite.setLayerId(task->layer, task->depth);
-    if (task->keyboardScale.value != 0) {
-        if (task->active) {
-            if (GFX.funcs.getTime() - task->keyTime >= 5) {
-                task->keyTime = GFX.funcs.getTime();
-                if (++task->keyFrame >= 4) {
-                    task->keyFrame = 0;
-                }
-            }
-            sprite.setClutRow(task->keyFrame);
-            if (task->column < 10 || task->row < 3) {
-                sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x27, task->column * 14 + 0x2F + task->column / 5 * 8,
-                            task->row * 18 + 0x5A);
-            } else {
-                for (i = 0; STCRDDEK_keyboard.pages[task->page].cells[task->row][task->column + i].kind != 1; i--) {
-                }
-                switch (task->column + i + task->row * 15) {
-                case NAME_KEY_LEFT:
-                default:
-                    key = 0;
-                    break;
-                case NAME_KEY_RIGHT:
-                    key = 1;
-                    break;
-                case NAME_KEY_DELETE:
-                    key = 2;
-                    STCRDDEK_bigKeys[2].sprite = NAME_ENTRY_TEXT_SPRITE(0x3C);
-                    break;
-                case NAME_KEY_SPACE:
-                    key = 3;
-                    STCRDDEK_bigKeys[3].sprite = NAME_ENTRY_TEXT_SPRITE(0x44);
-                    break;
-                case NAME_KEY_END:
-                    key = 4;
-                    STCRDDEK_bigKeys[4].sprite = NAME_ENTRY_TEXT_SPRITE(0x4C);
-                    break;
-                }
-                sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), STCRDDEK_bigKeys[key].sprite, STCRDDEK_bigKeys[key].x,
-                            STCRDDEK_bigKeys[key].y);
-            }
-            sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x28, task->cursor * 19 + 0x4B, 0x40);
-            sprite.setClutRow(0);
-        }
-        if (task->keyboardScale.value != 0x1000) {
-            sprite.setScale(task->keyboardScale.value, 0x1000, 0x1000);
-        }
-        if (task->keyboardScale.value != 0x1000) {
-            sprite.setPivot(0x18, 0x20);
-        }
-        sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x1D, 0x18, 0x15);
-        if (task->mode != 2) {
-            if (task->keyboardScale.value != 0x1000) {
-                sprite.setPivot(0x20, 0x3F);
-            }
-            if (task->partner != -1) {
-                if (GFX.funcs.getTime() - task->partnerTime >= 13) {
-                    task->partnerTime = GFX.funcs.getTime();
-                    if (++task->partnerFrame >= 7 || STCRDDEK_nameAnims[task->partner * 7 + task->partnerFrame] == -1) {
-                        task->partnerFrame = 0;
-                    }
-                }
-                sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), STCRDDEK_nameAnims[task->partner * 7 + task->partnerFrame],
-                            0x22, 0x30);
-            } else {
-                sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x36, 0x20, 0x2E);
-            }
-            if (GFX.funcs.getTime() - task->clutTime >= 5) {
-                task->clutTime = GFX.funcs.getTime();
-                if (++task->clutRow >= 14) {
-                    task->clutRow = 0;
-                }
-            }
-            sprite.setLayerId(task->layer, task->depth - 1);
-            sprite.setClutRow(task->clutRow);
-            sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x1F, 0x20, 0x2E);
-            sprite.setClutRow(0);
-            sprite.setLayerId(task->layer, task->depth);
-            sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x1E, 0x20, 0x2E);
-        }
-        if (task->keyboardScale.value != 0x1000) {
-            sprite.setPivot(0x20, 0x49);
-        }
-        if (task->mode != 2) {
-            if (NAME_ENTRY_JAPANESE) {
-                sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x34, 0x4B, 0x40);
-            } else {
-                sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x37, 0x4B, 0x40);
-            }
-        } else {
-            sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x35, 0x4B, 0x40);
-        }
-        if (task->keyboardScale.value != 0x1000) {
-            sprite.setScale(0x1000, task->keyboardScale.value, 0x1000);
-        }
-        if (STCRDDEK_keyboard.pageCount >= 2) {
-            if (GFX.funcs.getTime() - task->arrowTime >= 7) {
-                task->arrowTime = GFX.funcs.getTime();
-                if (++task->arrowFrame >= 6) {
-                    task->arrowFrame = 0;
-                }
-            }
-            sprite.setClutRow(STCRDDEK_keyArrowCluts[task->arrowFrame]);
-            sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x32, 0xA, 0x5E);
-            sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x33, 0x119, 0x5E);
-            sprite.setClutRow(0);
-        }
-        sprite.setClutRow(4);
-        sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x2C, 0xCB, 0xC3);
-        sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x2D, 0xDE, 0xC3);
-        sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), NAME_ENTRY_TEXT_SPRITE(0x3C), 0xCB, 0x99);
-        sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), NAME_ENTRY_TEXT_SPRITE(0x44), 0xCB, 0xAE);
-        sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), NAME_ENTRY_TEXT_SPRITE(0x4C), 0xF6, 0xC3);
-        sprite.setClutRow(0);
-        sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x25, 0x1D, 0x54);
-    }
-    sprite.setLayerId(task->layer, task->depth - 1);
-    if (task->messageScale.value != 0) {
-        if (task->messageScale.value != 0x1000) {
-            sprite.setScale(0x1000, task->messageScale.value, 0x1000);
-            sprite.setPivot(0, 0x78);
-        }
-        sprite.draw(FILE_CACHE.getEntry(STCRDDEK_KEY_SPRITES), 0x26, 0, 0x64);
-    }
-}
-
-void STCRDDEK_updateKeyboard(NameEntry *task, NameEntryWindows *windows) {
-    s32 page;
-    s32 newPage;
-    s32 i;
-    s32 key;
-    s32 j;
-    u16 c;
-    u32 glyph; /* the match depends on this u32 copy of c, which orders the loads of the key's glyph */
-
-    switch (task->substate) {
-    case 0:
-    default:
-        STCRDDEK_startTween(&task->keyboardScale, 1);
-        task->substate++;
-        break;
-    case 1:
-        if (STCRDDEK_updateTween(&task->keyboardScale)) {
-            STCRDDEK_showNameWindows(task, windows, 1);
-            task->active = 1;
-            task->substate++;
-        }
-        break;
-    case 2:
-        if (PAD_PRESSED(PAD_START)) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-            task->column = 13;
-            task->row = 6;
-            break;
-        }
-        if (STCRDDEK_keyboard.pageCount >= 2) {
-            page = task->page;
-            if (!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) {
-                if (--task->page < 0) {
-                    task->page = STCRDDEK_keyboard.pageCount - 1;
-                }
-            } else if (!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) {
-                if (++task->page > STCRDDEK_keyboard.pageCount - 1) {
-                    task->page = 0;
-                }
-            }
-            if (page != task->page) {
-                SOUND.playSound(SOUND_MENU_MOVE);
-                STCRDDEK_showNameWindows(task, windows, 1);
-                if (NAME_ENTRY_JAPANESE) {
-                    newPage = task->page;
-                    if (newPage == 0 || newPage == 1) {
-                        while (STCRDDEK_keyboard.pages[newPage].cells[task->row][task->column].kind != 1) {
-                            if (--task->column < 0) {
-                                task->column = 14;
-                            }
-                        }
-                    } else {
-                        while (STCRDDEK_keyboard.pages[newPage].cells[task->row][task->column].kind == 0) {
-                            if (--task->row < 0) {
-                                task->row = 6;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-            if (STCRDDEK_keyboard.pages[task->page].cells[task->row][task->column].kind < 0) {
-                task->column += STCRDDEK_keyboard.pages[task->page].cells[task->row][task->column].kind;
-            }
-            do {
-                if (--task->column < 0) {
-                    task->column = 14;
-                }
-            } while (STCRDDEK_keyboard.pages[task->page].cells[task->row][task->column].kind != 1);
-            SOUND.playSound(SOUND_MENU_MOVE);
-        } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-            if (STCRDDEK_keyboard.pages[task->page].cells[task->row][task->column].kind < 0) {
-                task->column += STCRDDEK_keyboard.pages[task->page].cells[task->row][task->column].kind;
-            }
-            do {
-                if (++task->column >= 15) {
-                    task->column = 0;
-                }
-            } while (STCRDDEK_keyboard.pages[task->page].cells[task->row][task->column].kind != 1);
-            SOUND.playSound(SOUND_MENU_MOVE);
-        }
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            do {
-                if (--task->row < 0) {
-                    task->row = 6;
-                }
-            } while (STCRDDEK_keyboard.pages[task->page].cells[task->row][task->column].kind == 0);
-            SOUND.playSound(SOUND_MENU_MOVE);
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            do {
-                if (++task->row >= 7) {
-                    task->row = 0;
-                }
-            } while (STCRDDEK_keyboard.pages[task->page].cells[task->row][task->column].kind == 0);
-            SOUND.playSound(SOUND_MENU_MOVE);
-        }
-        if (PAD_PRESSED(PAD_CROSS)) {
-            for (i = 0; STCRDDEK_keyboard.pages[task->page].cells[task->row][task->column + i].kind != 1; i--) {
-            }
-            key = task->row * 15 + task->column + i;
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            switch (key) {
-            case NAME_KEY_LEFT:
-                if (--task->cursor < 0) {
-                    task->cursor = 0;
-                }
-                break;
-            case NAME_KEY_RIGHT:
-                if (++task->cursor > task->maxLength - 1) {
-                    task->cursor = task->maxLength - 1;
-                }
-                break;
-            case NAME_KEY_DELETE:
-                if (task->cursor <= task->maxLength - 1 && task->text[task->cursor] == SJIS_SPACE) {
-                    if (--task->cursor < 0) {
-                        task->cursor = 0;
-                    }
-                }
-                c = ((TextStyle *)windows->name->style)->iconMap[1].code;
-                task->text[task->cursor] = (c >> 8) | ((c & 0xFF) << 8);
-                windows->name->setText(windows->name, task->text);
-                break;
-            case NAME_KEY_SPACE:
-                c = ((TextStyle *)windows->name->style)->iconMap[1].code;
-                task->text[task->cursor] = (c >> 8) | ((c & 0xFF) << 8);
-                if (++task->cursor > task->maxLength - 1) {
-                    task->cursor = task->maxLength - 1;
-                }
-                windows->name->setText(windows->name, task->text);
-                break;
-            case NAME_KEY_END:
-                for (j = 0; j < task->maxLength; j++) {
-                    if (task->text[j] != SJIS_SPACE && task->text[j] != 0) {
-                        for (j = 19; j >= 0; j--) {
-                            if (task->text[j] != SJIS_SPACE) {
-                                task->substate = 100;
-                                return;
-                            }
-                            task->text[j] = 0;
-                        }
-                    }
-                }
-                task->substate = 20;
-                break;
-            default:
-                glyph = ((TextStyle *)windows->name->style)
-                            ->sjisMap[STCRDDEK_keyboard.pages[task->page].cells[task->row][task->column].code]
-                            .code;
-                task->text[task->cursor] = (glyph >> 8) | ((glyph & 0xFF) << 8);
-                windows->name->setText(windows->name, task->text);
-                if (++task->cursor > task->maxLength - 1) {
-                    task->cursor = task->maxLength - 1;
-                    task->column = 13;
-                    task->row = 6;
-                }
-                break;
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            if (task->cursor <= task->maxLength - 1 && task->text[task->cursor] == SJIS_SPACE) {
-                if (--task->cursor < 0) {
-                    task->cursor = 0;
-                }
-            }
-            c = ((TextStyle *)windows->name->style)->iconMap[1].code;
-            task->text[task->cursor] = (c >> 8) | ((c & 0xFF) << 8);
-            windows->name->setText(windows->name, task->text);
-        }
-        break;
-    case 10:
-        STCRDDEK_showNameWindows(task, windows, 0);
-        STCRDDEK_startTween(&task->keyboardScale, 0);
-        task->active = 0;
-        task->substate++;
-        break;
-    case 11:
-        if (STCRDDEK_updateTween(&task->keyboardScale)) {
-            task->state = TASK_DONE;
-        }
-        break;
-    case 20:
-        task->active = 0;
-        STCRDDEK_startTween(&task->messageScale, 1);
-        task->substate++;
-        break;
-    case 21:
-        if (STCRDDEK_updateTween(&task->messageScale)) {
-            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_NAME_ENTRY)), 0x12);
-            task->substate++;
-        }
-        break;
-    case 22:
-        if (PAD_PRESSED(PAD_CROSS)) {
-            windows->message->setVisible(windows->message, 0);
-            STCRDDEK_startTween(&task->messageScale, 0);
-            task->substate++;
-        }
-        break;
-    case 23:
-        if (STCRDDEK_updateTween(&task->messageScale)) {
-            task->active = 1;
-            task->substate = 2;
-        }
-        break;
-    case 100:
-        break;
-    }
-}
-
-void STCRDDEK_updateNameEntry(NameEntry *task, NameEntryWindows *windows) {
-    TimLoader loader;
-
-    switch (task->state) {
-    case TASK_INIT:
-    default:
-        task->nextState(task);
-        initTimLoader(&loader);
-        loader.setImagePos(task->imageX, task->imageY);
-        loader.loadArchive(FILE_CACHE.getEntry(STCRDDEK_FILE_KEYBOARD << 16));
-        if (NAME_ENTRY_JAPANESE) {
-            STCRDDEK_keyboard.pageCount = 3;
-            STCRDDEK_keyboard.tabTexts = STCRDDEK_keyPagesJp;
-            STCRDDEK_keyboard.pages = STCRDDEK_keyCharsJp;
-        } else {
-            STCRDDEK_keyboard.pageCount = 1;
-            STCRDDEK_keyboard.tabTexts = STCRDDEK_keyPages;
-            STCRDDEK_keyboard.pages = STCRDDEK_keyChars;
-        }
-        task->unkBC.duration = 10;
-        task->messageScale.duration = 10;
-        task->keyboardScale.duration = 10;
-        STCRDDEK_createNameWindows(task, windows);
-        break;
-    case TASK_RUN:
-        STCRDDEK_updateKeyboard(task, windows);
-        STCRDDEK_drawKeyboard(task);
-        break;
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
-
-void STCRDDEK_setNameVram(NameEntry *entry, s32 x, s32 y) {
-    entry->imageX = x;
-    entry->imageY = y;
-}
-
-void STCRDDEK_setName(NameEntry *entry, char *text) {
-    TextTools tools;
-    s32 i;
-
-    initTextTools(&tools);
-    tools.convert(entry->text, text, 0);
-    for (i = strlen((char *)entry->text) >> 1; i < entry->maxLength; i++) {
-        entry->text[i] = SJIS_SPACE;
-    }
-}
-
-void STCRDDEK_getName(NameEntry *entry, char *dst) {
-    TextTools tools;
-    s32 i;
-
-    for (i = 0; i < entry->maxLength * 2; i++) {
-        dst[i] = 0;
-    }
-    for (i = entry->maxLength - 1; i >= 0; i--) {
-        if (entry->text[i] != SJIS_SPACE) {
-            break;
-        }
-        entry->text[i] = 0;
-    }
-    for (i = 0; i < entry->maxLength; i++) {
-        if (entry->text[i] != SJIS_SPACE) {
-            break;
-        }
-    }
-    initTextTools(&tools);
-    tools.convert(dst, &entry->text[i], 1);
-}
-
-void STCRDDEK_closeNameEntry(NameEntry *entry) {
-    entry->substate = 10;
-}
+#define START_FADE OVL_NAME(startTween)
+#include "../menu_common/start_fade.inc.c"
+#define UPDATE_FADE OVL_NAME(updateTween)
+#include "../menu_common/update_fade.inc.c"
+#include "../menu_common/name_entry/create_name_windows.inc.c"
+#include "../menu_common/name_entry/show_name_windows.inc.c"
+#include "../menu_common/name_entry/draw_keyboard.inc.c"
+#include "../menu_common/name_entry/update_keyboard.inc.c"
+#include "../menu_common/name_entry/update_name_entry.inc.c"
+#include "../menu_common/name_entry/set_name_vram.inc.c"
+#include "../menu_common/name_entry/set_name.inc.c"
+#include "../menu_common/name_entry/get_name.inc.c"
+#include "../menu_common/name_entry/close_name_entry.inc.c"
 
 NameEntry *STCRDDEK_createNameEntry(char *text) {
     NameEntry *entry = createTask(STCRDDEK_updateNameEntry, sizeof(NameEntry), sizeof(NameEntryWindows));
 
-    entry->getText = STCRDDEK_getName;
+    entry->getName = STCRDDEK_getName;
     entry->close = STCRDDEK_closeNameEntry;
     entry->layer = 0x1000;
     entry->depth = 3;
@@ -1475,93 +894,13 @@ NameEntry *STCRDDEK_createNameEntry(char *text) {
     return entry;
 }
 
-void STCRDDEK_setScrollBarX(ScrollBar *bar, s32 x, s32 width) {
-    bar->x = x;
-    bar->width = width;
-}
-
-void STCRDDEK_setScrollBarRange(ScrollBar *bar, s32 top, s32 bottom) {
-    bar->top = top;
-    bar->bottom = bottom;
-    bar->hasRange = 1;
-}
-
-void STCRDDEK_setScrollBarCount(ScrollBar *bar, s32 pageSize, s32 count) {
-    bar->pageSize = pageSize;
-    bar->count = count;
-    bar->hasCount = 1;
-}
-
-void STCRDDEK_setScrollBarPos(ScrollBar *bar, s32 pos) {
-    bar->pos = pos;
-}
-
-void STCRDDEK_updateScrollBar(ScrollBar *bar) {
-    Layer *layer;
-    u_long *ot;
-    POLY_F4 *poly;
-    s32 range;
-#if VERSION_US
-    s32 pages;
-#endif
-
-    switch (bar->state) {
-    case TASK_INIT:
-    default:
-        if (bar->hasRange != 0 && bar->hasCount != 0) {
-#if VERSION_US
-            bar->nextState(bar);
-            pages = bar->count / bar->pageSize + (bar->count % bar->pageSize != 0);
-            range = (bar->bottom - bar->top) << 8;
-            bar->size = range / pages;
-            bar->posStep = range / bar->count;
-#elif VERSION_EU
-            range = (bar->bottom - bar->top) << 8;
-            bar->size = range / bar->count * bar->pageSize;
-            bar->posStep = range / bar->count;
-            bar->nextState(bar);
-#endif
-        }
-        break;
-    case TASK_RUN:
-        layer = GFX.funcs.getLayer(bar->layer);
-        ot = (u_long *)layer->getOtEntry(layer, bar->depth);
-        poly = GFX.funcs.getPrim();
-        if (bar->pos < bar->count - 1) {
-            bar->y = bar->top + ((bar->pos * bar->posStep) >> 8);
-            if (bar->bottom - (bar->size >> 8) < bar->y) {
-                bar->y = bar->bottom - (bar->size >> 8);
-            }
-        } else {
-            bar->y = bar->bottom - (bar->size >> 8);
-        }
-        setlen(poly, 5);
-        poly->code = 0x28;
-        poly->r0 = poly->g0 = poly->b0 = 0xFF;
-        poly->x0 = poly->x2 = bar->x;
-        poly->x1 = poly->x3 = bar->x + bar->width;
-        poly->y0 = poly->y1 = bar->y;
-        poly->y2 = poly->y3 = bar->y + (bar->size >> 8);
-        addPrim(ot, poly);
-        GFX.funcs.setPrim(poly + 1);
-        break;
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
-
-ScrollBar *STCRDDEK_createScrollBar(void) {
-    ScrollBar *bar = createTask(STCRDDEK_updateScrollBar, sizeof(ScrollBar), 0);
-
-    bar->setX = STCRDDEK_setScrollBarX;
-    bar->setRange = STCRDDEK_setScrollBarRange;
-    bar->setCount = STCRDDEK_setScrollBarCount;
-    bar->setPos = STCRDDEK_setScrollBarPos;
-    bar->layer = 0x1000;
-    bar->depth = 3;
-    return bar;
-}
+#include "../menu_common/set_scroll_bar_x.inc.c"
+#include "../menu_common/set_scroll_bar_range.inc.c"
+#include "../menu_common/set_scroll_bar_count.inc.c"
+#include "../menu_common/set_scroll_bar_pos.inc.c"
+#include "../menu_common/update_scroll_bar.inc.c"
+#define SCROLL_BAR_DEPTH 3
+#include "../menu_common/create_scroll_bar.inc.c"
 
 /* The title, each deck's name and six counts, the two options and the
    cursor, then every window from the title on takes the cursor's depth */
@@ -1625,32 +964,32 @@ void STCRDDEK_drawScreen(DeckScreen *task) {
     sprite.draw(FILE_CACHE.getEntry(STCRDDEK_SPRITES), 8, task->scroll, task->scroll);
     sprite.setLayerId(task->layer, task->depth - 1);
     if (task->panels[0].level != 0) {
-        if (task->panels[0].level != 0x1000) {
-            sprite.setScale(task->panels[0].level, 0x1000, 0x1000);
+        if (task->panels[0].level != ONE) {
+            sprite.setScale(task->panels[0].level, ONE, ONE);
             sprite.setPivot(0x140, 0x22);
         }
         sprite.draw(FILE_CACHE.getEntry(STCRDDEK_SPRITES), 0x30, 0x7B, 0x1C);
     }
     for (i = 0; i < 3; i++) {
         if (task->rowPanels[i].level != 0) {
-            sprite.setScale(task->rowPanels[i].level, 0x1000, 0x1000);
-            if (task->rowPanels[i].level != 0x1000) {
+            sprite.setScale(task->rowPanels[i].level, ONE, ONE);
+            if (task->rowPanels[i].level != ONE) {
                 sprite.setPivot(0x17, 0x63 + i * 0x2D);
             }
             sprite.draw(FILE_CACHE.getEntry(STCRDDEK_SPRITES), 0x41, 0x17, 0x50 + i * 0x2D);
         }
     }
     if (task->panels[1].level != 0) {
-        sprite.setScale(task->panels[1].level, 0x1000, 0x1000);
-        if (task->panels[1].level != 0x1000) {
+        sprite.setScale(task->panels[1].level, ONE, ONE);
+        if (task->panels[1].level != ONE) {
             sprite.setPivot(0x140, 0x37);
         }
         sprite.draw(FILE_CACHE.getEntry(STCRDDEK_SPRITES), 0x2D, 0x92, 0x1C);
     }
     if (task->panels[2].level != 0) {
         sprite.setLayerId(task->layer, task->depth - 2);
-        sprite.setScale(0x1000, task->panels[2].level, 0x1000);
-        if (task->panels[2].level != 0x1000) {
+        sprite.setScale(ONE, task->panels[2].level, ONE);
+        if (task->panels[2].level != ONE) {
             sprite.setPivot(0x17, task->deck * 0x2D + 0x63);
         }
         if (task->chosen == 0) {
@@ -1911,7 +1250,7 @@ void STCRDDEK_updateScreen(DeckScreen *task, DeckScreenChildren *children) {
             case 0:
             default:
                 if (children->name->substate == 100) {
-                    children->name->getText(children->name, GAME.decks[task->deck].name);
+                    children->name->getName(children->name, GAME.decks[task->deck].name);
                     children->name->close(children->name);
                     task->substate++;
                 }
@@ -1977,75 +1316,10 @@ s32 STCRDDEK_filesLoading(void) {
     return FILE_CACHE.isLoading(STCRDDEK_FILE_KEYBOARD) != 0;
 }
 
-void STCRDDEK_startFade(PanelAnim *fade, s32 fadeIn) {
-    fade->active = 1;
-    if (fadeIn != 0) {
-        SOUND.playSound(SOUND_MENU_OPEN);
-        fade->level = 0;
-        fade->step = 0x1000 / fade->duration;
-    } else {
-        SOUND.playSound(SOUND_MENU_CLOSE);
-        fade->level = 0x1000;
-        fade->step = -((0x1000 / fade->duration) * 2);
-    }
-}
-
-s32 STCRDDEK_updateFade(PanelAnim *fade) {
-    if (fade->active == 0) {
-        return 1;
-    }
-    fade->level += fade->step;
-    if (fade->step > 0) {
-        if (fade->level > 0x1000) {
-            fade->level = 0x1000;
-            fade->active = 0;
-            return 1;
-        }
-    } else if (fade->level < 0) {
-        fade->level = 0;
-        fade->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void STCRDDEK_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames) {
-    if (from != to) {
-        lerp->duration = frames;
-        lerp->fixed = from << 8;
-        lerp->value = from;
-        lerp->target = to;
-        lerp->active = 1;
-        lerp->step = ((to - from) << 8) / lerp->duration;
-    }
-}
-
-s32 STCRDDEK_updateLerp(MenuLerp *lerp) {
-    if (lerp->active == 0) {
-        return 1;
-    }
-    lerp->fixed += lerp->step;
-    lerp->value = lerp->fixed >> 8;
-    if (lerp->step > 0) {
-        if (lerp->target < lerp->value) {
-            lerp->value = lerp->target;
-            lerp->active = 0;
-            return 1;
-        }
-    } else if (lerp->value < lerp->target) {
-        lerp->value = lerp->target;
-        lerp->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void STCRDDEK_loadFiles(void);
-s32 STCRDDEK_filesLoading(void);
-void STCRDDEK_startFade(PanelAnim *fade, s32 fadeIn);
-s32 STCRDDEK_updateFade(PanelAnim *fade);
-void STCRDDEK_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
-s32 STCRDDEK_updateLerp(MenuLerp *lerp);
+#include "../menu_common/start_fade.inc.c"
+#include "../menu_common/update_fade.inc.c"
+#include "../menu_common/start_lerp.inc.c"
+#include "../menu_common/update_lerp.inc.c"
 
 /* The CLUT rows of the cursor's frames */
 s32 STCRDDEK_cursorCluts[] = {

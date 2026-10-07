@@ -31,8 +31,8 @@ void STGTRAIN_drawSession(TrainSession *session) {
     sprite.setLayerId(session->layerId, session->depth);
     sprite.setTexture(0x240, 0x100);
     if (session->panels[2].level != 0) {
-        if (session->panels[2].level != 0x1000) {
-            sprite.setScale(session->panels[2].level, session->panels[2].level, 0x1000);
+        if (session->panels[2].level != ONE) {
+            sprite.setScale(session->panels[2].level, session->panels[2].level, ONE);
             sprite.setPivot(0xA6, 0x26);
         }
         if (GFX.funcs.getTime() - session->iconTime >= 0x10) {
@@ -43,26 +43,26 @@ void STGTRAIN_drawSession(TrainSession *session) {
             }
         }
         /* the match depends on i holding the icon too */
-        i = STGTRAIN_state.trainings[session->screen->unk78].icons[session->iconFrame];
+        i = STGTRAIN_state.trainings[session->screen->training].icons[session->iconFrame];
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_FILE_SPRITES << 16), i, 0x94, 0x14);
     }
     if (session->panels[3].level != 0) {
-        if (session->panels[3].level != 0x1000) {
-            sprite.setScale(session->panels[3].level, session->panels[3].level, 0x1000);
+        if (session->panels[3].level != ONE) {
+            sprite.setScale(session->panels[3].level, session->panels[3].level, ONE);
             sprite.setPivot(0xCE, 0x2F);
         }
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x2A, 0xBC, 0x26);
     }
     if (session->panels[1].level != 0) {
-        sprite.setScale(session->panels[1].level, 0x1000, 0x1000);
-        if (session->panels[1].level != 0x1000) {
+        sprite.setScale(session->panels[1].level, ONE, ONE);
+        if (session->panels[1].level != ONE) {
             sprite.setPivot(0x140, 0x26);
         }
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x25, 0x8F, 0xF);
     }
     if (session->panels[0].level != 0) {
-        if (session->panels[0].level != 0x1000) {
-            sprite.setScale(session->panels[0].level, 0x1000, 0x1000);
+        if (session->panels[0].level != ONE) {
+            sprite.setScale(session->panels[0].level, ONE, ONE);
             sprite.setPivot(0x140, 0x4E);
         }
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x26, 0x85, 0x43);
@@ -80,28 +80,28 @@ void STGTRAIN_drawSession(TrainSession *session) {
         sprite.setClutRow(0);
     }
     if (session->panels[6].level != 0) {
-        if (session->panels[6].level != 0x1000) {
-            sprite.setScale(session->panels[6].level, session->panels[6].level, 0x1000);
+        if (session->panels[6].level != ONE) {
+            sprite.setScale(session->panels[6].level, session->panels[6].level, ONE);
         }
         for (i = 0; i < 3; i++) {
-            if (session->panels[6].level != 0x1000) {
+            if (session->panels[6].level != ONE) {
                 sprite.setPivot(i * 40 + 0xA6, 0x6C);
             }
             sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x2A, i * 40 + 0x94, 0x63);
         }
     }
     if (session->panels[5].level != 0) {
-        sprite.setScale(session->panels[5].level, 0x1000, 0x1000);
+        sprite.setScale(session->panels[5].level, ONE, ONE);
         sprite.setPivot(0x140, 0x6C);
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x27, 0x82, 0x5E);
     }
     if (session->panels[7].level != 0) {
-        sprite.setScale(session->panels[7].level, 0x1000, 0x1000);
+        sprite.setScale(session->panels[7].level, ONE, ONE);
         sprite.setPivot(0x140, 0x8D);
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x27, 0x82, 0x7F);
     }
     if (session->panels[4].level != 0) {
-        sprite.setScale(session->panels[4].level, 0x1000, 0x1000);
+        sprite.setScale(session->panels[4].level, ONE, ONE);
         sprite.setPivot(0x140, 0x72);
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x1D, 0x82, 0x5E);
     }
@@ -110,7 +110,7 @@ void STGTRAIN_drawSession(TrainSession *session) {
 /*
  * Runs a training session: opens its panels, picks one of three
  * intensities (it costs STGTRAIN_intensityCosts's points of totals.fields.tp), asks to confirm
- * and closes, with the intensity in the screen's unk7C. The match depends on
+ * and closes, leaving the intensity in the screen's. The match depends on
  * each loop and each cursor's last value having a variable of its own:
  * shared, they take other registers.
  */
@@ -132,7 +132,7 @@ void STGTRAIN_runSession(TrainSession *session, TrainSessionWindows *win) {
         break;
     case 1:
         if (STGTRAIN_state.updateFade(&session->panels[1])) {
-            name = STGTRAIN_state.trainings[session->screen->unk78].name;
+            name = STGTRAIN_state.trainings[session->screen->training].name;
             win->text[1]->setString(win->text[1], FILE_CACHE.load(STGTRAIN_TEXT), name);
             STGTRAIN_state.startFade(&session->panels[2], 1);
             session->substate++;
@@ -186,7 +186,7 @@ void STGTRAIN_runSession(TrainSession *session, TrainSessionWindows *win) {
                 session->substate = 0xA;
             } else {
                 session->substate = 0xF;
-                session->screen->unk7C = session->intensity;
+                session->screen->intensity = session->intensity;
             }
         } else if (PAD_PRESSED(PAD_TRIANGLE)) {
             SOUND.playSound(SOUND_MENU_CANCEL);
@@ -247,25 +247,25 @@ void STGTRAIN_runSession(TrainSession *session, TrainSessionWindows *win) {
             win->text[0]->setString(win->text[0], FILE_CACHE.load(STGTRAIN_TEXT), 9);
             win->answers[0]->setString(win->answers[0], FILE_CACHE.load(STGTRAIN_TEXT), 0xA);
             win->answers[1]->setString(win->answers[1], FILE_CACHE.load(STGTRAIN_TEXT), 0xB);
-            session->unk6C = 0;
+            session->choice = 0;
             win->cursor->setPos(win->cursor, 0x94, 0x64);
             win->cursor->setVisible(win->cursor, 1);
             session->substate++;
         }
         break;
     case 0x12:
-        choice = session->unk6C;
+        choice = session->choice;
         if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            session->unk6C = 0;
+            session->choice = 0;
         } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            session->unk6C = 1;
+            session->choice = 1;
         }
-        if (choice != session->unk6C) {
+        if (choice != session->choice) {
             SOUND.playSound(SOUND_CURSOR);
-            win->cursor->setPos(win->cursor, 0x94, session->unk6C * 16 + 0x64);
+            win->cursor->setPos(win->cursor, 0x94, session->choice * 16 + 0x64);
         } else if (PAD_PRESSED(PAD_CROSS)) {
             SOUND.playSound(SOUND_SELECT);
-            if (session->unk6C == 0) {
+            if (session->choice == 0) {
                 session->substate = 0x19;
                 stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(session->screen->partner));
                 stats->stats[1] -= STGTRAIN_intensityCosts[session->intensity];
@@ -367,7 +367,7 @@ void STGTRAIN_updateSession(TrainSession *session, TrainSessionWindows *win) {
         session->panels[3].duration = 6;
         session->panels[2].duration = 6;
         session->panels[7].duration = 10;
-        session->intensity = session->screen->unk7C;
+        session->intensity = session->screen->intensity;
         break;
     case TASK_RUN:
         STGTRAIN_runSession(session, win);
@@ -460,10 +460,10 @@ void STGTRAIN_updateActor(TrainActor *actor, TrainActorSprites *sprites) {
     case TASK_RUN:
         if (actor->scaleChanged != 0) {
             if (sprites->sprite != NULL) {
-                sprites->sprite->setScale(sprites->sprite, actor->scale, actor->scale, 0x1000);
+                sprites->sprite->setScale(sprites->sprite, actor->scale, actor->scale, ONE);
             }
             if (sprites->effect != NULL) {
-                sprites->effect->setScale(sprites->effect, actor->scale, actor->scale, 0x1000);
+                sprites->effect->setScale(sprites->effect, actor->scale, actor->scale, ONE);
             }
             actor->scaleChanged = 0;
         }
@@ -473,8 +473,8 @@ void STGTRAIN_updateActor(TrainActor *actor, TrainActorSprites *sprites) {
         case 2:
             actor->scale += actor->scaleStep;
             if (actor->scaleStep > 0) {
-                if (actor->scale > 0x1000) {
-                    actor->scale = 0x1000;
+                if (actor->scale > ONE) {
+                    actor->scale = ONE;
                     actor->scaleStep = 0;
                     actor->mode = 1;
                 }
@@ -484,11 +484,11 @@ void STGTRAIN_updateActor(TrainActor *actor, TrainActorSprites *sprites) {
                 actor->mode = 1;
             }
             if (sprites->sprite != NULL) {
-                sprites->sprite->setScale(sprites->sprite, actor->scale, actor->scale, 0x1000);
+                sprites->sprite->setScale(sprites->sprite, actor->scale, actor->scale, ONE);
                 sprites->sprite->setPivot(sprites->sprite, 0xCF, 0x7F);
             }
             if (sprites->effect != NULL) {
-                sprites->effect->setScale(sprites->effect, actor->scale, actor->scale, 0x1000);
+                sprites->effect->setScale(sprites->effect, actor->scale, actor->scale, ONE);
                 sprites->effect->setPivot(sprites->effect, 0xCF, 0x7F);
             }
             break;
@@ -649,7 +649,7 @@ void STGTRAIN_growActor(TrainActor *actor) {
 
 /* Makes the Digimon shrink to nothing (mode 2) */
 void STGTRAIN_shrinkActor(TrainActor *actor) {
-    actor->scale = 0x1000;
+    actor->scale = ONE;
     actor->scaleStep = -0x333;
     actor->mode = 2;
 }
@@ -731,8 +731,8 @@ void STGTRAIN_drawMenu(TrainMenu *menu) {
     sprite.setLayerId(menu->layerId, menu->depth);
     sprite.setTexture(0x240, 0x100);
     if (menu->panels[0].level != 0) {
-        if (menu->panels[0].level != 0x1000) {
-            sprite.setScale(menu->panels[0].level, 0x1000, 0x1000);
+        if (menu->panels[0].level != ONE) {
+            sprite.setScale(menu->panels[0].level, ONE, ONE);
             sprite.setPivot(0x140, 0x4E);
         }
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x22, 0x92, 0x43);
@@ -757,15 +757,15 @@ void STGTRAIN_drawMenu(TrainMenu *menu) {
                 menu->iconFrame = 0;
             }
         }
-        if (menu->panels[2].level != 0x1000) {
-            sprite.setScale(menu->panels[2].level, menu->panels[2].level, 0x1000);
+        if (menu->panels[2].level != ONE) {
+            sprite.setScale(menu->panels[2].level, menu->panels[2].level, ONE);
         }
         for (i = 0; i < 8; i++) {
             entry = menu->trainings[menu->page][i];
             if (entry != 0) {
                 x = (i % 4) * 40;
                 y = (i / 4) * 40;
-                if (menu->panels[2].level != 0x1000) {
+                if (menu->panels[2].level != ONE) {
                     sprite.setPivot(x + 0xA8, y + 0x76);
                 }
                 if (entry == -1) {
@@ -799,15 +799,15 @@ void STGTRAIN_drawMenu(TrainMenu *menu) {
     }
     sprite.setClutRow(0);
     if (menu->panels[1].level != 0) {
-        sprite.setScale(menu->panels[1].level, 0x1000, 0x1000);
-        if (menu->panels[1].level != 0x1000) {
+        sprite.setScale(menu->panels[1].level, ONE, ONE);
+        if (menu->panels[1].level != ONE) {
             sprite.setPivot(0x140, 0x8A);
         }
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x24, 0x8F, 0x5F);
     }
     if (menu->panels[3].level != 0) {
-        if (menu->panels[3].level != 0x1000) {
-            sprite.setScale(menu->panels[3].level, 0x1000, 0x1000);
+        if (menu->panels[3].level != ONE) {
+            sprite.setScale(menu->panels[3].level, ONE, ONE);
             sprite.setPivot(0x140, 0xCD);
         }
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x23, 0x46, 0xBA);
@@ -948,8 +948,8 @@ void STGTRAIN_runMenu(TrainMenu *menu, TextWindow **win) {
             }
         } else if (PAD_PRESSED(PAD_CROSS)) {
             SOUND.playSound(SOUND_MENU_MOVE);
-            menu->screen->unk78 = menu->trainings[menu->page][menu->col + menu->row * 4];
-            if (menu->screen->unk78 > 0) {
+            menu->screen->training = menu->trainings[menu->page][menu->col + menu->row * 4];
+            if (menu->screen->training > 0) {
                 menu->substate = 0x32;
             }
         } else if (PAD_PRESSED(PAD_TRIANGLE)) {
@@ -1077,11 +1077,11 @@ void STGTRAIN_updateMenu(TrainMenu *menu, TextWindow **win) {
                 break;
             }
         }
-        if (menu->screen->unk78 > 0) {
+        if (menu->screen->training > 0) {
             for (page = 0; page < 2; page++) {
                 for (row = 0; row < 2; row++) {
                     for (col = 0; col < 4; col++) {
-                        if (menu->trainings[page][col + row * 4] == menu->screen->unk78) {
+                        if (menu->trainings[page][col + row * 4] == menu->screen->training) {
                             menu->page = page;
                             menu->col = col;
                             menu->row = row;
@@ -1141,73 +1141,10 @@ void STGTRAIN_loadImages(void) {
     loader.loadArchive(FILE_CACHE.getEntry(STGTRAIN_FILE_IMAGES << 16));
 }
 
-/* Starts opening (fadeIn) or closing a panel, with its sound; closing is
-   twice as fast */
-void STGTRAIN_startFade(PanelAnim *fade, s32 fadeIn) {
-    fade->active = 1;
-    if (fadeIn != 0) {
-        SOUND.playSound(SOUND_MENU_OPEN);
-        fade->level = 0;
-        fade->step = 0x1000 / fade->duration;
-    } else {
-        SOUND.playSound(SOUND_MENU_CLOSE);
-        fade->level = 0x1000;
-        fade->step = -((0x1000 / fade->duration) * 2);
-    }
-}
-
-/* Moves a panel's opening or closing on: 1 once it is done */
-s32 STGTRAIN_updateFade(PanelAnim *fade) {
-    if (fade->active == 0) {
-        return 1;
-    }
-    fade->level += fade->step;
-    if (fade->step > 0) {
-        if (fade->level > 0x1000) {
-            fade->level = 0x1000;
-            fade->active = 0;
-            return 1;
-        }
-    } else if (fade->level < 0) {
-        fade->level = 0;
-        fade->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
-/* Starts moving a value from from to to over frames */
-void STGTRAIN_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames) {
-    if (from != to) {
-        lerp->duration = frames;
-        lerp->fixed = from << 8;
-        lerp->value = from;
-        lerp->target = to;
-        lerp->active = 1;
-        lerp->step = ((to - from) << 8) / lerp->duration;
-    }
-}
-
-/* Moves the value on: 1 once it reaches the target */
-s32 STGTRAIN_updateLerp(MenuLerp *lerp) {
-    if (lerp->active == 0) {
-        return 1;
-    }
-    lerp->fixed += lerp->step;
-    lerp->value = lerp->fixed >> 8;
-    if (lerp->step > 0) {
-        if (lerp->target < lerp->value) {
-            lerp->value = lerp->target;
-            lerp->active = 0;
-            return 1;
-        }
-    } else if (lerp->value < lerp->target) {
-        lerp->value = lerp->target;
-        lerp->active = 0;
-        return 1;
-    }
-    return 0;
-}
+#include "../menu_common/start_fade.inc.c"
+#include "../menu_common/update_fade.inc.c"
+#include "../menu_common/start_lerp.inc.c"
+#include "../menu_common/update_lerp.inc.c"
 
 /* Starts loading a file of STGTRAIN_files, unless it is the one loaded */
 s32 STGTRAIN_requestFile(s32 index) {

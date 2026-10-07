@@ -101,7 +101,7 @@ void STDGNAME_updateScreen(ScreenTask *task, ScreenChildren *children) {
 
 void STDGNAME_fadeOutScreen(ScreenTask *task) {
     ScreenChildren *children = task->children;
-    FadeTask *fade;
+    ScreenFade *fade;
 
     children->fade = fade = STDGNAME_createFader();
     fade->start(fade, 0, 30);
@@ -137,34 +137,5 @@ s32 STDGNAME_filesLoading(void) {
     return FILE_CACHE.isLoading(TEXT_FILE(TEXT_NAME_ENTRY)) != 0;
 }
 
-void STDGNAME_startFade(Tween *tween, s32 open) {
-    tween->active = 1;
-    if (open) {
-        SOUND.playSound(SOUND_MENU_OPEN);
-        tween->step = 0x1000 / tween->duration;
-        tween->value = 0;
-    } else {
-        SOUND.playSound(SOUND_MENU_CLOSE);
-        tween->value = 0x1000;
-        tween->step = -(0x1000 / tween->duration * 2);
-    }
-}
-
-s32 STDGNAME_updateFade(Tween *tween) {
-    if (tween->active == 0) {
-        return 1;
-    }
-    tween->value += tween->step;
-    if (tween->step > 0) {
-        if (tween->value > 0x1000) {
-            tween->value = 0x1000;
-            tween->active = 0;
-            return 1;
-        }
-    } else if (tween->value < 0) {
-        tween->value = 0;
-        tween->active = 0;
-        return 1;
-    }
-    return 0;
-}
+#include "../menu_common/start_fade.inc.c"
+#include "../menu_common/update_fade.inc.c"

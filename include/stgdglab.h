@@ -11,12 +11,19 @@
 
 #include "game.h"
 
+/* The name of this overlay's copy of a function of src/menu_common/ */
+#define OVL_NAME(name) STGDGLAB_##name
+
 /* The lab's sprite sheet; the next file is its texture archive */
 #if VERSION_US
 #define FILE_LAB_SPRITES 0x2B6
 #elif VERSION_EU
 #define FILE_LAB_SPRITES 0x2C5
 #endif
+
+/* The flag of a skill marked in the lab (STGDGLAB_updateSkillPanel), in
+   PartnerEntry.skills beside SKILL_KNOWN and SKILL_LAST */
+#define SKILL_MARKED 0x4000
 
 /* The lab's main menu (STGDGLAB_createMenu) */
 typedef struct LabMenu {
@@ -27,10 +34,11 @@ typedef struct LabMenu {
     /* 0x05C */ s32 depth;
     /* 0x060 */ s32 choice; /* into STGDGLAB_screens */
     /* 0x064 */ PanelAnim panels[9];
-    /* 0x0F4 */ s32 unkF4;
-    /* 0x0F8 */ s32 unkF8;
-    /* 0x0FC */ s32 unkFC[5];
-    /* 0x110 */ s32 unk110;
+    /* 0x0F4 */ s32 animTime;
+    /* 0x0F8 */ s32 blinkTime;
+    /* 0x0FC */ s32 frames[5]; /* the party's animations, the picked partner's,
+                                  then the blinking frame's CLUT row */
+    /* 0x110 */ s32 memberCount; /* the members left and right go through */
     /* 0x114 */ void (*open)(struct LabMenu *menu);
     /* 0x118 */ void (*close)(struct LabMenu *menu);
 } LabMenu;
@@ -42,7 +50,8 @@ typedef struct LabMenuWindows {
     /* 0x14 */ TextWindow *statLabels[5];
     /* 0x28 */ TextWindow *statValues[5]; /* STGDGLAB_menuStats */
     /* 0x3C */ TextWindow *name;
-    /* 0x40 */ TextWindow *unk40;
+    /* 0x40 */ TextWindow *entriesHint; /* circle shows the entries (grey
+                                           without a partner) */
     /* 0x44 */ Cursor *cursor;
     /* 0x48 */ struct LabEntryList *panel;
 } LabMenuWindows;
@@ -62,8 +71,9 @@ typedef struct LabPartyScreen {
     /* 0x050 */ struct Lab *lab;
     /* 0x054 */ s32 layer;
     /* 0x058 */ s32 depth;
-    /* 0x05C */ s32 unk5C;
-    /* 0x060 */ s32 unk60;
+    /* 0x05C */ s32 pageRow; /* 1: the page is 0x7A lower, 0 (at the top)
+                                while the entry list is open */
+    /* 0x060 */ s32 pick; /* into partners */
     /* 0x064 */ PanelAnim panels[5];
     /* 0x0B4 */ u8 unkB4[0xC4 - 0xB4];
     /* 0x0C4 */ s32 animTime;
@@ -81,7 +91,7 @@ typedef struct LabPartyScreenWindows {
     /* 0x04 */ TextWindow *labels[5];
     /* 0x18 */ TextWindow *values[5];
     /* 0x2C */ TextWindow *name;
-    /* 0x30 */ TextWindow *unk30;
+    /* 0x30 */ TextWindow *entriesHint; /* as LabMenuWindows' */
     /* 0x34 */ struct LabEntryList *panel;
 } LabPartyScreenWindows;
 
@@ -103,9 +113,9 @@ typedef struct LabSlotScreen {
 typedef struct LabSlotScreenWindows {
     /* 0x00 */ TextWindow *title;
     /* 0x04 */ TextWindow *list[13]; /* two columns: 6, then 7 */
-    /* 0x38 */ TextWindow *unk38[3];
+    /* 0x38 */ TextWindow *slotNames[3]; /* the slots' Digimon */
     /* 0x44 */ TextWindow *options[2];
-    /* 0x4C */ TextWindow *unk4C;
+    /* 0x4C */ TextWindow *message;
     /* 0x50 */ Cursor *cursor;
     /* 0x54 */ struct LabEntryList *entryList;
     /* 0x58 */ struct LabEntryPanel *entryPanel;
@@ -123,7 +133,8 @@ typedef struct LabRecipeScreen {
     /* 0x0B8 */ s32 ownedCount;
     /* 0x0BC */ s32 table; /* into STGDGLAB_data.recipes */
     /* 0x0C0 */ s32 row;
-    /* 0x0C4 */ s32 unkC4[2];
+    /* 0x0C4 */ s32 rowCount;
+    /* 0x0C8 */ s32 nextRow; /* L1 and R1 move to it */
     /* 0x0CC */ s32 slots; /* how many of found[row] are in use */
     /* 0x0D0 */ s32 found[4][4][5]; /* the owned ids of each recipe */
     /* 0x210 */ s32 complete[4]; /* 0: a recipe of the row lacks ids */
@@ -165,12 +176,12 @@ typedef struct LabEntryPanel {
     /* 0x7A */ s16 entries[47]; /* listPartnerEntries */
     /* 0xD8 */ s32 entryCount;
     /* 0xDC */ PanelAnim fades[2];
-    /* 0xFC */ s32 unkFC;
+    /* 0xFC */ s32 option; /* the slot to digivolve to in battle, 3 for none */
 } LabEntryPanel;
 
 typedef struct LabEntryPanelWindows {
     /* 0x00 */ TextWindow *entries[10];
-    /* 0x28 */ TextWindow *unk28;
+    /* 0x28 */ TextWindow *digimonName;
     /* 0x2C */ TextWindow *unk2C;
     /* 0x30 */ TextWindow *skills[6];
     /* 0x48 */ TextWindow *values[14]; /* the battle stats, the resistances, the level */
@@ -199,17 +210,17 @@ typedef struct LabSkillPanel {
 } LabSkillPanel;
 
 typedef struct LabSkillPanelWindows {
-    /* 0x00 */ TextWindow *unk0;
-    /* 0x04 */ TextWindow *unk4;
-    /* 0x08 */ TextWindow *unk8;
+    /* 0x00 */ TextWindow *digimonName;
+    /* 0x04 */ TextWindow *learnedLabel;
+    /* 0x08 */ TextWindow *learned; /* how many skills are marked */
     /* 0x0C */ TextWindow *left[6];
     /* 0x24 */ TextWindow *right[6];
-    /* 0x3C */ TextWindow *unk3C;
-    /* 0x40 */ TextWindow *unk40;
-    /* 0x44 */ TextWindow *unk44;
+    /* 0x3C */ TextWindow *message;
+    /* 0x40 */ TextWindow *yes;
+    /* 0x44 */ TextWindow *no;
     /* 0x48 */ TextWindow *help;
-    /* 0x4C */ TextWindow *unk4C;
-    /* 0x50 */ TextWindow *unk50;
+    /* 0x4C */ TextWindow *mpLabel;
+    /* 0x50 */ TextWindow *mp; /* the picked skill's */
     /* 0x54 */ Cursor *optionCursor;
     /* 0x58 */ Cursor *cursor;
 } LabSkillPanelWindows;
@@ -221,8 +232,8 @@ typedef struct LabEntryList {
     /* 0x054 */ s32 partner;
     /* 0x058 */ s32 layer;
     /* 0x05C */ s32 depth;
-    /* 0x060 */ PanelAnim unk60;
-    /* 0x070 */ PanelAnim unk70;
+    /* 0x060 */ PanelAnim titlePanel; /* their levels follow fade's */
+    /* 0x070 */ PanelAnim listPanel;
     /* 0x080 */ PanelAnim fade;
     /* 0x090 */ s32 ids[50]; /* the partner's slots, then (allEntries) its other entries */
     /* 0x158 */ s32 scroll;
@@ -237,7 +248,7 @@ typedef struct LabEntryList {
 typedef struct LabEntryListWindows {
     /* 0x00 */ TextWindow *title;
     /* 0x04 */ TextWindow *options[3];
-    /* 0x10 */ TextWindow *unk10;
+    /* 0x10 */ TextWindow *digimonName;
     /* 0x14 */ TextWindow *unk14;
     /* 0x18 */ TextWindow *skills[6];
     /* 0x30 */ TextWindow *values[14]; /* the battle stats, the resistances, the level */
@@ -251,7 +262,7 @@ typedef struct Lab {
     /* 0x50 */ s32 layer;
     /* 0x54 */ s32 blinkPos;
     /* 0x58 */ s32 blinkSkip;
-    /* 0x5C */ s32 unk5C;
+    /* 0x5C */ s32 partySize; /* the party's slots: PARTY_SIZE */
     /* 0x60 */ s32 partyCount;
     /* 0x64 */ s32 member; /* the party member the screens show */
     /* 0x68 */ s32 (*openMenu)(struct Lab *lab);
@@ -267,17 +278,6 @@ typedef struct LabChildren {
     /* 0x8 */ ScreenFade *fade;
 } LabChildren;
 
-/* Moves a value towards a target in fixed point */
-typedef struct LabLerp {
-    /* 0x00 */ s32 duration;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 value;
-    /* 0x0C */ s32 fixed; /* value << 8 */
-    /* 0x10 */ s32 target;
-    /* 0x14 */ s32 step;
-    /* 0x18 */ s32 active;
-} LabLerp;
-
 /* An entry of STGDGLAB_entries */
 typedef struct LabEntry {
     /* 0x0 */ s16 id;
@@ -291,8 +291,8 @@ typedef struct LabFuncs {
     /* 0x04 */ s32 (*filesLoading)(void);
     /* 0x08 */ void (*startFade)(PanelAnim *fade, s32 fadeIn);
     /* 0x0C */ s32 (*updateFade)(PanelAnim *fade);
-    /* 0x10 */ void (*startLerp)(LabLerp *lerp, s32 from, s32 to, s32 frames);
-    /* 0x14 */ s32 (*updateLerp)(LabLerp *lerp);
+    /* 0x10 */ void (*startLerp)(MenuLerp *lerp, s32 from, s32 to, s32 frames);
+    /* 0x14 */ s32 (*updateLerp)(MenuLerp *lerp);
     /* 0x18 */ s32 (*getSprite)(s32 id);
     /* 0x1C */ s32 (*getB)(s32 id);
 } LabFuncs;
@@ -326,7 +326,7 @@ void STGDGLAB_updatePartyScreen(LabPartyScreen *screen, void *children);
 void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children);
 void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *windows);
 LabEntryList *STGDGLAB_createEntryList(s32 partner, s32 allEntries, s32 closable);
-void func_8008C234(LabSkillPanel *panel, LabSkillPanelWindows *windows);
+void STGDGLAB_updateSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windows);
 void STGDGLAB_updateEntryList(LabEntryList *panel, LabEntryListWindows *windows);
 void STGDGLAB_createEntryListWindows(LabEntryList *panel, LabEntryListWindows *windows);
 void STGDGLAB_runEntryList(LabEntryList *panel, LabEntryListWindows *windows);
@@ -354,10 +354,12 @@ void STGDGLAB_loadFiles(void);
 s32 STGDGLAB_filesLoading(void);
 void STGDGLAB_startFade(PanelAnim *fade, s32 fadeIn);
 s32 STGDGLAB_updateFade(PanelAnim *fade);
-void STGDGLAB_startLerp(LabLerp *lerp, s32 from, s32 to, s32 frames);
-s32 STGDGLAB_updateLerp(LabLerp *lerp);
+void STGDGLAB_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
+s32 STGDGLAB_updateLerp(MenuLerp *lerp);
 s32 STGDGLAB_getItemSprite(s32 id);
 s32 func_8008EC48(s32 id);
+s32 STGDGLAB_findRecipe(LabRecipeScreen *screen, s32 row, u32 col, s32 slot);
+void STGDGLAB_drawRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *win);
 
 /* STGDGLAB's data, in its order: the first object's, the fourth's and the
    fifth's */

@@ -22,6 +22,9 @@
 #include "game.h"
 #include <libpress.h>
 
+/* The name of this overlay's copy of a function of src/menu_common/ */
+#define OVL_NAME(name) STDWTITL_##name
+
 /* Draw layers of the screens */
 #define STDWTITL_SPLASH_LAYER 0x100
 #define STDWTITL_TITLE_LAYER 0x1000
@@ -253,31 +256,12 @@ typedef struct TitleImages {
     /* 0x4 */ s32 sprites; /* sprite bank */
 } TitleImages;
 
-/* A value going from one number to another, in 24.8 fixed point */
-typedef struct Tween {
-    /* 0x00 */ s32 duration;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 value;
-    /* 0x0C */ s32 fixed;
-    /* 0x10 */ s32 target;
-    /* 0x14 */ s32 step;
-    /* 0x18 */ s32 active;
-} Tween;
-
-/* A fade in or out, stepped once per frame */
-typedef struct Fade {
-    /* 0x0 */ s32 duration;
-    /* 0x4 */ s32 step;
-    /* 0x8 */ s32 level;
-    /* 0xC */ s32 active;
-} Fade;
-
 typedef struct TitleFuncs {
     /* 0x00 */ void (*loadImages)(void);
-    /* 0x04 */ void (*startFade)(Fade *fade, s32 fadeIn);
-    /* 0x08 */ s32 (*stepFade)(Fade *fade);
-    /* 0x0C */ void (*startTween)(Tween *tween, s32 from, s32 to, s32 duration);
-    /* 0x10 */ s32 (*stepTween)(Tween *tween);
+    /* 0x04 */ void (*startFade)(PanelAnim *fade, s32 fadeIn);
+    /* 0x08 */ s32 (*updateFade)(PanelAnim *fade);
+    /* 0x0C */ void (*startLerp)(MenuLerp *lerp, s32 from, s32 to, s32 duration);
+    /* 0x10 */ s32 (*updateLerp)(MenuLerp *lerp);
 } TitleFuncs;
 
 /* Executable symbols */
@@ -398,9 +382,9 @@ s32 STDWTITL_stepTitle(TitleTask *task, TitleChildren *children);
 void STDWTITL_tickTitle(TitleTask *task, TitleChildren *children);
 TitleTask *STDWTITL_startTitleTask(Task *parent);
 void STDWTITL_loadTitleImages(void);
-void STDWTITL_startFade(Fade *fade, s32 fadeIn);
-s32 STDWTITL_stepFade(Fade *fade);
-void STDWTITL_startTween(Tween *tween, s32 from, s32 to, s32 duration);
-s32 STDWTITL_stepTween(Tween *tween);
+void STDWTITL_startFade(PanelAnim *fade, s32 fadeIn);
+s32 STDWTITL_updateFade(PanelAnim *fade);
+void STDWTITL_startLerp(MenuLerp *tween, s32 from, s32 to, s32 duration);
+s32 STDWTITL_updateLerp(MenuLerp *tween);
 
 #endif /* STDWTITL_H */

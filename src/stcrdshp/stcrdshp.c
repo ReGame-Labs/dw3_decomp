@@ -1,12 +1,5 @@
 #include "stcrdshp.h"
 
-void STCRDSHP_drawCards(CardPackGrid *grid, s32 previous);
-void STCRDSHP_drawTurningSlots(CardPackGrid *grid);
-void STCRDSHP_updateHiding(CardPackGrid *grid);
-void STCRDSHP_createPackOpenWindows(CardPackOpen *open, CardPackOpenWindows *win);
-void STCRDSHP_drawPackOpen(CardPackOpen *open);
-void STCRDSHP_runPackOpen(CardPackOpen *open, CardPackOpenWindows *win);
-
 /* Creates the screen's windows and cursor */
 void STCRDSHP_createPackOpenWindows(CardPackOpen *open, CardPackOpenWindows *win) {
     s32 i;
@@ -178,8 +171,8 @@ void STCRDSHP_drawPackOpen(CardPackOpen *open) {
     sprite.setTexture(0x280, 0);
     sprite.setLayerId(open->layer, open->depth);
     if (open->fades[0].level != 0) {
-        if (open->fades[0].level != 0x1000) {
-            sprite.setScale(0x1000, open->fades[0].level, 0x1000);
+        if (open->fades[0].level != ONE) {
+            sprite.setScale(ONE, open->fades[0].level, ONE);
             sprite.setPivot(0xA0, 0x5C);
         } else {
             for (i = 0; i < 8; i++) {
@@ -213,8 +206,8 @@ void STCRDSHP_drawPackOpen(CardPackOpen *open) {
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x2B, 0, 0x32);
     }
     if (open->fades[1].level != 0) {
-        if (open->fades[1].level != 0x1000) {
-            sprite.setScale(open->fades[1].level, 0x1000, 0x1000);
+        if (open->fades[1].level != ONE) {
+            sprite.setScale(open->fades[1].level, ONE, ONE);
             sprite.setPivot(0x140, 0x8F);
         } else {
             sprite.setTexture(0x140, 0);
@@ -225,8 +218,8 @@ void STCRDSHP_drawPackOpen(CardPackOpen *open) {
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x2E, 0x79, 0x83);
     }
     if (open->fades[2].level != 0) {
-        sprite.setScale(0x1000, open->fades[2].level, 0x1000);
-        if (open->fades[2].level != 0x1000) {
+        sprite.setScale(ONE, open->fades[2].level, ONE);
+        if (open->fades[2].level != ONE) {
             sprite.setPivot(0xA0, 0xCF);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x2A, 0, 0xBD);
@@ -235,8 +228,8 @@ void STCRDSHP_drawPackOpen(CardPackOpen *open) {
         card = open->cards[open->card];
         initCardDrawer(&drawer);
         drawer.setCard(card);
-        sprite.setScale(open->fades[3].level, 0x1000, 0x1000);
-        if (open->fades[3].level != 0x1000) {
+        sprite.setScale(open->fades[3].level, ONE, ONE);
+        if (open->fades[3].level != ONE) {
             sprite.setPivot(0x140, 0x87);
         }
         kind = drawer.getKind();
@@ -249,16 +242,16 @@ void STCRDSHP_drawPackOpen(CardPackOpen *open) {
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), frame, 0x103, 0x7E);
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0xD, 0xFC, 0x7C);
-        if (open->fades[3].level != 0x1000) {
+        if (open->fades[3].level != ONE) {
             sprite.setPivot(0x140, 0x87);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0xA, 0x82, 0x7C);
-        if (open->fades[3].level != 0x1000) {
+        if (open->fades[3].level != ONE) {
             sprite.setPivot(0x140, 0xAF);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x10, 0x103, 0xA4);
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0xD, 0xFC, 0xA2);
-        if (open->fades[3].level != 0x1000) {
+        if (open->fades[3].level != ONE) {
             sprite.setPivot(0x140, 0xA5);
         }
         if (kind != 0) {
@@ -574,77 +567,11 @@ CardPackOpen *STCRDSHP_createPackOpen(CardShop *shop) {
     return open;
 }
 
-void STCRDSHP_startFader(ScreenFade *task, s32 fadeIn, s32 duration) {
-    task->setState(task, TASK_RUN);
-    task->substate = 1;
-    task->fadeIn = fadeIn;
-    if (fadeIn == 0) {
-        task->level = 0;
-        task->levelStep = 0xFF00 / duration;
-    } else {
-        task->level = 0xFF00;
-        task->levelStep = -(0xFF00 / duration);
-    }
-}
-
-void STCRDSHP_drawFader(ScreenFade *task) {
-    Layer *layer = GFX.funcs.getLayer(task->layerId);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, task->depth);
-    POLY_F4 *poly = GFX.funcs.getPrim();
-    DR_TPAGE *mode;
-
-    setlen(poly, 5);
-    poly->code = 0x2A;
-    poly->r0 = poly->g0 = poly->b0 = task->level >> 8;
-    poly->x0 = poly->x2 = 0;
-    poly->x1 = poly->x3 = 320;
-    poly->y0 = poly->y1 = 0;
-    poly->y2 = poly->y3 = 256;
-    addPrim(ot, poly);
-    mode = (DR_TPAGE *)(poly + 1);
-    setlen(mode, 1);
-    mode->code[0] = 0xE1000245;
-    addPrim(ot, mode);
-    GFX.funcs.setPrim(mode + 1);
-}
-
-void STCRDSHP_updateFader(ScreenFade *task) {
-    switch (task->state) {
-    case 0:
-    default:
-        task->nextState(task);
-        break;
-    case 1:
-        if (task->substate == 0) {
-            break;
-        }
-        task->level += task->levelStep;
-        if (task->fadeIn == 0) {
-            if (task->level > 0xFF00) {
-                task->level = 0xFF00;
-                task->state = 2;
-            }
-        } else if (task->level < 0) {
-            task->level = 0;
-            task->state = 2;
-        }
-        /* fallthrough */
-    case 2:
-        STCRDSHP_drawFader(task);
-        break;
-    case 3:
-        break;
-    }
-}
-
-ScreenFade *STCRDSHP_createFader(void) {
-    ScreenFade *task = createTask(STCRDSHP_updateFader, sizeof(ScreenFade), 0);
-
-    task->start = STCRDSHP_startFader;
-    task->layerId = 0x1000;
-    task->depth = 0;
-    return task;
-}
+#include "../menu_common/start_fader.inc.c"
+#include "../menu_common/draw_fader.inc.c"
+#include "../menu_common/update_fader.inc.c"
+#define FADER_DEPTH 0
+#include "../menu_common/create_fader.inc.c"
 
 void STCRDSHP_loadIcons(CardPackGrid *grid) {
     CardDrawer icon;

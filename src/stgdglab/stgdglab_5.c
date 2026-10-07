@@ -10,7 +10,7 @@ void STGDGLAB_createEntryListWindows(LabEntryList *panel, LabEntryListWindows *w
     for (i = 0; i < 3; i++) {
         windows->options[i] = createTextWindow(panel->layer, 1, 0xA7, i * 0xE + 0x31);
     }
-    windows->unk10 = createTextWindow(panel->layer, 1, 0x5B, 0x6A);
+    windows->digimonName = createTextWindow(panel->layer, 1, 0x5B, 0x6A);
     for (i = 0; i < 6; i++) {
         windows->values[i] = createTextWindow(panel->layer, 1, 0x7D, i * 0xE + 0x7F);
     }
@@ -72,7 +72,7 @@ void STGDGLAB_showEntryList(LabEntryList *panel, LabEntryListWindows *windows, s
             GAME.funcs.getPartnerEntry(panel->partner, id, &entry);
             GAME.funcs.computeStats(panel->partner, &totals);
             data = GET_DIGIMON(id);
-            windows->unk10->setString(windows->unk10, FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), data->nameId);
+            windows->digimonName->setString(windows->digimonName, FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), data->nameId);
             windows->unk14->setString(windows->unk14, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x13);
             windows->values[13]->setNumber(windows->values[13], 0, entry.level);
             for (i = 0; i < 6; i++) {
@@ -100,7 +100,7 @@ void STGDGLAB_showEntryList(LabEntryList *panel, LabEntryListWindows *windows, s
                                                   entry.skills[i] & SKILL_ID);
                     if (entry.skills[i] & SKILL_LAST) {
                         windows->skills[i]->setPalette(windows->skills[i], 3);
-                    } else if (entry.skills[i] & 0x4000) {
+                    } else if (entry.skills[i] & SKILL_MARKED) {
                         windows->skills[i]->setPalette(windows->skills[i], 4);
                     } else {
                         windows->skills[i]->setPalette(windows->skills[i], 0);
@@ -113,7 +113,7 @@ void STGDGLAB_showEntryList(LabEntryList *panel, LabEntryListWindows *windows, s
                 windows->values[i]->setRightAlign(windows->values[i], 1);
             }
         } else {
-            windows->unk10->setVisible(windows->unk10, 0);
+            windows->digimonName->setVisible(windows->digimonName, 0);
             windows->unk14->setVisible(windows->unk14, 0);
             for (i = 0; i < 14; i++) {
                 windows->values[i]->setVisible(windows->values[i], 0);
@@ -230,7 +230,7 @@ void STGDGLAB_runEntryList(LabEntryList *panel, LabEntryListWindows *windows) {
         panel->substate = 2;
         break;
     }
-    panel->unk60.level = panel->unk70.level = panel->fade.level;
+    panel->titlePanel.level = panel->listPanel.level = panel->fade.level;
 }
 
 /* Draws the panel's frames, its scroll arrows and the icons of the skills
@@ -243,18 +243,18 @@ void STGDGLAB_drawEntryList(LabEntryList *panel, LabEntryListWindows *windows) {
     initSpriteDrawer(&sprite);
     sprite.setTexture(0x280, 0x100);
     sprite.setLayerId(panel->layer, panel->depth);
-    if (panel->unk60.level != 0x1000) {
-        sprite.setScale(panel->unk60.level, 0x1000, 0x1000);
+    if (panel->titlePanel.level != ONE) {
+        sprite.setScale(panel->titlePanel.level, ONE, ONE);
         sprite.setPivot(0x140, 0x15);
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x20, 0x92, 0xF);
-    if (panel->unk70.level != 0x1000) {
-        sprite.setScale(panel->unk70.level, 0x1000, 0x1000);
+    if (panel->listPanel.level != ONE) {
+        sprite.setScale(panel->listPanel.level, ONE, ONE);
         sprite.setPivot(0x140, 0x45);
     } else {
-        sprite.setScale(0x1000, 0x1000, 0x1000);
+        sprite.setScale(ONE, ONE, ONE);
     }
-    if (panel->unk70.level == 0x1000) {
+    if (panel->listPanel.level == ONE) {
         if (GFX.funcs.getTime() - panel->blinkTime >= 8) {
             panel->blinkTime = GFX.funcs.getTime();
             panel->blink = 1 - panel->blink;
@@ -270,11 +270,11 @@ void STGDGLAB_drawEntryList(LabEntryList *panel, LabEntryListWindows *windows) {
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x22, 0x92, 0x2A);
     if (panel->count > 0) {
-        if (panel->fade.level != 0x1000) {
-            sprite.setScale(panel->unk70.level, 0x1000, 0x1000);
+        if (panel->fade.level != ONE) {
+            sprite.setScale(panel->listPanel.level, ONE, ONE);
             sprite.setPivot(0x140, 0xA4);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x2A, 0x54, 0x64);
         sprite.setTexture(0x140, 0);
@@ -320,8 +320,8 @@ void STGDGLAB_updateEntryList(LabEntryList *panel, LabEntryListWindows *windows)
         STGDGLAB_createEntryListWindows(panel, windows);
         windows->cursor = createCursor(panel->layer, panel->depth - 1, 0x9A, panel->cursor * 0xE + 0x31);
         windows->cursor->setVisible(windows->cursor, 0);
-        panel->unk60.duration = 10;
-        panel->unk70.duration = 10;
+        panel->titlePanel.duration = 10;
+        panel->listPanel.duration = 10;
         panel->fade.duration = 10;
         break;
     case TASK_RUN:
@@ -417,7 +417,7 @@ void STGDGLAB_updateLab(Lab *lab, LabChildren *children) {
         case 1:
             if (STGDGLAB_data.funcs.filesLoading() == 0) {
                 lab->nextState(lab);
-                lab->unk5C = 3;
+                lab->partySize = PARTY_SIZE;
                 STGDGLAB_packParty(lab);
             }
             break;
@@ -526,68 +526,10 @@ s32 STGDGLAB_filesLoading(void) {
     return FILE_CACHE.isLoading(TEXT_FILE(TEXT_SKILL_INFO)) != 0;
 }
 
-void STGDGLAB_startFade(PanelAnim *fade, s32 fadeIn) {
-    fade->active = 1;
-    if (fadeIn != 0) {
-        SOUND.playSound(SOUND_MENU_OPEN);
-        fade->level = 0;
-        fade->step = 0x1000 / fade->duration;
-    } else {
-        SOUND.playSound(SOUND_MENU_CLOSE);
-        fade->level = 0x1000;
-        fade->step = -((0x1000 / fade->duration) * 2);
-    }
-}
-
-s32 STGDGLAB_updateFade(PanelAnim *fade) {
-    if (fade->active == 0) {
-        return 1;
-    }
-    fade->level += fade->step;
-    if (fade->step > 0) {
-        if (fade->level > 0x1000) {
-            fade->level = 0x1000;
-            fade->active = 0;
-            return 1;
-        }
-    } else if (fade->level < 0) {
-        fade->level = 0;
-        fade->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void STGDGLAB_startLerp(LabLerp *lerp, s32 from, s32 to, s32 frames) {
-    if (from != to) {
-        lerp->duration = frames;
-        lerp->fixed = from << 8;
-        lerp->value = from;
-        lerp->target = to;
-        lerp->active = 1;
-        lerp->step = ((to - from) << 8) / lerp->duration;
-    }
-}
-
-s32 STGDGLAB_updateLerp(LabLerp *lerp) {
-    if (lerp->active == 0) {
-        return 1;
-    }
-    lerp->fixed += lerp->step;
-    lerp->value = lerp->fixed >> 8;
-    if (lerp->step > 0) {
-        if (lerp->target < lerp->value) {
-            lerp->value = lerp->target;
-            lerp->active = 0;
-            return 1;
-        }
-    } else if (lerp->value < lerp->target) {
-        lerp->value = lerp->target;
-        lerp->active = 0;
-        return 1;
-    }
-    return 0;
-}
+#include "../menu_common/start_fade.inc.c"
+#include "../menu_common/update_fade.inc.c"
+#include "../menu_common/start_lerp.inc.c"
+#include "../menu_common/update_lerp.inc.c"
 
 s32 STGDGLAB_getItemSprite(s32 id) {
     s32 i;

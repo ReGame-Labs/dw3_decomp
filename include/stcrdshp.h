@@ -7,6 +7,9 @@
 
 #include "game.h"
 
+/* The name of this overlay's copy of a function of src/menu_common/ */
+#define OVL_NAME(name) STCRDSHP_##name
+
 /* A card pack: the item and the six lists of 16 cards its slots draw from */
 typedef struct CardPack {
     /* 0x00 */ s32 item;
@@ -217,5 +220,14 @@ CardShop *STCRDSHP_createShop(void);
 CardPackOpen *STCRDSHP_createPackOpen(CardShop *shop); /* opens a pack */
 CardShopBuy *STCRDSHP_createBuy(CardShop *shop, s32 shopId); /* buys cards */
 CardPackGrid *STCRDSHP_createGrid(Task *owner, s32 *cards);
+void STCRDSHP_drawCards(CardPackGrid *grid, s32 previous);
+void STCRDSHP_drawTurningSlots(CardPackGrid *grid);
+void STCRDSHP_updateHiding(CardPackGrid *grid);
+void STCRDSHP_createPackOpenWindows(CardPackOpen *open, CardPackOpenWindows *win);
+void STCRDSHP_drawPackOpen(CardPackOpen *open);
+void STCRDSHP_runPackOpen(CardPackOpen *open, CardPackOpenWindows *win);
+void STCRDSHP_runBuy(CardShopBuy *buy, CardShopBuyWindows *win);
+void STCRDSHP_drawBuy(CardShopBuy *buy);
+void STCRDSHP_updateBuy(CardShopBuy *buy, CardShopBuyWindows *win);
 
 #endif

@@ -4,9 +4,6 @@
 
 #include "ststatus.h"
 
-void STSTATUS_moveMapCursor(StatusMapScreen *screen, s32 dx, s32 dy);
-void STSTATUS_drawMapScreen(StatusMapScreen *screen);
-
 /* Finds the area under the cursor and shows its name */
 void STSTATUS_showMapArea(StatusMapScreen *screen, TextWindow **windows) {
     s32 wasHovering = screen->hovering;
@@ -345,94 +342,13 @@ Task *STSTATUS_createMapScreen(FieldMenuScreen *menu, s32 extra) {
     return (Task *)screen;
 }
 
-void STSTATUS_setScrollBarX(ScrollBar *bar, s32 x, s32 width) {
-    bar->x = x;
-    bar->width = width;
-}
-
-void STSTATUS_setScrollBarRange(ScrollBar *bar, s32 top, s32 bottom) {
-    bar->top = top;
-    bar->bottom = bottom;
-    bar->hasRange = 1;
-}
-
-void STSTATUS_setScrollBarCount(ScrollBar *bar, s32 pageSize, s32 count) {
-    bar->pageSize = pageSize;
-    bar->count = count;
-    bar->hasCount = 1;
-}
-
-void STSTATUS_setScrollBarPos(ScrollBar *bar, s32 pos) {
-    bar->pos = pos;
-}
-
-void STSTATUS_updateScrollBar(ScrollBar *bar) {
-    Layer *layer;
-    u_long *ot;
-    POLY_F4 *poly;
-    s32 range;
-#if VERSION_US
-    s32 pages;
-#endif
-
-    switch (bar->state) {
-    case TASK_INIT:
-    default:
-        if (bar->hasRange != 0 && bar->hasCount != 0) {
-#if VERSION_US
-            bar->nextState(bar);
-            pages = bar->count / bar->pageSize + (bar->count % bar->pageSize != 0);
-            range = (bar->bottom - bar->top) << 8;
-            bar->size = range / pages;
-            bar->posStep = range / bar->count;
-#elif VERSION_EU
-            /* the European version sizes the thumb for the visible items */
-            range = (bar->bottom - bar->top) << 8;
-            bar->size = range / bar->count * bar->pageSize;
-            bar->posStep = range / bar->count;
-            bar->nextState(bar);
-#endif
-        }
-        break;
-    case TASK_RUN:
-        layer = GFX.funcs.getLayer(bar->layer);
-        ot = (u_long *)layer->getOtEntry(layer, bar->depth);
-        poly = GFX.funcs.getPrim();
-        if (bar->pos < bar->count - 1) {
-            bar->y = bar->top + ((bar->pos * bar->posStep) >> 8);
-            if (bar->bottom - (bar->size >> 8) < bar->y) {
-                bar->y = bar->bottom - (bar->size >> 8);
-            }
-        } else {
-            bar->y = bar->bottom - (bar->size >> 8);
-        }
-        setlen(poly, 5);
-        poly->code = 0x28;
-        poly->r0 = poly->g0 = poly->b0 = 0xFF;
-        poly->x0 = poly->x2 = bar->x;
-        poly->x1 = poly->x3 = bar->x + bar->width;
-        poly->y0 = poly->y1 = bar->y;
-        poly->y2 = poly->y3 = bar->y + (bar->size >> 8);
-        addPrim(ot, poly);
-        GFX.funcs.setPrim(poly + 1);
-        break;
-    case TASK_DONE:
-    case TASK_KILL:
-        break;
-    }
-}
-
-ScrollBar *STSTATUS_createScrollBar(void) {
-    ScrollBar *bar = createTask(STSTATUS_updateScrollBar, sizeof(ScrollBar), 0);
-
-    bar->setX = STSTATUS_setScrollBarX;
-    bar->setRange = STSTATUS_setScrollBarRange;
-    bar->setCount = STSTATUS_setScrollBarCount;
-    bar->setPos = STSTATUS_setScrollBarPos;
-    bar->layer = 0x1000;
-    bar->depth = 0;
-    return bar;
-}
+#include "../menu_common/set_scroll_bar_x.inc.c"
+#include "../menu_common/set_scroll_bar_range.inc.c"
+#include "../menu_common/set_scroll_bar_count.inc.c"
+#include "../menu_common/set_scroll_bar_pos.inc.c"
+#include "../menu_common/update_scroll_bar.inc.c"
+#define SCROLL_BAR_DEPTH 0
+#include "../menu_common/create_scroll_bar.inc.c"
 
 void STSTATUS_runScreens(FieldMenuScreen *menu, FieldMenuScreenChildren *children) {
     Task *(*open)(FieldMenuScreen *, s32);
@@ -576,39 +492,10 @@ s32 STSTATUS_filesLoading(void) {
     return FILE_CACHE.isLoading(TEXT_FILE(TEXT_SKILL_INFO)) != 0;
 }
 
-void STSTATUS_startFade(PanelAnim *fade, s32 fadeIn) {
-    fade->active = 1;
-    if (fadeIn != 0) {
-        SOUND.playSound(SOUND_MENU_OPEN);
-        fade->level = 0;
-        fade->step = 0x1000 / fade->duration;
-    } else {
-        SOUND.playSound(SOUND_MENU_CLOSE);
-        fade->level = 0x1000;
-        fade->step = -((0x1000 / fade->duration) * 2);
-    }
-}
+#include "../menu_common/start_fade.inc.c"
+#include "../menu_common/update_fade.inc.c"
 
-s32 STSTATUS_updateFade(PanelAnim *fade) {
-    if (fade->active == 0) {
-        return 1;
-    }
-    fade->level += fade->step;
-    if (fade->step > 0) {
-        if (fade->level > 0x1000) {
-            fade->level = 0x1000;
-            fade->active = 0;
-            return 1;
-        }
-    } else if (fade->level < 0) {
-        fade->level = 0;
-        fade->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void STSTATUS_startLerp(StatusLerp *lerp, s32 from, s32 to, s32 frames) {
+void STSTATUS_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames) {
     if (from != to) {
         SOUND.playSound(SOUND_MENU_OPEN);
         lerp->duration = frames;
@@ -620,25 +507,7 @@ void STSTATUS_startLerp(StatusLerp *lerp, s32 from, s32 to, s32 frames) {
     }
 }
 
-s32 STSTATUS_updateLerp(StatusLerp *lerp) {
-    if (lerp->active == 0) {
-        return 1;
-    }
-    lerp->fixed += lerp->step;
-    lerp->value = lerp->fixed >> 8;
-    if (lerp->step > 0) {
-        if (lerp->target < lerp->value) {
-            lerp->value = lerp->target;
-            lerp->active = 0;
-            return 1;
-        }
-    } else if (lerp->value < lerp->target) {
-        lerp->value = lerp->target;
-        lerp->active = 0;
-        return 1;
-    }
-    return 0;
-}
+#include "../menu_common/update_lerp.inc.c"
 
 s32 *STSTATUS_getTowns(s32 list, s32 index) {
     return STSTATUS_townLists[list][index];

@@ -1,12 +1,5 @@
 #include "stcrdabm.h"
 
-void STCRDABM_loadFiles(void);
-s32 STCRDABM_filesLoading(void);
-void STCRDABM_startFade(PanelAnim *fade, s32 fadeIn);
-s32 STCRDABM_updateFade(PanelAnim *fade);
-void STCRDABM_startLerp(CardAlbumLerp *lerp, s32 from, s32 to, s32 frames);
-s32 STCRDABM_updateLerp(CardAlbumLerp *lerp);
-
 /* The cursor's CLUT row on each frame of its blink */
 s32 STCRDABM_cursorBlink[6] = {0, 1, 2, 3, 2, 1};
 
@@ -15,81 +8,11 @@ CardAlbumFuncs STCRDABM_funcs = {
     STCRDABM_updateFade, STCRDABM_startLerp, STCRDABM_updateLerp,
 };
 
-void STCRDABM_drawFader(CardAlbumFader *fader);
-void STCRDABM_drawCards(CardAlbumGrid *grid, s32 previous);
-s32 STCRDABM_pageHasCards(CardAlbumGrid *grid);
-void STCRDABM_showCardInfo(CardAlbum *album, CardAlbumWindows *win, s32 show);
-void STCRDABM_drawAlbum(CardAlbum *album);
-
-void STCRDABM_startFader(CardAlbumFader *fader, s32 fadeIn, s32 frames) {
-    fader->setState(fader, 1);
-    fader->substate = 1;
-    fader->fadeIn = fadeIn;
-    if (fadeIn == 0) {
-        fader->level = 0;
-        fader->levelStep = 0xFF00 / frames;
-    } else {
-        fader->level = 0xFF00;
-        fader->levelStep = -(0xFF00 / frames);
-    }
-}
-
-void STCRDABM_drawFader(CardAlbumFader *fader) {
-    Layer *layer = GFX.funcs.getLayer(fader->layer);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, fader->depth);
-    POLY_F4 *poly = GFX.funcs.getPrim();
-    DR_TPAGE *mode;
-
-    setlen(poly, 5);
-    poly->code = 0x2A;
-    poly->r0 = poly->g0 = poly->b0 = fader->level >> 8;
-    poly->x0 = poly->x2 = 0;
-    poly->x1 = poly->x3 = 320;
-    poly->y0 = poly->y1 = 0;
-    poly->y2 = poly->y3 = 256;
-    addPrim(ot, poly);
-    mode = (DR_TPAGE *)(poly + 1);
-    setlen(mode, 1);
-    mode->code[0] = 0xE1000245;
-    addPrim(ot, mode);
-    GFX.funcs.setPrim(mode + 1);
-}
-
-void STCRDABM_updateFader(CardAlbumFader *fader) {
-    switch (fader->state) {
-    case 0:
-    default:
-        fader->nextState(fader);
-        break;
-    case 1:
-        if (fader->substate == 0) {
-            break;
-        }
-        fader->level += fader->levelStep;
-        if (fader->fadeIn == 0) {
-            if (fader->level > 0xFF00) {
-                fader->level = 0xFF00;
-                fader->state = 2;
-            }
-        } else if (fader->level < 0) {
-            fader->level = 0;
-            fader->state = 2;
-        }
-    case 2:
-        STCRDABM_drawFader(fader);
-    case 3:
-        break;
-    }
-}
-
-CardAlbumFader *STCRDABM_createFader(void) {
-    CardAlbumFader *fader = createTask(STCRDABM_updateFader, sizeof(CardAlbumFader), 0);
-
-    fader->start = STCRDABM_startFader;
-    fader->layer = 0x1000;
-    fader->depth = 0;
-    return fader;
-}
+#include "../menu_common/start_fader.inc.c"
+#include "../menu_common/draw_fader.inc.c"
+#include "../menu_common/update_fader.inc.c"
+#define FADER_DEPTH 0
+#include "../menu_common/create_fader.inc.c"
 
 void STCRDABM_loadIcons(CardAlbumGrid *grid) {
     CardDrawer icon;
@@ -327,8 +250,6 @@ CardAlbumGrid *STCRDABM_createGrid(CardAlbum *album) {
     return grid;
 }
 
-Task *STCRDABM_createAlbum(void);
-
 void STCRDABM_updateScene(Task *task, Task **items) {
     RECT rect;
     Layer *res;
@@ -495,17 +416,17 @@ void STCRDABM_drawAlbum(CardAlbum *album) {
     sprite.draw(FILE_CACHE.getEntry(STCRDABM_SPRITES), 8, album->frame, album->frame);
     sprite.setLayerId(album->layer, album->depth - 2);
     if (album->fade.level != 0) {
-        if (album->fade.level != 0x1000) {
-            sprite.setScale(album->fade.level, 0x1000, 0x1000);
+        if (album->fade.level != ONE) {
+            sprite.setScale(album->fade.level, ONE, ONE);
             sprite.setPivot(0, 0x20);
         }
         sprite.draw(FILE_CACHE.getEntry(STCRDABM_SPRITES), 9, 0, 0x15);
-        if (album->fade.level != 0x1000) {
+        if (album->fade.level != ONE) {
             sprite.setPivot(0x140, 0x20);
         }
         sprite.draw(FILE_CACHE.getEntry(STCRDABM_SPRITES), 0xF, 0xC8, 0x15);
-        if (album->fade.level != 0x1000) {
-            sprite.setScale(album->fade.level, album->fade.level, 0x1000);
+        if (album->fade.level != ONE) {
+            sprite.setScale(album->fade.level, album->fade.level, ONE);
             sprite.setPivot(0x3A, 0xA5);
         }
         sprite.draw(FILE_CACHE.getEntry(STCRDABM_SPRITES), 0xE, 0x22, 0x9A);
@@ -540,8 +461,8 @@ void STCRDABM_drawAlbum(CardAlbum *album) {
     if (album->infoFade.level != 0) {
         initCardDrawer(&icon);
         icon.setCard(album->card);
-        if (album->infoFade.level != 0x1000) {
-            sprite.setScale(album->infoFade.level, 0x1000, 0x1000);
+        if (album->infoFade.level != ONE) {
+            sprite.setScale(album->infoFade.level, ONE, ONE);
             sprite.setPivot(0x140, 0xA8);
         }
         kind = icon.getKind();
@@ -554,16 +475,16 @@ void STCRDABM_drawAlbum(CardAlbum *album) {
         }
         sprite.draw(FILE_CACHE.getEntry(STCRDABM_SPRITES), frame, 0x103, 0x9F);
         sprite.draw(FILE_CACHE.getEntry(STCRDABM_SPRITES), 0xD, 0xFC, 0x9D);
-        if (album->infoFade.level != 0x1000) {
+        if (album->infoFade.level != ONE) {
             sprite.setPivot(0x140, 0xA8);
         }
         sprite.draw(FILE_CACHE.getEntry(STCRDABM_SPRITES), 0xA, 0x82, 0x9D);
-        if (album->infoFade.level != 0x1000) {
+        if (album->infoFade.level != ONE) {
             sprite.setPivot(0x140, 0xD0);
         }
         sprite.draw(FILE_CACHE.getEntry(STCRDABM_SPRITES), 0x10, 0x103, 0xC5);
         sprite.draw(FILE_CACHE.getEntry(STCRDABM_SPRITES), 0xD, 0xFC, 0xC3);
-        if (album->infoFade.level != 0x1000) {
+        if (album->infoFade.level != ONE) {
             sprite.setPivot(0x140, 0xC6);
         }
         if (kind != 0) {
@@ -847,65 +768,7 @@ s32 STCRDABM_filesLoading(void) {
     return FILE_CACHE.isLoading(TEXT_FILE(TEXT_CARD_ALBUM)) != 0;
 }
 
-void STCRDABM_startFade(PanelAnim *fade, s32 fadeIn) {
-    fade->active = 1;
-    if (fadeIn != 0) {
-        SOUND.playSound(SOUND_MENU_OPEN);
-        fade->level = 0;
-        fade->step = 0x1000 / fade->duration;
-    } else {
-        SOUND.playSound(SOUND_MENU_CLOSE);
-        fade->level = 0x1000;
-        fade->step = -((0x1000 / fade->duration) * 2);
-    }
-}
-
-s32 STCRDABM_updateFade(PanelAnim *fade) {
-    if (fade->active == 0) {
-        return 1;
-    }
-    fade->level += fade->step;
-    if (fade->step > 0) {
-        if (fade->level > 0x1000) {
-            fade->level = 0x1000;
-            fade->active = 0;
-            return 1;
-        }
-    } else if (fade->level < 0) {
-        fade->level = 0;
-        fade->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void STCRDABM_startLerp(CardAlbumLerp *lerp, s32 from, s32 to, s32 frames) {
-    if (from != to) {
-        lerp->duration = frames;
-        lerp->fixed = from << 8;
-        lerp->value = from;
-        lerp->target = to;
-        lerp->active = 1;
-        lerp->step = ((to - from) << 8) / lerp->duration;
-    }
-}
-
-s32 STCRDABM_updateLerp(CardAlbumLerp *lerp) {
-    if (lerp->active == 0) {
-        return 1;
-    }
-    lerp->fixed += lerp->step;
-    lerp->value = lerp->fixed >> 8;
-    if (lerp->step > 0) {
-        if (lerp->target < lerp->value) {
-            lerp->value = lerp->target;
-            lerp->active = 0;
-            return 1;
-        }
-    } else if (lerp->value < lerp->target) {
-        lerp->value = lerp->target;
-        lerp->active = 0;
-        return 1;
-    }
-    return 0;
-}
+#include "../menu_common/start_fade.inc.c"
+#include "../menu_common/update_fade.inc.c"
+#include "../menu_common/start_lerp.inc.c"
+#include "../menu_common/update_lerp.inc.c"

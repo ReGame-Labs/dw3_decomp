@@ -17,7 +17,7 @@ s32 STGTRAIN_raiseStat(TrainResult *result, s32 stat) {
     if (result->training < 0xD) {
         column = 0;
     }
-    column += result->unkD8 * 3 + result->screen->unk7C;
+    column += result->bonusWorked * 3 + result->screen->intensity;
     if (STGTRAIN_statGains[column].range != 0) {
         gained = STGTRAIN_statGains[column].base + RANDOM.next() % STGTRAIN_statGains[column].range;
     } else {
@@ -41,7 +41,7 @@ s32 STGTRAIN_lowerStat(TrainResult *result, s32 stat) {
         return 0;
     }
     value = &stats->stats[stat + 5];
-    column = result->screen->unk7C;
+    column = result->screen->intensity;
     if (STGTRAIN_statLosses[column].range != 0) {
         lost = STGTRAIN_statLosses[column].base + RANDOM.next() % STGTRAIN_statLosses[column].range;
     } else {
@@ -82,14 +82,14 @@ s32 STGTRAIN_raiseResistance(TrainResult *result, s32 stat) {
     }
     /* the match depends on column being set in each branch: set before the
        test, its delay slot copy keeps a0 live where the table's lui wants it */
-    if (result->unkD8 == 0) {
+    if (result->bonusWorked == 0) {
         column = 0;
     } else if (result->training < 0xD) {
         column = 1;
     } else {
         column = 2;
     }
-    column += result->screen->unk7C * 3;
+    column += result->screen->intensity * 3;
     if (gains[column].range != 0) {
         gained = gains[column].base + RANDOM.next() % gains[column].range;
     } else {
@@ -131,14 +131,14 @@ s32 STGTRAIN_raiseMaxHpMp(TrainResult *result, s32 stat) {
 #endif
     }
     column = 0;
-    if (result->unkD8 != 0) {
+    if (result->bonusWorked != 0) {
         if (result->training < 0xD) {
             column = 1;
         } else {
             column = 2;
         }
     }
-    column += result->screen->unk7C * 3;
+    column += result->screen->intensity * 3;
     if (STGTRAIN_maxHpMpGains[column].range != 0) {
         gained = STGTRAIN_maxHpMpGains[column].base + RANDOM.next() % STGTRAIN_maxHpMpGains[column].range;
     } else {
@@ -243,9 +243,9 @@ void STGTRAIN_createResultWindows(TrainResult *result, TrainResultWindows *win) 
     win->message[0] = createTextWindow(result->layerId, 1, 0x74, 0xC0);
     win->message[0]->setLines(win->message[0], 2);
     win->message[1] = createTextWindow(result->layerId, 1, 0x74, 0xCE);
-    win->unk8[0] = createTextWindow(0x1002, 1, 0xA2, 0x75);
-    win->unk8[1] = createTextWindow(0x1002, 1, 0xA2, 0x91);
-    win->unk8[2] = createTextWindow(0x1002, 1, 0xA2, 0xA1);
+    win->question[0] = createTextWindow(0x1002, 1, 0xA2, 0x75);
+    win->question[1] = createTextWindow(0x1002, 1, 0xA2, 0x91);
+    win->question[2] = createTextWindow(0x1002, 1, 0xA2, 0xA1);
     win->cursor = createCursor(0x1002, result->depth - 1, 0x94, 0x91);
     win->cursor->setVisible(win->cursor, 0);
 }
@@ -258,32 +258,32 @@ void STGTRAIN_drawResult(TrainResult *result) {
     SpriteDrawer sprite;
     s32 i;
 
-    if (result->unkE4 != 0) {
+    if (result->prompting != 0) {
         initSpriteDrawer(&sprite);
         sprite.setLayerId(0x1002, 3);
         sprite.setTexture(0x140, 0);
-        if (GFX.funcs.getTime() - result->unkEC >= 4) {
-            result->unkEC = GFX.funcs.getTime();
-            result->unkE8++;
-            if (result->unkE8 >= 5) {
-                result->unkE8 = 0;
+        if (GFX.funcs.getTime() - result->arrowTime >= 4) {
+            result->arrowTime = GFX.funcs.getTime();
+            result->arrowClut++;
+            if (result->arrowClut >= 5) {
+                result->arrowClut = 0;
             }
         }
-        sprite.setClutRow(result->unkE8);
+        sprite.setClutRow(result->arrowClut);
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0xA, 0x124, 0xCD);
     }
     initSpriteDrawer(&sprite);
     sprite.setTexture(0x240, 0x100);
     sprite.setLayerId(result->layerId, result->depth);
-    if (result->unkD4 != 0) {
-        if (GFX.funcs.getTime() - result->unkE0 >= 3) {
-            result->unkE0 = GFX.funcs.getTime();
-            result->unkDC = 1 - result->unkDC;
+    if (result->bonusTrying != 0) {
+        if (GFX.funcs.getTime() - result->bonusBlinkTime >= 3) {
+            result->bonusBlinkTime = GFX.funcs.getTime();
+            result->bonusBlink = 1 - result->bonusBlink;
         }
-        sprite.setClutRow(result->unkDC + 1);
+        sprite.setClutRow(result->bonusBlink + 1);
     }
     for (i = 0; i < 5; i++) {
-        if (result->unkD8 != 0 && i == 3) {
+        if (result->bonusWorked != 0 && i == 3) {
             sprite.setClutRow(3);
         }
         if (result->trained[i] == 1) {
@@ -294,30 +294,30 @@ void STGTRAIN_drawResult(TrainResult *result) {
     }
     sprite.setClutRow(0);
     if (result->panels[0].level != 0) {
-        if (result->panels[0].level != 0x1000) {
-            sprite.setScale(result->panels[0].level, result->panels[0].level, 0x1000);
+        if (result->panels[0].level != ONE) {
+            sprite.setScale(result->panels[0].level, result->panels[0].level, ONE);
             sprite.setPivot(0xCF, 0x7F);
         }
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x28, 0x72, 0x4B);
     }
     if (result->panels[1].level != 0) {
-        if (result->panels[1].level != 0x1000) {
-            sprite.setScale(result->panels[1].level, 0x1000, 0x1000);
+        if (result->panels[1].level != ONE) {
+            sprite.setScale(result->panels[1].level, ONE, ONE);
             sprite.setPivot(0x140, 0xCD);
         }
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x23, 0x46, 0xBA);
     }
     sprite.setLayerId(0x1002, result->depth);
     if (result->panels[2].level != 0) {
-        if (result->panels[2].level != 0x1000) {
-            sprite.setScale(result->panels[2].level, 0x1000, 0x1000);
+        if (result->panels[2].level != ONE) {
+            sprite.setScale(result->panels[2].level, ONE, ONE);
             sprite.setPivot(0x140, 0x7B);
         }
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x26, 0x85, 0x70);
     }
     if (result->panels[3].level != 0) {
-        if (result->panels[3].level != 0x1000) {
-            sprite.setScale(result->panels[3].level, 0x1000, 0x1000);
+        if (result->panels[3].level != ONE) {
+            sprite.setScale(result->panels[3].level, ONE, ONE);
             sprite.setPivot(0x140, 0x9F);
         }
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x1D, 0x82, 0x8B);
@@ -405,14 +405,14 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
         break;
     case 4:
         if (win->actor->mode & 1) {
-            result->unkE4 = 1;
+            result->prompting = 1;
             result->substate++;
         }
         break;
     case 5:
         if (PAD_PRESSED(PAD_CROSS)) {
             SOUND.playSound(SOUND_MENU_CONFIRM);
-            result->unkE4 = 0;
+            result->prompting = 0;
             entry = (TrainEntry *)STGTRAIN_state.findTableEntry(result->modeArg, result->training);
             if (entry->stat != 0) {
                 sums[0] = 0;
@@ -520,16 +520,16 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
         if (win->message[0]->isFinished(win->message[0])) {
             SOUND.playSound(SOUND_MENU_CONFIRM);
             result->substate = 0x32;
-            result->unkE4 = 0;
+            result->prompting = 0;
             result->screen->showStats(result->screen, NULL);
         } else if (win->message[0]->isWaitingForButton(win->message[0])) {
-            result->unkE4 = 1;
+            result->prompting = 1;
             if (PAD_PRESSED(PAD_CROSS)) {
                 SOUND.playSound(SOUND_MENU_CONFIRM);
-                result->unkE4 = 0;
+                result->prompting = 0;
             }
         } else {
-            result->unkE4 = 0;
+            result->prompting = 0;
             if (PAD_PRESSED(PAD_CROSS)) {
                 win->message[0]->showPage(win->message[0]);
             }
@@ -538,7 +538,7 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
     case 0xA:
         if (result->training < 0xD) {
             result->substate = 0x14;
-            result->unkD4 = 1;
+            result->bonusTrying = 1;
             win->actor->play(win->actor);
             result->bonusSound = SOUND.playSound(0xA084603C);
         } else {
@@ -551,15 +551,15 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
         break;
     case 0xC:
         if (STGTRAIN_state.updateFade(&result->panels[2])) {
-            win->unk8[0]->setString(win->unk8[0], FILE_CACHE.load(STGTRAIN_TEXT), 0x11);
+            win->question[0]->setString(win->question[0], FILE_CACHE.load(STGTRAIN_TEXT), 0x11);
             STGTRAIN_state.startFade(&result->panels[3], 1);
             result->substate++;
         }
         break;
     case 0xD:
         if (STGTRAIN_state.updateFade(&result->panels[3])) {
-            win->unk8[1]->setString(win->unk8[1], FILE_CACHE.load(STGTRAIN_TEXT), 0xC);
-            win->unk8[2]->setString(win->unk8[2], FILE_CACHE.load(STGTRAIN_TEXT), 0xD);
+            win->question[1]->setString(win->question[1], FILE_CACHE.load(STGTRAIN_TEXT), 0xC);
+            win->question[2]->setString(win->question[2], FILE_CACHE.load(STGTRAIN_TEXT), 0xD);
             win->cursor->setPos(win->cursor, 0x94, result->before.fields.spare * 16 + 0x91);
             win->cursor->setVisible(win->cursor, 1);
             result->substate++;
@@ -593,9 +593,9 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
     case 0xF:
         STGTRAIN_state.startFade(&result->panels[2], 0);
         STGTRAIN_state.startFade(&result->panels[3], 0);
-        win->unk8[0]->setVisible(win->unk8[0], 0);
-        win->unk8[1]->setVisible(win->unk8[1], 0);
-        win->unk8[2]->setVisible(win->unk8[2], 0);
+        win->question[0]->setVisible(win->question[0], 0);
+        win->question[1]->setVisible(win->question[1], 0);
+        win->question[2]->setVisible(win->question[2], 0);
         win->cursor->setVisible(win->cursor, 0);
         result->substate++;
         break;
@@ -604,7 +604,7 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
         if (STGTRAIN_state.updateFade(&result->panels[3])) {
             if (result->counter == 0) {
                 result->substate = 0x14;
-                result->unkD4 = 1;
+                result->bonusTrying = 1;
                 win->actor->play(win->actor);
                 result->bonusSound = SOUND.playSound(0xA084603C);
                 stats = GAME.funcs.getPartnerStats(result->partner);
@@ -626,7 +626,7 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
             stats = GAME.funcs.getPartnerStats(result->partner);
             if (result->trained[3] != 0) {
                 stats->unk3CC[0] = result->training;
-                result->unkD8 = 1;
+                result->bonusWorked = 1;
             } else {
                 stats->unk3CC[0] = 0;
             }
@@ -637,8 +637,8 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
             }
             SOUND.keyOff(0xA084603C, result->bonusSound);
             STGTRAIN_applyTry(result, 3);
-            result->unkE4 = 1;
-            result->unkD4 = 0;
+            result->prompting = 1;
+            result->bonusTrying = 0;
             result->setSubstate(result, 3);
         }
         break;
@@ -746,7 +746,7 @@ TrainIdle *STGTRAIN_createIdle(TrainScreen *screen) {
 }
 
 /* The data: this object's tables */
-/* The battle stats a training raises, by [training >= 13][unkD8][level] */
+/* The battle stats a training raises, by [training >= 13][bonusWorked][level] */
 TrainGain STGTRAIN_statGains[] = {
     {1, 2}, {7, 2}, {14, 3},
     {2, 0}, {10, 0}, {20, 0},
@@ -757,7 +757,7 @@ TrainGain STGTRAIN_statGains[] = {
 TrainGain STGTRAIN_statLosses[] = {
     {1, 0}, {2, 3}, {4, 3},
 };
-/* The resistance gains, by [unkD8 ? (training < 13 ? 1 : 2) : 0][level] */
+/* The resistance gains, by [bonusWorked ? (training < 13 ? 1 : 2) : 0][level] */
 TrainGain STGTRAIN_resistGainsLow[] = {
     {1, 0}, {1, 0}, {2, 0},
     {4, 2}, {8, 0}, {12, 0},

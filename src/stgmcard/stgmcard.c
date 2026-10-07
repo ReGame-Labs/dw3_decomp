@@ -1,25 +1,5 @@
 #include "stgmcard.h"
 
-extern MemCardScreenFuncs STGMCARD_funcs;
-extern SaveIcon STGMCARD_saveIcon;
-
-void func_800833A0();
-void func_80082E28();
-void func_80082904();
-void func_80086BA0();
-void func_80083B10();
-
-Task *func_80087174(void);
-void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win);
-void func_80086E5C();
-extern MemCardWindowSpec STGMCARD_detailWindows[];
-extern s32 STGMCARD_partnerAnims[][7];
-extern s32 STGMCARD_partnerIcons[];
-extern s32 STGMCARD_slotIconX[];
-extern s32 STGMCARD_errorTexts[]; /* the texts of the results, by count */
-extern s32 STGMCARD_modeValues[];
-extern MemCardModeEntry STGMCARD_prevModes[];
-
 void STGMCARD_updateScene(MemCardScene *task, Task **children) {
     RECT rect;
     Layer *layer;
@@ -36,7 +16,7 @@ void STGMCARD_updateScene(MemCardScene *task, Task **children) {
         rect.h = 0xF0;
         layer = GFX.funcs.createLayer(&rect, 2, 0x1000);
         layer->setBgColor(layer, 0, 0, 0);
-        children[0] = (Task *)func_80087174();
+        children[0] = (Task *)STGMCARD_createScreen();
         task->nextState(task);
         break;
     case TASK_RUN:
@@ -50,77 +30,11 @@ Task *STGMCARD_start(void) {
     return createTask(STGMCARD_updateScene, sizeof(MemCardScene), 4);
 }
 
-void STGMCARD_startFader(ScreenFade *task, s32 fadeIn, s32 duration) {
-    task->setState(task, TASK_RUN);
-    task->substate = 1;
-    task->fadeIn = fadeIn;
-    if (fadeIn == 0) {
-        task->level = 0;
-        task->levelStep = 0xFF00 / duration;
-    } else {
-        task->level = 0xFF00;
-        task->levelStep = -(0xFF00 / duration);
-    }
-}
-
-void STGMCARD_drawFader(ScreenFade *task) {
-    Layer *layer = GFX.funcs.getLayer(task->layerId);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, task->depth);
-    POLY_F4 *poly = GFX.funcs.getPrim();
-    DR_TPAGE *mode;
-
-    setlen(poly, 5);
-    poly->code = 0x2A;
-    poly->r0 = poly->g0 = poly->b0 = task->level >> 8;
-    poly->x0 = poly->x2 = 0;
-    poly->x1 = poly->x3 = 320;
-    poly->y0 = poly->y1 = 0;
-    poly->y2 = poly->y3 = 256;
-    addPrim(ot, poly);
-    mode = (DR_TPAGE *)(poly + 1);
-    setlen(mode, 1);
-    mode->code[0] = 0xE1000245;
-    addPrim(ot, mode);
-    GFX.funcs.setPrim(mode + 1);
-}
-
-void STGMCARD_updateFader(ScreenFade *task) {
-    switch (task->state) {
-    case 0:
-    default:
-        task->nextState(task);
-        break;
-    case 1:
-        if (task->substate == 0) {
-            break;
-        }
-        task->level += task->levelStep;
-        if (task->fadeIn == 0) {
-            if (task->level > 0xFF00) {
-                task->level = 0xFF00;
-                task->state = 2;
-            }
-        } else if (task->level < 0) {
-            task->level = 0;
-            task->state = 2;
-        }
-        /* fallthrough */
-    case 2:
-        STGMCARD_drawFader(task);
-        break;
-    case 3:
-        break;
-    }
-}
-
-ScreenFade *STGMCARD_createFader(void) {
-    ScreenFade *task = createTask(STGMCARD_updateFader, sizeof(ScreenFade), 0);
-
-    task->start = STGMCARD_startFader;
-    task->layerId = 0x1000;
-    task->depth = 0;
-    return task;
-}
+#include "../menu_common/start_fader.inc.c"
+#include "../menu_common/draw_fader.inc.c"
+#include "../menu_common/update_fader.inc.c"
+#define FADER_DEPTH 0
+#include "../menu_common/create_fader.inc.c"
 
 void STGMCARD_showInfo(MemCardInfo *info) {
     info->setSubstate(info, 1);
@@ -140,7 +54,7 @@ void STGMCARD_hideInfo(MemCardInfo *info) {
 }
 
 /* Fills the details window with the selected save, or hides it */
-void func_80082904(MemCardInfo *info) {
+void STGMCARD_refreshInfo(MemCardInfo *info) {
     MemCardSave *save;
     TextWindow **windows;
     TextWindow **w;
@@ -164,8 +78,8 @@ void func_80082904(MemCardInfo *info) {
         }
     } else {
         windows[0]->setString(windows[0], save, -1);
-        windows[1]->setString(windows[1], FILE_CACHE.load(TEXT_FILE(TEXT_AREA_NAMES)), save->unk18);
-        windows[2]->setString(windows[2], FILE_CACHE.load(TEXT_FILE(TEXT_SHOP_NAMES)), save->unk1C);
+        windows[1]->setString(windows[1], FILE_CACHE.load(TEXT_FILE(TEXT_AREA_NAMES)), save->area);
+        windows[2]->setString(windows[2], FILE_CACHE.load(TEXT_FILE(TEXT_SHOP_NAMES)), save->place);
         for (i = 0; i < 2; i++) {
             windows[i + 3]->setString(windows[i + 3], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x15);
         }
@@ -211,7 +125,7 @@ void func_80082904(MemCardInfo *info) {
 
 /* The details window's task: creates its text windows, fades it in and out,
    and draws the selected save's partners and frame */
-void func_80082E28(MemCardInfo *info) {
+void STGMCARD_updateInfo(MemCardInfo *info) {
     SpriteDrawer sprite;
     TextWindow **windows;
     s32 *partners;
@@ -264,26 +178,26 @@ void func_80082E28(MemCardInfo *info) {
             default:
                 STGMCARD_funcs.startFade(&info->fade, 0);
                 info->shown = 0;
-                func_80082904(info);
+                STGMCARD_refreshInfo(info);
                 info->step++;
                 break;
             case 1:
                 if (STGMCARD_funcs.updateFade(&info->fade) != 0) {
-                    info->unk5C = 0;
+                    info->drawing = 0;
                     info->setSubstate(info, 0);
                 }
                 break;
             }
             break;
         }
-        if (info->unk5C == 0) {
+        if (info->drawing == 0) {
             break;
         }
         initSpriteDrawer(&sprite);
         sprite.setTexture(0x280, 0);
         sprite.setLayerId(info->layer, info->depth);
-        if (info->fade.level != 0x1000) {
-            sprite.setScale(0x1000, info->fade.level, 0x1000);
+        if (info->fade.level != ONE) {
+            sprite.setScale(ONE, info->fade.level, ONE);
             sprite.setPivot(160, 148);
         }
         partners = info->saves->file.saves[STGMCARD_funcs.slot].partners;
@@ -317,11 +231,11 @@ void func_80082E28(MemCardInfo *info) {
 }
 
 MemCardInfo *STGMCARD_createInfo(MemCardSaves *saves) {
-    MemCardInfo *info = createTask(func_80082E28, sizeof(MemCardInfo), 0x4C);
+    MemCardInfo *info = createTask(STGMCARD_updateInfo, sizeof(MemCardInfo), 0x4C);
 
     info->show = STGMCARD_showInfo;
     info->hide = STGMCARD_hideInfo;
-    info->refresh = func_80082904;
+    info->refresh = STGMCARD_refreshInfo;
     info->layer = 0x1000;
     info->saves = saves;
     info->depth = 1;
@@ -334,8 +248,8 @@ void STGMCARD_resetPanel(MemCardPanel *panel) {
     panel->rate = 0;
     panel->done = 0;
     panel->scale.vx = 0;
-    panel->scale.vz = 0x1000;
-    panel->scale.vy = 0x1000;
+    panel->scale.vz = ONE;
+    panel->scale.vy = ONE;
     panel->pivotX = panel->x;
     panel->pivotY = panel->y;
 }
@@ -367,7 +281,7 @@ void STGMCARD_setPanelPos(MemCardPanel *panel, s32 x, s32 y) {
 
 /* The panel's task: opens it by scaling it horizontally, then draws it as a
    gradient with a sprite */
-void func_800833A0(MemCardPanel *panel) {
+void STGMCARD_updatePanel(MemCardPanel *panel) {
     SVECTOR out[4];
     SVECTOR in[4];
     SpriteDrawer sprite;
@@ -392,7 +306,7 @@ void func_800833A0(MemCardPanel *panel) {
             return;
         case 1:
             if (panel->rate == 0) {
-                panel->rate = 0x1000 / panel->duration;
+                panel->rate = ONE / panel->duration;
             }
             panel->scale.vx += panel->rate;
             if (panel->scale.vx > 0xF33) {
@@ -401,11 +315,11 @@ void func_800833A0(MemCardPanel *panel) {
             break;
         case 2:
             if (panel->rate == 0) {
-                panel->rate = 0x1000 / panel->duration;
+                panel->rate = ONE / panel->duration;
             }
             panel->scale.vx += panel->rate;
-            if (panel->scale.vx > 0x1000) {
-                panel->scale.vx = 0x1000;
+            if (panel->scale.vx > ONE) {
+                panel->scale.vx = ONE;
                 panel->done = 1;
             }
             break;
@@ -464,7 +378,7 @@ void func_800833A0(MemCardPanel *panel) {
 }
 
 MemCardPanel *STGMCARD_createPanel(s32 x, s32 y, s32 w, s32 h) {
-    MemCardPanel *panel = createTask(func_800833A0, sizeof(MemCardPanel), 0);
+    MemCardPanel *panel = createTask(STGMCARD_updatePanel, sizeof(MemCardPanel), 0);
 
     panel->reset = STGMCARD_resetPanel;
     panel->start = STGMCARD_startPanel;
@@ -480,7 +394,7 @@ MemCardPanel *STGMCARD_createPanel(s32 x, s32 y, s32 w, s32 h) {
     return panel;
 }
 
-void func_8008385C(MemCardMenu *menu) {
+void STGMCARD_slideInHeader(MemCardMenu *menu) {
     TextWindow **windows = menu->children;
 
     STGMCARD_funcs.startLerp(&menu->lerps[1], -0x55, 0, 10);
@@ -491,38 +405,38 @@ void func_8008385C(MemCardMenu *menu) {
     menu->substate = 1;
 }
 
-void func_800838CC(MemCardMenu *menu, s32 arg) {
+void STGMCARD_startSlotPick(MemCardMenu *menu, s32 arg) {
     STGMCARD_funcs.startLerp(&menu->lerps[2], 0, 0x2F, 8);
     menu->substate = 5;
     STGMCARD_funcs.slot = arg;
-    STGMCARD_funcs.unk8 = 0;
+    STGMCARD_funcs.prevSlot = 0;
 }
 
-void func_80083934(MemCardMenu *menu) {
+void STGMCARD_slideOutHeader(MemCardMenu *menu) {
     STGMCARD_funcs.startLerp(&menu->lerps[1], 0, -0x55, 5);
     menu->substate = 4;
 }
 
-void func_80083978(MemCardMenu *menu) {
-    STGMCARD_funcs.startLerp(&menu->lerps[3], STGMCARD_funcs.unk8 * 0x44, STGMCARD_funcs.slot * 0x44, 5);
+void STGMCARD_moveSlotCursor(MemCardMenu *menu) {
+    STGMCARD_funcs.startLerp(&menu->lerps[3], STGMCARD_funcs.prevSlot * 0x44, STGMCARD_funcs.slot * 0x44, 5);
     menu->substate = 7;
 }
 
-void func_800839D8(MemCardMenu *menu) {
+void STGMCARD_slideInSlots(MemCardMenu *menu) {
     STGMCARD_funcs.startLerp(&menu->lerps[0], 0xDE, 0, 10);
     menu->substate = 2;
 }
 
-void func_80083A1C(MemCardMenu *menu) {
+void STGMCARD_slideOutSlots(MemCardMenu *menu) {
     STGMCARD_funcs.startLerp(&menu->lerps[0], 0, 0xDE, 5);
     menu->substate = 3;
 }
 
 void STGMCARD_resetMenu(MemCardMenu *menu) {
     menu->substate = 0;
-    menu->unkCC = 0;
+    menu->slid = 0;
     STGMCARD_funcs.slot = 0;
-    STGMCARD_funcs.unk8 = 0;
+    STGMCARD_funcs.prevSlot = 0;
     STGMCARD_funcs.startLerp(&menu->lerps[0], 0xDE, 0, 10);
     STGMCARD_funcs.startLerp(&menu->lerps[1], -0x55, 0, 10);
     STGMCARD_funcs.startLerp(&menu->lerps[2], 0, 0x2F, 8);
@@ -532,7 +446,7 @@ void STGMCARD_resetMenu(MemCardMenu *menu) {
 
 /* The save picker's task: slides in and out, moves between the first three
    saves with left and right, and draws each one's lead partner */
-void func_80083B10(MemCardMenu *menu, TextWindow **windows) {
+void STGMCARD_updateMenu(MemCardMenu *menu, TextWindow **windows) {
     SpriteDrawer sprite;
     s32 prev;
     s32 i;
@@ -561,19 +475,19 @@ void func_80083B10(MemCardMenu *menu, TextWindow **windows) {
         case 1:
             if (STGMCARD_funcs.updateLerp(&menu->lerps[1]) != 0) {
                 menu->substate = 0;
-                menu->unkCC = 1;
+                menu->slid = 1;
             }
             break;
         case 2:
             if (STGMCARD_funcs.updateLerp(&menu->lerps[0]) != 0) {
                 menu->substate = 0;
-                menu->unkCC = 2;
+                menu->slid = 2;
             }
             break;
         case 3:
             if (STGMCARD_funcs.updateLerp(&menu->lerps[0]) != 0) {
                 menu->substate = 0;
-                menu->unkCC = 3;
+                menu->slid = 3;
             }
             break;
         case 4:
@@ -583,32 +497,32 @@ void func_80083B10(MemCardMenu *menu, TextWindow **windows) {
             break;
         case 5:
             if (STGMCARD_funcs.updateLerp(&menu->lerps[2]) != 0) {
-                func_80083978(menu);
+                STGMCARD_moveSlotCursor(menu);
             }
             break;
         case 6:
             if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
                 prev = STGMCARD_funcs.slot;
-                STGMCARD_funcs.unk8 = prev;
+                STGMCARD_funcs.prevSlot = prev;
                 STGMCARD_funcs.slot = prev - 1;
                 if (STGMCARD_funcs.slot < 0) {
                     STGMCARD_funcs.slot = 0;
                 }
                 if (STGMCARD_funcs.slot != prev) {
                     menu->saves->refresh(menu->saves);
-                    func_80083978(menu);
+                    STGMCARD_moveSlotCursor(menu);
                     SOUND.playSound(SOUND_MENU_MOVE);
                 }
             } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
                 prev = STGMCARD_funcs.slot;
                 STGMCARD_funcs.slot = prev + 1;
-                STGMCARD_funcs.unk8 = prev;
+                STGMCARD_funcs.prevSlot = prev;
                 if (STGMCARD_funcs.slot >= 3) {
                     STGMCARD_funcs.slot = 2;
                 }
                 if (STGMCARD_funcs.slot != prev) {
                     menu->saves->refresh(menu->saves);
-                    func_80083978(menu);
+                    STGMCARD_moveSlotCursor(menu);
                     SOUND.playSound(SOUND_MENU_MOVE);
                 }
             }
@@ -653,14 +567,14 @@ void func_80083B10(MemCardMenu *menu, TextWindow **windows) {
 }
 
 MemCardMenu *STGMCARD_createMenu(MemCardSaves *saves) {
-    MemCardMenu *menu = createTask(func_80083B10, sizeof(MemCardMenu), 4);
+    MemCardMenu *menu = createTask(STGMCARD_updateMenu, sizeof(MemCardMenu), 4);
 
     menu->reset = STGMCARD_resetMenu;
-    menu->unkE0 = func_8008385C;
-    menu->unkE4 = func_800838CC;
-    menu->unkE8 = func_80083934;
-    menu->unkEC = func_800839D8;
-    menu->unkF0 = func_80083A1C;
+    menu->slideInHeader = STGMCARD_slideInHeader;
+    menu->startPick = STGMCARD_startSlotPick;
+    menu->slideOutHeader = STGMCARD_slideOutHeader;
+    menu->slideInSlots = STGMCARD_slideInSlots;
+    menu->slideOutSlots = STGMCARD_slideOutSlots;
     menu->layer = 0x1000;
     menu->depth = 2;
     menu->saves = saves;
@@ -676,10 +590,10 @@ void STGMCARD_showPort(MemCardSaves *saves, MemCardSavesWindows *win, s32 show) 
     }
 }
 
-void func_80084230(MemCardSaves *saves, MemCardSavesWindows *win) {
+void STGMCARD_showError(MemCardSaves *saves, MemCardSavesWindows *win) {
     saves->substate = 100;
     saves->choice = 0;
-    saves->count--;
+    saves->result--;
     if (win->windows[1] != NULL) {
         win->windows[1]->setVisible(win->windows[1], 0);
     }
@@ -697,7 +611,7 @@ void func_80084230(MemCardSaves *saves, MemCardSavesWindows *win) {
     }
 }
 
-void func_80084308(MemCardSaves *saves, MemCardSavesWindows *win) {
+void STGMCARD_closeMenuForError(MemCardSaves *saves, MemCardSavesWindows *win) {
     win->windows[1]->setVisible(win->windows[1], 0);
     win->panel->reset(win->panel);
     saves->substate = 90;
@@ -741,13 +655,13 @@ void STGMCARD_hideSaves(MemCardSaves *saves) {
 /*
  * The save list's states (saves->substate): picks the port, reads the card's
  * info section, lets the menu pick a slot, then loads or saves it. A failed
- * operation leaves its result in count and goes to 100, which shows
- * STGMCARD_errorTexts[count] and can format the card (110) or create the save
+ * operation leaves its error in saves->result and goes to 100, which shows
+ * STGMCARD_errorTexts[result] and can format the card (110) or create the save
  * file (120). 400 waits for the card and goes on to step.
  * Match depends on the separate variables: result lives across calls, status,
  * check, member and j each keep their own register.
  */
-void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
+void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
     MemCardSave *save;
     s32 prev;
     s32 result;
@@ -762,11 +676,11 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
     switch (saves->substate) {
     case 0:
     default:
-        win->unk0->setDepth(win->unk0, 1);
-        if (saves->screen->saving == 0) {
-            win->unk0->setString(win->unk0, FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 1);
+        win->title->setDepth(win->title, 1);
+        if (saves->screen->loading == 0) {
+            win->title->setString(win->title, FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 1);
         } else {
-            win->unk0->setString(win->unk0, FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0xE);
+            win->title->setString(win->title, FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0xE);
         }
         if (win->info == NULL) {
             win->info = STGMCARD_createInfo(saves);
@@ -775,7 +689,7 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
     case 1:
         if (STGMCARD_funcs.updateLerp(&saves->slide[1]) != 0) {
             win->windows[0]->setVisible(win->windows[0], 0);
-            if (saves->screen->saving == 0) {
+            if (saves->screen->loading == 0) {
                 win->windows[4]->setString(win->windows[4], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 2);
             } else {
                 win->windows[4]->setString(win->windows[4], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0xF);
@@ -788,10 +702,10 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
             win->windows[3]->setNumber(win->windows[3], 1, 2);
             win->cursor->setVisible(win->cursor, 1);
             win->cursor->setPos(win->cursor, 0xC2, saves->port * 14 + 0xBD);
-            saves->unk2844 = 1;
+            saves->choosing = 1;
             saves->substate++;
         }
-        win->unk0->setPos(win->unk0, saves->unk58[0] + (s16)(saves->slide[0].value + 200), saves->unk58[1] + (s16)(saves->slide[1].value + 9));
+        win->title->setPos(win->title, saves->origin[0] + (s16)(saves->slide[0].value + 200), saves->origin[1] + (s16)(saves->slide[1].value + 9));
         break;
     case 2:
         prev = saves->port;
@@ -818,11 +732,11 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
             win->panel->setBottomColor(win->panel, 0xD1, 0x2F, 0xDE);
             saves->substate = 10;
             SOUND.playSound(SOUND_SELECT);
-            saves->unk2844 = 0;
+            saves->choosing = 0;
         } else if (PAD_PRESSED(PAD_TRIANGLE)) {
             SOUND.playSound(SOUND_MENU_CANCEL);
             saves->hide(saves);
-            saves->unk2844 = 0;
+            saves->choosing = 0;
             saves->screen->step = 1;
         }
         break;
@@ -830,7 +744,7 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
         if (win->panel->substate == 0) {
             win->panel->start(win->panel, 1, 0x4C);
         }
-        status = saves->count = MEMCARD_SYSTEM.funcs.accept(saves->port);
+        status = saves->result = MEMCARD_SYSTEM.funcs.accept(saves->port);
         if (status != 0) {
             if (status == 1 || status - 1 == 3) {
                 saves->substate++;
@@ -841,7 +755,7 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
         }
         break;
     case 11:
-        status = saves->count = MEMCARD_SYSTEM.funcs.list(saves->port);
+        status = saves->result = MEMCARD_SYSTEM.funcs.list(saves->port);
         if (status != 0) {
             win->panel->start(win->panel, 2, 0x14);
             saves->substate++;
@@ -849,10 +763,10 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
         break;
     case 12:
         if (win->panel->done != 0) {
-            if (saves->count == 1) {
+            if (saves->result == 1) {
                 saves->substate = 20;
             } else {
-                func_80084230(saves, win);
+                STGMCARD_showError(saves, win);
             }
         }
         break;
@@ -865,7 +779,7 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
             saves->substate++;
         }
     case 21:
-        status = saves->count = MEMCARD_SYSTEM.funcs.read(saves->port, (u8 *)STGMCARD_funcs.infoBuf, sizeof(MemCardFile), 1);
+        status = saves->result = MEMCARD_SYSTEM.funcs.read(saves->port, (u8 *)STGMCARD_funcs.infoBuf, sizeof(MemCardFile), 1);
         if (status != 0) {
             win->panel->start(win->panel, 2, 0x14);
             saves->substate++;
@@ -873,32 +787,32 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
         break;
     case 22:
         if (win->panel->done != 0) {
-            if (saves->count == 1) {
+            if (saves->result == 1) {
                 if (STGMCARD_funcs.infoBuf->magic != MEMCARD_FILE_MAGIC) {
                     HEAP.zero(STGMCARD_funcs.infoBuf, 0x44);
                     STGMCARD_funcs.infoBuf->magic = MEMCARD_FILE_MAGIC;
                     STGMCARD_funcs.infoBuf->version = MEMCARD_SAVE_VERSION;
                 } else if (MEMCARD_SYSTEM.funcs.computeChecksum((u8 *)&STGMCARD_funcs.infoBuf->magic, sizeof(MemCardFile) - 4) & ~STGMCARD_funcs.infoBuf->checksum) {
-                    saves->count = 9;
-                    func_80084230(saves, win);
+                    saves->result = 9;
+                    STGMCARD_showError(saves, win);
                     break;
                 } else {
                     saves->file = *STGMCARD_funcs.infoBuf;
-                    STGMCARD_funcs.unk0 = STGMCARD_funcs.infoBuf->last;
+                    STGMCARD_funcs.lastSlot = STGMCARD_funcs.infoBuf->last;
                 }
                 win->windows[0]->setVisible(win->windows[0], 0);
                 win->windows[4]->setVisible(win->windows[4], 0);
                 win->panel->reset(win->panel);
                 saves->substate = 30;
             } else {
-                func_80084230(saves, win);
+                STGMCARD_showError(saves, win);
             }
         }
         break;
     case 30:
         win->windows[0]->setVisible(win->windows[0], 0);
         win->windows[4]->setVisible(win->windows[4], 0);
-        if (win->menu->unkCC != 5) {
+        if (win->menu->slid != 5) {
             win->menu->reset(win->menu);
         }
         if (win->info != NULL) {
@@ -908,24 +822,24 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
         break;
     case 31:
         if (win->menu->substate == 0) {
-            if (win->menu->unkCC == 0) {
-                win->menu->unkE0(win->menu);
-            } else if (win->menu->unkCC == 1) {
-                win->menu->unkEC(win->menu);
-            } else if (win->menu->unkCC == 2) {
-                win->menu->unkE4(win->menu, STGMCARD_funcs.unk0);
+            if (win->menu->slid == 0) {
+                win->menu->slideInHeader(win->menu);
+            } else if (win->menu->slid == 1) {
+                win->menu->slideInSlots(win->menu);
+            } else if (win->menu->slid == 2) {
+                win->menu->startPick(win->menu, STGMCARD_funcs.lastSlot);
                 saves->substate++;
             }
         }
         break;
     case 32:
         if (win->menu->substate == 6) {
-            if (saves->screen->saving == 0) {
+            if (saves->screen->loading == 0) {
                 win->windows[1]->setString(win->windows[1], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 6);
             } else {
                 win->windows[1]->setString(win->windows[1], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x10);
             }
-            win->info->unk5C = 1;
+            win->info->drawing = 1;
             win->info->shown = 1;
             win->info->refresh(win->info);
             saves->nextSubstate(saves);
@@ -938,7 +852,7 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
                 SOUND.playSound(SOUND_MENU_CONFIRM);
                 saves->substate = 400;
                 win->menu->substate = 0;
-                if (saves->screen->saving == 0) {
+                if (saves->screen->loading == 0) {
                     if (STGMCARD_funcs.infoBuf->saves[STGMCARD_funcs.slot].name[0] != 0) {
                         saves->step = 40;
                         saves->choice = 0;
@@ -946,7 +860,7 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
                         win->windows[2]->setString(win->windows[2], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x16);
                         win->windows[3]->setString(win->windows[3], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x17);
                         win->cursor->setVisible(win->cursor, 1);
-                        saves->unk2844 = 1;
+                        saves->choosing = 1;
                         win->cursor->setPos(win->cursor, 0xC2, saves->choice * 14 + 0xBD);
                     } else {
                         saves->step = 50;
@@ -963,8 +877,8 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
                 status = MEMCARD_SYSTEM.funcs.check(saves->port);
                 if (status != 0) {
                     if (status != 1) {
-                        saves->count = status - 1;
-                        func_80084308(saves, win);
+                        saves->result = status - 1;
+                        STGMCARD_closeMenuForError(saves, win);
                     }
                 }
             }
@@ -972,27 +886,27 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
         break;
     case 90:
         if (win->menu->substate == 0) {
-            switch (win->menu->unkCC) {
+            switch (win->menu->slid) {
             case 3:
-                win->menu->unkE8(win->menu);
+                win->menu->slideOutHeader(win->menu);
                 saves->substate = saves->step;
                 saves->step = saves->counter;
                 saves->counter = 0;
                 break;
             case 2:
                 win->info->hide(win->info);
-                win->menu->unkF0(win->menu);
+                win->menu->slideOutSlots(win->menu);
                 break;
             }
         }
         break;
     case 600:
         if (win->menu->substate == 0) {
-            if (win->menu->unkCC == 2) {
+            if (win->menu->slid == 2) {
                 win->info->hide(win->info);
-                win->menu->unkF0(win->menu);
-            } else if (win->menu->unkCC == 3) {
-                win->menu->unkE8(win->menu);
+                win->menu->slideOutSlots(win->menu);
+            } else if (win->menu->slid == 3) {
+                win->menu->slideOutHeader(win->menu);
                 saves->substate++;
             }
         }
@@ -1003,10 +917,10 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
     case 70:
         if (STGMCARD_funcs.infoBuf->saves[STGMCARD_funcs.slot].name[0] == 0) {
             win->windows[1]->setString(win->windows[1], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x18);
-            saves->unk2838 = 1;
+            saves->prompting = 1;
             saves->substate = 501;
             saves->step = 32;
-            saves->unk2848 = 1;
+            saves->backToPick = 1;
         } else {
             win->windows[1]->setString(win->windows[1], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x11);
             win->panel->start(win->panel, 1, MEMCARD_LOAD_FRAMES);
@@ -1014,25 +928,25 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
         }
         break;
     case 71:
-        status = saves->count = MEMCARD_SYSTEM.funcs.read(saves->port, (u8 *)STGMCARD_funcs.dataBuf, sizeof(GameSave), STGMCARD_funcs.slot + 2);
+        status = saves->result = MEMCARD_SYSTEM.funcs.read(saves->port, (u8 *)STGMCARD_funcs.dataBuf, sizeof(GameSave), STGMCARD_funcs.slot + 2);
         if (status != 0) {
             if (status == 1) {
                 if (MEMCARD_SYSTEM.funcs.computeChecksum(&STGMCARD_funcs.dataBuf->unk0[4], sizeof(GameSave) - 4) & ~STGMCARD_funcs.dataBuf->unk0[0]) {
-                    saves->count = 8;
-                    func_80084308(saves, win);
-                } else if (STGMCARD_funcs.dataBuf->unk0[2] != MEMCARD_SAVE_VERSION && saves->screen->saving != 0) {
-                    saves->count = 8;
-                    func_80084308(saves, win);
+                    saves->result = 8;
+                    STGMCARD_closeMenuForError(saves, win);
+                } else if (STGMCARD_funcs.dataBuf->unk0[2] != MEMCARD_SAVE_VERSION && saves->screen->loading != 0) {
+                    saves->result = 8;
+                    STGMCARD_closeMenuForError(saves, win);
                 } else {
                     *(GameSave *)&GAME = *(GameSave *)STGMCARD_funcs.dataBuf;
                     win->panel->start(win->panel, 2, 0x14);
                     saves->substate = 500;
                     win->menu->substate = 0;
-                    saves->unk2848 = 0;
+                    saves->backToPick = 0;
                 }
             } else {
-                saves->count = status - 1;
-                func_80084308(saves, win);
+                saves->result = status - 1;
+                STGMCARD_closeMenuForError(saves, win);
             }
         }
         break;
@@ -1054,7 +968,7 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
             SOUND.playSound(SOUND_SELECT);
             /* match depends on the 400 going through status */
             status = 400;
-            saves->unk2844 = 0;
+            saves->choosing = 0;
             saves->substate = status;
             if (saves->choice == 0) {
                 saves->step = 50;
@@ -1068,7 +982,7 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
             win->cursor->setVisible(win->cursor, 0);
             SOUND.playSound(SOUND_MENU_CANCEL);
             saves->substate = 400;
-            saves->unk2844 = 0;
+            saves->choosing = 0;
             saves->step = 32;
             win->menu->substate = 6;
         } else {
@@ -1078,9 +992,9 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
                     win->windows[2]->setVisible(win->windows[2], 0);
                     win->windows[3]->setVisible(win->windows[3], 0);
                     win->cursor->setVisible(win->cursor, 0);
-                    saves->unk2844 = 0;
-                    saves->count = result - 1;
-                    func_80084308(saves, win);
+                    saves->choosing = 0;
+                    saves->result = result - 1;
+                    STGMCARD_closeMenuForError(saves, win);
                 }
             }
         }
@@ -1096,8 +1010,8 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
         STGMCARD_funcs.dataBuf->unk0[0] = MEMCARD_SYSTEM.funcs.computeChecksum(&STGMCARD_funcs.dataBuf->unk0[4], sizeof(GameSave) - 4);
         STGMCARD_funcs.dataBuf->unk0[2] = MEMCARD_SAVE_VERSION;
         strcpy(save->name, STGMCARD_funcs.dataBuf->name);
-        save->unk18 = saves->screen->unk68;
-        save->unk1C = saves->screen->unk6C;
+        save->area = saves->screen->area;
+        save->place = saves->screen->place;
         save->money = STGMCARD_funcs.dataBuf->money;
         save->time = *(PlayTime *)&STGMCARD_funcs.dataBuf->playFrames;
         for (i = 0; i < 3; i++) {
@@ -1110,31 +1024,31 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
         saves->substate++;
         break;
     case 52:
-        status = saves->count = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)STGMCARD_funcs.infoBuf, sizeof(MemCardFile), 1);
+        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)STGMCARD_funcs.infoBuf, sizeof(MemCardFile), 1);
         if (status != 0) {
             if (status == 1) {
                 saves->substate++;
             } else {
-                saves->count = status - 1;
-                func_80084308(saves, win);
+                saves->result = status - 1;
+                STGMCARD_closeMenuForError(saves, win);
             }
         }
         break;
     case 53:
-        status = saves->count = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)STGMCARD_funcs.dataBuf, sizeof(GameSave), STGMCARD_funcs.slot + 2);
+        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)STGMCARD_funcs.dataBuf, sizeof(GameSave), STGMCARD_funcs.slot + 2);
         if (status != 0) {
             if (status == 1) {
                 win->panel->start(win->panel, 2, 0x14);
                 saves->substate = 500;
             } else {
-                saves->count = status - 1;
-                func_80084308(saves, win);
+                saves->result = status - 1;
+                STGMCARD_closeMenuForError(saves, win);
             }
         }
         break;
     case 500:
         if (win->panel->done != 0) {
-            if (saves->screen->saving == 0) {
+            if (saves->screen->loading == 0) {
                 saves->file = *STGMCARD_funcs.infoBuf;
                 saves->refresh(saves);
                 win->windows[1]->setString(win->windows[1], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 9);
@@ -1146,21 +1060,21 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
             }
             saves->substate++;
             win->panel->reset(win->panel);
-            saves->unk2838 = 1;
+            saves->prompting = 1;
         }
         break;
     case 501:
         if (PAD_PRESSED(PAD_CROSS)) {
             SOUND.playSound(SOUND_MENU_CONFIRM);
-            saves->unk2838 = 0;
+            saves->prompting = 0;
             saves->substate = saves->step;
-            if (saves->screen->saving == 0) {
+            if (saves->screen->loading == 0) {
                 saves->setStep(saves, 0);
                 win->menu->substate = 6;
             } else {
                 win->windows[1]->setVisible(win->windows[1], 0);
                 saves->step = 600;
-                if (saves->unk2848 != 0) {
+                if (saves->backToPick != 0) {
                     win->menu->substate = 6;
                 } else {
                     win->menu->substate = 0;
@@ -1170,9 +1084,9 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
             check = MEMCARD_SYSTEM.funcs.check(saves->port);
             if (check != 0) {
                 if (check != 1) {
-                    saves->unk2838 = 0;
-                    saves->count = 1;
-                    func_80084308(saves, win);
+                    saves->prompting = 0;
+                    saves->result = 1;
+                    STGMCARD_closeMenuForError(saves, win);
                 }
             }
         }
@@ -1180,7 +1094,7 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
     case 502:
         if (PAD_PRESSED(PAD_CROSS)) {
             SOUND.playSound(SOUND_MENU_CONFIRM);
-            saves->unk2838 = 0;
+            saves->prompting = 0;
             saves->substate = saves->step;
             win->windows[1]->setVisible(win->windows[1], 0);
             saves->step = 600;
@@ -1188,13 +1102,13 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
         }
         break;
     case 100:
-        win->windows[0]->setString(win->windows[0], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), STGMCARD_errorTexts[saves->count]);
+        win->windows[0]->setString(win->windows[0], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), STGMCARD_errorTexts[saves->result]);
         STGMCARD_showPort(saves, win, 1);
-        if (saves->screen->saving == 0) {
-            if (saves->count == 4) {
+        if (saves->screen->loading == 0) {
+            if (saves->result == 4) {
                 saves->choice = 1;
                 ask = 1;
-            } else if (saves->count == 5) {
+            } else if (saves->result == 5) {
                 if (MEMCARD.fileCount != 0) {
                     blocks = 0;
                     for (j = 0; j < MEMCARD.fileCount; j++) {
@@ -1202,21 +1116,21 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
                     }
                     if (blocks + 4 >= 16) {
                         win->windows[0]->setVisible(win->windows[0], 0);
-                        saves->count = 7;
+                        saves->result = 7;
                         saves->substate = 100;
                         break;
                     }
                 }
                 ask = 1;
             } else {
-                saves->unk2838 = 1;
+                saves->prompting = 1;
                 ask = 0;
-                if (saves->count == 7) {
+                if (saves->result == 7) {
                     win->windows[0]->setNumber(win->windows[0], 1, 4);
                 }
             }
             if (ask) {
-                if (saves->count == 4) {
+                if (saves->result == 4) {
                     win->windows[1]->setString(win->windows[1], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x19);
                 } else {
                     win->windows[1]->setString(win->windows[1], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x1A);
@@ -1224,16 +1138,16 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
                 win->windows[2]->setString(win->windows[2], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x16);
                 win->windows[3]->setString(win->windows[3], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x17);
                 win->cursor->setVisible(win->cursor, 1);
-                saves->unk2844 = 1;
+                saves->choosing = 1;
                 win->cursor->setPos(win->cursor, 0xC2, saves->choice * 14 + 0xBD);
             }
         } else {
-            saves->unk2838 = 1;
+            saves->prompting = 1;
         }
         saves->substate++;
         break;
     case 101:
-        if (saves->screen->saving == 0 && (u32)(saves->count - 4) < 2) {
+        if (saves->screen->loading == 0 && (u32)(saves->result - 4) < 2) {
             prev = saves->choice;
             if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
                 saves->choice = 0;
@@ -1253,8 +1167,8 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
                 win->windows[3]->setVisible(win->windows[3], 0);
                 win->cursor->setVisible(win->cursor, 0);
                 saves->substate = 400;
-                saves->unk2844 = 0;
-                if (saves->count == 4) {
+                saves->choosing = 0;
+                if (saves->result == 4) {
                     if (saves->choice == 0) {
                         saves->step = 110;
                         win->windows[0]->setString(win->windows[0], FILE_CACHE.load(TEXT_FILE(TEXT_MEMORY_CARD)), 0x1E);
@@ -1282,88 +1196,88 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
                 win->windows[3]->setVisible(win->windows[3], 0);
                 win->cursor->setVisible(win->cursor, 0);
                 saves->substate = 400;
-                saves->unk2844 = 0;
+                saves->choosing = 0;
                 saves->step = 1;
                 win->panel->reset(win->panel);
             }
             status = MEMCARD_SYSTEM.funcs.check(saves->port);
             if (status != 0) {
                 if (status != 1) {
-                    saves->count = status;
-                    saves->unk2844 = 0;
-                    func_80084230(saves, win);
+                    saves->result = status;
+                    saves->choosing = 0;
+                    STGMCARD_showError(saves, win);
                 }
             }
         } else if (PAD_PRESSED(PAD_CROSS)) {
             SOUND.playSound(SOUND_MENU_CONFIRM);
             saves->substate = 400;
-            saves->unk2838 = 0;
+            saves->prompting = 0;
             saves->step = 1;
         }
         break;
     case 400:
-        status = saves->count = MEMCARD_SYSTEM.funcs.check(saves->port);
+        status = saves->result = MEMCARD_SYSTEM.funcs.check(saves->port);
         if (status != 0) {
             saves->substate++;
         }
         break;
     case 401:
-        if (saves->count != 1) {
-            func_80084230(saves, win);
+        if (saves->result != 1) {
+            STGMCARD_showError(saves, win);
         }
         saves->substate = saves->step;
         saves->step = saves->counter;
         saves->counter = 0;
         break;
     case 110:
-        status = saves->count = MEMCARD_SYSTEM.funcs.format(saves->port);
+        status = saves->result = MEMCARD_SYSTEM.funcs.format(saves->port);
         if (status != 0) {
             if (status == 1) {
                 win->panel->start(win->panel, 2, 0x14);
                 saves->substate++;
             } else {
-                func_80084230(saves, win);
+                STGMCARD_showError(saves, win);
             }
         }
         break;
     case 111:
         if (win->panel->done != 0) {
-            func_80084230(saves, win);
-            saves->count = 5;
+            STGMCARD_showError(saves, win);
+            saves->result = 5;
         }
         break;
     case 120:
         saves->substate = 121;
         break;
     case 121:
-        status = saves->count = MEMCARD_SYSTEM.funcs.create(saves->port);
+        status = saves->result = MEMCARD_SYSTEM.funcs.create(saves->port);
         if (status != 0) {
             if (status == 1) {
                 saves->substate++;
             } else {
-                func_80084230(saves, win);
+                STGMCARD_showError(saves, win);
             }
         }
         break;
     case 122:
-        status = saves->count = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)&MEMCARD.header, sizeof(CardHeader), 0);
+        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)&MEMCARD.header, sizeof(CardHeader), 0);
         if (status != 0) {
             if (status == 1) {
                 if ((u32)(MEMCARD.iconCount - 1) >= 3) {
-                    saves->count = 3;
-                    func_80084230(saves, win);
+                    saves->result = 3;
+                    STGMCARD_showError(saves, win);
                 } else {
                     MEMCARD.unk324 = 0;
                     saves->substate++;
                 }
             } else {
-                saves->count = 10;
-                func_80084230(saves, win);
+                saves->result = 10;
+                STGMCARD_showError(saves, win);
             }
         }
         break;
     case 123:
-        status = saves->count = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)MEMCARD.icons[MEMCARD.unk324], 0x80, (MEMCARD.unk324 * 0x80 + 0x80) << 8);
+        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)MEMCARD.icons[MEMCARD.unk324], 0x80, (MEMCARD.unk324 * 0x80 + 0x80) << 8);
         if (status != 0) {
             if (status == 1) {
                 MEMCARD.unk324++;
@@ -1373,17 +1287,17 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
                     STGMCARD_funcs.infoBuf->version = MEMCARD_SAVE_VERSION;
                     STGMCARD_funcs.infoBuf->checksum = MEMCARD_SYSTEM.funcs.computeChecksum((u8 *)&STGMCARD_funcs.infoBuf->magic, sizeof(MemCardFile) - 4);
                     saves->file = *STGMCARD_funcs.infoBuf;
-                    STGMCARD_funcs.unk0 = STGMCARD_funcs.infoBuf->last;
+                    STGMCARD_funcs.lastSlot = STGMCARD_funcs.infoBuf->last;
                     saves->substate++;
                 }
             } else {
-                saves->count = 11;
-                func_80084230(saves, win);
+                saves->result = 11;
+                STGMCARD_showError(saves, win);
             }
         }
         break;
     case 124:
-        status = saves->count = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)STGMCARD_funcs.infoBuf, sizeof(MemCardFile), 1);
+        status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, (u8 *)STGMCARD_funcs.infoBuf, sizeof(MemCardFile), 1);
         if (status != 0) {
             win->panel->start(win->panel, 2, 0x14);
             saves->substate++;
@@ -1392,25 +1306,25 @@ void func_800844DC(MemCardSaves *saves, MemCardSavesWindows *win) {
     case 125:
         if (win->panel->done != 0) {
             win->panel->reset(win->panel);
-            if (saves->count == 1) {
+            if (saves->result == 1) {
                 saves->substate = 30;
             } else {
-                func_80084230(saves, win);
+                STGMCARD_showError(saves, win);
             }
         }
         break;
     }
 }
 
-/* Draws the save list's sprites: a menu sprite whose palette cycles while
-   unk2838 is set, the list's own sprite and, while unk2844 is set, one more */
-void func_800869D4(MemCardSaves *saves) {
+/* Draws the save list's sprites: the blinking cross button while a message
+   waits for it, the list's frame and the box of the cursor's two choices */
+void STGMCARD_drawSaves(MemCardSaves *saves) {
     SpriteDrawer sprite;
 
     initSpriteDrawer(&sprite);
     sprite.setLayerId(saves->layer, 2);
     sprite.setTexture(0x140, 0);
-    if (saves->unk2838 != 0) {
+    if (saves->prompting != 0) {
         if ((GFX.funcs.getTime() - saves->blinkTime) / 3 != 0) {
             saves->blinkTime = GFX.funcs.getTime();
             saves->blinkFrame++;
@@ -1423,28 +1337,28 @@ void func_800869D4(MemCardSaves *saves) {
     }
     sprite.setTexture(0x280, 0);
     sprite.setClutRow(0);
-    sprite.draw(FILE_CACHE.getEntry(FILE_GMCARD_SHEET << 16), 33, saves->unk58[0] + saves->slide[0].value, saves->unk58[1] + saves->slide[1].value);
-    if (saves->unk2844 != 0) {
+    sprite.draw(FILE_CACHE.getEntry(FILE_GMCARD_SHEET << 16), 33, saves->origin[0] + saves->slide[0].value, saves->origin[1] + saves->slide[1].value);
+    if (saves->choosing != 0) {
         sprite.setLayerId(saves->layer, 1);
         sprite.draw(FILE_CACHE.getEntry(FILE_GMCARD_SHEET << 16), 29, 188, 185);
     }
 }
 
 /* The save list's task: creates its windows, then runs it */
-void func_80086BA0(MemCardSaves *saves, MemCardSavesWindows *win) {
+void STGMCARD_updateSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
     switch (saves->state) {
     case TASK_INIT:
     default:
         saves->nextState(saves);
-        saves->unk58[0] = 5;
-        saves->unk58[1] = 89;
+        saves->origin[0] = 5;
+        saves->origin[1] = 89;
         STGMCARD_funcs.startLerp(&saves->slide[1], 151, 0, 10);
-        win->unk0 = createTextWindow(saves->layer, 1, saves->unk58[0] + 200, saves->unk58[1] + (s16)(saves->slide[1].value + 9));
-        win->windows[4] = createTextWindow(saves->layer, 1, saves->unk58[0] + 15, saves->unk58[1] + 24);
-        win->windows[0] = createTextWindow(saves->layer, 1, saves->unk58[0] + 15, saves->unk58[1] + 40);
+        win->title = createTextWindow(saves->layer, 1, saves->origin[0] + 200, saves->origin[1] + (s16)(saves->slide[1].value + 9));
+        win->windows[4] = createTextWindow(saves->layer, 1, saves->origin[0] + 15, saves->origin[1] + 24);
+        win->windows[0] = createTextWindow(saves->layer, 1, saves->origin[0] + 15, saves->origin[1] + 40);
         win->windows[0]->setLines(win->windows[0], 5);
         win->windows[0]->setDepth(win->windows[0], 1);
-        win->windows[1] = createTextWindow(saves->layer, 1, saves->unk58[0] + 15, saves->unk58[1] + 103);
+        win->windows[1] = createTextWindow(saves->layer, 1, saves->origin[0] + 15, saves->origin[1] + 103);
         win->windows[1]->setLines(win->windows[1], 2);
         win->windows[2] = createTextWindow(saves->layer, 1, 207, 189);
         win->windows[3] = createTextWindow(saves->layer, 1, 207, 203);
@@ -1453,20 +1367,20 @@ void func_80086BA0(MemCardSaves *saves, MemCardSavesWindows *win) {
         win->menu = STGMCARD_createMenu(saves);
         break;
     case TASK_RUN:
-        func_800844DC(saves, win);
-        func_800869D4(saves);
+        STGMCARD_runSaves(saves, win);
+        STGMCARD_drawSaves(saves);
         break;
     case TASK_DONE:
         switch (saves->substate) {
         case 0:
         default:
-            win->unk0->setVisible(win->unk0, 0);
+            win->title->setVisible(win->title, 0);
             saves->substate++;
             break;
         case 1:
             break;
         }
-        func_800869D4(saves);
+        STGMCARD_drawSaves(saves);
         break;
     case TASK_KILL:
         break;
@@ -1474,7 +1388,7 @@ void func_80086BA0(MemCardSaves *saves, MemCardSavesWindows *win) {
 }
 
 MemCardSaves *STGMCARD_createSaves(MemCardScreen *screen) {
-    MemCardSaves *saves = createTask(func_80086BA0, sizeof(MemCardSaves), sizeof(MemCardSavesWindows));
+    MemCardSaves *saves = createTask(STGMCARD_updateSaves, sizeof(MemCardSaves), sizeof(MemCardSavesWindows));
 
     saves->refresh = STGMCARD_refreshSaves;
     saves->hide = STGMCARD_hideSaves;
@@ -1485,7 +1399,7 @@ MemCardSaves *STGMCARD_createSaves(MemCardScreen *screen) {
 
 /* The main task: loads the files, runs the save list, then fades out and
    requests the next mode */
-void func_80086E5C(MemCardScreen *screen, MemCardScreenTasks *tasks) {
+void STGMCARD_updateScreen(MemCardScreen *screen, MemCardScreenTasks *tasks) {
     SpriteDrawer sprite;
 
     switch (screen->state) {
@@ -1531,21 +1445,21 @@ void func_80086E5C(MemCardScreen *screen, MemCardScreenTasks *tasks) {
         sprite.setLayerId(screen->layer, 3);
         sprite.setTexture(0x280, 0);
         sprite.draw(FILE_CACHE.getEntry(FILE_GMCARD_SHEET << 16), 31, 25, 0);
-        if (screen->unk5C != 0) {
-            screen->unk58++;
-            screen->unk58 = screen->unk58 < 96 ? screen->unk58 : 0;
-            screen->unk5C = 0;
+        if (screen->bgScrolled != 0) {
+            screen->bgScroll++;
+            screen->bgScroll = screen->bgScroll < 96 ? screen->bgScroll : 0;
+            screen->bgScrolled = 0;
         } else {
-            screen->unk5C = 1;
+            screen->bgScrolled = 1;
         }
-        sprite.draw(FILE_CACHE.getEntry(FILE_GMCARD_SHEET << 16), 30, screen->unk58, screen->unk58);
+        sprite.draw(FILE_CACHE.getEntry(FILE_GMCARD_SHEET << 16), 30, screen->bgScroll, screen->bgScroll);
         break;
     case TASK_DONE:
         break;
     case TASK_KILL:
         SOUND.stopSound(0x60800000);
         if (screen->step != 0) {
-            if (screen->saving == 0) {
+            if (screen->loading == 0) {
                 GAME.funcs.requestMode(GAME.funcs.getPrevMode(), 0);
             } else {
                 GAME.funcs.requestMode(MODE_TITLE, 0);
@@ -1560,22 +1474,22 @@ void func_80086E5C(MemCardScreen *screen, MemCardScreenTasks *tasks) {
 
 /* Creates the screen's main task, with what it needs from the mode it was
    opened from and the one it was opened for */
-Task *func_80087174(void) {
-    MemCardScreen *screen = createTask(func_80086E5C, sizeof(MemCardScreen), 8);
+Task *STGMCARD_createScreen(void) {
+    MemCardScreen *screen = createTask(STGMCARD_updateScreen, sizeof(MemCardScreen), 8);
     s32 mode;
     s32 prev;
     s32 i;
 
     screen->layer = 0x1000;
     mode = GAME.funcs.getMode() & 0xFF;
-    screen->saving = (u32)GAME.funcs.getModeArg() >> 31 ^ 1;
+    screen->loading = (u32)GAME.funcs.getModeArg() >> 31 ^ 1;
     prev = GAME.funcs.getPrevMode();
     for (i = 0; STGMCARD_prevModes[i].mode != 0; i++) {
         if (STGMCARD_prevModes[i].mode == prev) {
-            screen->unk68 = STGMCARD_prevModes[i].value;
+            screen->area = STGMCARD_prevModes[i].area;
         }
     }
-    screen->unk6C = STGMCARD_modeValues[mode];
+    screen->place = STGMCARD_places[mode];
     SOUND.loadBank(0x20);
     return (Task *)screen;
 }
@@ -1632,69 +1546,10 @@ void STGMCARD_freeBuffers(void) {
     }
 }
 
-void STGMCARD_startFade(PanelAnim *fade, s32 fadeIn) {
-    fade->active = 1;
-    if (fadeIn != 0) {
-        SOUND.playSound(SOUND_MENU_OPEN);
-        fade->level = 0;
-        fade->step = 0x1000 / fade->duration;
-    } else {
-        SOUND.playSound(SOUND_MENU_CLOSE);
-        fade->level = 0x1000;
-        fade->step = -((0x1000 / fade->duration) * 2);
-    }
-}
-
-s32 STGMCARD_updateFade(PanelAnim *fade) {
-    if (fade->active == 0) {
-        return 1;
-    }
-    fade->level += fade->step;
-    if (fade->step > 0) {
-        if (fade->level > 0x1000) {
-            fade->level = 0x1000;
-            fade->active = 0;
-            return 1;
-        }
-    } else if (fade->level < 0) {
-        fade->level = 0;
-        fade->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void STGMCARD_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames) {
-    if (from != to) {
-        lerp->duration = frames;
-        lerp->fixed = from << 8;
-        lerp->value = from;
-        lerp->target = to;
-        lerp->active = 1;
-        lerp->step = ((to - from) << 8) / lerp->duration;
-    }
-}
-
-s32 STGMCARD_updateLerp(MenuLerp *lerp) {
-    if (lerp->active == 0) {
-        return 1;
-    }
-    lerp->fixed += lerp->step;
-    lerp->value = lerp->fixed >> 8;
-    if (lerp->step > 0) {
-        if (lerp->target < lerp->value) {
-            lerp->value = lerp->target;
-            lerp->active = 0;
-            return 1;
-        }
-    } else if (lerp->value < lerp->target) {
-        lerp->value = lerp->target;
-        lerp->active = 0;
-        return 1;
-    }
-    return 0;
-}
-
+#include "../menu_common/start_fade.inc.c"
+#include "../menu_common/update_fade.inc.c"
+#include "../menu_common/start_lerp.inc.c"
+#include "../menu_common/update_lerp.inc.c"
 
 /* the details' text windows: their text, type and place */
 MemCardWindowSpec STGMCARD_detailWindows[] = {
@@ -1744,8 +1599,9 @@ s32 STGMCARD_errorTexts[] = {
     11, 12, 28, 13,
     38, 36, 37,
 };
-/* the save's unk1C, by the game mode */
-s32 STGMCARD_modeValues[] = {
+/* the place a save shows (a string of TEXT_SHOP_NAMES), by the low byte of
+   the game mode: the save point */
+s32 STGMCARD_places[] = {
     43, 43, 44, 45,
     46, 47, 48, 49,
     50, 51, 52, 53,

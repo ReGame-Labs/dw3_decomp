@@ -1,9 +1,5 @@
 #include "stcrdshp.h"
 
-void STCRDSHP_runBuy(CardShopBuy *buy, CardShopBuyWindows *win);
-void STCRDSHP_drawBuy(CardShopBuy *buy);
-void STCRDSHP_updateBuy(CardShopBuy *buy, CardShopBuyWindows *win);
-
 /* Creates the screen's windows and its cursor */
 void STCRDSHP_createBuyWindows(CardShopBuy *buy, CardShopBuyWindows *win) {
     win->windows[0] = createTextWindow(buy->layer, 1, 0x88, 0x80);
@@ -105,8 +101,8 @@ void STCRDSHP_drawBuy(CardShopBuy *buy) {
     if (buy->fades[0].level != 0) {
         initCardDrawer(&drawer);
         drawer.setCard(card);
-        if (buy->fades[0].level != 0x1000) {
-            sprite.setScale(buy->fades[0].level, 0x1000, 0x1000);
+        if (buy->fades[0].level != ONE) {
+            sprite.setScale(buy->fades[0].level, ONE, ONE);
             sprite.setPivot(0x140, 0x87);
         }
         kind = drawer.getKind();
@@ -119,16 +115,16 @@ void STCRDSHP_drawBuy(CardShopBuy *buy) {
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), frame, 0x103, 0x7E);
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0xD, 0xFC, 0x7C);
-        if (buy->fades[0].level != 0x1000) {
+        if (buy->fades[0].level != ONE) {
             sprite.setPivot(0x140, 0x87);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0xA, 0x82, 0x7C);
-        if (buy->fades[0].level != 0x1000) {
+        if (buy->fades[0].level != ONE) {
             sprite.setPivot(0x140, 0xAF);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x10, 0x103, 0xA4);
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0xD, 0xFC, 0xA2);
-        if (buy->fades[0].level != 0x1000) {
+        if (buy->fades[0].level != ONE) {
             sprite.setPivot(0x140, 0xA5);
         }
         if (kind != 0) {
@@ -138,7 +134,7 @@ void STCRDSHP_drawBuy(CardShopBuy *buy) {
         } else {
             sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0xC, 0xC7, 0x92);
         }
-        if (buy->fades[1].level != 0x1000) {
+        if (buy->fades[1].level != ONE) {
             sprite.setPivot(0x140, 0xC8);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x29, 0xD6, 0xBF);
@@ -158,7 +154,7 @@ void STCRDSHP_drawBuy(CardShopBuy *buy) {
                 buy->arrowsTime = GFX.funcs.getTime();
                 buy->arrowsShown = 1 - buy->arrowsShown;
             }
-            if (buy->fades[0].level == 0x1000 && buy->arrowsShown != 0) {
+            if (buy->fades[0].level == ONE && buy->arrowsShown != 0) {
                 if (buy->page > 0) {
                     sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x1A, 0xE, 0x55);
                 }
@@ -172,14 +168,14 @@ void STCRDSHP_drawBuy(CardShopBuy *buy) {
         initSpriteDrawer(&sprite);
         sprite.setTexture(0x280, 0);
         sprite.setLayerId(buy->layer, buy->depth - 2);
-        if (buy->fades[1].level != 0x1000) {
-            sprite.setScale(buy->fades[1].level, 0x1000, 0x1000);
+        if (buy->fades[1].level != ONE) {
+            sprite.setScale(buy->fades[1].level, ONE, ONE);
             sprite.setPivot(0x140, 0x3F);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x2C, 0x7B, 0x33);
         if (buy->fades[2].level != 0) {
-            if (buy->fades[2].level != 0x1000) {
-                sprite.setScale(buy->fades[2].level, 0x1000, 0x1000);
+            if (buy->fades[2].level != ONE) {
+                sprite.setScale(buy->fades[2].level, ONE, ONE);
                 sprite.setPivot(0x140, 0x64);
             }
             sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x2D, 0xAF, 0x50);

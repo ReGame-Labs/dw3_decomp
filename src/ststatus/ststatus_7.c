@@ -3,10 +3,6 @@
 
 #include "ststatus.h"
 
-void STSTATUS_runItemList(ItemList *panel, ItemListWindows *windows);
-s32 STSTATUS_moveItemListCursor(ItemList *panel, ItemListWindows *windows);
-void STSTATUS_drawItemList(ItemList *panel);
-
 void STSTATUS_createItemListWindows(ItemList *panel, ItemListWindows *windows) {
     TextWindow *window;
     s32 i;
@@ -290,25 +286,25 @@ void STSTATUS_drawItemList(ItemList *panel) {
             }
         }
     }
-    if (panel->fades[1].level != 0x1000) {
-        sprite.setScale(panel->fades[1].level, 0x1000, 0x1000);
+    if (panel->fades[1].level != ONE) {
+        sprite.setScale(panel->fades[1].level, ONE, ONE);
         sprite.setPivot(0xC, 0x17);
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x30, 0xC, 0x12);
-    if (panel->fades[0].level != 0x1000) {
-        sprite.setScale(0x1000, panel->fades[0].level, 0x1000);
+    if (panel->fades[0].level != ONE) {
+        sprite.setScale(ONE, panel->fades[0].level, ONE);
         sprite.setPivot(0xA0, 0x60);
     } else {
-        sprite.setScale(0x1000, 0x1000, 0x1000);
+        sprite.setScale(ONE, ONE, ONE);
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x2E, 0, 0x1E);
     if (panel->fades[2].level) {
         sprite.setLayerId(panel->layer, panel->depth - 2);
-        if (panel->fades[2].level != 0x1000) {
-            sprite.setScale(panel->fades[2].level, 0x1000, 0x1000);
+        if (panel->fades[2].level != ONE) {
+            sprite.setScale(panel->fades[2].level, ONE, ONE);
             sprite.setPivot(0x140, 0x26);
         } else {
-            sprite.setScale(0x1000, 0x1000, 0x1000);
+            sprite.setScale(ONE, ONE, ONE);
         }
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x26, 0xA0, 0x12);
     }

@@ -1,9 +1,6 @@
 #include "common.h"
 #include "stgdglab.h"
 
-s32 STGDGLAB_findRecipe(LabRecipeScreen *screen, s32 row, u32 col, s32 slot);
-void STGDGLAB_drawRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *win);
-
 void STGDGLAB_updateScene(Task *task, Task **children) {
     RECT rect;
     Layer *layer;
@@ -34,77 +31,11 @@ Task *STGDGLAB_createScene(void) {
     return createTask(STGDGLAB_updateScene, sizeof(Task), 4);
 }
 
-void STGDGLAB_startFader(ScreenFade *task, s32 fadeIn, s32 duration) {
-    task->setState(task, TASK_RUN);
-    task->substate = 1;
-    task->fadeIn = fadeIn;
-    if (fadeIn == 0) {
-        task->level = 0;
-        task->levelStep = 0xFF00 / duration;
-    } else {
-        task->level = 0xFF00;
-        task->levelStep = -(0xFF00 / duration);
-    }
-}
-
-void STGDGLAB_drawFader(ScreenFade *task) {
-    Layer *layer = GFX.funcs.getLayer(task->layerId);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, task->depth);
-    POLY_F4 *poly = GFX.funcs.getPrim();
-    DR_TPAGE *mode;
-
-    setlen(poly, 5);
-    poly->code = 0x2A;
-    poly->r0 = poly->g0 = poly->b0 = task->level >> 8;
-    poly->x0 = poly->x2 = 0;
-    poly->x1 = poly->x3 = 320;
-    poly->y0 = poly->y1 = 0;
-    poly->y2 = poly->y3 = 256;
-    addPrim(ot, poly);
-    mode = (DR_TPAGE *)(poly + 1);
-    setlen(mode, 1);
-    mode->code[0] = 0xE1000245;
-    addPrim(ot, mode);
-    GFX.funcs.setPrim(mode + 1);
-}
-
-void STGDGLAB_updateFader(ScreenFade *task) {
-    switch (task->state) {
-    case 0:
-    default:
-        task->nextState(task);
-        break;
-    case 1:
-        if (task->substate == 0) {
-            break;
-        }
-        task->level += task->levelStep;
-        if (task->fadeIn == 0) {
-            if (task->level > 0xFF00) {
-                task->level = 0xFF00;
-                task->state = 2;
-            }
-        } else if (task->level < 0) {
-            task->level = 0;
-            task->state = 2;
-        }
-        /* fallthrough */
-    case 2:
-        STGDGLAB_drawFader(task);
-        break;
-    case 3:
-        break;
-    }
-}
-
-ScreenFade *STGDGLAB_createFader(void) {
-    ScreenFade *task = createTask(STGDGLAB_updateFader, sizeof(ScreenFade), 0);
-
-    task->start = STGDGLAB_startFader;
-    task->layerId = 0x1000;
-    task->depth = 6;
-    return task;
-}
+#include "../menu_common/start_fader.inc.c"
+#include "../menu_common/draw_fader.inc.c"
+#include "../menu_common/update_fader.inc.c"
+#define FADER_DEPTH 6
+#include "../menu_common/create_fader.inc.c"
 
 /* Puts in found[row][slot] the owned ids of the recipe (row, col) and clears
    complete[row] when they're fewer than the recipe needs; gives the ids
@@ -224,7 +155,7 @@ void STGDGLAB_drawRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *
         id = screen->found[screen->row][screen->slot][screen->col];
         sprite.setTexture(0x140, 0x100);
         sprite.setAltClut(0x280, 0);
-        sprite.setScale(screen->panels[1].level, 0x1000, 0x1000);
+        sprite.setScale(screen->panels[1].level, ONE, ONE);
         if (screen->slot < 2) {
             sprite.setPivot(0, 0xC2);
             if (id != 0) {
@@ -253,7 +184,7 @@ void STGDGLAB_drawRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *
         }
     }
     sprite.setClutRow(screen->clutRow);
-    if (screen->panels[4].level == 0x1000) {
+    if (screen->panels[4].level == ONE) {
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x47, screen->col * 0x28 + 0x4A, screen->slot * 0x2E + 0x32);
     }
     if (screen->arrowLeft != 0) {
@@ -263,20 +194,20 @@ void STGDGLAB_drawRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x46, 0x110, 0xC9);
     }
     sprite.setClutRow(0);
-    if (screen->panels[0].level != 0x1000) {
-        sprite.setScale(screen->panels[0].level, 0x1000, 0x1000);
+    if (screen->panels[0].level != ONE) {
+        sprite.setScale(screen->panels[0].level, ONE, ONE);
         sprite.setPivot(0, 0x1F);
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x44, 0, 0x11);
-    if (screen->panels[0].level != 0x1000) {
+    if (screen->panels[0].level != ONE) {
         sprite.setPivot(0x140, 0x1F);
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x43, 0xF0, 0x11);
-    if (screen->panels[4].level != 0x1000) {
-        sprite.setScale(screen->panels[4].level, 0x1000, 0x1000);
+    if (screen->panels[4].level != ONE) {
+        sprite.setScale(screen->panels[4].level, ONE, ONE);
         sprite.setPivot(0x44, 0x42);
     } else {
-        sprite.setScale(0x1000, 0x1000, 0x1000);
+        sprite.setScale(ONE, ONE, ONE);
     }
     if (screen->found[screen->row][0][0] != -1) {
         if (complete) {
@@ -305,20 +236,20 @@ void STGDGLAB_drawRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *
     } else {
         sprite.setClutRow(0);
     }
-    if (screen->panels[3].level != 0x1000) {
-        sprite.setScale(0x1000, screen->panels[3].level, 0x1000);
+    if (screen->panels[3].level != ONE) {
+        sprite.setScale(ONE, screen->panels[3].level, ONE);
         sprite.setPivot(0x40, 0x3F);
     } else {
-        sprite.setScale(0x1000, 0x1000, 0x1000);
+        sprite.setScale(ONE, ONE, ONE);
     }
     for (k = screen->slots - 2; k >= 0; k--) {
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x3C, 0x3D, k * 0x2E + 0x3F);
     }
-    if (screen->panels[2].level != 0x1000) {
-        sprite.setScale(0x1000, screen->panels[2].level, 0x1000);
+    if (screen->panels[2].level != ONE) {
+        sprite.setScale(ONE, screen->panels[2].level, ONE);
         sprite.setPivot(0x3D, 0x42);
     } else {
-        sprite.setScale(0x1000, 0x1000, 0x1000);
+        sprite.setScale(ONE, ONE, ONE);
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x3D, 0x14, 0x32);
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x40, 0x24, 0x32);
@@ -326,19 +257,19 @@ void STGDGLAB_drawRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *
     sprite.setTexture(0x140, 0x100);
     sprite.setAltClut(0x280, 0);
     sprite.setLayerId(screen->layer, screen->depth - 1);
-    if (screen->panels[2].level != 0x1000) {
-        sprite.setScale(0x1000, screen->panels[2].level, 0x1000);
+    if (screen->panels[2].level != ONE) {
+        sprite.setScale(ONE, screen->panels[2].level, ONE);
         sprite.setPivot(0x3D, 0x42);
     } else {
-        sprite.setScale(0x1000, 0x1000, 0x1000);
+        sprite.setScale(ONE, ONE, ONE);
     }
     id = STGDGLAB_tableItems[screen->table];
     sprite.draw(FILE_CACHE.getEntry((FILE_LAB_SPRITES << 16) | 1), STGDGLAB_data.funcs.getSprite(id), 0x14, 0x32);
-    if (screen->panels[4].level != 0x1000) {
-        sprite.setScale(screen->panels[4].level, 0x1000, 0x1000);
+    if (screen->panels[4].level != ONE) {
+        sprite.setScale(screen->panels[4].level, ONE, ONE);
         sprite.setPivot(0x44, 0x42);
     } else {
-        sprite.setScale(0x1000, 0x1000, 0x1000);
+        sprite.setScale(ONE, ONE, ONE);
     }
     if (screen->found[screen->row][0][0] != -1) {
         for (m = 0; m < 4; m++) {
@@ -436,7 +367,7 @@ void STGDGLAB_updateRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows
                     screen->found[i][0][0] = -1;
                 }
             }
-            screen->unkC4[0] = 4;
+            screen->rowCount = 4;
             screen->slots = STGDGLAB_countRowIds(screen, screen->row);
             STGDGLAB_resetRecipeCursor(screen);
             screen->panels[0].duration = 8;
@@ -483,24 +414,24 @@ void STGDGLAB_updateRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows
             }
             break;
         case 3:
-            screen->unkC4[1] = screen->row;
+            screen->nextRow = screen->row;
             if ((!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) || (!PAD_HELD(PAD_R1) && PAD_REPEATED(PAD_L1))) {
-                if (--screen->unkC4[1] < 0) {
-                    screen->unkC4[1] = 0;
+                if (--screen->nextRow < 0) {
+                    screen->nextRow = 0;
                 }
             } else if ((!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) || (!PAD_HELD(PAD_L1) && PAD_REPEATED(PAD_R1))) {
-                if (++screen->unkC4[1] > screen->unkC4[0] - 1) {
-                    screen->unkC4[1] = screen->unkC4[0] - 1;
+                if (++screen->nextRow > screen->rowCount - 1) {
+                    screen->nextRow = screen->rowCount - 1;
                 }
             }
-            if (screen->unkC4[1] != screen->row) {
+            if (screen->nextRow != screen->row) {
                 SOUND.playSound(SOUND_MENU_MOVE);
-                win->rowNumber->setNumber(win->rowNumber, 0, screen->unkC4[1] + 1);
+                win->rowNumber->setNumber(win->rowNumber, 0, screen->nextRow + 1);
                 win->rowNumber->setRightAlign(win->rowNumber, 1);
-                if (screen->unkC4[1] == 0) {
+                if (screen->nextRow == 0) {
                     win->prev->setVisible(win->prev, 0);
                     screen->arrowLeft = 0;
-                } else if (screen->unkC4[1] == screen->unkC4[0] - 1) {
+                } else if (screen->nextRow == screen->rowCount - 1) {
                     win->next->setVisible(win->next, 0);
                     screen->arrowRight = 0;
                 } else {
@@ -684,7 +615,7 @@ void STGDGLAB_updateRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows
         case 1:
             if (STGDGLAB_data.funcs.updateFade(&screen->panels[4]) != 0) {
                 STGDGLAB_data.funcs.startFade(&screen->panels[3], 0);
-                screen->row = screen->unkC4[1];
+                screen->row = screen->nextRow;
                 screen->step++;
             }
             break;

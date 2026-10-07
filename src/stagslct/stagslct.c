@@ -3,7 +3,6 @@
 #if VERSION_EU
 /* "＞": the European overlay has 0x39 in the byte that pads it, where GCC
    would put 0, so it is an array with its padding (at the end of the file) */
-extern const char STAGSLCT_STR_CURSOR[];
 #define CURSOR STAGSLCT_STR_CURSOR
 #else
 #define CURSOR "\x81\x84" /* "＞" */
@@ -684,9 +683,6 @@ StageSelectEntry STAGSLCT_entries[] = {
 RECT STAGSLCT_screenRect = {0, 0, 320, 240};
 u16 STAGSLCT_biosVersion[10] = {0};
 u16 STAGSLCT_biosVersionEnd = 0;
-
-Task *STAGSLCT_createStageSelect(void);
-void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win);
 
 void STAGSLCT_updateScene(Task *task, Task **items) {
     switch (task->state) {
