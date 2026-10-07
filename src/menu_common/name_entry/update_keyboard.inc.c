@@ -118,12 +118,12 @@ void OVL_NAME(updateKeyboard)(NameEntry *task, NameEntryWindows *windows) {
                         task->cursor = 0;
                     }
                 }
-                c = ((TextStyle *)windows->name->style)->iconMap[1].code;
+                c = windows->name->style->iconMap[1].code;
                 task->name[task->cursor] = (c >> 8) | ((c & 0xFF) << 8);
                 windows->name->setText(windows->name, task->name);
                 break;
             case NAME_KEY_SPACE:
-                c = ((TextStyle *)windows->name->style)->iconMap[1].code;
+                c = windows->name->style->iconMap[1].code;
                 task->name[task->cursor] = (c >> 8) | ((c & 0xFF) << 8);
                 if (++task->cursor > task->maxLength - 1) {
                     task->cursor = task->maxLength - 1;
@@ -145,9 +145,7 @@ void OVL_NAME(updateKeyboard)(NameEntry *task, NameEntryWindows *windows) {
                 task->substate = 20;
                 break;
             default:
-                glyph = ((TextStyle *)windows->name->style)
-                            ->sjisMap[OVL_NAME(keyboard).pages[task->page].cells[task->row][task->column].code]
-                            .code;
+                glyph = windows->name->style->sjisMap[OVL_NAME(keyboard).pages[task->page].cells[task->row][task->column].code].code;
                 task->name[task->cursor] = (glyph >> 8) | ((glyph & 0xFF) << 8);
                 windows->name->setText(windows->name, task->name);
                 if (++task->cursor > task->maxLength - 1) {
@@ -164,7 +162,7 @@ void OVL_NAME(updateKeyboard)(NameEntry *task, NameEntryWindows *windows) {
                     task->cursor = 0;
                 }
             }
-            c = ((TextStyle *)windows->name->style)->iconMap[1].code;
+            c = windows->name->style->iconMap[1].code;
             task->name[task->cursor] = (c >> 8) | ((c & 0xFF) << 8);
             windows->name->setText(windows->name, task->name);
         }

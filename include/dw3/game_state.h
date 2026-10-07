@@ -1,7 +1,7 @@
 #ifndef DW3_GAME_STATE_H
 #define DW3_GAME_STATE_H
 
-/* The game state: modes, party, items, cards, flags (game3.c, game3_2.c, system.c) */
+/* The game state: modes, party, items, cards, flags (game/) */
 
 #include "common.h"
 #include <sys/types.h>
@@ -79,7 +79,7 @@ typedef struct DigimonData {
 
 /* An item (ITEMS, GET_ITEM) */
 typedef struct ItemInfo {
-    /* 0x0 */ u8 *data;
+    /* 0x0 */ u8 *data; /* the type's record (ItemData), or the usable items' effect */
     /* 0x4 */ u16 price;
     /* 0x6 */ u16 sellPrice; /* 0: cannot be sold */
     /* 0x8 */ u8 unk8;
@@ -141,6 +141,19 @@ typedef struct AccessoryData {
     /* 0x8 */ u8 stat;
     /* 0x9 */ u8 unk9[3];
 } AccessoryData;
+
+/* The record ItemInfo.data points to, by ItemInfo.type */
+typedef union ItemData {
+    WeaponData weapon;
+    ArmorData armor;
+    AccessoryData acc;
+} ItemData;
+
+/* ItemInfo.type's ranges: 2-14 weapons, 15-20 armour, 21-24 accessories,
+   each tested as one unsigned byte compare */
+#define IS_WEAPON_TYPE(type) ((u8)((type) - 2) < 13)
+#define IS_ARMOR_TYPE(type) ((u8)((type) - 15) < 6)
+#define IS_ACCESSORY_TYPE(type) ((u8)((type) - 21) < 4)
 
 /* The Digimon a partner can have, and the ones it takes to battle */
 #define PARTNER_ENTRY_COUNT 44
@@ -283,6 +296,7 @@ typedef union PartnerTotals {
 #elif VERSION_EU
 #define MODE_ENDING 0xE0B
 #endif
+#define MODE_STATUS 0x1000 /* STSTATUS: the field menu's screens (FIELD_MENU_CHOICE) */
 #define MODE_BATTLE_REPORT 0x1400 /* STFGTREP */
 
 /* The partner Digimon, and the ones in the party */
@@ -413,6 +427,15 @@ s32 getPartnerEntry(s32 partner, s32 id, PartnerEntry *out);
 s32 setPartnerEntry(s32 partner, s32 id, PartnerEntry *in);
 void addStatBonus(s16 *p, s32 stat, s32 delta);
 PartnerStats *getPartnerStats(s32 partner);
+s32 getPartyMember(u32 index);
+void setParty(s32 set);
+void giveStarterDeck(void);
+void resetPlayTime(void);
+void updatePlayTime(void);
+s32 getPartyPartner(u32 index);
+void setStat(s32 partner, u32 stat, s16 value);
+void addStat(s32 partner, u32 stat, s32 delta);
+void computeStats(s32 partner, PartnerTotals *out);
 
 extern DigimonData DIGIMON_DATA[];
 extern DigimonData *(*GET_DIGIMON)(s32 id); /* getDigimon */

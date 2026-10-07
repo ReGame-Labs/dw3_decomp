@@ -12,7 +12,7 @@ HEAP_BASE = 0x800AA800; // defined:True
 
 // the mode overlays' symbols the executable uses, which it links against
 // (the Makefile's CHILDREN_main): their entry points (MODE_ENTRY_POINTS) and
-// FIELDSTG's functions and data game3.c uses
+// FIELDSTG's functions and data game/events.c uses
 FIELDSTG_start = 0x80086CF4; // defined:True
 STDWTITL_start = 0x800827A0; // defined:True
 STDGNAME_start = 0x8008281C; // defined:True

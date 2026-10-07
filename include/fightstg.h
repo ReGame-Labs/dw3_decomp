@@ -6,8 +6,8 @@
 
 #include "game.h"
 #include <libgs.h>
-#include "dw3/menus.h"
-#include "dw3/files.h"
+#include "dw3/menu.h"
+#include "dw3/file.h"
 
 extern MATRIX IDENTITY_MATRIX; /* the root bone's parent (src/main/data/matrices.c) */
 

@@ -34,9 +34,8 @@ The folder is relative to `asm/<version>/`, so the function above is
    differing instructions marked `**`. Relocated fields are masked, so a
    different symbol name doesn't count as a difference. Set `UNIT=wstag210`
    (any part of the path) when several units have a function of that name, as
-   the stages do; `VERSION` picks the version. For a `-G8` file (`inn.c`,
-   `system.c`, `memcard.c`, `game3.c`, `game3_2.c`, `graphics.c`, `sound.c`, `overlay.c`), pass the
-   same flags as the Makefile: `CFLAGS='-O2 -G8 -fsigned-char -fno-builtin
+   the stages do; `VERSION` picks the version. For a `-G8` file (`G8_SRC` in the
+   Makefile), pass the same flags as the Makefile: `CFLAGS='-O2 -G8 -fsigned-char -fno-builtin
    -fdollars-in-identifiers' MASPSXFLAGS='--aspsx-version=2.86 -G8'`.
 3. **Search for a near miss.** When only register allocation or instruction
    order is left, try other source shapes first: types, the order of
@@ -285,12 +284,35 @@ does:
   `STGMCARD_drawFader` in STGMCARD). A copy that differs in a constant
   takes it from a macro that the including file defines just before the
   include (`FADER_DEPTH` for `create_fader.inc.c`).
-- The executable's files follow its original objects (`inn.c`, `system.c`,
-  `memcard.c`, ...). The SDK, Sony's code, isn't in `src/`: the build takes
-  it from the original as splat's disassembly (`asm/<version>/main/psyq/`),
-  and the C decompiled of it earlier is in this repository's history.
-- A file `X_2.c` is the second half of an original object that the splat
-  config splits in two; the report counts both halves as the unit `X`.
+- The executable is split into modules, a folder each under `src/main/`:
+
+  | Folder | What | Header (`include/dw3/`) |
+  |---|---|---|
+  | `system/` | the boot and the frame loop (`main.c`), the heap, the random numbers, the modes' overlays | `overlay.h`, `heap.h`, `random.h` |
+  | `task/` | the tasks' methods and creation, the task registry | `task.h` |
+  | `file/` | the CD reader, the file cache, the disc's file table, the RLE decompressor | `file.h` |
+  | `gfx/` | the display and the frame, the layers, the card, sprite and TIM drawers, the screen fade | `gfx.h` |
+  | `text/` | the text windows, the cursor, the message and talk boxes, the font, the text tools | `text.h` |
+  | `pad/` | the controllers and the demos | `pad.h` |
+  | `sound/` | the sound banks | `sound.h` |
+  | `memcard/` | the memory card saves | `memcard.h` |
+  | `game/` | the game state and modes, the events, the party, the stats, the partners, the Digimon and the items | `game_state.h` |
+  | `menu/` | the inn and the field menu | `menu.h` |
+
+  The original's objects (`inn`, `system`, `memcard`, `game3`...) are cut
+  into these files in their link order: each file is a run of the original's
+  code, and its rodata and data are runs of the original's too, in the same
+  order. `config/<version>/main.yaml` lists each file's `c`, `.rodata` and
+  `.data` subsegments, so a file can only move or split where all three stay
+  in order (and a datum that starts a file is word-aligned). The modules cut
+  from a `-G8` object keep `-G8` (`G8_SRC` in the Makefile). Each module
+  declares its types, functions and data once, in its header;
+  `include/game.h` includes them all.
+- The SDK, Sony's code, isn't in `src/`: the build takes it from the
+  original as splat's disassembly (`asm/<version>/main/psyq/`), and the C
+  decompiled of it earlier is in this repository's history.
+- An overlay's file `X_2.c` is the second half of an original object that
+  the splat config splits in two; the report counts both halves as the unit `X`.
 - The executable's data is in `src/main/data/` until it moves to the module
   that defines it. Its European tables differ all over (file numbers,
   screen positions, overlay addresses) and splat names them at other
@@ -299,7 +321,7 @@ does:
   differ. Give a table the same name in both versions when you name it.
   A module's data moves from its first datum on, as a whole or up to a
   datum where the rest can wait: give it a `.data` subsegment
-  of its own in both versions' `main.yaml` (`[0x2F1D8, .data, inn]`).
+  of its own in both versions' `main.yaml` (`[0x2F1D8, .data, menu/inn]`).
   What is left on each side stays
   in `src/main/data/`, one file per range, listed in address order in
   `GAME_DATA` (`tools/objdiff_generate.py`) and in `mk/version/eu.mk`. A

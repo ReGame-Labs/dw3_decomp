@@ -68,28 +68,29 @@ CPPFLAGS = $(INC) -undef -nostdinc -Wundef \
 	    -D_PSYQ -D__EXTENSIONS__ -D_MIPSEL -D_LANGUAGE_C -DLANGUAGE_C \
 	    -DVERSION_$(VERSION_UPPER) -DASM_DIR='"$(ASM_DIR)"'
 # -membedded-data: the game's code puts a small const in .rodata, not .sdata,
-# and reads it with lui/lw even at -G8 (OVERLAY_ADDRESS in system.c); it
+# and reads it with lui/lw even at -G8 (OVERLAY_ADDRESS in system/main.c); it
 # changes nothing else
 CC1FLAGS = -quiet -O2 -G$(SDATA_LIMIT) -mips1 -mcpu=3000 -mgas -msoft-float \
 	    -fgnu-linker -fsigned-char -fno-builtin -fdollars-in-identifiers -Wall -Wno-unused -membedded-data
 MASPSXFLAGS = --aspsx-version=2.86 -G$(SDATA_LIMIT) --use-comm-section --use-comm-for-lcomm
 
-# Most of the game is built with -G0; graphics.c reads its own small variables
-# through $gp. GFX_STARTED is its one .sdata variable; the .sbss pointers are
+# Most of the game is built with -G0; the executable's modules that came from
+# a -G8 object of the original read their own small variables through $gp.
+# GFX_STARTED (gfx/display.c) is the one .sdata variable; the .sbss ones are
 # declared static, so maspsx emits them as common symbols that resolve to the
 # definitions in data/game_bss.c, 8 bytes apart as the linker laid them. With
-# -G8 GCC leaves the address of a small extern (LANGUAGE in inn.c,
-# memcard.c and game3.c, in the European version) to the assembler, which loads it
-# again for each read.
+# -G8 GCC leaves the address of a small extern (LANGUAGE in menu/inn.c,
+# memcard/memcard.c and game/events.c, in the European version) to the
+# assembler, which loads it again for each read.
 SDATA_LIMIT := 0
-$(BUILDDIR)/src/main/inn.c.o: SDATA_LIMIT := 8
-$(BUILDDIR)/src/main/memcard.c.o: SDATA_LIMIT := 8
-$(BUILDDIR)/src/main/game3.c.o: SDATA_LIMIT := 8
-$(BUILDDIR)/src/main/system.c.o: SDATA_LIMIT := 8
-$(BUILDDIR)/src/main/graphics.c.o: SDATA_LIMIT := 8
-$(BUILDDIR)/src/main/sound.c.o: SDATA_LIMIT := 8
-$(BUILDDIR)/src/main/overlay.c.o: SDATA_LIMIT := 8
-$(BUILDDIR)/src/main/game3_2.c.o: SDATA_LIMIT := 8
+G8_SRC := $(addprefix src/main/, menu/inn.c gfx/screen_fade.c menu/field_menu.c \
+	game/digimon.c game/items.c file/cd_reader.c file/file_cache.c \
+	file/file_table.c task/task.c system/main.c memcard/memcard.c \
+	game/events.c game/state.c game/party.c game/play_time.c game/stats.c \
+	game/partner.c system/heap.c task/registry.c gfx/display.c gfx/layer.c \
+	gfx/card_drawer.c gfx/sprite_drawer.c text/text_tools.c gfx/tim_loader.c \
+	sound/sound.c system/overlay.c)
+$(G8_SRC:%.c=$(BUILDDIR)/%.c.o): SDATA_LIMIT := 8
 # the assembly sees every version as 0 or 1 too: .if VERSION_EU
 ASFLAGS := -EL -march=r3000 -mtune=r3000 -no-pad-sections -O1 -G0 $(INC) \
 	   $(foreach v,$(VERSIONS),--defsym VERSION_$(shell echo $(v) | tr a-z A-Z)=$(if $(filter $(v),$(VERSION)),1,0))
@@ -156,7 +157,7 @@ OVL_PARENT_wfightts := fightstg
 # and FIGHTSTG calls their functions (CHILDREN_template)
 CHILDREN_fightstg := wfightmn wfightts
 # The executable calls the mode overlays' entry points (MODE_ENTRY_POINTS),
-# and game3.c FIELDSTG's functions
+# and game/events.c FIELDSTG's functions
 CHILDREN_main := $(filter-out wfightmn wfightts,$(OVERLAYS))
 
 # The stage overlays (AAA/PRO/WSTAG###.PRO), listed in

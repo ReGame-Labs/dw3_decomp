@@ -1,7 +1,7 @@
 #ifndef DW3_MEMCARD_H
 #define DW3_MEMCARD_H
 
-/* Memory card saves (memcard.c) */
+/* Memory card saves (memcard/) */
 
 #include "common.h"
 #include <sys/types.h>
@@ -82,7 +82,7 @@ typedef struct CardDirEntry {
 typedef struct MemCard {
     /* 0x00 */ s32 state; /* MEMCARD_* */
     /* 0x04 */ u8 unk4[8];
-    /* 0x0C */ char *fileName;
+    /* 0x0C */ const char *fileName;
     /* 0x10 */ CardHeader header;
     /* 0x90 */ s32 cmd;
     /* 0x94 */ u32 result;
@@ -125,6 +125,21 @@ s32 memCardCommand(s32 port, s32 op);
 s32 checkMemCard(s32 port);
 s32 acceptMemCard(s32 port);
 s32 syncMemCard(void);
+
+/* The memory card library, declared here rather than from libmcrd.h, which
+   takes the buffers as u_long * and MemCardSync's result as a long *, where
+   the game passes u8 buffers and compares the result unsigned */
+void MemCardInit(long val);
+void MemCardStart(void);
+long MemCardSync(long mode, long *cmds, u_long *result);
+long MemCardExist(long chan);
+long MemCardAccept(long chan);
+long MemCardCreateFile(long chan, const char *file, long blocks);
+long MemCardFormat(long chan);
+long MemCardReadFile(long chan, const char *file, void *adrs, long ofs, long bytes);
+long MemCardWriteFile(long chan, const char *file, void *adrs, long ofs, long bytes);
+long MemCardUnformat(long chan);
+long MemCardGetDirentry(long chan, char *name, CardDirEntry *dir, long *files, long ofs, long max);
 
 extern MemCard MEMCARD;
 extern MemCardFuncs MEMCARD_FUNCS;

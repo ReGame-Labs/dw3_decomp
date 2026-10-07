@@ -12,7 +12,7 @@ _stacksize = 0x8005C068; // size:0x4
 setSaveFileName = 0x800148C0; // type:func size:0x70
 
 // us's names that tools/match_versions.py can't pair: data that only
-// system.c's and graphics.c's code reads, through $gp
+// system/main.c's and gfx/display.c's code reads, through $gp
 BOOT_IMAGE_RECT = 0x8005CCB4;
 ROOT_TASK = 0x8005CCBC;
 FLIP_PENDING = 0x8005CD00;

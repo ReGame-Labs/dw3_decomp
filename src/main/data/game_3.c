@@ -191,7 +191,7 @@ u8 STR_ALL_FILES[] = {
     0x2A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x80, 0x00,
 };
-/* text_window.c's CURSOR_FRAMES */
+/* text/cursor.c's CURSOR_FRAMES */
 char CURSOR_TEXT_3[4] = "\x81\x88";
 char CURSOR_TEXT_2[4] = "\x81\x87";
 char CURSOR_TEXT_1[4] = "\x81\x86";

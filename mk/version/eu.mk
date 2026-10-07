@@ -37,11 +37,10 @@ GP_VALUE := 0x8005CB50
 # are split into the USA version's modules (tools/split_version.py), so that
 # their asm lands at the same paths under asm/eu/ as under asm/us/; only the
 # PsyQ libraries and the functions behind INCLUDE_ASM stay asm.
-C_SRC := src/main/game3_2.c src/soundtst/soundtst.c
+C_SRC := src/soundtst/soundtst.c
 
-# game
-C_SRC += src/main/inn.c src/main/system.c src/main/memcard.c src/main/game3.c src/main/text_window.c src/main/pad.c src/main/graphics.c src/main/sound.c src/main/overlay.c
-C_SRC += src/main/data/matrices.c src/main/data/game_3.c src/main/data/game_bss.c
+# game: every module of the executable, and its data
+C_SRC += $(shell find src/main -name '*.c')
 
 # menus
 C_SRC += src/stitshop/stitshop.c src/stgdglab/stgdglab.c src/ststatus/ststatus.c
