@@ -1,3 +1,8 @@
+/*
+ * WSTAG436: Gale Tower, Qing Long City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG435.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,8 @@
+/*
+ * WSTAG203: Amaterasu City, Central Sector: the streets by the Cargo Tower. On
+ * the Amaterasu server; its Asuka server twin is WSTAG202.
+ */
+
 #include "common.h"
 #include "stage.h"
 

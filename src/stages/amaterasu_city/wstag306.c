@@ -1,3 +1,8 @@
+/*
+ * WSTAG306: Master Room, Amaterasu City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG305.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

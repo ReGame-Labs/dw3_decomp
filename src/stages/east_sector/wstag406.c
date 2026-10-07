@@ -1,3 +1,8 @@
+/*
+ * WSTAG406: Tyranno Valley, East Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG405.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

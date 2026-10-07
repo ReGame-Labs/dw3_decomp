@@ -1,3 +1,9 @@
+/*
+ * WSTAG967: Seabed, Underground: a dead end off WSTAG845 and 850, in the extra
+ * chapter. The European version's: in its extra chapter
+ * (FIELD_PROGRESS_EXTRA), mode 743 starts it instead of WSTAG860.
+ */
+
 #include "common.h"
 #include "stage.h"
 

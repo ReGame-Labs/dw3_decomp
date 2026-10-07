@@ -1,3 +1,9 @@
+/*
+ * WSTAG845: Seabed, Underground: Seehomon and Depthmon's forge. A tunnel only
+ * the other tunnels reach (WSTAG840, 850, 855, 860), with Seehomon's and
+ * Depthmon's weapon forging.
+ */
+
 #include "common.h"
 #include "stage.h"
 

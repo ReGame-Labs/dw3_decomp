@@ -1,3 +1,7 @@
+/*
+ * WSTAG245: Smith's Shop, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

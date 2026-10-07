@@ -1,3 +1,7 @@
+/*
+ * WSTAG285: Admin Center 1F, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

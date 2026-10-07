@@ -1,3 +1,7 @@
+/*
+ * WSTAG335: Wire Forest Entrance, Central Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

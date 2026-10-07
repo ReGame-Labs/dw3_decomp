@@ -1,3 +1,8 @@
+/*
+ * WSTAG211: Main Lobby, Amaterasu City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG210.
+ */
+
 #include "common.h"
 #include "stage.h"
 

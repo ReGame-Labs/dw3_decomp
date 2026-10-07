@@ -1,3 +1,8 @@
+/*
+ * WSTAG716: Lake of Ice, North Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG715.
+ */
+
 #include "common.h"
 #include "stage.h"
 

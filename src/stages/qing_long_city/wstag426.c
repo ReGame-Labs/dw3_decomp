@@ -1,3 +1,8 @@
+/*
+ * WSTAG426: Zephyr Tower, Qing Long City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG425.
+ */
+
 #include "common.h"
 #include "stage.h"
 

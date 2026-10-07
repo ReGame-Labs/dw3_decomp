@@ -1,3 +1,8 @@
+/*
+ * WSTAG761: Xuan Wu City, North Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG760.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,9 @@
+/*
+ * WSTAG971: Circuit Board, Underground: reached only from the other tunnels,
+ * in the extra chapter. The European version's: in its extra chapter
+ * (FIELD_PROGRESS_EXTRA), mode 747 starts it instead of WSTAG880.
+ */
+
 #include "common.h"
 #include "stage.h"
 

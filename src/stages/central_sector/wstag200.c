@@ -1,3 +1,9 @@
+/*
+ * WSTAG200: Asuka City, Central Sector: the streets by the bridge. Exits to
+ * Asuka Bridge (WSTAG205), the Main Lobby (210), the Digimon Lab (220), the
+ * Inn (235), Smith's Shop (245) and Lamb Chop (255).
+ */
+
 #include "common.h"
 #include "stage.h"
 

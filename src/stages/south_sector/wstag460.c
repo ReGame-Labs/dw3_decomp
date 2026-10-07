@@ -1,3 +1,8 @@
+/*
+ * WSTAG460: Reliability Spot, South Sector. Where the Qing Long Chief welcomes
+ * the player.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

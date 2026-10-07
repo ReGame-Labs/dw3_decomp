@@ -1,3 +1,9 @@
+/*
+ * WSTAG943: Plug Cape, Central Sector, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 655 starts it
+ * instead of WSTAG346.
+ */
+
 #include "common.h"
 #include "stage.h"
 

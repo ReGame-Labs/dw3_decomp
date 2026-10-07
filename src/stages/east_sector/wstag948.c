@@ -1,3 +1,9 @@
+/*
+ * WSTAG948: Protocol Forest, East Sector, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 660 starts it
+ * instead of WSTAG371.
+ */
+
 #include "common.h"
 #include "stage.h"
 

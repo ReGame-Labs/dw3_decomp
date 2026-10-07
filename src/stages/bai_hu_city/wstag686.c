@@ -1,3 +1,8 @@
+/*
+ * WSTAG686: Underground Cave, Bai Hu City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG685.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,8 @@
+/*
+ * WSTAG521: Zhu Que Hall, Zhu Que City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG520.
+ */
+
 #include "common.h"
 #include "stage.h"
 

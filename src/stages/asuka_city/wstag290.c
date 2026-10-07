@@ -1,3 +1,7 @@
+/*
+ * WSTAG290: Basement Stairs, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

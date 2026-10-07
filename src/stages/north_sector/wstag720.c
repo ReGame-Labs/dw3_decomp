@@ -1,3 +1,7 @@
+/*
+ * WSTAG720: Legendary Gym, North Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

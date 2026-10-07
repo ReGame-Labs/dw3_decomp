@@ -1,3 +1,8 @@
+/*
+ * WSTAG246: Wedge's Shop, Amaterasu City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG245.
+ */
+
 #include "common.h"
 #include "stage.h"
 

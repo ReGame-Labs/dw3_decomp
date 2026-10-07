@@ -1,3 +1,7 @@
+/*
+ * WSTAG430: Seiryu Tower, Seiryu City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

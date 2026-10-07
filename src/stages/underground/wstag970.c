@@ -1,3 +1,9 @@
+/*
+ * WSTAG970: Circuit Board, Underground: the Black Kingz' den, in the extra
+ * chapter. The European version's: in its extra chapter
+ * (FIELD_PROGRESS_EXTRA), mode 746 starts it instead of WSTAG875.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,8 @@
+/*
+ * WSTAG356: East Wire Forest, East Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG355.
+ */
+
 #include "common.h"
 #include "stage.h"
 

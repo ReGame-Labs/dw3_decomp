@@ -1,3 +1,7 @@
+/*
+ * WSTAG380: Divermon's Lake, East Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

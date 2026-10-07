@@ -1,3 +1,7 @@
+/*
+ * WSTAG580: Dum Dum Factory, West Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

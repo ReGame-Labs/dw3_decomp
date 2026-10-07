@@ -1,3 +1,8 @@
+/*
+ * WSTAG646: Mirage Tower, West Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG645.
+ */
+
 #include "common.h"
 #include "stage.h"
 

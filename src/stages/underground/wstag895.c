@@ -1,3 +1,9 @@
+/*
+ * WSTAG895: Circuit Board, Underground: a deep tunnel with guides to both
+ * servers. A tunnel only the other tunnels reach (WSTAG865 to 890), with
+ * guides to both servers' exits.
+ */
+
 #include "common.h"
 #include "stage.h"
 

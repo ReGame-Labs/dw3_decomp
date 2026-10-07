@@ -1,3 +1,9 @@
+/*
+ * WSTAG218: Asuka City, Central Sector: the streets by the Admin Center. Exits
+ * to the Basement Stairs (WSTAG290), the Prison Tower (295) and Admin Center
+ * 2F (300).
+ */
+
 #include "common.h"
 #include "stage.h"
 

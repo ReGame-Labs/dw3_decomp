@@ -1,3 +1,9 @@
+/*
+ * WSTAG750: Chamber Room, North Sector: the emergency Matrix Chamber. Its
+ * gates lead to the Real World and the Ice Dungeon (WSTAG735); the trip to the
+ * Real World (its 180 seconds, the Juggernaut taken) plays here.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

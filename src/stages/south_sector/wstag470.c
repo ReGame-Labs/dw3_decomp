@@ -1,3 +1,7 @@
+/*
+ * WSTAG470: Swamp Inn, South Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

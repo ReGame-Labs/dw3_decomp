@@ -1,3 +1,7 @@
+/*
+ * WSTAG465: Tranquil Swamp, South Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,8 @@
+/*
+ * WSTAG381: Divermon's Lake, East Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG380.
+ */
+
 #include "common.h"
 #include "stage.h"
 

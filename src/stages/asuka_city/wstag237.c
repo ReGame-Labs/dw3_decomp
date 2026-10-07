@@ -1,3 +1,7 @@
+/*
+ * WSTAG237: Underground Path, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,7 @@
+/*
+ * WSTAG233: Digimon Arena, Amaterasu City.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

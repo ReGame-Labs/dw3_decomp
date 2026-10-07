@@ -1,3 +1,8 @@
+/*
+ * WSTAG756: Battle Gate, North Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG755.
+ */
+
 #include "common.h"
 #include "stage.h"
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };

@@ -1,3 +1,7 @@
+/*
+ * WSTAG340: Shell Beach, Central Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

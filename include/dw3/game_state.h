@@ -321,7 +321,7 @@ typedef struct BattleSetup {
     /* 0x14 */ s32 music; /* the battle's music */
     /* 0x18 */ BattleEnemy enemies[3];
     /* 0x3C */ u8 ambushChance; /* a chance that WFIGHTMN scales by level */
-    /* 0x3D */ u8 unk3D; /* Encounter.unkD, 0-5 in runs of encounters; only the enemies' condition 13 reads it */
+    /* 0x3D */ u8 encounterKind; /* Encounter.kind; only the enemies' condition 13 reads it */
     /* 0x3E */ u8 blocks[12]; /* by BATTLE_BLOCK_*: what the player can't do in the battle */
     /* 0x4C */ s32 hasPrize; /* 1: the battle always gives prize */
     /* 0x50 */ s32 prize; /* an item (BattleResult.item) */

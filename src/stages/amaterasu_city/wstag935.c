@@ -1,3 +1,9 @@
+/*
+ * WSTAG935: Yellow Cruiser, Amaterasu City, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 640 starts it
+ * instead of WSTAG271.
+ */
+
 #include "common.h"
 #define STAGE_TWEEN /* stageFuncs is a StageFuncs (stage.h) */
 #include "stage.h"

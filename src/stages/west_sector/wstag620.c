@@ -1,3 +1,9 @@
+/*
+ * WSTAG620: Secret Room, West Sector: the rebels' hideout. Off the Sewers
+ * (WSTAG615): Lisa, Kail, Keith and Nick, who looks for the pass code, and the
+ * Byakko Leader.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

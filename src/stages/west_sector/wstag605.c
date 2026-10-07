@@ -1,3 +1,7 @@
+/*
+ * WSTAG605: Operation Room, West Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

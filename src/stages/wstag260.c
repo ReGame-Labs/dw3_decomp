@@ -1,3 +1,8 @@
+/*
+ * WSTAG260: Cargo Tower, Asuka City: the story events' scripts. Mode 528 loads
+ * the file, and FIELDSTG_createStoryEvents starts it.
+ */
+
 #include "common.h"
 #include "field_map.h"
 

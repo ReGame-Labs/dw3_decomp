@@ -1,3 +1,7 @@
+/*
+ * WSTAG250: Junk Shop, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

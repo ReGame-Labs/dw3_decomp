@@ -1,3 +1,8 @@
+/*
+ * WSTAG815: Gunslinger 2F, Spy Satellite. Lord Megadeath waits beyond its Warp
+ * Gate.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

@@ -1,3 +1,8 @@
+/*
+ * WSTAG561: Pelche Oasis, West Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG560.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,9 @@
+/*
+ * WSTAG923: Main Lobby, Amaterasu City, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 627 starts it
+ * instead of WSTAG211.
+ */
+
 #include "common.h"
 #define STAGE_TWEEN /* stageFuncs is a StageFuncs (stage.h) */
 #include "stage.h"

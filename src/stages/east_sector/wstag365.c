@@ -1,3 +1,7 @@
+/*
+ * WSTAG365: Forest Inn BF, East Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

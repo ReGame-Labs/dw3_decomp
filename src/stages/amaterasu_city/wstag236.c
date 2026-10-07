@@ -1,3 +1,8 @@
+/*
+ * WSTAG236: Amaterasu Inn 1F, Amaterasu City. On the Amaterasu server; its
+ * Asuka server twin is WSTAG235.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,8 @@
+/*
+ * WSTAG231: Arena Front Desk, Amaterasu City. On the Amaterasu server; its
+ * Asuka server twin is WSTAG230.
+ */
+
 #include "common.h"
 #include "stage.h"
 

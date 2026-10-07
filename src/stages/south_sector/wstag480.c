@@ -1,3 +1,7 @@
+/*
+ * WSTAG480: Jungle Grave, South Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

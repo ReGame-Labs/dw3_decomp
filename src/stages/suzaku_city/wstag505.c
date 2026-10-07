@@ -1,3 +1,7 @@
+/*
+ * WSTAG505: Suzaku Inn, Suzaku City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

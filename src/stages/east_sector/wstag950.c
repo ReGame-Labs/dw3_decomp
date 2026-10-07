@@ -1,3 +1,9 @@
+/*
+ * WSTAG950: Divermon's Lake, East Sector, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 662 starts it
+ * instead of WSTAG381.
+ */
+
 #include "common.h"
 #include "stage.h"
 

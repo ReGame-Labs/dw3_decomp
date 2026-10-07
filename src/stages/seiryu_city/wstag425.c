@@ -1,3 +1,7 @@
+/*
+ * WSTAG425: Zephyr Tower, Seiryu City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

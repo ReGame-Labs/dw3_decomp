@@ -1,3 +1,8 @@
+/*
+ * WSTAG800: Magasta B2F, Undersea Base. Where the player tries to stop the
+ * Juggernaut's launch.
+ */
+
 #include "common.h"
 #include "stage.h"
 #if VERSION_US

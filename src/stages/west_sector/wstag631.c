@@ -1,3 +1,8 @@
+/*
+ * WSTAG631: S Noise Desert, West Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG630.
+ */
+
 #include "common.h"
 #include "stage.h"
 

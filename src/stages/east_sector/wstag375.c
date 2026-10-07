@@ -1,3 +1,7 @@
+/*
+ * WSTAG375: Protocol Ruins, East Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the tables that use them */

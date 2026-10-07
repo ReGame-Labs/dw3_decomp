@@ -1,3 +1,8 @@
+/*
+ * WSTAG206: Amaterasu Bridge, Central Sector. On the Amaterasu server; its
+ * Asuka server twin is WSTAG205.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,9 @@
+/*
+ * WSTAG951: Duel Island, East Sector, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 663 starts it
+ * instead of WSTAG386.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,9 @@
+/*
+ * WSTAG938: Amaterasu Sewer, Amaterasu City, in the extra chapter. The
+ * European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 650
+ * starts it instead of WSTAG321.
+ */
+
 #include "common.h"
 #include "stage.h"
 

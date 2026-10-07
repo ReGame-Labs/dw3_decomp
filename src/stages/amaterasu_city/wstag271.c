@@ -1,3 +1,8 @@
+/*
+ * WSTAG271: Yellow Cruiser, Amaterasu City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG270.
+ */
+
 #include "common.h"
 #include "stage.h"
 

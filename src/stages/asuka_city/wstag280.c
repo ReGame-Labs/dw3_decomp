@@ -1,3 +1,7 @@
+/*
+ * WSTAG280: El Dorado, Asuka City.
+ */
+
 #include "common.h"
 #define STAGE_TWEEN /* stageFuncs is a StageFuncs (stage.h) */
 #include "stage.h"

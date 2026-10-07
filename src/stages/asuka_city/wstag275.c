@@ -1,3 +1,7 @@
+/*
+ * WSTAG275: Water Tunnel, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

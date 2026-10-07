@@ -1,3 +1,9 @@
+/*
+ * WSTAG840: Seabed, Underground: below Shell Beach, Plug Cape, South Cape and
+ * the Lake of Ice. A tunnel under Shell Beach, Plug Cape, South Cape and the
+ * Lake of Ice; it joins WSTAG845 and 855.
+ */
+
 #include "common.h"
 #include "stage.h"
 

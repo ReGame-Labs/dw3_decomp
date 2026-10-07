@@ -1,3 +1,7 @@
+/*
+ * WSTAG410: East Station, East Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

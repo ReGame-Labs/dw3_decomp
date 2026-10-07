@@ -1,3 +1,8 @@
+/*
+ * WSTAG256: Lamb Chop, Amaterasu City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG255.
+ */
+
 #include "common.h"
 #include "stage.h"
 

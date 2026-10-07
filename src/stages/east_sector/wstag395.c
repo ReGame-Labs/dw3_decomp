@@ -1,3 +1,7 @@
+/*
+ * WSTAG395: Wind Prairie, East Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

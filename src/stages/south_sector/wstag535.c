@@ -1,3 +1,8 @@
+/*
+ * WSTAG535: Catacomb, South Sector: before story point 0x1A. The Jungle Shrine
+ * (WSTAG530) leads here (mode 579) until GAME.progress reaches 0x1A.
+ */
+
 #include "common.h"
 #include "stage.h"
 

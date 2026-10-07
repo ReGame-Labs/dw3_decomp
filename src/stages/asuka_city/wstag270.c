@@ -1,3 +1,7 @@
+/*
+ * WSTAG270: Yellow Cruiser, Asuka City.
+ */
+
 #include "common.h"
 #define STAGE_TWEEN /* stageFuncs is a StageFuncs (stage.h) */
 #include "stage.h"

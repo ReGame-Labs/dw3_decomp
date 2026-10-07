@@ -1,3 +1,8 @@
+/*
+ * WSTAG261: Cargo Tower, Amaterasu City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG260.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

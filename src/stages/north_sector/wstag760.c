@@ -1,3 +1,7 @@
+/*
+ * WSTAG760: Genbu City, North Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

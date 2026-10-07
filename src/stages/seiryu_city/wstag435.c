@@ -1,3 +1,7 @@
+/*
+ * WSTAG435: Gale Tower, Seiryu City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

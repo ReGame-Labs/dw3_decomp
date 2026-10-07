@@ -23,36 +23,10 @@ void FIELDSTG_updateCommandTask(Task *task) {
     }
 }
 
-/*
- * Runs a field command (FIELD_COMMAND_*) of an event script: halts the
- * partners through the command task, sets the player icon's substate, hides
- * or shows a group of map objects, shakes the camera, searches the event
- * spot, or plays a sound; four sounds are held, to be keyed off by a later
- * command.
- */
-void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
+/* The commands that hide or show a group of the map objects (by their anim) */
+static inline void showObjectGroups(s32 command) {
     StageTile *object;
-    Task *icon;
-    s32 n;
 
-    if (task == NULL) {
-        return;
-    }
-    n = 0;
-    if (command == FIELD_COMMAND_HALT_PARTNERS) {
-        task->setSubstate(task, 1);
-    }
-    switch (command) {
-    case FIELD_COMMAND_ICON3:
-        n++;
-    case FIELD_COMMAND_ICON2:
-        n++;
-    case FIELD_COMMAND_ICON1:
-        n++;
-        icon = TASK_REGISTRY.funcs.find(FIELD_TASK_ICON, -1, -1);
-        icon->setSubstate(icon, n);
-        break;
-    }
     switch (command) {
     case FIELD_COMMAND_HIDE_OBJECTS(0) ... FIELD_COMMAND_HIDE_OBJECTS(FIELD_OBJECT_GROUPS - 1):
         for (object = FIELDSTG_state.objects; object->margin != 0; object++) {
@@ -69,17 +43,10 @@ void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
         }
         break;
     }
-    switch (command) {
-    case FIELD_COMMAND_SHAKE_CAMERA:
-        FIELDSTG_shakeCamera(1);
-        break;
-    case FIELD_COMMAND_STOP_CAMERA_SHAKE:
-        FIELDSTG_shakeCamera(0);
-        break;
-    }
-    if (command == FIELD_COMMAND_SEARCH_EVENT_SPOT) {
-        FIELDSTG_searchEventSpot();
-    }
+}
+
+/* The commands that play a sound */
+static inline void playCommandSound(s32 command) {
     switch (command) {
     case FIELD_COMMAND_PLAY_INFO_SIG:
         SOUND.playSound(SOUND_INFO_SIG);
@@ -148,6 +115,11 @@ void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
         SOUND.playSound(SOUND_SWITCH01);
         break;
     }
+}
+
+/* The commands that play a sound that goes on until a stop command keys it
+   off (FIELDSTG_heldVoice) */
+static inline void playHeldSound(s32 command) {
     switch (command) {
     case FIELD_COMMAND_PLAY_GAYALOOP:
         FIELDSTG_heldVoice = SOUND.playSound(SOUND_GAYALOOP);
@@ -162,6 +134,10 @@ void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
         FIELDSTG_heldVoice = SOUND.playSound(SOUND_COMCD115);
         break;
     }
+}
+
+/* The commands that stop that sound */
+static inline void stopHeldSound(s32 command) {
     switch (command) {
     case FIELD_COMMAND_STOP_GAYALOOP:
         SOUND.keyOff(SOUND_GAYALOOP, FIELDSTG_heldVoice);
@@ -176,6 +152,52 @@ void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
         SOUND.keyOff(SOUND_BEAM_HIT, FIELDSTG_heldVoice);
         break;
     }
+}
+
+/*
+ * Runs a field command (FIELD_COMMAND_*) of an event script: halts the
+ * partners through the command task, sets the player icon's substate, hides
+ * or shows a group of map objects, shakes the camera, searches the event
+ * spot, or plays a sound; four sounds are held, to be keyed off by a later
+ * command.
+ */
+void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
+    Task *icon;
+    s32 n;
+
+    if (task == NULL) {
+        return;
+    }
+    n = 0;
+    if (command == FIELD_COMMAND_HALT_PARTNERS) {
+        task->setSubstate(task, 1);
+    }
+    switch (command) {
+    case FIELD_COMMAND_ICON3:
+        n++;
+    case FIELD_COMMAND_ICON2:
+        n++;
+    case FIELD_COMMAND_ICON1:
+        n++;
+        icon = TASK_REGISTRY.funcs.find(FIELD_TASK_ICON, -1, -1);
+        icon->setSubstate(icon, n);
+        break;
+    }
+    showObjectGroups(command);
+    switch (command) {
+    case FIELD_COMMAND_SHAKE_CAMERA:
+        FIELDSTG_shakeCamera(1);
+        break;
+    case FIELD_COMMAND_STOP_CAMERA_SHAKE:
+        FIELDSTG_shakeCamera(0);
+        break;
+    }
+    if (command == FIELD_COMMAND_SEARCH_EVENT_SPOT) {
+        FIELDSTG_searchEventSpot();
+    }
+    playCommandSound(command);
+    playHeldSound(command);
+    stopHeldSound(command);
 }
 
 /* Creates the task of script command 813 (the create of

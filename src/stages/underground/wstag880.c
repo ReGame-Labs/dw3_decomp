@@ -1,3 +1,8 @@
+/*
+ * WSTAG880: Circuit Board, Underground: reached only from the other tunnels. A
+ * tunnel only WSTAG865 and 885 to 895 reach.
+ */
+
 #include "common.h"
 #include "stage.h"
 

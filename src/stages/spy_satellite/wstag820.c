@@ -1,3 +1,8 @@
+/*
+ * WSTAG820: Control Room, Spy Satellite. Where the player faces Lord
+ * Megadeath, then Snatchmon.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

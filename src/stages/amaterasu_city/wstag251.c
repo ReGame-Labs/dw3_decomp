@@ -1,3 +1,8 @@
+/*
+ * WSTAG251: Junk Shop, Amaterasu City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG250.
+ */
+
 #include "common.h"
 #include "stage.h"
 

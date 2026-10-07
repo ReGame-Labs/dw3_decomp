@@ -1,3 +1,7 @@
+/*
+ * WSTAG615: Sewers, West Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

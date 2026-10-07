@@ -1,3 +1,8 @@
+/*
+ * WSTAG691: Boot Mountain, North Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG690.
+ */
+
 #include "common.h"
 #include "stage.h"
 

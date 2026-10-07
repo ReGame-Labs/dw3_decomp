@@ -1,3 +1,7 @@
+/*
+ * WSTAG415: Deeper Crevice, East Sector. The gondola ride to South Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

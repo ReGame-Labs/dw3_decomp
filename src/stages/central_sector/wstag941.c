@@ -1,3 +1,9 @@
+/*
+ * WSTAG941: Wire Forest Entrance, Central Sector, in the extra chapter. The
+ * European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 653
+ * starts it instead of WSTAG336.
+ */
+
 #include "common.h"
 #include "stage.h"
 

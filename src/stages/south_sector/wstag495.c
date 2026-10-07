@@ -1,3 +1,7 @@
+/*
+ * WSTAG495: South Cape, South Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

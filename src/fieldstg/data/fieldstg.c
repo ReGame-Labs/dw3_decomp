@@ -1783,11 +1783,12 @@ u8 FIELDSTG_triggerAnims[][9] = {
     {0x12, 0x16, 0x13, 0x16, 0xFF, 0x00, 0x00, 0x00, 0x00},
     {0x45, 0x16, 0x46, 0x16, 0xFF, 0x00, 0x00, 0x00, 0x00},
 };
-/* Nothing reads it: a byte after FIELDSTG_triggerAnims that differs by version */
+/* Nothing reads it: the padding after FIELDSTG_triggerAnims, up to the word
+   FIELDSTG_nearDirs starts at, which each version fills with a byte of its own */
 #if VERSION_US
-u8 D_80096983 = 0x8E;
+u8 FIELDSTG_triggerAnimsPad = 0x8E;
 #elif VERSION_EU
-u8 D_80096983 = 0x03;
+u8 FIELDSTG_triggerAnimsPad = 0x03;
 #endif
 u8 FIELDSTG_nearDirs[][8] = {
     {0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01},
@@ -3674,7 +3675,7 @@ StageTile *FIELDSTG_objectCursor = NULL;
 s32 FIELDSTG_objectId = 0;
 Point FIELDSTG_tiles[5][6] = {{{0}}};
 s32 FIELDSTG_tileRequests = 0;
-s32 D_8009AA3C = 0; /* nothing reads it */
+s32 FIELDSTG_transitionUnused = 0; /* among FIELDSTG_playBattleTransition's; nothing uses it */
 RECT FIELDSTG_screenRect = {0, 0, 0, 0};
 s16 FIELDSTG_slideVoice = 0;
 /* Nothing reads it: the padding after FIELDSTG_slideVoice, which the European

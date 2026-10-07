@@ -16,10 +16,8 @@ and the tooling around it. The counts below are from commit `ab85a3a6`.
   all are never read, or only written or copied, and their comments say so;
   name them when the code or the disc's data shows what they hold. The
   ones still read in `src/` (32 uses) are listed with what is known in
-  their headers, for example `BATTLE_SETUP.unk3D`, which the enemy turn's
-  condition 13 compares.
-- [ ] 11 `D_` symbols are left, each with a comment on why:
-  - `FIELDSTG`'s `D_80096983` and `D_8009AA3C`, never read;
+  their headers.
+- [ ] 9 `D_` symbols are left, each with a comment on why:
   - `FIGHTSTG`'s `D_800A342C`, `D_800A3434` and `D_800A346C` in
     `fightstg.c`;
   - `WSTAG331`'s `D_800A5840`, `D_800A5AA4`, `D_800A5D2C` and `D_800A6F88`,
@@ -35,9 +33,12 @@ and the tooling around it. The counts below are from commit `ab85a3a6`.
   why it stays (another form changes the code) or is plain, like a byte
   offset or a `Task *`; replace one when a type that keeps the bytes turns
   up.
-- [ ] Say what each stage is. They are in the folders of their areas
-  ([src/stages/README.md](src/stages/README.md)); each stage's file should
-  also say which map or event it is.
+- [ ] Each stage's file says which map or event it is, and
+  [src/stages/README.md](src/stages/README.md) lists the names
+  (`tools/stage_names_doc.py` writes both). The 30 Underground tunnels
+  (WSTAG825 to 895, and the European 960 to 974) only have the game's names
+  for their region, Seabed or Circuit Board, and the maps that lead to them:
+  name them better if their maps or events tell more.
 
 ## Shared code
 

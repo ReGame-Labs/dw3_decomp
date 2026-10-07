@@ -1,3 +1,7 @@
+/*
+ * WSTAG655: Mirage Room, West Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

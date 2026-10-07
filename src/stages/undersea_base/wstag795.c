@@ -1,3 +1,8 @@
+/*
+ * WSTAG795: Magasta B1F, Undersea Base. The terrorists' base in the Real
+ * World, where the 180 seconds run out and the player is digitized back.
+ */
+
 #include "common.h"
 #include "stage.h"
 #if VERSION_US

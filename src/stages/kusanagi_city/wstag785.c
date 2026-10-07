@@ -1,3 +1,8 @@
+/*
+ * WSTAG785: Online Center, Kusanagi City (the Real World). MAGAMI's Online
+ * Center, where Junior registers before the Chamber Room.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

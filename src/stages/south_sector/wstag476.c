@@ -1,3 +1,8 @@
+/*
+ * WSTAG476: Shaman House, South Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG475.
+ */
+
 #include "common.h"
 #include "stage.h"
 

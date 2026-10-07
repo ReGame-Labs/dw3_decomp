@@ -1,3 +1,7 @@
+/*
+ * WSTAG320: Asuka Sewers, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

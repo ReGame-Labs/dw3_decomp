@@ -1,3 +1,7 @@
+/*
+ * WSTAG520: Suzaku Hall, Suzaku City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

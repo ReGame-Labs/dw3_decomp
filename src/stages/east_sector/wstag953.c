@@ -1,3 +1,9 @@
+/*
+ * WSTAG953: Kicking Forest, East Sector, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 665 starts it
+ * instead of WSTAG401.
+ */
+
 #include "common.h"
 #include "stage.h"
 

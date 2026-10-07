@@ -1,3 +1,7 @@
+/*
+ * WSTAG715: Lake of Ice, North Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

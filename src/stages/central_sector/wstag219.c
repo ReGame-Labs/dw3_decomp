@@ -1,3 +1,8 @@
+/*
+ * WSTAG219: Amaterasu City, Central Sector: the streets by the Admin Center.
+ * On the Amaterasu server; its Asuka server twin is WSTAG218.
+ */
+
 #include "common.h"
 #include "stage.h"
 

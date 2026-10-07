@@ -1,3 +1,9 @@
+/*
+ * WSTAG931: Wedge's Shop, Amaterasu City, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 636 starts it
+ * instead of WSTAG246.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,7 @@
+/*
+ * WSTAG370: Protocol Forest, East Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

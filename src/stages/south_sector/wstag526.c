@@ -1,3 +1,8 @@
+/*
+ * WSTAG526: Zhu Que UG Lake, South Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG525.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

@@ -1,3 +1,7 @@
+/*
+ * WSTAG650: Mirage Hall, West Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

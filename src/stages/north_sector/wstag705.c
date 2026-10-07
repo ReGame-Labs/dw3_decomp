@@ -1,3 +1,7 @@
+/*
+ * WSTAG705: Freeze Mountain, North Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

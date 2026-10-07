@@ -1,3 +1,8 @@
+/*
+ * WSTAG421: Qing Long City, East Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG420.
+ */
+
 #include "common.h"
 #include "stage.h"
 

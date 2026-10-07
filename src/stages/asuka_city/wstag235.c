@@ -1,3 +1,7 @@
+/*
+ * WSTAG235: Asuka Inn 1F, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

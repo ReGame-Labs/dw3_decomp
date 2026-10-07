@@ -1,3 +1,7 @@
+/*
+ * WSTAG685: Underground Cave, Byakko City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

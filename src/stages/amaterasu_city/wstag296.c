@@ -1,3 +1,8 @@
+/*
+ * WSTAG296: Prison Tower, Amaterasu City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG295.
+ */
+
 #include "common.h"
 #include "stage.h"
 

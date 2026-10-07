@@ -1,3 +1,7 @@
+/*
+ * WSTAG385: Duel Island, East Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };

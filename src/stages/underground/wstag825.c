@@ -1,3 +1,9 @@
+/*
+ * WSTAG825: Seabed, Underground: below the Sewers, Duel Island, Kicking Forest
+ * and the UG Lake. A tunnel under the Asuka and Amaterasu Sewers, Duel Island,
+ * Kicking Forest and the UG Lake; it joins WSTAG830, 835 and 855.
+ */
+
 #include "common.h"
 #include "stage.h"
 

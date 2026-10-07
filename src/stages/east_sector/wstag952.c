@@ -1,3 +1,9 @@
+/*
+ * WSTAG952: Wind Prairie, East Sector, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 664 starts it
+ * instead of WSTAG396.
+ */
+
 #include "common.h"
 #include "stage.h"
 

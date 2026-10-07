@@ -1,3 +1,7 @@
+/*
+ * WSTAG530: Jungle Shrine, South Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

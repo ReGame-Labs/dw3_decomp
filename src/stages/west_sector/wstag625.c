@@ -1,3 +1,9 @@
+/*
+ * WSTAG625: Secret Room, West Sector: the hideout later on. A second copy off
+ * the Sewers (WSTAG615), where Lisa sends the player into Asuka City and the
+ * Bai Hu Chief is met.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

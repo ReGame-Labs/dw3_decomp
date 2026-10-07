@@ -1,3 +1,7 @@
+/*
+ * WSTAG545: Bug Maze Pit, Network Break.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

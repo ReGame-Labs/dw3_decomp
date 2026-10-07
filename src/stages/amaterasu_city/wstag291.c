@@ -1,3 +1,8 @@
+/*
+ * WSTAG291: Basement Stairs, Amaterasu City. On the Amaterasu server; its
+ * Asuka server twin is WSTAG290.
+ */
+
 #include "common.h"
 #include "stage.h"
 
