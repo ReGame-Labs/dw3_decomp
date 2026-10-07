@@ -1,3 +1,7 @@
+/*
+ * WSTAG445: Bulk Swamp, South Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

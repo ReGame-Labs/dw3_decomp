@@ -8,11 +8,12 @@ the mode's area as the player enters (FIELDSTG_areaNames: {area, place,
 mode}; the area is a string of text file 0xAA, STAREA). Every mode of a
 stage is in one area, whose name in lower_snake_case is its folder:
 src/stages/wstag231.c goes to src/stages/amaterasu_city/wstag231.c, with
-its head if it has one (wstag924_head.c). A stage no mode starts (WSTAG260,
-the story events' scripts) stays in src/stages/, and so does common/.
+its head if it has one (wstag924_head.c). WSTAG260, the story events'
+scripts, which FIELDSTG starts with FIELDSTG_createStoryEvents, stays in
+src/stages/, and so does common/.
 
 It also writes src/stages/README.md, the list of the areas and their
-stages. The build finds a stage wherever it is under src/stages/, so the
+stages, with each stage's name from tools/stage_names_doc.py. The build finds a stage wherever it is under src/stages/, so the
 bytes don't change. It can be run again at any time:
 
     tools/stage_areas.py [-n]
@@ -103,12 +104,17 @@ def stage_files():
 
 
 def readme(areas):
-    """src/stages/README.md: the areas and their stages"""
+    """src/stages/README.md: the areas and their stages, with their names"""
+    from stage_names_doc import STAGES as NAMES
+
     by_area = {}
     for stage, area in sorted(areas.items()):
         by_area.setdefault(area, []).append(stage[len("wstag"):])
-    rows = "".join(f"| `{folder(a)}/` | {a} | {len(s)} | {', '.join(s)} |\n"
-                   for a, s in sorted(by_area.items(), key=lambda kv: kv[1][0]))
+    by_area = sorted(by_area.items(), key=lambda kv: kv[1][0])
+    rows = "".join(f"| `{folder(a)}/` | {a} | {len(s)} | {', '.join(s)} |\n" for a, s in by_area)
+    lists = "".join(f"\n## {a} (`{folder(a)}/`)\n\n"
+                    + "".join(f"- `wstag{n}`: {NAMES[int(n)][0]}\n" for n in s)
+                    for a, s in by_area)
     return f"""# The stage overlays
 
 Each stage overlay, AAA/PRO/WSTAG###.PRO, is one C file, `wstag###.c`, in
@@ -118,16 +124,20 @@ area, a string of text file 0xAA). `tools/stage_areas.py` moves them and
 writes this list.
 
 - `common/` holds the code that several stages share, which they include.
-- `wstag260.c`, the story events' scripts, belongs to no area: no mode
-  starts it, FIELDSTG runs its scripts.
+- `wstag260.c`, the story events' scripts, is the file mode 528 (Asuka
+  City's Cargo Tower) loads, but FIELDSTG starts that mode with its own
+  FIELDSTG_createStoryEvents, so the stage has no code and stays here.
 
 The cities have two copies of their stages, one for each server (Asuka and
 Amaterasu, Seiryu and Qing Long, Suzaku and Zhu Que, Byakko and Bai Hu),
 and the European version adds stages of its own (920 and up) to the areas.
 
+Each stage's file starts with a comment that says which map or event it is
+(`tools/stage_names_doc.py` writes them, and the names below).
+
 | Folder | Area | Stages | WSTAG |
 |---|---|---|---|
-{rows}"""
+{rows}{lists}"""
 
 
 def main():

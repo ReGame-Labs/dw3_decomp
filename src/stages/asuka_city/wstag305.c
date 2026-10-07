@@ -1,3 +1,7 @@
+/*
+ * WSTAG305: Master Room, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

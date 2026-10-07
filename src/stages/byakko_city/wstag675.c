@@ -1,3 +1,7 @@
+/*
+ * WSTAG675: Byakko Dome, Byakko City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

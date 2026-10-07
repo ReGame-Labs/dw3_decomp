@@ -1,3 +1,7 @@
+/*
+ * WSTAG745: Dark Dungeon, North Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

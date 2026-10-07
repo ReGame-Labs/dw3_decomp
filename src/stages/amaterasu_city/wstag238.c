@@ -1,3 +1,7 @@
+/*
+ * WSTAG238: Underground Path, Amaterasu City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

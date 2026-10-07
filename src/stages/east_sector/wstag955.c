@@ -1,3 +1,9 @@
+/*
+ * WSTAG955: East Station, East Sector, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 667 starts it
+ * instead of WSTAG411.
+ */
+
 #include "common.h"
 #include "stage.h"
 

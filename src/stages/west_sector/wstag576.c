@@ -1,3 +1,8 @@
+/*
+ * WSTAG576: Bullet Valley, West Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG575.
+ */
+
 #include "common.h"
 #include "stage.h"
 

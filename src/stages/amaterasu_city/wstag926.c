@@ -1,3 +1,9 @@
+/*
+ * WSTAG926: Arena Front Desk, Amaterasu City, in the extra chapter. The
+ * European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 631
+ * starts it instead of WSTAG231.
+ */
+
 #include "common.h"
 #include "stage.h"
 

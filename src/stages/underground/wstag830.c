@@ -1,3 +1,8 @@
+/*
+ * WSTAG830: Seabed, Underground: below the bridges. A tunnel under the Asuka
+ * and Amaterasu Bridges (WSTAG205, 206); it joins WSTAG825.
+ */
+
 #include "common.h"
 #include "stage.h"
 

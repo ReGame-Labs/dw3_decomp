@@ -1,3 +1,7 @@
+/*
+ * WSTAG420: Seiryu City, East Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

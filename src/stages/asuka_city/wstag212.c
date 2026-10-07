@@ -1,3 +1,9 @@
+/*
+ * WSTAG212: Main Lobby, Asuka City: the story events' copy. STAGSLCT's "Main
+ * Lobby: demo": the first partner's download, the DO Guard, Kail asking how to
+ * change into Digimon.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

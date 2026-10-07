@@ -1,3 +1,7 @@
+/*
+ * WSTAG690: Boot Mountain, North Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

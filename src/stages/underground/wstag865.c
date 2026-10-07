@@ -1,3 +1,9 @@
+/*
+ * WSTAG865: Circuit Board, Underground: entered from the sectors' maps. A
+ * tunnel entered from maps of Central, East, South, West and North Sector; it
+ * joins WSTAG880 to 895.
+ */
+
 #include "common.h"
 #include "stage.h"
 

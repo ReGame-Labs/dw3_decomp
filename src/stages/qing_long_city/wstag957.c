@@ -1,3 +1,9 @@
+/*
+ * WSTAG957: Zephyr Tower, Qing Long City, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 669 starts it
+ * instead of WSTAG426.
+ */
+
 #include "common.h"
 #include "stage.h"
 

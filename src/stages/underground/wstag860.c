@@ -1,3 +1,8 @@
+/*
+ * WSTAG860: Seabed, Underground: a dead end off WSTAG845 and 850. A tunnel
+ * only WSTAG845 and 850 reach, with chests (the Charisma Chip, TP Chip 3).
+ */
+
 #include "common.h"
 #include "stage.h"
 

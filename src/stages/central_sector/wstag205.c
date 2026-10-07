@@ -1,3 +1,7 @@
+/*
+ * WSTAG205: Asuka Bridge, Central Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

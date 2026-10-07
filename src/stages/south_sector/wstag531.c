@@ -1,3 +1,8 @@
+/*
+ * WSTAG531: Jungle Shrine, South Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG530.
+ */
+
 #include "common.h"
 #include "stage.h"
 

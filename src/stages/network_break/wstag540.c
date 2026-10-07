@@ -1,3 +1,7 @@
+/*
+ * WSTAG540: Bug Maze, Network Break.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,8 @@
+/*
+ * WSTAG336: Wire Forest Entrance, Central Sector. On the Amaterasu server; its
+ * Asuka server twin is WSTAG335.
+ */
+
 #include "common.h"
 #include "stage.h"
 

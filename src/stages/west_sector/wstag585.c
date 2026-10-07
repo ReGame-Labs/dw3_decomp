@@ -1,3 +1,7 @@
+/*
+ * WSTAG585: Duct Room 01, West Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,7 @@
+/*
+ * WSTAG730: Kulon Weapons, North Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

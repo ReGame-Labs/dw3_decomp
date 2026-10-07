@@ -1,3 +1,9 @@
+/*
+ * WSTAG968: Circuit Board, Underground: entered from the sectors' maps, in the
+ * extra chapter. The European version's: in its extra chapter
+ * (FIELD_PROGRESS_EXTRA), mode 744 starts it instead of WSTAG865.
+ */
+
 #include "common.h"
 #include "stage.h"
 

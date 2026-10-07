@@ -1,3 +1,8 @@
+/*
+ * WSTAG361: Forest Inn, East Sector. On the Amaterasu server; its Asuka server
+ * twin is WSTAG360.
+ */
+
 #include "common.h"
 #include "stage.h"
 

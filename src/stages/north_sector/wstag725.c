@@ -1,3 +1,7 @@
+/*
+ * WSTAG725: Kulon Pit, North Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,8 @@
+/*
+ * WSTAG601: Duct Room 04, West Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG600.
+ */
+
 #include "common.h"
 #include "stage.h"
 

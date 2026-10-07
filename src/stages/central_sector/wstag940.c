@@ -1,3 +1,9 @@
+/*
+ * WSTAG940: Central Park, Central Sector, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 652 starts it
+ * instead of WSTAG331.
+ */
+
 #include "common.h"
 #include "stage.h"
 

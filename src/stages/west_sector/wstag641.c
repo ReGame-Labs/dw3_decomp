@@ -1,3 +1,8 @@
+/*
+ * WSTAG641: Mobius Desert, West Sector: the looping part, on the Amaterasu
+ * server. On the Amaterasu server; its Asuka server twin is WSTAG640.
+ */
+
 #include "common.h"
 #include "stage.h"
 

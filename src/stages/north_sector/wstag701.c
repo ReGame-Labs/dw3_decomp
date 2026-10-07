@@ -1,3 +1,8 @@
+/*
+ * WSTAG701: Mountain Inn, North Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG700.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,8 @@
+/*
+ * WSTAG311: A.o.A Headquarters, Amaterasu City. On the Amaterasu server; its
+ * Asuka server twin is WSTAG310.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

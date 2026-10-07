@@ -1,3 +1,7 @@
+/*
+ * WSTAG345: Plug Cape, Central Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

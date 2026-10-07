@@ -1,3 +1,7 @@
+/*
+ * WSTAG230: Arena Front Desk, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

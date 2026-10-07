@@ -1,3 +1,8 @@
+/*
+ * WSTAG496: South Cape, South Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG495.
+ */
+
 #include "common.h"
 #include "stage.h"
 

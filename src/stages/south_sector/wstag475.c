@@ -1,3 +1,7 @@
+/*
+ * WSTAG475: Shaman House, South Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

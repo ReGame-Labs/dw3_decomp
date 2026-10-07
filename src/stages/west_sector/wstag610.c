@@ -1,3 +1,7 @@
+/*
+ * WSTAG610: Secret Stairs, West Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

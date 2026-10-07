@@ -1,3 +1,8 @@
+/*
+ * WSTAG221: Digimon Lab, Amaterasu City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG220.
+ */
+
 #include "common.h"
 #include "stage.h"
 

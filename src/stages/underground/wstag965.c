@@ -1,3 +1,9 @@
+/*
+ * WSTAG965: Seabed, Underground: below Central Park, Bulk Bridge and Phoenix
+ * Bay, in the extra chapter. The European version's: in its extra chapter
+ * (FIELD_PROGRESS_EXTRA), mode 741 starts it instead of WSTAG850.
+ */
+
 #include "common.h"
 #include "stage.h"
 

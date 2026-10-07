@@ -1,3 +1,9 @@
+/*
+ * WSTAG202: Asuka City, Central Sector: the streets by the Cargo Tower. Exits
+ * to the Underground Path (WSTAG237), the Yellow Cruiser (270), El Dorado
+ * (280) and the Cargo Tower (mode 528, WSTAG260).
+ */
+
 #include "common.h"
 #include "stage.h"
 

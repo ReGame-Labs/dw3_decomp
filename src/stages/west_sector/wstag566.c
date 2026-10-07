@@ -1,3 +1,8 @@
+/*
+ * WSTAG566: North Badland W, West Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG565.
+ */
+
 #include "common.h"
 #include "stage.h"
 

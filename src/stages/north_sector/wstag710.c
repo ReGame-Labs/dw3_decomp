@@ -1,3 +1,7 @@
+/*
+ * WSTAG710: Kulon Mine, North Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

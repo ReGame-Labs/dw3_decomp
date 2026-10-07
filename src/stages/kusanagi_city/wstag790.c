@@ -1,3 +1,8 @@
+/*
+ * WSTAG790: Chamber Room, Kusanagi City (the Real World). Where Junior logs
+ * into the game; Guardromon saves.
+ */
+
 #include "common.h"
 #include "stage.h"
 

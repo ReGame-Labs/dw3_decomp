@@ -1,3 +1,8 @@
+/*
+ * WSTAG326: Control Room, Amaterasu City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG325.
+ */
+
 #include "common.h"
 #include "stage.h"
 

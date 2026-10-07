@@ -366,7 +366,7 @@ s32 FIGHTSTG_testEnemyCondition(u8 condition, s16 arg) {
         }
         break;
     case 13:
-        if (BATTLE_SETUP.unk3D == arg) {
+        if (BATTLE_SETUP.encounterKind == arg) {
             result = 1;
         }
         break;

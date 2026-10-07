@@ -1,3 +1,7 @@
+/*
+ * WSTAG550: South Badland, West Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

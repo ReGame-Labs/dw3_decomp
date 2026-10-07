@@ -1,3 +1,9 @@
+/*
+ * WSTAG780: Street Corner, Kusanagi City (the Real World). Junior's town
+ * outside the MAGAMI Online Center; the news of the undersea base attack and
+ * the ending.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

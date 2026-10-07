@@ -1,3 +1,8 @@
+/*
+ * WSTAG746: Dark Dungeon, North Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG745.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

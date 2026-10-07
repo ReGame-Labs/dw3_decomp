@@ -1,3 +1,9 @@
+/*
+ * WSTAG538: Catacomb, South Sector, on the Amaterasu server. Off Amaterasu's
+ * Jungle Shrine (WSTAG531); STAGSLCT lists it as Amaterasu's after WSTAG535
+ * and 537.
+ */
+
 #include "common.h"
 #include "stage.h"
 

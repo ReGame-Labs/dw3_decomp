@@ -117,3 +117,7 @@ D_80082E88 FIELDSTG_startColor
 
 # Round 3
 FIELDSTG_talkVoice FIELDSTG_slideVoice
+
+# Final round: the two data FIELDSTG never reads
+D_80096983 FIELDSTG_triggerAnimsPad
+D_8009AA3C FIELDSTG_transitionUnused

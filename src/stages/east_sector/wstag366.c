@@ -1,3 +1,8 @@
+/*
+ * WSTAG366: Forest Inn BF, East Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG365.
+ */
+
 #include "common.h"
 #include "stage.h"
 

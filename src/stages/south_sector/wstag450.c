@@ -1,3 +1,7 @@
+/*
+ * WSTAG450: Bulk Bridge, South Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

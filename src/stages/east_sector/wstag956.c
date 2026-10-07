@@ -1,3 +1,9 @@
+/*
+ * WSTAG956: Qing Long City, East Sector, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 668 starts it
+ * instead of WSTAG421.
+ */
+
 #include "common.h"
 #include "stage.h"
 

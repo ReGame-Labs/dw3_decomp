@@ -1,3 +1,8 @@
+/*
+ * WSTAG636: Mobius Desert, West Sector: the way in, on the Amaterasu server.
+ * On the Amaterasu server; its Asuka server twin is WSTAG635.
+ */
+
 #include "common.h"
 #include "stage.h"
 

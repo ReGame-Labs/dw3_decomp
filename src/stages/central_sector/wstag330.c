@@ -1,3 +1,7 @@
+/*
+ * WSTAG330: Central Park, Central Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

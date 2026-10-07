@@ -1,3 +1,8 @@
+/*
+ * WSTAG726: Kulon Pit, North Sector. On the Amaterasu server; its Asuka server
+ * twin is WSTAG725.
+ */
+
 #include "common.h"
 #include "stage.h"
 

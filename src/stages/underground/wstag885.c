@@ -1,3 +1,9 @@
+/*
+ * WSTAG885: Circuit Board, Underground: a deep tunnel with Black Kingz and
+ * Numemon. A tunnel only the other tunnels reach (WSTAG865 to 895), with Black
+ * Kingz and Numemon battles.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,9 @@
+/*
+ * WSTAG537: Catacomb, South Sector: from story point 0x1A. The Jungle Shrine
+ * (WSTAG530) leads here (mode 580) from GAME.progress 0x1A on; it has the way
+ * to the Bug Maze (540).
+ */
+
 #include "common.h"
 #include "stage.h"
 

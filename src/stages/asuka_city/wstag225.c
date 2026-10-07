@@ -1,3 +1,7 @@
+/*
+ * WSTAG225: Login Room, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

@@ -1,3 +1,8 @@
+/*
+ * WSTAG431: Qing Long Tower, Qing Long City. On the Amaterasu server; its
+ * Asuka server twin is WSTAG430.
+ */
+
 #include "common.h"
 #include "stage.h"
 

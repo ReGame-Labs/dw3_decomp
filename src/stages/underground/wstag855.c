@@ -1,3 +1,8 @@
+/*
+ * WSTAG855: Seabed, Underground: the junction of the Seabed tunnels. A tunnel
+ * only the other tunnels reach: it joins WSTAG825, 835, 840, 845 and 850.
+ */
+
 #include "common.h"
 #include "stage.h"
 

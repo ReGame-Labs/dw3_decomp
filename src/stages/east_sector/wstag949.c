@@ -1,3 +1,9 @@
+/*
+ * WSTAG949: Protocol Ruins, East Sector, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 661 starts it
+ * instead of WSTAG376.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

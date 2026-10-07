@@ -1,3 +1,8 @@
+/*
+ * WSTAG635: Mobius Desert, West Sector: the way in. Between S Noise Desert
+ * (WSTAG630) and the Mirage Tower (645); it leads on to WSTAG640.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

@@ -1,3 +1,7 @@
+/*
+ * WSTAG805: Magasta 1F, Undersea Base. Where the Juggernaut launches.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

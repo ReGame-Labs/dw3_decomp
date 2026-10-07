@@ -1,3 +1,7 @@
+/*
+ * WSTAG555: Noise Desert, West Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

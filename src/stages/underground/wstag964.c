@@ -1,3 +1,9 @@
+/*
+ * WSTAG964: Seabed, Underground: Seehomon and Depthmon's forge, in the extra
+ * chapter. The European version's: in its extra chapter
+ * (FIELD_PROGRESS_EXTRA), mode 740 starts it instead of WSTAG845.
+ */
+
 #include "common.h"
 #include "stage.h"
 

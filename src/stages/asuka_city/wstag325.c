@@ -1,3 +1,7 @@
+/*
+ * WSTAG325: Control Room, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,7 @@
+/*
+ * WSTAG660: Byakko City, West Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

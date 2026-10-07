@@ -1,3 +1,7 @@
+/*
+ * WSTAG525: Suzaku UG Lake, South Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

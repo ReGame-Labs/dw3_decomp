@@ -1,3 +1,7 @@
+/*
+ * WSTAG500: Suzaku City, South Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

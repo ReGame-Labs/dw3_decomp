@@ -1,3 +1,8 @@
+/*
+ * WSTAG441: South Station, South Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG440.
+ */
+
 #include "common.h"
 #include "stage.h"
 

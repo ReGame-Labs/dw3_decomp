@@ -1,3 +1,8 @@
+/*
+ * WSTAG661: Bai Hu City, West Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG660.
+ */
+
 #include "common.h"
 #include "stage.h"
 

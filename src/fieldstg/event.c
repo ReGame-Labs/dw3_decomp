@@ -58,6 +58,18 @@ s32 FIELDSTG_setEventPose(EventTask *task, s16 *op, EventChildren *children) {
     return 4;
 }
 
+/* Gives the characters the event held their controls back */
+static inline void releaseEventActors(EventTask *task) {
+    s32 i;
+
+    for (i = 0; i < 30; i++) {
+        if (task->entries[i].id == 0) {
+            break;
+        }
+        task->entries[i].actor->resetControl(task->entries[i].actor);
+    }
+}
+
 /*
  * Runs an event: in TASK_INIT it waits for the event's text file and the
  * field (FIELD_TASK_FIELD) and holds the characters; in TASK_RUN it runs the script
@@ -223,12 +235,7 @@ void FIELDSTG_runEvent(EventTask *task, EventChildren *children) {
     case TASK_DONE:
         break;
     case TASK_KILL:
-        for (i = 0; i < 30; i++) {
-            if (task->entries[i].id == 0) {
-                break;
-            }
-            task->entries[i].actor->resetControl(task->entries[i].actor);
-        }
+        releaseEventActors(task);
         FIELDSTG_state.busy = 0;
         if (task->end != NULL) {
             task->end();

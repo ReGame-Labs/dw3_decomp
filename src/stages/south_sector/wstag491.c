@@ -1,3 +1,8 @@
+/*
+ * WSTAG491: Ether Jungle, South Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG490.
+ */
+
 #include "common.h"
 #include "stage.h"
 

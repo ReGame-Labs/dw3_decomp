@@ -1,3 +1,8 @@
+/*
+ * WSTAG621: Secret Room, West Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG620.
+ */
+
 #include "common.h"
 #include "stage.h"
 

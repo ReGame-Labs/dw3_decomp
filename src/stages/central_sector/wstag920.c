@@ -1,3 +1,9 @@
+/*
+ * WSTAG920: Amaterasu City, Central Sector: the streets by the bridge, in the
+ * extra chapter. The European version's: in its extra chapter
+ * (FIELD_PROGRESS_EXTRA), mode 624 starts it instead of WSTAG201.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,8 @@
+/*
+ * WSTAG616: Sewers, West Sector. On the Amaterasu server; its Asuka server
+ * twin is WSTAG615.
+ */
+
 #include "common.h"
 #include "stage.h"
 

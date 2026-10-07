@@ -1,3 +1,9 @@
+/*
+ * WSTAG936: Water Tunnel, Amaterasu City, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 641 starts it
+ * instead of WSTAG276.
+ */
+
 #include "common.h"
 #include "stage.h"
 

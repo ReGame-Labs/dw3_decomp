@@ -1,3 +1,9 @@
+/*
+ * WSTAG850: Seabed, Underground: below Central Park, Bulk Bridge and Phoenix
+ * Bay. A tunnel under Central Park, Bulk Bridge and Phoenix Bay; it joins
+ * WSTAG835, 845, 855 and 860.
+ */
+
 #include "common.h"
 #include "stage.h"
 

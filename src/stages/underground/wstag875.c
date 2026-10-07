@@ -1,3 +1,9 @@
+/*
+ * WSTAG875: Circuit Board, Underground: the Black Kingz' den. A tunnel only
+ * WSTAG885 to 895 reach: the Black Kingz and their leader, who has Etemon's
+ * Mic.
+ */
+
 #include "common.h"
 #include "stage.h"
 

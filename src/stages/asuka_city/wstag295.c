@@ -1,3 +1,7 @@
+/*
+ * WSTAG295: Prison Tower, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

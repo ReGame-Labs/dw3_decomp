@@ -1,3 +1,8 @@
+/*
+ * WSTAG711: Kulon Mine, North Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG710.
+ */
+
 #include "common.h"
 #include "stage.h"
 

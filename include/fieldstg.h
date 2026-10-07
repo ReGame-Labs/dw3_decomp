@@ -566,7 +566,7 @@ typedef struct StreamPool {
 
 /* The first sector of a map's tile file (MapStreamer.header) */
 typedef struct MapFileHeader {
-    /* 0x00 */ s32 unk0;
+    /* 0x00 */ s32 tileCount; /* the tiles with data (tileSizes not 0); nothing reads it */
     /* 0x04 */ s32 width; /* in 128-pixel tiles */
     /* 0x08 */ s32 height;
     /* 0x0C */ s32 tileBytes; /* the room of a tile on the CD */
@@ -842,7 +842,10 @@ typedef struct FieldChildren {
 typedef struct Encounter {
     /* 0x00 */ BattleEnemy *enemies[3];
     /* 0x0C */ u8 ambushChance;
-    /* 0x0D */ u8 unkD; /* copied to BATTLE_SETUP.unk3D */
+    /* 0x0D */ u8 kind; /* copied to BATTLE_SETUP.encounterKind: 1 for nearly all the maps'
+                          random battles (some enemies' battle table actions, condition 13, run
+                          away in them), 4 for the Digimon Arena's, 2, 3 and 5 mostly for the
+                          event battles */
     /* 0x0E */ u8 blocks[12]; /* copied to BATTLE_SETUP.blocks */
 } Encounter;
 

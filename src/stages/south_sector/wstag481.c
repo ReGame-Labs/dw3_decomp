@@ -1,3 +1,8 @@
+/*
+ * WSTAG481: Jungle Grave, South Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG480.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

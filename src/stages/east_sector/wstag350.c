@@ -1,3 +1,7 @@
+/*
+ * WSTAG350: West Wire Forest, East Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,8 @@
+/*
+ * WSTAG396: Wind Prairie, East Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG395.
+ */
+
 #include "common.h"
 #include "stage.h"
 

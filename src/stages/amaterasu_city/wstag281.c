@@ -1,3 +1,8 @@
+/*
+ * WSTAG281: El Dorado, Amaterasu City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG280.
+ */
+
 #include "common.h"
 #include "stage.h"
 

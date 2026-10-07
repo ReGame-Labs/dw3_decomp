@@ -1,3 +1,9 @@
+/*
+ * WSTAG921: Amaterasu City, Central Sector: the streets by the Cargo Tower, in
+ * the extra chapter. The European version's: in its extra chapter
+ * (FIELD_PROGRESS_EXTRA), mode 625 starts it instead of WSTAG203.
+ */
+
 #include "common.h"
 #include "stage.h"
 

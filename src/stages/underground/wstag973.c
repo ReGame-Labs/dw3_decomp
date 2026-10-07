@@ -1,3 +1,9 @@
+/*
+ * WSTAG973: Circuit Board, Underground: a deep tunnel with guides to both
+ * servers, in the extra chapter. The European version's: in its extra chapter
+ * (FIELD_PROGRESS_EXTRA), mode 749 starts it instead of WSTAG890.
+ */
+
 #include "common.h"
 #include "stage.h"
 

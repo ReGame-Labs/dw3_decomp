@@ -1,3 +1,8 @@
+/*
+ * WSTAG341: Shell Beach, Central Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG340.
+ */
+
 #include "common.h"
 #include "stage.h"
 

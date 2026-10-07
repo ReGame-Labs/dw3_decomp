@@ -1,3 +1,8 @@
+/*
+ * WSTAG640: Mobius Desert, West Sector: the looping part. Off WSTAG635: its
+ * exits loop back into itself, its other ways lead to WSTAG630 and 635.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

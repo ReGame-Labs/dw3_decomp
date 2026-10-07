@@ -1,3 +1,8 @@
+/*
+ * WSTAG680: Storage Room, Byakko City. The basement the player falls into; no
+ * Bai Hu copy.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

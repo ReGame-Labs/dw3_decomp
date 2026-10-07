@@ -1,3 +1,8 @@
+/*
+ * WSTAG456: Bios Swamp, South Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG455.
+ */
+
 #include "common.h"
 #include "stage.h"
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };

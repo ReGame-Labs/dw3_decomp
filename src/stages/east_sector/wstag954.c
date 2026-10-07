@@ -1,3 +1,9 @@
+/*
+ * WSTAG954: Tyranno Valley, East Sector, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 666 starts it
+ * instead of WSTAG406.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

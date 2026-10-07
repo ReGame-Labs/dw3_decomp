@@ -1,3 +1,9 @@
+/*
+ * WSTAG945: East Wire Forest, East Sector, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 657 starts it
+ * instead of WSTAG356.
+ */
+
 #include "common.h"
 #include "stage.h"
 

@@ -1,3 +1,8 @@
+/*
+ * WSTAG731: Kulon Weapons, North Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG730.
+ */
+
 #include "common.h"
 #include "stage.h"
 /* Defined below, after the code that uses them */

@@ -1,3 +1,7 @@
+/*
+ * WSTAG575: Bullet Valley, West Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

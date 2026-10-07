@@ -1,3 +1,7 @@
+/*
+ * WSTAG400: Kicking Forest, East Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

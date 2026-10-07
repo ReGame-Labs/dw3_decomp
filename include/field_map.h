@@ -282,9 +282,9 @@ typedef struct BattleList {
  * them, which FieldState.findBattles searches for the id.
  */
 typedef struct FieldBattles {
-    /* 0x00 */ s32 unk0;
+    /* 0x00 */ s32 serial; /* a number of its own, 1 to 448 over the stages; nothing reads it */
     /* 0x04 */ s32 id; /* the place, GAME.place */
-    /* 0x08 */ s32 unk8;
+    /* 0x08 */ s32 unk8; /* 0 in every list; nothing reads it */
     /* 0x0C */ BattleList *battles[4];
 } FieldBattles;
 

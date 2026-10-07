@@ -1,3 +1,8 @@
+/*
+ * WSTAG386: Duel Island, East Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG385.
+ */
+
 #include "common.h"
 #include "stage.h"
 

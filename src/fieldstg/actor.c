@@ -84,19 +84,8 @@ void FIELDSTG_updateActor(Actor *actor, ActorChildren *children) {
     }
 }
 
-/*
- * Creates a character (FIELD_TASK_ACTOR): key1 is the character, key2 its
- * kind (0 the player, 2 to 8 a follower, the others the map's characters).
- *
- * The match depends on kind holding getModeArg's result in the player's
- * branch, where kind is no longer needed: its second set keeps local-alloc
- * from doubling its live length, which puts it before the constant 1 in the
- * global allocator (the European version matches either way).
- */
-Actor *FIELDSTG_createActor(s32 key1, s32 kind, s32 image, FieldActorEntry *entry) {
-    Actor *actor = createTaskWithId(FIELDSTG_updateActor, sizeof(Actor), 0x10, FIELD_TASK_ACTOR);
-    s32 isLarge;
-
+/* Gives a new character its methods */
+static inline void setActorMethods(Actor *actor) {
     actor->walkInDir = FIELDSTG_walkActorInDir;
     actor->climbUp = FIELDSTG_startClimbUp;
     actor->climbDown = FIELDSTG_startClimbDown;
@@ -114,6 +103,33 @@ Actor *FIELDSTG_createActor(s32 key1, s32 kind, s32 image, FieldActorEntry *entr
     actor->setGoal = FIELDSTG_setActorGoal;
     actor->setAnim = FIELDSTG_setActorAnim;
     actor->setPose = FIELDSTG_setActorPose;
+}
+
+/* Puts the player or a follower on GAME.playerDepth's layer, or on layer 4 and
+   back to it when the temporary flags are cleared */
+static inline void takePartyDepth(Actor *actor) {
+    if (GAME.clearTempFlags) {
+        actor->depth = 4;
+        GAME.playerDepth = 4;
+    } else {
+        actor->depth = GAME.playerDepth;
+    }
+}
+
+/*
+ * Creates a character (FIELD_TASK_ACTOR): key1 is the character, key2 its
+ * kind (0 the player, 2 to 8 a follower, the others the map's characters).
+ *
+ * The match depends on kind holding getModeArg's result in the player's
+ * branch, where kind is no longer needed: its second set keeps local-alloc
+ * from doubling its live length, which puts it before the constant 1 in the
+ * global allocator (the European version matches either way).
+ */
+Actor *FIELDSTG_createActor(s32 key1, s32 kind, s32 image, FieldActorEntry *entry) {
+    Actor *actor = createTaskWithId(FIELDSTG_updateActor, sizeof(Actor), 0x10, FIELD_TASK_ACTOR);
+    s32 isLarge;
+
+    setActorMethods(actor);
     actor->key1 = key1;
     actor->key2 = kind;
     actor->getFacingTile = FIELDSTG_getFacingTile;
@@ -160,12 +176,7 @@ Actor *FIELDSTG_createActor(s32 key1, s32 kind, s32 image, FieldActorEntry *entr
         }
         actor->tile.x = actor->pos.x >> 8;
         actor->tile.y = actor->pos.y >> 8;
-        if (GAME.clearTempFlags) {
-            actor->depth = 4;
-            GAME.playerDepth = 4;
-        } else {
-            actor->depth = GAME.playerDepth;
-        }
+        takePartyDepth(actor);
     } else if (kind & 0xE) {
         actor->trail = HEAP.allocZeroed(sizeof(Trail), 2);
         actor->control = FIELDSTG_followLeader;
@@ -176,12 +187,7 @@ Actor *FIELDSTG_createActor(s32 key1, s32 kind, s32 image, FieldActorEntry *entr
         } else {
             actor->trail->tail = 0x25;
         }
-        if (GAME.clearTempFlags) {
-            actor->depth = 4;
-            GAME.playerDepth = 4;
-        } else {
-            actor->depth = GAME.playerDepth;
-        }
+        takePartyDepth(actor);
     } else {
         isLarge = key1 == 0x28;
         if (key1 == 0x29) {

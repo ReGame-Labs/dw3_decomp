@@ -1,3 +1,8 @@
+/*
+ * WSTAG676: Bai Hu Dome, Bai Hu City. On the Amaterasu server; its Asuka
+ * server twin is WSTAG675.
+ */
+
 #include "common.h"
 #include "stage.h"
 

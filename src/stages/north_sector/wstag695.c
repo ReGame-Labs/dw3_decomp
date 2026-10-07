@@ -1,3 +1,7 @@
+/*
+ * WSTAG695: Snow Mountain, North Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

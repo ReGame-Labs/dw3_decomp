@@ -1,3 +1,8 @@
+/*
+ * WSTAG656: Mirage Room, West Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG655.
+ */
+
 #include "common.h"
 #include "stage.h"
 

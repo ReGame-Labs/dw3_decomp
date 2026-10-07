@@ -1,3 +1,9 @@
+/*
+ * WSTAG835: Seabed, Underground: below Divermon's Lake and South and West
+ * Sector. A tunnel under Divermon's Lake, Ether Jungle, Suzaku City, South
+ * Badland, Pelche Oasis and North Badland E; it joins WSTAG825, 850 and 855.
+ */
+
 #include "common.h"
 #include "stage.h"
 

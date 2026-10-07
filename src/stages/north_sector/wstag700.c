@@ -1,3 +1,7 @@
+/*
+ * WSTAG700: Mountain Inn, North Sector.
+ */
+
 #include "common.h"
 #include "stage.h"
 

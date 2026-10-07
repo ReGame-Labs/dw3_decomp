@@ -1,3 +1,8 @@
+/*
+ * WSTAG581: Dum Dum Factory, West Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG580.
+ */
+
 #include "common.h"
 #include "stage.h"
 

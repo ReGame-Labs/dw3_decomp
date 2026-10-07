@@ -1,3 +1,7 @@
+/*
+ * WSTAG255: Lamb Chop, Asuka City.
+ */
+
 #include "common.h"
 #include "stage.h"
 

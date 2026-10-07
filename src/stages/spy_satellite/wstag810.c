@@ -1,3 +1,8 @@
+/*
+ * WSTAG810: Gunslinger 1F, Spy Satellite. Reached from Amaterasu's A.o.A
+ * Headquarters (WSTAG311); its blocks open from panels.
+ */
+
 #include "common.h"
 #include "stage.h"
 #if VERSION_US

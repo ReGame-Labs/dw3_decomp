@@ -1,3 +1,8 @@
+/*
+ * WSTAG376: Protocol Ruins, East Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG375.
+ */
+
 #include "common.h"
 #include "stage.h"
 

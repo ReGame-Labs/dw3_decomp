@@ -1,3 +1,9 @@
+/*
+ * WSTAG924: Digimon Lab, Amaterasu City, in the extra chapter. The European
+ * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 629 starts it
+ * instead of WSTAG221.
+ */
+
 #include "common.h"
 #define STAGE_TWEEN /* stageFuncs is a StageFuncs (stage.h) */
 #include "stage.h"

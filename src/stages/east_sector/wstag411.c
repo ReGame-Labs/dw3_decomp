@@ -1,3 +1,8 @@
+/*
+ * WSTAG411: East Station, East Sector. On the Amaterasu server; its Asuka
+ * server twin is WSTAG410.
+ */
+
 #include "common.h"
 #include "stage.h"
 

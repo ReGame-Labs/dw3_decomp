@@ -1,3 +1,8 @@
+/*
+ * WSTAG286: Admin Center 1F, Amaterasu City. On the Amaterasu server; its
+ * Asuka server twin is WSTAG285.
+ */
+
 #include "common.h"
 #include "stage.h"
 
