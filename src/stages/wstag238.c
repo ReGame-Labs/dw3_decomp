@@ -22,7 +22,7 @@ void setupStage(void) {
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.soundBank = 0x1F;
-    FIELDSTG_state.music = 0x607C0000;
+    FIELDSTG_state.music = MUSIC(0x1F, 0);
     FIELDSTG_map.setFile(0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(7, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
@@ -49,12 +49,12 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { 0xFFFF, 0 }, { 0xFFFF, 0 } }, 1, 0x271, 0xF0, 0x108, 7, 0, 0, 0 },
-    { { { 0xFFFF, 0 }, { 0xFFFF, 0 } }, 1, 0x28A, 0x138, 0x64, 7, 0, 0, 0 },
-    { { { 0xFFFF, 0 }, { 0xFFFF, 0 } }, 1, 0x279, 0xA7, 0x153, 3, 0x64, 0, 0 },
-    { { { 0xFFFF, 0 }, { 0xFFFF, 0 } }, 3, 6, 0x203, 0xC2, 0, 0, 0, 0 },
-    { { { 0xFFFF, 0 }, { 0xFFFF, 0 } }, 2, 6, 0x212, 0x128, 0, 0, 0, 0 },
-    { { { 0xFFFF, 0 }, { 0xFFFF, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x271, 0xF0, 0x108, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x28A, 0x138, 0x64, 7, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x279, 0xA7, 0x153, 3, 0x64, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, 3, 6, 0x203, 0xC2, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, 2, 6, 0x212, 0x128, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,

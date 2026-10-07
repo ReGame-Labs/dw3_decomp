@@ -15,23 +15,13 @@ void setupStage(void) {
     FIELDSTG_state.start = (Vec2){0xF500, 0x17A00};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.soundBank = 0x2B;
-    FIELDSTG_state.music = 0x60AC0000;
+    FIELDSTG_state.music = MUSIC(0x2B, 0);
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_map.setFile(0, 0x9050001);
     FIELDSTG_map.setFile(7, 0x9050002);
     FIELDSTG_map.setFirstMap(0);
 }
-
-extern u16 D_800A5FFC[];
-extern u16 D_800A6004[];
-extern u16 D_800A6010[];
-extern FieldTalk D_800A601C[];
-extern FieldTalk D_800A6034[];
-extern FieldTalk D_800A604C[];
-extern FieldActorEntry D_800A607C;
-extern FieldActorEntry D_800A6090;
-extern FieldActorEntry D_800A60A4;
 
 ActorImage stageImages[] = {
     { 0x200, 0x100, 0x21C, 0x1A6, 0x70, 0xA6, 0x230, 0x1FE },
@@ -44,30 +34,30 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x170, 0x100, 0xC0, 0, 0x140, 0x1ED },
     { 0x140, 0x100, 0x178, 0x100, 0xE0, 0, 0x140, 0x1EC },
 };
-u16 D_800A5FFC[] = { 0x7054, 0, 0xFFFF };
-u16 D_800A6004[] = { 0x7054, 1, 0x100C, 0, 0xFFFF };
-u16 D_800A6010[] = { 0x7054, 1, 0x100C, 1, 0xFFFF };
-FieldTalk D_800A601C[] = {
+u16 actor2Talk0Conditions[] = { SPECIAL(0x54), 0, CODES_END };
+u16 actor2Talk1Conditions[] = { SPECIAL(0x54), 1, FLAG(0x10, 0xC), 0, CODES_END };
+u16 actor2Talk2Conditions[] = { SPECIAL(0x54), 1, FLAG(0x10, 0xC), 1, CODES_END };
+FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x6D },
     { NULL, NULL, 0 },
 };
-FieldTalk D_800A6034[] = {
+FieldTalk actor1Talks[] = {
     { NULL, NULL, 0x6E },
     { NULL, NULL, 0 },
 };
-FieldTalk D_800A604C[] = {
-    { D_800A5FFC, NULL, 0x6A },
-    { D_800A6004, NULL, 0x6B },
-    { D_800A6010, NULL, 0x6C },
+FieldTalk actor2Talks[] = {
+    { actor2Talk0Conditions, NULL, 0x6A },
+    { actor2Talk1Conditions, NULL, 0x6B },
+    { actor2Talk2Conditions, NULL, 0x6C },
     { NULL, NULL, 0 },
 };
-FieldActorEntry D_800A607C = { NULL, D_800A601C, 0x20, 4, 368, 264, 5 };
-FieldActorEntry D_800A6090 = { NULL, D_800A6034, 0x24, 5, 440, 253, 5 };
-FieldActorEntry D_800A60A4 = { NULL, D_800A604C, 0x68, 6, 407, 269, 5 };
+FieldActorEntry actor0 = { NULL, actor0Talks, 0x20, 4, 368, 264, 5 };
+FieldActorEntry actor1 = { NULL, actor1Talks, 0x24, 5, 440, 253, 5 };
+FieldActorEntry actor2 = { NULL, actor2Talks, 0x68, 6, 407, 269, 5 };
 FieldActorEntry *stageActors[] = {
-    &D_800A607C,
-    &D_800A6090,
-    &D_800A60A4,
+    &actor0,
+    &actor1,
+    &actor2,
     NULL,
 };
 StageTile stageObjects[] = {
@@ -95,8 +85,8 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { 0xFFFF, 0 }, { 0xFFFF, 0 } }, 1, 0x28A, 0x3F8, 0x2DC, 1, 0, 0, 0 },
-    { { { 0xFFFF, 0 }, { 0xFFFF, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, 1, 0x28A, 0x3F8, 0x2DC, 1, 0, 0, 0 },
+    { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {
     setupStage,
