@@ -121,15 +121,118 @@ void STGTRAIN_drawMenu(TrainMenu *menu) {
     }
 }
 
+/* Shows the hint to the other page: R1 on the first page, L1 on the second */
+static inline void STGTRAIN_showPageHint(TrainMenu *menu, TextWindow **win) {
+    if (menu->page == 0) {
+        win[1]->setString(win[1], FILE_CACHE.load(STGTRAIN_TEXT), 0x45);
+        win[1]->setPos(win[1], 0xE4, 0xA0);
+    } else {
+        win[1]->setString(win[1], FILE_CACHE.load(STGTRAIN_TEXT), 0x44);
+        win[1]->setPos(win[1], 0xA3, 0xA0);
+    }
+}
+
+/* Turns the page with L1 or R1 when the gym has more than five trainings,
+   putting the cursor on the new page's first training; or moves the cursor
+   to the next training in the direction pressed, and closes the menu with
+   the one under it picked (cross) or none (triangle) */
+static inline void STGTRAIN_pickTraining(TrainMenu *menu, TextWindow **win) {
+    s32 col;
+    s32 row;
+
+    col = menu->page;
+    if (STGTRAIN_state.tableCount >= 6) {
+        if (!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) {
+            menu->page = 0;
+        } else if (!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) {
+            menu->page = 1;
+        }
+    }
+    if (col != menu->page) {
+        SOUND.playSound(SOUND_MENU_MOVE);
+        STGTRAIN_showPageHint(menu, win);
+        for (col = 0; col < 8; col++) {
+            if (menu->trainings[menu->page][col] > 0) {
+                menu->col = col % 4;
+                menu->row = col / 4;
+                break;
+            }
+        }
+        STGTRAIN_showTrainingInfo(menu, win, 1);
+        menu->iconFrame = 0;
+        return;
+    }
+    col = menu->col;
+    row = menu->row;
+    if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
+        for (;;) {
+            if (--menu->col < 0) {
+                menu->col = 0;
+                break;
+            }
+            if (menu->trainings[menu->page][menu->col + menu->row * 4] > 0) {
+                break;
+            }
+        }
+    } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
+        for (;;) {
+            if (++menu->col >= 4) {
+                menu->col = 3;
+                break;
+            }
+            if (menu->trainings[menu->page][menu->col + menu->row * 4] > 0) {
+                break;
+            }
+        }
+    }
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        for (;;) {
+            if (--menu->row < 0) {
+                menu->row = 0;
+                break;
+            }
+            if (menu->trainings[menu->page][menu->col + menu->row * 4] > 0) {
+                break;
+            }
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        for (;;) {
+            if (++menu->row >= 2) {
+                menu->row = 1;
+                break;
+            }
+            if (menu->trainings[menu->page][menu->col + menu->row * 4] > 0) {
+                break;
+            }
+        }
+    }
+    if (col != menu->col || row != menu->row) {
+        if (menu->trainings[menu->page][menu->col + menu->row * 4] > 0) {
+            SOUND.playSound(SOUND_MENU_MOVE);
+            STGTRAIN_showTrainingInfo(menu, win, 1);
+        } else {
+            menu->col = col;
+            menu->row = row;
+        }
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_MENU_MOVE);
+        menu->screen->training = menu->trainings[menu->page][menu->col + menu->row * 4];
+        if (menu->screen->training > 0) {
+            menu->substate = 0x32;
+        }
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        menu->substate = 0x32;
+        menu->step = 1;
+    }
+}
+
 /*
  * Runs the training menu: opens its panels, moves the cursor over the
  * trainings of a page (L1 and R1 turn the pages when the gym has more than
  * five), and closes with a training picked (cross) or none (triangle).
  */
 void STGTRAIN_runMenu(TrainMenu *menu, TextWindow **win) {
-    s32 col;
-    s32 row;
-
     switch (menu->substate) {
     case 0:
     default:
@@ -153,13 +256,7 @@ void STGTRAIN_runMenu(TrainMenu *menu, TextWindow **win) {
         if (STGTRAIN_state.updateFade(&menu->panels[2])) {
             if (STGTRAIN_state.tableCount >= 6) {
                 menu->arrowShown = 1;
-                if (menu->page == 0) {
-                    win[1]->setString(win[1], FILE_CACHE.load(STGTRAIN_TEXT), 0x45);
-                    win[1]->setPos(win[1], 0xE4, 0xA0);
-                } else {
-                    win[1]->setString(win[1], FILE_CACHE.load(STGTRAIN_TEXT), 0x44);
-                    win[1]->setPos(win[1], 0xA3, 0xA0);
-                }
+                STGTRAIN_showPageHint(menu, win);
             }
             STGTRAIN_state.startFade(&menu->panels[3], 1);
             menu->substate++;
@@ -173,97 +270,7 @@ void STGTRAIN_runMenu(TrainMenu *menu, TextWindow **win) {
         }
         break;
     case 10:
-        col = menu->page;
-        if (STGTRAIN_state.tableCount >= 6) {
-            if (!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) {
-                menu->page = 0;
-            } else if (!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) {
-                menu->page = 1;
-            }
-        }
-        if (col != menu->page) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-            if (menu->page == 0) {
-                win[1]->setString(win[1], FILE_CACHE.load(STGTRAIN_TEXT), 0x45);
-                win[1]->setPos(win[1], 0xE4, 0xA0);
-            } else {
-                win[1]->setString(win[1], FILE_CACHE.load(STGTRAIN_TEXT), 0x44);
-                win[1]->setPos(win[1], 0xA3, 0xA0);
-            }
-            for (col = 0; col < 8; col++) {
-                if (menu->trainings[menu->page][col] > 0) {
-                    menu->col = col % 4;
-                    menu->row = col / 4;
-                    break;
-                }
-            }
-            STGTRAIN_showTrainingInfo(menu, win, 1);
-            menu->iconFrame = 0;
-            break;
-        }
-        col = menu->col;
-        row = menu->row;
-        if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-            for (;;) {
-                if (--menu->col < 0) {
-                    menu->col = 0;
-                    break;
-                }
-                if (menu->trainings[menu->page][menu->col + menu->row * 4] > 0) {
-                    break;
-                }
-            }
-        } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-            for (;;) {
-                if (++menu->col >= 4) {
-                    menu->col = 3;
-                    break;
-                }
-                if (menu->trainings[menu->page][menu->col + menu->row * 4] > 0) {
-                    break;
-                }
-            }
-        }
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            for (;;) {
-                if (--menu->row < 0) {
-                    menu->row = 0;
-                    break;
-                }
-                if (menu->trainings[menu->page][menu->col + menu->row * 4] > 0) {
-                    break;
-                }
-            }
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            for (;;) {
-                if (++menu->row >= 2) {
-                    menu->row = 1;
-                    break;
-                }
-                if (menu->trainings[menu->page][menu->col + menu->row * 4] > 0) {
-                    break;
-                }
-            }
-        }
-        if (col != menu->col || row != menu->row) {
-            if (menu->trainings[menu->page][menu->col + menu->row * 4] > 0) {
-                SOUND.playSound(SOUND_MENU_MOVE);
-                STGTRAIN_showTrainingInfo(menu, win, 1);
-            } else {
-                menu->col = col;
-                menu->row = row;
-            }
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-            menu->screen->training = menu->trainings[menu->page][menu->col + menu->row * 4];
-            if (menu->screen->training > 0) {
-                menu->substate = 0x32;
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            menu->substate = 0x32;
-            menu->step = 1;
-        }
+        STGTRAIN_pickTraining(menu, win);
         break;
     case 0x32:
         menu->cursorShown = 0;

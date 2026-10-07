@@ -26,14 +26,13 @@
 typedef struct TrainAnimFrame {
     /* 0x0 */ s16 sprite; /* into the sprite bank */
     /* 0x2 */ u8 duration; /* in ticks of GFX.funcs.getTime */
-    /* 0x3 */ u8 unk3;
     /* 0x4 */ s16 x;
     /* 0x6 */ s16 y;
 } TrainAnimFrame;
 
 /* A sprite animation: its frames follow the header */
 typedef struct TrainAnim {
-    /* 0x0 */ s16 unk0;
+    /* 0x0 */ s16 unk0; /* 0x124 in every animation; nothing reads it */
     /* 0x2 */ s16 frameCount;
     /* 0x4 */ TrainAnimFrame frames[1];
 } TrainAnim;
@@ -49,14 +48,16 @@ typedef struct TrainSpritePart {
     /* 0x06 */ u16 tpage; /* bits 0-4: the page's column, 64 pixels each; 5-8: getTPage's abr and tp */
     /* 0x08 */ u16 w;
     /* 0x0A */ u16 h;
-    /* 0x0C */ u8 unkC[8];
+    /* 0x0C */ u8 unkC[8]; /* nothing reads it: in the files, four s16: 0, flags
+                             (bits 0, 14 and 15), 0x1000 and 0x1000 */
 } TrainSpritePart;
 
-/* A sprite bank, as the animated sprite reads it */
+/* A sprite bank's header, as the animated sprite reads it: its sprites
+   start bankOffset bytes from it (TrainImageSet) */
 typedef struct TrainSpriteBank {
-    /* 0x0 */ s16 unk0;
-    /* 0x2 */ u16 unk2;
-    /* 0x4 */ u16 unk4;
+    /* 0x0 */ s16 unk0; /* 801 in every bank; nothing reads it */
+    /* 0x2 */ u16 unk2; /* 0 in every bank */
+    /* 0x4 */ u16 spriteCount;
 } TrainSpriteBank;
 
 /* Draws an animated sprite, maybe rotated and scaled (STGTRAIN_createSprite) */
@@ -73,10 +74,10 @@ typedef struct TrainSprite {
     /* 0x070 */ s32 clutX;
     /* 0x074 */ s32 clutY;
     /* 0x078 */ s32 flags; /* bit 31: paused; the rest, ended */
-    /* 0x07C */ s32 unk7C;
+    /* 0x07C */ s32 pad; /* never read or written */
     /* 0x080 */ TrainSpriteBank *bank;
-    /* 0x084 */ u16 unk84; /* the bank's unk2 and unk4: nothing reads them */
-    /* 0x086 */ u16 unk86;
+    /* 0x084 */ u16 unk84; /* the bank's unk2 and spriteCount: nothing reads them */
+    /* 0x086 */ u16 spriteCount;
     /* 0x088 */ s32 bankOffset;
     /* 0x08C */ TrainAnim *anim;
     /* 0x090 */ s32 frame;
@@ -200,7 +201,7 @@ typedef struct TrainIdle {
     /* 0x50 */ TrainScreen *screen;
     /* 0x54 */ s32 layerId;
     /* 0x58 */ s32 depth;
-    /* 0x5C */ u8 unk5C[0x10];
+    /* 0x5C */ u8 pad[0x10]; /* never read or written */
 } TrainIdle;
 
 /* An animated sprite of an image set, as a training shows it
@@ -214,17 +215,17 @@ typedef struct TrainActor {
     /* 0x60 */ s32 result; /* the training worked */
     /* 0x64 */ s32 scale;
     /* 0x68 */ s32 scaleStep;
-    /* 0x6C */ s32 unk6C;
+    /* 0x6C */ s32 pad6C; /* never read or written */
     /* 0x70 */ s32 scaleChanged;
     /* 0x74 */ s32 layerId;
     /* 0x78 */ s32 depth;
-    /* 0x7C */ s32 unk7C;
+    /* 0x7C */ s32 pad7C; /* never read or written */
     /* 0x80 */ s32 pos[4]; /* x, y, clutX, clutY: for loadSet */
     /* 0x90 */ s32 savedX;
     /* 0x94 */ s32 posSet;
     /* 0x98 */ s32 clutSet;
     /* 0x9C */ s32 chance; /* of the training working, in % */
-    /* 0xA0 */ s32 unkA0;
+    /* 0xA0 */ s32 padA0; /* never read or written */
     /* 0xA4 */ void (*setPos)(struct TrainActor *actor, s32 x, s32 y);
     /* 0xA8 */ void (*setClutPos)(struct TrainActor *actor, s32 x, s32 y);
     /* 0xAC */ void (*setChance)(struct TrainActor *actor, s32 chance);
@@ -235,14 +236,14 @@ typedef struct TrainActor {
     /* 0xC0 */ void (*setScale)(struct TrainActor *actor, s32 scale);
     /* 0xC4 */ s32 (*getResult)(struct TrainActor *actor);
     /* 0xC8 */ void (*end)(struct TrainActor *actor);
-    /* 0xCC */ u8 unkCC[8];
+    /* 0xCC */ u8 padCC[8]; /* never read or written */
 } TrainActor;
 
 /* The children of a TrainActor */
 typedef struct TrainActorSprites {
     /* 0x0 */ TrainSprite *sprite;
     /* 0x4 */ TrainSprite *effect; /* of set 8 */
-    /* 0x8 */ void *unk8;
+    /* 0x8 */ void *pad; /* never read or written */
 } TrainActorSprites;
 
 /* The results of a training (STGTRAIN_createResult) */
@@ -266,7 +267,6 @@ typedef struct TrainResult {
     /* 0x0E8 */ s32 arrowClut;
     /* 0x0EC */ s32 arrowTime;
     /* 0x0F0 */ s16 bonusSound; /* the slot of the bonus try's sound */
-    /* 0x0F2 */ s16 unkF2;
     /* 0x0F4 */ PanelAnim panels[4];
 } TrainResult;
 
@@ -298,7 +298,7 @@ typedef struct TrainImageSet {
     /* 0x00 */ s32 id;
     /* 0x04 */ TrainSpriteBank *bank;
     /* 0x08 */ s32 bankOffset;
-    /* 0x0C */ s32 unkC;
+    /* 0x0C */ s32 bankSize; /* in bytes */
     /* 0x10 */ TrainAnim *anims[6];
     /* 0x28 */ u8 *images[4];
     /* 0x38 */ s32 imageCount;
@@ -307,7 +307,7 @@ typedef struct TrainImageSet {
 } TrainImageSet;
 
 /* The header of an image set in the loaded file: offsets into it, then
-   two values */
+   the bank's offset of its first sprite and the bank's size */
 typedef struct TrainSetHeader {
     /* 0x00 */ s32 count; /* of the offsets */
     /* 0x04 */ s32 bank;
@@ -358,7 +358,7 @@ typedef struct TrainState {
     /* 0x310 */ s32 (*getFileEffectSameDepth)(s32 index);
     /* 0x314 */ TrainSpriteBank *(*getBank)(s32 set);
     /* 0x318 */ s32 (*getBankOffset)(s32 set);
-    /* 0x31C */ s32 (*getSetUnkC)(s32 set);
+    /* 0x31C */ s32 (*getBankSize)(s32 set);
     /* 0x320 */ TrainAnim *(*getAnim)(s32 set, s32 i);
     /* 0x324 */ TrainEntry *(*getTable)(s32 index);
     /* 0x328 */ TrainEntry *(*findTableEntry)(s32 index, s32 id);
@@ -486,7 +486,7 @@ s32 STGTRAIN_getFilePos(s32 index);
 s32 STGTRAIN_getFileEffectSameDepth(s32 index);
 TrainSpriteBank *STGTRAIN_getBank(s32 set);
 s32 STGTRAIN_getBankOffset(s32 set);
-s32 STGTRAIN_getSetUnkC(s32 set);
+s32 STGTRAIN_getBankSize(s32 set);
 TrainAnim *STGTRAIN_getAnim(s32 set, s32 i);
 TrainEntry *STGTRAIN_getGymTrainings(s32 index);
 TrainEntry *STGTRAIN_findGymTraining(s32 index, s32 id);

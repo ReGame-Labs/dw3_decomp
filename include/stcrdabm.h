@@ -40,7 +40,7 @@ typedef struct CardAlbumGrid {
     /* 0x68 */ s32 turned;    /* slots turned so far */
     /* 0x6C */ s32 time;
     /* 0x70 */ s32 frame;
-    /* 0x74 */ u8 unk74[0x10];
+    /* 0x74 */ u8 pad[0x10]; /* never read or written */
     /* 0x84 */ void (*setPage)(struct CardAlbumGrid *grid, s32 first);
     /* 0x88 */ void (*hide)(struct CardAlbumGrid *grid);
 } CardAlbumGrid;

@@ -111,7 +111,7 @@ typedef struct DeckCards {
     /* 0x54 */ s32 layer;
     /* 0x58 */ s32 depth;
     /* 0x5C */ s32 count; /* cards shown so far */
-    /* 0x60 */ u8 unk60[0x10];
+    /* 0x60 */ u8 pad[0x10]; /* never read or written */
 } DeckCards;
 
 /* A task that waits for triangle; nothing creates it */
@@ -120,7 +120,7 @@ typedef struct DeckIdle {
     /* 0x50 */ void *parent;
     /* 0x54 */ s32 layer;
     /* 0x58 */ s32 depth;
-    /* 0x5C */ u8 unk5C[0x10];
+    /* 0x5C */ u8 pad[0x10]; /* never read or written */
 } DeckIdle;
 
 /* A deck's row on the screen: its name and how many cards of each kind it has */

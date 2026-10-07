@@ -818,6 +818,120 @@ void STAGSLCT_zoomTitle(StageSelect *sel, StageSelectWindows *win) {
     }
 }
 
+/* Pad 1's R2 and L2 step GAME.progress down and up (0x8000 counts as 0) */
+static inline void editProgress(StageSelectWindows *win) {
+    if ((PAD.getPressed(0) & (1 << PAD_R2)) || (PAD.getRepeated(0) & (1 << PAD_R2))) {
+        if (GAME.progress == 0x8000) {
+            GAME.progress = 0;
+        }
+        if (GAME.progress != 0) {
+            GAME.progress--;
+        }
+    }
+    if ((PAD.getPressed(0) & (1 << PAD_L2)) || (PAD.getRepeated(0) & (1 << PAD_L2))) {
+        if (GAME.progress == 0x8000) {
+            GAME.progress = 0;
+        }
+        GAME.progress++;
+    }
+    win->progress->setNumber(win->progress, 0, GAME.progress);
+}
+
+/* Pad 2's L1/R1 and L2/R2 change the party's levels and charisma (by 10 when
+   repeating); shows party member 0's */
+static inline void editParty(StageSelectWindows *win) {
+    s32 slot;
+    s32 member;
+    PartnerStats *stats;
+    s32 levelStep;
+    s32 charismaStep;
+    s32 charisma;
+    s32 level;
+
+    charisma = 0;
+    level = 0;
+    charismaStep = 0;
+    levelStep = 0;
+    if (!PAD2_HELD(PAD_L1) && PAD2_PRESSED(PAD_R1)) {
+        levelStep = 1;
+    } else if (!PAD2_HELD(PAD_R1) && PAD2_PRESSED(PAD_L1)) {
+        levelStep = -1;
+    } else if (!PAD2_HELD(PAD_L1) && PAD2_REPEATED(PAD_R1)) {
+        levelStep = 10;
+    } else if (!PAD2_HELD(PAD_R1) && PAD2_REPEATED(PAD_L1)) {
+        levelStep = -10;
+    }
+    if (!PAD2_HELD(PAD_L2) && PAD2_PRESSED(PAD_R2)) {
+        charismaStep = 1;
+    } else if (!PAD2_HELD(PAD_R2) && PAD2_PRESSED(PAD_L2)) {
+        charismaStep = -1;
+    } else if (!PAD2_HELD(PAD_L2) && PAD2_REPEATED(PAD_R2)) {
+        charismaStep = 10;
+    } else if (!PAD2_HELD(PAD_R2) && PAD2_REPEATED(PAD_L2)) {
+        charismaStep = -10;
+    }
+    for (slot = 0; slot < 3; slot++) {
+        member = GAME.funcs.getPartyMember(slot);
+        if (member >= 0) {
+            stats = GAME.funcs.getPartnerStats(member);
+            stats->stats[STAT_CHARISMA] += charismaStep;
+            if (stats->stats[STAT_CHARISMA] >= 1000) {
+                stats->stats[STAT_CHARISMA] = 999;
+            }
+            if (stats->stats[STAT_CHARISMA] < 0) {
+                stats->stats[STAT_CHARISMA] = 0;
+            }
+            stats->stats[STAT_LEVEL] += levelStep;
+            if (stats->stats[STAT_LEVEL] >= 100) {
+                stats->stats[STAT_LEVEL] = 99;
+            }
+            if (stats->stats[STAT_LEVEL] <= 0) {
+                stats->stats[STAT_LEVEL] = 1;
+            }
+            if (slot == 0) {
+                charisma = stats->stats[STAT_CHARISMA];
+                level = stats->stats[STAT_LEVEL];
+            }
+        }
+    }
+    win->charisma->setNumber(win->charisma, 0, charisma);
+    win->level->setNumber(win->level, 0, level);
+}
+
+/* Pad 2's up/down and right/left change BATTLE_SETUP.debugUpDown and
+   debugLeftRight, shown while not -1 */
+static inline void editBattleDebug(StageSelectWindows *win) {
+    if (PAD.getPressed(1) & (1 << PAD_UP)) {
+        if (BATTLE_SETUP.debugUpDown != 3) {
+            BATTLE_SETUP.debugUpDown++;
+        }
+    } else if (PAD.getPressed(1) & (1 << PAD_DOWN)) {
+        if (BATTLE_SETUP.debugUpDown != -1) {
+            BATTLE_SETUP.debugUpDown--;
+        }
+    } else if (PAD.getPressed(1) & (1 << PAD_RIGHT)) {
+        if (BATTLE_SETUP.debugLeftRight != 7) {
+            BATTLE_SETUP.debugLeftRight++;
+        }
+    } else if (PAD.getPressed(1) & (1 << PAD_LEFT)) {
+        if (BATTLE_SETUP.debugLeftRight != -1) {
+            BATTLE_SETUP.debugLeftRight--;
+        }
+    }
+    if (BATTLE_SETUP.debugUpDown != -1) {
+        win->debugUpDown->setNumber(win->debugUpDown, 0, BATTLE_SETUP.debugUpDown + 1);
+        win->debugUpDown->setVisible(win->debugUpDown, 1);
+    } else {
+        win->debugUpDown->setVisible(win->debugUpDown, 0);
+    }
+    if (BATTLE_SETUP.debugLeftRight != -1) {
+        win->debugLeftRight->setNumber(win->debugLeftRight, 0, BATTLE_SETUP.debugLeftRight + 1);
+        win->debugLeftRight->setVisible(win->debugLeftRight, 1);
+    } else {
+        win->debugLeftRight->setVisible(win->debugLeftRight, 0);
+    }
+}
+
 /*
  * The stage select. Pad 1 moves the cursor (up/down), turns pages (L1/R1),
  * toggles BATTLE_SETUP.randomBattles (Select), starts the entry (Cross: scene 0x300
@@ -831,13 +945,6 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
        through this view */
     StageSelect *sel = (StageSelect *)task;
     s32 i;
-    s32 slot;
-    s32 member;
-    PartnerStats *stats;
-    s32 levelStep;
-    s32 charismaStep;
-    s32 charisma;
-    s32 level;
 
     switch (sel->state) {
     case TASK_INIT:
@@ -932,98 +1039,9 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
 #else
             win->region->setText(win->region, STAGSLCT_regionNames[1]);
 #endif
-            if ((PAD.getPressed(0) & (1 << PAD_R2)) || (PAD.getRepeated(0) & (1 << PAD_R2))) {
-                if (GAME.progress == 0x8000) {
-                    GAME.progress = 0;
-                }
-                if (GAME.progress != 0) {
-                    GAME.progress--;
-                }
-            }
-            if ((PAD.getPressed(0) & (1 << PAD_L2)) || (PAD.getRepeated(0) & (1 << PAD_L2))) {
-                if (GAME.progress == 0x8000) {
-                    GAME.progress = 0;
-                }
-                GAME.progress++;
-            }
-            win->progress->setNumber(win->progress, 0, GAME.progress);
-            charisma = 0;
-            level = 0;
-            charismaStep = 0;
-            levelStep = 0;
-            if (!PAD2_HELD(PAD_L1) && PAD2_PRESSED(PAD_R1)) {
-                levelStep = 1;
-            } else if (!PAD2_HELD(PAD_R1) && PAD2_PRESSED(PAD_L1)) {
-                levelStep = -1;
-            } else if (!PAD2_HELD(PAD_L1) && PAD2_REPEATED(PAD_R1)) {
-                levelStep = 10;
-            } else if (!PAD2_HELD(PAD_R1) && PAD2_REPEATED(PAD_L1)) {
-                levelStep = -10;
-            }
-            if (!PAD2_HELD(PAD_L2) && PAD2_PRESSED(PAD_R2)) {
-                charismaStep = 1;
-            } else if (!PAD2_HELD(PAD_R2) && PAD2_PRESSED(PAD_L2)) {
-                charismaStep = -1;
-            } else if (!PAD2_HELD(PAD_L2) && PAD2_REPEATED(PAD_R2)) {
-                charismaStep = 10;
-            } else if (!PAD2_HELD(PAD_R2) && PAD2_REPEATED(PAD_L2)) {
-                charismaStep = -10;
-            }
-            for (slot = 0; slot < 3; slot++) {
-                member = GAME.funcs.getPartyMember(slot);
-                if (member >= 0) {
-                    stats = GAME.funcs.getPartnerStats(member);
-                    stats->stats[STAT_CHARISMA] += charismaStep;
-                    if (stats->stats[STAT_CHARISMA] >= 1000) {
-                        stats->stats[STAT_CHARISMA] = 999;
-                    }
-                    if (stats->stats[STAT_CHARISMA] < 0) {
-                        stats->stats[STAT_CHARISMA] = 0;
-                    }
-                    stats->stats[STAT_LEVEL] += levelStep;
-                    if (stats->stats[STAT_LEVEL] >= 100) {
-                        stats->stats[STAT_LEVEL] = 99;
-                    }
-                    if (stats->stats[STAT_LEVEL] <= 0) {
-                        stats->stats[STAT_LEVEL] = 1;
-                    }
-                    if (slot == 0) {
-                        charisma = stats->stats[STAT_CHARISMA];
-                        level = stats->stats[STAT_LEVEL];
-                    }
-                }
-            }
-            win->charisma->setNumber(win->charisma, 0, charisma);
-            win->level->setNumber(win->level, 0, level);
-            if (PAD.getPressed(1) & (1 << PAD_UP)) {
-                if (BATTLE_SETUP.debugUpDown != 3) {
-                    BATTLE_SETUP.debugUpDown++;
-                }
-            } else if (PAD.getPressed(1) & (1 << PAD_DOWN)) {
-                if (BATTLE_SETUP.debugUpDown != -1) {
-                    BATTLE_SETUP.debugUpDown--;
-                }
-            } else if (PAD.getPressed(1) & (1 << PAD_RIGHT)) {
-                if (BATTLE_SETUP.debugLeftRight != 7) {
-                    BATTLE_SETUP.debugLeftRight++;
-                }
-            } else if (PAD.getPressed(1) & (1 << PAD_LEFT)) {
-                if (BATTLE_SETUP.debugLeftRight != -1) {
-                    BATTLE_SETUP.debugLeftRight--;
-                }
-            }
-            if (BATTLE_SETUP.debugUpDown != -1) {
-                win->debugUpDown->setNumber(win->debugUpDown, 0, BATTLE_SETUP.debugUpDown + 1);
-                win->debugUpDown->setVisible(win->debugUpDown, 1);
-            } else {
-                win->debugUpDown->setVisible(win->debugUpDown, 0);
-            }
-            if (BATTLE_SETUP.debugLeftRight != -1) {
-                win->debugLeftRight->setNumber(win->debugLeftRight, 0, BATTLE_SETUP.debugLeftRight + 1);
-                win->debugLeftRight->setVisible(win->debugLeftRight, 1);
-            } else {
-                win->debugLeftRight->setVisible(win->debugLeftRight, 0);
-            }
+            editProgress(win);
+            editParty(win);
+            editBattleDebug(win);
             break;
         }
         break;

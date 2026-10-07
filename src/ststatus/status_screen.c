@@ -363,6 +363,17 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
     }
 }
 
+/* Moves the member cursor's palette on every 9 frames */
+static inline void STSTATUS_stepStatusCursor(StatsScreen *screen) {
+    if (GFX.funcs.getTime() - screen->cursorTime >= 9) {
+        screen->cursorTime = GFX.funcs.getTime();
+        screen->cursorFrame++;
+        if (screen->cursorFrame >= 8) {
+            screen->cursorFrame = 0;
+        }
+    }
+}
+
 /* Draws the partners' portraits and frames, the chosen one's, its equipment
    and the panels' frames */
 void STSTATUS_drawStatusScreen(StatsScreen *screen) {
@@ -532,13 +543,7 @@ void STSTATUS_drawStatusScreen(StatsScreen *screen) {
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x1F, 0x14, 0xD);
     }
     if (screen->cursorShown) {
-        if (GFX.funcs.getTime() - screen->cursorTime >= 9) {
-            screen->cursorTime = GFX.funcs.getTime();
-            screen->cursorFrame++;
-            if (screen->cursorFrame >= 8) {
-                screen->cursorFrame = 0;
-            }
-        }
+        STSTATUS_stepStatusCursor(screen);
         initSpriteDrawer(&sprite);
         sprite.setLayerId(screen->layer, screen->depth - 1);
         sprite.setTexture(0x280, 0x100);
@@ -667,186 +672,285 @@ void STSTATUS_runStatusChoice(StatsScreen *screen, StatsScreenWindows *windows) 
     }
 }
 
+/* Starts the fades of the first page and the title (and, with one party
+   member, of the help's panel); the next substate is the party's size */
+static inline void STSTATUS_startStatusScreen(StatsScreen *screen) {
+    STSTATUS_data.funcs.startFade(&screen->pageFades[0], 1);
+    STSTATUS_data.funcs.startFade(&screen->fades[0], 1);
+    if (screen->count == 1) {
+        STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
+    }
+    screen->substate = screen->count;
+}
+
+/* One member: once the page and the panels are in, shows the page, the title
+   and the help */
+static inline void STSTATUS_openStatusScreenAlone(StatsScreen *screen, StatsScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    STSTATUS_data.funcs.updateFade(&screen->fades[0]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_showStatusPage(screen, windows, 0, 1);
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
+        windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x30);
+        windows->help2->setString(windows->help2, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
+        screen->substate = 10;
+    }
+}
+
+/* Two members: once the first page and the title are in, shows them and
+   starts the second page and the help's panel */
+static inline void STSTATUS_openFirstOfTwoStatusPages(StatsScreen *screen, StatsScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[0])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
+        STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
+        STSTATUS_showStatusPage(screen, windows, 0, 1);
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
+        screen->substate = 4;
+    }
+}
+
+/* Two members: once the second page and the help's panel are in, shows the
+   page and the help */
+static inline void STSTATUS_openSecondOfTwoStatusPages(StatsScreen *screen, StatsScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_showStatusPage(screen, windows, 1, 1);
+        windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x30);
+        windows->help2->setString(windows->help2, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
+        screen->substate = 10;
+    }
+}
+
+/* Three members: once the first page and the title are in, shows them and
+   starts the second page */
+static inline void STSTATUS_openFirstOfThreeStatusPages(StatsScreen *screen, StatsScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[0])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
+        STSTATUS_showStatusPage(screen, windows, 0, 1);
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
+        screen->substate = 5;
+    }
+}
+
+/* Three members: once the second page is in, shows it and starts the third
+   page and the help's panel */
+static inline void STSTATUS_openSecondOfThreeStatusPages(StatsScreen *screen, StatsScreenWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[2], 1);
+        STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
+        STSTATUS_showStatusPage(screen, windows, 1, 1);
+        screen->substate++;
+    }
+}
+
+/* Three members: once the third page and the help's panel are in, shows the
+   page and the help */
+static inline void STSTATUS_openThirdStatusPage(StatsScreen *screen, StatsScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_showStatusPage(screen, windows, 2, 1);
+        windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x30);
+        windows->help2->setString(windows->help2, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
+        screen->substate = 10;
+    }
+}
+
+/* Choosing a party member: up and down move the cursor, cross closes the
+   pages for the member's question, triangle closes the screen */
+static inline void STSTATUS_chooseStatusMember(StatsScreen *screen) {
+    s32 member;
+
+    member = screen->member;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        screen->member--;
+        if (screen->member < 0) {
+            screen->member = 0;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        screen->member++;
+        if (screen->member > screen->count - 1) {
+            screen->member = screen->count - 1;
+        }
+    }
+    if (member != screen->member) {
+        SOUND.playSound(SOUND_MENU_MOVE);
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+        screen->cursorShown = 0;
+        screen->option = 0;
+        screen->setSubstate(screen, 0x32);
+        screen->step = 1;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        screen->cursorShown = 0;
+        screen->setSubstate(screen, 0x32);
+    }
+}
+
+/* Creates the chosen option's panel: the digivolution panel or the
+   equipment panel */
+static inline void STSTATUS_openStatusPanel(StatsScreen *screen, StatsScreenWindows *windows) {
+    if (screen->option == 0) {
+        if (windows->panel == NULL) {
+            windows->panel = STSTATUS_createDigivolvePanel(screen);
+        }
+    } else if (windows->panel == NULL) {
+        windows->panel = STSTATUS_createEquipPanel(screen);
+    }
+    screen->substate++;
+}
+
+/* Once the panel is gone, goes back to the question */
+static inline void STSTATUS_waitStatusPanel(StatsScreen *screen, StatsScreenWindows *windows) {
+    if (windows->panel == NULL) {
+        screen->setSubstate(screen, 15);
+        screen->counter = 1;
+    }
+}
+
+/* Starts closing the pages: the last page, the help's panel and, with one
+   member, the title */
+static inline void STSTATUS_closeStatusScreen(StatsScreen *screen, StatsScreenWindows *windows) {
+    STSTATUS_data.funcs.startFade(&screen->pageFades[screen->count - 1], 0);
+    STSTATUS_showStatusPage(screen, windows, screen->count - 1, 0);
+    STSTATUS_data.funcs.startFade(&screen->fades[1], 0);
+    windows->help->setVisible(windows->help, 0);
+    windows->help2->setVisible(windows->help2, 0);
+    if (screen->count == 1) {
+        STSTATUS_data.funcs.startFade(&screen->fades[0], 0);
+        windows->title->setVisible(windows->title, 0);
+    }
+    screen->substate = screen->count + 0x32;
+}
+
+/* One member: once the page and the panels are closed, goes on to the end */
+static inline void STSTATUS_closeStatusScreenAlone(StatsScreen *screen) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    STSTATUS_data.funcs.updateFade(&screen->fades[0]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        screen->substate = 0x39;
+    }
+}
+
+/* Two members: once the second page and the help's panel are closed, starts
+   closing the first and the title */
+static inline void STSTATUS_closeSecondOfTwoStatusPages(StatsScreen *screen, StatsScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
+        STSTATUS_data.funcs.startFade(&screen->fades[0], 0);
+        STSTATUS_showStatusPage(screen, windows, 0, 0);
+        windows->title->setVisible(windows->title, 0);
+        screen->substate = 0x36;
+    }
+}
+
+/* Three members: once the third page and the help's panel are closed, starts
+   closing the second */
+static inline void STSTATUS_closeThirdStatusPage(StatsScreen *screen, StatsScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[1], 0);
+        STSTATUS_showStatusPage(screen, windows, 1, 0);
+        screen->substate = 0x37;
+    }
+}
+
+/* Three members: once the second page is closed, starts closing the first
+   and the title */
+static inline void STSTATUS_closeSecondOfThreeStatusPages(StatsScreen *screen, StatsScreenWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
+        STSTATUS_data.funcs.startFade(&screen->fades[0], 0);
+        STSTATUS_showStatusPage(screen, windows, 0, 0);
+        windows->title->setVisible(windows->title, 0);
+        screen->substate++;
+    }
+}
+
+/* Two or three members: once the first page and the title are closed, goes
+   on to the end */
+static inline void STSTATUS_closeFirstStatusPage(StatsScreen *screen) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[0])) {
+        screen->substate = 0x39;
+    }
+}
+
+/* With the pages closed: the chosen member's question, or the screen's end */
+static inline void STSTATUS_endStatusPages(StatsScreen *screen) {
+    if (screen->step) {
+        screen->setSubstate(screen, 15);
+    } else {
+        screen->state = 3;
+    }
+}
+
 /* The fifth screen's steps: the pages fade in, a party member is chosen and
    its panel opens, then the pages fade out */
 void STSTATUS_runStatusScreen(StatsScreen *screen, StatsScreenWindows *windows) {
-    s32 member;
-
     switch (screen->substate) {
     case 0:
     default:
-        STSTATUS_data.funcs.startFade(&screen->pageFades[0], 1);
-        STSTATUS_data.funcs.startFade(&screen->fades[0], 1);
-        if (screen->count == 1) {
-            STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
-        }
-        screen->substate = screen->count;
+        STSTATUS_startStatusScreen(screen);
         break;
     case 1:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        STSTATUS_data.funcs.updateFade(&screen->fades[0]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_showStatusPage(screen, windows, 0, 1);
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
-            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x30);
-            windows->help2->setString(windows->help2, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
-            screen->substate = 10;
-        }
+        STSTATUS_openStatusScreenAlone(screen, windows);
         break;
     case 2:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[0])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
-            STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
-            STSTATUS_showStatusPage(screen, windows, 0, 1);
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
-            screen->substate = 4;
-        }
+        STSTATUS_openFirstOfTwoStatusPages(screen, windows);
         break;
     case 4:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_showStatusPage(screen, windows, 1, 1);
-            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x30);
-            windows->help2->setString(windows->help2, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
-            screen->substate = 10;
-        }
+        STSTATUS_openSecondOfTwoStatusPages(screen, windows);
         break;
     case 3:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[0])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
-            STSTATUS_showStatusPage(screen, windows, 0, 1);
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
-            screen->substate = 5;
-        }
+        STSTATUS_openFirstOfThreeStatusPages(screen, windows);
         break;
     case 5:
-        if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[2], 1);
-            STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
-            STSTATUS_showStatusPage(screen, windows, 1, 1);
-            screen->substate++;
-        }
+        STSTATUS_openSecondOfThreeStatusPages(screen, windows);
         break;
     case 6:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_showStatusPage(screen, windows, 2, 1);
-            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x30);
-            windows->help2->setString(windows->help2, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
-            screen->substate = 10;
-        }
+        STSTATUS_openThirdStatusPage(screen, windows);
         break;
     case 10:
         screen->cursorShown = 1;
         screen->substate++;
         break;
     case 11:
-        member = screen->member;
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            screen->member--;
-            if (screen->member < 0) {
-                screen->member = 0;
-            }
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            screen->member++;
-            if (screen->member > screen->count - 1) {
-                screen->member = screen->count - 1;
-            }
-        }
-        if (member != screen->member) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            screen->cursorShown = 0;
-            screen->option = 0;
-            screen->setSubstate(screen, 0x32);
-            screen->step = 1;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            screen->cursorShown = 0;
-            screen->setSubstate(screen, 0x32);
-        }
+        STSTATUS_chooseStatusMember(screen);
         break;
     case 15:
         STSTATUS_runStatusChoice(screen, windows);
         break;
     case 0x14:
-        if (screen->option == 0) {
-            if (windows->panel == NULL) {
-                windows->panel = STSTATUS_createDigivolvePanel(screen);
-            }
-        } else if (windows->panel == NULL) {
-            windows->panel = STSTATUS_createEquipPanel(screen);
-        }
-        screen->substate++;
+        STSTATUS_openStatusPanel(screen, windows);
         break;
     case 0x15:
-        if (windows->panel == NULL) {
-            screen->setSubstate(screen, 15);
-            screen->counter = 1;
-        }
+        STSTATUS_waitStatusPanel(screen, windows);
         break;
     case 0x32:
-        STSTATUS_data.funcs.startFade(&screen->pageFades[screen->count - 1], 0);
-        STSTATUS_showStatusPage(screen, windows, screen->count - 1, 0);
-        STSTATUS_data.funcs.startFade(&screen->fades[1], 0);
-        windows->help->setVisible(windows->help, 0);
-        windows->help2->setVisible(windows->help2, 0);
-        if (screen->count == 1) {
-            STSTATUS_data.funcs.startFade(&screen->fades[0], 0);
-            windows->title->setVisible(windows->title, 0);
-        }
-        screen->substate = screen->count + 0x32;
+        STSTATUS_closeStatusScreen(screen, windows);
         break;
     case 0x33:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        STSTATUS_data.funcs.updateFade(&screen->fades[0]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            screen->substate = 0x39;
-        }
+        STSTATUS_closeStatusScreenAlone(screen);
         break;
     case 0x34:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
-            STSTATUS_data.funcs.startFade(&screen->fades[0], 0);
-            STSTATUS_showStatusPage(screen, windows, 0, 0);
-            windows->title->setVisible(windows->title, 0);
-            screen->substate = 0x36;
-        }
+        STSTATUS_closeSecondOfTwoStatusPages(screen, windows);
         break;
     case 0x35:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[1], 0);
-            STSTATUS_showStatusPage(screen, windows, 1, 0);
-            screen->substate = 0x37;
-        }
+        STSTATUS_closeThirdStatusPage(screen, windows);
         break;
     case 0x37:
-        if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
-            STSTATUS_data.funcs.startFade(&screen->fades[0], 0);
-            STSTATUS_showStatusPage(screen, windows, 0, 0);
-            windows->title->setVisible(windows->title, 0);
-            screen->substate++;
-        }
+        STSTATUS_closeSecondOfThreeStatusPages(screen, windows);
         break;
     case 0x36:
     case 0x38:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[0])) {
-            screen->substate = 0x39;
-        }
+        STSTATUS_closeFirstStatusPage(screen);
         break;
     case 0x39:
-        if (screen->step) {
-            screen->setSubstate(screen, 15);
-        } else {
-            screen->state = 3;
-        }
+        STSTATUS_endStatusPages(screen);
         break;
     }
 }
@@ -905,15 +1009,15 @@ Task *STSTATUS_createStatusScreen(FieldMenuScreen *menu, s32 extra) {
 }
 
 s32 STSTATUS_pageStats4[] = {
-    0, 2, 3, 4,
-    5,
+    STAT_LEVEL, STAT_HP, STAT_MAX_HP, STAT_MP,
+    STAT_MAX_MP,
 };
 /* The stats screen 4 shows, as STSTATUS_panelStats */
 s32 STSTATUS_equipStats[] = {
-    6, 7, 8, 9,
-    10, 11, 12, 13,
-    14, 15, 16, 17,
-    18,
+    STAT_STRENGTH, STAT_DEFENSE, STAT_SPIRIT, STAT_WISDOM,
+    STAT_SPEED, STAT_CHARISMA, STAT_RESISTS, STAT_RESISTS + 1,
+    STAT_RESISTS + 2, STAT_RESISTS + 3, STAT_RESISTS + 4, STAT_RESISTS + 5,
+    STAT_RESISTS + 6,
 };
 /* The strings of the empty equipment slots, as STSTATUS_slotStrings */
 s32 STSTATUS_equipStrings[] = {

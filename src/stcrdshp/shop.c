@@ -42,7 +42,7 @@ void STCRDSHP_showTitle(CardShop *shop, CardShopWindows *win, s32 show) {
     }
 }
 
-/* Shows or hides the options (buy cards, open a pack, item shop) and the help */
+/* Shows or hides the options (buy cards, open a pack, edit the decks) and the help */
 void STCRDSHP_showOptions(CardShop *shop, CardShopWindows *win, s32 show) {
     s32 i;
 
@@ -106,12 +106,98 @@ void STCRDSHP_drawShop(CardShop *shop) {
     }
 }
 
-/* Opens the panels, moves the cursor and starts what was chosen */
-void STCRDSHP_runShop(CardShop *shop, CardShopWindows *win) {
+/* Up/down choose buy one card, open booster or edit folder; cross starts it,
+   triangle leaves the shop */
+static inline void STCRDSHP_chooseOption(CardShop *shop, CardShopWindows *win) {
     s32 cursor;
+
+    cursor = shop->cursor;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        if (--shop->cursor < 0) {
+            shop->cursor = 0;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        if (++shop->cursor >= 3) {
+            shop->cursor = 2;
+        }
+    }
+    if (cursor != shop->cursor) {
+        SOUND.playSound(SOUND_CURSOR);
+        win->cursor->setPos(win->cursor, 0x9A, shop->cursor * 14 + 0x35);
+    }
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        shop->substate = 10;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        shop->setSubstate(shop, 50);
+    }
+}
+
+/* Starts what was chosen: the screen to buy cards, the one to open a pack when
+   the bag has one (else a message), or the deck editor once the shop has
+   closed */
+static inline void STCRDSHP_startOption(CardShop *shop, CardShopWindows *win) {
     s32 count;
     s32 i;
 
+    shop->step = 1;
+    switch (shop->cursor) {
+    case 0:
+    default:
+        win->dialog = (Task *)STCRDSHP_createBuy(shop, shop->shop);
+        shop->substate = 50;
+        break;
+    case 1:
+        count = ITEM_FUNCS->list(1, shop->items);
+        for (i = 0; i < count; i++) {
+            if (ITEM_FUNCS->getCategory(shop->items[i]) == CARD_PACK_CATEGORY) {
+                win->dialog = (Task *)STCRDSHP_createPackOpen(shop);
+                shop->substate = 50;
+                break;
+            }
+        }
+        if (win->dialog == NULL) {
+            shop->setSubstate(shop, 20);
+        }
+        break;
+    case 2:
+        shop->substate = 100;
+        shop->toDeckEditor = 1;
+        break;
+    }
+}
+
+/* Hides the options and the cursor and closes their panel; leaving the shop
+   (step unset), also fades the screen out */
+static inline void STCRDSHP_closeOptions(CardShop *shop, CardShopWindows *win) {
+    if (shop->step == 0) {
+        win->fade = STCRDSHP_createFader();
+        win->fade->start(win->fade, 0, 0x1E);
+        win->fade->depth = 6;
+    }
+    STCRDSHP_showOptions(shop, win, 0);
+    win->cursor->setVisible(win->cursor, 0);
+    STCRDSHP_funcs.startFade(&shop->fades[1], 0);
+    shop->substate++;
+}
+
+/* Once the options' panel has closed: waits for the screen chosen, or closes
+   the title's panel to leave */
+static inline void STCRDSHP_endOptions(CardShop *shop, CardShopWindows *win) {
+    if (STCRDSHP_funcs.updateFade(&shop->fades[1]) != 0) {
+        if (shop->step == 0) {
+            STCRDSHP_showTitle(shop, win, 0);
+            STCRDSHP_funcs.startFade(&shop->fades[0], 0);
+            shop->substate++;
+        } else {
+            shop->substate = 11;
+        }
+    }
+}
+
+/* Opens the panels, moves the cursor and starts what was chosen */
+void STCRDSHP_runShop(CardShop *shop, CardShopWindows *win) {
     switch (shop->substate) {
     case 0:
     default:
@@ -134,54 +220,10 @@ void STCRDSHP_runShop(CardShop *shop, CardShopWindows *win) {
         }
         break;
     case 3:
-        cursor = shop->cursor;
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            if (--shop->cursor < 0) {
-                shop->cursor = 0;
-            }
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            if (++shop->cursor >= 3) {
-                shop->cursor = 2;
-            }
-        }
-        if (cursor != shop->cursor) {
-            SOUND.playSound(SOUND_CURSOR);
-            win->cursor->setPos(win->cursor, 0x9A, shop->cursor * 14 + 0x35);
-        }
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            shop->substate = 10;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            shop->setSubstate(shop, 50);
-        }
+        STCRDSHP_chooseOption(shop, win);
         break;
     case 10:
-        shop->step = 1;
-        switch (shop->cursor) {
-        case 0:
-        default:
-            win->dialog = (Task *)STCRDSHP_createBuy(shop, shop->shop);
-            shop->substate = 50;
-            break;
-        case 1:
-            count = ITEM_FUNCS->list(1, shop->items);
-            for (i = 0; i < count; i++) {
-                if (ITEM_FUNCS->getCategory(shop->items[i]) == CARD_PACK_CATEGORY) {
-                    win->dialog = (Task *)STCRDSHP_createPackOpen(shop);
-                    shop->substate = 50;
-                    break;
-                }
-            }
-            if (win->dialog == NULL) {
-                shop->setSubstate(shop, 20);
-            }
-            break;
-        case 2:
-            shop->substate = 100;
-            shop->toItemShop = 1;
-            break;
-        }
+        STCRDSHP_startOption(shop, win);
         break;
     case 11:
         if (win->dialog == NULL) {
@@ -216,26 +258,10 @@ void STCRDSHP_runShop(CardShop *shop, CardShopWindows *win) {
         }
         break;
     case 50:
-        if (shop->step == 0) {
-            win->fade = STCRDSHP_createFader();
-            win->fade->start(win->fade, 0, 0x1E);
-            win->fade->depth = 6;
-        }
-        STCRDSHP_showOptions(shop, win, 0);
-        win->cursor->setVisible(win->cursor, 0);
-        STCRDSHP_funcs.startFade(&shop->fades[1], 0);
-        shop->substate++;
+        STCRDSHP_closeOptions(shop, win);
         break;
     case 51:
-        if (STCRDSHP_funcs.updateFade(&shop->fades[1]) != 0) {
-            if (shop->step == 0) {
-                STCRDSHP_showTitle(shop, win, 0);
-                STCRDSHP_funcs.startFade(&shop->fades[0], 0);
-                shop->substate++;
-            } else {
-                shop->substate = 11;
-            }
-        }
+        STCRDSHP_endOptions(shop, win);
         break;
     case 52:
         if (STCRDSHP_funcs.updateFade(&shop->fades[0]) != 0) {
@@ -248,7 +274,7 @@ void STCRDSHP_runShop(CardShop *shop, CardShopWindows *win) {
         shop->substate++;
         break;
     case 101:
-        if (win->fade->state == 2) {
+        if (win->fade->state == TASK_DONE) {
             shop->state = TASK_KILL;
         }
         break;
@@ -264,7 +290,7 @@ void STCRDSHP_showMoney(CardShop *shop) {
 }
 
 /* The shop's update: loads its files, then runs it; leaves to the field or
-   the item shop */
+   the deck editor */
 void STCRDSHP_updateShop(CardShop *shop, CardShopWindows *win) {
     switch (shop->state) {
     case TASK_INIT:
@@ -293,7 +319,7 @@ void STCRDSHP_updateShop(CardShop *shop, CardShopWindows *win) {
     case TASK_DONE:
         break;
     case TASK_KILL:
-        if (shop->toItemShop != 0) {
+        if (shop->toDeckEditor != 0) {
             GAME.funcs.requestMode(MODE_DECK_EDITOR, GAME.funcs.getModeArg());
         } else {
             GAME.funcs.requestMode(GAME.fieldMode, 0);
@@ -303,8 +329,8 @@ void STCRDSHP_updateShop(CardShop *shop, CardShopWindows *win) {
 }
 
 /* Creates the card shop (task) for the shop of the mode's argument, titled for
-   the field it is opened from; the cursor starts on the item shop when coming
-   back from it. Requests the card data and strings */
+   the field it is opened from; the cursor starts on the deck editor's option
+   when coming back from it. Requests the card data and strings */
 CardShop *STCRDSHP_createShop(void) {
     CardShop *shop = createTask(STCRDSHP_updateShop, sizeof(CardShop), sizeof(CardShopWindows));
     s32 mode;

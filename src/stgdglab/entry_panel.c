@@ -151,28 +151,245 @@ void STGDGLAB_showEntryPanelOptions(LabEntryPanel *panel, LabEntryPanelWindows *
     }
 }
 
+/* Moves the cursor over the entries: the shoulder buttons scroll five rows,
+   up and down move a row (scrolling at the edges) and left and right a column,
+   skipping empty entries; 1 when it moved */
+static inline s32 moveEntryCursor(LabEntryPanel *panel) {
+    s32 scroll;
+    s32 row;
+    s32 moved;
+    s32 rows;
+    s32 n;
+
+    scroll = panel->scroll;
+    moved = 0;
+    if (panel->entryCount >= 11) {
+        if ((!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) || (!PAD_HELD(PAD_R1) && PAD_REPEATED(PAD_L1))) {
+            panel->scroll -= 5;
+            if (panel->scroll < 0) {
+                panel->scroll = 0;
+            }
+        } else if ((!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) ||
+                   (!PAD_HELD(PAD_L1) && PAD_REPEATED(PAD_R1))) {
+            rows = panel->entryCount - panel->entryCount / 2;
+            for (n = 0; n < 5; n++) {
+                panel->scroll++;
+                if (panel->scroll + 4 > rows - 1) {
+                    panel->scroll = rows - 5;
+                    break;
+                }
+            }
+        }
+        if (scroll != panel->scroll) {
+            moved = 1;
+            panel->row = 0;
+        }
+    }
+    if (!moved) {
+        row = panel->row;
+        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+            panel->row--;
+            if (panel->row < 0) {
+                panel->row = 0;
+                panel->scroll--;
+                if (panel->scroll < 0) {
+                    panel->scroll = 0;
+                }
+            }
+            if (row != panel->row || scroll != panel->scroll) {
+                moved = 1;
+            }
+        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+            if (panel->entryCount >= 10) {
+                panel->row++;
+                if (panel->row >= 5) {
+                    panel->row = 4;
+                    panel->scroll++;
+                    if (panel->scroll > panel->entryCount - panel->entryCount / 2 - 1) {
+                        panel->scroll = panel->entryCount - panel->entryCount / 2 - 1;
+                    }
+                }
+            } else {
+                panel->row++;
+                if (panel->row > panel->entryCount - panel->entryCount / 2 - 1) {
+                    panel->row = panel->entryCount - panel->entryCount / 2 - 1;
+                }
+            }
+            if (scroll != panel->scroll || row != panel->row) {
+                if (panel->col != 0) {
+                    if (panel->entries[(panel->scroll + panel->row) * 2 + panel->col] >= 3) {
+                        moved = 1;
+                    } else if (panel->entries[(panel->scroll + panel->row) * 2] >= 3) {
+                        panel->col = 0;
+                        moved = 1;
+                    }
+                } else if (panel->entries[(panel->scroll + panel->row) * 2] >= 3) {
+                    moved = 1;
+                }
+                if (!moved) {
+                    panel->row = row;
+                    panel->scroll = scroll;
+                }
+            }
+        }
+        if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
+            if (panel->col != 0) {
+                panel->col = 0;
+                moved = 1;
+            }
+        } else if ((PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) && panel->col == 0 &&
+                   panel->entries[(panel->scroll + panel->row) * 2 + 1] >= 3) {
+            panel->col = 1;
+            moved = 1;
+        }
+    }
+    return moved;
+}
+
+/* Cross on an entry: one already in a slot is refused; otherwise it goes in
+   the slot, and the options' panel opens when the slot held the entry the
+   partner digivolves to in battle, else the panel closes */
+static inline void putPickedEntry(LabEntryPanel *panel, LabEntryPanelWindows *windows) {
+    Partner *partner;
+    s32 id;
+    s32 k;
+
+    id = panel->entries[(panel->scroll + panel->row) * 2 + panel->col];
+    for (k = 0; k < 3; k++) {
+        if (panel->slots[k] == id) {
+            id = 0;
+            break;
+        }
+    }
+    if (id == 0) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+    } else {
+        SOUND.playSound(SOUND_SELECT);
+        partner = &GAME.partners[panel->partner];
+        if (panel->slots[panel->slot] == partner->battleDigivolve) {
+            panel->substate = 2;
+        } else {
+            STGDGLAB_showEntryPanel(panel, windows, 0);
+            STGDGLAB_data.funcs.startFade(panel->fades, 0);
+            panel->substate = 0;
+            panel->step = 1;
+        }
+        panel->slots[panel->slot] = id;
+        GAME.funcs.setPartnerSlots(panel->partner, panel->slots);
+#if VERSION_US
+        if (windows->scrollBar != NULL) {
+            windows->scrollBar->state = TASK_KILL;
+        }
+#endif
+    }
+}
+
+/* The options' panel: up and down pick the slot to digivolve to in battle, or
+   none; cross sets it as the partner's, triangle sets none */
+static inline void pickBattleDigivolve(LabEntryPanel *panel, LabEntryPanelWindows *windows) {
+    Partner *partner;
+    s32 old;
+
+    old = panel->option;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        panel->option--;
+        if (panel->option < 0) {
+            panel->option = 0;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        panel->option++;
+        if (panel->option >= 4) {
+            panel->option = 3;
+        }
+    }
+    if (old != panel->option) {
+        SOUND.playSound(SOUND_CURSOR);
+        windows->optionCursor->setPos(windows->optionCursor, 0x9A, panel->option * 0xE + 0x83);
+    }
+    partner = &GAME.partners[panel->partner];
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        if (panel->option < 3) {
+            partner->battleDigivolve = panel->slots[panel->option];
+        } else {
+            partner->battleDigivolve = 0;
+        }
+        panel->substate++;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        partner->battleDigivolve = 0;
+        panel->substate++;
+    }
+}
+
+/* Draws the panel: the entries' marks, the blinking scroll arrows, the frames,
+   the picked entry's skill icons and, while it is shown, the options' panel */
+static inline void drawEntryPanel(LabEntryPanel *panel) {
+    SpriteDrawer sprite;
+    PartnerEntry entry;
+    s32 i;
+    s32 j;
+
+    initSpriteDrawer(&sprite);
+    sprite.setLayerId(panel->layer, panel->depth);
+    sprite.setTexture(0x280, 0x100);
+    if (panel->fades[0].level != ONE) {
+        sprite.setScale(panel->fades[0].level, ONE, ONE);
+        sprite.setPivot(0x140, 0x37);
+    } else {
+        for (j = 0; j < 10; j++) {
+            if (panel->entries[panel->scroll * 2 + j] >= 3) {
+                sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x3E, (j % 2) * 0x85 + 0x18,
+                            (j / 2) * 0xE + 0x16);
+            }
+        }
+    }
+    if (GFX.funcs.getTime() - panel->blinkTime >= 8) {
+        panel->blinkTime = GFX.funcs.getTime();
+        panel->blink = 1 - panel->blink;
+    }
+    if (panel->fades[0].level == ONE && panel->blink) {
+        if (panel->scroll > 0) {
+            sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x34, 0x123, 0x13);
+        }
+        if (panel->entryCount >= 10 && panel->scroll < panel->entryCount - panel->entryCount / 2 - 5) {
+            sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x35, 0x123, 0x55);
+        }
+    }
+    sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x29, 0x12, 0xF);
+    sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x2A, 0x54, 0x64);
+    sprite.setTexture(0x140, 0);
+    sprite.setLayerId(panel->layer, panel->depth - 1);
+    sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x14, 0x5B, 0x7F);
+    GAME.funcs.getPartnerEntry(panel->partner, panel->entries[(panel->scroll + panel->row) * 2 + panel->col],
+                               &entry);
+    for (i = 0; i < 6; i++) {
+        if (entry.skills[i] != 0) {
+            sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16),
+                        TECHS[(entry.skills[i] & SKILL_ID) - 1].icon + 0x37, 0xB4, i * 0xE + 0x8B);
+        }
+    }
+    if (panel->fades[1].level != 0) {
+        initSpriteDrawer(&sprite);
+        sprite.setLayerId(panel->layer, panel->depth - 2);
+        sprite.setTexture(0x280, 0x100);
+        if (panel->fades[1].level != ONE) {
+            sprite.setScale(panel->fades[1].level, ONE, ONE);
+            sprite.setPivot(0x140, 0x9D);
+        }
+        sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x2C, 0x95, 0x7C);
+        if (panel->fades[1].level != ONE) {
+            sprite.setPivot(0, 0xD0);
+        }
+        sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x2B, 0, 0xBF);
+    }
+}
+
 /* The panel's task: lists the partner's entries two by two, with the
    shoulder buttons scrolling five rows at a time; cross puts the picked
    entry in the slot and, when the slot held the partner's current entry,
    asks for the new one; triangle closes it */
 void STGDGLAB_updateEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windows) {
-    SpriteDrawer sprite;
-    PartnerEntry entry;
-    Partner *partner;
-    Partner *current;
-    s32 scroll;
-    s32 row;
-    s32 moved;
-    s32 rows;
-    s32 old;
-    s32 id;
-    /* The match depends on the four loops having their own counters, and on
-       the two Partner pointers being separate */
-    s32 i;
-    s32 j;
-    s32 k;
-    s32 n;
-
     switch (panel->state) {
     case TASK_INIT:
     default:
@@ -207,89 +424,7 @@ void STGDGLAB_updateEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windo
             }
             break;
         case 1:
-            scroll = panel->scroll;
-            moved = 0;
-            if (panel->entryCount >= 11) {
-                if ((!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) || (!PAD_HELD(PAD_R1) && PAD_REPEATED(PAD_L1))) {
-                    panel->scroll -= 5;
-                    if (panel->scroll < 0) {
-                        panel->scroll = 0;
-                    }
-                } else if ((!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) ||
-                           (!PAD_HELD(PAD_L1) && PAD_REPEATED(PAD_R1))) {
-                    rows = panel->entryCount - panel->entryCount / 2;
-                    for (n = 0; n < 5; n++) {
-                        panel->scroll++;
-                        if (panel->scroll + 4 > rows - 1) {
-                            panel->scroll = rows - 5;
-                            break;
-                        }
-                    }
-                }
-                if (scroll != panel->scroll) {
-                    moved = 1;
-                    panel->row = 0;
-                }
-            }
-            if (!moved) {
-                row = panel->row;
-                if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-                    panel->row--;
-                    if (panel->row < 0) {
-                        panel->row = 0;
-                        panel->scroll--;
-                        if (panel->scroll < 0) {
-                            panel->scroll = 0;
-                        }
-                    }
-                    if (row != panel->row || scroll != panel->scroll) {
-                        moved = 1;
-                    }
-                } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-                    if (panel->entryCount >= 10) {
-                        panel->row++;
-                        if (panel->row >= 5) {
-                            panel->row = 4;
-                            panel->scroll++;
-                            if (panel->scroll > panel->entryCount - panel->entryCount / 2 - 1) {
-                                panel->scroll = panel->entryCount - panel->entryCount / 2 - 1;
-                            }
-                        }
-                    } else {
-                        panel->row++;
-                        if (panel->row > panel->entryCount - panel->entryCount / 2 - 1) {
-                            panel->row = panel->entryCount - panel->entryCount / 2 - 1;
-                        }
-                    }
-                    if (scroll != panel->scroll || row != panel->row) {
-                        if (panel->col != 0) {
-                            if (panel->entries[(panel->scroll + panel->row) * 2 + panel->col] >= 3) {
-                                moved = 1;
-                            } else if (panel->entries[(panel->scroll + panel->row) * 2] >= 3) {
-                                panel->col = 0;
-                                moved = 1;
-                            }
-                        } else if (panel->entries[(panel->scroll + panel->row) * 2] >= 3) {
-                            moved = 1;
-                        }
-                        if (!moved) {
-                            panel->row = row;
-                            panel->scroll = scroll;
-                        }
-                    }
-                }
-                if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-                    if (panel->col != 0) {
-                        panel->col = 0;
-                        moved = 1;
-                    }
-                } else if ((PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) && panel->col == 0 &&
-                           panel->entries[(panel->scroll + panel->row) * 2 + 1] >= 3) {
-                    panel->col = 1;
-                    moved = 1;
-                }
-            }
-            if (moved) {
+            if (moveEntryCursor(panel)) {
                 SOUND.playSound(SOUND_CURSOR);
                 windows->cursor->setPos(windows->cursor, panel->col * 0x85 + 0x1A, panel->row * 0xE + 0x16);
                 STGDGLAB_showEntryPanel(panel, windows, 1);
@@ -299,34 +434,7 @@ void STGDGLAB_updateEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windo
                 }
 #endif
             } else if (PAD_PRESSED(PAD_CROSS)) {
-                id = panel->entries[(panel->scroll + panel->row) * 2 + panel->col];
-                for (k = 0; k < 3; k++) {
-                    if (panel->slots[k] == id) {
-                        id = 0;
-                        break;
-                    }
-                }
-                if (id == 0) {
-                    SOUND.playSound(SOUND_MENU_CANCEL);
-                } else {
-                    SOUND.playSound(SOUND_SELECT);
-                    current = &GAME.partners[panel->partner];
-                    if (panel->slots[panel->slot] == current->battleDigivolve) {
-                        panel->substate = 2;
-                    } else {
-                        STGDGLAB_showEntryPanel(panel, windows, 0);
-                        STGDGLAB_data.funcs.startFade(panel->fades, 0);
-                        panel->substate = 0;
-                        panel->step = 1;
-                    }
-                    panel->slots[panel->slot] = id;
-                    GAME.funcs.setPartnerSlots(panel->partner, panel->slots);
-#if VERSION_US
-                    if (windows->scrollBar != NULL) {
-                        windows->scrollBar->state = TASK_KILL;
-                    }
-#endif
-                }
+                putPickedEntry(panel, windows);
             } else if (PAD_PRESSED(PAD_TRIANGLE)) {
                 SOUND.playSound(SOUND_MENU_CANCEL);
                 STGDGLAB_showEntryPanel(panel, windows, 0);
@@ -357,36 +465,7 @@ void STGDGLAB_updateEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windo
             }
             break;
         case 4:
-            old = panel->option;
-            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-                panel->option--;
-                if (panel->option < 0) {
-                    panel->option = 0;
-                }
-            } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-                panel->option++;
-                if (panel->option >= 4) {
-                    panel->option = 3;
-                }
-            }
-            if (old != panel->option) {
-                SOUND.playSound(SOUND_CURSOR);
-                windows->optionCursor->setPos(windows->optionCursor, 0x9A, panel->option * 0xE + 0x83);
-            }
-            partner = &GAME.partners[panel->partner];
-            if (PAD_PRESSED(PAD_CROSS)) {
-                SOUND.playSound(SOUND_SELECT);
-                if (panel->option < 3) {
-                    partner->battleDigivolve = panel->slots[panel->option];
-                } else {
-                    partner->battleDigivolve = 0;
-                }
-                panel->substate++;
-            } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-                SOUND.playSound(SOUND_MENU_CANCEL);
-                partner->battleDigivolve = 0;
-                panel->substate++;
-            }
+            pickBattleDigivolve(panel, windows);
             break;
         case 5:
             STGDGLAB_data.funcs.startFade(&panel->fades[1], 0);
@@ -401,59 +480,7 @@ void STGDGLAB_updateEntryPanel(LabEntryPanel *panel, LabEntryPanelWindows *windo
             }
             break;
         }
-        initSpriteDrawer(&sprite);
-        sprite.setLayerId(panel->layer, panel->depth);
-        sprite.setTexture(0x280, 0x100);
-        if (panel->fades[0].level != ONE) {
-            sprite.setScale(panel->fades[0].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x37);
-        } else {
-            for (j = 0; j < 10; j++) {
-                if (panel->entries[panel->scroll * 2 + j] >= 3) {
-                    sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x3E, (j % 2) * 0x85 + 0x18,
-                                (j / 2) * 0xE + 0x16);
-                }
-            }
-        }
-        if (GFX.funcs.getTime() - panel->blinkTime >= 8) {
-            panel->blinkTime = GFX.funcs.getTime();
-            panel->blink = 1 - panel->blink;
-        }
-        if (panel->fades[0].level == ONE && panel->blink) {
-            if (panel->scroll > 0) {
-                sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x34, 0x123, 0x13);
-            }
-            if (panel->entryCount >= 10 && panel->scroll < panel->entryCount - panel->entryCount / 2 - 5) {
-                sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x35, 0x123, 0x55);
-            }
-        }
-        sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x29, 0x12, 0xF);
-        sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x2A, 0x54, 0x64);
-        sprite.setTexture(0x140, 0);
-        sprite.setLayerId(panel->layer, panel->depth - 1);
-        sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x14, 0x5B, 0x7F);
-        GAME.funcs.getPartnerEntry(panel->partner, panel->entries[(panel->scroll + panel->row) * 2 + panel->col],
-                                   &entry);
-        for (i = 0; i < 6; i++) {
-            if (entry.skills[i] != 0) {
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16),
-                            TECHS[(entry.skills[i] & SKILL_ID) - 1].icon + 0x37, 0xB4, i * 0xE + 0x8B);
-            }
-        }
-        if (panel->fades[1].level != 0) {
-            initSpriteDrawer(&sprite);
-            sprite.setLayerId(panel->layer, panel->depth - 2);
-            sprite.setTexture(0x280, 0x100);
-            if (panel->fades[1].level != ONE) {
-                sprite.setScale(panel->fades[1].level, ONE, ONE);
-                sprite.setPivot(0x140, 0x9D);
-            }
-            sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x2C, 0x95, 0x7C);
-            if (panel->fades[1].level != ONE) {
-                sprite.setPivot(0, 0xD0);
-            }
-            sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x2B, 0, 0xBF);
-        }
+        drawEntryPanel(panel);
         break;
     case TASK_DONE:
     case TASK_KILL:

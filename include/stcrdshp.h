@@ -42,17 +42,17 @@ typedef struct CardPackGrid {
     /* 0x50 */ struct CardShop *owner; /* never read */
     /* 0x54 */ s32 layer;
     /* 0x58 */ s32 depth;
-    /* 0x5C */ s32 unk5C; /* unused (in STCRDABM's grid: the page's first card) */
-    /* 0x60 */ s32 unk60; /* unused (in STCRDABM's grid: the page being turned's) */
+    /* 0x5C */ s32 pad5C; /* never read or written (STCRDABM's grid: the page's first card) */
+    /* 0x60 */ s32 pad60; /* never read or written (STCRDABM's grid: the page being turned's) */
     /* 0x64 */ s32 shown;  /* cards drawn */
     /* 0x68 */ s32 turned; /* slots turned so far */
     /* 0x6C */ s32 time;
     /* 0x70 */ s32 frame;
-    /* 0x74 */ s32 unk74; /* unused */
-    /* 0x78 */ s32 unk78; /* unused */
+    /* 0x74 */ s32 pad74; /* never read or written */
+    /* 0x78 */ s32 pad78; /* never read or written */
     /* 0x7C */ s32 cards[6];
     /* 0x94 */ s32 prevCards[6]; /* the cards being turned */
-    /* 0xAC */ u8 unkAC[0x10]; /* unused */
+    /* 0xAC */ u8 padAC[0x10]; /* never read or written */
     /* 0xBC */ void (*setCards)(struct CardPackGrid *grid, s32 *cards);
     /* 0xC0 */ void (*hide)(struct CardPackGrid *grid);
 } CardPackGrid;
@@ -77,7 +77,7 @@ typedef struct CardShopTitle {
 } CardShopTitle;
 
 /* The card shop's main task (STCRDSHP_createShop): buy cards, open packs
-   or go to the item shop */
+   or edit the decks */
 typedef struct CardShop {
     TASK_HEADER(CardShop);
     /* 0x050 */ s32 layer;
@@ -86,7 +86,7 @@ typedef struct CardShop {
     /* 0x05C */ s32 scrollWait; /* it moves every other frame */
     /* 0x060 */ s32 shop; /* the game mode's argument */
     /* 0x064 */ s32 title;
-    /* 0x068 */ s32 toItemShop;
+    /* 0x068 */ s32 toDeckEditor;
     /* 0x06C */ s32 cursor;
     /* 0x070 */ s16 items[0x194]; /* the bag's, to look for packs */
     /* 0x398 */ PanelAnim fades[3];
@@ -126,7 +126,7 @@ typedef struct CardPackOpen {
     /* 0x098 */ s16 packs[0x194]; /* the bag's card packs */
     /* 0x3C0 */ s32 packCount;
     /* 0x3C4 */ s16 items[0x194]; /* the bag's items */
-    /* 0x6EC */ s32 unk6EC; /* unused */
+    /* 0x6EC */ s32 pad; /* never read or written */
     /* 0x6F0 */ PanelAnim fades[4];
 } CardPackOpen;
 
@@ -181,7 +181,23 @@ typedef struct CardShopBuy {
 } CardShopBuy;
 
 typedef struct CardShopBuyWindows {
-    /* 0x00 */ TextWindow *windows[17];
+    /* 0x00 */ TextWindow *name; /* the card under the cursor's */
+    /* 0x04 */ TextWindow *pointsLabel;
+    /* 0x08 */ TextWindow *points;
+    /* 0x0C */ TextWindow *countLabel;
+    /* 0x10 */ TextWindow *count; /* how many the player has */
+    /* 0x14 */ TextWindow *text; /* its effect (TEXT_CARD_EFFECTS) */
+    /* 0x18 */ TextWindow *apLabel;
+    /* 0x1C */ TextWindow *ap;
+    /* 0x20 */ TextWindow *hpLabel;
+    /* 0x24 */ TextWindow *hp;
+    /* 0x28 */ TextWindow *priceLabel;
+    /* 0x2C */ TextWindow *price;
+    /* 0x30 */ TextWindow *prev; /* by the arrows */
+    /* 0x34 */ TextWindow *next;
+    /* 0x38 */ TextWindow *message; /* the total, or why the card can't be bought */
+    /* 0x3C */ TextWindow *yes;
+    /* 0x40 */ TextWindow *no;
     /* 0x44 */ Cursor *cursor;
     /* 0x48 */ CardPackGrid *grid;
 } CardShopBuyWindows;

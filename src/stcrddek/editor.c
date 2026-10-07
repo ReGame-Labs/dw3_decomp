@@ -365,20 +365,284 @@ void STCRDDEK_drawEditor(DeckEditor *task) {
     }
 }
 
-/* The editor's states: picks a card of the deck (R1 its info panel, circle sorts
-   the deck, triangle leaves), then a card of the list to take its place (L1/R1
-   a page, triangle back), refusing with a message one the deck has 4 of */
-void STCRDDEK_stepEditor(DeckEditor *task, DeckEditorChildren *children) {
+/* The cursor on the deck's grid (9 columns, the last row 4): the pad moves it,
+   R1 opens or closes the card's info panel, cross goes on to the list of the
+   cards owned, triangle leaves and circle sorts the deck */
+static inline void STCRDDEK_moveDeckCursor(DeckEditor *task, DeckEditorChildren *children) {
+    s32 prev;
+
+    prev = task->column + task->row * 9;
+    if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
+        if (--task->column < 0) {
+            task->column = 0;
+        }
+    } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
+        if (task->row == 4) {
+            if (++task->column >= 4) {
+                task->column = 3;
+            }
+        } else {
+            if (++task->column >= 9) {
+                task->column = 8;
+            }
+        }
+    }
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        if (--task->row < 0) {
+            task->row = 0;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        task->row++;
+        if (task->column >= 4) {
+            if (task->row >= 4) {
+                task->row = 3;
+            }
+        } else {
+            if (task->row >= 5) {
+                task->row = 4;
+            }
+        }
+    }
+    STCRDDEK_showEditorWindows(task, children, 1);
+    if (prev != task->column + task->row * 9) {
+        SOUND.playSound(SOUND_MENU_MOVE);
+    } else if (!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) {
+        SOUND.playSound(SOUND_MENU_MOVE);
+        task->substate = 10;
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        if (task->listCount != 0) {
+            SOUND.playSound(SOUND_MENU_CONFIRM);
+            task->substate = 20;
+        }
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        task->substate = 50;
+    } else if (PAD_PRESSED(PAD_CIRCLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        task->substate = 30;
+    }
+}
+
+/* Opens or closes the info panel of the card under the cursor */
+static inline void STCRDDEK_toggleCardInfo(DeckEditor *task, DeckEditorChildren *children) {
+    task->cursorShown = 0;
+    task->infoShown = 1 - task->infoShown;
+    if (task->infoShown) {
+        STCRDDEK_funcs.startFade(&task->panels[1], 1);
+        task->substate = 11;
+        task->step = 0;
+    } else {
+        STCRDDEK_showEditorWindows(task, children, 1);
+        STCRDDEK_funcs.startFade(&task->panels[1], 0);
+        task->substate = 11;
+        task->step = 1;
+    }
+}
+
+/* Leaves the deck's grid for the list of the cards owned: fills the list and
+   keeps its cursor on a card, closes the grid's panels and opens the list's */
+static inline void STCRDDEK_openCardList(DeckEditor *task, DeckEditorChildren *children) {
+    children->cards->state = TASK_KILL;
+    STCRDDEK_buildCardList(task);
+    STCRDDEK_funcs.startFade(&task->panels[2], 1);
+    while (task->list[task->listTop + task->listCursor] == 0) {
+        if (--task->listTop < 0) {
+            task->listTop = 0;
+            if (--task->listCursor < 0) {
+                task->listCursor = 0;
+            }
+        }
+    }
+    task->cursorShown = 0;
+    STCRDDEK_funcs.startFade(&task->panels[0], 0);
+    if (task->infoShown) {
+        task->panels[1].level = 0;
+        task->infoShown = 0;
+    }
+    STCRDDEK_showEditorWindows(task, children, 0);
+    task->substate++;
+}
+
+/* Once the list card's panel has opened: adds a scroll bar to a list longer
+   than a page and shows the cursor and the card under it */
+static inline void STCRDDEK_showCardListCursor(DeckEditor *task, DeckEditorChildren *children) {
+    if (STCRDDEK_funcs.updateFade(&task->panels[3])) {
+        if (task->listCount >= 9 && children->scrollBar == NULL) {
+            children->scrollBar = STCRDDEK_createScrollBar();
+            children->scrollBar->setX(children->scrollBar, 0x125, 0xC);
+            children->scrollBar->setRange(children->scrollBar, 0x2A, 0x8F);
+            children->scrollBar->setCount(children->scrollBar, 8, task->listCount);
+            children->scrollBar->setPos(children->scrollBar, task->listCursor);
+        }
+        children->cursor->setPos(children->cursor, 0x89, task->listCursor * 14 + 0x27);
+        children->cursor->setVisible(children->cursor, 1);
+        STCRDDEK_showListCard(task, children, 1);
+        task->substate++;
+    }
+}
+
+/* The cursor on the list of the cards owned: L1/R1 turn a page, up/down move
+   it (scrolling the list); cross puts the card in the deck's slot unless the
+   deck already has four of it (a message), triangle goes back to the grid */
+static inline void STCRDDEK_chooseListCard(DeckEditor *task, DeckEditorChildren *children) {
     s32 prev;
 #if VERSION_EU
     s32 prevTop;
 #endif
-    s32 i;
-    s32 j;
     s32 id;
     s32 old;
+
+    prev = task->listTop + task->listCursor;
+#if VERSION_EU
+    prevTop = task->listTop;
+#endif
+    if (task->listCount >= 9) {
+        if ((!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) || (!PAD_HELD(PAD_R1) && PAD_REPEATED(PAD_L1))) {
+            task->listTop -= 7;
+            if (task->listTop < 0) {
+                task->listTop = 0;
+            }
+        } else if ((!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) || (!PAD_HELD(PAD_L1) && PAD_REPEATED(PAD_R1))) {
+            s32 k;
+
+            for (k = 0; k < 7; k++) {
+                if (++task->listTop > task->listCount - 8) {
+                    task->listTop = task->listCount - 8;
+                    break;
+                }
+            }
+        }
+    }
+    if (prev == task->listTop + task->listCursor) {
+        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+            if (--task->listCursor < 0) {
+                task->listCursor = 0;
+                if (--task->listTop < 0) {
+                    task->listTop = 0;
+                }
+            }
+        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+            if (task->listCount >= 9) {
+                if (++task->listCursor >= 8) {
+                    task->listCursor = 7;
+                    if (++task->listTop > task->listCount - 8) {
+                        task->listTop = task->listCount - 8;
+                    }
+                }
+            } else {
+                if (++task->listCursor > task->listCount - 1) {
+                    task->listCursor = task->listCount - 1;
+                }
+            }
+        }
+    }
+#if VERSION_EU
+    if (children->scrollBar != NULL && prevTop != task->listTop) {
+        children->scrollBar->setPos(children->scrollBar, task->listTop);
+    }
+#endif
+    if (prev != task->listTop + task->listCursor) {
+        SOUND.playSound(SOUND_CURSOR);
+        children->cursor->setPos(children->cursor, 0x89, task->listCursor * 14 + 0x27);
+        STCRDDEK_showCardList(task, children, 1);
+        STCRDDEK_showListCard(task, children, 1);
+#if VERSION_US
+        if (children->scrollBar != NULL) {
+            children->scrollBar->setPos(children->scrollBar, task->listTop + task->listCursor);
+        }
+#endif
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        id = task->list[task->listTop + task->listCursor];
+        old = GAME.decks[task->deck].cards[task->column + task->row * 9];
+        SOUND.playSound(SOUND_SELECT);
+        if (id != old && GAME.cards[id] - task->owned[id] >= 4) {
+            task->substate = 60;
+        } else {
+            GAME.decks[task->deck].cards[task->column + task->row * 9] = id;
+            task->screen->countKinds(task->screen);
+            task->substate++;
+        }
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        task->substate++;
+    }
+}
+
+/* Hides the list, its card and its cursor and closes their panels, and ends
+   the scroll bar */
+static inline void STCRDDEK_closeCardList(DeckEditor *task, DeckEditorChildren *children) {
+    STCRDDEK_funcs.startFade(&task->panels[2], 0);
+    STCRDDEK_showCardList(task, children, 0);
+    STCRDDEK_funcs.startFade(&task->panels[3], 0);
+    STCRDDEK_showListCard(task, children, 0);
+    children->cursor->setVisible(children->cursor, 0);
+    if (children->scrollBar != NULL) {
+        children->scrollBar->state = TASK_KILL;
+    }
+    task->substate++;
+}
+
+/* Before sorting the deck: closes the grid's panels and hides its windows */
+static inline void STCRDDEK_startSort(DeckEditor *task, DeckEditorChildren *children) {
+    children->cards->state = TASK_KILL;
+    STCRDDEK_buildCardList(task);
+    task->counter = 0;
+    task->substate++;
+    STCRDDEK_funcs.startFade(&task->panels[0], 0);
+    task->cursorShown = 0;
+    STCRDDEK_funcs.startFade(&task->panels[0], 0);
+    task->panels[1].level = 0;
+    task->infoShown = 0;
+    STCRDDEK_showEditorWindows(task, children, 0);
+}
+
+/* Sorts the deck's 40 cards by id, then shows the grid again */
+static inline void STCRDDEK_sortDeck(DeckEditor *task, DeckEditorChildren *children) {
+    s32 i;
+    s32 j;
     s32 tmp;
 
+    for (i = 0; i < 39; i++) {
+        for (j = i + 1; j < 40; j++) {
+            if (GAME.decks[task->deck].cards[i] > GAME.decks[task->deck].cards[j]) {
+                tmp = GAME.decks[task->deck].cards[i];
+                GAME.decks[task->deck].cards[i] = GAME.decks[task->deck].cards[j];
+                GAME.decks[task->deck].cards[j] = tmp;
+            }
+        }
+    }
+    task->substate = 0;
+}
+
+/* Leaving: ends the deck's cards and closes the grid's panels and windows */
+static inline void STCRDDEK_closeEditor(DeckEditor *task, DeckEditorChildren *children) {
+    children->cards->state = TASK_KILL;
+    task->cursorShown = 0;
+    STCRDDEK_funcs.startFade(&task->panels[0], 0);
+    if (task->infoShown) {
+        task->panels[1].level = 0;
+        task->infoShown = 0;
+    }
+    STCRDDEK_showEditorWindows(task, children, 0);
+    task->substate++;
+}
+
+/* Once the grid's panel has opened: shows the deck's windows, fills the list
+   of the cards owned and starts laying out the deck's cards */
+static inline void STCRDDEK_openEditor(DeckEditor *task, DeckEditorChildren *children) {
+    if (STCRDDEK_funcs.updateFade(&task->panels[0])) {
+        task->blinkTime = 0;
+        STCRDDEK_showEditorWindows(task, children, 1);
+        STCRDDEK_buildCardList(task);
+        children->cards = STCRDDEK_createDeckCards(task);
+        task->substate++;
+    }
+}
+
+/* The editor's states: picks a card of the deck (R1 its info panel, circle sorts
+   the deck, triangle leaves), then a card of the list to take its place (L1/R1
+   a page, triangle back), refusing with a message one the deck has 4 of */
+void STCRDDEK_stepEditor(DeckEditor *task, DeckEditorChildren *children) {
     switch (task->substate) {
     case 0:
     default:
@@ -386,13 +650,7 @@ void STCRDDEK_stepEditor(DeckEditor *task, DeckEditorChildren *children) {
         task->substate++;
         break;
     case 1:
-        if (STCRDDEK_funcs.updateFade(&task->panels[0])) {
-            task->blinkTime = 0;
-            STCRDDEK_showEditorWindows(task, children, 1);
-            STCRDDEK_buildCardList(task);
-            children->cards = STCRDDEK_createDeckCards(task);
-            task->substate++;
-        }
+        STCRDDEK_openEditor(task, children);
         break;
     case 2:
         if (children->cards->state == TASK_DONE) {
@@ -401,70 +659,10 @@ void STCRDDEK_stepEditor(DeckEditor *task, DeckEditorChildren *children) {
         }
         break;
     case 5:
-        prev = task->column + task->row * 9;
-        if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-            if (--task->column < 0) {
-                task->column = 0;
-            }
-        } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-            if (task->row == 4) {
-                if (++task->column >= 4) {
-                    task->column = 3;
-                }
-            } else {
-                if (++task->column >= 9) {
-                    task->column = 8;
-                }
-            }
-        }
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            if (--task->row < 0) {
-                task->row = 0;
-            }
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            task->row++;
-            if (task->column >= 4) {
-                if (task->row >= 4) {
-                    task->row = 3;
-                }
-            } else {
-                if (task->row >= 5) {
-                    task->row = 4;
-                }
-            }
-        }
-        STCRDDEK_showEditorWindows(task, children, 1);
-        if (prev != task->column + task->row * 9) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-        } else if (!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-            task->substate = 10;
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            if (task->listCount != 0) {
-                SOUND.playSound(SOUND_MENU_CONFIRM);
-                task->substate = 20;
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            task->substate = 50;
-        } else if (PAD_PRESSED(PAD_CIRCLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            task->substate = 30;
-        }
+        STCRDDEK_moveDeckCursor(task, children);
         break;
     case 10:
-        task->cursorShown = 0;
-        task->infoShown = 1 - task->infoShown;
-        if (task->infoShown) {
-            STCRDDEK_funcs.startFade(&task->panels[1], 1);
-            task->substate = 11;
-            task->step = 0;
-        } else {
-            STCRDDEK_showEditorWindows(task, children, 1);
-            STCRDDEK_funcs.startFade(&task->panels[1], 0);
-            task->substate = 11;
-            task->step = 1;
-        }
+        STCRDDEK_toggleCardInfo(task, children);
         break;
     case 11:
         if (STCRDDEK_funcs.updateFade(&task->panels[1])) {
@@ -476,25 +674,7 @@ void STCRDDEK_stepEditor(DeckEditor *task, DeckEditorChildren *children) {
         }
         break;
     case 20:
-        children->cards->state = TASK_KILL;
-        STCRDDEK_buildCardList(task);
-        STCRDDEK_funcs.startFade(&task->panels[2], 1);
-        while (task->list[task->listTop + task->listCursor] == 0) {
-            if (--task->listTop < 0) {
-                task->listTop = 0;
-                if (--task->listCursor < 0) {
-                    task->listCursor = 0;
-                }
-            }
-        }
-        task->cursorShown = 0;
-        STCRDDEK_funcs.startFade(&task->panels[0], 0);
-        if (task->infoShown) {
-            task->panels[1].level = 0;
-            task->infoShown = 0;
-        }
-        STCRDDEK_showEditorWindows(task, children, 0);
-        task->substate++;
+        STCRDDEK_openCardList(task, children);
         break;
     case 21:
         if (STCRDDEK_funcs.updateFade(&task->panels[0])) {
@@ -509,106 +689,13 @@ void STCRDDEK_stepEditor(DeckEditor *task, DeckEditorChildren *children) {
         }
         break;
     case 23:
-        if (STCRDDEK_funcs.updateFade(&task->panels[3])) {
-            if (task->listCount >= 9 && children->scrollBar == NULL) {
-                children->scrollBar = STCRDDEK_createScrollBar();
-                children->scrollBar->setX(children->scrollBar, 0x125, 0xC);
-                children->scrollBar->setRange(children->scrollBar, 0x2A, 0x8F);
-                children->scrollBar->setCount(children->scrollBar, 8, task->listCount);
-                children->scrollBar->setPos(children->scrollBar, task->listCursor);
-            }
-            children->cursor->setPos(children->cursor, 0x89, task->listCursor * 14 + 0x27);
-            children->cursor->setVisible(children->cursor, 1);
-            STCRDDEK_showListCard(task, children, 1);
-            task->substate++;
-        }
+        STCRDDEK_showCardListCursor(task, children);
         break;
     case 24:
-        prev = task->listTop + task->listCursor;
-#if VERSION_EU
-        prevTop = task->listTop;
-#endif
-        if (task->listCount >= 9) {
-            if ((!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) || (!PAD_HELD(PAD_R1) && PAD_REPEATED(PAD_L1))) {
-                task->listTop -= 7;
-                if (task->listTop < 0) {
-                    task->listTop = 0;
-                }
-            } else if ((!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) || (!PAD_HELD(PAD_L1) && PAD_REPEATED(PAD_R1))) {
-                s32 k;
-
-                for (k = 0; k < 7; k++) {
-                    if (++task->listTop > task->listCount - 8) {
-                        task->listTop = task->listCount - 8;
-                        break;
-                    }
-                }
-            }
-        }
-        if (prev == task->listTop + task->listCursor) {
-            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-                if (--task->listCursor < 0) {
-                    task->listCursor = 0;
-                    if (--task->listTop < 0) {
-                        task->listTop = 0;
-                    }
-                }
-            } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-                if (task->listCount >= 9) {
-                    if (++task->listCursor >= 8) {
-                        task->listCursor = 7;
-                        if (++task->listTop > task->listCount - 8) {
-                            task->listTop = task->listCount - 8;
-                        }
-                    }
-                } else {
-                    if (++task->listCursor > task->listCount - 1) {
-                        task->listCursor = task->listCount - 1;
-                    }
-                }
-            }
-        }
-#if VERSION_EU
-        if (children->scrollBar != NULL && prevTop != task->listTop) {
-            children->scrollBar->setPos(children->scrollBar, task->listTop);
-        }
-#endif
-        if (prev != task->listTop + task->listCursor) {
-            SOUND.playSound(SOUND_CURSOR);
-            children->cursor->setPos(children->cursor, 0x89, task->listCursor * 14 + 0x27);
-            STCRDDEK_showCardList(task, children, 1);
-            STCRDDEK_showListCard(task, children, 1);
-#if VERSION_US
-            if (children->scrollBar != NULL) {
-                children->scrollBar->setPos(children->scrollBar, task->listTop + task->listCursor);
-            }
-#endif
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            id = task->list[task->listTop + task->listCursor];
-            old = GAME.decks[task->deck].cards[task->column + task->row * 9];
-            SOUND.playSound(SOUND_SELECT);
-            if (id != old && GAME.cards[id] - task->owned[id] >= 4) {
-                task->substate = 60;
-            } else {
-                GAME.decks[task->deck].cards[task->column + task->row * 9] = id;
-                task->screen->countKinds(task->screen);
-                task->substate++;
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            task->substate++;
-        }
+        STCRDDEK_chooseListCard(task, children);
         break;
     case 25:
-        STCRDDEK_funcs.startFade(&task->panels[2], 0);
-        STCRDDEK_showCardList(task, children, 0);
-        STCRDDEK_funcs.startFade(&task->panels[3], 0);
-        STCRDDEK_showListCard(task, children, 0);
-        children->cursor->setVisible(children->cursor, 0);
-        if (children->scrollBar != NULL) {
-            children->scrollBar->state = TASK_KILL;
-        }
-        task->substate++;
+        STCRDDEK_closeCardList(task, children);
         break;
     case 26:
         STCRDDEK_funcs.updateFade(&task->panels[2]);
@@ -619,16 +706,7 @@ void STCRDDEK_stepEditor(DeckEditor *task, DeckEditorChildren *children) {
         }
         break;
     case 30:
-        children->cards->state = TASK_KILL;
-        STCRDDEK_buildCardList(task);
-        task->counter = 0;
-        task->substate++;
-        STCRDDEK_funcs.startFade(&task->panels[0], 0);
-        task->cursorShown = 0;
-        STCRDDEK_funcs.startFade(&task->panels[0], 0);
-        task->panels[1].level = 0;
-        task->infoShown = 0;
-        STCRDDEK_showEditorWindows(task, children, 0);
+        STCRDDEK_startSort(task, children);
         break;
     case 31:
         if (STCRDDEK_funcs.updateFade(&task->panels[3])) {
@@ -636,27 +714,10 @@ void STCRDDEK_stepEditor(DeckEditor *task, DeckEditorChildren *children) {
         }
         break;
     case 32:
-        for (i = 0; i < 39; i++) {
-            for (j = i + 1; j < 40; j++) {
-                if (GAME.decks[task->deck].cards[i] > GAME.decks[task->deck].cards[j]) {
-                    tmp = GAME.decks[task->deck].cards[i];
-                    GAME.decks[task->deck].cards[i] = GAME.decks[task->deck].cards[j];
-                    GAME.decks[task->deck].cards[j] = tmp;
-                }
-            }
-        }
-        task->substate = 0;
+        STCRDDEK_sortDeck(task, children);
         break;
     case 50:
-        children->cards->state = TASK_KILL;
-        task->cursorShown = 0;
-        STCRDDEK_funcs.startFade(&task->panels[0], 0);
-        if (task->infoShown) {
-            task->panels[1].level = 0;
-            task->infoShown = 0;
-        }
-        STCRDDEK_showEditorWindows(task, children, 0);
-        task->substate++;
+        STCRDDEK_closeEditor(task, children);
         break;
     case 51:
         if (STCRDDEK_funcs.updateFade(&task->panels[0])) {

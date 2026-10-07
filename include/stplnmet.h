@@ -59,7 +59,7 @@ typedef struct SparkleFrame {
 /* An animated sprite (STPLNMET_updateSparkles, STPLNMET_updateShine) */
 typedef struct NameSparkle {
     TASK_HEADER(NameSparkle);
-    /* 0x50 */ s32 unk50[4];
+    /* 0x50 */ s32 pad[4]; /* never read or written */
     /* 0x60 */ s32 frame;
     /* 0x64 */ s32 time;
 } NameSparkle;
@@ -69,7 +69,7 @@ typedef struct NameDialog {
     TASK_HEADER(NameDialog);
     /* 0x50 */ struct PlayerNameScreen *screen;
     /* 0x54 */ s32 clutRow;
-    /* 0x58 */ s32 unk58;
+    /* 0x58 */ s32 pad; /* never read or written */
 } NameDialog;
 
 typedef struct NameDialogWindows {
@@ -142,7 +142,7 @@ typedef struct PartnerChoice {
     /* 0x6C */ s32 choice; /* STPLNMET_funcs.choices */
     /* 0x70 */ s32 arrowFrame;
     /* 0x74 */ s32 arrowTime;
-    /* 0x78 */ u8 unk78[0x88 - 0x78];
+    /* 0x78 */ u8 pad[0x88 - 0x78]; /* never read or written */
     /* 0x88 */ void (*hide)(struct PartnerChoice *task, s32 hide);
 } PartnerChoice;
 

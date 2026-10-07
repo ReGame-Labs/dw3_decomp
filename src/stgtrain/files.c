@@ -47,14 +47,15 @@ void STGTRAIN_freeFile(void) {
     }
 }
 
-/* The set's sprite bank, and the two values after its offsets */
+/* The set's sprite bank, where its sprites start and its size: the two
+   words after the set's offsets */
 s32 STGTRAIN_readSetBank(TrainSetHeader *header, s32 set) {
     STGTRAIN_bankCursor.set = header;
     /* the offsets count bytes from the file's start */
     STGTRAIN_state.sets[set].bank = (TrainSpriteBank *)(STGTRAIN_state.data + header->bank);
     STGTRAIN_bankCursor.w += *STGTRAIN_bankCursor.w + 1;
     STGTRAIN_state.sets[set].bankOffset = *STGTRAIN_bankCursor.w++;
-    STGTRAIN_state.sets[set].unkC = *STGTRAIN_bankCursor.w;
+    STGTRAIN_state.sets[set].bankSize = *STGTRAIN_bankCursor.w;
     return 1;
 }
 
@@ -197,9 +198,9 @@ s32 STGTRAIN_getBankOffset(s32 set) {
     return STGTRAIN_state.sets[set].bankOffset;
 }
 
-/* An image set's unkC */
-s32 STGTRAIN_getSetUnkC(s32 set) {
-    return STGTRAIN_state.sets[set].unkC;
+/* The size of an image set's sprite bank (nothing calls it) */
+s32 STGTRAIN_getBankSize(s32 set) {
+    return STGTRAIN_state.sets[set].bankSize;
 }
 
 /* An animation of an image set */
@@ -423,7 +424,7 @@ TrainState STGTRAIN_state = {
     STGTRAIN_loadImages, STGTRAIN_startFade, STGTRAIN_updateFade, STGTRAIN_startLerp,
     STGTRAIN_updateLerp, STGTRAIN_requestFile, STGTRAIN_getFile, STGTRAIN_freeFile,
     STGTRAIN_readSet, STGTRAIN_loadSet, STGTRAIN_getFileId, STGTRAIN_getFilePos,
-    STGTRAIN_getFileEffectSameDepth, STGTRAIN_getBank, STGTRAIN_getBankOffset, STGTRAIN_getSetUnkC,
+    STGTRAIN_getFileEffectSameDepth, STGTRAIN_getBank, STGTRAIN_getBankOffset, STGTRAIN_getBankSize,
     STGTRAIN_getAnim, STGTRAIN_getGymTrainings, STGTRAIN_findGymTraining,
 };
 TrainCursor STGTRAIN_bankCursor = {NULL};

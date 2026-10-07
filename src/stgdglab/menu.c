@@ -92,19 +92,229 @@ void STGDGLAB_showMenuPage(LabMenu *menu, LabMenuWindows *windows) {
     menu->frames[3] = 0;
 }
 
+/* The menu's title and button hint, each once its panel has faded in; then
+   fades the options' panel in */
+static inline void showMenuTitle(LabMenu *menu, LabMenuWindows *windows) {
+    s32 done;
+
+    done = 0;
+    if (STGDGLAB_data.funcs.updateFade(&menu->panels[0])) {
+        if (windows->title == NULL) {
+            windows->title = createTextWindow(menu->layer, 1, 0xAE, 0x15);
+            windows->title->setDepth(windows->title, menu->depth - 1);
+        }
+        windows->title->setPos(windows->title, 0xAE, 0x15);
+        done = 1;
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 1);
+    }
+    if (STGDGLAB_data.funcs.updateFade(&menu->panels[2])) {
+        if (windows->label == NULL) {
+            windows->label = createTextWindow(menu->layer, 1, 0xD3, 0xCC);
+            windows->label->setDepth(windows->label, menu->depth - 1);
+        }
+        windows->label->setPos(windows->label, 0xD3, 0xCC);
+        done++;
+        windows->label->setString(windows->label, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 5);
+    }
+    if (done == 2) {
+        STGDGLAB_data.funcs.startFade(&menu->panels[1], 1);
+        menu->substate++;
+    }
+}
+
+/* Once their panel has faded in, the three screens' names and the cursor */
+static inline void showMenuOptions(LabMenu *menu, LabMenuWindows *windows) {
+    s32 i;
+
+    if (STGDGLAB_data.funcs.updateFade(&menu->panels[1])) {
+        for (i = 0; i < 3; i++) {
+            if (windows->options[i] == NULL) {
+                windows->options[i] = createTextWindow(menu->layer, 1, 0xA7, i * 0xE + 0x31);
+                windows->options[i]->setDepth(windows->options[i], menu->depth - 1);
+            }
+            windows->options[i]->setString(windows->options[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), i + 2);
+        }
+        if (windows->cursor == NULL) {
+            windows->cursor = createCursor(menu->layer, 1, 0x9A, menu->choice * 0xE + 0x31);
+        }
+        windows->cursor->setVisible(windows->cursor, 1);
+        menu->substate++;
+    }
+}
+
+/* Up and down pick a screen; cross goes on to the party, triangle leaves the lab */
+static inline void pickMenuOption(LabMenu *menu, LabMenuWindows *windows) {
+    s32 old;
+
+    old = menu->choice;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        if (--menu->choice < 0) {
+            menu->choice = 0;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        if (++menu->choice >= 3) {
+            menu->choice = 2;
+        }
+    }
+    if (old != menu->choice) {
+        SOUND.playSound(SOUND_CURSOR);
+        windows->cursor->setPos(windows->cursor, 0x9A, menu->choice * 0xE + 0x31);
+    }
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        menu->step = 0;
+        menu->substate++;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        menu->step = 1;
+        menu->substate++;
+        menu->lab->fadeOut(menu->lab);
+    }
+}
+
+/* Left and right go through the party's members; cross opens the screen for
+   the member, triangle goes back to the screens, circle (on "Switch
+   Digimon", with a member) opens the member's entries */
+static inline void pickMember(LabMenu *menu, LabMenuWindows *windows) {
+    s32 old;
+
+    old = menu->lab->member;
+    if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
+        if (--menu->lab->member < 0) {
+            menu->lab->member = menu->memberCount - 1;
+        }
+    } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
+        if (++menu->lab->member > menu->memberCount - 1) {
+            menu->lab->member = 0;
+        }
+    }
+    if (old != menu->lab->member) {
+        SOUND.playSound(SOUND_MENU_MOVE);
+        STGDGLAB_showMenuPage(menu, windows);
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+        menu->step = 1;
+        menu->substate++;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        menu->step = 0;
+        menu->substate++;
+    } else if (PAD_PRESSED(PAD_CIRCLE) && menu->choice == 0 &&
+               GAME.funcs.getPartyMember(menu->lab->member) >= 0) {
+        menu->step = 2;
+        menu->substate++;
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+    }
+}
+
+/* Once the member panel has faded out, fades the page out and hides its
+   windows (the stats and name only when going back to the screens) */
+static inline void closeMenuPage(LabMenu *menu, LabMenuWindows *windows) {
+    s32 i;
+
+    if (STGDGLAB_data.funcs.updateFade(&menu->panels[7])) {
+        if (menu->step == 0) {
+            STGDGLAB_data.funcs.startFade(&menu->panels[3], 0);
+            for (i = 0; i < 5; i++) {
+                if (windows->statLabels[i] != NULL) {
+                    windows->statLabels[i]->setVisible(windows->statLabels[i], 0);
+                }
+                if (windows->statValues[i] != NULL) {
+                    windows->statValues[i]->setVisible(windows->statValues[i], 0);
+                }
+            }
+            if (windows->name != NULL) {
+                windows->name->setVisible(windows->name, 0);
+            }
+        }
+        STGDGLAB_data.funcs.startFade(&menu->panels[4], 0);
+        STGDGLAB_data.funcs.startFade(&menu->panels[5], 0);
+        STGDGLAB_data.funcs.startFade(&menu->panels[6], 0);
+        if (menu->choice == 0) {
+            STGDGLAB_data.funcs.startFade(&menu->panels[8], 0);
+        }
+        if (windows->title != NULL) {
+            windows->title->setVisible(windows->title, 0);
+        }
+        if (windows->label != NULL) {
+            windows->label->setVisible(windows->label, 0);
+        }
+        if (windows->entriesHint != NULL) {
+            windows->entriesHint->setVisible(windows->entriesHint, 0);
+        }
+        menu->substate++;
+    }
+}
+
+/* Once the page's panel has faded in, the member's page and its label */
+static inline void showMenuPageLabel(LabMenu *menu, LabMenuWindows *windows) {
+    STGDGLAB_data.funcs.updateFade(&menu->panels[3]);
+    if (STGDGLAB_data.funcs.updateFade(&menu->panels[4])) {
+        STGDGLAB_showMenuPage(menu, windows);
+        if (windows->label == NULL) {
+            windows->label = createTextWindow(menu->layer, 1, 0xA1, 0x17);
+            windows->label->setDepth(windows->label, menu->depth - 1);
+        }
+        windows->label->setPos(windows->label, 0xA1, 0x17);
+        windows->label->setString(windows->label, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 6);
+        menu->substate++;
+    }
+}
+
+/* Once their panels have faded in, the entries hint (on "Switch Digimon")
+   and the title that asks for a member for the picked screen */
+static inline void showMenuPageTitle(LabMenu *menu, LabMenuWindows *windows) {
+    if (menu->choice == 0 && STGDGLAB_data.funcs.updateFade(&menu->panels[8])) {
+        if (windows->entriesHint == NULL) {
+            windows->entriesHint = createTextWindow(menu->layer, 1, 0xF, 0x55);
+            windows->entriesHint->setDepth(windows->entriesHint, menu->depth - 1);
+        }
+        windows->entriesHint->setString(windows->entriesHint, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x14);
+    }
+    STGDGLAB_data.funcs.updateFade(&menu->panels[5]);
+    if (STGDGLAB_data.funcs.updateFade(&menu->panels[6])) {
+        if (windows->title == NULL) {
+            windows->title = createTextWindow(menu->layer, 1, 0xAE, 0x49);
+        }
+        windows->title->setPos(windows->title, 0xAE, 0x49);
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), menu->choice + 0x18);
+        menu->substate++;
+    }
+}
+
+/* Once the page's panels have faded out (all but the page itself when a
+   screen or the entries open): opens the screen, the member's entries or the
+   screens' menu again */
+static inline void waitMenuPageClosed(LabMenu *menu) {
+    s32 closed;
+    s32 m;
+
+    closed = 0;
+    for (m = menu->step != 0; m < 6; m++) {
+        closed += STGDGLAB_data.funcs.updateFade(&menu->panels[m + 3]);
+    }
+    if (menu->step == 1) {
+        if (closed == 5) {
+            menu->nextSubstate(menu);
+            menu->picked = 1;
+        }
+    } else if (menu->step == 2) {
+        if (closed == 5) {
+            menu->setSubstate(menu, 30);
+        }
+    } else if (closed == 6) {
+        menu->setSubstate(menu, 0);
+    }
+}
+
 /* The main menu's states: fades its panels in, picks one of the three
    screens with up and down, then shows the party's stats while left and
    right go through them; circle opens the partner's entries */
 void STGDGLAB_runMenu(LabMenu *menu, LabMenuWindows *windows) {
     TextWindow **items;
-    s32 old;
-    /* The match depends on cases 4, 5 and 18 having their own counters, and
-       on case 5 clearing its count after i */
-    s32 closed;
+    /* The match depends on cases 4 and 5 having their own counters, and on
+       case 5 clearing its count after k */
     s32 faded;
-    s32 done;
-    s32 i;
-    s32 m;
     s32 j;
     s32 k;
 
@@ -116,71 +326,13 @@ void STGDGLAB_runMenu(LabMenu *menu, LabMenuWindows *windows) {
         menu->substate++;
         break;
     case 1:
-        done = 0;
-        if (STGDGLAB_data.funcs.updateFade(&menu->panels[0])) {
-            if (windows->title == NULL) {
-                windows->title = createTextWindow(menu->layer, 1, 0xAE, 0x15);
-                windows->title->setDepth(windows->title, menu->depth - 1);
-            }
-            windows->title->setPos(windows->title, 0xAE, 0x15);
-            done = 1;
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 1);
-        }
-        if (STGDGLAB_data.funcs.updateFade(&menu->panels[2])) {
-            if (windows->label == NULL) {
-                windows->label = createTextWindow(menu->layer, 1, 0xD3, 0xCC);
-                windows->label->setDepth(windows->label, menu->depth - 1);
-            }
-            windows->label->setPos(windows->label, 0xD3, 0xCC);
-            done++;
-            windows->label->setString(windows->label, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 5);
-        }
-        if (done == 2) {
-            STGDGLAB_data.funcs.startFade(&menu->panels[1], 1);
-            menu->substate++;
-        }
+        showMenuTitle(menu, windows);
         break;
     case 2:
-        if (STGDGLAB_data.funcs.updateFade(&menu->panels[1])) {
-            for (i = 0; i < 3; i++) {
-                if (windows->options[i] == NULL) {
-                    windows->options[i] = createTextWindow(menu->layer, 1, 0xA7, i * 0xE + 0x31);
-                    windows->options[i]->setDepth(windows->options[i], menu->depth - 1);
-                }
-                windows->options[i]->setString(windows->options[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), i + 2);
-            }
-            if (windows->cursor == NULL) {
-                windows->cursor = createCursor(menu->layer, 1, 0x9A, menu->choice * 0xE + 0x31);
-            }
-            windows->cursor->setVisible(windows->cursor, 1);
-            menu->substate++;
-        }
+        showMenuOptions(menu, windows);
         break;
     case 3:
-        old = menu->choice;
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            if (--menu->choice < 0) {
-                menu->choice = 0;
-            }
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            if (++menu->choice >= 3) {
-                menu->choice = 2;
-            }
-        }
-        if (old != menu->choice) {
-            SOUND.playSound(SOUND_CURSOR);
-            windows->cursor->setPos(windows->cursor, 0x9A, menu->choice * 0xE + 0x31);
-        }
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            menu->step = 0;
-            menu->substate++;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            menu->step = 1;
-            menu->substate++;
-            menu->lab->fadeOut(menu->lab);
-        }
+        pickMenuOption(menu, windows);
         break;
     case 4:
         for (j = 0, items = menu->children; j < menu->childCount - 2; j++, items++) {
@@ -224,35 +376,10 @@ void STGDGLAB_runMenu(LabMenu *menu, LabMenuWindows *windows) {
         menu->substate++;
         break;
     case 11:
-        STGDGLAB_data.funcs.updateFade(&menu->panels[3]);
-        if (STGDGLAB_data.funcs.updateFade(&menu->panels[4])) {
-            STGDGLAB_showMenuPage(menu, windows);
-            if (windows->label == NULL) {
-                windows->label = createTextWindow(menu->layer, 1, 0xA1, 0x17);
-                windows->label->setDepth(windows->label, menu->depth - 1);
-            }
-            windows->label->setPos(windows->label, 0xA1, 0x17);
-            windows->label->setString(windows->label, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 6);
-            menu->substate++;
-        }
+        showMenuPageLabel(menu, windows);
         break;
     case 12:
-        if (menu->choice == 0 && STGDGLAB_data.funcs.updateFade(&menu->panels[8])) {
-            if (windows->entriesHint == NULL) {
-                windows->entriesHint = createTextWindow(menu->layer, 1, 0xF, 0x55);
-                windows->entriesHint->setDepth(windows->entriesHint, menu->depth - 1);
-            }
-            windows->entriesHint->setString(windows->entriesHint, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x14);
-        }
-        STGDGLAB_data.funcs.updateFade(&menu->panels[5]);
-        if (STGDGLAB_data.funcs.updateFade(&menu->panels[6])) {
-            if (windows->title == NULL) {
-                windows->title = createTextWindow(menu->layer, 1, 0xAE, 0x49);
-            }
-            windows->title->setPos(windows->title, 0xAE, 0x49);
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), menu->choice + 0x18);
-            menu->substate++;
-        }
+        showMenuPageTitle(menu, windows);
         break;
     case 14:
         if (STGDGLAB_data.funcs.updateFade(&menu->panels[7])) {
@@ -260,89 +387,17 @@ void STGDGLAB_runMenu(LabMenu *menu, LabMenuWindows *windows) {
         }
         break;
     case 15:
-        old = menu->lab->member;
-        if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-            if (--menu->lab->member < 0) {
-                menu->lab->member = menu->memberCount - 1;
-            }
-        } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-            if (++menu->lab->member > menu->memberCount - 1) {
-                menu->lab->member = 0;
-            }
-        }
-        if (old != menu->lab->member) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-            STGDGLAB_showMenuPage(menu, windows);
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            menu->step = 1;
-            menu->substate++;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            menu->step = 0;
-            menu->substate++;
-        } else if (PAD_PRESSED(PAD_CIRCLE) && menu->choice == 0 &&
-                   GAME.funcs.getPartyMember(menu->lab->member) >= 0) {
-            menu->step = 2;
-            menu->substate++;
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-        }
+        pickMember(menu, windows);
         break;
     case 16:
         STGDGLAB_data.funcs.startFade(&menu->panels[7], 0);
         menu->substate++;
         break;
     case 17:
-        if (STGDGLAB_data.funcs.updateFade(&menu->panels[7])) {
-            if (menu->step == 0) {
-                STGDGLAB_data.funcs.startFade(&menu->panels[3], 0);
-                for (i = 0; i < 5; i++) {
-                    if (windows->statLabels[i] != NULL) {
-                        windows->statLabels[i]->setVisible(windows->statLabels[i], 0);
-                    }
-                    if (windows->statValues[i] != NULL) {
-                        windows->statValues[i]->setVisible(windows->statValues[i], 0);
-                    }
-                }
-                if (windows->name != NULL) {
-                    windows->name->setVisible(windows->name, 0);
-                }
-            }
-            STGDGLAB_data.funcs.startFade(&menu->panels[4], 0);
-            STGDGLAB_data.funcs.startFade(&menu->panels[5], 0);
-            STGDGLAB_data.funcs.startFade(&menu->panels[6], 0);
-            if (menu->choice == 0) {
-                STGDGLAB_data.funcs.startFade(&menu->panels[8], 0);
-            }
-            if (windows->title != NULL) {
-                windows->title->setVisible(windows->title, 0);
-            }
-            if (windows->label != NULL) {
-                windows->label->setVisible(windows->label, 0);
-            }
-            if (windows->entriesHint != NULL) {
-                windows->entriesHint->setVisible(windows->entriesHint, 0);
-            }
-            menu->substate++;
-        }
+        closeMenuPage(menu, windows);
         break;
     case 18:
-        closed = 0;
-        for (m = menu->step != 0; m < 6; m++) {
-            closed += STGDGLAB_data.funcs.updateFade(&menu->panels[m + 3]);
-        }
-        if (menu->step == 1) {
-            if (closed == 5) {
-                menu->nextSubstate(menu);
-                menu->picked = 1;
-            }
-        } else if (menu->step == 2) {
-            if (closed == 5) {
-                menu->setSubstate(menu, 30);
-            }
-        } else if (closed == 6) {
-            menu->setSubstate(menu, 0);
-        }
+        waitMenuPageClosed(menu);
         break;
     case 19:
         if (menu->picked == 0) {

@@ -43,6 +43,115 @@ void STDWTITL_drawMenu(MenuTask *task) {
     }
 }
 
+/* "PRESS START": waits a moment, then for Start (choice 3 after ten seconds),
+   blinks and spreads the two options out from it */
+static inline void runPressStart(MenuTask *task) {
+    switch (task->substate) {
+    case 1:
+    default:
+        if (task->timer++ >= 6) {
+            task->selection = 2;
+            task->timer = 0;
+            task->showCursor = 1;
+            task->nextSubstate(task);
+        }
+        break;
+    case 2:
+        if (PAD_PRESSED(PAD_START)) {
+            task->nextSubstate(task);
+            task->timer = 0;
+            SOUND.playSound(SOUND_SELECT);
+            task->blink = 0;
+        }
+        if (++task->timer >= 600) {
+            task->choice = 3;
+        }
+        break;
+    case 3:
+        if ((++task->timer & 3) == 0) {
+            task->timer = 0;
+            if (++task->blink >= 3) {
+                task->nextSubstate(task);
+                task->showOptions = 1;
+                task->options[0].x = task->options[1].x = 79;
+                task->options[0].y = task->options[1].y = 166;
+                task->blink = 0;
+                task->showCursor = 0;
+                SOUND.playSound(SOUND_SWITCH03);
+            }
+        }
+        break;
+    case 4:
+        task->options[0].x = (STDWTITL_menuCursorPositions[0].x - 79) * task->timer / 15 + 79;
+        task->options[0].y = (STDWTITL_menuCursorPositions[0].y - 166) * task->timer / 15 + 166;
+        task->options[1].x = (STDWTITL_menuCursorPositions[1].x - 79) * task->timer / 15 + 79;
+        task->options[1].y = (STDWTITL_menuCursorPositions[1].y - 166) * task->timer / 15 + 166;
+        if (++task->timer >= 15) {
+            task->timer = 0;
+            task->nextSubstate(task);
+        }
+        break;
+    case 5:
+        if (++task->timer >= 6) {
+            task->setState(task, TASK_DONE);
+        }
+        break;
+    }
+}
+
+/* The two options: up and down move between new game and continue, and the
+   confirm button blinks the option and sets choice */
+static inline void runOptions(MenuTask *task) {
+    switch (task->substate) {
+    case 0:
+    default:
+        task->showOptions = 1;
+        task->selection = 1;
+        task->showCursor = 1;
+        task->options[0].x = STDWTITL_menuCursorPositions[0].x;
+        task->options[0].y = STDWTITL_menuCursorPositions[0].y;
+        task->options[1].x = STDWTITL_menuCursorPositions[1].x;
+        task->options[1].y = STDWTITL_menuCursorPositions[1].y;
+        task->nextSubstate(task);
+        break;
+    case 1:
+        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+            if (task->selection != 0) {
+                SOUND.playSound(SOUND_CURSOR);
+            }
+            task->selection = 0;
+        }
+        if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+            if (task->selection != 1) {
+                SOUND.playSound(SOUND_CURSOR);
+            }
+            task->selection = 1;
+        }
+        if (PAD_PRESSED(PAD_CROSS)) {
+            task->timer = 0;
+            SOUND.playSound(SOUND_SELECT);
+            task->nextSubstate(task);
+        }
+        break;
+    case 2:
+        if ((++task->timer & 3) == 0) {
+            task->timer = 0;
+            if (++task->blink >= 3) {
+                if (task->selection != 0) {
+                    task->choice = 2;
+                } else {
+                    task->choice = 1;
+                }
+                task->nextSubstate(task);
+                task->blink = 0;
+            }
+        }
+        break;
+    case 3:
+        break;
+    }
+}
+
 /* The menu's task: once shown, waits for Start on "PRESS START" (choice 3 after ten
    seconds), blinks and spreads out the two options; then moves between new game
    and continue, and the confirm button blinks the option and sets choice */
@@ -61,107 +170,10 @@ void STDWTITL_tickMenu(MenuTask *task) {
         if (task->substate == 0) {
             return;
         }
-        switch (task->substate) {
-        case 1:
-        default:
-            if (task->timer++ >= 6) {
-                task->selection = 2;
-                task->timer = 0;
-                task->showCursor = 1;
-                task->nextSubstate(task);
-            }
-            break;
-        case 2:
-            if (PAD_PRESSED(PAD_START)) {
-                task->nextSubstate(task);
-                task->timer = 0;
-                SOUND.playSound(SOUND_SELECT);
-                task->blink = 0;
-            }
-            if (++task->timer >= 600) {
-                task->choice = 3;
-            }
-            break;
-        case 3:
-            if ((++task->timer & 3) == 0) {
-                task->timer = 0;
-                if (++task->blink >= 3) {
-                    task->nextSubstate(task);
-                    task->showOptions = 1;
-                    task->options[0].x = task->options[1].x = 79;
-                    task->options[0].y = task->options[1].y = 166;
-                    task->blink = 0;
-                    task->showCursor = 0;
-                    SOUND.playSound(SOUND_SWITCH03);
-                }
-            }
-            break;
-        case 4:
-            task->options[0].x = (STDWTITL_menuCursorPositions[0].x - 79) * task->timer / 15 + 79;
-            task->options[0].y = (STDWTITL_menuCursorPositions[0].y - 166) * task->timer / 15 + 166;
-            task->options[1].x = (STDWTITL_menuCursorPositions[1].x - 79) * task->timer / 15 + 79;
-            task->options[1].y = (STDWTITL_menuCursorPositions[1].y - 166) * task->timer / 15 + 166;
-            if (++task->timer >= 15) {
-                task->timer = 0;
-                task->nextSubstate(task);
-            }
-            break;
-        case 5:
-            if (++task->timer >= 6) {
-                task->setState(task, TASK_DONE);
-            }
-            break;
-        }
+        runPressStart(task);
         break;
     case TASK_DONE:
-        switch (task->substate) {
-        case 0:
-        default:
-            task->showOptions = 1;
-            task->selection = 1;
-            task->showCursor = 1;
-            task->options[0].x = STDWTITL_menuCursorPositions[0].x;
-            task->options[0].y = STDWTITL_menuCursorPositions[0].y;
-            task->options[1].x = STDWTITL_menuCursorPositions[1].x;
-            task->options[1].y = STDWTITL_menuCursorPositions[1].y;
-            task->nextSubstate(task);
-            break;
-        case 1:
-            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-                if (task->selection != 0) {
-                    SOUND.playSound(SOUND_CURSOR);
-                }
-                task->selection = 0;
-            }
-            if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-                if (task->selection != 1) {
-                    SOUND.playSound(SOUND_CURSOR);
-                }
-                task->selection = 1;
-            }
-            if (PAD_PRESSED(PAD_CROSS)) {
-                task->timer = 0;
-                SOUND.playSound(SOUND_SELECT);
-                task->nextSubstate(task);
-            }
-            break;
-        case 2:
-            if ((++task->timer & 3) == 0) {
-                task->timer = 0;
-                if (++task->blink >= 3) {
-                    if (task->selection != 0) {
-                        task->choice = 2;
-                    } else {
-                        task->choice = 1;
-                    }
-                    task->nextSubstate(task);
-                    task->blink = 0;
-                }
-            }
-            break;
-        case 3:
-            break;
-        }
+        runOptions(task);
         break;
     case TASK_KILL:
         return;

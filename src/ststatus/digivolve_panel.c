@@ -160,9 +160,9 @@ void STSTATUS_showDigivolveStats(DigivolvePanel *panel, DigivolvePanelWindows *w
                 tech = entry.skills[i];
                 if (tech != 0) {
                     windows->values[i]->setString(windows->values[i], FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), tech & SKILL_ID);
-                    if (tech & 0x8000) {
+                    if (tech & SKILL_LAST) {
                         windows->values[i]->setPalette(windows->values[i], PALETTE_YELLOW);
-                    } else if (tech & 0x4000) {
+                    } else if (tech & SKILL_MARKED) {
                         windows->values[i]->setPalette(windows->values[i], PALETTE_GREEN);
                     } else {
                         windows->values[i]->setPalette(windows->values[i], PALETTE_WHITE);
@@ -382,18 +382,410 @@ void STSTATUS_drawDigivolvePanel(DigivolvePanel *panel) {
     }
 }
 
+/* Once the title's panel is in, shows the title and starts the slots' panel */
+static inline void STSTATUS_openDigivolveTitle(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[0])) {
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x37);
+        STSTATUS_data.funcs.startFade(&panel->fades[1], 1);
+        panel->substate++;
+    }
+}
+
+/* Once the slots' panel is in, shows the slots and starts the stats' panel */
+static inline void STSTATUS_openDigivolveSlots(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[1])) {
+        STSTATUS_showDigivolveSlots(panel, windows, 1);
+        STSTATUS_data.funcs.startFade(&panel->fades[3], 1);
+        panel->substate++;
+    }
+}
+
+/* Once the stats' panel is in, shows the partner's stats and the cursor on it */
+static inline void STSTATUS_openDigivolveStats(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[3])) {
+        STSTATUS_showDigivolveStats(panel, windows, 1);
+        windows->slotCursor->setPos(windows->slotCursor, 0x50, 0x4D);
+        windows->slotCursor->setVisible(windows->slotCursor, 1);
+        panel->substate++;
+    }
+}
+
+/* Choosing the partner or a slot: right and left move between them, up and
+   down between the slots, cross asks about the slot (or shows the partner's
+   own technique), triangle closes the panel */
+static inline void STSTATUS_chooseDigivolveSlot(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    s32 slot;
+
+    if (panel->fromEntry) {
+        slot = panel->slot;
+        if (PAD_PRESSED(PAD_LEFT)) {
+            panel->fromEntry = 0;
+            STSTATUS_showDigivolveStats(panel, windows, 1);
+            windows->slotCursor->setPos(windows->slotCursor, 0x50, 0x4D);
+            SOUND.playSound(SOUND_CURSOR);
+            return;
+        }
+        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+            panel->slot--;
+            if (panel->slot < 0) {
+                panel->slot = 0;
+            }
+        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+            panel->slot++;
+            if (panel->slot > panel->slotCount - 1) {
+                panel->slot = panel->slotCount - 1;
+            }
+        }
+        if (slot != panel->slot) {
+            STSTATUS_showDigivolveStats(panel, windows, 1);
+            windows->slotCursor->setPos(windows->slotCursor, 0xB0, panel->slot * 0xE + 0x31);
+            SOUND.playSound(SOUND_CURSOR);
+        } else if (PAD_PRESSED(PAD_CROSS)) {
+            SOUND.playSound(SOUND_SELECT);
+            panel->substate = 10;
+        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+            SOUND.playSound(SOUND_MENU_CANCEL);
+            panel->substate = 0x32;
+        }
+    } else if (panel->slotCount > 0 && PAD_PRESSED(PAD_RIGHT)) {
+        panel->fromEntry = 1;
+        STSTATUS_showDigivolveStats(panel, windows, 1);
+        windows->slotCursor->setPos(windows->slotCursor, 0xB0, panel->slot * 0xE + 0x31);
+        SOUND.playSound(SOUND_CURSOR);
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        panel->substate = 0x3C;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        panel->substate = 0x32;
+    }
+}
+
+/* Starts closing the slots' panel for the question about the slot */
+static inline void STSTATUS_closeSlotsForQuestion(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    STSTATUS_data.funcs.startFade(&panel->fades[1], 0);
+    STSTATUS_showDigivolveSlots(panel, windows, 0);
+    windows->slotCursor->setVisible(windows->slotCursor, 0);
+    windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2C);
+    panel->substate++;
+}
+
+/* Once the slots' panel is closed, starts the question's panel */
+static inline void STSTATUS_openDigivolveQuestion(DigivolvePanel *panel) {
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[1])) {
+        STSTATUS_data.funcs.startFade(&panel->fades[2], 1);
+        panel->substate++;
+    }
+}
+
+/* Once the question's panel is in, shows the question and its cursor */
+static inline void STSTATUS_enterDigivolveQuestion(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[2])) {
+        STSTATUS_showDigivolveChoices(panel, windows, 1);
+        windows->optionCursor->setVisible(windows->optionCursor, 1);
+        panel->substate++;
+    }
+}
+
+/* The question: up and down move the cursor, cross makes the slot's entry
+   the partner's battle digivolution (or no longer) or shows its techniques,
+   triangle goes back to the slots */
+static inline void STSTATUS_answerDigivolveQuestion(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    Partner *partner;
+    s32 option;
+
+    option = panel->option;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        panel->option = 0;
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        panel->option = 1;
+    }
+    if (option != panel->option) {
+        SOUND.playSound(SOUND_CURSOR);
+        windows->optionCursor->setPos(windows->optionCursor, 0xB4, panel->option * 0xE + 0x3A);
+    }
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        if (panel->option == 0) {
+            partner = &GAME.partners[GAME.funcs.getPartyMember(panel->member)];
+            if (partner->battleDigivolve == panel->slots[panel->slot]) {
+                partner->battleDigivolve = 0;
+            } else {
+                partner->battleDigivolve = panel->slots[panel->slot];
+            }
+            panel->substate = 0x19;
+        } else {
+            panel->substate = 0x28;
+        }
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        panel->substate = 0x14;
+    }
+}
+
+/* Starts closing the question's panel, back to the slots */
+static inline void STSTATUS_closeDigivolveQuestion(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    STSTATUS_data.funcs.startFade(&panel->fades[2], 0);
+    STSTATUS_showDigivolveChoices(panel, windows, 0);
+    windows->optionCursor->setVisible(windows->optionCursor, 0);
+    windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x37);
+    panel->substate++;
+}
+
+/* Once the question's panel is closed, starts the slots' panel */
+static inline void STSTATUS_reopenDigivolveSlots(DigivolvePanel *panel) {
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[2])) {
+        STSTATUS_data.funcs.startFade(&panel->fades[1], 1);
+        panel->substate++;
+    }
+}
+
+/* Starts closing the title's and the question's panels for the battle
+   digivolution's message */
+static inline void STSTATUS_closeQuestionForBattle(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    STSTATUS_data.funcs.startFade(&panel->fades[0], 0);
+    windows->title->setVisible(windows->title, 0);
+    STSTATUS_data.funcs.startFade(&panel->fades[2], 0);
+    STSTATUS_showDigivolveChoices(panel, windows, 0);
+    windows->optionCursor->setVisible(windows->optionCursor, 0);
+    panel->substate++;
+}
+
+/* Once the question's panel is closed, starts scrolling the stats up */
+static inline void STSTATUS_scrollUpForBattle(DigivolvePanel *panel) {
+    STSTATUS_data.funcs.updateFade(&panel->fades[0]);
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[2])) {
+        STSTATUS_data.funcs.startLerp(&panel->scroll, 0, -0x22, 4);
+        panel->substate++;
+    }
+}
+
+/* Scrolls the stats; once up, starts the info panel */
+static inline void STSTATUS_openBattleMessage(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateLerp(&panel->scroll)) {
+        STSTATUS_data.funcs.startFade(&panel->fades[4], 1);
+        panel->substate++;
+    }
+    STSTATUS_scrollTechList(panel, windows);
+}
+
+/* Once the info panel is in, says whether the partner now digivolves in
+   battle */
+static inline void STSTATUS_showBattleMessage(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    Partner *partner;
+
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[4])) {
+        partner = &GAME.partners[GAME.funcs.getPartyMember(panel->member)];
+        if (partner->battleDigivolve != 0) {
+            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x3C);
+        } else {
+            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x3D);
+        }
+        panel->blink = 1;
+        panel->substate++;
+    }
+}
+
+/* Cross takes the message away */
+static inline void STSTATUS_waitBattleMessage(DigivolvePanel *panel) {
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+        panel->blink = 0;
+        panel->substate++;
+    }
+}
+
+/* Starts closing the info panel and the stats' panel */
+static inline void STSTATUS_closeBattleMessage(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    STSTATUS_data.funcs.startFade(&panel->fades[4], 0);
+    windows->help->setVisible(windows->help, 0);
+    STSTATUS_data.funcs.startFade(&panel->fades[3], 0);
+    STSTATUS_showDigivolveStats(panel, windows, 0);
+    panel->substate++;
+}
+
+/* Once the stats' panel is closed, scrolls the stats back and starts the
+   panel again */
+static inline void STSTATUS_endBattleMessage(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&panel->fades[4]);
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[3])) {
+        panel->fromEntry = 0;
+        STSTATUS_data.funcs.startLerp(&panel->scroll, 0, -0x22, 4);
+        STSTATUS_scrollTechList(panel, windows);
+        panel->substate = 0;
+    }
+}
+
+/* Starts closing the question's panel for the entry's techniques */
+static inline void STSTATUS_closeQuestionForTechs(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    STSTATUS_data.funcs.startFade(&panel->fades[2], 0);
+    STSTATUS_showDigivolveChoices(panel, windows, 0);
+    windows->optionCursor->setVisible(windows->optionCursor, 0);
+    windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2A);
+    panel->substate++;
+}
+
+/* Once the question's panel is closed, starts scrolling the stats up */
+static inline void STSTATUS_scrollUpForTechs(DigivolvePanel *panel) {
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[2])) {
+        STSTATUS_data.funcs.startLerp(&panel->scroll, 0, -0x22, 4);
+        panel->substate++;
+    }
+}
+
+/* Scrolls the stats; once up, starts the info panel */
+static inline void STSTATUS_openEntryTechs(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateLerp(&panel->scroll)) {
+        STSTATUS_data.funcs.startFade(&panel->fades[4], 1);
+        panel->substate++;
+    }
+    STSTATUS_scrollTechList(panel, windows);
+}
+
+/* Starts closing the info panel and scrolling the stats back */
+static inline void STSTATUS_closeEntryTechs(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2C);
+    windows->listCursor->setVisible(windows->listCursor, 0);
+    STSTATUS_showTechCost(panel, windows, 0);
+    STSTATUS_data.funcs.startLerp(&panel->scroll, -0x22, 0, 4);
+    STSTATUS_data.funcs.startFade(&panel->fades[4], 0);
+    panel->substate++;
+}
+
+/* Scrolls the stats back; once the info panel is closed, starts the
+   question's panel */
+static inline void STSTATUS_reopenDigivolveQuestion(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    STSTATUS_data.funcs.updateLerp(&panel->scroll);
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[4])) {
+        STSTATUS_data.funcs.startFade(&panel->fades[2], 1);
+        panel->substate++;
+    }
+    STSTATUS_scrollTechList(panel, windows);
+}
+
+/* Once the question's panel is in, shows the question and its cursor again */
+static inline void STSTATUS_enterQuestionAgain(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[2])) {
+        windows->optionCursor->setVisible(windows->optionCursor, 1);
+        STSTATUS_showDigivolveChoices(panel, windows, 1);
+        panel->substate = 13;
+    }
+}
+
+/* Starts closing the panel: the title, the slots and the stats */
+static inline void STSTATUS_closeDigivolvePanel(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    STSTATUS_data.funcs.startFade(&panel->fades[0], 0);
+    STSTATUS_data.funcs.startFade(&panel->fades[1], 0);
+    STSTATUS_data.funcs.startFade(&panel->fades[3], 0);
+    STSTATUS_showDigivolveSlots(panel, windows, 0);
+    STSTATUS_showDigivolveStats(panel, windows, 0);
+    windows->slotCursor->setVisible(windows->slotCursor, 0);
+    windows->title->setVisible(windows->title, 0);
+    panel->substate++;
+}
+
+/* Ends the panel once its panels are closed */
+static inline void STSTATUS_endDigivolvePanel(DigivolvePanel *panel) {
+    STSTATUS_data.funcs.updateFade(&panel->fades[0]);
+    STSTATUS_data.funcs.updateFade(&panel->fades[1]);
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[3])) {
+        panel->state = 3;
+    }
+}
+
+/* Starts closing the slots' panel for the partner's own technique */
+static inline void STSTATUS_closeSlotsForPartnerTech(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    STSTATUS_data.funcs.startFade(&panel->fades[1], 0);
+    STSTATUS_showDigivolveSlots(panel, windows, 0);
+    windows->slotCursor->setVisible(windows->slotCursor, 0);
+    windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2A);
+    panel->substate++;
+}
+
+/* Once the slots' panel is closed, starts scrolling the stats up */
+static inline void STSTATUS_scrollUpForPartnerTech(DigivolvePanel *panel) {
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[1])) {
+        STSTATUS_data.funcs.startLerp(&panel->scroll, 0, -0x22, 4);
+        panel->substate++;
+    }
+}
+
+/* Scrolls the stats; once up, starts the info panel */
+static inline void STSTATUS_openPartnerTech(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateLerp(&panel->scroll)) {
+        STSTATUS_data.funcs.startFade(&panel->fades[4], 1);
+        panel->substate++;
+    }
+    STSTATUS_scrollTechList(panel, windows);
+}
+
+/* Once the info panel is in, puts the cursor on the partner's own technique
+   (its seventh skill) and shows its description and MP cost */
+static inline void STSTATUS_showPartnerTech(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    DigimonData *data;
+    s32 tech;
+
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[4])) {
+        data = &DIGIMON_DATA[GAME.funcs.getPartyMember(panel->member)];
+        tech = data->skills[6];
+        panel->tech = 5;
+        windows->listCursor->setPos(windows->listCursor, 0xA9, panel->scroll.value + 0xCE);
+        windows->listCursor->setVisible(windows->listCursor, 1);
+        windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_INFO)), tech);
+        windows->mpLabel->setString(windows->mpLabel, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 3);
+        windows->mp->setNumber(windows->mp, 0, TECHS[tech - 1].mp);
+        windows->mp->setRightAlign(windows->mp, 1);
+        panel->substate++;
+    }
+}
+
+/* Cross or triangle go back */
+static inline void STSTATUS_waitPartnerTech(DigivolvePanel *panel) {
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        panel->substate++;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        panel->substate++;
+    }
+}
+
+/* Starts closing the info panel and scrolling the stats back */
+static inline void STSTATUS_closePartnerTech(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x37);
+    windows->listCursor->setVisible(windows->listCursor, 0);
+    STSTATUS_showTechCost(panel, windows, 0);
+    STSTATUS_data.funcs.startLerp(&panel->scroll, -0x22, 0, 4);
+    STSTATUS_data.funcs.startFade(&panel->fades[4], 0);
+    panel->substate++;
+}
+
+/* Scrolls the stats back; once the info panel is closed, starts the slots'
+   panel */
+static inline void STSTATUS_reopenSlotsAfterTech(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    STSTATUS_data.funcs.updateLerp(&panel->scroll);
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[4])) {
+        STSTATUS_data.funcs.startFade(&panel->fades[1], 1);
+        panel->substate++;
+    }
+    STSTATUS_scrollTechList(panel, windows);
+}
+
+/* Once the slots' panel is in, shows the slots and the cursor, back to
+   choosing a slot */
+static inline void STSTATUS_enterSlotsAgain(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&panel->fades[1])) {
+        STSTATUS_showDigivolveSlots(panel, windows, 1);
+        windows->slotCursor->setVisible(windows->slotCursor, 1);
+        panel->substate = 4;
+    }
+}
+
 /* The panel's update: picks a slot, then shows its entry's techniques or
    makes the battle start as it */
 void STSTATUS_runDigivolvePanel(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
     PartnerEntry entry;
-    Partner *partner;
-    DigimonData *data;
-    /* the cursors' old rows: the match depends on cases 4 and 13 having
-       their own variables */
     s32 old;
-    s32 slot;
-    s32 option;
-    s32 tech;
     s32 i;
 
     switch (panel->substate) {
@@ -403,210 +795,64 @@ void STSTATUS_runDigivolvePanel(DigivolvePanel *panel, DigivolvePanelWindows *wi
         panel->substate++;
         break;
     case 1:
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[0])) {
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x37);
-            STSTATUS_data.funcs.startFade(&panel->fades[1], 1);
-            panel->substate++;
-        }
+        STSTATUS_openDigivolveTitle(panel, windows);
         break;
     case 2:
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[1])) {
-            STSTATUS_showDigivolveSlots(panel, windows, 1);
-            STSTATUS_data.funcs.startFade(&panel->fades[3], 1);
-            panel->substate++;
-        }
+        STSTATUS_openDigivolveSlots(panel, windows);
         break;
     case 3:
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[3])) {
-            STSTATUS_showDigivolveStats(panel, windows, 1);
-            windows->slotCursor->setPos(windows->slotCursor, 0x50, 0x4D);
-            windows->slotCursor->setVisible(windows->slotCursor, 1);
-            panel->substate++;
-        }
+        STSTATUS_openDigivolveStats(panel, windows);
         break;
     case 4:
-        if (panel->fromEntry) {
-            slot = panel->slot;
-            if (PAD_PRESSED(PAD_LEFT)) {
-                panel->fromEntry = 0;
-                STSTATUS_showDigivolveStats(panel, windows, 1);
-                windows->slotCursor->setPos(windows->slotCursor, 0x50, 0x4D);
-                SOUND.playSound(SOUND_CURSOR);
-                break;
-            }
-            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-                panel->slot--;
-                if (panel->slot < 0) {
-                    panel->slot = 0;
-                }
-            } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-                panel->slot++;
-                if (panel->slot > panel->slotCount - 1) {
-                    panel->slot = panel->slotCount - 1;
-                }
-            }
-            if (slot != panel->slot) {
-                STSTATUS_showDigivolveStats(panel, windows, 1);
-                windows->slotCursor->setPos(windows->slotCursor, 0xB0, panel->slot * 0xE + 0x31);
-                SOUND.playSound(SOUND_CURSOR);
-            } else if (PAD_PRESSED(PAD_CROSS)) {
-                SOUND.playSound(SOUND_SELECT);
-                panel->substate = 10;
-            } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-                SOUND.playSound(SOUND_MENU_CANCEL);
-                panel->substate = 0x32;
-            }
-        } else if (panel->slotCount > 0 && PAD_PRESSED(PAD_RIGHT)) {
-            panel->fromEntry = 1;
-            STSTATUS_showDigivolveStats(panel, windows, 1);
-            windows->slotCursor->setPos(windows->slotCursor, 0xB0, panel->slot * 0xE + 0x31);
-            SOUND.playSound(SOUND_CURSOR);
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            panel->substate = 0x3C;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            panel->substate = 0x32;
-        }
+        STSTATUS_chooseDigivolveSlot(panel, windows);
         break;
     case 10:
-        STSTATUS_data.funcs.startFade(&panel->fades[1], 0);
-        STSTATUS_showDigivolveSlots(panel, windows, 0);
-        windows->slotCursor->setVisible(windows->slotCursor, 0);
-        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2C);
-        panel->substate++;
+        STSTATUS_closeSlotsForQuestion(panel, windows);
         break;
     case 11:
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[1])) {
-            STSTATUS_data.funcs.startFade(&panel->fades[2], 1);
-            panel->substate++;
-        }
+        STSTATUS_openDigivolveQuestion(panel);
         break;
     case 12:
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[2])) {
-            STSTATUS_showDigivolveChoices(panel, windows, 1);
-            windows->optionCursor->setVisible(windows->optionCursor, 1);
-            panel->substate++;
-        }
+        STSTATUS_enterDigivolveQuestion(panel, windows);
         break;
     case 13:
-        option = panel->option;
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            panel->option = 0;
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            panel->option = 1;
-        }
-        if (option != panel->option) {
-            SOUND.playSound(SOUND_CURSOR);
-            windows->optionCursor->setPos(windows->optionCursor, 0xB4, panel->option * 0xE + 0x3A);
-        }
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            if (panel->option == 0) {
-                partner = &GAME.partners[GAME.funcs.getPartyMember(panel->member)];
-                if (partner->battleDigivolve == panel->slots[panel->slot]) {
-                    partner->battleDigivolve = 0;
-                } else {
-                    partner->battleDigivolve = panel->slots[panel->slot];
-                }
-                panel->substate = 0x19;
-            } else {
-                panel->substate = 0x28;
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            panel->substate = 0x14;
-        }
+        STSTATUS_answerDigivolveQuestion(panel, windows);
         break;
     case 0x14:
-        STSTATUS_data.funcs.startFade(&panel->fades[2], 0);
-        STSTATUS_showDigivolveChoices(panel, windows, 0);
-        windows->optionCursor->setVisible(windows->optionCursor, 0);
-        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x37);
-        panel->substate++;
+        STSTATUS_closeDigivolveQuestion(panel, windows);
         break;
     case 0x15:
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[2])) {
-            STSTATUS_data.funcs.startFade(&panel->fades[1], 1);
-            panel->substate++;
-        }
+        STSTATUS_reopenDigivolveSlots(panel);
         break;
     case 0x19:
-        STSTATUS_data.funcs.startFade(&panel->fades[0], 0);
-        windows->title->setVisible(windows->title, 0);
-        STSTATUS_data.funcs.startFade(&panel->fades[2], 0);
-        STSTATUS_showDigivolveChoices(panel, windows, 0);
-        windows->optionCursor->setVisible(windows->optionCursor, 0);
-        panel->substate++;
+        STSTATUS_closeQuestionForBattle(panel, windows);
         break;
     case 0x1A:
-        STSTATUS_data.funcs.updateFade(&panel->fades[0]);
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[2])) {
-            STSTATUS_data.funcs.startLerp(&panel->scroll, 0, -0x22, 4);
-            panel->substate++;
-        }
+        STSTATUS_scrollUpForBattle(panel);
         break;
     case 0x1B:
-        if (STSTATUS_data.funcs.updateLerp(&panel->scroll)) {
-            STSTATUS_data.funcs.startFade(&panel->fades[4], 1);
-            panel->substate++;
-        }
-        STSTATUS_scrollTechList(panel, windows);
+        STSTATUS_openBattleMessage(panel, windows);
         break;
     case 0x1C:
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[4])) {
-            /* the match depends on taking the partner's address */
-            if ((&GAME.partners[GAME.funcs.getPartyMember(panel->member)])->battleDigivolve != 0) {
-                windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x3C);
-            } else {
-                windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x3D);
-            }
-            panel->blink = 1;
-            panel->substate++;
-        }
+        STSTATUS_showBattleMessage(panel, windows);
         break;
     case 0x1D:
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            panel->blink = 0;
-            panel->substate++;
-        }
+        STSTATUS_waitBattleMessage(panel);
         break;
     case 0x1E:
-        STSTATUS_data.funcs.startFade(&panel->fades[4], 0);
-        windows->help->setVisible(windows->help, 0);
-        STSTATUS_data.funcs.startFade(&panel->fades[3], 0);
-        STSTATUS_showDigivolveStats(panel, windows, 0);
-        panel->substate++;
+        STSTATUS_closeBattleMessage(panel, windows);
         break;
     case 0x1F:
-        STSTATUS_data.funcs.updateFade(&panel->fades[4]);
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[3])) {
-            panel->fromEntry = 0;
-            STSTATUS_data.funcs.startLerp(&panel->scroll, 0, -0x22, 4);
-            STSTATUS_scrollTechList(panel, windows);
-            panel->substate = 0;
-        }
+        STSTATUS_endBattleMessage(panel, windows);
         break;
     case 0x28:
-        STSTATUS_data.funcs.startFade(&panel->fades[2], 0);
-        STSTATUS_showDigivolveChoices(panel, windows, 0);
-        windows->optionCursor->setVisible(windows->optionCursor, 0);
-        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2A);
-        panel->substate++;
+        STSTATUS_closeQuestionForTechs(panel, windows);
         break;
     case 0x29:
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[2])) {
-            STSTATUS_data.funcs.startLerp(&panel->scroll, 0, -0x22, 4);
-            panel->substate++;
-        }
+        STSTATUS_scrollUpForTechs(panel);
         break;
     case 0x2A:
-        if (STSTATUS_data.funcs.updateLerp(&panel->scroll)) {
-            STSTATUS_data.funcs.startFade(&panel->fades[4], 1);
-            panel->substate++;
-        }
-        STSTATUS_scrollTechList(panel, windows);
+        STSTATUS_openEntryTechs(panel, windows);
         break;
     case 0x2B:
         if (STSTATUS_data.funcs.updateFade(&panel->fades[4])) {
@@ -669,111 +915,44 @@ void STSTATUS_runDigivolvePanel(DigivolvePanel *panel, DigivolvePanelWindows *wi
         }
         break;
     case 0x2D:
-        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2C);
-        windows->listCursor->setVisible(windows->listCursor, 0);
-        STSTATUS_showTechCost(panel, windows, 0);
-        STSTATUS_data.funcs.startLerp(&panel->scroll, -0x22, 0, 4);
-        STSTATUS_data.funcs.startFade(&panel->fades[4], 0);
-        panel->substate++;
+        STSTATUS_closeEntryTechs(panel, windows);
         break;
     case 0x2E:
-        STSTATUS_data.funcs.updateLerp(&panel->scroll);
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[4])) {
-            STSTATUS_data.funcs.startFade(&panel->fades[2], 1);
-            panel->substate++;
-        }
-        STSTATUS_scrollTechList(panel, windows);
+        STSTATUS_reopenDigivolveQuestion(panel, windows);
         break;
     case 0x2F:
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[2])) {
-            windows->optionCursor->setVisible(windows->optionCursor, 1);
-            STSTATUS_showDigivolveChoices(panel, windows, 1);
-            panel->substate = 13;
-        }
+        STSTATUS_enterQuestionAgain(panel, windows);
         break;
     case 0x32:
-        STSTATUS_data.funcs.startFade(&panel->fades[0], 0);
-        STSTATUS_data.funcs.startFade(&panel->fades[1], 0);
-        STSTATUS_data.funcs.startFade(&panel->fades[3], 0);
-        STSTATUS_showDigivolveSlots(panel, windows, 0);
-        STSTATUS_showDigivolveStats(panel, windows, 0);
-        windows->slotCursor->setVisible(windows->slotCursor, 0);
-        windows->title->setVisible(windows->title, 0);
-        panel->substate++;
+        STSTATUS_closeDigivolvePanel(panel, windows);
         break;
     case 0x33:
-        STSTATUS_data.funcs.updateFade(&panel->fades[0]);
-        STSTATUS_data.funcs.updateFade(&panel->fades[1]);
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[3])) {
-            panel->state = 3;
-        }
+        STSTATUS_endDigivolvePanel(panel);
         break;
     case 0x3C:
-        STSTATUS_data.funcs.startFade(&panel->fades[1], 0);
-        STSTATUS_showDigivolveSlots(panel, windows, 0);
-        windows->slotCursor->setVisible(windows->slotCursor, 0);
-        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2A);
-        panel->substate++;
+        STSTATUS_closeSlotsForPartnerTech(panel, windows);
         break;
     case 0x3D:
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[1])) {
-            STSTATUS_data.funcs.startLerp(&panel->scroll, 0, -0x22, 4);
-            panel->substate++;
-        }
+        STSTATUS_scrollUpForPartnerTech(panel);
         break;
     case 0x3E:
-        if (STSTATUS_data.funcs.updateLerp(&panel->scroll)) {
-            STSTATUS_data.funcs.startFade(&panel->fades[4], 1);
-            panel->substate++;
-        }
-        STSTATUS_scrollTechList(panel, windows);
+        STSTATUS_openPartnerTech(panel, windows);
         break;
     case 0x3F:
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[4])) {
-            data = &DIGIMON_DATA[GAME.funcs.getPartyMember(panel->member)];
-            tech = data->skills[6];
-            panel->tech = 5;
-            windows->listCursor->setPos(windows->listCursor, 0xA9, panel->scroll.value + 0xCE);
-            windows->listCursor->setVisible(windows->listCursor, 1);
-            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_INFO)), tech);
-            windows->mpLabel->setString(windows->mpLabel, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 3);
-            windows->mp->setNumber(windows->mp, 0, TECHS[tech - 1].mp);
-            windows->mp->setRightAlign(windows->mp, 1);
-            panel->substate++;
-        }
+        STSTATUS_showPartnerTech(panel, windows);
         break;
     case 0x40:
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            panel->substate++;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            panel->substate++;
-        }
+        STSTATUS_waitPartnerTech(panel);
         break;
     case 0x41:
-        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x37);
-        windows->listCursor->setVisible(windows->listCursor, 0);
-        STSTATUS_showTechCost(panel, windows, 0);
-        STSTATUS_data.funcs.startLerp(&panel->scroll, -0x22, 0, 4);
-        STSTATUS_data.funcs.startFade(&panel->fades[4], 0);
-        panel->substate++;
+        STSTATUS_closePartnerTech(panel, windows);
         break;
     case 0x42:
-        STSTATUS_data.funcs.updateLerp(&panel->scroll);
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[4])) {
-            STSTATUS_data.funcs.startFade(&panel->fades[1], 1);
-            panel->substate++;
-        }
-        STSTATUS_scrollTechList(panel, windows);
+        STSTATUS_reopenSlotsAfterTech(panel, windows);
         break;
     case 0x16:
     case 0x43:
-        if (STSTATUS_data.funcs.updateFade(&panel->fades[1])) {
-            STSTATUS_showDigivolveSlots(panel, windows, 1);
-            windows->slotCursor->setVisible(windows->slotCursor, 1);
-            panel->substate = 4;
-        }
+        STSTATUS_enterSlotsAgain(panel, windows);
         break;
     }
 }
@@ -825,8 +1004,8 @@ DigivolvePanel *STSTATUS_createDigivolvePanel(StatsScreen *screen) {
 /* The stats the fifth screen's panel shows: six battle stats, then the
    resistances */
 s32 STSTATUS_panelStats[] = {
-    6, 7, 8, 9,
-    10, 11, 12, 13,
-    14, 15, 16, 17,
-    18,
+    STAT_STRENGTH, STAT_DEFENSE, STAT_SPIRIT, STAT_WISDOM,
+    STAT_SPEED, STAT_CHARISMA, STAT_RESISTS, STAT_RESISTS + 1,
+    STAT_RESISTS + 2, STAT_RESISTS + 3, STAT_RESISTS + 4, STAT_RESISTS + 5,
+    STAT_RESISTS + 6,
 };

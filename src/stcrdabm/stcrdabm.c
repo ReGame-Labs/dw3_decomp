@@ -492,14 +492,121 @@ void STCRDABM_findPageCards(CardAlbum *album) {
     }
 }
 
+/* The page turned: shows the new page's cards, fading the card's details in
+   or out when the page gains or loses cards seen */
+static inline void STCRDABM_turnAlbumPage(CardAlbum *album, CardAlbumWindows *win) {
+    SOUND.playSound(SOUND_MENU_MOVE);
+    album->active = 0;
+    album->slot = 0;
+    STCRDABM_findPageCards(album);
+    STCRDABM_showPageInfo(album, win, 1);
+    if (album->infoFade.level == 0) {
+        if (album->pageHasCards != 0) {
+            album->substate = 10;
+            album->step = 1;
+            win->grid->setPage(win->grid, album->page * ALBUM_PAGE_CARDS | 1);
+        } else {
+            album->substate = 15;
+        }
+    } else {
+        win->grid->setPage(win->grid, album->page * ALBUM_PAGE_CARDS | 1);
+        if (album->pageHasCards == 0) {
+            album->substate = 10;
+            album->step = 0;
+        } else {
+            album->substate = 15;
+        }
+    }
+}
+
+/* The pad moves the cursor between the page's slots (two rows of six) to the
+   next card seen that way, and shows its details; it stays put when there is none */
+static inline void STCRDABM_moveAlbumCursor(CardAlbum *album, CardAlbumWindows *win) {
+    s32 slot;
+    s32 i;
+
+    slot = album->slot;
+    if (PAD_PRESSED(PAD_UP)) {
+        if (album->slot >= 6) {
+            album->slot -= 6;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN)) {
+        if (album->slot < 6) {
+            album->slot += 6;
+        }
+    }
+    if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
+        if (--album->slot < 0) {
+            album->slot = 0;
+        }
+    } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
+        if (++album->slot >= ALBUM_PAGE_CARDS) {
+            album->slot = ALBUM_PAGE_CARDS - 1;
+        }
+    }
+    if (album->page * ALBUM_PAGE_CARDS + album->slot >= CARD_COUNT - 1) {
+        album->slot = CARD_COUNT - 2 - album->page * ALBUM_PAGE_CARDS;
+    }
+    if (slot != album->slot) {
+        i = album->slot;
+        album->slot = -1;
+        if (i < slot) {
+            for (; i >= 0; i--) {
+                if (album->slotHasCard[i] != 0) {
+                    album->slot = i;
+                    break;
+                }
+            }
+        } else if (slot < i) {
+            for (; i < ALBUM_PAGE_CARDS; i++) {
+                if (album->slotHasCard[i] != 0) {
+                    album->slot = i;
+                    break;
+                }
+            }
+        }
+        if (album->slot == -1) {
+            album->slot = slot;
+        } else {
+            STCRDABM_showCardInfo(album, win, 1);
+            SOUND.playSound(SOUND_MENU_MOVE);
+        }
+    }
+}
+
+/* The album open: L1/R1 turn the page, the pad moves the cursor between the
+   page's cards seen; triangle fades the screen out to leave */
+static inline void STCRDABM_browseAlbum(CardAlbum *album, CardAlbumWindows *win) {
+    s32 prev;
+
+    prev = album->page;
+    if ((!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) || (!PAD_HELD(PAD_R1) && PAD_REPEATED(PAD_L1))) {
+        if (--album->page < 0) {
+            album->page = 0;
+        }
+    } else if ((!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) || (!PAD_HELD(PAD_L1) && PAD_REPEATED(PAD_R1))) {
+        if (++album->page > album->pageCount - 1) {
+            album->page = album->pageCount - 1;
+        }
+    }
+    if (prev != album->page) {
+        STCRDABM_turnAlbumPage(album, win);
+    } else {
+        STCRDABM_moveAlbumCursor(album, win);
+    }
+    if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        album->active = 0;
+        album->substate = 50;
+        win->fader = STCRDABM_createFader();
+        win->fader->start(win->fader, 0, 10);
+    }
+}
+
 /* The album's steps: opens it, then turns pages with L1 and R1, moves the cursor
    between the seen cards and shows the selected one's details; Triangle fades the
    screen out to leave */
 void STCRDABM_runAlbum(CardAlbum *album, CardAlbumWindows *win) {
-    s32 prev;
-    s32 slot;
-    s32 i;
-
     switch (album->substate) {
     case 0:
     default:
@@ -522,95 +629,7 @@ void STCRDABM_runAlbum(CardAlbum *album, CardAlbumWindows *win) {
         album->substate++;
         break;
     case 4:
-        prev = album->page;
-        if ((!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) || (!PAD_HELD(PAD_R1) && PAD_REPEATED(PAD_L1))) {
-            if (--album->page < 0) {
-                album->page = 0;
-            }
-        } else if ((!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) || (!PAD_HELD(PAD_L1) && PAD_REPEATED(PAD_R1))) {
-            if (++album->page > album->pageCount - 1) {
-                album->page = album->pageCount - 1;
-            }
-        }
-        if (prev != album->page) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-            album->active = 0;
-            album->slot = 0;
-            STCRDABM_findPageCards(album);
-            STCRDABM_showPageInfo(album, win, 1);
-            if (album->infoFade.level == 0) {
-                if (album->pageHasCards != 0) {
-                    album->substate = 10;
-                    album->step = 1;
-                    win->grid->setPage(win->grid, album->page * ALBUM_PAGE_CARDS | 1);
-                } else {
-                    album->substate = 15;
-                }
-            } else {
-                win->grid->setPage(win->grid, album->page * ALBUM_PAGE_CARDS | 1);
-                if (album->pageHasCards == 0) {
-                    album->substate = 10;
-                    album->step = 0;
-                } else {
-                    album->substate = 15;
-                }
-            }
-        } else {
-            slot = album->slot;
-            if (PAD_PRESSED(PAD_UP)) {
-                if (album->slot >= 6) {
-                    album->slot -= 6;
-                }
-            } else if (PAD_PRESSED(PAD_DOWN)) {
-                if (album->slot < 6) {
-                    album->slot += 6;
-                }
-            }
-            if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-                if (--album->slot < 0) {
-                    album->slot = 0;
-                }
-            } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-                if (++album->slot >= ALBUM_PAGE_CARDS) {
-                    album->slot = ALBUM_PAGE_CARDS - 1;
-                }
-            }
-            if (album->page * ALBUM_PAGE_CARDS + album->slot >= CARD_COUNT - 1) {
-                album->slot = CARD_COUNT - 2 - album->page * ALBUM_PAGE_CARDS;
-            }
-            if (slot != album->slot) {
-                i = album->slot;
-                album->slot = -1;
-                if (i < slot) {
-                    for (; i >= 0; i--) {
-                        if (album->slotHasCard[i] != 0) {
-                            album->slot = i;
-                            break;
-                        }
-                    }
-                } else if (slot < i) {
-                    for (; i < ALBUM_PAGE_CARDS; i++) {
-                        if (album->slotHasCard[i] != 0) {
-                            album->slot = i;
-                            break;
-                        }
-                    }
-                }
-                if (album->slot == -1) {
-                    album->slot = slot;
-                } else {
-                    STCRDABM_showCardInfo(album, win, 1);
-                    SOUND.playSound(SOUND_MENU_MOVE);
-                }
-            }
-        }
-        if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            album->active = 0;
-            album->substate = 50;
-            win->fader = STCRDABM_createFader();
-            win->fader->start(win->fader, 0, 10);
-        }
+        STCRDABM_browseAlbum(album, win);
         break;
     case 10:
         if (album->step == 0) {
@@ -625,7 +644,7 @@ void STCRDABM_runAlbum(CardAlbum *album, CardAlbumWindows *win) {
         }
         break;
     case 15:
-        if (win->grid->state == 1) {
+        if (win->grid->state == TASK_RUN) {
             album->active = win->grid->state;
             STCRDABM_showPageInfo(album, win, 1);
             if (album->infoFade.level != 0) {
@@ -641,8 +660,8 @@ void STCRDABM_runAlbum(CardAlbum *album, CardAlbumWindows *win) {
         }
         break;
     case 50:
-        if (win->fader->state == 2) {
-            album->state = 3;
+        if (win->fader->state == TASK_DONE) {
+            album->state = TASK_KILL;
         }
         break;
     case 51:

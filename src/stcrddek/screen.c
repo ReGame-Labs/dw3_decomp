@@ -130,12 +130,123 @@ void STCRDDEK_countCardKinds(DeckScreen *task) {
     }
 }
 
+/* Up/down choose one of the three decks; cross offers what to do with it,
+   triangle leaves the screen */
+static inline void STCRDDEK_chooseDeck(DeckScreen *task, DeckScreenChildren *children) {
+    s32 prevDeck;
+
+    prevDeck = task->deck;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        if (--task->deck < 0) {
+            task->deck = 0;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        if (++task->deck >= 3) {
+            task->deck = 2;
+        }
+    }
+    if (prevDeck != task->deck) {
+        SOUND.playSound(SOUND_MENU_MOVE);
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+        task->substate = 10;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        task->setSubstate(task, 100);
+    }
+}
+
+/* Once the options' panel has opened: shows edit folder and change name, the
+   cursor on edit */
+static inline void STCRDDEK_openDeckOptions(DeckScreen *task, DeckScreenChildren *children) {
+    if (STCRDDEK_funcs.updateFade(&task->panels[1])) {
+        task->renaming = 0;
+        children->cursor->setPos(children->cursor, 0x9A, 0x23);
+        children->cursor->setVisible(children->cursor, 1);
+        children->options[0]->setString(children->options[0], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0x1A);
+        children->options[1]->setString(children->options[1], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0x1B);
+        task->substate++;
+    }
+}
+
+/* Up/down choose to edit the deck or to rename it; cross closes the decks'
+   rows to open it, triangle goes back to the decks */
+static inline void STCRDDEK_chooseDeckOption(DeckScreen *task, DeckScreenChildren *children) {
+    s32 prevChoice;
+
+    prevChoice = task->renaming;
+    if (PAD_PRESSED(PAD_UP)) {
+        task->renaming = 0;
+    } else if (PAD_PRESSED(PAD_DOWN)) {
+        task->renaming = 1;
+    }
+    if (prevChoice != task->renaming) {
+        SOUND.playSound(SOUND_CURSOR);
+        children->cursor->setPos(children->cursor, 0x9A, task->renaming * 14 + 0x23);
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        task->setSubstate(task, 50);
+        task->step = 1;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        task->substate = 15;
+    }
+}
+
+/* Closes the decks' rows, from the last, to open the editor or the name entry
+   (step set): the cursor stays frozen on the chosen option */
+static inline void STCRDDEK_startClosingRows(DeckScreen *task, DeckScreenChildren *children) {
+    if (task->step) {
+        children->cursor->setStill(children->cursor, 1);
+        children->cursor->setPalette(children->cursor, PALETTE_GREY);
+    }
+    STCRDDEK_funcs.startFade(&task->panels[2], 0);
+    STCRDDEK_funcs.startFade(&task->rowPanels[2], 0);
+    STCRDDEK_showDeckRow(task, children, 2, 0);
+    task->substate++;
+}
+
+/* Once the second deck's row has closed: hides the options (the title, step
+   unset) and closes the first deck's row */
+static inline void STCRDDEK_closeFirstRow(DeckScreen *task, DeckScreenChildren *children) {
+    if (STCRDDEK_funcs.updateFade(&task->rowPanels[1])) {
+        if (task->step) {
+            children->cursor->setStill(children->cursor, 0);
+            children->cursor->setPalette(children->cursor, PALETTE_WHITE);
+            children->cursor->setVisible(children->cursor, 0);
+            children->options[0]->setVisible(children->options[0], 0);
+            children->options[1]->setVisible(children->options[1], 0);
+            STCRDDEK_funcs.startFade(&task->panels[1], 0);
+        } else {
+            children->title->setVisible(children->title, 0);
+            STCRDDEK_funcs.startFade(&task->panels[0], 0);
+        }
+        STCRDDEK_funcs.startFade(&task->rowPanels[0], 0);
+        STCRDDEK_showDeckRow(task, children, 0, 0);
+        task->substate++;
+    }
+}
+
+/* Once the rows have closed: opens the editor or the name entry for the chosen
+   deck and waits for it; after the fade out of triangle (step unset), ends
+   the screen */
+static inline void STCRDDEK_openChosen(DeckScreen *task, DeckScreenChildren *children) {
+    if (task->step) {
+        if (task->renaming == 0) {
+            children->child.editor = STCRDDEK_createEditor(task, task->deck);
+        } else {
+            children->child.name = STCRDDEK_createNameEntry(GAME.decks[task->deck].name);
+        }
+        task->setState(task, TASK_DONE);
+    } else {
+        task->state = TASK_KILL;
+    }
+}
+
 /* The screen's states: opens the title and the decks' rows; cross on a deck
    offers to edit or rename it, closing the rows to open the editor or the
    name entry; triangle fades the screen out to leave */
 void STCRDDEK_stepScreen(DeckScreen *task, DeckScreenChildren *children) {
-    s32 prevDeck;
-    s32 prevChoice;
     ScreenFade *fader;
 
     switch (task->substate) {
@@ -172,25 +283,7 @@ void STCRDDEK_stepScreen(DeckScreen *task, DeckScreenChildren *children) {
         }
         break;
     case 4:
-        prevDeck = task->deck;
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            if (--task->deck < 0) {
-                task->deck = 0;
-            }
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            if (++task->deck >= 3) {
-                task->deck = 2;
-            }
-        }
-        if (prevDeck != task->deck) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            task->substate = 10;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            task->setSubstate(task, 100);
-        }
+        STCRDDEK_chooseDeck(task, children);
         break;
     case 10:
         task->chosen = 1;
@@ -206,33 +299,10 @@ void STCRDDEK_stepScreen(DeckScreen *task, DeckScreenChildren *children) {
         }
         break;
     case 12:
-        if (STCRDDEK_funcs.updateFade(&task->panels[1])) {
-            task->renaming = 0;
-            children->cursor->setPos(children->cursor, 0x9A, 0x23);
-            children->cursor->setVisible(children->cursor, 1);
-            children->options[0]->setString(children->options[0], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0x1A);
-            children->options[1]->setString(children->options[1], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0x1B);
-            task->substate++;
-        }
+        STCRDDEK_openDeckOptions(task, children);
         break;
     case 13:
-        prevChoice = task->renaming;
-        if (PAD_PRESSED(PAD_UP)) {
-            task->renaming = 0;
-        } else if (PAD_PRESSED(PAD_DOWN)) {
-            task->renaming = 1;
-        }
-        if (prevChoice != task->renaming) {
-            SOUND.playSound(SOUND_CURSOR);
-            children->cursor->setPos(children->cursor, 0x9A, task->renaming * 14 + 0x23);
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            task->setSubstate(task, 50);
-            task->step = 1;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            task->substate = 15;
-        }
+        STCRDDEK_chooseDeckOption(task, children);
         break;
     case 15:
         children->cursor->setVisible(children->cursor, 0);
@@ -255,14 +325,7 @@ void STCRDDEK_stepScreen(DeckScreen *task, DeckScreenChildren *children) {
         }
         break;
     case 50:
-        if (task->step) {
-            children->cursor->setStill(children->cursor, 1);
-            children->cursor->setPalette(children->cursor, PALETTE_GREY);
-        }
-        STCRDDEK_funcs.startFade(&task->panels[2], 0);
-        STCRDDEK_funcs.startFade(&task->rowPanels[2], 0);
-        STCRDDEK_showDeckRow(task, children, 2, 0);
-        task->substate++;
+        STCRDDEK_startClosingRows(task, children);
         break;
     case 51:
         STCRDDEK_funcs.updateFade(&task->panels[2]);
@@ -273,22 +336,7 @@ void STCRDDEK_stepScreen(DeckScreen *task, DeckScreenChildren *children) {
         }
         break;
     case 52:
-        if (STCRDDEK_funcs.updateFade(&task->rowPanels[1])) {
-            if (task->step) {
-                children->cursor->setStill(children->cursor, 0);
-                children->cursor->setPalette(children->cursor, PALETTE_WHITE);
-                children->cursor->setVisible(children->cursor, 0);
-                children->options[0]->setVisible(children->options[0], 0);
-                children->options[1]->setVisible(children->options[1], 0);
-                STCRDDEK_funcs.startFade(&task->panels[1], 0);
-            } else {
-                children->title->setVisible(children->title, 0);
-                STCRDDEK_funcs.startFade(&task->panels[0], 0);
-            }
-            STCRDDEK_funcs.startFade(&task->rowPanels[0], 0);
-            STCRDDEK_showDeckRow(task, children, 0, 0);
-            task->substate++;
-        }
+        STCRDDEK_closeFirstRow(task, children);
         break;
     case 53:
         if (task->step) {
@@ -301,16 +349,7 @@ void STCRDDEK_stepScreen(DeckScreen *task, DeckScreenChildren *children) {
         }
         break;
     case 54:
-        if (task->step) {
-            if (task->renaming == 0) {
-                children->child.editor = STCRDDEK_createEditor(task, task->deck);
-            } else {
-                children->child.name = STCRDDEK_createNameEntry(GAME.decks[task->deck].name);
-            }
-            task->setState(task, TASK_DONE);
-        } else {
-            task->state = TASK_KILL;
-        }
+        STCRDDEK_openChosen(task, children);
         break;
     case 100:
         children->fader = fader = STCRDDEK_createFader();
@@ -318,7 +357,7 @@ void STCRDDEK_stepScreen(DeckScreen *task, DeckScreenChildren *children) {
         task->substate++;
         break;
     case 101:
-        if (children->fader->state == 2) {
+        if (children->fader->state == TASK_DONE) {
             task->substate = 54;
         }
         break;

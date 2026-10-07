@@ -35,9 +35,6 @@ and the tooling around it. The counts below are from commit `ab85a3a6`.
   why it stays (another form changes the code) or is plain, like a byte
   offset or a `Task *`; replace one when a type that keeps the bytes turns
   up.
-- [ ] `STGDGLAB` is "the partners' digivolutions, it seems": check it against
-  its strings (files 0x3A, 0x4F, 0x48, 0xA3 and 0x9C) and `STAGSLCT`'s list
-  of the game's scenes.
 - [ ] Say what each stage is. They are in the folders of their areas
   ([src/stages/README.md](src/stages/README.md)); each stage's file should
   also say which map or event it is.

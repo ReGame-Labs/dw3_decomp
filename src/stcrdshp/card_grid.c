@@ -186,7 +186,7 @@ void STCRDSHP_updateGrid(CardPackGrid *grid) {
             if (GFX.funcs.getTime() - grid->time >= 2) {
                 grid->time = GFX.funcs.getTime();
                 if (++grid->frame >= 11) {
-                    grid->state = 1;
+                    grid->state = TASK_RUN;
                 }
             }
             break;

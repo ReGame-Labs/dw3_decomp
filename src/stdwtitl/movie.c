@@ -35,6 +35,7 @@ void STDWTITL_readStream(CdlLOC *loc) {
 
     param = CdlModeSpeed;
     do {
+        /* libcd takes a command's parameters as bytes */
         while (CdControl(CdlSetloc, (u_char *)loc, 0) == 0) {
         }
         while (CdControl(CdlSetmode, &param, 0) == 0) {
@@ -59,6 +60,7 @@ u_long *STDWTITL_getNextFrame(DecEnv *dec) {
     StHEADER *sector;
     s32 count = 2000;
 
+    /* libcd hands the sector's header back as words */
     while (StGetNext(&addr, (u_long **)&sector) != 0) {
         if (--count == 0) {
             return NULL;
@@ -114,7 +116,7 @@ void STDWTITL_onSliceDecoded(void) {
     }
     rect.y = 36;
     if (STDWTITL_decEnv.slice.x < STDWTITL_decEnv.rect[STDWTITL_decEnv.rectid].x + STDWTITL_decEnv.rect[STDWTITL_decEnv.rectid].w) {
-        DecDCTout((u_long *)STDWTITL_decEnv.imgbuf[STDWTITL_decEnv.imgid], STDWTITL_decEnv.slice.w * STDWTITL_decEnv.slice.h / 2);
+        DecDCTout(STDWTITL_decEnv.imgbuf[STDWTITL_decEnv.imgid], STDWTITL_decEnv.slice.w * STDWTITL_decEnv.slice.h / 2);
     } else {
         STDWTITL_decEnv.isdone = 1;
         STDWTITL_decEnv.rectid = STDWTITL_decEnv.rectid == 0;
@@ -122,7 +124,7 @@ void STDWTITL_onSliceDecoded(void) {
         STDWTITL_decEnv.slice.y = STDWTITL_decEnv.rect[STDWTITL_decEnv.rectid].y;
     }
     DrawSync(0);
-    LoadImage(&rect, (u_long *)STDWTITL_decEnv.imgbuf[id]);
+    LoadImage(&rect, STDWTITL_decEnv.imgbuf[id]);
 }
 
 /* Waits until the MDEC has decoded the whole frame (switching buffers itself if it
@@ -164,7 +166,7 @@ void STDWTITL_tickMoviePlayer(MoviePlayerTask *task) {
         task->nextState(task);
     case TASK_RUN:
         DecDCTin(STDWTITL_decEnv.vlcbuf[STDWTITL_decEnv.vlcid], 3);
-        DecDCTout((u_long *)STDWTITL_decEnv.imgbuf[STDWTITL_decEnv.imgid], STDWTITL_decEnv.slice.w * STDWTITL_decEnv.slice.h / 2);
+        DecDCTout(STDWTITL_decEnv.imgbuf[STDWTITL_decEnv.imgid], STDWTITL_decEnv.slice.w * STDWTITL_decEnv.slice.h / 2);
         STDWTITL_decodeNextFrame(&STDWTITL_decEnv);
         STDWTITL_waitFrameDecoded(&STDWTITL_decEnv, 0);
         if (STDWTITL_movieEnded == 1 || (PAD.getPressed(0) & (1 << PAD_START))) {

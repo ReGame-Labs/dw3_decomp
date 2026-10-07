@@ -42,7 +42,7 @@ struct ScreenTask;
 /* A sprite of the partner menu, that opens by scaling */
 typedef struct MenuSprite {
     /* 0x00 */ s32 sprite; /* -1 ends the list */
-    /* 0x04 */ s32 unk4; /* 10, or 5 for the last: nothing reads it */
+    /* 0x04 */ s32 pad; /* 10, or 5 for the last: never read */
     /* 0x08 */ s32 x;
     /* 0x0C */ s32 y;
     /* 0x10 */ s32 pivotX;
@@ -70,7 +70,7 @@ typedef struct MenuTask {
     /* 0x54 */ s32 layer;
     /* 0x58 */ s32 cursorClut;
     /* 0x5C */ MenuAnim anims[3];
-    /* 0x74 */ s32 unk74;
+    /* 0x74 */ s32 pad; /* never read or written */
     /* 0x78 */ s32 partyCount;
     /* 0x7C */ s32 titleClut;
     /* 0x80 */ PanelAnim tweens[6];
@@ -80,18 +80,18 @@ typedef struct ScreenChildren {
     /* 0x0 */ MenuTask *menu;
     /* 0x4 */ NameEntry *name;
     /* 0x8 */ ScreenFade *fade;
-    /* 0xC */ Task *unkC; /* never set: the screen waits on it in TASK_DONE */
+    /* 0xC */ Task *awaited; /* never set: the screen would wait in TASK_DONE until it ends */
 } ScreenChildren;
 
 /* The screen's controller */
 typedef struct ScreenTask {
     TASK_HEADER(ScreenTask);
     /* 0x50 */ s32 layer;
-    /* 0x54 */ s32 unk54;
+    /* 0x54 */ s32 pad54; /* never read or written */
     /* 0x58 */ s32 scroll;
     /* 0x5C */ s32 tick;
     /* 0x60 */ s32 choice;
-    /* 0x64 */ s32 unk64;
+    /* 0x64 */ s32 pad64; /* never read or written */
     /* 0x68 */ void (*fadeOut)(struct ScreenTask *task);
 } ScreenTask;
 

@@ -96,27 +96,108 @@ void STGDGLAB_showSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *window
     }
 }
 
+/* Reads the party member's slots and entries and fades the screen's panels in */
+static inline void loadSlotScreen(LabSlotScreen *screen) {
+    s32 member;
+
+    member = GAME.funcs.getPartyMember(screen->lab->member);
+    GAME.funcs.getPartnerSlots(member, screen->slots);
+    screen->entryCount = GAME.funcs.listPartnerEntries(member, screen->entries);
+    STGDGLAB_data.funcs.startFade(&screen->panels[0], 1);
+    STGDGLAB_data.funcs.startFade(&screen->panels[1], 1);
+    STGDGLAB_data.funcs.startFade(&screen->panels[2], 1);
+    STGDGLAB_data.funcs.startFade(&screen->panels[3], 1);
+    screen->substate++;
+}
+
+/* Up and down pick "Change digivolve type" or "Load technique"; cross opens
+   the entry list (or says it can't, without enough entries), triangle leaves */
+static inline void pickSlotOption(LabSlotScreen *screen, LabSlotScreenWindows *windows) {
+    s32 old;
+
+    old = screen->choice;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        screen->choice--;
+        if (screen->choice < 0) {
+            screen->choice = 0;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        screen->choice++;
+        if (screen->choice >= 2) {
+            screen->choice = 1;
+        }
+    }
+    if (old != screen->choice) {
+        SOUND.playSound(SOUND_CURSOR);
+        windows->cursor->setPos(windows->cursor, 0x9A, screen->choice * 0xE + 0x72);
+    }
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        if ((screen->choice == 0 && screen->entryCount < 4) || (screen->choice == 1 && screen->entryCount == 0)) {
+            screen->setSubstate(screen, 30);
+            STGDGLAB_data.funcs.startFade(&screen->panels[4], 1);
+            windows->cursor->setVisible(windows->cursor, 0);
+        } else {
+            screen->step = 0;
+            screen->substate++;
+        }
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        screen->step = 1;
+        screen->substate++;
+    }
+}
+
+/* Once the screen's panels have faded out, goes on to the entry list for the
+   picked option, or ends the screen */
+static inline void openSlotOption(LabSlotScreen *screen) {
+    STGDGLAB_data.funcs.updateFade(&screen->panels[0]);
+    STGDGLAB_data.funcs.updateFade(&screen->panels[1]);
+    STGDGLAB_data.funcs.updateFade(&screen->panels[2]);
+    if (STGDGLAB_data.funcs.updateFade(&screen->panels[3])) {
+        if (screen->step == 0) {
+            screen->picked = 0;
+            screen->setSubstate(screen, 40);
+            switch (screen->choice) {
+            case 0:
+            default:
+                screen->step = 10;
+                break;
+            case 1:
+                screen->step = 20;
+                break;
+            case 2:
+                screen->setState(screen, TASK_KILL);
+                break;
+            }
+        } else {
+            screen->setState(screen, TASK_KILL);
+        }
+    }
+}
+
+/* Cross closes the message: fades its panel out and hides it */
+static inline void closeMessage(LabSlotScreen *screen, LabSlotScreenWindows *windows, s32 panel) {
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+        STGDGLAB_data.funcs.startFade(&screen->panels[panel], 0);
+        windows->message->setVisible(windows->message, 0);
+        screen->substate++;
+    }
+}
+
 /* The second screen's states: picks between the entries and the skills,
    opens the list of the member's entries and then the picked one's panel */
 void STGDGLAB_runSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *windows) {
     s16 slots[4];
     PartnerEntry entry;
-    s32 member;
     s32 found;
-    s32 old;
     s32 i;
 
     switch (screen->substate) {
     case 0:
     default:
-        member = GAME.funcs.getPartyMember(screen->lab->member);
-        GAME.funcs.getPartnerSlots(member, screen->slots);
-        screen->entryCount = GAME.funcs.listPartnerEntries(member, screen->entries);
-        STGDGLAB_data.funcs.startFade(&screen->panels[0], 1);
-        STGDGLAB_data.funcs.startFade(&screen->panels[1], 1);
-        STGDGLAB_data.funcs.startFade(&screen->panels[2], 1);
-        STGDGLAB_data.funcs.startFade(&screen->panels[3], 1);
-        screen->substate++;
+        loadSlotScreen(screen);
         break;
     case 1:
         STGDGLAB_data.funcs.updateFade(&screen->panels[0]);
@@ -128,37 +209,7 @@ void STGDGLAB_runSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *windows
         }
         break;
     case 2:
-        old = screen->choice;
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            screen->choice--;
-            if (screen->choice < 0) {
-                screen->choice = 0;
-            }
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            screen->choice++;
-            if (screen->choice >= 2) {
-                screen->choice = 1;
-            }
-        }
-        if (old != screen->choice) {
-            SOUND.playSound(SOUND_CURSOR);
-            windows->cursor->setPos(windows->cursor, 0x9A, screen->choice * 0xE + 0x72);
-        }
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            if ((screen->choice == 0 && screen->entryCount < 4) || (screen->choice == 1 && screen->entryCount == 0)) {
-                screen->setSubstate(screen, 30);
-                STGDGLAB_data.funcs.startFade(&screen->panels[4], 1);
-                windows->cursor->setVisible(windows->cursor, 0);
-            } else {
-                screen->step = 0;
-                screen->substate++;
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            screen->step = 1;
-            screen->substate++;
-        }
+        pickSlotOption(screen, windows);
         break;
     case 3:
         STGDGLAB_data.funcs.startFade(&screen->panels[0], 0);
@@ -169,29 +220,7 @@ void STGDGLAB_runSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *windows
         screen->substate++;
         break;
     case 4:
-        STGDGLAB_data.funcs.updateFade(&screen->panels[0]);
-        STGDGLAB_data.funcs.updateFade(&screen->panels[1]);
-        STGDGLAB_data.funcs.updateFade(&screen->panels[2]);
-        if (STGDGLAB_data.funcs.updateFade(&screen->panels[3])) {
-            if (screen->step == 0) {
-                screen->picked = 0;
-                screen->setSubstate(screen, 40);
-                switch (screen->choice) {
-                case 0:
-                default:
-                    screen->step = 10;
-                    break;
-                case 1:
-                    screen->step = 20;
-                    break;
-                case 2:
-                    screen->setState(screen, TASK_KILL);
-                    break;
-                }
-            } else {
-                screen->setState(screen, TASK_KILL);
-            }
-        }
+        openSlotOption(screen);
         break;
     case 40:
         if (windows->entryList == NULL) {
@@ -287,12 +316,7 @@ void STGDGLAB_runSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *windows
         }
         break;
     case 31:
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            STGDGLAB_data.funcs.startFade(&screen->panels[4], 0);
-            windows->message->setVisible(windows->message, 0);
-            screen->substate++;
-        }
+        closeMessage(screen, windows, 4);
         break;
     case 32:
         if (STGDGLAB_data.funcs.updateFade(&screen->panels[4])) {
@@ -311,12 +335,7 @@ void STGDGLAB_runSlotScreen(LabSlotScreen *screen, LabSlotScreenWindows *windows
         }
         break;
     case 51:
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            STGDGLAB_data.funcs.startFade(&screen->panels[5], 0);
-            windows->message->setVisible(windows->message, 0);
-            screen->substate++;
-        }
+        closeMessage(screen, windows, 5);
         break;
     case 52:
         if (STGDGLAB_data.funcs.updateFade(&screen->panels[5])) {

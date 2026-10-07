@@ -13,10 +13,9 @@ Vec2 STITSHOP_changePos[] = {
 /* The stats the info shows, in PartnerTotals.stats: six battle stats, then
    the resistances */
 s32 STITSHOP_stats[] = {
-    6, 7, 8, 9,
-    10, 11, 12, 13,
-    14, 15, 16, 17,
-    18,
+    STAT_STRENGTH, STAT_DEFENSE, STAT_SPIRIT, STAT_WISDOM, STAT_SPEED, STAT_CHARISMA,
+    STAT_RESISTS, STAT_RESISTS + 1, STAT_RESISTS + 2, STAT_RESISTS + 3,
+    STAT_RESISTS + 4, STAT_RESISTS + 5, STAT_RESISTS + 6,
 };
 /* The strings of the item kinds (the records' kind) */
 s32 STITSHOP_kindStrings[] = {

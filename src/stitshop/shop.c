@@ -174,7 +174,7 @@ void STITSHOP_runShop(ItemShop *shop, ItemShopWindows *win) {
         }
         break;
     case 23:
-        if (win->fade->state == 2) {
+        if (win->fade->state == TASK_DONE) {
             shop->state = TASK_KILL;
         }
         break;

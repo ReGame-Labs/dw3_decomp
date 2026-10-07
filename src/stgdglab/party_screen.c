@@ -211,12 +211,78 @@ void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children) {
     }
 }
 
+/* Once the first panels have faded in, fades in the page's and the party's
+   panels and shows the title and the entries hint (grey without partners) */
+static inline void showPartyTitle(LabPartyScreen *screen, LabPartyScreenWindows *windows) {
+    STGDGLAB_data.funcs.updateFade(&screen->panels[1]);
+    if (STGDGLAB_data.funcs.updateFade(&screen->panels[2])) {
+        STGDGLAB_data.funcs.startFade(&screen->panels[0], 1);
+        STGDGLAB_data.funcs.startFade(&screen->panels[3], 1);
+        if (windows->title == NULL) {
+            windows->title = createTextWindow(screen->layer, 1, 0xAE, 0x15);
+        }
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x1D);
+        if (windows->entriesHint == NULL) {
+            windows->entriesHint = createTextWindow(screen->layer, 1, 0xF, 0xCC);
+        }
+        windows->entriesHint->setString(windows->entriesHint, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x14);
+        if (screen->count == 0) {
+            windows->entriesHint->setPalette(windows->entriesHint, PALETTE_GREY);
+        } else {
+            windows->entriesHint->setPalette(windows->entriesHint, PALETTE_WHITE);
+        }
+        screen->substate++;
+    }
+}
+
+/* Left and right go through the partners outside the party; circle shows the
+   picked one's entries, cross swaps it with the party member (refused when
+   both are empty), triangle goes back */
+static inline void pickPartner(LabPartyScreen *screen, LabPartyScreenWindows *windows) {
+    s32 old;
+
+    old = screen->pick;
+    if (screen->count >= 2) {
+        if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
+            screen->pick--;
+            if (screen->pick < 0) {
+                screen->pick = screen->count - 1;
+            }
+        } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
+            screen->pick++;
+            if (screen->pick > screen->count - 1) {
+                screen->pick = 0;
+            }
+        }
+    }
+    if (old != screen->pick) {
+        SOUND.playSound(SOUND_MENU_MOVE);
+        STGDGLAB_showPartyPage(screen, windows);
+    } else if (PAD_PRESSED(PAD_CIRCLE)) {
+        if (screen->partners[screen->pick] >= 0) {
+            screen->step = 2;
+            screen->substate++;
+            SOUND.playSound(SOUND_MENU_CONFIRM);
+        }
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        if (GAME.funcs.getPartyMember(screen->lab->member) >= 0 || screen->partners[screen->pick] >= 0) {
+            screen->step = 1;
+            screen->substate++;
+            SOUND.playSound(SOUND_MENU_CONFIRM);
+        } else {
+            SOUND.playSound(SOUND_MENU_CANCEL);
+        }
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        screen->step = 0;
+        screen->substate++;
+    }
+}
+
 /* The first screen's states: fades its panels in, picks a partner with left
    and right, then swaps it into the party (cross) or shows its entries
    (circle) */
 void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *windows) {
-    s32 old;
-
     switch (screen->substate) {
     case 0:
     default:
@@ -225,25 +291,7 @@ void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *wind
         screen->substate++;
         break;
     case 1:
-        STGDGLAB_data.funcs.updateFade(&screen->panels[1]);
-        if (STGDGLAB_data.funcs.updateFade(&screen->panels[2])) {
-            STGDGLAB_data.funcs.startFade(&screen->panels[0], 1);
-            STGDGLAB_data.funcs.startFade(&screen->panels[3], 1);
-            if (windows->title == NULL) {
-                windows->title = createTextWindow(screen->layer, 1, 0xAE, 0x15);
-            }
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x1D);
-            if (windows->entriesHint == NULL) {
-                windows->entriesHint = createTextWindow(screen->layer, 1, 0xF, 0xCC);
-            }
-            windows->entriesHint->setString(windows->entriesHint, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x14);
-            if (screen->count == 0) {
-                windows->entriesHint->setPalette(windows->entriesHint, PALETTE_GREY);
-            } else {
-                windows->entriesHint->setPalette(windows->entriesHint, PALETTE_WHITE);
-            }
-            screen->substate++;
-        }
+        showPartyTitle(screen, windows);
         break;
     case 2:
         STGDGLAB_data.funcs.updateFade(&screen->panels[0]);
@@ -259,42 +307,7 @@ void STGDGLAB_runPartyScreen(LabPartyScreen *screen, LabPartyScreenWindows *wind
         }
         break;
     case 4:
-        old = screen->pick;
-        if (screen->count >= 2) {
-            if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-                screen->pick--;
-                if (screen->pick < 0) {
-                    screen->pick = screen->count - 1;
-                }
-            } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-                screen->pick++;
-                if (screen->pick > screen->count - 1) {
-                    screen->pick = 0;
-                }
-            }
-        }
-        if (old != screen->pick) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-            STGDGLAB_showPartyPage(screen, windows);
-        } else if (PAD_PRESSED(PAD_CIRCLE)) {
-            if (screen->partners[screen->pick] >= 0) {
-                screen->step = 2;
-                screen->substate++;
-                SOUND.playSound(SOUND_MENU_CONFIRM);
-            }
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            if (GAME.funcs.getPartyMember(screen->lab->member) >= 0 || screen->partners[screen->pick] >= 0) {
-                screen->step = 1;
-                screen->substate++;
-                SOUND.playSound(SOUND_MENU_CONFIRM);
-            } else {
-                SOUND.playSound(SOUND_MENU_CANCEL);
-            }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            screen->step = 0;
-            screen->substate++;
-        }
+        pickPartner(screen, windows);
         break;
     case 5:
         STGDGLAB_data.funcs.startFade(&screen->panels[4], 0);

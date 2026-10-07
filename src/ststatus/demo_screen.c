@@ -175,141 +175,216 @@ void STSTATUS_drawDemoScreen(PartyScreen *screen) {
     }
 }
 
-/* As STSTATUS_runCardScreen, for the second screen: the choice sets GAME.digivolveDemo */
-void STSTATUS_runDemoScreen(PartyScreen *screen, PartyScreenWindows *windows) {
+/* Starts the fade of the first page (and, with one party member, of the
+   panels); the next substate is the party's size */
+static inline void STSTATUS_startDemoScreen(PartyScreen *screen) {
+    STSTATUS_data.funcs.startFade(&screen->pageFades[0], 1);
+    if (screen->count == 1) {
+        STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
+        STSTATUS_data.funcs.startFade(&screen->fade, 1);
+    }
+    screen->substate = screen->count;
+}
+
+/* One member: once the page and the panels are in, shows the page, the help,
+   the hint and the options */
+static inline void STSTATUS_openDemoScreenAlone(PartyScreen *screen, PartyScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    STSTATUS_data.funcs.updateFade(&screen->fade);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_showDemoPage(screen, windows, 0, 1);
+        windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x49);
+        windows->hint->setString(windows->hint, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
+        STSTATUS_showDemoChoices(screen, windows, 1);
+        screen->substate = 10;
+    }
+}
+
+/* Two members: once the first page is in, shows it and starts the second
+   page and the help's panel */
+static inline void STSTATUS_openFirstOfTwoDemoPages(PartyScreen *screen, PartyScreenWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&screen->pageFades[0])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
+        STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
+        STSTATUS_showDemoPage(screen, windows, 0, 1);
+        screen->substate = 4;
+    }
+}
+
+/* Two members: once the second page and the panels are in, shows the page,
+   the help, the hint and the options */
+static inline void STSTATUS_openSecondOfTwoDemoPages(PartyScreen *screen, PartyScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
+    STSTATUS_data.funcs.updateFade(&screen->fade);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_showDemoPage(screen, windows, 1, 1);
+        windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x49);
+        windows->hint->setString(windows->hint, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
+        STSTATUS_showDemoChoices(screen, windows, 1);
+        screen->substate = 10;
+    }
+}
+
+/* Three members: once the first page is in, shows it and starts the second */
+static inline void STSTATUS_openFirstOfThreeDemoPages(PartyScreen *screen, PartyScreenWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&screen->pageFades[0])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
+        STSTATUS_showDemoPage(screen, windows, 0, 1);
+        screen->substate = 5;
+    }
+}
+
+/* Three members: once the second page is in, shows it and starts the third
+   and the help's panel */
+static inline void STSTATUS_openSecondOfThreeDemoPages(PartyScreen *screen, PartyScreenWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[2], 1);
+        STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
+        STSTATUS_showDemoPage(screen, windows, 1, 1);
+        screen->substate++;
+    }
+}
+
+/* Three members: once the third page and the panels are in, shows the page,
+   the help, the hint and the options */
+static inline void STSTATUS_openThirdDemoPage(PartyScreen *screen, PartyScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
+    STSTATUS_data.funcs.updateFade(&screen->fade);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_showDemoPage(screen, windows, 2, 1);
+        windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x49);
+        windows->hint->setString(windows->hint, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
+        STSTATUS_showDemoChoices(screen, windows, 1);
+        screen->substate = 10;
+    }
+}
+
+/* Choosing an option: up and down move the cursor, cross turns the
+   digivolution demo on or off, both cross and triangle close the screen */
+static inline void STSTATUS_chooseDemoOption(PartyScreen *screen, PartyScreenWindows *windows) {
     s32 choice;
 
+    choice = screen->choice;
+    if (PAD_PRESSED(PAD_UP)) {
+        screen->choice = 0;
+    } else if (PAD_PRESSED(PAD_DOWN)) {
+        screen->choice = 1;
+    }
+    if (choice != screen->choice) {
+        SOUND.playSound(SOUND_CURSOR);
+        windows->cursor->setPos(windows->cursor, 0xB8, screen->choice * 14 + 0x3A);
+    }
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        if (screen->choice == 0) {
+            GAME.digivolveDemo = 1;
+        } else {
+            GAME.digivolveDemo = 0;
+        }
+        screen->substate = 0x32;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        screen->substate = 0x32;
+    }
+}
+
+/* Starts closing the screen: the last page, the panels, the help, the hint
+   and the options */
+static inline void STSTATUS_closeDemoScreen(PartyScreen *screen, PartyScreenWindows *windows) {
+    STSTATUS_data.funcs.startFade(&screen->pageFades[screen->count - 1], 0);
+    STSTATUS_showDemoPage(screen, windows, screen->count - 1, 0);
+    STSTATUS_data.funcs.startFade(&screen->fades[1], 0);
+    windows->help->setVisible(windows->help, 0);
+    windows->hint->setVisible(windows->hint, 0);
+    STSTATUS_data.funcs.startFade(&screen->fade, 0);
+    STSTATUS_showDemoChoices(screen, windows, 0);
+    screen->substate = screen->count + 0x32;
+}
+
+/* One member: once the page and the panels are closed, goes on to the end */
+static inline void STSTATUS_closeDemoScreenAlone(PartyScreen *screen) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    STSTATUS_data.funcs.updateFade(&screen->fade);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        screen->substate = 0x39;
+    }
+}
+
+/* Two members: once the second page and the panels are closed, starts
+   closing the first */
+static inline void STSTATUS_closeSecondOfTwoDemoPages(PartyScreen *screen, PartyScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
+    STSTATUS_data.funcs.updateFade(&screen->fade);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
+        STSTATUS_showDemoPage(screen, windows, 0, 0);
+        screen->substate = 0x36;
+    }
+}
+
+/* Three members: once the third page and the panels are closed, starts
+   closing the second */
+static inline void STSTATUS_closeThirdDemoPage(PartyScreen *screen, PartyScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
+    STSTATUS_data.funcs.updateFade(&screen->fade);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[1], 0);
+        STSTATUS_showDemoPage(screen, windows, 1, 0);
+        screen->substate = 0x37;
+    }
+}
+
+/* Three members: once the second page is closed, starts closing the first */
+static inline void STSTATUS_closeSecondOfThreeDemoPages(PartyScreen *screen, PartyScreenWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
+        STSTATUS_showDemoPage(screen, windows, 0, 0);
+        screen->substate++;
+    }
+}
+
+/* As STSTATUS_runCardScreen, for the second screen: the choice sets GAME.digivolveDemo */
+void STSTATUS_runDemoScreen(PartyScreen *screen, PartyScreenWindows *windows) {
     switch (screen->substate) {
     case 0:
     default:
-        STSTATUS_data.funcs.startFade(&screen->pageFades[0], 1);
-        if (screen->count == 1) {
-            STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
-            STSTATUS_data.funcs.startFade(&screen->fade, 1);
-        }
-        screen->substate = screen->count;
+        STSTATUS_startDemoScreen(screen);
         break;
     case 1:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        STSTATUS_data.funcs.updateFade(&screen->fade);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_showDemoPage(screen, windows, 0, 1);
-            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x49);
-            windows->hint->setString(windows->hint, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
-            STSTATUS_showDemoChoices(screen, windows, 1);
-            screen->substate = 10;
-        }
+        STSTATUS_openDemoScreenAlone(screen, windows);
         break;
     case 2:
-        if (STSTATUS_data.funcs.updateFade(&screen->pageFades[0])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
-            STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
-            STSTATUS_showDemoPage(screen, windows, 0, 1);
-            screen->substate = 4;
-        }
+        STSTATUS_openFirstOfTwoDemoPages(screen, windows);
         break;
     case 4:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
-        STSTATUS_data.funcs.updateFade(&screen->fade);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_showDemoPage(screen, windows, 1, 1);
-            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x49);
-            windows->hint->setString(windows->hint, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
-            STSTATUS_showDemoChoices(screen, windows, 1);
-            screen->substate = 10;
-        }
+        STSTATUS_openSecondOfTwoDemoPages(screen, windows);
         break;
     case 3:
-        if (STSTATUS_data.funcs.updateFade(&screen->pageFades[0])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
-            STSTATUS_showDemoPage(screen, windows, 0, 1);
-            screen->substate = 5;
-        }
+        STSTATUS_openFirstOfThreeDemoPages(screen, windows);
         break;
     case 5:
-        if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[2], 1);
-            STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
-            STSTATUS_showDemoPage(screen, windows, 1, 1);
-            screen->substate++;
-        }
+        STSTATUS_openSecondOfThreeDemoPages(screen, windows);
         break;
     case 6:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
-        STSTATUS_data.funcs.updateFade(&screen->fade);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_showDemoPage(screen, windows, 2, 1);
-            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x49);
-            windows->hint->setString(windows->hint, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
-            STSTATUS_showDemoChoices(screen, windows, 1);
-            screen->substate = 10;
-        }
+        STSTATUS_openThirdDemoPage(screen, windows);
         break;
     case 10:
-        choice = screen->choice;
-        if (PAD_PRESSED(PAD_UP)) {
-            screen->choice = 0;
-        } else if (PAD_PRESSED(PAD_DOWN)) {
-            screen->choice = 1;
-        }
-        if (choice != screen->choice) {
-            SOUND.playSound(SOUND_CURSOR);
-            windows->cursor->setPos(windows->cursor, 0xB8, screen->choice * 14 + 0x3A);
-        }
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            if (screen->choice == 0) {
-                GAME.digivolveDemo = 1;
-            } else {
-                GAME.digivolveDemo = 0;
-            }
-            screen->substate = 0x32;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            screen->substate = 0x32;
-        }
+        STSTATUS_chooseDemoOption(screen, windows);
         break;
     case 0x32:
-        STSTATUS_data.funcs.startFade(&screen->pageFades[screen->count - 1], 0);
-        STSTATUS_showDemoPage(screen, windows, screen->count - 1, 0);
-        STSTATUS_data.funcs.startFade(&screen->fades[1], 0);
-        windows->help->setVisible(windows->help, 0);
-        windows->hint->setVisible(windows->hint, 0);
-        STSTATUS_data.funcs.startFade(&screen->fade, 0);
-        STSTATUS_showDemoChoices(screen, windows, 0);
-        screen->substate = screen->count + 0x32;
+        STSTATUS_closeDemoScreen(screen, windows);
         break;
     case 0x33:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        STSTATUS_data.funcs.updateFade(&screen->fade);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            screen->substate = 0x39;
-        }
+        STSTATUS_closeDemoScreenAlone(screen);
         break;
     case 0x34:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
-        STSTATUS_data.funcs.updateFade(&screen->fade);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
-            STSTATUS_showDemoPage(screen, windows, 0, 0);
-            screen->substate = 0x36;
-        }
+        STSTATUS_closeSecondOfTwoDemoPages(screen, windows);
         break;
     case 0x35:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
-        STSTATUS_data.funcs.updateFade(&screen->fade);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[1], 0);
-            STSTATUS_showDemoPage(screen, windows, 1, 0);
-            screen->substate = 0x37;
-        }
+        STSTATUS_closeThirdDemoPage(screen, windows);
         break;
     case 0x37:
-        if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
-            STSTATUS_showDemoPage(screen, windows, 0, 0);
-            screen->substate++;
-        }
+        STSTATUS_closeSecondOfThreeDemoPages(screen, windows);
         break;
     case 0x36:
     case 0x38:
@@ -371,6 +446,6 @@ Task *STSTATUS_createDemoScreen(FieldMenuScreen *menu, s32 extra) {
 }
 
 s32 STSTATUS_pageStats2[] = {
-    0, 2, 3, 4,
-    5,
+    STAT_LEVEL, STAT_HP, STAT_MAX_HP, STAT_MP,
+    STAT_MAX_MP,
 };

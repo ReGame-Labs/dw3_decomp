@@ -294,18 +294,169 @@ void STCRDSHP_listPacks(CardPackOpen *open) {
     }
 }
 
-/* The states of the screen that opens a pack: its fades, the page and
-   cursor, and the grid of cards a pack gives */
-void STCRDSHP_runPackOpen(CardPackOpen *open, CardPackOpenWindows *win) {
-    s32 old;
+/* The cursor on the page's packs (two columns of four): L1/R1 turn the page,
+   the pad moves it; cross opens the pack, triangle leaves */
+static inline void STCRDSHP_choosePack(CardPackOpen *open, CardPackOpenWindows *win) {
     s32 cursor;
     s32 first;
     s32 last;
+
+    first = open->page;
+    if (!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) {
+        open->page--;
+        if (open->page < 0) {
+            open->page = 0;
+        }
+    } else if (!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) {
+        open->page++;
+        if (open->page > open->pages - 1) {
+            open->page = open->pages - 1;
+        }
+    }
+    if (first != open->page) {
+        SOUND.playSound(SOUND_CURSOR);
+        open->cursor = open->page * 8;
+        win->cursor->setPos(win->cursor, (open->cursor % 2) * 0x83 + 0x1D, (open->cursor % 8) / 2 * 0xE + 0x39);
+        STCRDSHP_showPackPage(open, win, 1);
+        STCRDSHP_showPack(open, win, 1);
+        return;
+    }
+    last = (first + 1) * 8 - 1;
+    cursor = open->cursor;
+    first *= 8;
+    if (last > open->packCount - 1) {
+        last = open->packCount - 1;
+    }
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        open->cursor -= 2;
+        if (open->cursor < first) {
+            open->cursor = first;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        open->cursor += 2;
+        if (open->cursor > last) {
+            open->cursor = last;
+        }
+    }
+    if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
+        open->cursor--;
+        if (open->cursor < first) {
+            open->cursor = first;
+        }
+    } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
+        open->cursor++;
+        if (open->cursor > last) {
+            open->cursor = last;
+        }
+    }
+    if (cursor != open->cursor) {
+        SOUND.playSound(SOUND_CURSOR);
+        win->cursor->setPos(win->cursor, (open->cursor % 2) * 0x83 + 0x1D, (open->cursor % 8) / 2 * 0xE + 0x39);
+        STCRDSHP_showPack(open, win, 1);
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        open->substate = 10;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        open->substate = 50;
+        open->step = 0;
+    }
+}
+
+/* Hides the packs' page and the pack under the cursor and closes their panels;
+   the help says the pack is opened, triangle to go back */
+static inline void STCRDSHP_closePackList(CardPackOpen *open, CardPackOpenWindows *win) {
+    STCRDSHP_funcs.startFade(&open->fades[0], 0);
+    STCRDSHP_showPackPage(open, win, 0);
+    STCRDSHP_funcs.startFade(&open->fades[1], 0);
+    STCRDSHP_showPack(open, win, 0);
+    win->cursor->setVisible(win->cursor, 0);
+    win->help[0]->setString(win->help[0], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0x10);
+    win->help[1]->setString(win->help[1], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 4);
+    open->substate++;
+}
+
+/* Once the panels have closed (and the last pack's grid has gone): draws the
+   pack's six cards, one of 16 at random for each slot, adds them to the
+   player's and takes the pack from the bag, then lays them out */
+static inline void STCRDSHP_openPack(CardPackOpen *open, CardPackOpenWindows *win) {
     s32 pack;
     s32 index;
     s32 i;
-    s32 end;
     s32 slot;
+
+    STCRDSHP_funcs.updateFade(&open->fades[0]);
+    if (STCRDSHP_funcs.updateFade(&open->fades[1])) {
+        pack = open->packs[open->cursor];
+        if (win->grid != NULL) {
+            win->grid->state = TASK_KILL;
+            return;
+        }
+        index = 0;
+        for (i = 0; STCRDSHP_packs[i].item != 0; i++) {
+            if (STCRDSHP_packs[i].item == pack) {
+                index = i;
+            }
+        }
+        for (i = 0; i < 6; i++) {
+            slot = RANDOM.next() % 16;
+            open->cards[i] = STCRDSHP_packs[index].slots[i][slot];
+            GAME.funcs.addCards(open->cards[i], 1);
+        }
+        GAME.items[pack]--;
+        win->grid = STCRDSHP_createGrid(open->shop, open->cards);
+        open->card = 0;
+        STCRDSHP_funcs.startFade(&open->fades[3], 1);
+        open->substate++;
+    }
+}
+
+/* The cursor on the cards drawn: left/right show each one; triangle closes
+   them */
+static inline void STCRDSHP_choosePackCard(CardPackOpen *open, CardPackOpenWindows *win) {
+    s32 old;
+
+    old = open->card;
+    if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
+        open->card--;
+        if (open->card < 0) {
+            open->card = 0;
+        }
+    } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
+        open->card++;
+        if (open->card >= 6) {
+            open->card = 5;
+        }
+    }
+    if (old != open->card) {
+        SOUND.playSound(SOUND_MENU_MOVE);
+        STCRDSHP_showPackCard(open, win, 1);
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        open->substate = 50;
+        open->glowShown = 0;
+        open->step = 1;
+    }
+}
+
+/* Leaving, once the help's panel has closed: hides the packs' page and the
+   pack under the cursor and closes their panels */
+static inline void STCRDSHP_closePackOpen(CardPackOpen *open, CardPackOpenWindows *win) {
+    if (STCRDSHP_funcs.updateFade(&open->fades[2])) {
+        STCRDSHP_funcs.startFade(&open->fades[0], 0);
+        STCRDSHP_showPackPage(open, win, 0);
+        STCRDSHP_funcs.startFade(&open->fades[1], 0);
+        STCRDSHP_showPack(open, win, 0);
+        win->cursor->setVisible(win->cursor, 0);
+        open->substate++;
+    }
+}
+
+/* The states of the screen that opens a pack: its fades, the page and
+   cursor, and the grid of cards a pack gives */
+void STCRDSHP_runPackOpen(CardPackOpen *open, CardPackOpenWindows *win) {
+    s32 i;
+    s32 end;
     s32 top;
 
     switch (open->substate) {
@@ -335,102 +486,13 @@ void STCRDSHP_runPackOpen(CardPackOpen *open, CardPackOpenWindows *win) {
         open->substate++;
         break;
     case 4:
-        first = open->page;
-        if (!PAD_HELD(PAD_R1) && PAD_PRESSED(PAD_L1)) {
-            open->page--;
-            if (open->page < 0) {
-                open->page = 0;
-            }
-        } else if (!PAD_HELD(PAD_L1) && PAD_PRESSED(PAD_R1)) {
-            open->page++;
-            if (open->page > open->pages - 1) {
-                open->page = open->pages - 1;
-            }
-        }
-        if (first != open->page) {
-            SOUND.playSound(SOUND_CURSOR);
-            open->cursor = open->page * 8;
-            win->cursor->setPos(win->cursor, (open->cursor % 2) * 0x83 + 0x1D, (open->cursor % 8) / 2 * 0xE + 0x39);
-            STCRDSHP_showPackPage(open, win, 1);
-            STCRDSHP_showPack(open, win, 1);
-            break;
-        }
-        last = (first + 1) * 8 - 1;
-        cursor = open->cursor;
-        first *= 8;
-        if (last > open->packCount - 1) {
-            last = open->packCount - 1;
-        }
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            open->cursor -= 2;
-            if (open->cursor < first) {
-                open->cursor = first;
-            }
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            open->cursor += 2;
-            if (open->cursor > last) {
-                open->cursor = last;
-            }
-        }
-        if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-            open->cursor--;
-            if (open->cursor < first) {
-                open->cursor = first;
-            }
-        } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-            open->cursor++;
-            if (open->cursor > last) {
-                open->cursor = last;
-            }
-        }
-        if (cursor != open->cursor) {
-            SOUND.playSound(SOUND_CURSOR);
-            win->cursor->setPos(win->cursor, (open->cursor % 2) * 0x83 + 0x1D, (open->cursor % 8) / 2 * 0xE + 0x39);
-            STCRDSHP_showPack(open, win, 1);
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_SELECT);
-            open->substate = 10;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            open->substate = 50;
-            open->step = 0;
-        }
+        STCRDSHP_choosePack(open, win);
         break;
     case 10:
-        STCRDSHP_funcs.startFade(&open->fades[0], 0);
-        STCRDSHP_showPackPage(open, win, 0);
-        STCRDSHP_funcs.startFade(&open->fades[1], 0);
-        STCRDSHP_showPack(open, win, 0);
-        win->cursor->setVisible(win->cursor, 0);
-        win->help[0]->setString(win->help[0], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 0x10);
-        win->help[1]->setString(win->help[1], FILE_CACHE.load(TEXT_FILE(TEXT_CARD_SHOP)), 4);
-        open->substate++;
+        STCRDSHP_closePackList(open, win);
         break;
     case 11:
-        STCRDSHP_funcs.updateFade(&open->fades[0]);
-        if (STCRDSHP_funcs.updateFade(&open->fades[1])) {
-            pack = open->packs[open->cursor];
-            if (win->grid != NULL) {
-                win->grid->state = TASK_KILL;
-                break;
-            }
-            index = 0;
-            for (i = 0; STCRDSHP_packs[i].item != 0; i++) {
-                if (STCRDSHP_packs[i].item == pack) {
-                    index = i;
-                }
-            }
-            for (i = 0; i < 6; i++) {
-                slot = RANDOM.next() % 16;
-                open->cards[i] = STCRDSHP_packs[index].slots[i][slot];
-                GAME.funcs.addCards(open->cards[i], 1);
-            }
-            GAME.items[pack]--;
-            win->grid = STCRDSHP_createGrid(open->shop, open->cards);
-            open->card = 0;
-            STCRDSHP_funcs.startFade(&open->fades[3], 1);
-            open->substate++;
-        }
+        STCRDSHP_openPack(open, win);
         break;
     case 12:
         if (STCRDSHP_funcs.updateFade(&open->fades[3])) {
@@ -442,27 +504,7 @@ void STCRDSHP_runPackOpen(CardPackOpen *open, CardPackOpenWindows *win) {
         }
         break;
     case 13:
-        old = open->card;
-        if (PAD_PRESSED(PAD_LEFT) || PAD_REPEATED(PAD_LEFT)) {
-            open->card--;
-            if (open->card < 0) {
-                open->card = 0;
-            }
-        } else if (PAD_PRESSED(PAD_RIGHT) || PAD_REPEATED(PAD_RIGHT)) {
-            open->card++;
-            if (open->card >= 6) {
-                open->card = 5;
-            }
-        }
-        if (old != open->card) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-            STCRDSHP_showPackCard(open, win, 1);
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            open->substate = 50;
-            open->glowShown = 0;
-            open->step = 1;
-        }
+        STCRDSHP_choosePackCard(open, win);
         break;
     case 50:
         STCRDSHP_funcs.startFade(&open->fades[2], 0);
@@ -485,11 +527,9 @@ void STCRDSHP_runPackOpen(CardPackOpen *open, CardPackOpenWindows *win) {
     case 52:
         if (STCRDSHP_funcs.updateFade(&open->fades[3]) || win->grid == NULL) {
             /* The match depends on the page's rows: the last as
-               (page + 1) * 8 - 1, as case 4 writes it, which shifts the
-               page twice, and the first in a variable of its own. sched1
-               moves an insn that gives a pseudo its only value next to the
-               call; with `first`, set in case 4 too, the store of the
-               substate goes there instead. */
+               (page + 1) * 8 - 1, as STCRDSHP_choosePack writes it, which
+               shifts the page twice, and the first in a variable of its
+               own. */
             open->substate = 0;
             end = (open->page + 1) * 8 - 1;
             i = open->packs[open->cursor];
@@ -515,14 +555,7 @@ void STCRDSHP_runPackOpen(CardPackOpen *open, CardPackOpenWindows *win) {
         }
         break;
     case 55:
-        if (STCRDSHP_funcs.updateFade(&open->fades[2])) {
-            STCRDSHP_funcs.startFade(&open->fades[0], 0);
-            STCRDSHP_showPackPage(open, win, 0);
-            STCRDSHP_funcs.startFade(&open->fades[1], 0);
-            STCRDSHP_showPack(open, win, 0);
-            win->cursor->setVisible(win->cursor, 0);
-            open->substate++;
-        }
+        STCRDSHP_closePackOpen(open, win);
         break;
     case 56:
         STCRDSHP_funcs.updateFade(&open->fades[0]);

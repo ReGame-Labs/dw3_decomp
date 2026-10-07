@@ -33,11 +33,11 @@ typedef struct StageSelectWindows {
     /* 0x08 */ TextWindow *names[14];
     /* 0x40 */ TextWindow *titles[14];
     /* 0x78 */ TextWindow *bios;
-    /* 0x7C */ TextWindow *unk7C; /* unused */
+    /* 0x7C */ TextWindow *pad; /* never read or written */
     /* 0x80 */ TextWindow *region;
     /* 0x84 */ TextWindow *progress; /* GAME.progress */
     /* 0x88 */ TextWindow *randomBattles; /* BATTLE_SETUP.randomBattles */
-    /* 0x8C */ TextWindow *charisma; /* party member 0's (stats[11]) */
+    /* 0x8C */ TextWindow *charisma; /* party member 0's (STAT_CHARISMA) */
     /* 0x90 */ TextWindow *level; /* party member 0's */
     /* 0x94 */ TextWindow *debugUpDown; /* BATTLE_SETUP.debugUpDown */
     /* 0x98 */ TextWindow *debugLeftRight; /* BATTLE_SETUP.debugLeftRight */

@@ -69,14 +69,14 @@ s32 STSTATUS_getChosenTech(TechScreen *screen) {
     PartnerStats *stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(screen->member));
     s16 tech = screen->rows[screen->member].techs[screen->cursor];
 
-    if (TECHS[tech - 1].mp <= stats->stats[4]) {
+    if (TECHS[tech - 1].mp <= stats->stats[STAT_MP]) {
         return tech;
     }
     return 0;
 }
 
-/* A technique's healing: its power a bit more than 64 times, with a
-   partner's stat 9 */
+/* A technique's healing: 64 times its power, plus its power times the
+   partner's wisdom over 8 */
 s32 STSTATUS_getTechHealing(s32 partner, s32 tech) {
     PartnerTotals stats;
     TechData *info;
@@ -110,11 +110,11 @@ s32 STSTATUS_useTech(TechScreen *screen, TechScreenWindows *windows, s32 failSou
     if (TECHS[tech - 1].kind == 3) {
         ids[1] = GAME.funcs.getPartyMember(screen->target);
         target = GAME.funcs.getPartnerStats(ids[1]);
-        if (target->stats[2] < target->stats[3]) {
-            user->stats[4] -= TECHS[tech - 1].mp;
-            target->stats[2] += power;
-            if (target->stats[2] > target->stats[3]) {
-                target->stats[2] = target->stats[3];
+        if (target->stats[STAT_HP] < target->stats[STAT_MAX_HP]) {
+            user->stats[STAT_MP] -= TECHS[tech - 1].mp;
+            target->stats[STAT_HP] += power;
+            if (target->stats[STAT_HP] > target->stats[STAT_MAX_HP]) {
+                target->stats[STAT_HP] = target->stats[STAT_MAX_HP];
                 windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x52);
             } else {
                 windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x53);
@@ -134,10 +134,10 @@ s32 STSTATUS_useTech(TechScreen *screen, TechScreenWindows *windows, s32 failSou
             ids[1] = GAME.funcs.getPartyMember(i);
             if (ids[1] >= 0) {
                 target = GAME.funcs.getPartnerStats(ids[1]);
-                if (target->stats[2] < target->stats[3]) {
-                    target->stats[2] += power;
-                    if (target->stats[2] > target->stats[3]) {
-                        target->stats[2] = target->stats[3];
+                if (target->stats[STAT_HP] < target->stats[STAT_MAX_HP]) {
+                    target->stats[STAT_HP] += power;
+                    if (target->stats[STAT_HP] > target->stats[STAT_MAX_HP]) {
+                        target->stats[STAT_HP] = target->stats[STAT_MAX_HP];
                         full++;
                     }
                     /* the match depends on this coming after full++ */
@@ -148,7 +148,7 @@ s32 STSTATUS_useTech(TechScreen *screen, TechScreenWindows *windows, s32 failSou
             }
         }
         if (healed) {
-            user->stats[4] -= TECHS[tech - 1].mp;
+            user->stats[STAT_MP] -= TECHS[tech - 1].mp;
             for (i = 0; i < screen->count; i++) {
                 STSTATUS_showTechPage(screen, windows, i, 1);
             }
@@ -272,14 +272,11 @@ void STSTATUS_showChosenTech(TechScreen *screen, TechScreenWindows *windows, s32
     }
 }
 
-/* Draws the partners' portraits and frames, the cursors and the help arrow */
-void STSTATUS_drawTechScreen(TechScreen *screen) {
-    SpriteDrawer sprite;
+/* Moves the partners' portraits to their next frames every 13 frames */
+static inline void STSTATUS_animateTechPortraits(TechScreen *screen) {
     s32 id;
     s32 i;
 
-    initSpriteDrawer(&sprite);
-    sprite.setLayerId(screen->layer, screen->depth);
     if (GFX.funcs.getTime() - screen->frameTime >= 13) {
         screen->frameTime = GFX.funcs.getTime();
         for (i = 0; i < screen->count; i++) {
@@ -291,6 +288,28 @@ void STSTATUS_drawTechScreen(TechScreen *screen) {
             }
         }
     }
+}
+
+/* Moves the member cursor's palette on every 9 frames */
+static inline void STSTATUS_stepTechCursor(TechScreen *screen) {
+    if (GFX.funcs.getTime() - screen->cursorTime >= 9) {
+        screen->cursorTime = GFX.funcs.getTime();
+        screen->cursorFrame++;
+        if (screen->cursorFrame >= 8) {
+            screen->cursorFrame = 0;
+        }
+    }
+}
+
+/* Draws the partners' portraits and frames, the cursors and the help arrow */
+void STSTATUS_drawTechScreen(TechScreen *screen) {
+    SpriteDrawer sprite;
+    s32 id;
+    s32 i;
+
+    initSpriteDrawer(&sprite);
+    sprite.setLayerId(screen->layer, screen->depth);
+    STSTATUS_animateTechPortraits(screen);
     for (i = 0; i < screen->count; i++) {
         if (screen->pageFades[i].level != 0) {
             if (screen->pageFades[i].level != ONE) {
@@ -360,13 +379,7 @@ void STSTATUS_drawTechScreen(TechScreen *screen) {
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x20, 0, 0xC2);
     }
-    if (GFX.funcs.getTime() - screen->cursorTime >= 9) {
-        screen->cursorTime = GFX.funcs.getTime();
-        screen->cursorFrame++;
-        if (screen->cursorFrame >= 8) {
-            screen->cursorFrame = 0;
-        }
-    }
+    STSTATUS_stepTechCursor(screen);
     if (screen->targetShown) {
         initSpriteDrawer(&sprite);
         sprite.setLayerId(screen->layer, screen->depth - 1);
@@ -399,318 +412,459 @@ void STSTATUS_drawTechScreen(TechScreen *screen) {
     }
 }
 
-/* The technique screen's update: opens the pages, picks who uses a
-   technique, which one and on whom, then closes them */
-void STSTATUS_runTechScreen(TechScreen *screen, TechScreenWindows *windows) {
-    s32 member; /* case 11 has its own variable: the match depends on it */
+/* Starts the fades of the first page and the title (and, with one party
+   member, of the help's panel); the next substate is the party's size */
+static inline void STSTATUS_startTechScreen(TechScreen *screen) {
+    STSTATUS_data.funcs.startFade(&screen->pageFades[0], 1);
+    STSTATUS_data.funcs.startFade(&screen->fades[0], 1);
+    if (screen->count == 1) {
+        STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
+    }
+    screen->substate = screen->count;
+}
+
+/* One member: once the page and the panels are in, shows the title and the
+   page */
+static inline void STSTATUS_openTechScreenAlone(TechScreen *screen, TechScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    STSTATUS_data.funcs.updateFade(&screen->fades[0]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
+        STSTATUS_showTechPage(screen, windows, 0, 1);
+        screen->substate = 10;
+    }
+}
+
+/* Two members: once the first page and the title are in, shows them and
+   starts the second page and the help's panel */
+static inline void STSTATUS_openFirstOfTwoTechPages(TechScreen *screen, TechScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[0])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
+        STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
+        STSTATUS_showTechPage(screen, windows, 0, 1);
+        screen->substate = 4;
+    }
+}
+
+/* Two members: once the second page and the help's panel are in, shows the
+   page */
+static inline void STSTATUS_openSecondOfTwoTechPages(TechScreen *screen, TechScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_showTechPage(screen, windows, 1, 1);
+        screen->substate = 10;
+    }
+}
+
+/* Three members: once the first page and the title are in, shows them and
+   starts the second page */
+static inline void STSTATUS_openFirstOfThreeTechPages(TechScreen *screen, TechScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[0])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
+        STSTATUS_showTechPage(screen, windows, 0, 1);
+        screen->substate = 5;
+    }
+}
+
+/* Three members: once the second page is in, shows it and starts the third
+   page and the help's panel */
+static inline void STSTATUS_openSecondOfThreeTechPages(TechScreen *screen, TechScreenWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[2], 1);
+        STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
+        STSTATUS_showTechPage(screen, windows, 1, 1);
+        screen->substate++;
+    }
+}
+
+/* Three members: once the third page and the help's panel are in, shows the
+   page */
+static inline void STSTATUS_openThirdTechPage(TechScreen *screen, TechScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_showTechPage(screen, windows, 2, 1);
+        screen->substate = 10;
+    }
+}
+
+/* Shows the member cursor and the help for choosing who uses a technique */
+static inline void STSTATUS_showTechHelp(TechScreen *screen, TechScreenWindows *windows) {
+    screen->memberShown = 1;
+    windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x28);
+    windows->help2->setString(windows->help2, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
+    screen->substate++;
+}
+
+/* Choosing who uses a technique: up and down move the cursor, cross opens
+   the member's techniques, triangle closes the screen */
+static inline void STSTATUS_chooseTechMember(TechScreen *screen) {
+    s32 member;
+
+    member = screen->member;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        screen->member--;
+        if (screen->member < 0) {
+            screen->member = 0;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        screen->member++;
+        if (screen->member > screen->count - 1) {
+            screen->member = screen->count - 1;
+        }
+    }
+    if (member != screen->member) {
+        SOUND.playSound(SOUND_MENU_MOVE);
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+        screen->substate = 15;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        screen->substate = 0x32;
+    }
+}
+
+/* Starts opening the member's technique list, or says they have none */
+static inline void STSTATUS_openTechList(TechScreen *screen, TechScreenWindows *windows) {
+    if (screen->rows[screen->member].techCount != 0) {
+        screen->fade.duration = 8;
+        STSTATUS_data.funcs.startFade(&screen->fade, 1);
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2A);
+        windows->help->setVisible(windows->help, 0);
+        windows->help2->setVisible(windows->help2, 0);
+        screen->substate = 0x1E;
+    } else {
+        screen->substate = 0x10;
+    }
+}
+
+/* Hides the member cursor and says the member has no technique to use here */
+static inline void STSTATUS_sayNoFieldTechs(TechScreen *screen, TechScreenWindows *windows) {
+    screen->memberShown = 0;
+    windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x29);
+    windows->help2->setVisible(windows->help2, 0);
+    screen->blink = 1;
+    screen->substate++;
+}
+
+/* Cross takes the message away and goes back to choosing a member */
+static inline void STSTATUS_closeNoFieldTechs(TechScreen *screen, TechScreenWindows *windows) {
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+        screen->memberShown = 1;
+        windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x28);
+        windows->help2->setVisible(windows->help2, 1);
+        screen->blink = 0;
+        screen->substate = 11;
+    }
+}
+
+/* Once the list's panel is in, shows the techniques and the cursor on the
+   first one */
+static inline void STSTATUS_enterTechList(TechScreen *screen, TechScreenWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&screen->fade)) {
+        screen->cursor = 0;
+        STSTATUS_showTechList(screen, windows, 1);
+        STSTATUS_showChosenTech(screen, windows, 1);
+        windows->cursor->setPos(windows->cursor, 0xA6, screen->cursor * 0xE + 0x41);
+        windows->cursor->setVisible(windows->cursor, 1);
+        screen->substate++;
+    }
+}
+
+/* Choosing a technique: up and down move the cursor, cross uses it (after
+   choosing whom, for one that heals one member) or says the MP is short,
+   triangle closes the list */
+static inline void STSTATUS_chooseTech(TechScreen *screen, TechScreenWindows *windows) {
     s32 old;
     s32 tech;
 
-    switch (screen->substate) {
-    case 0:
-    default:
-        STSTATUS_data.funcs.startFade(&screen->pageFades[0], 1);
-        STSTATUS_data.funcs.startFade(&screen->fades[0], 1);
-        if (screen->count == 1) {
-            STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
-        }
-        screen->substate = screen->count;
-        break;
-    case 1:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        STSTATUS_data.funcs.updateFade(&screen->fades[0]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
-            STSTATUS_showTechPage(screen, windows, 0, 1);
-            screen->substate = 10;
-        }
-        break;
-    case 2:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[0])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
-            STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
-            STSTATUS_showTechPage(screen, windows, 0, 1);
-            screen->substate = 4;
-        }
-        break;
-    case 4:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_showTechPage(screen, windows, 1, 1);
-            screen->substate = 10;
-        }
-        break;
-    case 3:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[0])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[1], 1);
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
-            STSTATUS_showTechPage(screen, windows, 0, 1);
-            screen->substate = 5;
-        }
-        break;
-    case 5:
-        if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[2], 1);
-            STSTATUS_data.funcs.startFade(&screen->fades[1], 1);
-            STSTATUS_showTechPage(screen, windows, 1, 1);
-            screen->substate++;
-        }
-        break;
-    case 6:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_showTechPage(screen, windows, 2, 1);
-            screen->substate = 10;
-        }
-        break;
-    case 10:
-        screen->memberShown = 1;
-        windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x28);
-        windows->help2->setString(windows->help2, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x15);
-        screen->substate++;
-        break;
-    case 11:
-        member = screen->member;
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            screen->member--;
-            if (screen->member < 0) {
-                screen->member = 0;
-            }
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            screen->member++;
-            if (screen->member > screen->count - 1) {
-                screen->member = screen->count - 1;
-            }
-        }
-        if (member != screen->member) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            screen->substate = 15;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            screen->substate = 0x32;
-        }
-        break;
-    case 15:
-        if (screen->rows[screen->member].techCount != 0) {
-            screen->fade.duration = 8;
-            STSTATUS_data.funcs.startFade(&screen->fade, 1);
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2A);
-            windows->help->setVisible(windows->help, 0);
-            windows->help2->setVisible(windows->help2, 0);
-            screen->substate = 0x1E;
-        } else {
-            screen->substate = 0x10;
-        }
-        break;
-    case 0x10:
-        screen->memberShown = 0;
-        windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x29);
-        windows->help2->setVisible(windows->help2, 0);
-        screen->blink = 1;
-        screen->substate++;
-        break;
-    case 0x11:
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            screen->memberShown = 1;
-            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x28);
-            windows->help2->setVisible(windows->help2, 1);
-            screen->blink = 0;
-            screen->substate = 11;
-        }
-        break;
-    case 0x1E:
-        if (STSTATUS_data.funcs.updateFade(&screen->fade)) {
+    old = screen->cursor;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        screen->cursor--;
+        if (screen->cursor < 0) {
             screen->cursor = 0;
-            STSTATUS_showTechList(screen, windows, 1);
-            STSTATUS_showChosenTech(screen, windows, 1);
-            windows->cursor->setPos(windows->cursor, 0xA6, screen->cursor * 0xE + 0x41);
-            windows->cursor->setVisible(windows->cursor, 1);
-            screen->substate++;
         }
-        break;
-    case 0x1F:
-        old = screen->cursor;
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            screen->cursor--;
-            if (screen->cursor < 0) {
-                screen->cursor = 0;
-            }
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            screen->cursor++;
-            if (screen->cursor > screen->rows[screen->member].techCount - 1) {
-                screen->cursor = screen->rows[screen->member].techCount - 1;
-            }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        screen->cursor++;
+        if (screen->cursor > screen->rows[screen->member].techCount - 1) {
+            screen->cursor = screen->rows[screen->member].techCount - 1;
         }
-        if (old != screen->cursor) {
-            windows->cursor->setPos(windows->cursor, 0xA6, screen->cursor * 0xE + 0x41);
-            STSTATUS_showChosenTech(screen, windows, 1);
-            SOUND.playSound(SOUND_CURSOR);
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            tech = STSTATUS_getChosenTech(screen);
-            if (tech != 0) {
-                if (TECHS[tech - 1].kind == 3) {
-                    SOUND.playSound(SOUND_SELECT);
-                    screen->targetShown = 1;
-                    windows->cursor->setPalette(windows->cursor, PALETTE_GREY);
-                    windows->cursor->setStill(windows->cursor, 1);
-                    windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2B);
-                    screen->substate++;
-                } else {
-                    windows->cursor->setPalette(windows->cursor, PALETTE_GREY);
-                    windows->cursor->setStill(windows->cursor, 1);
-                    STSTATUS_showChosenTech(screen, windows, 0);
-                    screen->step = screen->substate;
-                    STSTATUS_useTech(screen, windows, SOUND_SELECT);
-                    screen->substate = 0x24;
-                    screen->blink = 1;
-                }
-            } else {
+    }
+    if (old != screen->cursor) {
+        windows->cursor->setPos(windows->cursor, 0xA6, screen->cursor * 0xE + 0x41);
+        STSTATUS_showChosenTech(screen, windows, 1);
+        SOUND.playSound(SOUND_CURSOR);
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        tech = STSTATUS_getChosenTech(screen);
+        if (tech != 0) {
+            if (TECHS[tech - 1].kind == 3) {
                 SOUND.playSound(SOUND_SELECT);
+                screen->targetShown = 1;
+                windows->cursor->setPalette(windows->cursor, PALETTE_GREY);
+                windows->cursor->setStill(windows->cursor, 1);
+                windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2B);
+                screen->substate++;
+            } else {
                 windows->cursor->setPalette(windows->cursor, PALETTE_GREY);
                 windows->cursor->setStill(windows->cursor, 1);
                 STSTATUS_showChosenTech(screen, windows, 0);
-                windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x69);
-                screen->substate = 0x23;
+                screen->step = screen->substate;
+                STSTATUS_useTech(screen, windows, SOUND_SELECT);
+                screen->substate = 0x24;
                 screen->blink = 1;
             }
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            STSTATUS_data.funcs.startFade(&screen->fade, 0);
-            STSTATUS_showTechList(screen, windows, 0);
+        } else {
+            SOUND.playSound(SOUND_SELECT);
+            windows->cursor->setPalette(windows->cursor, PALETTE_GREY);
+            windows->cursor->setStill(windows->cursor, 1);
             STSTATUS_showChosenTech(screen, windows, 0);
-            windows->cursor->setVisible(windows->cursor, 0);
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
-            screen->substate = 0x28;
+            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x69);
+            screen->substate = 0x23;
+            screen->blink = 1;
         }
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        STSTATUS_data.funcs.startFade(&screen->fade, 0);
+        STSTATUS_showTechList(screen, windows, 0);
+        STSTATUS_showChosenTech(screen, windows, 0);
+        windows->cursor->setVisible(windows->cursor, 0);
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x27);
+        screen->substate = 0x28;
+    }
+}
+
+/* Choosing whom the technique heals: up and down move the cursor, cross uses
+   it or says the MP is short, triangle goes back to the list */
+static inline void STSTATUS_chooseTechTarget(TechScreen *screen, TechScreenWindows *windows) {
+    s32 old;
+
+    old = screen->target;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        screen->target--;
+        if (screen->target < 0) {
+            screen->target = 0;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        screen->target++;
+        if (screen->target > screen->count - 1) {
+            screen->target = screen->count - 1;
+        }
+    }
+    if (old != screen->target) {
+        SOUND.playSound(SOUND_MENU_MOVE);
+    } else if (PAD_PRESSED(PAD_CROSS)) {
+        STSTATUS_showChosenTech(screen, windows, 0);
+        if (STSTATUS_getChosenTech(screen) != 0) {
+            screen->targetShown = 0;
+            screen->step = screen->substate;
+            STSTATUS_useTech(screen, windows, SOUND_MENU_CONFIRM);
+            screen->substate = 0x24;
+        } else {
+            SOUND.playSound(SOUND_MENU_CONFIRM);
+            screen->memberShown = 0;
+            screen->targetShown = 0;
+            windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x69);
+            screen->substate = 0x23;
+        }
+        screen->blink = 1;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        screen->substate = 0x1F;
+        screen->targetShown = 0;
+        windows->cursor->setPalette(windows->cursor, PALETTE_WHITE);
+        windows->cursor->setStill(windows->cursor, 0);
+        windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2A);
+    }
+}
+
+/* Cross takes the short MP message away and goes back to the list */
+static inline void STSTATUS_closeShortMp(TechScreen *screen, TechScreenWindows *windows) {
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+        STSTATUS_showChosenTech(screen, windows, 1);
+        windows->cursor->setPalette(windows->cursor, PALETTE_WHITE);
+        windows->cursor->setStill(windows->cursor, 0);
+        screen->substate = 0x1F;
+        screen->blink = 0;
+    }
+}
+
+/* Cross takes the technique's result away and goes back to where it was
+   chosen */
+static inline void STSTATUS_closeTechUsed(TechScreen *screen, TechScreenWindows *windows) {
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_MENU_CONFIRM);
+        STSTATUS_showChosenTech(screen, windows, 1);
+        screen->substate = screen->step;
+        /* the match depends on testing step, not substate */
+        if (screen->step == 0x1F) {
+            windows->cursor->setPalette(windows->cursor, PALETTE_WHITE);
+            windows->cursor->setStill(windows->cursor, 0);
+        } else {
+            screen->targetShown = 1;
+        }
+        screen->blink = 0;
+    }
+}
+
+/* Once the list's panel is closed, goes back to choosing a member */
+static inline void STSTATUS_closeTechList(TechScreen *screen) {
+    if (STSTATUS_data.funcs.updateFade(&screen->fade)) {
+        screen->setSubstate(screen, 10);
+    }
+}
+
+/* Starts closing the screen: the last page, the help's panel and, with one
+   member, the title */
+static inline void STSTATUS_closeTechScreen(TechScreen *screen, TechScreenWindows *windows) {
+    screen->memberShown = 0;
+    windows->help2->setVisible(windows->help2, 0);
+    STSTATUS_data.funcs.startFade(&screen->fades[1], 0);
+    STSTATUS_showChosenTech(screen, windows, 0);
+    STSTATUS_data.funcs.startFade(&screen->pageFades[screen->count - 1], 0);
+    STSTATUS_showTechPage(screen, windows, screen->count - 1, 0);
+    if (screen->count == 1) {
+        windows->title->setVisible(windows->title, 0);
+        STSTATUS_data.funcs.startFade(&screen->fades[0], 0);
+    }
+    screen->substate = screen->count + 0x32;
+}
+
+/* One member: ends the screen once the page and the panels are closed */
+static inline void STSTATUS_closeTechScreenAlone(TechScreen *screen) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    STSTATUS_data.funcs.updateFade(&screen->fades[0]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        screen->state = 3;
+    }
+}
+
+/* Two members: once the second page and the help's panel are closed, starts
+   closing the first and the title */
+static inline void STSTATUS_closeSecondOfTwoTechPages(TechScreen *screen, TechScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
+        STSTATUS_showTechPage(screen, windows, 0, 0);
+        STSTATUS_data.funcs.startFade(&screen->fades[0], 0);
+        windows->title->setVisible(windows->title, 0);
+        screen->substate = 0x36;
+    }
+}
+
+/* Three members: once the third page and the help's panel are closed, starts
+   closing the second */
+static inline void STSTATUS_closeThirdTechPage(TechScreen *screen, TechScreenWindows *windows) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[1], 0);
+        STSTATUS_showTechPage(screen, windows, 1, 0);
+        screen->substate = 0x37;
+    }
+}
+
+/* Three members: once the second page is closed, starts closing the first
+   and the title */
+static inline void STSTATUS_closeSecondOfThreeTechPages(TechScreen *screen, TechScreenWindows *windows) {
+    if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
+        STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
+        STSTATUS_data.funcs.startFade(&screen->fades[0], 0);
+        windows->title->setVisible(windows->title, 0);
+        STSTATUS_showTechPage(screen, windows, 0, 0);
+        screen->substate++;
+    }
+}
+
+/* Two or three members: ends the screen once the first page and the title
+   are closed */
+static inline void STSTATUS_closeFirstTechPage(TechScreen *screen) {
+    STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
+    if (STSTATUS_data.funcs.updateFade(&screen->fades[0])) {
+        screen->state = 3;
+    }
+}
+
+/* The technique screen's update: opens the pages, picks who uses a
+   technique, which one and on whom, then closes them */
+void STSTATUS_runTechScreen(TechScreen *screen, TechScreenWindows *windows) {
+    switch (screen->substate) {
+    case 0:
+    default:
+        STSTATUS_startTechScreen(screen);
+        break;
+    case 1:
+        STSTATUS_openTechScreenAlone(screen, windows);
+        break;
+    case 2:
+        STSTATUS_openFirstOfTwoTechPages(screen, windows);
+        break;
+    case 4:
+        STSTATUS_openSecondOfTwoTechPages(screen, windows);
+        break;
+    case 3:
+        STSTATUS_openFirstOfThreeTechPages(screen, windows);
+        break;
+    case 5:
+        STSTATUS_openSecondOfThreeTechPages(screen, windows);
+        break;
+    case 6:
+        STSTATUS_openThirdTechPage(screen, windows);
+        break;
+    case 10:
+        STSTATUS_showTechHelp(screen, windows);
+        break;
+    case 11:
+        STSTATUS_chooseTechMember(screen);
+        break;
+    case 15:
+        STSTATUS_openTechList(screen, windows);
+        break;
+    case 0x10:
+        STSTATUS_sayNoFieldTechs(screen, windows);
+        break;
+    case 0x11:
+        STSTATUS_closeNoFieldTechs(screen, windows);
+        break;
+    case 0x1E:
+        STSTATUS_enterTechList(screen, windows);
+        break;
+    case 0x1F:
+        STSTATUS_chooseTech(screen, windows);
         break;
     case 0x20:
-        old = screen->target;
-        if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-            screen->target--;
-            if (screen->target < 0) {
-                screen->target = 0;
-            }
-        } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-            screen->target++;
-            if (screen->target > screen->count - 1) {
-                screen->target = screen->count - 1;
-            }
-        }
-        if (old != screen->target) {
-            SOUND.playSound(SOUND_MENU_MOVE);
-        } else if (PAD_PRESSED(PAD_CROSS)) {
-            STSTATUS_showChosenTech(screen, windows, 0);
-            if (STSTATUS_getChosenTech(screen) != 0) {
-                screen->targetShown = 0;
-                screen->step = screen->substate;
-                STSTATUS_useTech(screen, windows, SOUND_MENU_CONFIRM);
-                screen->substate = 0x24;
-            } else {
-                SOUND.playSound(SOUND_MENU_CONFIRM);
-                screen->memberShown = 0;
-                screen->targetShown = 0;
-                windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x69);
-                screen->substate = 0x23;
-            }
-            screen->blink = 1;
-        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-            SOUND.playSound(SOUND_MENU_CANCEL);
-            screen->substate = 0x1F;
-            screen->targetShown = 0;
-            windows->cursor->setPalette(windows->cursor, PALETTE_WHITE);
-            windows->cursor->setStill(windows->cursor, 0);
-            windows->title->setString(windows->title, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x2A);
-        }
+        STSTATUS_chooseTechTarget(screen, windows);
         break;
     case 0x23:
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            STSTATUS_showChosenTech(screen, windows, 1);
-            windows->cursor->setPalette(windows->cursor, PALETTE_WHITE);
-            windows->cursor->setStill(windows->cursor, 0);
-            screen->substate = 0x1F;
-            screen->blink = 0;
-        }
+        STSTATUS_closeShortMp(screen, windows);
         break;
     case 0x24:
-        if (PAD_PRESSED(PAD_CROSS)) {
-            SOUND.playSound(SOUND_MENU_CONFIRM);
-            STSTATUS_showChosenTech(screen, windows, 1);
-            screen->substate = screen->step;
-            /* the match depends on testing step, not substate */
-            if (screen->step == 0x1F) {
-                windows->cursor->setPalette(windows->cursor, PALETTE_WHITE);
-                windows->cursor->setStill(windows->cursor, 0);
-            } else {
-                screen->targetShown = 1;
-            }
-            screen->blink = 0;
-        }
+        STSTATUS_closeTechUsed(screen, windows);
         break;
     case 0x28:
-        if (STSTATUS_data.funcs.updateFade(&screen->fade)) {
-            screen->setSubstate(screen, 10);
-        }
+        STSTATUS_closeTechList(screen);
         break;
     case 0x32:
-        screen->memberShown = 0;
-        windows->help2->setVisible(windows->help2, 0);
-        STSTATUS_data.funcs.startFade(&screen->fades[1], 0);
-        STSTATUS_showChosenTech(screen, windows, 0);
-        STSTATUS_data.funcs.startFade(&screen->pageFades[screen->count - 1], 0);
-        STSTATUS_showTechPage(screen, windows, screen->count - 1, 0);
-        if (screen->count == 1) {
-            windows->title->setVisible(windows->title, 0);
-            STSTATUS_data.funcs.startFade(&screen->fades[0], 0);
-        }
-        screen->substate = screen->count + 0x32;
+        STSTATUS_closeTechScreen(screen, windows);
         break;
     case 0x33:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        STSTATUS_data.funcs.updateFade(&screen->fades[0]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            screen->state = 3;
-        }
+        STSTATUS_closeTechScreenAlone(screen);
         break;
     case 0x34:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[1]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
-            STSTATUS_showTechPage(screen, windows, 0, 0);
-            STSTATUS_data.funcs.startFade(&screen->fades[0], 0);
-            windows->title->setVisible(windows->title, 0);
-            screen->substate = 0x36;
-        }
+        STSTATUS_closeSecondOfTwoTechPages(screen, windows);
         break;
     case 0x35:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[2]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[1], 0);
-            STSTATUS_showTechPage(screen, windows, 1, 0);
-            screen->substate = 0x37;
-        }
+        STSTATUS_closeThirdTechPage(screen, windows);
         break;
     case 0x37:
-        if (STSTATUS_data.funcs.updateFade(&screen->pageFades[1])) {
-            STSTATUS_data.funcs.startFade(&screen->pageFades[0], 0);
-            STSTATUS_data.funcs.startFade(&screen->fades[0], 0);
-            windows->title->setVisible(windows->title, 0);
-            STSTATUS_showTechPage(screen, windows, 0, 0);
-            screen->substate++;
-        }
+        STSTATUS_closeSecondOfThreeTechPages(screen, windows);
         break;
     case 0x36:
     case 0x38:
-        STSTATUS_data.funcs.updateFade(&screen->pageFades[0]);
-        if (STSTATUS_data.funcs.updateFade(&screen->fades[0])) {
-            screen->state = 3;
-        }
+        STSTATUS_closeFirstTechPage(screen);
         break;
     }
 }
@@ -763,8 +917,8 @@ Task *STSTATUS_createTechScreen(FieldMenuScreen *menu, s32 extra) {
 }
 
 s32 STSTATUS_pageStats8[] = {
-    0, 2, 3, 4,
-    5,
+    STAT_LEVEL, STAT_HP, STAT_MAX_HP, STAT_MP,
+    STAT_MAX_MP,
 };
 /* The sprites of the technique counts, from 1 */
 s32 STSTATUS_techSprites[] = {

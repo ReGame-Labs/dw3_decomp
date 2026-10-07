@@ -14,7 +14,7 @@ s32 STDWTITL_getEdgeFadeLevel(s32 time) {
    edges, the edges twice as dark */
 void STDWTITL_drawEdgeFade(s32 level) {
     Layer *layer = GFX.funcs.getLayer(STDWTITL_TITLE_LAYER);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, 0);
+    u_long *ot = layer->getOtEntry(layer, 0);
     POLY_G3 *poly = GFX.funcs.getPrim();
     DR_TPAGE *mode;
     s32 edge;
@@ -39,6 +39,7 @@ void STDWTITL_drawEdgeFade(s32 level) {
         addPrim(ot, poly);
         poly++;
     }
+    /* the texture page packet goes right after the triangles */
     mode = (DR_TPAGE *)poly;
     setDrawTPage(mode, 0, 1, getTPage(0, 2, 320, 0));
     addPrim(ot, mode);

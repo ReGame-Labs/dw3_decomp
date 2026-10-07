@@ -13,7 +13,7 @@ s32 *STSTATUS_getTowns(s32 list, s32 index) {
 /* Puts the owned items of a list in OUT and returns how many: below 5 the
    item lists of ITEM_FUNCS, 5 the equipment of STSTATUS_equipKinds, 6 and 7
    the items of kinds 4 and 5 (STSTATUS_slotLists) */
-s32 STSTATUS_listItems(s32 list, u16 *out) {
+s32 STSTATUS_listItems(s32 list, s16 *out) {
     if (list < 5) {
         return ITEM_FUNCS->list(list, out);
     }
@@ -29,7 +29,7 @@ s32 STSTATUS_listItems(s32 list, u16 *out) {
 }
 
 /* The items whose kind (WeaponData.kind) is one of STSTATUS_equipKinds's four */
-s32 STSTATUS_listEquipItems(u16 *out) {
+s32 STSTATUS_listEquipItems(s16 *out) {
     s32 i;
     s32 j;
     s32 count;
@@ -58,7 +58,7 @@ s32 STSTATUS_listEquipItems(u16 *out) {
 }
 
 /* The items of one kind (WeaponData.kind) */
-s32 STSTATUS_listItemsOfKind(s32 kind, u16 *out) {
+s32 STSTATUS_listItemsOfKind(s32 kind, s16 *out) {
     s32 i;
     s32 count;
 

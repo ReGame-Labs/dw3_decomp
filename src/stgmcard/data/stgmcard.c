@@ -129,10 +129,13 @@ MemCardScreenFuncs STGMCARD_funcs = {
     STGMCARD_loadFiles, STGMCARD_filesLoading, STGMCARD_freeBuffers,
     STGMCARD_startFade, STGMCARD_updateFade, STGMCARD_startLerp, STGMCARD_updateLerp,
 };
-s32 STGMCARD_iconClut[] = {
-    0x2D6B0000, 0x469320E7, 0x71C85167, 0x3A0F635A,
-    0x28C473DD, 0x185944, 0x71C87E8D, 0x7E587E13,
-};
+/* the save icon's 16 colors, for the card's header */
+CardClut STGMCARD_iconClut = {{
+    0x00, 0x00, 0x6B, 0x2D, 0xE7, 0x20, 0x93, 0x46,
+    0x67, 0x51, 0xC8, 0x71, 0x5A, 0x63, 0x0F, 0x3A,
+    0xDD, 0x73, 0xC4, 0x28, 0x44, 0x59, 0x18, 0x00,
+    0x8D, 0x7E, 0xC8, 0x71, 0x13, 0x7E, 0x58, 0x7E,
+}};
 s32 STGMCARD_iconFrames[3][32] = {
     {
         0x2EFFFFFF, 0xF2222222, 0xA2EFFFFF, 0x29AAAAAA,
@@ -165,8 +168,7 @@ s32 STGMCARD_iconFrames[3][32] = {
         0x71222EEE, 0x22212121, 0x1722EEEE, 0x22111111,
     },
 };
-/* The CLUT is kept as words */
 SaveIcon STGMCARD_saveIcon = {
-    (CardClut *)STGMCARD_iconClut,
+    &STGMCARD_iconClut,
     {STGMCARD_iconFrames[0], STGMCARD_iconFrames[1], STGMCARD_iconFrames[2]},
 };
