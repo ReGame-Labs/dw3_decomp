@@ -28,8 +28,7 @@ The badge in README.md shows the fake matches, then the other three kinds
 together, and the table in docs/status.md each count (--check README.md
 docs/status.md). The functions still in assembly are counted apart, and
 --list also shows what is assembly without being a hack: the rodata still
-behind INCLUDE_RODATA, the data written as top-level asm (padding that the
-original objects have) and the macros that wrap inline asm for what C can't
+behind INCLUDE_RODATA and the macros that wrap inline asm for what C can't
 say (moving $sp to the scratchpad, GTE instructions).
 
 A function either matches as C or stays behind its INCLUDE_ASM, so these
@@ -38,7 +37,8 @@ always fail:
 - NON_MATCHING (or NONMATCHING) code, and #if 0 blocks: C that doesn't
   match, or a draft, doesn't belong in src/;
 - inline asm written in a function's body, a register variable pinned with
-  asm("$reg"), or a top-level asm that isn't data: assembly in place of C.
+  asm("$reg"), or a top-level asm, data included: assembly in place of C
+  (data, padding too, is written as C).
 """
 
 import argparse
@@ -66,7 +66,6 @@ HACKS = ("bec", "frame", "form")
 # what --list shows besides: assembly, but not a hack
 OTHER = (
     ("rodata", "Rodata still in assembly (INCLUDE_RODATA)"),
-    ("data", "Data written as top-level asm"),
     ("macros", "Macros that wrap inline asm"),
 )
 
@@ -76,8 +75,8 @@ TOKEN = re.compile(r'"(?:\\.|[^"\\\n])*"|\'(?:\\.|[^\'\\\n])*\'|/\*.*?\*/|//[^\n
 INCLUDE_ASM = re.compile(r"^\s*INCLUDE_ASM\s*\(\s*[^,()]*,\s*(\w+)\s*\)", re.M)
 INCLUDE_RODATA = re.compile(r"^\s*INCLUDE_RODATA\s*\(\s*[^,()]*,\s*(\w+)\s*\)", re.M)
 ASM = re.compile(r"\b(?:__asm__|__asm|asm)\b")
-# a top-level asm statement, and whether its string starts with .section
-TOP_ASM = re.compile(r'^(?:__asm__|__asm|asm)\s*\(\s*("\s*\.section\b)?', re.M)
+# a top-level asm statement
+TOP_ASM = re.compile(r"^(?:__asm__|__asm|asm)\s*\(", re.M)
 DEFINE = re.compile(r"^[ \t]*#[ \t]*define[ \t]+(\w+)(?:[^\n]*\\\n)*[^\n]*", re.M)
 REGISTER_ASM = re.compile(r"\bregister\b[^;{}()]*\b(?:__asm__|__asm|asm)\s*\(")
 NON_MATCHING = re.compile(r"\bNON_?MATCHING\b")
@@ -244,15 +243,9 @@ def scan():
                 n = line_of(plain, m.start())
                 if n in owner and n not in pinned:
                     forbid(m.start(), "inline asm in a function's body")
-            # top-level asm: data (.section ...) is fine, anything else isn't
             for m in TOP_ASM.finditer(DIRECTIVE.sub(blank, TOKEN.sub(blank_comment, text))):
-                n = line_of(text, m.start())
-                if n in owner:
-                    continue
-                if m[1]:
-                    other["data"].append((rel, n, ""))
-                else:
-                    forbid(m.start(), "top-level asm that isn't data")
+                if line_of(text, m.start()) not in owner:
+                    forbid(m.start(), "top-level asm: write it, data too, in C")
             for m in DEFINE.finditer(code):
                 if ASM.search(m[0]):
                     other["macros"].append((rel, line_of(code, m.start()), m[1]))
