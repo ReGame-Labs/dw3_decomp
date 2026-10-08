@@ -77,7 +77,8 @@ give it real types once the code that uses it is understood.
   draft that came close can go in the pull request's description, not in the
   source. `tools/hacks.py` fails the CI on `NON_MATCHING` (or `NONMATCHING`),
   on `#if 0`, on inline asm in a function's body, on a register variable
-  pinned with `asm("$reg")` and on a top-level asm that isn't data.
+  pinned with `asm("$reg")` and on any top-level asm: data, padding
+  included, is written in C.
 - A fake match is the last resort, not a shortcut: only for a function that
   natural C has failed to match after a real search (other source shapes,
   types, statement order, the permuter's legitimate finds), a forced form is

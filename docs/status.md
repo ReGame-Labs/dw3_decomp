@@ -201,8 +201,8 @@ README's badge counts them: fake matches, then the other kinds together.
 
 `tools/hacks.py --list` lists every one with its file, line and function, and
 also what is assembly without being a hack: the rodata still behind
-`INCLUDE_RODATA`, data written as a top-level `__asm__`, and the macros that
-wrap the inline asm C can't say. The CI fails on what the source must never
-have: `NON_MATCHING` code, `#if 0` blocks, and inline asm in place of C.
+`INCLUDE_RODATA` and the macros that wrap the inline asm C can't say. The CI
+fails on what the source must never have: `NON_MATCHING` code, `#if 0`
+blocks, and inline asm in place of C, top-level data asm included.
 `tools/hacks.py --check README.md docs/status.md` checks that the README's
 badge and the table above are up to date.
