@@ -105,13 +105,13 @@ s16 script1225[] = {
     0x300, 0x5A,
     0x304, 0xC05, 0, 0, 0,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
-__asm__(".section .data\n\t.half 0x9462\n");
+    0x9462,
 #elif VERSION_EU
-__asm__(".section .data\n\t.half 0x1062\n");
+    0x1062,
 #endif
+};
 s16 script1269[] = {
     0x600, 1, 2,
     0x102, 2, 0x45B, 0x345, 7,
@@ -131,13 +131,13 @@ s16 script1269[] = {
     0x301,
     0x300, 0x1E,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
-__asm__(".section .data\n\t.half 0x3C02\n");
+    0x3C02,
 #elif VERSION_EU
-__asm__(".section .data\n\t.half 0x8E02\n");
+    0x8E02,
 #endif
+};
 s16 script1270[] = {
     0x600, 1, 2,
     0x100, 2, 0x45B, 0x345,

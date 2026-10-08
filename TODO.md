@@ -47,10 +47,10 @@ and the tooling around it. The counts below are from commit `f5763800`.
 
 ## Data
 
-- [ ] 56 top-level `__asm__` statements in 34 stage files write the
-  non-zero padding halfword that the original has between some of a stage's
-  data (event scripts, battles, images, animation frames). Write it in C
-  instead, as part of the data it follows.
+- [x] The non-zero padding halfword the original has after 39 event scripts
+  in 34 stage files (56 top-level `__asm__` statements, one for each version
+  that has it) is now the script's last element, under the same `#if`: no
+  data is written as asm any more.
 - [ ] The stages' data repeats between stages, and between the versions as
   `#if VERSION_US` / `VERSION_EU` rows: write what is the same once, where
   the bytes allow it.

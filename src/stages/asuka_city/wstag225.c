@@ -236,11 +236,11 @@ s16 script5[] = {
     0x300, 6,
     0x304, 0x203, 0x2DA, 0x17E, 1,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
-__asm__(".section .data\n\t.half 0x8FB0\n");
+    0x8FB0,
 #endif
+};
 AnimFrame updateTileEffectFrames_0[] = {
     { 70, 4 }, { 71, 4 }, { 70, 4 }, { 71, 4 },
     { 255, 0x3E7 },

@@ -114,13 +114,13 @@ s16 script790[] = {
     0x101, 2, 1, 3,
     0x300, 0x1E,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
-__asm__(".section .data\n\t.half 0x240\n");
+    0x240,
 #elif VERSION_EU
-__asm__(".section .data\n\t.half 0x800A\n");
+    0x800A,
 #endif
+};
 s16 script791[] = {
     0x600, 1, 0xC8,
     0x100, 2, 0x138, 0x25C,
@@ -146,13 +146,13 @@ s16 script791[] = {
     0x600, 1, 2,
     0x300, 0x1E,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
-__asm__(".section .data\n\t.half 0x1\n");
+    0x1,
 #elif VERSION_EU
-__asm__(".section .data\n\t.half 0x800A\n");
+    0x800A,
 #endif
+};
 StageEffectSpot updateStageSpots[] = {
     { 36, 0, 0x14C, 0x264 },
     { 28, 0, 236, 0x1B4 },

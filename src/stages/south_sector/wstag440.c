@@ -89,13 +89,13 @@ s16 script144[] = {
     0x300, 0x3C,
     0x304, 0x22C, 0x140, 0x140, 5,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
-__asm__(".section .data\n\t.half 0x8E02\n");
+    0x8E02,
 #elif VERSION_EU
-__asm__(".section .data\n\t.half 0x128\n");
+    0x128,
 #endif
+};
 s16 script152[] = {
     0x601, 1, 0x1AF, 0xD9,
     0x100, 2, 0x1EF, 0xB9,
@@ -108,13 +108,13 @@ s16 script152[] = {
     0x300, 0x3C,
     0x304, 0x233, 0x208, 0x9C, 7,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
-__asm__(".section .data\n\t.half 0x8FBF\n");
+    0x8FBF,
 #elif VERSION_EU
-__asm__(".section .data\n\t.half 0x1FB\n");
+    0x1FB,
 #endif
+};
 Battle area0Battle0 = { 0, 0, MUSIC(1, 0) };
 Battle area0Battle1 = { 0, 0, MUSIC(1, 0) };
 Battle area0Battle2 = { 0, 0, MUSIC(1, 0) };

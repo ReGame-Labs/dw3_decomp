@@ -86,11 +86,11 @@ s16 script220[] = {
     0x301,
     0x300, 0x1E,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
-__asm__(".section .data\n\t.half 0x8FB1\n");
+    0x8FB1,
 #endif
+};
 Battle area0Battle0 = { 0, 0, MUSIC(1, 0) };
 Battle area0Battle1 = { 0, 0, MUSIC(1, 0) };
 Battle area0Battle2 = { 0, 0, MUSIC(1, 0) };
