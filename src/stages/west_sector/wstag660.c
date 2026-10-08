@@ -127,11 +127,11 @@ s16 script1231[] = {
     0x300, 0x5A,
     0x304, 0xC06, 0, 0, 0,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_EU
-__asm__(".section .data\n\t.half 0x6004\n");
+    0x6004,
 #endif
+};
 ActorImage stageImages[] = {
     { 0x200, 0x100, 0x21C, 0x1A6, 0x70, 0xA6, 0x230, 0x1FE },
     { 0x200, 0x100, 0x200, 0x100, 0, 0, 0x220, 0x1FE },

@@ -87,11 +87,11 @@ s16 script925[] = {
     0x301,
     0x300, 0x1E,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_EU
-__asm__(".section .data\n\t.half 0x6961\n");
+    0x6961,
 #endif
+};
 Battle area0Battle0 = { 0, 0, MUSIC(1, 0) };
 Battle area0Battle1 = { 0, 0, MUSIC(1, 0) };
 Battle area0Battle2 = { 0, 0, MUSIC(1, 0) };

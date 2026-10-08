@@ -170,11 +170,11 @@ s16 script1281[] = {
     0x301,
     0x300, 0x1E,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_EU
-__asm__(".section .data\n\t.half 0x6004\n");
+    0x6004,
 #endif
+};
 s16 script1282[] = {
     0x600, 1, 2,
     0x100, 2, 0x18D, 0x10E,

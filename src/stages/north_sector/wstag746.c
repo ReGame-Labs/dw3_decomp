@@ -193,11 +193,11 @@ s16 script1298[] = {
     0x600, 1, 2,
     0x300, 0x1E,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_EU
-__asm__(".section .data\n\t.half 0x2\n");
+    0x2,
 #endif
+};
 StageEffectSpot updateStageSpots[] = {
     { 68, 0, 0x11B, 0x154 },
     { 68, 0, 0x13C, 0x1C4 },

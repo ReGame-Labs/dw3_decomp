@@ -103,13 +103,13 @@ s16 script390[] = {
     0x101, 0x133, 1, 3,
     0x300, 0x1E,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
-__asm__(".section .data\n\t.half 0xA622\n");
+    0xA622,
 #elif VERSION_EU
-__asm__(".section .data\n\t.half 0x1F9\n");
+    0x1F9,
 #endif
+};
 s16 script400[] = {
     0x600, 0, 2,
     0x102, 2, 0x27F, 0x141, 7,

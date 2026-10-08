@@ -255,11 +255,11 @@ s16 script830[] = {
     0x101, 2, 1, 1,
     0x300, 0x1E,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
-__asm__(".section .data\n\t.half 0x31A8\n");
+    0x31A8,
 #endif
+};
 s16 script840[] = {
     0x102, 2, 0x1C1, 0x387, 5,
     0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
@@ -303,11 +303,11 @@ s16 script840[] = {
     0x101, 2, 1, 1,
     0x300, 0x1E,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
-__asm__(".section .data\n\t.half 0x31A8\n");
+    0x31A8,
 #endif
+};
 s16 script1505[] = {
     0x300, 0x1E,
     0x101, 0x323, 0x325, 2,

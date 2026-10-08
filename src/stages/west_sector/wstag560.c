@@ -69,13 +69,13 @@ s16 script1459[] = {
     0x300, 0x5A,
     0x304, 0xC14, 0, 0, 0,
     0,
-};
-/* the original's padding, which isn't zeros */
+    /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
-__asm__(".section .data\n\t.half 0x37\n");
+    0x37,
 #elif VERSION_EU
-__asm__(".section .data\n\t.half 0x6004\n");
+    0x6004,
 #endif
+};
 Battle area0Battle0 = { 148, 3, MUSIC(2, 0) };
 Battle area0Battle1 = { 148, 3, MUSIC(2, 0) };
 Battle area0Battle2 = { 148, 3, MUSIC(2, 0) };
