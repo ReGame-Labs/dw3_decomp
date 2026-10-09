@@ -139,10 +139,12 @@ MAIN_C_SRC := $(filter src/engine/%,$(ALL_C_SRC))
 # splat's data files), and a stage's head's rodata
 STAGE_HEADS := $(filter src/field/stages/%_head.c,$(ALL_C_SRC))
 DATA_STAGES := $(shell awk '!/^\#/ && $$2 == "data" { print tolower($$1) }' $(CONFIG_DIR)/stages.txt)
-# where splat writes a C file's disassembly: src/engine/ is main's,
-# src/<group>/<binary>/ the binary's (src/field/stages/ the stages')
-src_asm = $(patsubst src/engine/%.c,$(ASM_DIR)/main/%.s,$(filter src/engine/%,$(1))) \
-	  $(foreach g,field battle cardgame menus debug,$(patsubst src/$(g)/%.c,$(ASM_DIR)/%.s,$(filter src/$(g)/%,$(1))))
+# each binary's C folder, its config's src_path (src/menus/item_shop for
+# STITSHOP), and where splat writes a C file's disassembly: under the
+# binary's name ($(ASM_DIR)/stitshop/)
+$(foreach b,main $(OVERLAYS),$(eval SRC_DIR_$(b) := $(shell sed -n 's/^ *src_path: *//p' $(CONFIG_DIR)/$(b).yaml)))
+SRC_DIR_stages := src/field/stages
+src_asm = $(foreach b,main stages $(OVERLAYS),$(patsubst $(SRC_DIR_$(b))/%.c,$(ASM_DIR)/$(b)/%.s,$(filter $(SRC_DIR_$(b))/%,$(1))))
 TARGET_ASM := $(filter-out $(foreach b,main $(OVERLAYS),$(ASM_DIR)/$(b)/data/%) $(foreach s,$(DATA_STAGES),$(ASM_DIR)/stages/$(STAGE_PATH_$(s)).s),\
 	      $(call src_asm,$(filter-out $(STAGE_HEADS),$(ALL_C_SRC)))) \
 	      $(STAGE_HEADS:src/field/stages/%.c=$(ASM_DIR)/stages/data/%.rodata.s)
@@ -163,7 +165,7 @@ OBJ := $(C_OBJ) $(ASM_OBJ) $(BIN_OBJ)
 
 # Overlays: the game's AAA/PRO/*.PRO files, loaded at 0x80082448 after the
 # executable's .bss. Each one, from the version's OVERLAYS, has its own splat
-# config ($(CONFIG_DIR)/<name>.yaml), sources (src/<group>/<name>, $(ASM_DIR)/<name>)
+# config ($(CONFIG_DIR)/<name>.yaml), sources (its src_path, $(ASM_DIR)/<name>)
 # and output ($(BUILDDIR)/AAA/PRO/<FILE>.PRO), and is linked against the
 # executable's symbols (MAIN_SYMS).
 $(foreach o,$(OVERLAYS),$(eval OVL_FILE_$(o) := $(shell echo $(o) | tr a-z A-Z).PRO))
@@ -236,9 +238,8 @@ $(LINKDIR)/$(1)_syms.ld: $(LINKDIR)/layout/$(1).elf
 endef
 $(eval $(call CHILDREN_template,main,$(OBJ),$(GENDIR)/main.ld,$(UNDEFINED_SYMS) $(MAIN_AUTO_SYMS)))
 
-# an overlay's C is in src/<group>/<name>/ (src/menus/ststatus/)
 define OVERLAY_template
-$(1)_C_SRC := $$(filter $$(or $$(OVL_C_SRC_$(1)),$$(addsuffix %,$$(wildcard src/*/$(1)/))),$$(ALL_C_SRC))
+$(1)_C_SRC := $$(filter $$(or $$(OVL_C_SRC_$(1)),$$(SRC_DIR_$(1))/%),$$(ALL_C_SRC))
 $(1)_ASM_SRC := $$(filter-out $$(TARGET_ASM),$$(if $$(OVL_YAML_$(1)),$$(OVL_ASM_SRC_$(1)),\
 	$$(shell find $$(ASM_DIR)/$(1) -name '*.s' \
 	-not -path '*/nonmatchings/*' -not -path '*/matchings/*' 2> /dev/null)))

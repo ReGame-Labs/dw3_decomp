@@ -18,7 +18,7 @@ every struct defined under include/ and src/:
 - `STRUCT.OLD` in a comment becomes `STRUCT.NEW` everywhere.
 
 --files limits the uses (not the definition) to the files that match one of
-the globs, relative to the repository (`src/cardgame/cardgame/*.c`).
+the globs, relative to the repository (`src/cardgame/card_battle/*.c`).
 
 A spec file holds one rename per line, `STRUCT OLD NEW [--via REGEX]...
 [--files GLOB]...` (shell quoting), and comment lines that start with `#`;

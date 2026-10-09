@@ -27,7 +27,7 @@ a name the stage already has (or includes from src/field/stages/common), and a
 function only one version of a stage has keep their address names. The names
 go into the C, both versions' config/<version>/stages/<stage>.txt and, for a
 function FIELDSTG links against, its WSTAGnnn_ name in include/field/stages.h and
-src/field/fieldstg/ (and docs/) (then `make regenerate` each version). Only splat's names
+src/field/field_mode/ (and docs/) (then `make regenerate` each version). Only splat's names
 (func_XXXXXXXX) are renamed, so it can be run again at any time:
 
     tools/name_stage_funcs.py [wstag200 ...]
@@ -42,8 +42,8 @@ from name_stage_data import (
 
 AUTO = re.compile(r"^func_([0-9A-F]{8})$")
 FUNCTION = re.compile(r"^(?:static\s+)?[\w\s\*]+?\b(\w+)\(([^;]*)\)\s*\{\s*$")
-COMMANDS = ROOT / "src" / "field" / "fieldstg" / "data" / "fieldstg.c"
-LINKED = ([ROOT / "include" / "field" / "stages.h"] + sorted((ROOT / "src" / "field" / "fieldstg").rglob("*.c"))
+COMMANDS = ROOT / "src" / "field" / "field_mode" / "data" / "fieldstg.c"
+LINKED = ([ROOT / "include" / "field" / "stages.h"] + sorted((ROOT / "src" / "field" / "field_mode").rglob("*.c"))
           + sorted((ROOT / "docs").glob("*.md")))
 HEADER = "// functions named by what calls them (tools/name_stage_funcs.py)"
 GENERIC_TASKS = {"StageTask", "Task"}

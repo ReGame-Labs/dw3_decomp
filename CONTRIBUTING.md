@@ -265,11 +265,11 @@ does:
   declared `static` at the top of the file.
 - Headers: `include/engine/game.h` includes the engine's headers, one per module in
   `include/engine/<module>.h`, each with its own types and prototypes;
-  `include/<group>/<overlay>.h` has an overlay's (in the groups of `src/`),
+  `include/<group>/<folder>.h` has an overlay's (in the groups of `src/`),
   and `include/field/stage.h` what the stages share. A large overlay's are
-  split by module into `include/<group>/<overlay>/*.h` (FIGHTSTG, CARDGAME):
+  split by module into `include/<group>/<folder>/*.h` (FIGHTSTG, CARDGAME):
   `types.h` first, with the types the others point to before they are
-  defined, and `include/<group>/<overlay>.h` includes them all. Every header has an `#ifndef <NAME>_H` guard, and most a
+  defined, and `include/<group>/<folder>.h` includes them all. Every header has an `#ifndef <NAME>_H` guard, and most a
   comment at the top that says what the module or overlay is.
 - A `.c` file keeps the externs and prototypes only it uses at its top,
   after the includes. Anything a second file needs moves to a header.
@@ -278,8 +278,12 @@ does:
 
 - One folder per binary under `src/`: `src/engine/` for the executable,
   `src/<group>/<overlay>/` for each overlay, grouped by the part of the game
-  it runs (`field/`, `battle/`, `cardgame/`, `menus/`, `debug/`; the folder
-  keeps the overlay's name on the disc), and `src/field/stages/` with one
+  it runs (`field/`, `battle/`, `cardgame/`, `menus/`, `debug/`) and named
+  after what it is: `src/menus/item_shop/` is STITSHOP.PRO
+  ([src/README.md](src/README.md) lists them with their files on the disc).
+  The disc's name stays the binary's: its config (`config/<version>/stitshop.yaml`,
+  whose `src_path` gives the folder), its asm, its functions' prefix
+  (`STITSHOP_`) and its unit in the report. `src/field/stages/` has one
   `wstag###.c` per stage, in the folder of the area FIELDSTG names when
   the player enters it (`src/field/stages/asuka_city/wstag210.c`): the 18 areas
   and their stages are listed in [src/field/stages/README.md](src/field/stages/README.md),

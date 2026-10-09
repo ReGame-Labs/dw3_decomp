@@ -44,16 +44,23 @@ EXPECTED_DIR = ROOT / "expected" / VERSION
 # the prebuilt compiler and tools (tools/dl_deps.sh), as the Makefile's BIN_DIR
 BIN_DIR = Path(os.environ.get("BIN_DIR") or ROOT / "bin")
 
-# where each binary's C is under src/, grouped by the part of the game it
-# runs (engine, field, battle, cardgame, menus, debug); src/shared/ holds the
-# code several overlays include
+# where each binary's C is under src/: grouped by the part of the game it
+# runs, each overlay in a folder named after what it is (the disc's name is
+# the binary's: config/<version>/<binary>.yaml, asm/<version>/<binary>/);
+# src/shared/ holds the code several overlays include
 SRC = ROOT / "src"
-SRC_DIRS = {"main": "engine", "fieldstg": "field/fieldstg", "stages": "field/stages"}
-SRC_DIRS.update({b: f"battle/{b}" for b in ("fightstg", "wfightmn", "stfgtrep")})
-SRC_DIRS.update({b: f"cardgame/{b}" for b in ("cardgame", "stcrddek", "stcrdshp", "stcrdabm")})
-SRC_DIRS.update({b: f"menus/{b}" for b in ("stdwtitl", "ststatus", "stitshop", "stgmcard", "stgdglab",
-                                            "stgtrain", "stplnmet", "stdgname", "cnty_sel")})
-SRC_DIRS.update({b: f"debug/{b}" for b in ("stagslct", "wfightts", "shocktst", "soundtst")})
+SRC_DIRS = {
+    "main": "engine",
+    "fieldstg": "field/field_mode", "stages": "field/stages",
+    "fightstg": "battle/battle_mode", "wfightmn": "battle/normal_battle", "stfgtrep": "battle/report",
+    "cardgame": "cardgame/card_battle", "stcrddek": "cardgame/deck_editor",
+    "stcrdshp": "cardgame/card_packs", "stcrdabm": "cardgame/album",
+    "stdwtitl": "menus/title", "ststatus": "menus/field_menu", "stitshop": "menus/item_shop",
+    "stgmcard": "menus/memory_card", "stgdglab": "menus/digimon_lab", "stgtrain": "menus/gym",
+    "stplnmet": "menus/player_name", "stdgname": "menus/partner_name", "cnty_sel": "menus/country_select",
+    "stagslct": "debug/stage_select", "wfightts": "debug/battle_test",
+    "shocktst": "debug/vibration_test", "soundtst": "debug/sound_test",
+}
 
 
 def src_dir(binary: str) -> Path:
