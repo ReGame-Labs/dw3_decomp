@@ -67,6 +67,7 @@ void STCRDDEK_updateDeckCards(DeckCards *task) {
         break;
     case TASK_RUN:
         STCRDDEK_loadNextCard(task);
+        /* fallthrough */
     case TASK_DONE:
         STCRDDEK_drawDeckCards(task);
         break;

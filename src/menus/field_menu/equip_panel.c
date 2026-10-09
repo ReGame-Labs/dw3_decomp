@@ -58,7 +58,7 @@ void STSTATUS_showEquipItem(EquipPanel *panel, EquipPanelWindows *windows, s32 i
     if (item > 0) {
         windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_INFO)), item);
         if (panel->slot == 2 || panel->slot == 3) {
-            data = GET_ITEM[0](item)->data.record;
+            data = ITEM_FUNCS.get(item)->data.record;
             windows->kind->setString(windows->kind, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), STSTATUS_kindStrings[data->weapon.kind - 1]);
             return;
         }
@@ -173,7 +173,7 @@ void STSTATUS_drawEquipPanel(EquipPanel *panel) {
             for (i = 0; i < 6; i++) {
                 item = stats->equip[i];
                 if (item > 0) {
-                    sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS->getCategory(item), 0xB2, i * 14 + 0x31);
+                    sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS.getCategory(item), 0xB2, i * 14 + 0x31);
                 }
             }
         }
@@ -196,7 +196,7 @@ void STSTATUS_drawEquipPanel(EquipPanel *panel) {
                         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x31, 0x91, i * 14 + 0x4B);
                         if (item > 0) {
                             sprite.setTexture(0x140, 0);
-                            sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS->getCategory(item), 0x91, i * 14 + 0x4B);
+                            sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS.getCategory(item), 0x91, i * 14 + 0x4B);
                         }
                     }
                 }
@@ -235,7 +235,7 @@ void STSTATUS_drawEquipPanel(EquipPanel *panel) {
                 item = *(stats->equip + panel->slot); /* the match depends on this form */
                 if (item > 0) {
                     sprite.setTexture(0x140, 0);
-                    sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS->getCategory(item), 0xB2, 0x23);
+                    sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS.getCategory(item), 0xB2, 0x23);
                 }
             }
         }

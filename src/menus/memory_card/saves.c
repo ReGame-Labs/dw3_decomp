@@ -497,8 +497,7 @@ static inline void STGMCARD_fillSave(MemCardSaves *saves) {
     save->area = saves->screen->area;
     save->place = saves->screen->place;
     save->money = STGMCARD_funcs.dataBuf->game.money;
-    /* GameState keeps the play time as PlayTime's fields, from playFrames */
-    save->time = *(PlayTime *)&STGMCARD_funcs.dataBuf->game.playFrames;
+    save->time = STGMCARD_funcs.dataBuf->game.playTime;
     for (i = 0; i < 3; i++) {
         member = GAME.funcs.getPartyMember(i);
         save->levels[i] = STGMCARD_funcs.dataBuf->game.partners[member].info.stats[STAT_LEVEL];
@@ -868,6 +867,7 @@ void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
     case 0:
     default:
         STGMCARD_openSaves(saves, win);
+        /* fallthrough */
     case 1:
         STGMCARD_slideInTitle(saves, win);
         break;
@@ -885,6 +885,7 @@ void STGMCARD_runSaves(MemCardSaves *saves, MemCardSavesWindows *win) {
         break;
     case 20:
         STGMCARD_startInfoRead(saves, win);
+        /* fallthrough */
     case 21:
         STGMCARD_readInfo(saves, win);
         break;

@@ -90,7 +90,7 @@ void updateCursor(Cursor *task, TextWindow **win) {
 
 /* A menu cursor on a layer at (x, y) */
 Cursor *createCursor(s16 layerId, s32 depth, s16 x, s16 y) {
-    Cursor *task = createTask(updateCursor, 0x98, 4);
+    Cursor *task = createTask(updateCursor, sizeof(Cursor), 4);
 
     task->layerId = layerId;
     task->depth = depth;

@@ -26,7 +26,7 @@ s32 STDWTITL_stepLoopingAnimation(AnimState *anim, AnimFrame *frames, s32 depth)
 }
 
 /* Draws the title screen's background, from entries 0-2 of its file */
-void STDWTITL_drawBackground(BackgroundTask *task) {
+void STDWTITL_drawBackground(TitleBackgroundTask *task) {
     SpriteDrawer sprite;
 
     initSpriteDrawer(&sprite);
@@ -42,7 +42,7 @@ void STDWTITL_drawBackground(BackgroundTask *task) {
 
 /* Steps and draws the background's eight looping sprite animations; the last two at
    the positions picked for them */
-void STDWTITL_drawBackgroundSprites(BackgroundTask *task) {
+void STDWTITL_drawBackgroundSprites(TitleBackgroundTask *task) {
     SpriteDrawer sprite;
     s32 frame0 = STDWTITL_stepLoopingAnimation(&task->anims[0], STDWTITL_backgroundAnim0, 0);
     s32 frame1 = STDWTITL_stepLoopingAnimation(&task->anims[1], STDWTITL_backgroundAnim1, 0);
@@ -84,7 +84,7 @@ void STDWTITL_drawBackgroundSprites(BackgroundTask *task) {
 
 /* The background's task: draws the background; once animated, also its eight
    sprite animations, the last two with a random delay and position */
-void STDWTITL_tickBackground(BackgroundTask *task) {
+void STDWTITL_tickBackground(TitleBackgroundTask *task) {
     s32 i;
 
     switch (task->state) {
@@ -119,6 +119,7 @@ void STDWTITL_tickBackground(BackgroundTask *task) {
             task->setSubstate(task, 1);
         }
         STDWTITL_drawBackgroundSprites(task);
+        /* fallthrough */
     case TASK_RUN:
         STDWTITL_drawBackground(task);
         break;
@@ -128,15 +129,15 @@ void STDWTITL_tickBackground(BackgroundTask *task) {
 }
 
 /* Starts the background's sprite animations (the task's animate) */
-void STDWTITL_animateBackground(BackgroundTask *task) {
+void STDWTITL_animateBackground(TitleBackgroundTask *task) {
     if (task->state == TASK_RUN) {
         task->setState(task, TASK_DONE);
     }
 }
 
 /* Creates the title screen's background (task); skip is not used */
-BackgroundTask *STDWTITL_startBackgroundTask(s32 skip) {
-    BackgroundTask *task = createTask(STDWTITL_tickBackground, sizeof(BackgroundTask), 0);
+TitleBackgroundTask *STDWTITL_startBackgroundTask(s32 skip) {
+    TitleBackgroundTask *task = createTask(STDWTITL_tickBackground, sizeof(TitleBackgroundTask), 0);
 
     task->animate = STDWTITL_animateBackground;
     task->layerId = STDWTITL_TITLE_LAYER;

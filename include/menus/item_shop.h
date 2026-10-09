@@ -45,17 +45,10 @@ typedef struct ItemShopWindows {
     /* 0x20 */ ScreenFade *fade;
 } ItemShopWindows;
 
-/* A partner's stats as STITSHOP_computeStats gives them (PartnerStats'
-   stats and status, copied whole) */
-typedef struct ShopStatBlock {
-    /* 0x00 */ s16 stats[19];
-    /* 0x26 */ s16 penalties[3]; /* subtracted from STAT_STRENGTH, STAT_DEFENSE and STAT_SPEED */
-} ShopStatBlock;
-
 /* What the details panel shows of a partner */
 typedef struct ShopPartnerInfo {
-    /* 0x00 */ ShopStatBlock current;
-    /* 0x2C */ ShopStatBlock withItem; /* with the item equipped */
+    /* 0x00 */ StatBlock current;
+    /* 0x2C */ StatBlock withItem; /* with the item equipped */
     /* 0x58 */ s32 slot;
     /* 0x5C */ s32 changes; /* how many of the stats would change */
     /* 0x60 */ s32 rows[8]; /* from 2: the stats that change (from 1) */
@@ -242,14 +235,8 @@ typedef struct ItemShopFuncs {
     /* 0x28 */ void (*equip)(s32 partner, s32 slot, s32 item, s32 fromBag);
 } ItemShopFuncs;
 
-/* A partner's equipment, copied whole (PartnerStats.equip) */
-typedef struct ShopEquipSet {
-    s16 items[6];
-} ShopEquipSet;
-
 /* scene.c */
 void STITSHOP_updateScene(Task *task, ItemShop **child);
-Task *STITSHOP_start(void);
 void STITSHOP_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
 void STITSHOP_drawFader(ScreenFade *task);
 void STITSHOP_updateFader(ScreenFade *task);
@@ -287,7 +274,7 @@ void STITSHOP_listSellable(ShopItemList *list);
 ShopItemList *STITSHOP_createItemList(ShopDialog *dialog, s32 type, s32 selling);
 
 /* info.c */
-void STITSHOP_computeStats(s32 partner, ShopStatBlock *out);
+void STITSHOP_computeStats(s32 partner, StatBlock *out);
 void STITSHOP_addStat(s16 *p, s32 stat, s32 delta);
 void STITSHOP_showStat(ShopInfo *info, TextWindow *win, ShopStatRow *row);
 void STITSHOP_colorStat(ShopInfo *info, TextWindow *win, ShopStatRow *row);

@@ -6,10 +6,10 @@
  *
  * A background scrolls diagonally, three panels open one after the other and
  * a highlighted option blinks until Start is pressed. Then the option flashes,
- * the panels close, the screen fades to black and the game moves on to mode
- * 0xE01. The USA version doesn't store the choice; the European one sets the
- * language from it (LANGUAGE), and moves on to mode 0xE02 for any language
- * but 0.
+ * the panels close, the screen fades to black and the game moves on to
+ * MODE_OPENING. The USA version doesn't store the choice; the European one
+ * sets the language from it (LANGUAGE), and moves on to MODE_OPENING_2 for
+ * any language but 0.
  */
 
 #include "engine/game.h"
@@ -41,7 +41,7 @@
 
 /* Sounds (SOUND.playSound) */
 #define CNTY_SEL_SOUND_BANK 0x21
-#define CNTY_SEL_MUSIC 0x60840002
+#define CNTY_SEL_MUSIC MUSIC(0x21, 2)
 
 /* A linear tween of a panel's scale */
 typedef struct PanelTween {
@@ -58,11 +58,11 @@ typedef struct LeftPanelTween {
 } LeftPanelTween;
 
 /* The scrolling background, which also fades the screen out */
-typedef struct BackgroundTask {
-    TASK_HEADER(BackgroundTask);
+typedef struct CountryBackgroundTask {
+    TASK_HEADER(CountryBackgroundTask);
     /* 0x50 */ s16 scroll;
     /* 0x52 */ s16 fade;
-} BackgroundTask;
+} CountryBackgroundTask;
 
 /* The highlighted option */
 typedef struct CursorTask {
@@ -88,17 +88,17 @@ typedef struct MenuChildren {
     /* 0x04 */ PanelTask *rightPanel;
     /* 0x08 */ PanelTask *topPanel;
     /* 0x0C */ PanelTask *leftPanel;
-    /* 0x10 */ BackgroundTask *background;
+    /* 0x10 */ CountryBackgroundTask *background;
 } MenuChildren;
 
 /* The screen's controller */
-typedef struct MenuTask {
-    TASK_HEADER(MenuTask);
+typedef struct CountryMenuTask {
+    TASK_HEADER(CountryMenuTask);
     /* 0x50 */ s16 selection;
     /* 0x52 */ s16 timer;
-} MenuTask;
+} CountryMenuTask;
 
-/* MenuTask substates (Task.substate) in TASK_RUN */
+/* CountryMenuTask substates (Task.substate) in TASK_RUN */
 enum MenuStep {
     MENU_OPEN_RIGHT_PANEL,
     MENU_WAIT_RIGHT_PANEL,
@@ -127,12 +127,12 @@ extern LeftPanelTween CNTY_SEL_leftPanelTweens[];
 extern u8 CNTY_SEL_languages[];
 #endif
 
-void CNTY_SEL_tickScreen(Task *task, MenuTask **menu);
-void CNTY_SEL_drawBackground(BackgroundTask *task);
+void CNTY_SEL_tickScreen(Task *task, CountryMenuTask **menu);
+void CNTY_SEL_drawBackground(CountryBackgroundTask *task);
 s32 CNTY_SEL_getFadeLevel(s32 time);
 void CNTY_SEL_drawFade(s32 level);
-void CNTY_SEL_tickBackground(BackgroundTask *task);
-BackgroundTask *CNTY_SEL_startBackgroundTask(void);
+void CNTY_SEL_tickBackground(CountryBackgroundTask *task);
+CountryBackgroundTask *CNTY_SEL_startBackgroundTask(void);
 s16 CNTY_SEL_stepAnimation(AnimState *anim, AnimFrame *frames, s32 depth);
 void CNTY_SEL_drawCursor(CursorTask *task);
 void CNTY_SEL_setCursorSelection(CursorTask *task, s16 selection);
@@ -150,7 +150,7 @@ s32 CNTY_SEL_getLeftPanelScale(PanelTask *task, s32 phase);
 void CNTY_SEL_drawLeftPanel(PanelTask *task);
 void CNTY_SEL_tickLeftPanel(PanelTask *task);
 PanelTask *CNTY_SEL_startLeftPanelTask(void);
-void CNTY_SEL_tickMenu(MenuTask *task, MenuChildren *children);
-MenuTask *CNTY_SEL_startMenuTask(void);
+void CNTY_SEL_tickMenu(CountryMenuTask *task, MenuChildren *children);
+CountryMenuTask *CNTY_SEL_startMenuTask(void);
 
 #endif /* CNTY_SEL_H */

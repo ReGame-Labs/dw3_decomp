@@ -177,7 +177,9 @@ until the first menu (the title screen, or the European language menu),
 then watches it for an exception or code that runs outside the BIOS, the
 kernel and the build.
 `make PAD=0x10004 smoke` boots a padding build, which shows that the code
-and data that moved still work. It needs `DISC=` (the original image, a
+and data that moved still work, and `make TOOLCHAIN=gcc smoke` the modern
+GCC's ([docs/toolchain.md](docs/toolchain.md#modern-gcc-build)), whose
+files may be smaller than the original's and are padded to them. It needs `DISC=` (the original image, a
 `.bin`), `BIOS=` (a directory with a PlayStation BIOS) and, if DuckStation
 isn't `duckstation-qt`, `DUCKSTATION=`, on the command line or in
 `local.mk`.
@@ -237,6 +239,9 @@ does:
 
 - Four spaces, no tabs; the opening brace on the same line; braces around
   every `if`, `for` and `while` body, even a one-line one.
+  `.clang-format` has this layout for clang-format 18:
+  `make format FILES=<file>` lays out a file you've changed
+  ([docs/toolchain.md](docs/toolchain.md#formatter)).
 - Comments are `/* */`. A function gets a one-line comment above it that
   says what it does or returns (`/* Advances a panel animation; 1 once it has
   finished */`), and a block of code a comment for what isn't obvious from
@@ -271,8 +276,19 @@ does:
   `types.h` first, with the types the others point to before they are
   defined, and `include/<group>/<folder>.h` includes them all. Every header has an `#ifndef <NAME>_H` guard, and most a
   comment at the top that says what the module or overlay is.
-- A `.c` file keeps the externs and prototypes only it uses at its top,
-  after the includes. Anything a second file needs moves to a header.
+- Every function that isn't `static` has its prototype in the header of
+  its module or overlay, next to those of the functions defined around it,
+  even when only its own file calls it (`make lint` checks it). A function
+  defined old-style is declared with the promoted types its callers pass
+  (`s32` for an `s16`), the types it narrows to in a comment. The stages
+  are the exception: a stage is one file, and its functions keep splat's
+  names, the same in many stages, so it declares one only where a use
+  comes first. A `.c` file keeps the externs only it uses at its top,
+  after the includes; anything a second file needs moves to a header.
+- A `case` that runs into the next one ends with `/* fallthrough */`, at the
+  indentation of its statements. `make lint` checks this too, and that
+  nothing declares a local or a label it doesn't use, except for the
+  marked stack frame locals, which its list keeps.
 
 ## Layout
 

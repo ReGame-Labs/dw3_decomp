@@ -1,17 +1,17 @@
 /* Steps the tween (stageFuncs.update): whether it has ended */
-s32 updateTween(StageTween *tween) {
+s32 updateTween(PanelAnim *tween) {
     if (tween->active == 0) {
         return 1;
     }
-    tween->value += tween->step;
+    tween->level += tween->step;
     if (tween->step > 0) {
-        if (tween->value > 0x1000) {
-            tween->value = 0x1000;
+        if (tween->level > ONE) {
+            tween->level = ONE;
             tween->active = 0;
             return 1;
         }
-    } else if (tween->value < 0) {
-        tween->value = 0;
+    } else if (tween->level < 0) {
+        tween->level = 0;
         tween->active = 0;
         return 1;
     }

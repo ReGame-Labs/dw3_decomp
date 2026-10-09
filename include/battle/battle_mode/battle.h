@@ -146,7 +146,7 @@ typedef struct EventQueueFuncs {
     /* 0x18 */ s32 (*find)(s32 type, u8 side, s32 fighter);
     /* 0x1C */ void (*remove)(EventKey *key); /* the events whose first two args are its */
     /* 0x20 */ s32 (*getDelay)(u8 side, s32 kind); /* FIGHTSTG_getEventDelay: when an event of side's runs */
-    /* 0x24 */ void (*useItem)(u8 side, s32 fighter, s32 item); /* FIGHTSTG_cureStatus: an item's cure */
+    /* 0x24 */ void (*cureStatus)(u8 side, s32 fighter, s32 item); /* FIGHTSTG_cureStatus: an item's cure */
 } EventQueueFuncs;
 
 /* An event kind's delay range (FIGHTSTG_eventDelays, by kind): FIGHTSTG_getEventDelay
@@ -172,7 +172,7 @@ typedef struct EventQueue {
 } EventQueue;
 
 /* The battle's sides, as the functions that take a side want them: side >> 4
-   is its row of FIGHTSTG_battle.fighters, and SIDE_ENEMY - side the other
+   is its row of FIGHTSTG_battle.state.fighters, and SIDE_ENEMY - side the other
    side */
 #define SIDE_PLAYER 0
 #define SIDE_ENEMY 0x10
@@ -213,19 +213,31 @@ typedef struct BattleSpeed {
     /* 0x4 */ s32 rest; /* the time mode 2 hasn't counted yet */
 } BattleSpeed;
 
+/* The battle's element boost: one element's techniques do more damage, and
+   the ones of the element it weakens less (FIGHTSTG_getElementBoost) */
+typedef struct ElementBoost {
+    /* 0x0 */ s16 element; /* under ELEMENT_FIRST: none */
+    /* 0x2 */ s16 amount; /* in 128ths */
+} ElementBoost;
+
+/* What a battle starts from: WFIGHTMN_start zeroes it as one block, and
+   FIGHTSTG_testRunAway reads runAttempts through a pointer to it */
+typedef struct BattleState {
+    /* 0x00 */ s32 active[2]; /* each side's fighter */
+    /* 0x08 */ BattleFighter fighters[2][3];
+    /* 0xC8 */ ElementBoost boost;
+    /* 0xCC */ s16 runAttempts; /* the player's, each of which makes running away likelier (FIGHTSTG_testRunAway) */
+    /* 0xCE */ s16 kind; /* the kind of battle */
+    /* 0xD0 */ s16 tech; /* a technique id, set by WFIGHTMN */
+    /* 0xD2 */ s8 hitCount; /* BATTLE_KIND_FINAL_LAST: the partner's hits that did damage */
+    /* 0xD3 */ u8 weakened; /* BATTLE_KIND_FINAL_LAST: the enemy is weakened (FIGHTSTG_weakenEnemy) */
+} BattleState;
+
 /* FIGHTSTG_battle: the battle */
 typedef struct Battle {
     /* 0x00 */ s32 pad; /* nothing uses it */
     /* 0x04 */ s32 frames; /* since the last update */
-    /* 0x08 */ s32 active[2]; /* each side's fighter */
-    /* 0x10 */ BattleFighter fighters[2][3];
-    /* 0xD0 */ s16 boostElement; /* an element FIGHTSTG_getElementBoost boosts */
-    /* 0xD2 */ s16 boostAmount; /* and how much, in 128ths */
-    /* 0xD4 */ s16 runAttempts; /* the player's, each of which makes running away likelier (FIGHTSTG_testRunAway) */
-    /* 0xD6 */ s16 kind; /* the kind of battle */
-    /* 0xD8 */ s16 tech; /* a technique id, set by WFIGHTMN */
-    /* 0xDA */ s8 hitCount; /* BATTLE_KIND_FINAL_LAST: the partner's hits that did damage */
-    /* 0xDB */ u8 weakened; /* BATTLE_KIND_FINAL_LAST: the enemy is weakened (FIGHTSTG_weakenEnemy) */
+    /* 0x08 */ BattleState state;
     /* 0xDC */ BattleSpeed speed;
     /* 0xE4 */ void (*countFrames)(void);
     /* 0xE8 */ void (*setSpeed)(s32 mode);
@@ -388,6 +400,7 @@ s32 FIGHTSTG_findNextEvent(void);
 s32 FIGHTSTG_findEvent(s32 type, u8 side, s32 fighter);
 void FIGHTSTG_removeEvents(EventKey *key);
 void FIGHTSTG_updateRoot(Task *task, Task **children);
+s32 FIGHTSTG_pickEnemySwitch(EnemyTurn *task);
 void FIGHTSTG_updateEnemyTurn(EnemyTurn *task, BattleChild *children);
 void FIGHTSTG_queueLastEnemy(void);
 s32 FIGHTSTG_testEnemyCondition(u8 condition, s16 arg);
@@ -398,21 +411,29 @@ void FIGHTSTG_tryPoison(void);
 void FIGHTSTG_tryParalysis(void);
 void FIGHTSTG_tryConfusion(void);
 void FIGHTSTG_trySleep(void);
+void FIGHTSTG_tryKnockOut(void);
+void FIGHTSTG_rollMultiHit(void);
 void FIGHTSTG_tryDrain(void);
+void FIGHTSTG_markEnemyOnly(void);
+void FIGHTSTG_markCritical(void);
 void FIGHTSTG_lowerAttack(void);
 void FIGHTSTG_lowerDefense(void);
 void FIGHTSTG_drainMp(void);
 void FIGHTSTG_raiseOneStatus(void);
 void FIGHTSTG_raiseEachStatus(void);
 void FIGHTSTG_raiseAllStatus(void);
+void FIGHTSTG_tryNoSwitch(void);
+void FIGHTSTG_startDoubleMagic(void);
+void FIGHTSTG_startEndBattle(void);
+void FIGHTSTG_applyTechEffect(void);
 void FIGHTSTG_trySteal(void);
-void FIGHTSTG_queueBoostEnd(u8 side, s32 fighter, s32 kind, s32 arg3);
+void FIGHTSTG_queueBoostEnd(u8 side, s32 fighter, s32 kind, s32 tech);
 s32 FIGHTSTG_findBattleTableIndex(s32 id);
 BattleTableEntry *FIGHTSTG_getBattleTableEntry(s32 id);
 BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index);
 extern s32 FIGHTSTG_opposedElements[];
 extern s32 FIGHTSTG_eventPopModes[]; /* per event type, FIGHTSTG_popEvent takes (1), peeks at (-1) or skips (0) it */
-s32 FIGHTSTG_getElementBoost(s32 value, s32 arg1);
+s32 FIGHTSTG_getElementBoost(s32 value, s32 element);
 s32 FIGHTSTG_adjustDamage(u8 side, s32 id, s32 value);
 s32 FIGHTSTG_rollCritical(u8 side, s32 id);
 s32 FIGHTSTG_rollMagicCritical(u8 side, s32 id);
@@ -455,7 +476,7 @@ s32 FIGHTSTG_rollNoSwitch(s32 actor, s32 id);
 s32 FIGHTSTG_rollNoDigivolve(s32 actor, s32 id);
 s32 FIGHTSTG_testRunAway(u8 side);
 #if VERSION_EU
-s32 FIGHTSTG_rollCounter(s32 arg0, s32 arg1);
+s32 FIGHTSTG_rollCounter(s32 side, s32 damage);
 #endif
 s32 FIGHTSTG_testWakeUp(u8 side, s32 value);
 s32 FIGHTSTG_testConfusion(u8 side);
@@ -464,11 +485,11 @@ void FIGHTSTG_changeBoost(u8 side, s32 index, s32 stat, s32 percent);
 s32 FIGHTSTG_getGaugeGain(s32 damage);
 s32 FIGHTSTG_getTechCost(u8 side, s32 id);
 
-/* Row's active fighter (FIGHTSTG_battle.fighters[row][active[row]]), as the
+/* Row's active fighter (FIGHTSTG_battle.state.fighters[row][active[row]]), as the
    row's offset in bytes added to the slot's fighter in row 0 */
 static inline BattleFighter *FIGHTSTG_getActiveFighter(s32 row) {
-    s32 offset = row * sizeof(FIGHTSTG_battle.fighters[0]);
-    BattleFighter *slot = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[row]];
+    s32 offset = row * sizeof(FIGHTSTG_battle.state.fighters[0]);
+    BattleFighter *slot = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[row]];
 
     return (BattleFighter *)(offset + (s32)slot);
 }

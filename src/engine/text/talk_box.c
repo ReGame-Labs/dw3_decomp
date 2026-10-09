@@ -37,7 +37,7 @@ void drawTalkBoxFrame(TalkBoxFrame *task) {
     SVECTOR v[4];
     TalkBox *parent = task->parent;
     u32 type = parent->type;
-    s32 pad;
+    s32 widthOffset;
     s32 i;
     s32 x;
     FileCache *cache;
@@ -46,11 +46,11 @@ void drawTalkBoxFrame(TalkBoxFrame *task) {
     POLY_FT4 *p;
     DVECTOR *pos;
 
-    pad = 0;
+    widthOffset = 0;
     if (type < 2) {
-        pad = parent->w;
+        widthOffset = parent->w;
     }
-    pos = &TALK_BOX_LAYOUTS[type].parts;
+    pos = &TALK_BOX_LAYOUTS[type].spritePos;
     initSpriteDrawer(&obj);
     obj.setLayerId(task->parent->layerId, 0);
     obj.setTexture(0x140, 0);
@@ -62,7 +62,7 @@ void drawTalkBoxFrame(TalkBoxFrame *task) {
                            task->parent->y + pos->vy);
             break;
         case 1:
-            obj.draw(cache->getEntry(FILE_MENU_SPRITES << 16), 0, task->parent->x + pos->vx - pad, task->parent->y + pos->vy);
+            obj.draw(cache->getEntry(FILE_MENU_SPRITES << 16), 0, task->parent->x + pos->vx - widthOffset, task->parent->y + pos->vy);
             break;
         case 3:
             if (type < 2) {
@@ -76,8 +76,10 @@ void drawTalkBoxFrame(TalkBoxFrame *task) {
     }
     layer = GFX.funcs.getLayer(task->parent->layerId);
     ot = layer->getOtEntry(layer, 0);
+    /* By name: the code adds the panel's offset (12) to the table's address,
+       where an array's &parts[2] adds 8 to the first position's */
     pos = &TALK_BOX_LAYOUTS[type].panel;
-    v[0].vx = v[2].vx = task->parent->x + pos->vx - pad;
+    v[0].vx = v[2].vx = task->parent->x + pos->vx - widthOffset;
     v[1].vx = v[3].vx = v[0].vx + task->parent->w;
     v[0].vy = v[1].vy = task->parent->y + pos->vy;
     v[2].vy = v[3].vy = v[0].vy + task->parent->h;
@@ -124,7 +126,7 @@ void updateTalkBoxFrame(TalkBoxFrame *task) {
 
 /* The frame of a talk box */
 TalkBoxFrame *createTalkBoxFrame(TalkBox *parent) {
-    TalkBoxFrame *task = createTask(updateTalkBoxFrame, 0x60, 0);
+    TalkBoxFrame *task = createTask(updateTalkBoxFrame, sizeof(TalkBoxFrame), 0);
 
     task->parent = parent;
     return task;
@@ -217,8 +219,8 @@ void updateZoomBox(ZoomBox *task) {
 
 /* A zoom box around a talk box of type `type` at (x, y) */
 ZoomBox *createZoomBox(s32 layerId, s16 x, s16 y, s32 w, s32 h, s32 type) {
-    s16 pad = w;
-    ZoomBox *task = createTask(updateZoomBox, 0xC0, 0);
+    s16 widthOffset = w;
+    ZoomBox *task = createTask(updateZoomBox, sizeof(ZoomBox), 0);
 
     task->layerId = layerId;
     task->x = x;
@@ -226,10 +228,10 @@ ZoomBox *createZoomBox(s32 layerId, s16 x, s16 y, s32 w, s32 h, s32 type) {
     task->w = w + 0x20;
     task->h = h;
     if (type == 2 || type == 3) {
-        pad = 0;
+        widthOffset = 0;
     }
-    task->offsetX = TALK_BOX_LAYOUTS[type].zoomX - pad;
-    task->offsetY = TALK_BOX_LAYOUTS[type].zoomY;
+    task->offsetX = TALK_BOX_LAYOUTS[type].sprite0Pos.vx - widthOffset;
+    task->offsetY = TALK_BOX_LAYOUTS[type].sprite0Pos.vy;
     task->left = x + task->offsetX;
     task->top = y + task->offsetY;
     return task;
@@ -314,6 +316,7 @@ void updateTalkBox(TalkBox *task, TalkBoxChildren *children) {
             } else {
                 SOUND.playSound(SOUND_MENU_CLOSE);
             }
+            /* fallthrough */
         case 1:
         case 2:
             if (task->timer++ >= delays.frames[task->step]) {
@@ -363,7 +366,7 @@ TalkBox *createTalkBox(s32 id, s16 x, s16 y, void *strings, s32 index, u32 type)
     s32 w;
     s32 i;
 
-    task = createTask(updateTalkBox, 0x6C, 0x18);
+    task = createTask(updateTalkBox, sizeof(TalkBox), sizeof(TalkBoxChildren));
     task->layerId = id;
     task->x = x;
     task->y = y;
@@ -417,8 +420,8 @@ TalkBox *createTalkBox(s32 id, s16 x, s16 y, void *strings, s32 index, u32 type)
 }
 
 TalkBoxLayout TALK_BOX_LAYOUTS[4] = {
-    { 3, { 0, -16 }, 0, 0xFFB6, { 16, -74 }, { 16, -74 }, 6, -71, 6, -58, { 16, -38 } },
-    { 5, { 0, 0 }, 0, 0x000C, { 16, 12 }, { 16, 12 }, 6, 15, 6, 28, { 16, 48 } },
-    { 4, { -16, -16 }, 0xFFE6, 0xFFB6, { -10, -74 }, { 125, -74 }, -20, -71, -20, -58, { 125, -38 } },
-    { 6, { -20, 0 }, 0xFFE6, 0x000C, { -10, 12 }, { 125, 12 }, -20, 15, -20, 28, { 125, 48 } },
+    { 3, { 0, -16 }, { 0, -74 }, { 16, -74 }, { 16, -74 }, 6, -71, 6, -58, { 16, -38 } },
+    { 5, { 0, 0 }, { 0, 12 }, { 16, 12 }, { 16, 12 }, 6, 15, 6, 28, { 16, 48 } },
+    { 4, { -16, -16 }, { -26, -74 }, { -10, -74 }, { 125, -74 }, -20, -71, -20, -58, { 125, -38 } },
+    { 6, { -20, 0 }, { -26, 12 }, { -10, 12 }, { 125, 12 }, -20, 15, -20, 28, { 125, 48 } },
 };

@@ -54,7 +54,7 @@ void FIELDSTG_showSpotHint(SpotHint *task) {
 }
 
 /* Creates the hint for a search at to, from the prize at from */
-SpotHint *FIELDSTG_createSpotHint(Point from, Point to) {
+SpotHint *FIELDSTG_createSpotHint(Vec2 from, Vec2 to) {
     SpotHint *task = createTask(FIELDSTG_showSpotHint, sizeof(SpotHint), 0);
 
     task->from = from;
@@ -186,7 +186,7 @@ HiddenSpots *FIELDSTG_createHiddenSpots(s32 count) {
 
 /* The hidden spots, when one is within 10 pixels of pos (selecting it if
    select), or NULL */
-HiddenSpots *FIELDSTG_findHiddenSpot(Point *pos, s32 select) {
+HiddenSpots *FIELDSTG_findHiddenSpot(Vec2 *pos, s32 select) {
     HiddenSpots *task = TASK_REGISTRY.funcs.find(FIELD_TASK_HIDDEN_SPOTS, -1, -1);
     s32 i;
 

@@ -8,15 +8,15 @@
  * the order they link.
  */
 
+/* The name of this overlay's copy of a function or type of src/shared/ */
+#define OVL_NAME(name) STCRDDEK_##name
+
 /* The overlay's NameEntry and the name entry's files (name_entry.h) */
-#define NAME_ENTRY_HAS_UNK98 0
+#define NAME_ENTRY_HAS_UNUSED98 0
 #define NAME_ENTRY_HAS_HIDE 0
 #define NAME_ENTRY_SPRITES STCRDDEK_KEY_SPRITES
 #define NAME_ENTRY_FILE_KEYBOARD STCRDDEK_FILE_KEYBOARD
 #include "shared/name_entry.h"
-
-/* The name of this overlay's copy of a function of src/shared/ */
-#define OVL_NAME(name) STCRDDEK_##name
 
 #if VERSION_US
 #define STCRDDEK_FILE_SPRITES 0x62E /* as the card shop's */
@@ -161,7 +161,6 @@ typedef struct DeckScreen {
 
 /* scene.c */
 void STCRDDEK_updateScene(Task *task, DeckScreen **child);
-Task *STCRDDEK_start(void);
 void STCRDDEK_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
 void STCRDDEK_drawFader(ScreenFade *task);
 void STCRDDEK_updateFader(ScreenFade *task);
@@ -235,7 +234,7 @@ extern KeyPage STCRDDEK_keyCharsJp[];
 extern KeyTabs STCRDDEK_keyPages[];
 extern KeyPage STCRDDEK_keyChars[];
 extern TextStyle STCRDDEK_nameStyle;
-extern s32 STCRDDEK_nameAnims[];
+extern s32 STCRDDEK_nameAnims[][7];
 extern BigKey STCRDDEK_bigKeys[];
 extern s32 STCRDDEK_keyArrowCluts[];
 extern DeckFuncs STCRDDEK_funcs;

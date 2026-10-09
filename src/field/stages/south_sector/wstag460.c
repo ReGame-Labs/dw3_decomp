@@ -18,8 +18,8 @@ void *createTileDuoTask(void);
 void fadeOutWanderer();
 extern AnimFrame updateTileSoloFrames0[];
 extern AnimFrame updateTileSoloFrames1[];
-void fadeOutTileSolo(StageTileSolo *task, s32 arg1, s32 arg2);
-void fadeOutTileDuo(StageTileDuo *task, s32 arg1, s32 arg2);
+void fadeOutTileSolo(StageTileSolo *task, s32 command, s32 arg);
+void fadeOutTileDuo(StageTileDuo *task, s32 command, s32 arg);
 StageWanderer *createWandererTask(s32 tileAnim, s32 speedIndex, s32 start);
 
 /* Creates the tiles and the seven wanderers; in TASK_DONE makes them all hide and goes back to TASK_RUN */
@@ -137,8 +137,9 @@ void updateTileSolo(StageTileSolo *task) {
     }
 }
 
-/* Makes the StageTileSolo hide in 20 frames */
-void fadeOutTileSolo(StageTileSolo *task, s32 arg1, s32 arg2) {
+/* Makes the StageTileSolo hide in 20 frames; command and arg, a script
+   command handler's (ScriptCommand.handle), are 0 from the stage and unread */
+void fadeOutTileSolo(StageTileSolo *task, s32 command, s32 arg) {
     if (task != NULL) {
         task->mode = 2;
         task->wait = 0x14;
@@ -245,8 +246,8 @@ void updateTileDuo(StageTileDuo *task) {
     }
 }
 
-/* Makes the StageTileDuo hide in 150 frames */
-void fadeOutTileDuo(StageTileDuo *task, s32 arg1, s32 arg2) {
+/* Makes the StageTileDuo hide in 150 frames (command and arg as fadeOutTileSolo's) */
+void fadeOutTileDuo(StageTileDuo *task, s32 command, s32 arg) {
     if (task != NULL) {
         task->mode = 2;
         task->wait = 0x96;
@@ -469,37 +470,37 @@ void setupStage(void) {
 }
 
 s16 script370[] = {
-    0x600, 0, 2,
-    0x102, 2, 0x70, 0x188, 3,
-    0x100, 0x82, 0x60, 0x16F,
-    0x101, 0x82, 1, 7,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 2,
-    0x101, 2, 1, 3,
-    0x300, 0x1E,
-    0x101, 0x323, 0x325, 2,
-    0x300, 0x3C,
-    0x101, 0x323, 0x326, 2,
-    0x300, 0x1E,
-    0x200, 0, 1, 2, 3,
-    0x301,
-    0x300, 0x1E,
-    0x100, 0x82, 0, 0,
-    0x101, 0x82, 1, 7,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON3, 2,
-    0x300, 0x1E,
-    0x200, 0, 2, 2, 3,
-    0x301,
-    0x101, 0x33E, 0x34C, 2,
-    0x300, 0xD2,
-    0x200, 0, 3, 2, 3,
-    0x301,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x102, 2, 0xB0, 0x1A8, 7,
-    0x300, 0x3C,
-    0x304, 0x235, 0x470, 0xE0, 7,
-    0,
+    SCRIPT_FOLLOW(0, 2),
+    SCRIPT_WALK(2, 0x70, 0x188, 3),
+    SCRIPT_PLACE(0x82, 0x60, 0x16F),
+    SCRIPT_POSE(0x82, 1, 7),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_POSE(2, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(0x323, 0x325, 2),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x323, 0x326, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 2, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_PLACE(0x82, 0, 0),
+    SCRIPT_POSE(0x82, 1, 7),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON3, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 2, 2, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_COMMAND(0x33E, 0x34C, 2),
+    SCRIPT_WAIT(0xD2),
+    SCRIPT_TALK(0, 3, 2, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(2, 0xB0, 0x1A8, 7),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_LEAVE(0x235, 0x470, 0xE0, 7),
+    SCRIPT_END,
 };
 AnimFrame updateTileSoloFrames0[] = {
     { 0, 8 }, { 1, 8 }, { 2, 8 }, { 3, 8 },

@@ -118,255 +118,255 @@ void setupStage(void) {
 }
 
 s16 script1300[] = {
-    0x100, 2, 0xEF, 0xE1,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x102, 2, 0x170, 0x120, 7,
-    0x302, 2,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x200, 0, 1, 2, 2,
-    0x101, 2, 7, 7,
-    0x301,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0,
+    SCRIPT_PLACE(2, 0xEF, 0xE1),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(2, 0x170, 0x120, 7),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 2, 2),
+    SCRIPT_POSE(2, 7, 7),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_END,
 };
 s16 script1301[] = {
-    0x102, 2, 0x3F8, 0x105, 7,
-    0x102, 0x22, 0x418, 0x114, 7,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 0x22,
-    0x101, 2, 1, 7,
-    0x101, 0x22, 1, 3,
-    0x101, 0x323, 0x325, 2,
-    0x300, 0x78,
-    0x101, 0x323, 0x326, 2,
-    0x300, 0x1E,
-    0x200, 0, 1, 0x22, 2,
-    0x301,
-    0x300, 0x1E,
-    0,
+    SCRIPT_WALK(2, 0x3F8, 0x105, 7),
+    SCRIPT_WALK(0x22, 0x418, 0x114, 7),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(0x22),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_POSE(0x22, 1, 3),
+    SCRIPT_COMMAND(0x323, 0x325, 2),
+    SCRIPT_WAIT(0x78),
+    SCRIPT_COMMAND(0x323, 0x326, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 0x22, 2),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_END,
 };
 s16 script1302[] = {
-    0x102, 2, 0x464, 0x41F, 7,
-    0x102, 0xE2, 0x484, 0x42F, 7,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 0xE2,
-    0x101, 2, 1, 7,
-    0x101, 0xE2, 1, 3,
-    0x101, 0x323, 0x325, 2,
-    0x300, 0x78,
-    0x101, 0x323, 0x326, 2,
-    0x300, 0x1E,
-    0x200, 0, 1, 0xE2, 2,
-    0x200, 0, 1, 0xE2, 2,
-    0x301,
-    0x300, 0x1E,
-    0,
+    SCRIPT_WALK(2, 0x464, 0x41F, 7),
+    SCRIPT_WALK(0xE2, 0x484, 0x42F, 7),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(0xE2),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_POSE(0xE2, 1, 3),
+    SCRIPT_COMMAND(0x323, 0x325, 2),
+    SCRIPT_WAIT(0x78),
+    SCRIPT_COMMAND(0x323, 0x326, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 0xE2, 2),
+    SCRIPT_TALK(0, 1, 0xE2, 2),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_END,
 };
 s16 script1303[] = {
-    0x102, 2, 0xB8, 0x34C, 1,
-    0x102, 0xE3, 0x99, 0x35C, 1,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 0xE3,
-    0x101, 2, 1, 1,
-    0x101, 0xE3, 1, 5,
-    0x101, 0x323, 0x325, 2,
-    0x300, 0x78,
-    0x101, 0x323, 0x326, 2,
-    0x300, 0x1E,
-    0x200, 0, 1, 0xE3, 0,
-    0x301,
-    0x300, 0x1E,
-    0,
+    SCRIPT_WALK(2, 0xB8, 0x34C, 1),
+    SCRIPT_WALK(0xE3, 0x99, 0x35C, 1),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(0xE3),
+    SCRIPT_POSE(2, 1, 1),
+    SCRIPT_POSE(0xE3, 1, 5),
+    SCRIPT_COMMAND(0x323, 0x325, 2),
+    SCRIPT_WAIT(0x78),
+    SCRIPT_COMMAND(0x323, 0x326, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 0xE3, 0),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_END,
 };
 s16 script1304[] = {
-    0x102, 2, 0x148, 0x1AC, 7,
-    0x102, 0x23, 0x168, 0x1BD, 7,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 0x23,
-    0x101, 2, 1, 7,
-    0x101, 0x23, 1, 3,
-    0x101, 0x323, 0x325, 2,
-    0x300, 0x78,
-    0x101, 0x323, 0x326, 2,
-    0x300, 0x1E,
-    0x200, 0, 1, 0x23, 2,
-    0x301,
-    0x101, 0x23, 1, 4,
-    0x300, 0x1E,
-    0x304, 0x229, 0x5CF, 0x3E8, 7,
-    0,
+    SCRIPT_WALK(2, 0x148, 0x1AC, 7),
+    SCRIPT_WALK(0x23, 0x168, 0x1BD, 7),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(0x23),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_POSE(0x23, 1, 3),
+    SCRIPT_COMMAND(0x323, 0x325, 2),
+    SCRIPT_WAIT(0x78),
+    SCRIPT_COMMAND(0x323, 0x326, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 0x23, 2),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(0x23, 1, 4),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_LEAVE(0x229, 0x5CF, 0x3E8, 7),
+    SCRIPT_END,
 };
 s16 script1507[] = {
-    0x102, 2, 0xB0, 0xC1, 3,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 2,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x200, 0, 1, 2, 2,
-    0x101, 2, 7, 7,
-    0x301,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x101, 0x323, 0x327, 2,
-    0x300, 0x5A,
-    0x101, 0x323, 0x326, 2,
-    0x300, 0x1E,
-    0x200, 0, 2, 2, 2,
-    0x101, 2, 7, 7,
-    0x301,
-    0x101, 2, 1, 3,
-    0x300, 0x3C,
-    0x304, 0x229, 0x654, 0x442, 3,
-    0,
+    SCRIPT_WALK(2, 0xB0, 0xC1, 3),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 2, 2),
+    SCRIPT_POSE(2, 7, 7),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(0x323, 0x327, 2),
+    SCRIPT_WAIT(0x5A),
+    SCRIPT_COMMAND(0x323, 0x326, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 2, 2, 2),
+    SCRIPT_POSE(2, 7, 7),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(2, 1, 3),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_LEAVE(0x229, 0x654, 0x442, 3),
+    SCRIPT_END,
 };
 s16 script1508[] = {
-    0x102, 2, 0x648, 0xCD, 5,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 2,
-    0x101, 2, 1, 1,
-    0x300, 0x1E,
-    0x200, 0, 1, 2, 2,
-    0x101, 2, 7, 1,
-    0x301,
-    0x101, 2, 1, 1,
-    0x300, 0x1E,
-    0x101, 0x323, 0x327, 2,
-    0x300, 0x5A,
-    0x101, 0x323, 0x326, 2,
-    0x300, 0x1E,
-    0x200, 0, 2, 2, 2,
-    0x101, 2, 7, 1,
-    0x301,
-    0x101, 2, 1, 5,
-    0x300, 0x3C,
-    0x304, 0x22B, 0xB0, 0x4F8, 5,
-    0,
+    SCRIPT_WALK(2, 0x648, 0xCD, 5),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_POSE(2, 1, 1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 2, 2),
+    SCRIPT_POSE(2, 7, 1),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(2, 1, 1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(0x323, 0x327, 2),
+    SCRIPT_WAIT(0x5A),
+    SCRIPT_COMMAND(0x323, 0x326, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 2, 2, 2),
+    SCRIPT_POSE(2, 7, 1),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(2, 1, 5),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_LEAVE(0x22B, 0xB0, 0x4F8, 5),
+    SCRIPT_END,
 };
 s16 script1509[] = {
-    0x102, 2, 0xD0, 0x2FD, 3,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 2,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x200, 0, 1, 2, 2,
-    0x101, 2, 7, 7,
-    0x301,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x101, 0x323, 0x327, 2,
-    0x300, 0x5A,
-    0x101, 0x323, 0x326, 2,
-    0x300, 0x1E,
-    0x200, 0, 2, 2, 2,
-    0x101, 2, 7, 7,
-    0x301,
-    0x101, 2, 1, 3,
-    0x300, 0x3C,
-    0x304, 0x22C, 0x384, 0x160, 3,
-    0,
+    SCRIPT_WALK(2, 0xD0, 0x2FD, 3),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 2, 2),
+    SCRIPT_POSE(2, 7, 7),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(0x323, 0x327, 2),
+    SCRIPT_WAIT(0x5A),
+    SCRIPT_COMMAND(0x323, 0x326, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 2, 2, 2),
+    SCRIPT_POSE(2, 7, 7),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(2, 1, 3),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_LEAVE(0x22C, 0x384, 0x160, 3),
+    SCRIPT_END,
 };
-Battle battles0Area0Battle0 = { 37, 8, MUSIC(2, 0) };
-Battle battles0Area0Battle1 = { 37, 8, MUSIC(2, 0) };
-Battle battles0Area0Battle2 = { 37, 8, MUSIC(2, 0) };
-Battle battles0Area0Battle3 = { 37, 8, MUSIC(2, 0) };
-Battle battles0Area0Battle4 = { 37, 8, MUSIC(2, 0) };
-Battle battles0Area0Battle5 = { 37, 8, MUSIC(2, 0) };
-Battle battles0Area0Battle6 = { 37, 8, MUSIC(2, 0) };
-Battle battles0Area0Battle7 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles0Area0Battle0 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles0Area0Battle1 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles0Area0Battle2 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles0Area0Battle3 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles0Area0Battle4 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles0Area0Battle5 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles0Area0Battle6 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles0Area0Battle7 = { 37, 8, MUSIC(2, 0) };
 BattleList battles0Area0Battles = {
     3,
     { &battles0Area0Battle0, &battles0Area0Battle1, &battles0Area0Battle2, &battles0Area0Battle3,
       &battles0Area0Battle4, &battles0Area0Battle5, &battles0Area0Battle6, &battles0Area0Battle7 },
 };
-Battle battles0Area1Battle0 = { 49, 13, MUSIC(2, 0) };
-Battle battles0Area1Battle1 = { 49, 13, MUSIC(2, 0) };
-Battle battles0Area1Battle2 = { 49, 13, MUSIC(2, 0) };
-Battle battles0Area1Battle3 = { 49, 13, MUSIC(2, 0) };
-Battle battles0Area1Battle4 = { 40, 13, MUSIC(2, 0) };
-Battle battles0Area1Battle5 = { 40, 13, MUSIC(2, 0) };
-Battle battles0Area1Battle6 = { 40, 13, MUSIC(2, 0) };
-Battle battles0Area1Battle7 = { 40, 13, MUSIC(2, 0) };
+AreaBattle battles0Area1Battle0 = { 49, 13, MUSIC(2, 0) };
+AreaBattle battles0Area1Battle1 = { 49, 13, MUSIC(2, 0) };
+AreaBattle battles0Area1Battle2 = { 49, 13, MUSIC(2, 0) };
+AreaBattle battles0Area1Battle3 = { 49, 13, MUSIC(2, 0) };
+AreaBattle battles0Area1Battle4 = { 40, 13, MUSIC(2, 0) };
+AreaBattle battles0Area1Battle5 = { 40, 13, MUSIC(2, 0) };
+AreaBattle battles0Area1Battle6 = { 40, 13, MUSIC(2, 0) };
+AreaBattle battles0Area1Battle7 = { 40, 13, MUSIC(2, 0) };
 BattleList battles0Area1Battles = {
     3,
     { &battles0Area1Battle0, &battles0Area1Battle1, &battles0Area1Battle2, &battles0Area1Battle3,
       &battles0Area1Battle4, &battles0Area1Battle5, &battles0Area1Battle6, &battles0Area1Battle7 },
 };
-Battle battles0Area2Battle0 = { 0, 4, MUSIC(2, 0) };
-Battle battles0Area2Battle1 = { 0, 4, MUSIC(2, 0) };
-Battle battles0Area2Battle2 = { 0, 4, MUSIC(2, 0) };
-Battle battles0Area2Battle3 = { 0, 4, MUSIC(2, 0) };
-Battle battles0Area2Battle4 = { 0, 4, MUSIC(2, 0) };
-Battle battles0Area2Battle5 = { 0, 4, MUSIC(2, 0) };
-Battle battles0Area2Battle6 = { 0, 4, MUSIC(2, 0) };
-Battle battles0Area2Battle7 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles0Area2Battle0 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles0Area2Battle1 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles0Area2Battle2 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles0Area2Battle3 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles0Area2Battle4 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles0Area2Battle5 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles0Area2Battle6 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles0Area2Battle7 = { 0, 4, MUSIC(2, 0) };
 BattleList battles0Area2Battles = {
     0,
     { &battles0Area2Battle0, &battles0Area2Battle1, &battles0Area2Battle2, &battles0Area2Battle3,
       &battles0Area2Battle4, &battles0Area2Battle5, &battles0Area2Battle6, &battles0Area2Battle7 },
 };
-Battle battles0Area3Battle0 = { 207, 13, MUSIC(3, 0) };
-Battle battles0Area3Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle battles0Area3Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle battles0Area3Battle3 = { 327, 13, MUSIC(2, 0) };
-Battle battles0Area3Battle4 = { 328, 8, MUSIC(2, 0) };
-Battle battles0Area3Battle5 = { 101, 4, MUSIC(2, 0) };
-Battle battles0Area3Battle6 = { 147, 13, MUSIC(2, 0) };
-Battle battles0Area3Battle7 = { 66, 8, MUSIC(2, 0) };
+AreaBattle battles0Area3Battle0 = { 207, 13, MUSIC(3, 0) };
+AreaBattle battles0Area3Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle battles0Area3Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle battles0Area3Battle3 = { 327, 13, MUSIC(2, 0) };
+AreaBattle battles0Area3Battle4 = { 328, 8, MUSIC(2, 0) };
+AreaBattle battles0Area3Battle5 = { 101, 4, MUSIC(2, 0) };
+AreaBattle battles0Area3Battle6 = { 147, 13, MUSIC(2, 0) };
+AreaBattle battles0Area3Battle7 = { 66, 8, MUSIC(2, 0) };
 BattleList battles0Area3Battles = {
     0,
     { &battles0Area3Battle0, &battles0Area3Battle1, &battles0Area3Battle2, &battles0Area3Battle3,
       &battles0Area3Battle4, &battles0Area3Battle5, &battles0Area3Battle6, &battles0Area3Battle7 },
 };
-Battle battles1Area0Battle0 = { 37, 8, MUSIC(2, 0) };
-Battle battles1Area0Battle1 = { 37, 8, MUSIC(2, 0) };
-Battle battles1Area0Battle2 = { 37, 8, MUSIC(2, 0) };
-Battle battles1Area0Battle3 = { 37, 8, MUSIC(2, 0) };
-Battle battles1Area0Battle4 = { 37, 8, MUSIC(2, 0) };
-Battle battles1Area0Battle5 = { 37, 8, MUSIC(2, 0) };
-Battle battles1Area0Battle6 = { 37, 8, MUSIC(2, 0) };
-Battle battles1Area0Battle7 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles1Area0Battle0 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles1Area0Battle1 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles1Area0Battle2 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles1Area0Battle3 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles1Area0Battle4 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles1Area0Battle5 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles1Area0Battle6 = { 37, 8, MUSIC(2, 0) };
+AreaBattle battles1Area0Battle7 = { 37, 8, MUSIC(2, 0) };
 BattleList battles1Area0Battles = {
     3,
     { &battles1Area0Battle0, &battles1Area0Battle1, &battles1Area0Battle2, &battles1Area0Battle3,
       &battles1Area0Battle4, &battles1Area0Battle5, &battles1Area0Battle6, &battles1Area0Battle7 },
 };
-Battle battles1Area1Battle0 = { 145, 13, MUSIC(2, 0) };
-Battle battles1Area1Battle1 = { 145, 13, MUSIC(2, 0) };
-Battle battles1Area1Battle2 = { 145, 13, MUSIC(2, 0) };
-Battle battles1Area1Battle3 = { 145, 13, MUSIC(2, 0) };
-Battle battles1Area1Battle4 = { 145, 13, MUSIC(2, 0) };
-Battle battles1Area1Battle5 = { 145, 13, MUSIC(2, 0) };
-Battle battles1Area1Battle6 = { 40, 13, MUSIC(2, 0) };
-Battle battles1Area1Battle7 = { 40, 13, MUSIC(2, 0) };
+AreaBattle battles1Area1Battle0 = { 145, 13, MUSIC(2, 0) };
+AreaBattle battles1Area1Battle1 = { 145, 13, MUSIC(2, 0) };
+AreaBattle battles1Area1Battle2 = { 145, 13, MUSIC(2, 0) };
+AreaBattle battles1Area1Battle3 = { 145, 13, MUSIC(2, 0) };
+AreaBattle battles1Area1Battle4 = { 145, 13, MUSIC(2, 0) };
+AreaBattle battles1Area1Battle5 = { 145, 13, MUSIC(2, 0) };
+AreaBattle battles1Area1Battle6 = { 40, 13, MUSIC(2, 0) };
+AreaBattle battles1Area1Battle7 = { 40, 13, MUSIC(2, 0) };
 BattleList battles1Area1Battles = {
     3,
     { &battles1Area1Battle0, &battles1Area1Battle1, &battles1Area1Battle2, &battles1Area1Battle3,
       &battles1Area1Battle4, &battles1Area1Battle5, &battles1Area1Battle6, &battles1Area1Battle7 },
 };
-Battle battles1Area2Battle0 = { 0, 4, MUSIC(2, 0) };
-Battle battles1Area2Battle1 = { 0, 4, MUSIC(2, 0) };
-Battle battles1Area2Battle2 = { 0, 4, MUSIC(2, 0) };
-Battle battles1Area2Battle3 = { 0, 4, MUSIC(2, 0) };
-Battle battles1Area2Battle4 = { 0, 4, MUSIC(2, 0) };
-Battle battles1Area2Battle5 = { 0, 4, MUSIC(2, 0) };
-Battle battles1Area2Battle6 = { 0, 4, MUSIC(2, 0) };
-Battle battles1Area2Battle7 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles1Area2Battle0 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles1Area2Battle1 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles1Area2Battle2 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles1Area2Battle3 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles1Area2Battle4 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles1Area2Battle5 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles1Area2Battle6 = { 0, 4, MUSIC(2, 0) };
+AreaBattle battles1Area2Battle7 = { 0, 4, MUSIC(2, 0) };
 BattleList battles1Area2Battles = {
     0,
     { &battles1Area2Battle0, &battles1Area2Battle1, &battles1Area2Battle2, &battles1Area2Battle3,
       &battles1Area2Battle4, &battles1Area2Battle5, &battles1Area2Battle6, &battles1Area2Battle7 },
 };
-Battle battles1Area3Battle0 = { 207, 13, MUSIC(3, 0) };
-Battle battles1Area3Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle battles1Area3Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle battles1Area3Battle3 = { 327, 13, MUSIC(2, 0) };
-Battle battles1Area3Battle4 = { 328, 8, MUSIC(2, 0) };
-Battle battles1Area3Battle5 = { 101, 4, MUSIC(2, 0) };
-Battle battles1Area3Battle6 = { 147, 13, MUSIC(2, 0) };
-Battle battles1Area3Battle7 = { 66, 8, MUSIC(2, 0) };
+AreaBattle battles1Area3Battle0 = { 207, 13, MUSIC(3, 0) };
+AreaBattle battles1Area3Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle battles1Area3Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle battles1Area3Battle3 = { 327, 13, MUSIC(2, 0) };
+AreaBattle battles1Area3Battle4 = { 328, 8, MUSIC(2, 0) };
+AreaBattle battles1Area3Battle5 = { 101, 4, MUSIC(2, 0) };
+AreaBattle battles1Area3Battle6 = { 147, 13, MUSIC(2, 0) };
+AreaBattle battles1Area3Battle7 = { 66, 8, MUSIC(2, 0) };
 BattleList battles1Area3Battles = {
     0,
     { &battles1Area3Battle0, &battles1Area3Battle1, &battles1Area3Battle2, &battles1Area3Battle3,

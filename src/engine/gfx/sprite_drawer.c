@@ -74,12 +74,12 @@ void spriteDrawerDraw(s32 *sheet, s32 frame, s32 x, s32 y) {
     }
     p = (s16 *)((u8 *)sheet + sheet[i + 2]);
     /* rot.vx and rot.vy are tested as one word */
-    if (SPRITE_DRAWER->scaleX != ONE || SPRITE_DRAWER->scaleY != ONE || SPRITE_DRAWER->scaleZ != ONE ||
+    if (SPRITE_DRAWER->scale.vx != ONE || SPRITE_DRAWER->scale.vy != ONE || SPRITE_DRAWER->scale.vz != ONE ||
         *(s32 *)&SPRITE_DRAWER->rot.vx != 0 || SPRITE_DRAWER->rot.vz != 0) {
         transform = 1;
         if (SPRITE_DRAWER->transformDirty) {
             RotMatrixYXZ_gte(&SPRITE_DRAWER->rot, &SPRITE_DRAWER->matrix);
-            ScaleMatrix(&SPRITE_DRAWER->matrix, (VECTOR *)&SPRITE_DRAWER->scaleX); /* scaleX-Z as a VECTOR */
+            ScaleMatrix(&SPRITE_DRAWER->matrix, &SPRITE_DRAWER->scale);
         }
     }
     count = *p++;
@@ -195,14 +195,22 @@ void spriteDrawerDraw(s32 *sheet, s32 frame, s32 x, s32 y) {
 
 /* Sprite drawer method: scales the sprites (ONE: as they are) */
 void spriteDrawerSetScale(s32 x, s32 y, s32 z) {
-    SPRITE_DRAWER->scaleX = x;
-    SPRITE_DRAWER->scaleY = y;
-    SPRITE_DRAWER->scaleZ = z;
+    SPRITE_DRAWER->scale.vx = x;
+    SPRITE_DRAWER->scale.vy = y;
+    SPRITE_DRAWER->scale.vz = z;
     SPRITE_DRAWER->transformDirty = 1;
 }
 
-/* Sprite drawer method: rotates the sprites */
-void spriteDrawerSetRotation(s16 x, s16 y, s16 z) {
+/*
+ * Sprite drawer method: rotates the sprites. An old-style definition, as
+ * SpriteDrawer.setRotation's unprototyped callers suit: they pass ints,
+ * which it takes as shorts.
+ */
+void spriteDrawerSetRotation(x, y, z)
+s16 x;
+s16 y;
+s16 z;
+{
     SPRITE_DRAWER->rot.vx = x;
     SPRITE_DRAWER->rot.vy = y;
     SPRITE_DRAWER->rot.vz = z;
@@ -231,9 +239,9 @@ void spriteDrawerSetColor(CVECTOR *color) {
  */
 void initSpriteDrawer(SpriteDrawer *obj) {
     HEAP.zero(obj, sizeof(SpriteDrawer));
-    obj->scaleX = ONE;
-    obj->scaleY = ONE;
-    obj->scaleZ = ONE;
+    obj->scale.vx = ONE;
+    obj->scale.vy = ONE;
+    obj->scale.vz = ONE;
     obj->followScroll = 1;
     obj->color.b = 0x80;
     obj->color.g = 0x80;

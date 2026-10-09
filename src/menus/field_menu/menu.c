@@ -36,22 +36,22 @@ void STSTATUS_runScreens(FieldMenuScreen *menu, FieldMenuScreenChildren *childre
     }
 }
 
-/* Draws sprite 0x1D at (blinkPos, blinkPos): it moves one pixel down and right
-   every other frame, back to 0 at 0x60 */
-void STSTATUS_drawBlink(FieldMenuScreen *menu) {
+/* Draws the scrolling background, sprite 0x1D at (bgScroll, bgScroll): it
+   moves one pixel down and right every other frame, back to 0 at 0x60 */
+void STSTATUS_drawBackground(FieldMenuScreen *menu) {
     SpriteDrawer sprite;
 
     initSpriteDrawer(&sprite);
     sprite.setLayerId(menu->layer, 7);
     sprite.setTexture(0x280, 0x100);
-    if (menu->blinkSkip != 0) {
-        menu->blinkPos++;
-        menu->blinkPos = menu->blinkPos < 0x60 ? menu->blinkPos : 0;
-        menu->blinkSkip = 0;
+    if (menu->bgTick != 0) {
+        menu->bgScroll++;
+        menu->bgScroll = menu->bgScroll < 0x60 ? menu->bgScroll : 0;
+        menu->bgTick = 0;
     } else {
-        menu->blinkSkip = 1;
+        menu->bgTick = 1;
     }
-    sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x1D, menu->blinkPos, menu->blinkPos);
+    sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x1D, menu->bgScroll, menu->bgScroll);
 }
 
 /* The mode's main task: loads the files and the background's textures, then runs
@@ -87,13 +87,13 @@ void STSTATUS_updateMenu(FieldMenuScreen *menu, FieldMenuScreenChildren *childre
         break;
     case TASK_RUN:
         STSTATUS_runScreens(menu, children);
-        STSTATUS_drawBlink(menu);
+        STSTATUS_drawBackground(menu);
         break;
     case TASK_DONE:
         if (children->fieldMenu == NULL) {
             menu->state = TASK_RUN;
         }
-        STSTATUS_drawBlink(menu);
+        STSTATUS_drawBackground(menu);
         break;
     case TASK_KILL:
         break;
@@ -106,8 +106,8 @@ FieldMenuScreen *STSTATUS_createMenu(void) {
     FieldMenuScreen *menu = createTask(STSTATUS_updateMenu, sizeof(FieldMenuScreen), sizeof(FieldMenuScreenChildren));
 
     menu->layer = SCREEN_LAYER;
-    menu->lateGame = STSTATUS_areaFuncs.isLateGame();
-    if (menu->lateGame == 0) {
+    menu->gameHalf = STSTATUS_areaFuncs.getGameHalf();
+    if (menu->gameHalf == 0) {
         menu->bgArchive = (FILE_STATUS_BG + 1) << 16;
         menu->bgFile = FILE_STATUS_BG + 1;
         menu->bgArchive1 = ((FILE_STATUS_BG + 1) << 16) + 1;

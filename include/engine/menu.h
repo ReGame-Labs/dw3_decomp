@@ -134,8 +134,17 @@ typedef struct FieldMenuChoice {
 
 extern FieldMenuChoice FIELD_MENU_CHOICE;
 
+void innStartPanel(PanelAnim *panel, s32 open);
+s32 innUpdatePanel(PanelAnim *panel);
+void healParty(void);
+void updateInnMenu(Inn *task, InnChildren *data);
 void updateInn(struct Inn *task, struct InnChildren *data);
 Inn *createInn(s32 layerId);
+void startPanel(PanelAnim *panel, s32 open);
+s32 updatePanel(PanelAnim *panel);
+void createFieldMenuWindows(FieldMenu *task, FieldMenuWindows *win);
+void showPartnerPage(void *menu, FieldMenuWindows *win, s32 page, s32 show);
+s32 getFieldZone(void);
 void updateFieldMenu(FieldMenu *task, FieldMenuWindows *win);
 FieldMenu *createFieldMenu(s32 layerId, s32 cursor);
 

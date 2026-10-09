@@ -1,7 +1,7 @@
 #ifndef STGMCARD_H
 #define STGMCARD_H
 
-/* STGMCARD.PRO: mode 0xC00, the memory card screen. Its modules are in
+/* STGMCARD.PRO: the memory card screen (MODE_CONTINUE). Its modules are in
    src/menus/memory_card/, and the functions below are by module, in the order they
    link. */
 
@@ -40,7 +40,7 @@ typedef struct MemCardScreen {
                                argument is not negative (saving: negative) */
     /* 0x54 */ s32 layer;
     /* 0x58 */ s32 bgScroll; /* the background's offset, 0 to 95 */
-    /* 0x5C */ s32 bgScrolled; /* it moves every other frame */
+    /* 0x5C */ s32 bgTick; /* it moves every other frame */
     /* 0x60 */ s32 pad[2]; /* never read or written */
     /* 0x68 */ s32 area; /* a string of TEXT_AREA_NAMES, from the previous mode */
     /* 0x6C */ s32 place; /* a string of TEXT_SHOP_NAMES (STGMCARD_places) */
@@ -66,15 +66,6 @@ typedef struct MemCardSavesWindows {
     /* 0x20 */ struct MemCardMenu *menu;
     /* 0x24 */ struct MemCardInfo *info;
 } MemCardSavesWindows;
-
-/* The play time, as GameState keeps it from playFrames */
-typedef struct PlayTime {
-    /* 0x0 */ s32 frames;
-    /* 0x4 */ s16 hours;
-    /* 0x6 */ s16 minutes;
-    /* 0x8 */ s16 seconds;
-    /* 0xA */ s16 maxed;
-} PlayTime;
 
 /* A save of the memory card, as the list shows it */
 typedef struct MemCardSave {
@@ -241,10 +232,16 @@ typedef struct MemCardPanel {
     /* 0xD4 */ void (*setPos)(struct MemCardPanel *panel, s32 x, s32 y);
 } MemCardPanel;
 
+/* A frame of the save's icon, a sector of the save file: 16x16 pixels of 4
+   bits, the left one of each byte in its low bits, that index the CLUT */
+typedef struct SaveIconFrame {
+    /* 0x00 */ u8 pixels[16][8];
+} SaveIconFrame;
+
 /* The save's icon for the memory card's directory */
 typedef struct SaveIcon {
     /* 0x0 */ CardClut *clut;
-    /* 0x4 */ void *frames[3];
+    /* 0x4 */ SaveIconFrame *frames[3];
 } SaveIcon;
 
 /* The overlay's buffers and helpers (STGMCARD_funcs) */
@@ -267,7 +264,6 @@ typedef struct MemCardScreenFuncs {
 
 /* scene.c */
 void STGMCARD_updateScene(MemCardScene *task, MemCardScreen **child);
-Task *STGMCARD_start(void);
 void STGMCARD_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
 void STGMCARD_drawFader(ScreenFade *task);
 void STGMCARD_updateFader(ScreenFade *task);

@@ -265,7 +265,6 @@ CardShopBuy *STCRDSHP_createBuy(CardShop *shop, s32 shopId);
 
 /* scene.c */
 void STCRDSHP_updateScene(Task *task, CardShop **child);
-Task *STCRDSHP_start(void);
 
 /* shop.c */
 void STCRDSHP_createShopWindows(CardShop *shop, CardShopWindows *win);

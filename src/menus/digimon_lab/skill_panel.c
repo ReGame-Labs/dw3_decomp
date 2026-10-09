@@ -131,6 +131,7 @@ void STGDGLAB_updateSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windo
         switch (panel->substate) {
         default:
             panel->setState(panel, TASK_KILL);
+            /* fallthrough */
         case 0:
             if (STGDGLAB_data.funcs.updateFade(&panel->fade)) {
                 STGDGLAB_showSkillPanel(panel, windows, 1);

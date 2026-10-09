@@ -17,7 +17,7 @@ void FIGHTSTG_showCommands(CommandMenu *task) {
             w->lines[i] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x24, 0x6D + i * 0x13);
             w->lines[i]->setString(w->lines[i], text, i + 1);
         }
-        fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+        fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
         if (fighter->flags & FIGHTER_ASLEEP) {
             for (i = 0; i < BATTLE_COMMAND_SWITCH; i++) {
                 w->lines[0]->setPalette(w->lines[i], PALETTE_GREY);
@@ -56,7 +56,7 @@ void FIGHTSTG_updateCommandMenu(CommandMenu *task, CommandMenuWindows *w) {
                 break;
             }
             SOUND.playSound(SOUND_MENU_CONFIRM);
-            fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+            fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
             if ((fighter->flags & FIGHTER_ASLEEP) && w->cursor->sel < BATTLE_COMMAND_SWITCH) {
                 break;
             }

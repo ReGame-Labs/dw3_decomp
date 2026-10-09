@@ -64,13 +64,13 @@ void STDGNAME_drawBackground(ScreenTask *task) {
     sprite.setTexture(0x280, 0);
     sprite.draw(FILE_CACHE.getEntry(STDGNAME_SPRITES), 0x31, 0, 0);
     /* Scroll one pixel every other frame, wrapping at 96 */
-    if (task->tick) {
-        task->scroll = task->scroll++ < 95 ? task->scroll : 0;
-        task->tick = 0;
+    if (task->bgTick) {
+        task->bgScroll = task->bgScroll++ < 95 ? task->bgScroll : 0;
+        task->bgTick = 0;
     } else {
-        task->tick = 1;
+        task->bgTick = 1;
     }
-    sprite.draw(FILE_CACHE.getEntry(STDGNAME_SPRITES), 0x24, task->scroll, task->scroll);
+    sprite.draw(FILE_CACHE.getEntry(STDGNAME_SPRITES), 0x24, task->bgScroll, task->bgScroll);
 }
 
 /* The renaming screen's task: loads its files, then runs the screen and draws

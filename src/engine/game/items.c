@@ -20,12 +20,15 @@ ItemInfo *getItem(s32 id) {
     return &ITEMS[id - 1];
 }
 
-/* The category of an item's type (ITEM_TYPE_CATEGORIES) */
-u8 getItemCategory(s32 id) {
+/*
+ * The category of an item's type (ITEM_TYPE_CATEGORIES); an s32, as the menus
+ * that call it through ITEM_FUNCS don't truncate the result to a byte.
+ */
+s32 getItemCategory(s32 id) {
     return ITEM_TYPE_CATEGORIES[getItem(id)->type];
 }
 
-/* ITEM_FUNCS->isKind */
+/* ITEM_FUNCS.isKind */
 s32 isItemKind(s32 item, s32 kind) {
     return getItem(item)->kind == kind;
 }
@@ -884,11 +887,11 @@ BattleSetup BATTLE_SETUP = { 1, -1, -1, 0, 0, 0, {{0}}, 0, 0, {0}, 0, 0, clearBa
 
 BattleResult BATTLE_RESULT = { 0 };
 
-ItemInfo *(*GET_ITEM[4])(s32 item) = {
+ItemFuncs ITEM_FUNCS = {
     getItem,
-    (ItemInfo *(*)(s32))getItemCategory,
-    (ItemInfo *(*)(s32))isItemKind,
-    (ItemInfo *(*)(s32))listItems,
+    getItemCategory,
+    isItemKind,
+    listItems,
 };
 
 /* The categories' strings, by item type */

@@ -228,7 +228,7 @@ s32 FIGHTSTG_getEventDelay(u8 side, s32 kind) {
     switch (kind) {
     case 2: {
         s32 row = side != 0;
-        BattleStats *own = FIGHTSTG_battleFuncs.computeStats(side, 1, FIGHTSTG_battle.active[row]);
+        BattleStats *own = FIGHTSTG_battleFuncs.computeStats(side, 1, FIGHTSTG_battle.state.active[row]);
 
         delay = RANDOM.next() % FIGHTSTG_eventDelays[kind].div + own->stats[BATTLE_STAT_SPIRIT] * 10;
         break;
@@ -238,8 +238,8 @@ s32 FIGHTSTG_getEventDelay(u8 side, s32 kind) {
         break;
     case 9: {
         s32 row = side != 0;
-        BattleStats *own = FIGHTSTG_battleFuncs.computeStats(side, 1, FIGHTSTG_battle.active[row]);
-        BattleStats *other = FIGHTSTG_battleFuncs.computeStats((side == 0) << 4, 0, FIGHTSTG_battle.active[1 - row]);
+        BattleStats *own = FIGHTSTG_battleFuncs.computeStats(side, 1, FIGHTSTG_battle.state.active[row]);
+        BattleStats *other = FIGHTSTG_battleFuncs.computeStats((side == 0) << 4, 0, FIGHTSTG_battle.state.active[1 - row]);
 
         delay = RANDOM.next() % FIGHTSTG_eventDelays[kind].div + 3000 + (own->stats[BATTLE_STAT_SPIRIT] + FIGHTSTG_events.funcs.statusStrength) * 8
               - (other->resist[RESIST_PARALYSIS] + other->resist[4]) * 8;
@@ -247,8 +247,8 @@ s32 FIGHTSTG_getEventDelay(u8 side, s32 kind) {
     }
     case 10: {
         s32 row = side != 0;
-        BattleStats *own = FIGHTSTG_battleFuncs.computeStats(side, 1, FIGHTSTG_battle.active[row]);
-        BattleStats *other = FIGHTSTG_battleFuncs.computeStats((side == 0) << 4, 0, FIGHTSTG_battle.active[1 - row]);
+        BattleStats *own = FIGHTSTG_battleFuncs.computeStats(side, 1, FIGHTSTG_battle.state.active[row]);
+        BattleStats *other = FIGHTSTG_battleFuncs.computeStats((side == 0) << 4, 0, FIGHTSTG_battle.state.active[1 - row]);
 
         delay = RANDOM.next() % FIGHTSTG_eventDelays[kind].div + 3000 + (own->stats[BATTLE_STAT_SPIRIT] + FIGHTSTG_events.funcs.statusStrength) * 8
               - (other->resist[RESIST_CONFUSION] + other->resist[3]) * 8;
@@ -256,8 +256,8 @@ s32 FIGHTSTG_getEventDelay(u8 side, s32 kind) {
     }
     case 11: {
         s32 row = side != 0;
-        BattleStats *own = FIGHTSTG_battleFuncs.computeStats(side, 1, FIGHTSTG_battle.active[row]);
-        BattleStats *other = FIGHTSTG_battleFuncs.computeStats((side == 0) << 4, 0, FIGHTSTG_battle.active[1 - row]);
+        BattleStats *own = FIGHTSTG_battleFuncs.computeStats(side, 1, FIGHTSTG_battle.state.active[row]);
+        BattleStats *other = FIGHTSTG_battleFuncs.computeStats((side == 0) << 4, 0, FIGHTSTG_battle.state.active[1 - row]);
 
         delay = RANDOM.next() % FIGHTSTG_eventDelays[kind].div + 1000 + (own->stats[BATTLE_STAT_SPIRIT] + FIGHTSTG_events.funcs.statusStrength) * 8
               - (other->resist[RESIST_SLEEP] + other->resist[2]) * 8;
@@ -265,15 +265,15 @@ s32 FIGHTSTG_getEventDelay(u8 side, s32 kind) {
     }
     case 12: {
         s32 row = side != 0;
-        BattleStats *own = FIGHTSTG_battleFuncs.computeStats(side, 1, FIGHTSTG_battle.active[row]);
+        BattleStats *own = FIGHTSTG_battleFuncs.computeStats(side, 1, FIGHTSTG_battle.state.active[row]);
 
         delay = RANDOM.next() % FIGHTSTG_eventDelays[kind].div + 2000 + own->stats[BATTLE_STAT_SPIRIT] * 10;
         break;
     }
     default: {
         s32 row = side != 0;
-        BattleStats *own = FIGHTSTG_battleFuncs.computeStats(side, 1, FIGHTSTG_battle.active[row]);
-        BattleStats *other = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY - side, 0, FIGHTSTG_battle.active[1 - row]);
+        BattleStats *own = FIGHTSTG_battleFuncs.computeStats(side, 1, FIGHTSTG_battle.state.active[row]);
+        BattleStats *other = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY - side, 0, FIGHTSTG_battle.state.active[1 - row]);
         s32 square = own->stats[BATTLE_STAT_SPEED] * other->stats[BATTLE_STAT_SPEED];
         s32 root = 999;
         s32 i;
@@ -305,7 +305,7 @@ u8 FIGHTSTG_statusFlags[] = {
     FIGHTER_POISONED, FIGHTER_PARALYZED, FIGHTER_CONFUSED, 0x3F, /* all six */
 };
 
-/* An item's cure (FIGHTSTG_events.funcs.useItem): items 0xBE-0xC5 clear a
+/* An item's cure (FIGHTSTG_events.funcs.cureStatus): items 0xBE-0xC5 clear a
    status of the fighter and remove its events, 0xC4 and 0xC5 all of them */
 void FIGHTSTG_cureStatus(u8 side, s32 fighter, s32 item) {
     s32 kind;
@@ -335,7 +335,7 @@ void FIGHTSTG_cureStatus(u8 side, s32 fighter, s32 item) {
     }
     /* the match depends on the row local, and on kind becoming the event type */
     row = side != 0;
-    fighters = FIGHTSTG_battle.fighters[row];
+    fighters = FIGHTSTG_battle.state.fighters[row];
     if (fighters[fighter].id == 0) {
         return;
     }
@@ -387,7 +387,7 @@ void FIGHTSTG_queueRunAway(u8 side) {
     FIGHTSTG_newEvent.type = EVENT_RUN_AWAY;
     FIGHTSTG_newEvent.delay = FIGHTSTG_getEventDelay(side, 1);
     FIGHTSTG_newEvent.args[0] = side;
-    FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.active[side != 0];
+    FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.state.active[side != 0];
     FIGHTSTG_pushEvent(&FIGHTSTG_newEvent);
 }
 
@@ -406,7 +406,7 @@ void FIGHTSTG_queueAutoRecoverEnd(u8 side) {
         FIGHTSTG_newEvent.type = EVENT_AUTO_RECOVER_END;
         FIGHTSTG_newEvent.delay = time;
         FIGHTSTG_newEvent.args[0] = side;
-        FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.active[other];
+        FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.state.active[other];
         FIGHTSTG_newEvent.args[2] = 0xBD;
         FIGHTSTG_pushEvent(&FIGHTSTG_newEvent);
     }
@@ -471,7 +471,7 @@ void FIGHTSTG_inflictPoison(u8 side, s32 fighter, s32 damage) {
         FIGHTSTG_pushEvent(&FIGHTSTG_newEvent);
     }
     other = side != 0;
-    entry = &FIGHTSTG_battle.fighters[other][fighter];
+    entry = &FIGHTSTG_battle.state.fighters[other][fighter];
     entry->flags |= FIGHTER_POISONED;
 }
 
@@ -480,7 +480,7 @@ void FIGHTSTG_inflictPoison(u8 side, s32 fighter, s32 damage) {
    already queued */
 void FIGHTSTG_inflictParalysis(u8 side, s32 unused, u8 strength) {
     s32 other = side != 0;
-    s32 i = FIGHTSTG_findEvent(EVENT_STATUS_END, side, FIGHTSTG_battle.active[other]);
+    s32 i = FIGHTSTG_findEvent(EVENT_STATUS_END, side, FIGHTSTG_battle.state.active[other]);
     s32 time;
     BattleFighter *entry;
 
@@ -492,10 +492,10 @@ void FIGHTSTG_inflictParalysis(u8 side, s32 unused, u8 strength) {
         FIGHTSTG_newEvent.type = EVENT_STATUS_END;
         FIGHTSTG_newEvent.delay = time;
         FIGHTSTG_newEvent.args[0] = side;
-        FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.active[other];
+        FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.state.active[other];
         FIGHTSTG_pushEvent(&FIGHTSTG_newEvent);
     }
-    entry = &FIGHTSTG_battle.fighters[other][FIGHTSTG_battle.active[other]];
+    entry = &FIGHTSTG_battle.state.fighters[other][FIGHTSTG_battle.state.active[other]];
     entry->paralysis = strength;
     entry->flags |= FIGHTER_PARALYZED;
 }
@@ -505,7 +505,7 @@ void FIGHTSTG_inflictParalysis(u8 side, s32 unused, u8 strength) {
    causes it) or pushes back the one already queued */
 void FIGHTSTG_inflictConfusion(u8 side, s32 fromTech, u8 strength) {
     s32 other = side != 0;
-    s32 i = FIGHTSTG_findEvent(EVENT_STATUS_END + 1, side, FIGHTSTG_battle.active[other]);
+    s32 i = FIGHTSTG_findEvent(EVENT_STATUS_END + 1, side, FIGHTSTG_battle.state.active[other]);
     s32 time;
     BattleFighter *entry;
 
@@ -521,10 +521,10 @@ void FIGHTSTG_inflictConfusion(u8 side, s32 fromTech, u8 strength) {
         FIGHTSTG_newEvent.type = EVENT_STATUS_END + 1;
         FIGHTSTG_newEvent.delay = time;
         FIGHTSTG_newEvent.args[0] = side;
-        FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.active[other];
+        FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.state.active[other];
         FIGHTSTG_pushEvent(&FIGHTSTG_newEvent);
     }
-    entry = &FIGHTSTG_battle.fighters[other][FIGHTSTG_battle.active[other]];
+    entry = &FIGHTSTG_battle.state.fighters[other][FIGHTSTG_battle.state.active[other]];
     entry->confusion = strength;
     entry->flags |= FIGHTER_CONFUSED;
 }
@@ -534,7 +534,7 @@ void FIGHTSTG_inflictConfusion(u8 side, s32 fromTech, u8 strength) {
    already queued */
 void FIGHTSTG_inflictSleep(u8 side, s32 unused, u8 strength) {
     s32 other = side != 0;
-    s32 i = FIGHTSTG_findEvent(EVENT_STATUS_END + 2, side, FIGHTSTG_battle.active[other]);
+    s32 i = FIGHTSTG_findEvent(EVENT_STATUS_END + 2, side, FIGHTSTG_battle.state.active[other]);
     s32 time;
     BattleFighter *entry;
 
@@ -546,10 +546,10 @@ void FIGHTSTG_inflictSleep(u8 side, s32 unused, u8 strength) {
         FIGHTSTG_newEvent.type = EVENT_STATUS_END + 2;
         FIGHTSTG_newEvent.delay = time;
         FIGHTSTG_newEvent.args[0] = side;
-        FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.active[other];
+        FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.state.active[other];
         FIGHTSTG_pushEvent(&FIGHTSTG_newEvent);
     }
-    entry = &FIGHTSTG_battle.fighters[other][FIGHTSTG_battle.active[other]];
+    entry = &FIGHTSTG_battle.state.fighters[other][FIGHTSTG_battle.state.active[other]];
     entry->sleep = strength;
     entry->flags |= FIGHTER_ASLEEP;
 }
@@ -559,13 +559,14 @@ s32 FIGHTSTG_boostEvents[] = {
     EVENT_BOOST_END, EVENT_BOOST_END + 1, EVENT_BOOST_END + 2,
 };
 
-/* Queues the end of a fighter's boost of stat kind (later when arg3 is
-   set), or pushes back the one already queued */
-void FIGHTSTG_queueBoostEnd(u8 side, s32 fighter, s32 kind, s32 arg3) {
+/* Queues the end of a fighter's boost of stat kind, 12 frames on when a
+   technique (tech) gave it and 8 when an item did (tech 0), or pushes back
+   the one already queued */
+void FIGHTSTG_queueBoostEnd(u8 side, s32 fighter, s32 kind, s32 tech) {
     s32 i = FIGHTSTG_findEvent(FIGHTSTG_boostEvents[kind], side, fighter);
     s32 time;
 
-    if (arg3 != 0) {
+    if (tech != 0) {
         time = FIGHTSTG_getEventDelay(side, 12);
     } else {
         time = FIGHTSTG_getEventDelay(side, 8);

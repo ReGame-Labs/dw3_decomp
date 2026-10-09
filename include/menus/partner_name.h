@@ -5,15 +5,15 @@
    in src/menus/partner_name/, and the functions below are by module, in the order they
    link. */
 
+/* The name of this overlay's copy of a function or type of src/shared/ */
+#define OVL_NAME(name) STDGNAME_##name
+
 /* The overlay's NameEntry and the name entry's files (name_entry.h) */
-#define NAME_ENTRY_HAS_UNK98 1
+#define NAME_ENTRY_HAS_UNUSED98 1
 #define NAME_ENTRY_HAS_HIDE 0
 #define NAME_ENTRY_SPRITES STDGNAME_KEY_SPRITES
 #define NAME_ENTRY_FILE_KEYBOARD STDGNAME_FILE_KEYBOARD
 #include "shared/name_entry.h"
-
-/* The name of this overlay's copy of a function of src/shared/ */
-#define OVL_NAME(name) STDGNAME_##name
 
 /* The screen's files: the discs number them differently */
 #if VERSION_US
@@ -64,8 +64,8 @@ typedef struct MenuAnim {
 } MenuAnim;
 
 /* The partner menu */
-typedef struct MenuTask {
-    TASK_HEADER(MenuTask);
+typedef struct PartnerMenuTask {
+    TASK_HEADER(PartnerMenuTask);
     /* 0x50 */ struct ScreenTask *screen;
     /* 0x54 */ s32 layer;
     /* 0x58 */ s32 cursorClut;
@@ -74,10 +74,10 @@ typedef struct MenuTask {
     /* 0x78 */ s32 partyCount;
     /* 0x7C */ s32 titleClut;
     /* 0x80 */ PanelAnim tweens[6];
-} MenuTask;
+} PartnerMenuTask;
 
 typedef struct ScreenChildren {
-    /* 0x0 */ MenuTask *menu;
+    /* 0x0 */ PartnerMenuTask *menu;
     /* 0x4 */ NameEntry *name;
     /* 0x8 */ ScreenFade *fade;
     /* 0xC */ Task *awaited; /* never set: the screen would wait in TASK_DONE until it ends */
@@ -88,8 +88,8 @@ typedef struct ScreenTask {
     TASK_HEADER(ScreenTask);
     /* 0x50 */ s32 layer;
     /* 0x54 */ s32 pad54; /* never read or written */
-    /* 0x58 */ s32 scroll;
-    /* 0x5C */ s32 tick;
+    /* 0x58 */ s32 bgScroll;
+    /* 0x5C */ s32 bgTick;
     /* 0x60 */ s32 choice;
     /* 0x64 */ s32 pad64; /* never read or written */
     /* 0x68 */ void (*fadeOut)(struct ScreenTask *task);
@@ -107,7 +107,7 @@ typedef struct ScreenFuncs {
 /* STDGNAME's data (data/stdgname.c) */
 extern NameKeyboard STDGNAME_keyboard;
 extern TextStyle STDGNAME_nameStyle;
-extern s32 STDGNAME_nameAnims[];
+extern s32 STDGNAME_nameAnims[][7];
 extern BigKey STDGNAME_bigKeys[];
 extern s32 STDGNAME_keyArrowCluts[];
 extern KeyTabs STDGNAME_keyPages[];
@@ -124,7 +124,6 @@ extern TextStyle STDGNAME_menuStyle;
 
 /* scene.c */
 void STDGNAME_updateScene(Task *task, ScreenTask **screen);
-Task *STDGNAME_start(void);
 void STDGNAME_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
 void STDGNAME_drawFader(ScreenFade *task);
 void STDGNAME_updateFader(ScreenFade *task);
@@ -145,11 +144,11 @@ void STDGNAME_closeNameEntry(NameEntry *task);
 NameEntry *STDGNAME_createNameEntry(char *name, s32 partner);
 
 /* menu.c */
-void STDGNAME_showMenuWindow(MenuTask *task, TextWindow **window, s32 index, s32 show);
-void STDGNAME_drawMenu(MenuTask *task, TextWindow **windows);
-s32 STDGNAME_runMenu(MenuTask *task, TextWindow **windows);
-void STDGNAME_updateMenu(MenuTask *task, TextWindow **windows);
-MenuTask *STDGNAME_createMenu(ScreenTask *screen);
+void STDGNAME_showMenuWindow(PartnerMenuTask *task, TextWindow **window, s32 index, s32 show);
+void STDGNAME_drawMenu(PartnerMenuTask *task, TextWindow **windows);
+s32 STDGNAME_runMenu(PartnerMenuTask *task, TextWindow **windows);
+void STDGNAME_updateMenu(PartnerMenuTask *task, TextWindow **windows);
+PartnerMenuTask *STDGNAME_createMenu(ScreenTask *screen);
 
 /* screen.c */
 void STDGNAME_stepScreen(ScreenTask *task, ScreenChildren *children);

@@ -39,8 +39,8 @@ void CARDGAME_startHandPick(CardBattle *battle, CardScreen *screen, CardPile *pi
     battle->effectStep.choice = -1;
 }
 
-/* Starts a pick of the cards (all when all > 0) in mode arg3 (anim.next) */
-void CARDGAME_startPick(CardBattle *battle, CardScreen *screen, s32 all, s32 arg3) {
+/* Starts a pick of the cards (all when all > 0) in mode (anim.next) */
+void CARDGAME_startPick(CardBattle *battle, CardScreen *screen, s32 all, s32 mode) {
     s32 i;
 
     if (all > 0) {
@@ -52,7 +52,7 @@ void CARDGAME_startPick(CardBattle *battle, CardScreen *screen, s32 all, s32 arg
     }
     CARDGAME_clearCardInfo(battle, screen);
     battle->effectStep.nextState = 1;
-    battle->anim.next = arg3;
+    battle->anim.next = mode;
     battle->effectStep.cursor = 0;
     battle->effectStep.choice = -1;
 }

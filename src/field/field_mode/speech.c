@@ -4,8 +4,8 @@
 
 /* Where a talk box goes: beside its actor's head on the screen, on the side
    its type says */
-void FIELDSTG_getSpeechPos(Speech *task, Point *out) {
-    Point pos;
+void FIELDSTG_getSpeechPos(Speech *task, Vec2 *out) {
+    Vec2 pos;
 
     pos.x = task->actor->tile.x;
     pos.y = task->actor->tile.y;
@@ -29,8 +29,8 @@ void FIELDSTG_getSpeechPos(Speech *task, Point *out) {
 /* A speech's update: opens its message box or talk box, moves the talk box
    with its actor, and ends with it */
 void FIELDSTG_updateSpeech(Speech *task, void **box) {
-    Point pos;
-    Point newPos;
+    Vec2 pos;
+    Vec2 newPos;
     TalkBox *talkBox;
 
     switch (task->state) {
@@ -76,7 +76,7 @@ Speech *FIELDSTG_createSpeech(Actor *actor, s32 entry, s32 type, s32 isMessage) 
    away from where it faces and the edges */
 Speech *FIELDSTG_createTalk(Actor *actor, s32 entry) {
     Speech *task = createTask(FIELDSTG_updateSpeech, sizeof(Speech), 4);
-    Point pos;
+    Vec2 pos;
 
     task->actor = actor;
     task->entry = entry;

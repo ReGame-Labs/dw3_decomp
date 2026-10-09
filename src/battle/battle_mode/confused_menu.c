@@ -84,15 +84,15 @@ void FIGHTSTG_stepConfusedMessage(ConfusedMenu *task, ConfusedMenuWindows *w) {
 }
 
 /* Puts the active partner's name into the message's first line (side 0 only) */
-void FIGHTSTG_setConfusedName(ConfusedMenu *task, ConfusedMenuWindows *windows, s32 arg2) {
-    if (arg2 == 0) {
-        windows->lines[0]->setSubString(windows->lines[0], GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0])), -1, 1);
+void FIGHTSTG_setConfusedName(ConfusedMenu *task, ConfusedMenuWindows *windows, s32 side) {
+    if (side == 0) {
+        windows->lines[0]->setSubString(windows->lines[0], GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0])), -1, 1);
     }
 }
 
 /* the confused menu's (FIGHTSTG_updateConfusedMenu) results, two per line,
    each a message (task->queue[0]) and its line of text 0x80 */
-s16 FIGHTSTG_confusedMessages[16][2] = {
+ConfusedMessage FIGHTSTG_confusedMessages[16] = {
     { 1, 0x73 }, { 2, 0x74 }, { 3, 0x75 }, { 4, 0x76 },
     { 5, 0x77 }, { 6, 0x78 }, { 7, 0x79 }, { 8, 0x7A },
     { 9, 0x7B }, { 10, 0x7C }, { 11, 0x7D }, { 12, 0x7E },
@@ -105,7 +105,7 @@ s16 FIGHTSTG_confusedLines[8] = {
 
 /* Sets up confused message index (FIGHTSTG_confusedMessages) with the
    partner's name and starts showing it */
-void FIGHTSTG_showConfusedMessage(ConfusedMenu *task, s32 index, s32 arg2) {
+void FIGHTSTG_showConfusedMessage(ConfusedMenu *task, s32 index, s32 unused) {
     ConfusedMenuWindows *w = task->children;
 
     task->started = 1;
@@ -115,9 +115,9 @@ void FIGHTSTG_showConfusedMessage(ConfusedMenu *task, s32 index, s32 arg2) {
     if (w->lines[1] == NULL) {
         w->lines[1] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x14, 0xD0);
     }
-    task->queue[0] = FIGHTSTG_confusedMessages[index][0];
+    task->queue[0] = FIGHTSTG_confusedMessages[index].result;
     w->lines[0]->setString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x16);
-    w->lines[1]->setString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), FIGHTSTG_confusedMessages[index][1]);
+    w->lines[1]->setString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), FIGHTSTG_confusedMessages[index].text);
     task->lineCount = 2;
     FIGHTSTG_setConfusedName(task, w, 0);
     w->lines[0]->setVisible(w->lines[0], 0);
@@ -136,7 +136,7 @@ CursorLayout FIGHTSTG_confusedCursor = {
 void FIGHTSTG_updateConfusedMenu(ConfusedMenu *task, ConfusedMenuWindows *w) {
     s32 i;
     s32 j;
-    s16 tmp;
+    s16 line;
 
     switch (task->state) {
     case TASK_INIT:
@@ -145,9 +145,9 @@ void FIGHTSTG_updateConfusedMenu(ConfusedMenu *task, ConfusedMenuWindows *w) {
         w->cursor->sel = task->firstLine;
         for (i = 0; i < 8; i++) {
             j = RANDOM.next() % 8;
-            tmp = FIGHTSTG_confusedLines[i];
+            line = FIGHTSTG_confusedLines[i];
             FIGHTSTG_confusedLines[i] = FIGHTSTG_confusedLines[j];
-            FIGHTSTG_confusedLines[j] = tmp;
+            FIGHTSTG_confusedLines[j] = line;
         }
         FIGHTSTG_showConfusedCommands(task);
         task->nextState(task);

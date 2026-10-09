@@ -21,15 +21,23 @@ char *getString(s32 *table, s32 index) {
     return (char *)table + table[index + 1];
 }
 
-/* The width in pixels of the text's widest line in a style */
-s32 measureText(TextBuffer *text, TextStyle *style, s32 spacing) {
+/*
+ * The width in pixels of the text's widest line in a style, with a fixed
+ * spacing per character unless spacing is 0. An old-style definition, as
+ * its unprototyped declaration and TextTools.measure suit: callers pass an
+ * int, which it takes as a short (converted once, on entry).
+ */
+s32 measureText(text, style, spacing)
+TextBuffer *text;
+TextStyle *style;
+s16 spacing;
+{
     s32 pos;
     s32 w;
     s32 max;
     s32 c;
     s32 op;
     s32 n;
-    Glyph *g;
 #if VERSION_US
     s32 len;
 #endif
@@ -45,8 +53,8 @@ s32 measureText(TextBuffer *text, TextStyle *style, s32 spacing) {
         c = ((s32 (*)())FONT.decode)(text->data + pos, (u8)text->sjis, style);
         switch (((u32)c >> 8) & 0xFF) {
         case 0:
-            if ((s16)spacing != 0) {
-                w += (s16)spacing;
+            if (spacing != 0) {
+                w += spacing;
             } else {
                 w += style->glyphs[(s16)c - 4].advance + style->glyphs[(s16)c - 4].dx;
             }
@@ -59,8 +67,8 @@ s32 measureText(TextBuffer *text, TextStyle *style, s32 spacing) {
         case 1:
             n = c & 0xFF;
             if (n <= style->iconCount && n > 0) {
-                if ((s16)spacing != 0) {
-                    w += (s16)spacing;
+                if (spacing != 0) {
+                    w += spacing;
                 } else {
                     w += style->icons[n - 1].advance + style->icons[n - 1].dx;
                 }
@@ -78,7 +86,7 @@ s32 measureText(TextBuffer *text, TextStyle *style, s32 spacing) {
                 w = 0;
                 break;
             case 5:
-                w += measureText(&text[text->data[pos + 2]], style, (s16)spacing);
+                w += measureText(&text[text->data[pos + 2]], style, spacing);
                 break;
 #if VERSION_US
             case 8:
@@ -91,8 +99,8 @@ s32 measureText(TextBuffer *text, TextStyle *style, s32 spacing) {
             pos += FONT.codeLengths[op];
             break;
         case 3:
-            if ((s16)spacing != 0) {
-                w += (s16)spacing;
+            if (spacing != 0) {
+                w += spacing;
             } else {
                 w += style->glyphs->advance + style->glyphs->dx;
             }

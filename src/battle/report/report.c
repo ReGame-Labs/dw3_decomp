@@ -174,6 +174,7 @@ void STFGTREP_runReport(FightReport *report, FightReportChildren *children) {
         for (i = 0; i < report->count; i++) {
             children->partners[i]->show(children->partners[i]);
         }
+        /* fallthrough */
     case 0:
     default:
         report->substate++;

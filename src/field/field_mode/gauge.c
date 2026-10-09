@@ -69,6 +69,7 @@ void FIELDSTG_runGauge(GaugeGame *task) {
 #endif
         task->speed = 0x100;
         task->nextState(task);
+        /* fallthrough */
     case TASK_RUN:
         switch (task->substate) {
         case 0:
@@ -154,7 +155,7 @@ void FIELDSTG_runGauge(GaugeGame *task) {
 }
 
 /* Creates the gauge game at a tile */
-GaugeGame *FIELDSTG_createGauge(Point pos) {
+GaugeGame *FIELDSTG_createGauge(Vec2 pos) {
     GaugeGame *task = createTask(FIELDSTG_runGauge, sizeof(GaugeGame), 0);
 
     task->pos = pos;

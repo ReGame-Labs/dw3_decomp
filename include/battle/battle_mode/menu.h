@@ -85,7 +85,7 @@ typedef struct ItemMenu {
     TASK_HEADER(ItemMenu);
     /* 0x050 */ s32 *result; /* -1 until it is done, then the item or -2 */
     /* 0x054 */ s32 sel; /* the cursor's line last frame */
-    /* 0x058 */ s16 items[0x194]; /* the bag's (ITEM_FUNCS->list) */
+    /* 0x058 */ s16 items[0x194]; /* the bag's (ITEM_FUNCS.list) */
     /* 0x380 */ s16 *usable; /* the items with flag 2 */
     /* 0x384 */ s32 count;
     /* 0x388 */ s32 page;
@@ -351,19 +351,42 @@ s32 FIGHTSTG_isPlayerChoosing(void);
 /* Shared between the overlay's objects */
 extern RECT FIGHTSTG_fighterCameraRect; /* FIGHTSTG_updatePartnerView's layer */
 void FIGHTSTG_updateHpTweens(HpDisplay *task, TextWindow **windows);
+void FIGHTSTG_stepHpTween(HpTween *tween);
+void FIGHTSTG_showFighterNames(HpDisplay *task, TextWindow **windows);
 void FIGHTSTG_drawHud(HpDisplay *task, TextWindow **windows);
 void FIGHTSTG_updateHud(HpDisplay *task, TextWindow **windows);
+void FIGHTSTG_drawPartnerViewFrame(PartnerView *task, FighterCamera **cameras);
 void FIGHTSTG_updatePartnerView(PartnerView *task, FighterCamera **cameras);
 void FIGHTSTG_updatePlayerTurn(PlayerTurn *task, PlayerTurnChild *children);
+void FIGHTSTG_drawSwitchInMenu(SwitchInMenu *task);
+void FIGHTSTG_createSwitchInWindows(SwitchInMenu *task, SwitchInMenuWindows *w);
+void FIGHTSTG_showSwitchInNames(SwitchInMenu *task, SwitchInMenuWindows *w, s32 visible);
+void FIGHTSTG_showSwitchInChoices(SwitchInMenu *task, SwitchInMenuWindows *w, s32 visible);
 void FIGHTSTG_updateSwitchInMenu(SwitchInMenu *task, SwitchInMenuWindows *w);
+void FIGHTSTG_showDigivolveNames(DigivolveMenu *task);
 void FIGHTSTG_updateDigivolveMenu(DigivolveMenu *task, void *children);
 SwitchInMenu *FIGHTSTG_createSwitchInMenu(s32 *result);
+void FIGHTSTG_drawItemMenu(ItemMenu *task);
+void FIGHTSTG_createItemWindows(ItemMenu *task, ItemMenuWindows *w);
+void FIGHTSTG_showItemPage(ItemMenu *task, ItemMenuWindows *w);
 void FIGHTSTG_updateItemMenu(ItemMenu *task, ItemMenuWindows *w);
+void FIGHTSTG_drawTechMenu(TechMenu *task);
+void FIGHTSTG_createTechWindows(TechMenu *task, TechMenuChild *children);
+void FIGHTSTG_showTechPage(TechMenu *task, TechMenuChild *children);
 void FIGHTSTG_updateTechMenu(TechMenu *task, TechMenuChild *children);
 void FIGHTSTG_drawMessageBox(BattleMessageBox *task);
 void FIGHTSTG_stepMessage(BattleMessageBox *task, BattleMessageBoxWindows *windows);
+void FIGHTSTG_updateMessage(BattleMessageBox *task, void *children);
 void FIGHTSTG_showMessage(BattleMessageBox *task, s32 type, s32 *data);
+void FIGHTSTG_finishMessage(BattleMessageBox *task);
+void FIGHTSTG_showCommands(CommandMenu *task);
 void FIGHTSTG_updateCommandMenu(CommandMenu *task, CommandMenuWindows *w);
+void FIGHTSTG_drawPageArrows(PartnerInfo *task);
+void FIGHTSTG_showPageButtons(PartnerInfo *task, TextWindow **windows);
+void FIGHTSTG_drawStatsFrame(PartnerInfo *task);
+void FIGHTSTG_showStats(PartnerInfo *task, TextWindow **windows);
+void FIGHTSTG_drawTechIcons(PartnerInfo *task);
+void FIGHTSTG_showTechs(PartnerInfo *task, TextWindow **windows);
 void FIGHTSTG_updatePartnerInfo(PartnerInfo *task, TextWindow **windows);
 void FIGHTSTG_updateSwitchMenu(SwitchMenu *task, SwitchMenuWindows *w);
 void FIGHTSTG_updateConfusedMenu(ConfusedMenu *task, ConfusedMenuWindows *w);
@@ -382,7 +405,12 @@ extern CursorLayout FIGHTSTG_switchCursor; /* FIGHTSTG_updateSwitchMenu's cursor
 extern CursorLayout FIGHTSTG_pairCursors[2]; /* FIGHTSTG_updateSwitchInMenu's cursors */
 extern CursorLayout FIGHTSTG_confusedCursor; /* FIGHTSTG_updateConfusedMenu's */
 extern StatLine FIGHTSTG_statLines[13];
-extern s16 FIGHTSTG_confusedMessages[16][2]; /* FIGHTSTG_updateConfusedMenu's results: the message, its line */
+/* A result of FIGHTSTG_updateConfusedMenu */
+typedef struct ConfusedMessage {
+    /* 0x0 */ s16 result; /* for ConfusedMenu.queue[0] */
+    /* 0x2 */ s16 text; /* its line of TEXT_BATTLE_MENU */
+} ConfusedMessage;
+extern ConfusedMessage FIGHTSTG_confusedMessages[16];
 extern s16 FIGHTSTG_confusedLines[8]; /* FIGHTSTG_updateConfusedMenu's lines, shuffled */
 extern RECT FIGHTSTG_cursorBarRect; /* where FIGHTSTG_drawCursorBar's bar is in VRAM */
 extern DR_MOVE FIGHTSTG_cursorBarMoves[4]; /* FIGHTSTG_drawCursorBar's bar */
@@ -398,14 +426,18 @@ SwitchMenu *FIGHTSTG_createSwitchMenu(s32 *result, s32 *line, s32 canCancel);
 SwitchInMenu *FIGHTSTG_createPairSwitchMenu(s32 *result, s32 *techResult);
 ConfusedMenu *FIGHTSTG_createConfusedMenu(s32 *result, Task *partnerView, Task *shotCamera);
 s32 FIGHTSTG_getPairDigimon(SwitchMenu *task, s32 index, s32 member);
+void FIGHTSTG_drawSwitchMenu(SwitchMenu *task);
+void FIGHTSTG_createSwitchWindows(SwitchMenu *task, SwitchMenuWindows *w);
+void FIGHTSTG_showSwitchFighters(SwitchMenu *task, SwitchMenuWindows *w);
 extern s32 FIGHTSTG_mpWindowX[4]; /* FIGHTSTG_createSwitchInWindows's MP windows' x */
 void FIGHTSTG_setMessageName(BattleMessageBox *task, BattleMessageBoxWindows *w, s32 side, s32 index);
+void FIGHTSTG_findFighters(BattleMessageBox *task, FighterFilter *filter);
 void FIGHTSTG_showFightersMessage(BattleMessageBox *task, BattleMessageBoxWindows *w, BattleMessage *msg);
 void FIGHTSTG_showConfusedCommands(ConfusedMenu *task);
 void FIGHTSTG_drawConfusedMessageBox(ConfusedMenu *task);
 void FIGHTSTG_stepConfusedMessage(ConfusedMenu *task, ConfusedMenuWindows *w);
-void FIGHTSTG_setConfusedName(ConfusedMenu *task, ConfusedMenuWindows *windows, s32 arg2);
-void FIGHTSTG_showConfusedMessage(ConfusedMenu *task, s32 index, s32 arg2);
+void FIGHTSTG_setConfusedName(ConfusedMenu *task, ConfusedMenuWindows *windows, s32 side);
+void FIGHTSTG_showConfusedMessage(ConfusedMenu *task, s32 index, s32 unused);
 void FIGHTSTG_drawCursorSprites(MenuCursor *task);
 void FIGHTSTG_drawCursorBar(s32 arg);
 

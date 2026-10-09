@@ -34,6 +34,7 @@ static inline void addNewDigimon(DigimonChange *task, Models *models, FightStage
         SOUND.playSound(0x41140000);
         models->add(models, 1, task->key1, 0);
         task->nextStep(task);
+        /* fallthrough */
     case 1:
         task->counter += GFX.funcs.getFrameTime();
         if (task->counter >= 180) {
@@ -211,6 +212,7 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
             default:
                 SOUND.loadBank(0x45);
                 task->nextStep(task);
+                /* fallthrough */
             case 1:
                 if (SOUND.isLoading() == 0) {
                     task->nextSubstate(task);
@@ -227,12 +229,14 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
             FILE_CACHE.request(task->file);
             task->idleMotion = models->get(models, 0)->idleMotion;
             task->nextSubstate(task);
+            /* fallthrough */
         case 2:
             if (FILE_CACHE.isLoading(task->file) != 0) {
                 break;
             }
             FILE_CACHE.request(FILE_CHANGE);
             task->nextSubstate(task);
+            /* fallthrough */
         case 3:
             if (FILE_CACHE.isLoading(FILE_CHANGE) != 0) {
                 break;
@@ -250,12 +254,14 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
         default:
             stage->setStage(stage, task->key2 != 0 ? 0x1F : 0x1C, 0x20, 0x20);
             task->nextSubstate(task);
+            /* fallthrough */
         case 1:
             addNewDigimon(task, models, stage);
             break;
         case 2:
             startChange(task, children, models, camera);
             task->nextSubstate(task);
+            /* fallthrough */
         case 3:
             wipeToWireframe(task, children, models);
             break;
@@ -282,6 +288,7 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
         case 6:
             swapInNewDigimon(task, models, camera);
             task->nextSubstate(task);
+            /* fallthrough */
         case 7:
             switch (task->step) {
             case 0:
@@ -302,6 +309,7 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
         case 9:
             models->get(models, 0)->motion = 13;
             task->nextSubstate(task);
+            /* fallthrough */
         case 10:
             task->counter += GFX.funcs.getFrameTime();
             if (task->counter >= 180) {
@@ -311,6 +319,7 @@ void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *ch
         case 11:
             stage->setStage(stage, BATTLE_SETUP.stage, 0x20, 0x20);
             task->nextSubstate(task);
+            /* fallthrough */
         case 12:
             if (stage->state != 2) {
                 models->face(models, 0);

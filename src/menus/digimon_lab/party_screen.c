@@ -7,30 +7,30 @@
    lower by pageRow */
 void STGDGLAB_showPartyPage(LabPartyScreen *screen, LabPartyScreenWindows *windows) {
     PartnerTotals totals;
-    s32 *pos;
+    LabWindowPos *pos;
     s32 member;
     s32 i;
 
     for (i = 0; i < 5; i++) {
-        pos = &STGDGLAB_data.pos[i * 3];
+        pos = &STGDGLAB_data.layout[i];
         if (windows->labels[i] == NULL) {
-            windows->labels[i] = createTextWindow(screen->layer, 3, pos[1], pos[2]);
+            windows->labels[i] = createTextWindow(screen->layer, 3, pos->x, pos->y);
             windows->labels[i]->setDepth(windows->labels[i], screen->depth - 1);
         }
-        windows->labels[i]->setString(windows->labels[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), pos[0]);
-        windows->labels[i]->setPos(windows->labels[i], pos[1], pos[2] + screen->pageRow * 0x7A);
+        windows->labels[i]->setString(windows->labels[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), pos->string);
+        windows->labels[i]->setPos(windows->labels[i], pos->x, pos->y + screen->pageRow * 0x7A);
     }
     member = screen->partners[screen->pick];
     if (member >= 0) {
         GAME.funcs.computeStats(member, &totals);
     }
     for (i = 0; i < 5; i++) {
-        pos = &STGDGLAB_data.pos[(i + 5) * 3];
+        pos = &STGDGLAB_data.layout[i + 5];
         if (windows->values[i] == NULL) {
-            windows->values[i] = createTextWindow(screen->layer, 3, pos[1], pos[2]);
+            windows->values[i] = createTextWindow(screen->layer, 3, pos->x, pos->y);
             windows->values[i]->setDepth(windows->values[i], screen->depth - 1);
         }
-        windows->values[i]->setPos(windows->values[i], pos[1], pos[2] + screen->pageRow * 0x7A);
+        windows->values[i]->setPos(windows->values[i], pos->x, pos->y + screen->pageRow * 0x7A);
         if (member < 0) {
             if (i == 0) {
                 windows->values[0]->setString(windows->values[0], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0x1C);
@@ -42,9 +42,9 @@ void STGDGLAB_showPartyPage(LabPartyScreen *screen, LabPartyScreenWindows *windo
         }
         windows->values[i]->setRightAlign(windows->values[i], 1);
     }
-    pos = &STGDGLAB_data.pos[30];
+    pos = &STGDGLAB_data.layout[10];
     if (windows->name == NULL) {
-        windows->name = createTextWindow(screen->layer, 1, pos[1], pos[2]);
+        windows->name = createTextWindow(screen->layer, 1, pos->x, pos->y);
         windows->name->setDepth(windows->name, screen->depth - 1);
     }
     if (member < 0) {
@@ -54,7 +54,7 @@ void STGDGLAB_showPartyPage(LabPartyScreen *screen, LabPartyScreenWindows *windo
         windows->name->setString(windows->name, GAME.funcs.getPartnerStats(member)->name, -1);
         windows->entriesHint->setPalette(windows->entriesHint, PALETTE_WHITE);
     }
-    windows->name->setPos(windows->name, pos[1], pos[2] + screen->pageRow * 0x7A);
+    windows->name->setPos(windows->name, pos->x, pos->y + screen->pageRow * 0x7A);
     screen->frame = 0;
 }
 
@@ -75,7 +75,7 @@ void STGDGLAB_hideWindows(LabPartyScreen *screen) {
 /* Draws the first screen's frames and the party's animations */
 void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children) {
     SpriteDrawer sprite;
-    LabAnim *anim;
+    PartnerAnim *anim;
     s32 member;
     s32 id;
     s32 i;

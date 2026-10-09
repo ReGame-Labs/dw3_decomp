@@ -43,8 +43,16 @@ typedef struct MemBlock {
     /* 0x8 */ s32 tag; /* MEM_* */
 } MemBlock;
 
+void freeMem(void *ptr);
+void heapNop(void);
+void freeMemByTag(s32 tag);
+void initHeap(void);
 void zeroMem(void *dst, s32 size);
-void *allocMem();
+void fillMem(s8 *dst, s8 value, s32 count);
+void *allocMem(s32 size, s32 tag);
+void allocMemHigh(s32 size, s32 tag);
+void *allocMemZeroed(s32 size, s32 tag);
+void lockMem(void *ptr, s32 lock);
 void *tryAllocMem(u32 size, s32 tag);
 void *tryAllocMemHigh(u32 size, s32 tag);
 

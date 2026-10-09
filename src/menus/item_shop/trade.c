@@ -34,7 +34,7 @@ void STITSHOP_showQuantity(ShopBuy *buy, ShopBuyWindows *win, s32 show) {
 void STITSHOP_showBuyTotal(ShopBuy *buy, ShopBuyWindows *win, s32 show) {
     if (show) {
         win->total->setString(win->total, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), 0x12);
-        win->total->setNumber(win->total, 1, GET_ITEM[0](buy->item)->price * buy->quantity);
+        win->total->setNumber(win->total, 1, ITEM_FUNCS.get(buy->item)->price * buy->quantity);
         win->yes->setString(win->yes, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), 0x13);
         win->no->setString(win->no, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), 0x14);
     } else {
@@ -152,7 +152,7 @@ static inline void STITSHOP_chooseBuyQuantity(ShopBuy *buy, ShopBuyWindows *win)
         }
     }
     if (old != buy->quantity) {
-        price = GET_ITEM[0](buy->item)->price;
+        price = ITEM_FUNCS.get(buy->item)->price;
         if (GAME.money < price * buy->quantity) {
             buy->quantity = GAME.money / price;
         }
@@ -187,7 +187,7 @@ static inline void STITSHOP_pickBuyItem(ShopBuy *buy, ShopBuyWindows *win) {
             win->total->setString(win->total, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), 0x1C);
             win->total->setVisible(win->total, 0);
             buy->substate = 45;
-        } else if (GAME.money < GET_ITEM[0](buy->item)->price) {
+        } else if (GAME.money < ITEM_FUNCS.get(buy->item)->price) {
             win->total->setString(win->total, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), 0x1B);
             win->total->setVisible(win->total, 0);
             buy->substate = 45;
@@ -228,8 +228,8 @@ static inline void STITSHOP_confirmBuy(ShopBuy *buy, ShopBuyWindows *win) {
         SOUND.playSound(SOUND_SELECT);
         buy->setSubstate(buy, 20);
         if (buy->choice == 0) {
-            if (ITEM_FUNCS->isKind(buy->item, ITEM_KIND_WEAPON) || ITEM_FUNCS->isKind(buy->item, ITEM_KIND_ARMOR) ||
-                ITEM_FUNCS->isKind(buy->item, ITEM_KIND_ACCESSORY)) {
+            if (ITEM_FUNCS.isKind(buy->item, ITEM_KIND_WEAPON) || ITEM_FUNCS.isKind(buy->item, ITEM_KIND_ARMOR) ||
+                ITEM_FUNCS.isKind(buy->item, ITEM_KIND_ACCESSORY)) {
                 buy->step = 1;
             }
             if (GAME.items[buy->item] + buy->quantity >= 100) {
@@ -238,7 +238,7 @@ static inline void STITSHOP_confirmBuy(ShopBuy *buy, ShopBuyWindows *win) {
                 GAME.items[buy->item] += buy->quantity;
             }
             win->info->showItem(win->info, buy->item, buy->quantity);
-            GAME.money -= GET_ITEM[0](buy->item)->price * buy->quantity;
+            GAME.money -= ITEM_FUNCS.get(buy->item)->price * buy->quantity;
             buy->shop->showMoney(buy->shop);
         }
     } else if (PAD_PRESSED(PAD_TRIANGLE)) {
@@ -350,7 +350,7 @@ static inline void STITSHOP_startBuyQuantity(ShopBuy *buy, ShopBuyWindows *win) 
     u16 price;
 
     win->list->close(win->list);
-    price = GET_ITEM[0](buy->item)->price;
+    price = ITEM_FUNCS.get(buy->item)->price;
     if (price == 0) {
         price = 1;
     }
@@ -878,7 +878,7 @@ static inline void STITSHOP_chooseSellQuantity(ShopSell *sell, ShopSellWindows *
         }
     }
     if (old != sell->quantity) {
-        GET_ITEM[0](sell->item); /* its result is unused */
+        ITEM_FUNCS.get(sell->item); /* its result is unused */
         win->quantity->setNumber(win->quantity, 0, sell->quantity);
         win->quantity->setRightAlign(win->quantity, 1);
         win->info->showItem(win->info, sell->item, sell->quantity);
@@ -917,7 +917,7 @@ static inline void STITSHOP_closeSellQuantity(ShopSell *sell, ShopSellWindows *w
 static inline void STITSHOP_openSellTotal(ShopSell *sell, ShopSellWindows *win) {
     if (STITSHOP_funcs.updateFade(&sell->panels[2]) != 0) {
         win->total->setString(win->total, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), 0x12);
-        win->total->setNumber(win->total, 1, GET_ITEM[0](sell->item)->sellPrice * sell->quantity);
+        win->total->setNumber(win->total, 1, ITEM_FUNCS.get(sell->item)->sellPrice * sell->quantity);
         win->yes->setString(win->yes, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), 0x22);
         win->no->setString(win->no, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), 0x14);
         sell->choice = 0;
@@ -944,7 +944,7 @@ static inline void STITSHOP_confirmSell(ShopSell *sell, ShopSellWindows *win) {
     } else if (PAD_PRESSED(PAD_CROSS)) {
         SOUND.playSound(SOUND_SELECT);
         if (sell->choice == 0) {
-            GAME.money += GET_ITEM[0](sell->item)->sellPrice * sell->quantity;
+            GAME.money += ITEM_FUNCS.get(sell->item)->sellPrice * sell->quantity;
             if (GAME.money > 9999999) {
                 GAME.money = 9999999;
             }

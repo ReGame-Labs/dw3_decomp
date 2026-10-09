@@ -37,7 +37,7 @@ Task *STDWTITL_startSplashLoaderTask(void) {
 
 /* The overlay's main task: by the low byte of the game mode, starts the title screen
    (0), the still screen (STDWTITL_SPLASH_MODE) or movie n-1 (any other) */
-void STDWTITL_tickScreen(Task *task, ScreenChildren *children) {
+void STDWTITL_tickScreen(Task *task, TitleModeChildren *children) {
     RECT rect;
     Layer *layer;
 
@@ -75,5 +75,5 @@ void STDWTITL_tickScreen(Task *task, ScreenChildren *children) {
 
 /* The overlay's entry: creates its main task (STDWTITL_tickScreen) */
 Task *STDWTITL_start(void) {
-    return createTask(STDWTITL_tickScreen, sizeof(Task), sizeof(ScreenChildren));
+    return createTask(STDWTITL_tickScreen, sizeof(Task), sizeof(TitleModeChildren));
 }

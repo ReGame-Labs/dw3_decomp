@@ -302,7 +302,9 @@ extern CardEffect CARDGAME_cardEffects[]; /* the effects of the first 60 cards, 
 CardBattle *CARDGAME_createBattle(s32 arg);
 void CARDGAME_showPanelValues(CardBattle *battle, CardBattleItems *items);
 extern s16 CARDGAME_animPiles[7][2]; /* the side and pile CARDGAME_updateCardAnims passes to CARDGAME_layOutPile */
-extern u16 CARDGAME_defaultDeck[]; /* the deck used when the chosen one is empty */
+/* the deck used when the chosen one is empty: its first 40 cards, as card
+   ids - 1 (CardBattle.playerDeck); nothing reads the 40 after them */
+extern u16 CARDGAME_defaultDeck[];
 extern CardOffset CARDGAME_deckWindowPos[3]; /* the three deck windows */
 extern u8 CARDGAME_turnStates[]; /* the next record.turnState state, by step and side */
 extern CardBattleMessage CARDGAME_battleMessages[]; /* the step and nextPhase of CARDGAME_startBattleMessage, by prevPhase */
@@ -310,7 +312,7 @@ extern CardBattleMessage CARDGAME_battleMessages[]; /* the step and nextPhase of
 extern s32 CARDGAME_slotRowPositions[2][4]; /* sprite positions, by SHIFT_PAL_SCREEN */
 extern CardOffset CARDGAME_panelIconPositions[2][2][2]; /* CARDGAME_drawPanelIcon's icon and label positions, by SHIFT_PAL_SCREEN and side (EU) */
 #endif
-void CARDGAME_startColorChange(CardBattle *battle, CardScreen *screen, s32 arg2, s32 arg3);
+void CARDGAME_startColorChange(CardBattle *battle, CardScreen *screen, s32 amount, s32 interval);
 extern s16 CARDGAME_cardWindowPositions[2][2][2]; /* two positions, then the same moved for SHIFT_PAL_SCREEN */
 extern s16 CARDGAME_colorFlags[]; /* a flag bit per card colour */
 extern s32 CARDGAME_discardPositions[][2]; /* x, y per side */
@@ -318,7 +320,7 @@ extern u8 CARDGAME_slotMoves[2][6][2]; /* per side, the slot moves (from, to) of
 extern u8 CARDGAME_slotMoveCounts[]; /* per side, the entries of CARDGAME_slotMoves */
 extern u8 CARDGAME_markedCounts[2]; /* per side, the marked slots */
 void CARDGAME_returnOpponentHand(CardBattle *battle, CardBattleItems *items);
-s32 CARDGAME_canPlayCard(CardBattle *battle, u8 *arg1, s32 card);
+s32 CARDGAME_canPlayCard(CardBattle *battle, u8 *points, s32 card);
 s32 CARDGAME_stepColorValue(CardBattle *battle, CardScreen *screen, s32 side, s32 color);
 s32 CARDGAME_stepShakeAway(CardBattle *battle, CardScreen *screen, s32 index);
 void CARDGAME_discardSlotCard(CardBattle *battle, CardScreen *screen, s32 side, s32 index);
@@ -370,13 +372,13 @@ void CARDGAME_showPileCard(CardBattle *battle, CardScreen *screen, s32 side, s32
 s32 CARDGAME_drawFromDeck(CardBattle *battle, CardScreen *screen, s32 side, s32 which);
 void CARDGAME_startDiscardCount(CardBattle *battle, CardScreen *screen, s32 side);
 s32 CARDGAME_returnUsedCards(CardBattle *battle, CardScreen *screen, s32 side);
-void CARDGAME_startDraw(CardBattle *battle, CardScreen *screen, s32 arg2);
+void CARDGAME_startDraw(CardBattle *battle, CardScreen *screen, s32 count);
 s32 CARDGAME_markDrawnCards(CardBattle *battle, CardScreen *screen, s32 side);
 void CARDGAME_drawMarkedCards(CardBattle *battle, CardScreen *screen, s32 side);
 s32 CARDGAME_drawNewCards(CardBattle *battle, CardScreen *screen, s32 side);
 void CARDGAME_startSlotSweep(CardBattle *battle, CardScreen *screen);
 s32 CARDGAME_stepSlotSweep(CardBattle *battle, CardScreen *screen, s32 which);
-void CARDGAME_markRecordHits(CardBattle *battle, CardScreen *screen, s32 arg2, s32 index);
+void CARDGAME_markRecordHits(CardBattle *battle, CardScreen *screen, s32 side, s32 index);
 void CARDGAME_putSlotCard(CardBattle *battle, CardScreen *screen, s32 side, s32 card);
 void CARDGAME_takeHandCard(CardBattle *battle, CardScreen *screen, s32 side);
 s32 CARDGAME_moveSlotCard(CardBattle *battle, CardScreen *screen, s32 side);
@@ -403,13 +405,13 @@ s32 CARDGAME_stepOpenPanels(CardBattle *battle, CardScreen *screen);
 s32 CARDGAME_checkPlayCondition(CardBattle *battle, CardScreen *screen, s32 kind);
 
 /* The steps CARDGAME_runEffectStep starts (CardBattle.effectStep.next) and runs (effectStep.id) */
-void CARDGAME_startSlotEffects(CardBattle *battle, CardScreen *screen, s32 arg2);
+void CARDGAME_startSlotEffects(CardBattle *battle, CardScreen *screen, s32 which);
 void CARDGAME_moveMarkedSlots(CardBattle *battle, CardScreen *screen, s32 arg2, s32 arg3);
 s32 CARDGAME_stepSlotStats(CardBattle *battle, CardScreen *screen);
 void CARDGAME_markTargetSlots(CardBattle *battle, CardScreen *screen);
 s32 CARDGAME_removeMarkedSlots(CardBattle *battle, CardScreen *screen);
 s32 CARDGAME_markPileCardsByColor(CardBattle *battle, CardScreen *screen, s32 side, s32 kind, s32 flags);
-s32 CARDGAME_markSlotsByColor(CardBattle *battle, CardScreen *screen, s32 arg2, s32 flags);
+s32 CARDGAME_markSlotsByColor(CardBattle *battle, CardScreen *screen, s32 side, s32 flags);
 s32 CARDGAME_discardHand(CardBattle *battle, CardScreen *screen, s32 side);
 s32 CARDGAME_drainColorValues(CardBattle *battle, CardScreen *screen);
 s32 CARDGAME_discardPrevCard(CardBattle *battle, CardScreen *screen);

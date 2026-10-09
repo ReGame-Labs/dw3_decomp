@@ -138,7 +138,7 @@ void STSTATUS_showItemHelp(ItemScreen *screen, s32 mode) {
 
     if (mode == 1) {
         windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_INFO)), screen->item);
-        info = GET_ITEM[0](screen->item);
+        info = ITEM_FUNCS.get(screen->item);
         if (info->type >= 2 && info->type <= 14) {
             data = info->data.record;
             windows->kind->setString(windows->kind, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), STSTATUS_kindStrings0[data->weapon.kind]);
@@ -180,7 +180,7 @@ s32 STSTATUS_itemInfoFaded(ItemScreen *screen) {
 /* Uses the chosen item on the chosen party member */
 void STSTATUS_useItem(ItemScreen *screen, ItemScreenWindows *windows) {
     s32 amount = 0;
-    ItemEffect *effect = GET_ITEM[0](screen->item)->data.effect;
+    ItemEffect *effect = ITEM_FUNCS.get(screen->item)->data.effect;
     PartnerStats *stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(screen->member));
     StatusStatItem *entry;
     s16 *values;
@@ -377,7 +377,7 @@ void STSTATUS_drawItemScreen(ItemScreen *screen) {
         } else {
             sprite.setScale(ONE, ONE, ONE);
             sprite.setTexture(0x140, 0);
-            sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS->getCategory(screen->item), 0x16, 0xAE);
+            sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS.getCategory(screen->item), 0x16, 0xAE);
         }
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x2F, 0xF, 0xA5);
@@ -541,7 +541,7 @@ static inline void STSTATUS_chooseItemList(ItemScreen *screen, ItemScreenWindows
         windows->optionCursor->setPos(windows->optionCursor, 0xB0, screen->option * 0xE + 0x31);
     } else if (PAD_PRESSED(PAD_CROSS)) {
         SOUND.playSound(SOUND_SELECT);
-        screen->itemCount = ITEM_FUNCS->list(STSTATUS_itemLists[screen->option], screen->items);
+        screen->itemCount = ITEM_FUNCS.list(STSTATUS_itemLists[screen->option], screen->items);
         if (screen->itemCount <= 0) {
             windows->help->setString(windows->help, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), screen->option + 0x64);
         } else {
@@ -762,7 +762,7 @@ static inline void STSTATUS_closeUsedItem(ItemScreen *screen) {
 static inline void STSTATUS_confirmItemUsed(ItemScreen *screen) {
     if (PAD_PRESSED(PAD_CROSS)) {
         SOUND.playSound(SOUND_MENU_CONFIRM);
-        screen->itemCount = ITEM_FUNCS->list(STSTATUS_itemLists[screen->option], screen->items);
+        screen->itemCount = ITEM_FUNCS.list(STSTATUS_itemLists[screen->option], screen->items);
         if (screen->itemCount <= 0) {
             screen->nextSubstate(screen);
             STSTATUS_data.funcs.startFade(&screen->fades[0], 1);

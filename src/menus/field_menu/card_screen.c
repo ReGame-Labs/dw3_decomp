@@ -474,7 +474,7 @@ void STSTATUS_updateCardScreen(PartyScreen *screen, PartyScreenWindows *windows)
 }
 
 /* Creates the screen with the party's pages (task) whose two options go to the
-   card album (scene 0x1200) or the deck editor (scene 0x400) */
+   card album (MODE_CARD_ALBUM) or the deck editor (MODE_DECK_EDITOR) */
 Task *STSTATUS_createCardScreen(FieldMenuScreen *menu, s32 extra) {
     PartyScreen *screen = createTask(STSTATUS_updateCardScreen, sizeof(PartyScreen), sizeof(PartyScreenWindows));
 

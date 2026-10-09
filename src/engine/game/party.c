@@ -60,11 +60,11 @@ void setParty(s32 set) {
 }
 
 /* Gives `count` copies of a card (up to CARD_COPIES_MAX) and marks it seen */
-void addCards(s32 item, s32 count) {
-    GAME.cardsSeen[item] = 1;
-    GAME.cards[item] += count;
-    if (GAME.cards[item] > CARD_COPIES_MAX) {
-        GAME.cards[item] = CARD_COPIES_MAX;
+void addCards(s32 card, s32 count) {
+    GAME.cardsSeen[card] = 1;
+    GAME.cards[card] += count;
+    if (GAME.cards[card] > CARD_COPIES_MAX) {
+        GAME.cards[card] = CARD_COPIES_MAX;
     }
 }
 

@@ -14,7 +14,7 @@ BattleAction FIGHTSTG_action = {
 };
 /* the battle: its fighters, speed and drawing functions */
 Battle FIGHTSTG_battle = {
-    0, 0, { 0 }, { { { 0 } } }, 0, 0, 0, 0, 0, 0, 0, { 0, 0 },
+    0, 0, { { 0 }, { { { 0 } } }, { 0, 0 }, 0, 0, 0, 0, 0 }, { 0, 0 },
     FIGHTSTG_countFrames, FIGHTSTG_setSpeed, FIGHTSTG_projectPoint, FIGHTSTG_drawQuad, FIGHTSTG_drawBlendedQuad,
 };
 /* the fighters' data, loaded one at a time */
@@ -52,7 +52,7 @@ void FIGHTSTG_startRestriction(s32 tech) {
     if (entry->effect != TECH_EFFECT_NO_SWITCH) {
         kind = entry->effect == TECH_EFFECT_NO_DIGIVOLVE;
     }
-    fighter = FIGHTSTG_battle.active[0];
+    fighter = FIGHTSTG_battle.state.active[0];
     i = FIGHTSTG_findEvent(FIGHTSTG_techEvents[kind], 0, fighter);
     time = (RANDOM.next() % 101 + 100) * entry->effectPower;
 
@@ -68,7 +68,7 @@ void FIGHTSTG_startRestriction(s32 tech) {
         FIGHTSTG_newEvent.args[2] = kind;
         FIGHTSTG_pushEvent(&FIGHTSTG_newEvent);
     }
-    target = &FIGHTSTG_battle.fighters[0][fighter];
+    target = &FIGHTSTG_battle.state.fighters[0][fighter];
     if (kind == 0) {
         target->flags |= FIGHTER_NO_SWITCH;
     } else {
@@ -81,7 +81,7 @@ void FIGHTSTG_queuePartnerTech(s32 tech) {
     FIGHTSTG_newEvent.type = EVENT_PARTNER_TECH;
     FIGHTSTG_newEvent.delay = 0x7FFF;
     FIGHTSTG_newEvent.args[0] = 0;
-    FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.active[0];
+    FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.state.active[0];
     FIGHTSTG_newEvent.args[2] = tech;
     FIGHTSTG_pushEvent(&FIGHTSTG_newEvent);
 }
@@ -99,7 +99,7 @@ void FIGHTSTG_queueBlastEnd(s32 kind) {
     FIGHTSTG_newEvent.type = EVENT_BLAST_END;
     FIGHTSTG_newEvent.delay = FIGHTSTG_getEventDelay(0, kind + 3);
     FIGHTSTG_newEvent.args[0] = 0;
-    FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.active[0];
+    FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.state.active[0];
     FIGHTSTG_pushEvent(&FIGHTSTG_newEvent);
 }
 
@@ -108,7 +108,7 @@ void FIGHTSTG_queueKnockOut(u8 side) {
     FIGHTSTG_newEvent.type = EVENT_KNOCK_OUT;
     FIGHTSTG_newEvent.delay = 1;
     FIGHTSTG_newEvent.args[0] = side;
-    FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.active[side != 0];
+    FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.state.active[side != 0];
     FIGHTSTG_pushEventFirst(&FIGHTSTG_newEvent);
 }
 
@@ -116,7 +116,7 @@ void FIGHTSTG_queueKnockOut(u8 side) {
    pushes back the one already queued */
 void FIGHTSTG_queueSpecialEnd(void) {
 #if VERSION_US
-    s32 i = FIGHTSTG_findEvent(EVENT_SPECIAL_END, 0, FIGHTSTG_battle.active[0]);
+    s32 i = FIGHTSTG_findEvent(EVENT_SPECIAL_END, 0, FIGHTSTG_battle.state.active[0]);
     s32 time = FIGHTSTG_getEventDelay(0, 8);
 
     if (i >= 0) {
@@ -127,14 +127,14 @@ void FIGHTSTG_queueSpecialEnd(void) {
         FIGHTSTG_newEvent.type = EVENT_SPECIAL_END;
         FIGHTSTG_newEvent.delay = time;
         FIGHTSTG_newEvent.args[0] = 0;
-        FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.active[0];
+        FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.state.active[0];
         FIGHTSTG_pushEvent(&FIGHTSTG_newEvent);
     }
 #elif VERSION_EU
     FIGHTSTG_newEvent.type = EVENT_SPECIAL_END;
     FIGHTSTG_newEvent.delay = 1;
     FIGHTSTG_newEvent.args[0] = 0;
-    FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.active[0];
+    FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.state.active[0];
     FIGHTSTG_pushEventFirst(&FIGHTSTG_newEvent);
 #endif
 }
@@ -144,7 +144,7 @@ void FIGHTSTG_queueDigidevolve(void) {
     FIGHTSTG_newEvent.type = EVENT_DIGIDEVOLVE;
     FIGHTSTG_newEvent.delay = 1;
     FIGHTSTG_newEvent.args[0] = 0;
-    FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.active[0];
+    FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.state.active[0];
     FIGHTSTG_pushEventFirst(&FIGHTSTG_newEvent);
 }
 
@@ -164,9 +164,9 @@ void FIGHTSTG_weakenEnemy(void) {
     FIGHTSTG_newEvent.delay = 3000;
     FIGHTSTG_pushEvent(&FIGHTSTG_newEvent);
     entry = FIGHTSTG_battleTableFunc(0x1D3);
-    FIGHTSTG_battle.weakened = 1;
-    FIGHTSTG_battle.fighters[1][0].boosts[1] = -entry->stats[1] >> 1;
-    FIGHTSTG_battle.fighters[1][0].boosts[3] = -entry->stats[2] >> 1;
+    FIGHTSTG_battle.state.weakened = 1;
+    FIGHTSTG_battle.state.fighters[1][0].boosts[1] = -entry->stats[1] >> 1;
+    FIGHTSTG_battle.state.fighters[1][0].boosts[3] = -entry->stats[2] >> 1;
 }
 
 /* Ends the enemy's weakness now: its queued event 24 runs next */

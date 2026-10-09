@@ -34,7 +34,7 @@ void setupStage(void) {
 void updateTileTimer(StageTileTimer *task) {
     StageTile *object;
     StageTile *tile;
-    StageActor *player;
+    Actor *player;
 
     switch (task->state) {
     case TASK_INIT:
@@ -54,7 +54,7 @@ void updateTileTimer(StageTileTimer *task) {
         player = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
         tile->y++;
         task->timer++;
-        player->y += 0x100;
+        player->pos.y += 0x100;
         if (task->timer >= 0x96) {
             task->setState(task, TASK_KILL);
         }
@@ -149,36 +149,36 @@ FieldEvent stageEvents[] = {
     { -1, NULL, 0, NULL, NULL },
 };
 s16 script1606[] = {
-    0x102, 2, 0x12F, 0x168, 3,
-    0x101, 0x20, 1, 7,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 2,
-    0x101, 2, 1, 3,
-    0x300, 0x1E,
-    0x200, 0, 1, 0x20, 0,
-    0x301,
-    0x300, 0x1E,
-    0x200, 0, 2, 2, 2,
-    0x101, 2, 7, 3,
-    0x301,
-    0x101, 2, 1, 3,
-    0x300, 0x1E,
-    0x200, 0, 3, 0x20, 0,
-    0x301,
-    0x300, 0x1E,
-    0x101, 0x323, 0x325, 2,
-    0x300, 0x5A,
-    0x101, 0x323, 0x326, 2,
-    0x300, 0x1E,
-    0x200, 0, 4, 2, 2,
-    0x101, 2, 7, 3,
-    0x301,
-    0x101, 2, 1, 3,
-    0x300, 0x1E,
-    0x101, 2, 1, 0,
-    0x300, 0x3C,
-    0x101, 0x356, 0x349, 2,
-    0x300, 0x30,
-    0x304, 0x278, 0xC0, 0x158, 5,
-    0,
+    SCRIPT_WALK(2, 0x12F, 0x168, 3),
+    SCRIPT_POSE(0x20, 1, 7),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_POSE(2, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 0x20, 0),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 2, 2, 2),
+    SCRIPT_POSE(2, 7, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(2, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 3, 0x20, 0),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(0x323, 0x325, 2),
+    SCRIPT_WAIT(0x5A),
+    SCRIPT_COMMAND(0x323, 0x326, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 4, 2, 2),
+    SCRIPT_POSE(2, 7, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(2, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 0),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x356, 0x349, 2),
+    SCRIPT_WAIT(0x30),
+    SCRIPT_LEAVE(0x278, 0xC0, 0x158, 5),
+    SCRIPT_END,
 };

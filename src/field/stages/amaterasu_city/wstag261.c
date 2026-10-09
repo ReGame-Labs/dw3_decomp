@@ -10,30 +10,30 @@ extern s16 tileLiftShake[];
 
 #include "common/update_tile_lift.inc.c"
 
-/* Ends the task when map object 0x348 (down = 0) or 0x349 (down = 1) is triggered */
-void handleCommand827(StageTileLift *task, s32 id) {
+/* Runs a script command of the lift's: moves it up or down */
+void handleCommand827(Lift *task, s32 id) {
     if (task != NULL) {
         switch (id) {
-        case 0x348:
+        case LIFT_UP:
             task->setState(task, TASK_DONE);
-            task->down = 0;
+            task->raised = 0;
             break;
-        case 0x349:
+        case LIFT_DOWN:
             task->setState(task, TASK_DONE);
-            task->down = 1;
+            task->raised = 1;
             break;
         }
     }
 }
 
-/* Creates the task of updateTileLift, down set from flag 0x1C3D */
-StageTileLift *createCommand827(s32 id) {
-    StageTileLift *task = createTaskWithId(updateTileLift, sizeof(StageTileLift), 0, id);
+/* Creates the lift (updateTileLift), raised when flag 0x1C3D is set */
+Lift *createCommand827(s32 id) {
+    Lift *task = createTaskWithId(updateTileLift, sizeof(Lift), 0, id);
 
     if (FLAGS_00.checkCondition(FLAG(0x1C, 0x3D), 1)) {
-        task->down = 1;
+        task->raised = 1;
     } else {
-        task->down = 0;
+        task->raised = 0;
     }
     return task;
 }
@@ -91,80 +91,80 @@ void setupStage(void) {
 }
 
 s16 script1321[] = {
-    0x102, 2, 0xBF, 0x190, 3,
-    0x100, 0x3F, 0xB0, 0x188,
-    0x101, 0x3F, 1, 0,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 2,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_SWITCH02, 2,
-    0x300, 0x3C,
-    0x101, 2, 1, 6,
-    0x300, 0x1E,
-    0x101, 2, 1, 5,
-    0x300, 0x1E,
-    0x101, 2, 1, 6,
-    0x300, 0x1E,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x101, 2, 1, 6,
-    0x300, 0x1E,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x101, 2, 1, 5,
-    0x300, 0x1E,
-    0x102, 2, 0xEC, 0x178, 5,
-    0x302, 2,
-    0x102, 2, 0x108, 0x184, 7,
-    0x302, 2,
-    0x200, 0, 1, 2, 0,
-    0x101, 2, 1, 3,
-    0x301,
-    0x100, 0x3F, 0xB0, 0x109,
-    0x101, 0x3F, 1, 0,
-    0x101, 0x33B, 0x348, 2,
-    0x300, 0x12C,
-    0x300, 0x1E,
-    0,
+    SCRIPT_WALK(2, 0xBF, 0x190, 3),
+    SCRIPT_PLACE(0x3F, 0xB0, 0x188),
+    SCRIPT_POSE(0x3F, 1, 0),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_SWITCH02, 2),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_POSE(2, 1, 6),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 5),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 6),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 6),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 5),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(2, 0xEC, 0x178, 5),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_WALK(2, 0x108, 0x184, 7),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_TALK(0, 1, 2, 0),
+    SCRIPT_POSE(2, 1, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_PLACE(0x3F, 0xB0, 0x109),
+    SCRIPT_POSE(0x3F, 1, 0),
+    SCRIPT_COMMAND(0x33B, LIFT_UP, 2),
+    SCRIPT_WAIT(0x12C),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_END,
 };
 s16 script1326[] = {
-    0x102, 2, 0xBF, 0x111, 3,
-    0x100, 0x3F, 0xB0, 0x109,
-    0x101, 0x3F, 1, 0,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 2,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_SWITCH02, 2,
-    0x300, 0x3C,
-    0x101, 2, 1, 6,
-    0x300, 0x1E,
-    0x101, 2, 1, 5,
-    0x300, 0x1E,
-    0x101, 2, 1, 6,
-    0x300, 0x1E,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x101, 2, 1, 6,
-    0x300, 0x1E,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x101, 2, 1, 5,
-    0x300, 0x1E,
-    0x102, 2, 0xEF, 0xF9, 5,
-    0x302, 2,
-    0x102, 2, 0x108, 0x105, 7,
-    0x302, 2,
-    0x200, 0, 1, 2, 0,
-    0x101, 2, 1, 3,
-    0x301,
-    0x100, 0x3F, 0xB0, 0x188,
-    0x101, 0x3F, 1, 0,
-    0x101, 0x33B, 0x349, 2,
-    0x300, 0x12C,
-    0x300, 0x1E,
-    0,
+    SCRIPT_WALK(2, 0xBF, 0x111, 3),
+    SCRIPT_PLACE(0x3F, 0xB0, 0x109),
+    SCRIPT_POSE(0x3F, 1, 0),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_SWITCH02, 2),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_POSE(2, 1, 6),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 5),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 6),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 6),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 5),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(2, 0xEF, 0xF9, 5),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_WALK(2, 0x108, 0x105, 7),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_TALK(0, 1, 2, 0),
+    SCRIPT_POSE(2, 1, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_PLACE(0x3F, 0xB0, 0x188),
+    SCRIPT_POSE(0x3F, 1, 0),
+    SCRIPT_COMMAND(0x33B, LIFT_DOWN, 2),
+    SCRIPT_WAIT(0x12C),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_END,
 };
 s16 tileLiftShake[] = {
     1, 2, 1, 0, -1, -2, -1, 0,

@@ -4,7 +4,7 @@
 
 /* Shows (creating it the first time) or hides a text window of the partner menu:
    2 to 4 are the party's names, the others strings of TEXT_DIGIMON_NAMING */
-void STDGNAME_showMenuWindow(MenuTask *task, TextWindow **window, s32 index, s32 show) {
+void STDGNAME_showMenuWindow(PartnerMenuTask *task, TextWindow **window, s32 index, s32 show) {
     s32 layer = 0;
     char *name;
 
@@ -32,7 +32,7 @@ void STDGNAME_showMenuWindow(MenuTask *task, TextWindow **window, s32 index, s32
 /* Draws the partner menu, its parts opening by scaling: its three sprites (the
    one at the chosen partner in a cycling palette), each partner's animation in
    its slot and the slots' frames over a glow in a cycling palette */
-void STDGNAME_drawMenu(MenuTask *task, TextWindow **windows) {
+void STDGNAME_drawMenu(PartnerMenuTask *task, TextWindow **windows) {
     SpriteDrawer sprite;
     s32 i;
     s32 value;
@@ -119,7 +119,7 @@ void STDGNAME_drawMenu(MenuTask *task, TextWindow **windows) {
 
 /* Up/down choose a partner; cross picks it to rename, triangle leaves the screen
    (choice -1, fading out). 1 once either is pressed */
-s32 STDGNAME_runMenu(MenuTask *task, TextWindow **windows) {
+s32 STDGNAME_runMenu(PartnerMenuTask *task, TextWindow **windows) {
     if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
         if (--STDGNAME_funcs.partner < 0) {
             STDGNAME_funcs.partner = task->partyCount - 1;
@@ -148,7 +148,7 @@ s32 STDGNAME_runMenu(MenuTask *task, TextWindow **windows) {
 /* The partner menu's task: opens its panels, then each partner's slot and name
    one after the other, runs the menu and closes everything once a choice is
    made */
-void STDGNAME_updateMenu(MenuTask *task, TextWindow **windows) {
+void STDGNAME_updateMenu(PartnerMenuTask *task, TextWindow **windows) {
     s32 i;
     s32 j;
     s32 done;
@@ -230,8 +230,8 @@ void STDGNAME_updateMenu(MenuTask *task, TextWindow **windows) {
 }
 
 /* Creates the partner menu (task) to pick the partner to rename */
-MenuTask *STDGNAME_createMenu(ScreenTask *screen) {
-    MenuTask *task = createTask(STDGNAME_updateMenu, sizeof(MenuTask), 10 * sizeof(TextWindow *));
+PartnerMenuTask *STDGNAME_createMenu(ScreenTask *screen) {
+    PartnerMenuTask *task = createTask(STDGNAME_updateMenu, sizeof(PartnerMenuTask), 10 * sizeof(TextWindow *));
 
     task->screen = screen;
     task->layer = SCREEN_LAYER;

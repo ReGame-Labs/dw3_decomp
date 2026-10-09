@@ -172,8 +172,17 @@ s32 layerGetOtShift(LayerView *layer) {
     return layer->otShift;
 }
 
-/* Layer method: the color the layer's area is cleared to (black: not cleared) */
-void layerSetBgColor(LayerView *layer, u8 r, u8 g, u8 b) {
+/*
+ * Layer method: the color the layer's area is cleared to (black: not
+ * cleared). An old-style definition, as Layer.setBgColor's unprototyped
+ * callers suit: they pass ints, which it takes as bytes.
+ */
+void layerSetBgColor(layer, r, g, b)
+LayerView *layer;
+u8 r;
+u8 g;
+u8 b;
+{
     layer->bgR = r;
     layer->bgB = b;
     layer->bgG = g;
@@ -184,8 +193,12 @@ void layerSetBgColor(LayerView *layer, u8 r, u8 g, u8 b) {
     }
 }
 
-/* Layer method: the drawing offset */
-void layerSetOffset(LayerView *layer, s16 x, s16 y) {
+/* Layer method: the drawing offset. Old-style, as layerSetBgColor */
+void layerSetOffset(layer, x, y)
+LayerView *layer;
+s16 x;
+s16 y;
+{
     layer->offsetX = x;
     layer->offsetY = y;
 }
@@ -208,14 +221,22 @@ void layerAddScroll(LayerView *layer, s32 dx, s32 dy) {
     layer->scrollY += dy;
 }
 
-/* Layer method: moves the clip rectangle */
-void layerSetClipPos(LayerView *layer, s16 x, s16 y) {
+/* Layer method: moves the clip rectangle. Old-style, as layerSetBgColor */
+void layerSetClipPos(layer, x, y)
+LayerView *layer;
+s16 x;
+s16 y;
+{
     layer->x = x;
     layer->y = y;
 }
 
-/* Layer method: resizes the clip rectangle */
-void layerSetClipSize(LayerView *layer, s16 w, s16 h) {
+/* Layer method: resizes the clip rectangle. Old-style, as layerSetBgColor */
+void layerSetClipSize(layer, w, h)
+LayerView *layer;
+s16 w;
+s16 h;
+{
     layer->w = w;
     layer->h = h;
 }

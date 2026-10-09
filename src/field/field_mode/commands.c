@@ -175,8 +175,10 @@ void FIELDSTG_handleFieldCommand(Task *task, s32 command) {
     switch (command) {
     case FIELD_COMMAND_ICON3:
         n++;
+        /* fallthrough */
     case FIELD_COMMAND_ICON2:
         n++;
+        /* fallthrough */
     case FIELD_COMMAND_ICON1:
         n++;
         icon = TASK_REGISTRY.funcs.find(FIELD_TASK_ICON, -1, -1);

@@ -63,6 +63,7 @@ void FIGHTSTG_updateFace(Face *task) {
             switch (task->blinkTimer >> 1) {
             case 0:
                 task->blinkTimer = (RANDOM.next() & 0x7F) + 60;
+                /* fallthrough */
             default:
                 eyes = 0;
                 break;

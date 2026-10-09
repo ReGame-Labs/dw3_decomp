@@ -177,7 +177,14 @@ s32 CARDGAME_promptText = 0;
 s16 CARDGAME_savedPanelScales[2] = {0, 0};
 s32 CARDGAME_selectionText = 0;
 u8 CARDGAME_slotMoves[2][6][2] = {{{0}}};
-/* per side, the entries of CARDGAME_slotMoves, then (CARDGAME_markedCounts,
-   a symbol of its own) the marked slots; the rest is not used */
+/* per side, the entries of CARDGAME_slotMoves; bytes 2 and 3 are
+   CARDGAME_markedCounts, the marked slots (config/<version>/
+   undefined_syms_cardgame.txt), and the rest is not used. Two symbols, not a
+   struct or an array: CARDGAME_removeMarkedSlots loads each address with its
+   own lui and addiu, and GCC 2.8.1 folds the members of one object into one
+   base (CARDGAME_removeMarkedSlots no longer matches as either). The zero
+   variables from CARDGAME_promptText on end the file, as an overlay's .bss
+   would: two 2-byte variables 2 bytes apart fit commons that the linker laid
+   out, not word-aligned C definitions. */
 u8 CARDGAME_slotMoveCounts[8] = {0};
 CardMessageWindow CARDGAME_savedScreenState = {0};

@@ -795,7 +795,6 @@ static inline void drawMeshPolygons(MeshDrawState *state) {
                 FIGHTSTG_addMeshPolyFT(state);
             }
         } while (0);
-    next:
         n = state->quad + 3;
         state->cmd += n;
         if (state->lit) {

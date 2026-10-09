@@ -741,7 +741,7 @@ void STGTRAIN_initIdle(TrainIdle *task, void *children) {
 }
 
 /* Left empty */
-void STGTRAIN_showIdle(TrainIdle *task, void *children, s32 arg2) {
+void STGTRAIN_showIdle(TrainIdle *task, void *children, s32 show) {
 }
 
 /* Only sets up a sprite drawer */

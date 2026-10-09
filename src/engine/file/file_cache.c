@@ -214,7 +214,7 @@ void freeFilesFrom(u32 addr) {
             if (end >= addr) {
                 HEAP.free(slot->data);
                 slot->file = 0;
-                slot->data = 0;
+                slot->data = NULL;
                 slot->lastUsed = 0;
                 slot->marked = 0;
                 slot->state = FILE_FREE;

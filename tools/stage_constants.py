@@ -6,7 +6,7 @@ names (include/field/field_map.h), and the condition codes
 (include/engine/game_state.h).
 
 - a field's or a battle's music (FieldState.music, the third word of a
-  Battle) becomes MUSIC(bank, n);
+  AreaBattle) becomes MUSIC(bank, n);
 - a sound the stages play, given to SOUND.playSound, stopSound or
   fadeOutSound or in a table of them, becomes its SOUND_ name from
   include/engine/sound.h or include/field/stage.h;
@@ -183,7 +183,7 @@ def rewrite(text, sounds):
         new = music(m.group(2))
         return m.group(1) + new + m.group(3) if new else m.group(0)
 
-    text = re.sub(r"(^Battle \w+ = \{ [^,]+, [^,]+, )(" + NUMBER + r")( \};)", battle, text, flags=re.M)
+    text = re.sub(r"(^AreaBattle \w+ = \{ [^,]+, [^,]+, )(" + NUMBER + r")( \};)", battle, text, flags=re.M)
 
     def call(m):
         v = int(m.group(2), 0)

@@ -9,20 +9,21 @@ s32 FIGHTSTG_opposedElements[] = {
     6,
 };
 
-/* What the battle's element boost adds to value for a technique of element
-   arg1: its power in 128ths of value for that element, half as much taken
-   off for the element that element weakens, nothing otherwise */
-s32 FIGHTSTG_getElementBoost(s32 value, s32 arg1) {
-    s16 *effect = &FIGHTSTG_battle.boostElement;
+/* What the battle's element boost adds to value for a technique of the
+   given element: the boost's amount in 128ths of value for the boosted
+   element, half as much taken off for the element it weakens, nothing
+   otherwise */
+s32 FIGHTSTG_getElementBoost(s32 value, s32 element) {
+    ElementBoost *boost = &FIGHTSTG_battle.state.boost;
 
-    if (effect[0] < ELEMENT_FIRST) {
+    if (boost->element < ELEMENT_FIRST) {
         return 0;
     }
-    if (arg1 == effect[0]) {
-        return value * effect[1] / 128;
+    if (element == boost->element) {
+        return value * boost->amount / 128;
     }
-    if (FIGHTSTG_opposedElements[arg1] == effect[0]) {
-        return -(value * effect[1] / 256);
+    if (FIGHTSTG_opposedElements[element] == boost->element) {
+        return -(value * boost->amount / 256);
     }
     return 0;
 }
@@ -93,11 +94,11 @@ s32 FIGHTSTG_computeDamage(u8 side, s32 id) {
     s32 enemy;
 
     if (side == 0) {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     }
     user = &FIGHTSTG_battleFuncs.stats[0];
     tech = &TECHS[id - 1];
@@ -105,7 +106,7 @@ s32 FIGHTSTG_computeDamage(u8 side, s32 id) {
     if (side == 0) {
         value = tech->power * user->stats[BATTLE_STAT_ATTACK] / target->stats[BATTLE_STAT_DEFENSE];
     } else {
-        enemy = FIGHTSTG_battle.active[1]; /* the match depends on reading it first */
+        enemy = FIGHTSTG_battle.state.active[1]; /* the match depends on reading it first */
         value = tech->power * BATTLE_SETUP.enemies[enemy].strength / 16 * user->stats[BATTLE_STAT_ATTACK] /
                 target->stats[BATTLE_STAT_DEFENSE];
     }
@@ -127,11 +128,11 @@ s32 FIGHTSTG_computeMagicDamage(u8 side, s32 id) {
     s16 resist;
 
     if (side == 0) {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     }
     user = &FIGHTSTG_battleFuncs.stats[0];
     tech = &TECHS[id - 1];
@@ -139,7 +140,7 @@ s32 FIGHTSTG_computeMagicDamage(u8 side, s32 id) {
     if (side == 0) {
         base = tech->power;
     } else {
-        enemy = FIGHTSTG_battle.active[1]; /* the match depends on reading it first */
+        enemy = FIGHTSTG_battle.state.active[1]; /* the match depends on reading it first */
         base = tech->power * BATTLE_SETUP.enemies[enemy].strength / 16;
     }
     power = base * (user->stats[BATTLE_STAT_SPIRIT] * 50 / target->stats[BATTLE_STAT_SPIRIT] + 50) / 100;
@@ -202,12 +203,12 @@ s32 FIGHTSTG_getDamage(s32 *args) {
     index = args[1];
     damage = args[2];
     team = side != 0;
-    if (index != FIGHTSTG_battle.active[team]) {
+    if (index != FIGHTSTG_battle.state.active[team]) {
         return 0;
     }
     FIGHTSTG_computeStats(side, 0, index);
     stats = &FIGHTSTG_battleFuncs.stats[1];
-    fighter = &FIGHTSTG_battle.fighters[team][index];
+    fighter = &FIGHTSTG_battle.state.fighters[team][index];
     maxHp = fighter->maxHp;
     result = (damage / 2 - (stats->resist[RESIST_POISON] + stats->resist[1]) / 10) * maxHp / 100;
     if (result <= 0) {
@@ -230,19 +231,19 @@ s32 FIGHTSTG_computeCounterDamage(u8 side, s32 id, s32 value) {
     TechData *entry;
 
     if (side == 0) {
-        fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+        fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
         own = id == GET_DIGIMON(fighter->id)->skills[0];
     } else {
-        fighter = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+        fighter = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
         FIGHTSTG_battleTableFunc(fighter->id);
         own = 0;
     }
     if (side == 0) {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     }
     if (own == 1) {
         saved = FIGHTSTG_battleFuncs.stats[0].tripleHit;
@@ -273,11 +274,11 @@ s32 FIGHTSTG_computeHeal(u8 side, s32 id) {
 #endif
 
     if (side == 0) {
-        fighter = FIGHTSTG_battle.active[0];
+        fighter = FIGHTSTG_battle.state.active[0];
         flag = SIDE_PLAYER;
     } else {
         flag = SIDE_ENEMY;
-        fighter = FIGHTSTG_battle.active[1];
+        fighter = FIGHTSTG_battle.state.active[1];
     }
     FIGHTSTG_computeStats(flag, 1, fighter);
     stats = &FIGHTSTG_battleFuncs.stats[0];
@@ -301,9 +302,9 @@ s32 FIGHTSTG_getHeal(u8 side, s32 index, s32 big) {
     s32 value;
 
     if (side == 0) {
-        fighter = &FIGHTSTG_battle.fighters[0][index];
+        fighter = &FIGHTSTG_battle.state.fighters[0][index];
     } else {
-        fighter = &FIGHTSTG_battle.fighters[1][index];
+        fighter = &FIGHTSTG_battle.state.fighters[1][index];
     }
     if (big) {
         value = fighter->maxHp * (RANDOM.next() % 9 + 8) / 128;

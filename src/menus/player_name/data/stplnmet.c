@@ -798,21 +798,11 @@ TextStyle STPLNMET_nameStyle = {
     FONT_GLYPH_MAP, FONT_ICON_MAP, 0xEA, 0x72,
 };
 /* The partner's animation beside the name: 7 frames per partner, -1 ends one */
-s32 STPLNMET_nameAnims[] = {
-    7, 8, 9, 10,
-    9, 8, -1, 14,
-    15, 16, 15, -1,
-    -1, -1, 11, 12,
-    13, 12, -1, -1,
-    -1, 3, 4, 5,
-    6, 5, 4, -1,
-    25, 26, 27, 28,
-    27, 26, -1, 0,
-    1, 2, 1, -1,
-    -1, -1, 17, 18,
-    19, 20, 19, 18,
-    -1, 21, 22, 23,
-    24, 23, 22, -1,
+s32 STPLNMET_nameAnims[][7] = {
+    {7, 8, 9, 10, 9, 8, -1}, {14, 15, 16, 15, -1, -1, -1},
+    {11, 12, 13, 12, -1, -1, -1}, {3, 4, 5, 6, 5, 4, -1},
+    {25, 26, 27, 28, 27, 26, -1}, {0, 1, 2, 1, -1, -1, -1},
+    {17, 18, 19, 20, 19, 18, -1}, {21, 22, 23, 24, 23, 22, -1},
 };
 /* The keys bigger than a cell, where the keyboard cursor highlights them */
 BigKey STPLNMET_bigKeys[] = {

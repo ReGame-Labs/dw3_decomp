@@ -25,10 +25,10 @@
 typedef struct FieldMenuScreen {
     TASK_HEADER(FieldMenuScreen);
     /* 0x50 */ s32 layer;
-    /* 0x54 */ s32 blinkPos;
-    /* 0x58 */ s32 blinkSkip;
+    /* 0x54 */ s32 bgScroll;
+    /* 0x58 */ s32 bgTick;
     /* 0x5C */ s32 pad; /* never read or written */
-    /* 0x60 */ s32 lateGame; /* STSTATUS_area.isLateGame() */
+    /* 0x60 */ s32 gameHalf; /* STSTATUS_getGameHalf */
     /* 0x64 */ s32 bgFile;
     /* 0x68 */ s32 bgFile2;
     /* 0x6C */ s32 bgArchive;
@@ -284,7 +284,7 @@ typedef struct StatusFuncs {
 
 /* Where the game is (STSTATUS_areaFuncs) */
 typedef struct StatusAreaFuncs {
-    /* 0x0 */ s32 (*isLateGame)(void); /* -1 outside of the field */
+    /* 0x0 */ s32 (*getGameHalf)(void); /* 0, 1, or -1 outside of the field */
     /* 0x4 */ s32 (*getArea)(void);
     /* 0x8 */ void (*getVisitedAreas)(s32 *out);
 } StatusAreaFuncs;
@@ -315,7 +315,7 @@ typedef struct StatusMapScreen {
     /* 0x064 */ u8 pad64[4]; /* never read or written */
     /* 0x068 */ s32 file; /* FILE_STATUS_BG or the next one but one */
     /* 0x06C */ u8 pad6C[0x78 - 0x6C]; /* never read or written */
-    /* 0x078 */ s32 lateGame;
+    /* 0x078 */ s32 gameHalf;
     /* 0x07C */ s32 progress; /* which towns are drawn */
     /* 0x080 */ s32 archive; /* entries of file: the map */
     /* 0x084 */ s32 archive1; /* the towns */
@@ -419,11 +419,6 @@ typedef struct TechScreen {
     /* 0x1E4 */ PanelAnim fade;
 } TechScreen;
 
-/* A partner's portrait animation: sprites, -1 ends it */
-typedef struct StatusAnim {
-    s32 frames[7];
-} StatusAnim;
-
 /* An area on the map screen */
 typedef struct StatusMapSpot {
     /* 0x0 */ s32 sprite;
@@ -439,20 +434,19 @@ typedef struct StatusMapPoint {
 /* The screens' tables, item lists and helpers, in one object: the functions
    that use two of them keep its address in a register */
 typedef struct StatusData {
-    /* 0x000 */ StatusAnim *partnerAnims; /* the partners' portraits */
+    /* 0x000 */ PartnerAnim *partnerAnims; /* the partners' portraits */
     /* 0x004 */ WindowPos *layout; /* where the windows go, and their strings */
     /* 0x008 */ StatusMapSpot *spots; /* the map's areas, from 1 */
     /* 0x00C */ StatusMapPoint *towns; /* from 1 */
-    /* 0x010 */ s16 items[404]; /* ITEM_FUNCS->list(2) */
+    /* 0x010 */ s16 items[404]; /* ITEM_FUNCS.list(2) */
     /* 0x338 */ s32 itemCount;
-    /* 0x33C */ s16 items2[404]; /* ITEM_FUNCS->list(3) */
+    /* 0x33C */ s16 items2[404]; /* ITEM_FUNCS.list(3) */
     /* 0x664 */ s32 item2Count;
     /* 0x668 */ StatusFuncs funcs;
 } StatusData;
 
 /* card_screen.c */
 void STSTATUS_updateScene(Task *task, FieldMenuScreen **child);
-Task *STSTATUS_start(void);
 void STSTATUS_createCardWindows(PartyScreen *screen, PartyScreenWindows *windows);
 void STSTATUS_showCardPage(PartyScreen *screen, PartyScreenWindows *windows, s32 member, s32 show);
 void STSTATUS_showCardChoices(PartyScreen *screen, PartyScreenWindows *windows, s32 show);
@@ -576,7 +570,7 @@ void STSTATUS_setScrollBarPos(ScrollBar *bar, s32 pos);
 void STSTATUS_updateScrollBar(ScrollBar *bar);
 ScrollBar *STSTATUS_createScrollBar(void);
 void STSTATUS_runScreens(FieldMenuScreen *menu, FieldMenuScreenChildren *children);
-void STSTATUS_drawBlink(FieldMenuScreen *menu);
+void STSTATUS_drawBackground(FieldMenuScreen *menu);
 void STSTATUS_updateMenu(FieldMenuScreen *menu, FieldMenuScreenChildren *children);
 FieldMenuScreen *STSTATUS_createMenu(void);
 void STSTATUS_loadFiles(void);
@@ -593,14 +587,9 @@ s32 STSTATUS_listEquipItems(s16 *out);
 s32 STSTATUS_listItemsOfKind(s32 kind, s16 *out);
 s32 STSTATUS_canEquip(s32 partner, s32 slot, s32 item);
 void STSTATUS_equip(s32 partner, s32 slot, s32 item);
-s32 STSTATUS_isLateGame(void);
+s32 STSTATUS_getGameHalf(void);
 s32 STSTATUS_getArea(void);
 void STSTATUS_getVisitedAreas(s32 *out);
-
-/* A partner's equipment, copied as a whole */
-typedef struct StatusEquip {
-    s16 items[6];
-} StatusEquip;
 
 /* What the items that raise a stat raise (STSTATUS_statItems), up to a kind of -1 */
 typedef struct StatusStatItem {
@@ -629,7 +618,7 @@ extern s32 STSTATUS_techSprites[]; /* the sprites of the technique counts */
 extern s32 STSTATUS_pageStats9[];
 extern s32 STSTATUS_cursorFrames[]; /* the map cursor's frames */
 extern Task *(*STSTATUS_screens[2][7])(FieldMenuScreen *menu, s32 extra);
-extern StatusAnim STSTATUS_partnerAnims[];
+extern PartnerAnim STSTATUS_partnerAnims[];
 extern WindowPos STSTATUS_layout[];
 extern StatusMapSpot STSTATUS_spots[];
 extern StatusMapPoint STSTATUS_towns[];

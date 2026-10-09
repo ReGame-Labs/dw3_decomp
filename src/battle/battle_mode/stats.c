@@ -62,7 +62,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
     }
     HEAP.zero(stats, sizeof(BattleStats));
     if (side == 0) {
-        fighter = &FIGHTSTG_battle.fighters[0][index];
+        fighter = &FIGHTSTG_battle.state.fighters[0][index];
         member = GAME.funcs.getPartyMember(index);
         digimon = &DIGIMON_DATA[member];
         GAME.funcs.computeStats(member, &totals);
@@ -120,7 +120,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
         values = &partner->equip[4];
         for (i = 0; i < 2; i++) {
             if (values[i] != 0) {
-                acc = GET_ITEM[0](values[i])->data.acc;
+                acc = ITEM_FUNCS.get(values[i])->data.acc;
                 if (acc->stat == 17) {
                     stats->resist[RESIST_POISON] = acc->amount;
                 } else if (acc->stat == 18) {
@@ -140,7 +140,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
         count = 0;
         for (i = 0; i < 4; i++) {
             if (values[i] > 0) {
-                info = GET_ITEM[0](values[i]);
+                info = ITEM_FUNCS.get(values[i]);
                 if (info->type >= 2 && info->type <= 14) {
                     data = info->data.record;
                     stats->accuracy += data->weapon.accuracy;
@@ -158,7 +158,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
         found = 0;
         for (i = 0; i < 4; i++) {
             if (i != 1 && values[i] > 0) {
-                data = GET_ITEM[0](values[i])->data.record;
+                data = ITEM_FUNCS.get(values[i])->data.record;
                 if (values[i] == 0x97) {
                     stats->statuses[HIT_POISON].chance = data->weapon.statusChance;
                     stats->statuses[HIT_POISON].power = data->weapon.statusPower;
@@ -191,10 +191,10 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
                 if (values[i] == 0x13C) {
                     stats->tripleHit = 1;
                 } else if (values[i] == 0x13D) {
-                    data = GET_ITEM[0](0x13D)->data.record;
+                    data = ITEM_FUNCS.get(0x13D)->data.record;
                     stats->criticalBonus = data->acc.amount;
                 } else if (values[i] == 0x13E) {
-                    data = GET_ITEM[0](0x13E)->data.record;
+                    data = ITEM_FUNCS.get(0x13E)->data.record;
                     stats->counter = data->acc.amount;
                 }
             }
@@ -202,7 +202,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
         values = &partner->equip[4];
         for (i = 0; i < 2; i++) {
             if (values[i] >= 0x153 && values[i] <= 0x167) {
-                data = GET_ITEM[0](values[i])->data.record;
+                data = ITEM_FUNCS.get(values[i])->data.record;
                 if (values[i] < 0x156) {
                     stats->element = 2;
                 } else if (values[i] < 0x159) {
@@ -220,27 +220,27 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
                 }
                 stats->elementPower = data->acc.amount;
             } else if (values[i] >= 0x145 && values[i] <= 0x146) {
-                data = GET_ITEM[0](values[i])->data.record;
+                data = ITEM_FUNCS.get(values[i])->data.record;
                 stats->damageCut = data->acc.amount;
             } else if (values[i] >= 0x14B && values[i] <= 0x14C) {
-                data = GET_ITEM[0](values[i])->data.record;
+                data = ITEM_FUNCS.get(values[i])->data.record;
                 stats->accuracy += data->acc.amount;
             } else if (values[i] >= 0x14D && values[i] <= 0x14E) {
-                data = GET_ITEM[0](values[i])->data.record;
+                data = ITEM_FUNCS.get(values[i])->data.record;
                 stats->evasion += data->acc.amount;
             } else if (values[i] >= 0x14F && values[i] <= 0x150) {
-                data = GET_ITEM[0](values[i])->data.record;
+                data = ITEM_FUNCS.get(values[i])->data.record;
                 stats->runAwayBonus = data->acc.amount;
             } else if (values[i] == 0x13F) {
-                data = GET_ITEM[0](values[i])->data.record;
+                data = ITEM_FUNCS.get(values[i])->data.record;
                 stats->runAwayGuard = 1;
             } else if (values[i] >= 0x147 && values[i] <= 0x148) {
-                data = GET_ITEM[0](values[i])->data.record;
+                data = ITEM_FUNCS.get(values[i])->data.record;
                 stats->stealBonus = data->acc.amount;
             }
         }
     } else {
-        fighter = &FIGHTSTG_battle.fighters[1][index];
+        fighter = &FIGHTSTG_battle.state.fighters[1][index];
         computeEnemyStats(stats, fighter, index);
     }
     if (which) {

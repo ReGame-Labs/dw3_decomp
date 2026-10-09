@@ -51,9 +51,9 @@ s32 CARDGAME_discardHand(CardBattle *battle, CardScreen *screen, s32 side) {
 
 /* Starts CARDGAME_stepColorValue: amount (effectStep.vars[3], below 0 to take) one at a
    time, one each interval frames (effectStep.vars[2]) */
-void CARDGAME_startColorChange(CardBattle *battle, CardScreen *screen, s32 arg2, s32 arg3) {
-    battle->effectStep.vars[2] = arg3;
-    battle->effectStep.vars[3] = arg2;
+void CARDGAME_startColorChange(CardBattle *battle, CardScreen *screen, s32 amount, s32 interval) {
+    battle->effectStep.vars[2] = interval;
+    battle->effectStep.vars[3] = amount;
     battle->effectStep.nextState = 1;
 }
 
@@ -601,13 +601,13 @@ s32 CARDGAME_returnUsedCards(CardBattle *battle, CardScreen *screen, s32 side) {
 }
 
 /* Starts drawing count cards (effectStep.count) */
-void CARDGAME_startDraw(CardBattle *battle, CardScreen *screen, s32 arg2) {
+void CARDGAME_startDraw(CardBattle *battle, CardScreen *screen, s32 count) {
     s32 i;
 
     for (i = 0; i < 40; i++) {
         battle->effectStep.marked[i] = 0;
     }
-    battle->effectStep.count = arg2;
+    battle->effectStep.count = count;
     battle->effectStep.flags = 0;
 }
 

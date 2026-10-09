@@ -7,7 +7,7 @@
    weapons' attack (STAT_STRENGTH), the armor's defense (STAT_DEFENSE) and the
    items' bonuses added, up to 999, less the penalties on STAT_STRENGTH,
    STAT_DEFENSE and STAT_SPEED */
-void STITSHOP_computeStats(s32 partner, ShopStatBlock *out) {
+void STITSHOP_computeStats(s32 partner, StatBlock *out) {
     s16 *equip;
     s32 i;
     s32 j;
@@ -21,12 +21,12 @@ void STITSHOP_computeStats(s32 partner, ShopStatBlock *out) {
     PartnerStats *d;
 
     /* PartnerStats' stats[] and status[] (the penalties), as one block */
-    *out = *(ShopStatBlock *)save->partners[partner].info.stats;
+    *out = *(StatBlock *)save->partners[partner].info.stats;
     d = &GAME.partners[partner].info;
     equip = d->equip;
     for (i = 0; i < 6; i++) {
         if (equip[i] > 0) {
-            info = GET_ITEM[0](equip[i]);
+            info = ITEM_FUNCS.get(equip[i]);
             type = info->type;
             data = info->data.record;
             if (IS_WEAPON_TYPE(type)) {
@@ -201,7 +201,7 @@ void STITSHOP_showOtherChanges(ShopInfo *info, TextWindow **win, ShopStatRow *ro
    the slot the item goes in, then the others it would change. The item is
    equipped to compute them and the partner's equipment put back */
 void STITSHOP_fillPartnerRows(ShopInfo *info, ShopInfoWindows *win, s32 member) {
-    ShopEquipSet equip;
+    PartnerEquip equip;
     ShopStatRow row;
     s32 partner = GAME.funcs.getPartyMember(member);
     PartnerStats *stats = GAME.funcs.getPartnerStats(partner);
@@ -209,19 +209,19 @@ void STITSHOP_fillPartnerRows(ShopInfo *info, ShopInfoWindows *win, s32 member) 
     ItemData *data;
 
     /* the partner's equipment, kept as one block while the item is tried on */
-    equip = *(ShopEquipSet *)stats->equip;
+    equip = *(PartnerEquip *)stats->equip;
     STITSHOP_computeStats(partner, &p->current);
     p->slot = STITSHOP_funcs.compareEquip(partner, info->item);
     STITSHOP_funcs.equip(partner, p->slot, info->item, 0);
     STITSHOP_computeStats(partner, &p->withItem);
-    *(ShopEquipSet *)stats->equip = equip;
+    *(PartnerEquip *)stats->equip = equip;
     p->changes = 2;
     switch (p->slot) {
     case 0:
     case 2:
     case 3:
     default:
-        if (IS_WEAPON_TYPE(GET_ITEM[0](info->item)->type)) {
+        if (IS_WEAPON_TYPE(ITEM_FUNCS.get(info->item)->type)) {
             p->rows[0] = 1;
             row.partner = member;
             row.stat = 0;
@@ -306,7 +306,7 @@ void STITSHOP_fillPartnerRows(ShopInfo *info, ShopInfoWindows *win, s32 member) 
         STITSHOP_showStat(info, win->partners[member].changes[2], &row);
         STITSHOP_colorStat(info, win->partners[member].changes[2], &row);
         row.skip = 5;
-        data = GET_ITEM[0](info->item)->data.record;
+        data = ITEM_FUNCS.get(info->item)->data.record;
         /* the row of the stat the accessory raises (7 raises them all and has
            none). The match depends on the range tests being written out: the
            inner one isn't merged with the outer one before cse */
@@ -406,9 +406,9 @@ void STITSHOP_showItemRows(ShopInfo *info, ShopInfoWindows *win, s32 show) {
         win->owned->setRightAlign(win->owned, 1);
         win->priceLabel->setString(win->priceLabel, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), 2);
         if (info->selling == 0) {
-            win->price->setNumber(win->price, 0, GET_ITEM[0](info->item)->price * info->quantity);
+            win->price->setNumber(win->price, 0, ITEM_FUNCS.get(info->item)->price * info->quantity);
         } else {
-            win->price->setNumber(win->price, 0, GET_ITEM[0](info->item)->sellPrice * info->quantity);
+            win->price->setNumber(win->price, 0, ITEM_FUNCS.get(info->item)->sellPrice * info->quantity);
         }
         win->price->setRightAlign(win->price, 1);
     } else {
@@ -429,7 +429,7 @@ void STITSHOP_showItemDesc(ShopInfo *info, ShopInfoWindows *win, s32 show) {
 
     if (show) {
         win->desc->setString(win->desc, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_INFO)), info->item);
-        item = GET_ITEM[0](info->item);
+        item = ITEM_FUNCS.get(info->item);
         if (item->type >= 2 && item->type < 14) {
             data = item->data.record;
             win->kind->setString(win->kind, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_SHOP)), STITSHOP_kindStrings[data->weapon.kind]);
@@ -768,8 +768,8 @@ void STITSHOP_updateInfo(ShopInfo *info, ShopInfoWindows *win) {
         info->panels[2].duration = 10;
         info->panels[3].duration = 10;
         if (info->selling == 0 &&
-            (ITEM_FUNCS->isKind(info->item, ITEM_KIND_WEAPON) || ITEM_FUNCS->isKind(info->item, ITEM_KIND_ARMOR) ||
-             ITEM_FUNCS->isKind(info->item, ITEM_KIND_ACCESSORY))) {
+            (ITEM_FUNCS.isKind(info->item, ITEM_KIND_WEAPON) || ITEM_FUNCS.isKind(info->item, ITEM_KIND_ARMOR) ||
+             ITEM_FUNCS.isKind(info->item, ITEM_KIND_ACCESSORY))) {
             info->hasStats = 1;
         }
         break;
@@ -790,7 +790,7 @@ void STITSHOP_updateInfo(ShopInfo *info, ShopInfoWindows *win) {
                 sprite.setPivot(0x140, offset + 0x81);
             } else {
                 sprite.setTexture(0x140, 0);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS->getCategory(info->item), 0x16,
+                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS.getCategory(info->item), 0x16,
                             offset + STITSHOP_lineY(info, 0x73));
             }
             sprite.setTexture(0x280, 0x100);
@@ -847,8 +847,8 @@ void STITSHOP_setKindVisible(ShopInfo *info, s32 visible) {
 /* Turns the details panel between the description and the partners' stats
    (info->turnPage); only for the items of kinds 3 to 5, which have stats */
 void STITSHOP_turnInfoPage(ShopInfo *info) {
-    if (ITEM_FUNCS->isKind(info->item, ITEM_KIND_WEAPON) != 0 || ITEM_FUNCS->isKind(info->item, ITEM_KIND_ARMOR) != 0 ||
-        ITEM_FUNCS->isKind(info->item, ITEM_KIND_ACCESSORY) != 0) {
+    if (ITEM_FUNCS.isKind(info->item, ITEM_KIND_WEAPON) != 0 || ITEM_FUNCS.isKind(info->item, ITEM_KIND_ARMOR) != 0 ||
+        ITEM_FUNCS.isKind(info->item, ITEM_KIND_ACCESSORY) != 0) {
         SOUND.playSound(SOUND_MENU_MOVE);
         info->substate = 10;
         info->shown = 0;

@@ -19,7 +19,7 @@ void OVL_NAME(updateNameEntry)(NameEntry *task, NameEntryWindows *windows) {
             OVL_NAME(keyboard).tabTexts = OVL_NAME(keyPages);
             OVL_NAME(keyboard).pages = OVL_NAME(keyChars);
         }
-        task->unkBC.duration = 10;
+        task->unusedBC.duration = 10;
         task->messageScale.duration = 10;
         task->keyboardScale.duration = 10;
         OVL_NAME(createNameWindows)(task, windows);

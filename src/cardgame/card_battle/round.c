@@ -56,8 +56,8 @@ s32 CARDGAME_stepSlotSweep(CardBattle *battle, CardScreen *screen, s32 which) {
 }
 
 /* Marks (marks) the plays whose effect reaches sprite index, by
-   their target (targetKind): a side, both, or a colour */
-void CARDGAME_markRecordHits(CardBattle *battle, CardScreen *screen, s32 arg2, s32 index) {
+   their target (targetKind): a side, both, or a colour; side is not used */
+void CARDGAME_markRecordHits(CardBattle *battle, CardScreen *screen, s32 side, s32 index) {
     s32 i;
     s32 color;
     s32 n;

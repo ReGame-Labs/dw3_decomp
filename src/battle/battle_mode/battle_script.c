@@ -53,7 +53,7 @@ void FIGHTSTG_runScriptHits(BattleScript *script, BattleScriptChildren *children
         }
         children->script = FIGHTSTG_createBattleScript();
         children->script->enemy = script->enemy == 0;
-        switch (script->scripts) {
+        switch (script->hitsPlayed) {
         case 0:
         default:
             hit = script->hits[0];
@@ -66,7 +66,7 @@ void FIGHTSTG_runScriptHits(BattleScript *script, BattleScriptChildren *children
             break;
         }
         children->script->index = hit + 1;
-        script->scripts++;
+        script->hitsPlayed++;
         break;
     }
 }
@@ -504,11 +504,11 @@ void FIGHTSTG_runScriptSound(BattleScript *script, BattleScriptChildren *childre
     s32 time = *script->pc++;
 
     if (sound == 0x62) {
-        sound = script->hits[script->sounds] == 3 ? 0x38 : script->sound;
-        script->sounds++;
+        sound = script->hits[script->soundsPlayed] == 3 ? 0x38 : script->sound;
+        script->soundsPlayed++;
     } else if (sound == 0x63) {
         sound = script->hits[3] == 3 ? 0x38 : script->sound;
-        script->sounds++;
+        script->soundsPlayed++;
     }
     if (children->sound == NULL) {
         children->sound = FIGHTSTG_playBattleSound(sound, time);

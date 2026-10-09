@@ -437,6 +437,7 @@ void CARDGAME_drawBlinker(CardBlinker *blinker) {
     switch (++blinker->blinkTime >> 2) {
     default:
         blinker->blinkTime = 0;
+        /* fallthrough */
     case 0:
         row = 0;
         break;

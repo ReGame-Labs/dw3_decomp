@@ -22,7 +22,7 @@ static inline void playCounterTech(Counterattack *task, BattleChild *children) {
         children[0].script->sound = tech->scriptSound;
     }
     {
-        BattleStats *stats = FIGHTSTG_battleFuncs.computeStats(task->side, 1, FIGHTSTG_battle.active[other]);
+        BattleStats *stats = FIGHTSTG_battleFuncs.computeStats(task->side, 1, FIGHTSTG_battle.state.active[other]);
 
         if (tech->element >= ELEMENT_FIRST || stats->element >= ELEMENT_FIRST) {
             if (tech->element >= ELEMENT_FIRST) {
@@ -46,9 +46,9 @@ static inline void playCounterTech(Counterattack *task, BattleChild *children) {
         children[0].script->effect = 0x2E;
         children[0].script->sound = 0x1E;
     }
-    row = FIGHTSTG_battle.fighters[1 - other];
+    row = FIGHTSTG_battle.state.fighters[1 - other];
     if (task->hit != 0) {
-        if (row[FIGHTSTG_battle.active[1 - other]].hp - task->damage <= 0) {
+        if (row[FIGHTSTG_battle.state.active[1 - other]].hp - task->damage <= 0) {
             children[0].script->hits[3] = 2;
         } else {
             children[0].script->hits[3] = 1;
@@ -58,11 +58,11 @@ static inline void playCounterTech(Counterattack *task, BattleChild *children) {
     } else {
         children[0].script->hits[3] = 3;
     }
-    row = FIGHTSTG_battle.fighters[0];
+    row = FIGHTSTG_battle.state.fighters[0];
     if (task->side != 0) {
-        row = FIGHTSTG_battle.fighters[1];
+        row = FIGHTSTG_battle.state.fighters[1];
     }
-    row[FIGHTSTG_battle.active[task->side != 0]].charge = 0;
+    row[FIGHTSTG_battle.state.active[task->side != 0]].charge = 0;
 }
 
 /* Shows whether the counterattack hit and for how much, and takes the damage
@@ -80,7 +80,7 @@ static inline void showCounterResult(Counterattack *task, BattleChild *children)
     }
     if (task->damage != 0) {
         s32 index = task->side == 0;
-        BattleFighter *fighter = &FIGHTSTG_battle.fighters[index][FIGHTSTG_battle.active[index]];
+        BattleFighter *fighter = &FIGHTSTG_battle.state.fighters[index][FIGHTSTG_battle.state.active[index]];
 
         fighter->hp -= task->damage;
         if (fighter->hp <= 0) {
@@ -114,22 +114,22 @@ void FIGHTSTG_updateCounterattack(Counterattack *task, BattleChild *children) {
             break;
         }
         other = task->side != 0;
-        fighter = &FIGHTSTG_battle.fighters[other][FIGHTSTG_battle.active[other]];
+        fighter = &FIGHTSTG_battle.state.fighters[other][FIGHTSTG_battle.state.active[other]];
         if ((fighter->flags & FIGHTER_PARALYZED) && FIGHTSTG_battleFuncs.testParalysis(task->side) != 0) {
             task->state = TASK_DONE;
             break;
         }
         if (task->side == 0) {
-            s32 index = FIGHTSTG_events.funcs.find(EVENT_PARTNER_TECH, 0, FIGHTSTG_battle.active[0]);
+            s32 index = FIGHTSTG_events.funcs.find(EVENT_PARTNER_TECH, 0, FIGHTSTG_battle.state.active[0]);
 
             if (index >= 0) {
                 task->tech = FIGHTSTG_events.events[index].args[2];
                 task->substate = 0;
                 FIGHTSTG_events.events[index].type = 0;
 #if VERSION_US
-            } else if (FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0])->counter != 0) {
+            } else if (FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0])->counter != 0) {
 #elif VERSION_EU
-            } else if (FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0])->counter != 0
+            } else if (FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0])->counter != 0
                        && FIGHTSTG_battleFuncs.rollCounter(0, task->received) != 0) {
 #endif
                 task->tech = GET_DIGIMON(fighter->id)->skills[0];
@@ -150,7 +150,7 @@ void FIGHTSTG_updateCounterattack(Counterattack *task, BattleChild *children) {
             }
             task->tech = FIGHTSTG_getEnemyAction(entry->counter.target);
             if (task->tech == 1) {
-                task->tech = FIGHTSTG_battleTableFunc((FIGHTSTG_battle.fighters[1] + FIGHTSTG_battle.active[1])->id)->techs[0];
+                task->tech = FIGHTSTG_battleTableFunc((FIGHTSTG_battle.state.fighters[1] + FIGHTSTG_battle.state.active[1])->id)->techs[0];
                 task->substate = 1;
             }
         }
@@ -161,7 +161,7 @@ void FIGHTSTG_updateCounterattack(Counterattack *task, BattleChild *children) {
         task->hit = FIGHTSTG_battleFuncs.rollHit(task->side, task->tech);
         if (task->hit != 0) {
             task->damage = FIGHTSTG_battleFuncs.computeCounterDamage(task->side, task->tech, task->received);
-            if (FIGHTSTG_battle.kind != BATTLE_KIND_NORMAL) {
+            if (FIGHTSTG_battle.state.kind != BATTLE_KIND_NORMAL) {
                 task->damage = WFIGHTMN_limitDamage(task->side, task->damage, 0);
             }
         }
@@ -211,7 +211,7 @@ Counterattack *FIGHTSTG_startCounterattack(s32 side, s32 received, s32 noKnockOu
 /* Revives one of the player's fighters at full HP, clearing its status
    events, and raises its defense by tech's effectPower (FIGHTSTG_battleFuncs.changeBoost) */
 void FIGHTSTG_reviveFighter(s32 tech, s32 fighter) {
-    BattleFighter *fighters = FIGHTSTG_battle.fighters[0];
+    BattleFighter *fighters = FIGHTSTG_battle.state.fighters[0];
     TechData *entry = &TECHS[tech - 1];
     s32 index;
     s32 i;

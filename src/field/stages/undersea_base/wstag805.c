@@ -398,155 +398,155 @@ void setupStage(void) {
 }
 
 s16 script880[] = {
-    0x100, 1, 0x2B4, 0x198,
-    0x101, 1, 1, 3,
-    0x100, 0xD2, 0x168, 0xC5,
-    0x101, 0xD2, 1, 3,
-    0x300, 0x1E,
-    0x102, 1, 0x288, 0x182, 3,
-    0x302, 1,
-    0x102, 1, 0x248, 0x136, 3,
-    0x302, 1,
-    0x102, 1, 0x1D8, 0xFE, 3,
-    0x302, 1,
-    0x200, 0, 5, 0xD2, 3,
-    0x101, 1, 1, 3,
-    0x301,
-    0x101, 1, 0xC, 3,
-    0x101, 0x323, 0x325, 1,
-    0x300, 0x3C,
-    0x101, 1, 1, 3,
-    0x101, 0x323, 0x326, 1,
-    0x300, 0x1E,
-    0x102, 1, 0x188, 0xD6, 3,
-    0x302, 1,
-    0x101, 1, 1, 3,
-    0x300, 0x1E,
-    0x200, 0, 1, 1, 3,
-    0x101, 1, 0xC, 3,
-    0x301,
-    0x101, 0x323, 0x325, 0xD2,
-    0x300, 0x3C,
-    0x101, 1, 1, 3,
-    0x101, 0xD2, 1, 7,
-    0x101, 0x323, 0x326, 0xD2,
-    0x300, 0x1E,
-    0x200, 0, 2, 0xD2, 2,
-    0x301,
-    0x300, 0x1E,
-    0x200, 0, 3, 1, 3,
-    0x301,
-    0x300, 0x1E,
-    0x200, 0, 4, 0xD2, 2,
-    0x301,
-    0x300, 0x1E,
-    0,
+    SCRIPT_PLACE(1, 0x2B4, 0x198),
+    SCRIPT_POSE(1, 1, 3),
+    SCRIPT_PLACE(0xD2, 0x168, 0xC5),
+    SCRIPT_POSE(0xD2, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(1, 0x288, 0x182, 3),
+    SCRIPT_WAIT_WALK(1),
+    SCRIPT_WALK(1, 0x248, 0x136, 3),
+    SCRIPT_WAIT_WALK(1),
+    SCRIPT_WALK(1, 0x1D8, 0xFE, 3),
+    SCRIPT_WAIT_WALK(1),
+    SCRIPT_TALK(0, 5, 0xD2, 3),
+    SCRIPT_POSE(1, 1, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(1, 0xC, 3),
+    SCRIPT_COMMAND(0x323, 0x325, 1),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_POSE(1, 1, 3),
+    SCRIPT_COMMAND(0x323, 0x326, 1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(1, 0x188, 0xD6, 3),
+    SCRIPT_WAIT_WALK(1),
+    SCRIPT_POSE(1, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 1, 3),
+    SCRIPT_POSE(1, 0xC, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_COMMAND(0x323, 0x325, 0xD2),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_POSE(1, 1, 3),
+    SCRIPT_POSE(0xD2, 1, 7),
+    SCRIPT_COMMAND(0x323, 0x326, 0xD2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 2, 0xD2, 2),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 3, 1, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 4, 0xD2, 2),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_END,
 };
 s16 script881[] = {
-    0x100, 1, 0x188, 0xD6,
-    0x101, 1, 1, 3,
-    0x100, 0x13C, 0x173, 0xCA,
-    0x101, 0x13C, 1, 1,
-    0x300, 0x78,
-    0x200, 0, 1, 1, 2,
-    0x101, 1, 7, 3,
-    0x301,
-    0x101, 1, 1, 3,
-    0x300, 0x1E,
-    0x102, 1, 0x17A, 0xCF, 3,
-    0x302, 1,
-    0x300, 0x1E,
-    0x100, 0x13C, 0, 0,
-    0x101, 0x13C, 1, 1,
-    0x300, 0x1E,
-    0x200, 0, 7, 1, 2,
-    0x101, 1, 7, 3,
-    0x301,
-    0x101, 1, 1, 3,
-    0x300, 0x3C,
-    0x101, 0x348, 0x35B, 1,
-    0x300, 0x3C,
-    0x200, 0, 3, 1, 4,
-    0x301,
-    0x101, 0x323, 0x325, 1,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_DEMO_BGM, 1,
-    0x300, 0x3C,
-    0x101, 0x323, 0x326, 1,
-    0x300, 0x1E,
-    0x200, 0, 4, 1, 2,
-    0x301,
-    0x102, 1, 0x160, 0xC2, 3,
-    0x302, 1,
-    0x101, 1, 1, 3,
-    0x300, 0x1E,
-    0x101, 1, 1, 3,
-    0x101, 0x323, 0x327, 1,
-    0x300, 0x3C,
-    0x101, 0x323, 0x326, 1,
-    0x300, 0x1E,
-    0x200, 0, 6, 1, 3,
-    0x301,
-    0x300, 0x78,
-    0x101, 0x323, 0x325, 1,
-    0x300, 0x3C,
-    0x101, 0x323, 0x326, 1,
-    0x300, 0x1E,
-    0x200, 0, 2, 1, 3,
-    0x301,
-    0x300, 0x1E,
-    0x601, 0, 0xE0, 0xB2,
-    0x101, 0x349, 0x335, 1,
-    0x300, 0x12C,
-    0x600, 0, 1,
-    0x300, 0x1E,
-    0x200, 0, 5, 1, 3,
-    0x301,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHAKE_CAMERA, 1,
-    0x300, 0x96,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_CAMERA_SHAKE, 1,
+    SCRIPT_PLACE(1, 0x188, 0xD6),
+    SCRIPT_POSE(1, 1, 3),
+    SCRIPT_PLACE(0x13C, 0x173, 0xCA),
+    SCRIPT_POSE(0x13C, 1, 1),
+    SCRIPT_WAIT(0x78),
+    SCRIPT_TALK(0, 1, 1, 2),
+    SCRIPT_POSE(1, 7, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(1, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(1, 0x17A, 0xCF, 3),
+    SCRIPT_WAIT_WALK(1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_PLACE(0x13C, 0, 0),
+    SCRIPT_POSE(0x13C, 1, 1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 7, 1, 2),
+    SCRIPT_POSE(1, 7, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(1, 1, 3),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x348, 0x35B, 1),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_TALK(0, 3, 1, 4),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_COMMAND(0x323, 0x325, 1),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_DEMO_BGM, 1),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x323, 0x326, 1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 4, 1, 2),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WALK(1, 0x160, 0xC2, 3),
+    SCRIPT_WAIT_WALK(1),
+    SCRIPT_POSE(1, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(1, 1, 3),
+    SCRIPT_COMMAND(0x323, 0x327, 1),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x323, 0x326, 1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 6, 1, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x78),
+    SCRIPT_COMMAND(0x323, 0x325, 1),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x323, 0x326, 1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 2, 1, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_LOOK_AT(0, 0xE0, 0xB2),
+    SCRIPT_COMMAND(0x349, 0x335, 1),
+    SCRIPT_WAIT(0x12C),
+    SCRIPT_FOLLOW(0, 1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 5, 1, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_SHAKE_CAMERA, 1),
+    SCRIPT_WAIT(0x96),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_CAMERA_SHAKE, 1),
 #if VERSION_US
-    0x304, 0xE03, 1, 1, 1,
+    SCRIPT_LEAVE(0xE03, 1, 1, 1),
 #elif VERSION_EU
-    0x304, 0xE04, 1, 1, 1,
+    SCRIPT_LEAVE(0xE04, 1, 1, 1),
 #endif
-    0,
+    SCRIPT_END,
 };
 s16 script882[] = {
-    0x600, 1, 0xD2,
-    0x100, 2, 0, 0,
-    0x101, 2, 1, 0,
-    0x100, 0xD2, 0x168, 0xC5,
-    0x101, 0xD2, 1, 3,
-    0x300, 0x1E,
-    0x300, 0xB4,
-    0x200, 0, 4, 0xD2, 3,
-    0x301,
-    0x300, 0x1E,
-    0x101, 0x348, 0x35B, 2,
-    0x300, 0x3C,
-    0x200, 0, 1, 0xD2, 4,
-    0x301,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_DEMO_BGM, 2,
-    0x300, 0x96,
-    0x601, 0, 0xE0, 0xB2,
-    0x101, 0x349, 0x335, 2,
-    0x300, 0x12C,
-    0x600, 0, 0xD2,
-    0x300, 0x1E,
-    0x200, 0, 2, 0xD2, 3,
-    0x301,
-    0x300, 0x5A,
-    0x200, 0, 3, 0xD2, 3,
-    0x301,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHAKE_CAMERA, 2,
-    0x300, 0x96,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_CAMERA_SHAKE, 2,
+    SCRIPT_FOLLOW(1, 0xD2),
+    SCRIPT_PLACE(2, 0, 0),
+    SCRIPT_POSE(2, 1, 0),
+    SCRIPT_PLACE(0xD2, 0x168, 0xC5),
+    SCRIPT_POSE(0xD2, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WAIT(0xB4),
+    SCRIPT_TALK(0, 4, 0xD2, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(0x348, 0x35B, 2),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_TALK(0, 1, 0xD2, 4),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_DEMO_BGM, 2),
+    SCRIPT_WAIT(0x96),
+    SCRIPT_LOOK_AT(0, 0xE0, 0xB2),
+    SCRIPT_COMMAND(0x349, 0x335, 2),
+    SCRIPT_WAIT(0x12C),
+    SCRIPT_FOLLOW(0, 0xD2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 2, 0xD2, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x5A),
+    SCRIPT_TALK(0, 3, 0xD2, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_SHAKE_CAMERA, 2),
+    SCRIPT_WAIT(0x96),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_CAMERA_SHAKE, 2),
 #if VERSION_US
-    0x304, 0xE03, 0x15E, 0xCA, 1,
+    SCRIPT_LEAVE(0xE03, 0x15E, 0xCA, 1),
 #elif VERSION_EU
-    0x304, 0xE04, 0x15E, 0xCA, 1,
+    SCRIPT_LEAVE(0xE04, 0x15E, 0xCA, 1),
 #endif
-    0,
+    SCRIPT_END,
 };
 StageFloaterSpot updateFloaterChainSpots[] = {
     { 8, 140, 0 },
@@ -677,53 +677,53 @@ StageFloaterFrame updateFloaterFrames1[] = {
     { 5, 8, 0 },
     { 255, 0, 0 },
 };
-Battle area0Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area0Battles = {
     0,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
       &area0Battle4, &area0Battle5, &area0Battle6, &area0Battle7 },
 };
-Battle area1Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area1Battles = {
     0,
     { &area1Battle0, &area1Battle1, &area1Battle2, &area1Battle3,
       &area1Battle4, &area1Battle5, &area1Battle6, &area1Battle7 },
 };
-Battle area2Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area2Battles = {
     0,
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-Battle area3Battle0 = { 22, 18, MUSIC(0x23, 0) };
-Battle area3Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle0 = { 22, 18, MUSIC(0x23, 0) };
+AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area3Battles = {
     0,
     { &area3Battle0, &area3Battle1, &area3Battle2, &area3Battle3,

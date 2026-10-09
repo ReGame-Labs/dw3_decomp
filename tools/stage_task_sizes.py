@@ -7,7 +7,7 @@ block of its children. Where the update's first parameter is a pointer to a
 type of include/field/stage.h (or include/field/field_map.h) of that size, the size
 becomes sizeof(Type); and where its second parameter is a pointer to such a
 type of the children's size, so does that one. The sizes come from compiling
-a probe of the headers with the game's compiler (make's TOOLCHAIN, CC1). A
+a probe of the headers with the game's compiler (make's CROSS, CC1). A
 number that is not the size of the type stays as it is. It changes no bytes,
 and can be run again at any time:
 
@@ -43,7 +43,7 @@ def version_sizes(version):
     names = sorted(names)
     probe = '#include "common.h"\n#include "stage.h"\n'
     probe += "".join(f"int size_{n} = sizeof({n});\n" for n in names)
-    toolchain = os.environ.get("TOOLCHAIN", "mipsel-linux-gnu-")
+    toolchain = os.environ.get("CROSS", "mipsel-linux-gnu-")
     cc1 = os.environ.get("CC1", "bin/gcc-2.8.1-psx/cc1")
     with tempfile.TemporaryDirectory() as tmp:
         c, i, s = (os.path.join(tmp, "probe" + ext) for ext in (".c", ".i", ".s"))

@@ -13,8 +13,9 @@ s32 FIELDSTG_getActorWidth(s32 index) {
     return FIELDSTG_actorWidths[index];
 }
 
-/* Picks the stage overlay of the mode (FIELDSTG_stages): its file and its
-   setup; hangs if there is none */
+/* Picks the stage overlay of the mode (FIELDSTG_stages, in the European
+   version's extra chapter FIELDSTG_extraStages and then those): its file and
+   its setup; hangs if there is none */
 void FIELDSTG_pickStage(void) {
     StageEntry *entry;
     s32 mode;
@@ -23,9 +24,9 @@ void FIELDSTG_pickStage(void) {
     entry = FIELDSTG_stages;
 #elif VERSION_EU
     if (GAME.progress != FIELD_PROGRESS_EXTRA) {
-        entry = FIELDSTG_euStages;
-    } else {
         entry = FIELDSTG_stages;
+    } else {
+        entry = FIELDSTG_extraStages;
     }
 #endif
     mode = GAME.funcs.getMode();

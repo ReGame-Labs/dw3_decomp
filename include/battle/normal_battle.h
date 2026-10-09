@@ -9,7 +9,7 @@
 
 /* The item a partner can equip that makes FIGHTSTG's FIGHTSTG_queueRecovery act on
    it at the start of the battle */
-#define WFIGHTMN_ITEM 0x140
+#define WFIGHTMN_RECOVERY_ITEM 0x140
 
 /* The battle menu (WFIGHTMN_start), registered as BATTLE_TASK_MENU */
 typedef struct BattleMenu {
@@ -38,14 +38,33 @@ typedef struct BattleMenuChildren {
 
 /* The screen its layers cover */
 extern RECT WFIGHTMN_screen;
-/* A technique's look by its effect and by its element, for WFIGHTMN_bringLastEnemy */
-extern s32 WFIGHTMN_effectVisuals[][3];
-extern s32 WFIGHTMN_elementVisuals[][4];
+/* A technique's look (TechData's script fields) by its effect, for
+   WFIGHTMN_bringLastEnemy */
+typedef struct EffectLook {
+    /* 0x0 */ s32 effect; /* TechData.effect, -1 ends the list */
+    /* 0x4 */ s32 scriptEffect;
+    /* 0x8 */ s32 scriptSound;
+} EffectLook;
+/* A technique's look by its element, for WFIGHTMN_bringLastEnemy */
+typedef struct ElementLook {
+    /* 0x0 */ s32 element; /* TechData.element */
+    /* 0x4 */ s32 scriptEffect;
+    /* 0x8 */ s32 scriptSound;
+    /* 0xC */ s32 scriptStage;
+} ElementLook;
+/* A battle script's look (BattleScript.effect and sound) */
+typedef struct ScriptLook {
+    /* 0x0 */ s32 effect;
+    /* 0x4 */ s32 sound;
+} ScriptLook;
+extern EffectLook WFIGHTMN_effectVisuals[];
+extern ElementLook WFIGHTMN_elementVisuals[];
 /* WFIGHTMN_startTech's effects */
-extern s32 WFIGHTMN_actionEffects[][2];
+extern ScriptLook WFIGHTMN_actionEffects[];
 /* The battle menu's states, by its substate */
 extern void (*WFIGHTMN_states[])(BattleMenu *task, BattleMenuChildren *children);
 
+void WFIGHTMN_loadFiles(BattleLoader *task);
 BattleLoader *WFIGHTMN_createLoader(void);
 
 /* setup.c */
@@ -57,6 +76,7 @@ void WFIGHTMN_markFought(void);
 void WFIGHTMN_markPicked(BattleMenu *task, BattleMenuChildren *children);
 
 /* menu.c */
+void WFIGHTMN_updateMenu(BattleMenu *task, BattleMenuChildren *children);
 void WFIGHTMN_cancelBlast(void);
 void WFIGHTMN_runTurn(BattleMenu *task);
 /* The states in WFIGHTMN_states */
@@ -82,5 +102,6 @@ void WFIGHTMN_digidevolve(BattleMenu *task, BattleMenuChildren *children);
 void WFIGHTMN_showWon(BattleMenu *task, BattleMenuChildren *children);
 void WFIGHTMN_bringLastEnemy(BattleMenu *task, BattleMenuChildren *children);
 void WFIGHTMN_restoreEnemy(BattleMenu *task, BattleMenuChildren *children);
+void WFIGHTMN_recordTech(u8 side, s32 id);
 
 #endif /* WFIGHTMN_H */

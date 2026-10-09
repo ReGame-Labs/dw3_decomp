@@ -17,11 +17,11 @@ s32 FIGHTSTG_rollCritical(u8 side, s32 id) {
     s32 k;
 
     if (side == 0) {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     }
     chance = 4;
     atk = &FIGHTSTG_battleFuncs.stats[0];
@@ -33,7 +33,7 @@ s32 FIGHTSTG_rollCritical(u8 side, s32 id) {
         }
     } else if (atk->criticalBonus != 0) {
         k = side != 0;
-        fighter = &FIGHTSTG_battle.fighters[k][FIGHTSTG_battle.active[k]];
+        fighter = &FIGHTSTG_battle.state.fighters[k][FIGHTSTG_battle.state.active[k]];
         if (fighter->special) {
             chance = atk->criticalBonus * 2 + 4;
         } else {
@@ -53,7 +53,7 @@ s32 FIGHTSTG_rollCritical(u8 side, s32 id) {
         }
     }
     j = side == 0;
-    fighter = &FIGHTSTG_battle.fighters[j][FIGHTSTG_battle.active[j]];
+    fighter = &FIGHTSTG_battle.state.fighters[j][FIGHTSTG_battle.state.active[j]];
     if (fighter->flags & FIGHTER_PARALYZED) {
         chance += fighter->paralysis >> 3;
     }
@@ -79,17 +79,17 @@ s32 FIGHTSTG_rollMagicCritical(u8 side, s32 id) {
 
 #if VERSION_US
     if (side == 0) {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     }
 #elif VERSION_EU
     if (side == 0) {
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
     }
 #endif
     def = &FIGHTSTG_battleFuncs.stats[1];
@@ -103,7 +103,7 @@ s32 FIGHTSTG_rollMagicCritical(u8 side, s32 id) {
         chance = value + 0x40;
     }
     j = side == 0;
-    fighter = &FIGHTSTG_battle.fighters[j][FIGHTSTG_battle.active[j]];
+    fighter = &FIGHTSTG_battle.state.fighters[j][FIGHTSTG_battle.state.active[j]];
     if (fighter->flags & FIGHTER_PARALYZED) {
         chance += fighter->paralysis >> 3;
     }
@@ -129,17 +129,17 @@ s32 FIGHTSTG_rollHit(u8 side, s32 id) {
     s32 diff;
 
     if (side == 0) {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     }
     atk = &FIGHTSTG_battleFuncs.stats[0];
     def = &FIGHTSTG_battleFuncs.stats[1];
     entry = &TECHS[id - 1];
     if (side == 0) {
-        if (FIGHTSTG_battle.kind == BATTLE_KIND_FINAL_LAST) {
+        if (FIGHTSTG_battle.state.kind == BATTLE_KIND_FINAL_LAST) {
             return (RANDOM.next() & 0x7F) >= 0x2B;
         }
         diff = atk->stats[BATTLE_STAT_SPEED] + atk->accuracy - def->stats[BATTLE_STAT_SPEED];
@@ -171,16 +171,16 @@ s32 FIGHTSTG_rollMagicHit(u8 side, s32 id) {
     s32 diff;
 
     if (side == 0) {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     }
     atk = &FIGHTSTG_battleFuncs.stats[0];
     def = &FIGHTSTG_battleFuncs.stats[1];
     entry = &TECHS[id - 1];
-    if (side == 0 && FIGHTSTG_battle.kind == BATTLE_KIND_FINAL_LAST) {
+    if (side == 0 && FIGHTSTG_battle.state.kind == BATTLE_KIND_FINAL_LAST) {
         return (RANDOM.next() & 0x7F) >= 0x2B;
     }
     diff = atk->stats[BATTLE_STAT_WISDOM] - def->stats[BATTLE_STAT_WISDOM];
@@ -204,11 +204,11 @@ s32 FIGHTSTG_rollPoison(u8 side, s32 id) {
         if (BATTLE_SETUP.blocks[BATTLE_BLOCK_POISON]) {
             return 0;
         }
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     }
     atk = &FIGHTSTG_battleFuncs.stats[0];
     def = &FIGHTSTG_battleFuncs.stats[1];
@@ -247,11 +247,11 @@ static inline s32 rollStatus(u8 side, s32 id, s32 block, s32 status, s32 resist,
         if (BATTLE_SETUP.blocks[block]) {
             return 0;
         }
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     }
     atk = &FIGHTSTG_battleFuncs.stats[0];
     def = &FIGHTSTG_battleFuncs.stats[1];
@@ -295,11 +295,11 @@ s32 FIGHTSTG_rollSleep(u8 side, s32 id) {
         if (BATTLE_SETUP.blocks[BATTLE_BLOCK_SLEEP]) {
             return 0;
         }
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     }
     atk = &FIGHTSTG_battleFuncs.stats[0];
     def = &FIGHTSTG_battleFuncs.stats[1];
@@ -335,14 +335,14 @@ s32 FIGHTSTG_rollSteal(u8 side, s32 id) {
         if (BATTLE_SETUP.blocks[BATTLE_BLOCK_STEAL]) {
             return 0;
         }
-        if (FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]].item <= 0) {
+        if (FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]].item <= 0) {
             return 0;
         }
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     }
     if (side == 0) {
         atk = &FIGHTSTG_battleFuncs.stats[0];
@@ -353,7 +353,7 @@ s32 FIGHTSTG_rollSteal(u8 side, s32 id) {
             ratio = 200;
         }
         power = (entry->effectChance + atk->stealBonus) * 100 / 64;
-        chance = FIGHTSTG_battleTableFunc(FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]].id)->itemChance * ratio * power / 10000;
+        chance = FIGHTSTG_battleTableFunc(FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]].id)->itemChance * ratio * power / 10000;
         roll = RANDOM.next() % 1024;
         if (roll < chance) {
             return 1;
@@ -375,7 +375,7 @@ s32 FIGHTSTG_rollDrain(u8 side, s32 id) {
 #if VERSION_US
     stats = &FIGHTSTG_battleFuncs.stats[0];
 #elif VERSION_EU
-    stats = FIGHTSTG_computeStats(side, 1, FIGHTSTG_battle.active[side >> 4]);
+    stats = FIGHTSTG_computeStats(side, 1, FIGHTSTG_battle.state.active[side >> 4]);
 #endif
     entry = &TECHS[id - 1];
     if (entry->effect < TECH_EFFECT_FIRST) {
@@ -400,7 +400,7 @@ s32 FIGHTSTG_rollDedigivolve(s32 actor, s32 id) {
     s32 i;
 
     for (i = 0; i < 8; i++) {
-        if (DIGIMON_DATA[i].id == FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]].id) {
+        if (DIGIMON_DATA[i].id == FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]].id) {
             return 0;
         }
     }
@@ -413,8 +413,8 @@ s32 FIGHTSTG_rollStatusRaise(s32 actor, s32 id) {
     TechData *entry;
     s32 chance;
 
-    FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-    FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
+    FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
+    FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     entry = &TECHS[id - 1];
     chance = entry->effectChance + (FIGHTSTG_battleFuncs.stats[0].stats[BATTLE_STAT_WISDOM] - FIGHTSTG_battleFuncs.stats[1].stats[BATTLE_STAT_WISDOM]) / 8;
     return (RANDOM.next() & 0x7F) < chance;
@@ -431,11 +431,11 @@ s32 FIGHTSTG_rollNoDigivolve(s32 actor, s32 id) {
 }
 
 #if VERSION_EU
-/* FIGHTSTG_battleFuncs.rollCounter: a random test, likelier the bigger arg1 is next
-   to the player's fighter's max HP */
-s32 FIGHTSTG_rollCounter(s32 arg0, s32 arg1) {
-    BattleFighter *fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
-    s32 chance = (arg1 << 6) / fighter->maxHp + 32;
+/* FIGHTSTG_battleFuncs.rollCounter: a random test, likelier the bigger damage is next
+   to the player's fighter's max HP; side is not used */
+s32 FIGHTSTG_rollCounter(s32 side, s32 damage) {
+    BattleFighter *fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
+    s32 chance = (damage << 6) / fighter->maxHp + 32;
 
     return (RANDOM.next() & 0x7F) < chance;
 }
@@ -445,22 +445,22 @@ s32 FIGHTSTG_rollCounter(s32 arg0, s32 arg1) {
    both sides' stats; the player can't while BATTLE_BLOCK_RUN_AWAY is set, and
    in the European version neither can the enemy while its fighter is asleep.
    The match depends on the battle's runAttempts being read through a pointer
-   to its active array, taken before side is tested again, and on the flags
-   being tested with family as a halfword. */
+   to its state, taken before side is tested again, and on the flags being
+   tested with family as a halfword. */
 s32 FIGHTSTG_testRunAway(u8 side) {
     BattleStats *atk;
     BattleStats *def;
     s32 chance;
-    s32 *active;
+    BattleState *state;
 
     if (side == 0) {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
-        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     }
-    active = FIGHTSTG_battle.active;
+    state = &FIGHTSTG_battle.state;
     atk = &FIGHTSTG_battleFuncs.stats[0];
     def = &FIGHTSTG_battleFuncs.stats[1];
     if (side == 0) {
@@ -470,7 +470,7 @@ s32 FIGHTSTG_testRunAway(u8 side) {
         if (*(u16 *)&atk->flags & (FIGHTER_ASLEEP | FIGHTER_NO_SWITCH)) {
             return 0;
         }
-        chance = (((Battle *)(active - 2))->runAttempts + 1) * 8;
+        chance = (state->runAttempts + 1) * 8;
         if (atk->flags & FIGHTER_PARALYZED) {
             chance >>= 1;
         }
@@ -514,17 +514,17 @@ s32 FIGHTSTG_testWakeUp(u8 side, s32 value) {
     BattleStats *def;
 
     if (side == 0) {
-        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.active[0]);
+        FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
     } else {
-        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     }
     team = side != 0;
     def = &FIGHTSTG_battleFuncs.stats[1];
-    index = FIGHTSTG_events.funcs.find(EVENT_STATUS_END + 2, side, FIGHTSTG_battle.active[team]);
+    index = FIGHTSTG_events.funcs.find(EVENT_STATUS_END + 2, side, FIGHTSTG_battle.state.active[team]);
     chance = (value << 7) / def->stats[BATTLE_STAT_DEFENSE];
     delay = FIGHTSTG_events.events[index].time / 100;
     luck = 64;
-    luck -= FIGHTSTG_battle.fighters[team][FIGHTSTG_battle.active[team]].sleep >> 1;
+    luck -= FIGHTSTG_battle.state.fighters[team][FIGHTSTG_battle.state.active[team]].sleep >> 1;
     chance = chance + luck - delay;
     return (RANDOM.next() & 0x7F) < chance;
 }
@@ -534,22 +534,21 @@ s32 FIGHTSTG_testWakeUp(u8 side, s32 value) {
 s32 FIGHTSTG_testConfusion(u8 side) {
     BattleStats *stats;
     s32 other;
-    BattleFighter *entry;
     s32 flag;
     s32 fighter;
     s32 chance;
 
     if (side == 0) {
-        fighter = FIGHTSTG_battle.active[0];
+        fighter = FIGHTSTG_battle.state.active[0];
         flag = SIDE_PLAYER;
     } else {
         flag = SIDE_ENEMY;
-        fighter = FIGHTSTG_battle.active[1];
+        fighter = FIGHTSTG_battle.state.active[1];
     }
     FIGHTSTG_computeStats(flag, 0, fighter);
     stats = &FIGHTSTG_battleFuncs.stats[1];
     other = side != 0;
-    chance = FIGHTSTG_battle.fighters[other][FIGHTSTG_battle.active[other]].confusion - (stats->resist[RESIST_CONFUSION] + stats->resist[3]) / 8;
+    chance = FIGHTSTG_battle.state.fighters[other][FIGHTSTG_battle.state.active[other]].confusion - (stats->resist[RESIST_CONFUSION] + stats->resist[3]) / 8;
     return (RANDOM.next() & 0x7F) < chance;
 }
 
@@ -564,16 +563,16 @@ s32 FIGHTSTG_testParalysis(u8 side) {
     s32 chance;
 
     if (side == 0) {
-        fighter = FIGHTSTG_battle.active[0];
+        fighter = FIGHTSTG_battle.state.active[0];
         flag = SIDE_PLAYER;
     } else {
         flag = SIDE_ENEMY;
-        fighter = FIGHTSTG_battle.active[1];
+        fighter = FIGHTSTG_battle.state.active[1];
     }
     FIGHTSTG_computeStats(flag, 0, fighter);
     stats = &FIGHTSTG_battleFuncs.stats[1];
     other = side != 0;
-    chance = FIGHTSTG_battle.fighters[other][FIGHTSTG_battle.active[other]].paralysis - (stats->resist[RESIST_PARALYSIS] + stats->resist[4]) / 8;
+    chance = FIGHTSTG_battle.state.fighters[other][FIGHTSTG_battle.state.active[other]].paralysis - (stats->resist[RESIST_PARALYSIS] + stats->resist[4]) / 8;
     if (chance < 0x20) {
         chance = 0x20;
     }

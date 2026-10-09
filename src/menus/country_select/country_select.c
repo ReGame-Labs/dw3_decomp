@@ -32,7 +32,7 @@ u8 CNTY_SEL_languages[] = {2, 3, 5, 4, 6, 1, 0};
 /* The mode's root task: once the sound bank is loaded, sets up the display and the layer,
    uploads the images, creates the screen's controller and starts the music; stops the
    music when killed */
-void CNTY_SEL_tickScreen(Task *task, MenuTask **menu) {
+void CNTY_SEL_tickScreen(Task *task, CountryMenuTask **menu) {
     TimLoader loader;
     Layer *layer;
 
@@ -74,13 +74,13 @@ Task *CNTY_SEL_start(void) {
     Task *task;
 
     ClearImage2(&CNTY_SEL_vramRect, 0, 0, 0);
-    task = createTask(CNTY_SEL_tickScreen, sizeof(Task), sizeof(MenuTask *));
+    task = createTask(CNTY_SEL_tickScreen, sizeof(Task), sizeof(CountryMenuTask *));
     SOUND.loadBank(CNTY_SEL_SOUND_BANK);
     return task;
 }
 
 /* Draws the background, moved diagonally by half its scroll */
-void CNTY_SEL_drawBackground(BackgroundTask *task) {
+void CNTY_SEL_drawBackground(CountryBackgroundTask *task) {
     SpriteDrawer sprite;
     s32 offset;
 
@@ -129,7 +129,7 @@ void CNTY_SEL_drawFade(s32 level) {
 
 /* The background's task: scrolls and draws it; when done, keeps it scrolling while the
    screen fades to black over 30 frames, then ends */
-void CNTY_SEL_tickBackground(BackgroundTask *task) {
+void CNTY_SEL_tickBackground(CountryBackgroundTask *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
@@ -158,8 +158,8 @@ void CNTY_SEL_tickBackground(BackgroundTask *task) {
 }
 
 /* Creates the scrolling background (task) */
-BackgroundTask *CNTY_SEL_startBackgroundTask(void) {
-    return createTask(CNTY_SEL_tickBackground, sizeof(BackgroundTask), 0);
+CountryBackgroundTask *CNTY_SEL_startBackgroundTask(void) {
+    return createTask(CNTY_SEL_tickBackground, sizeof(CountryBackgroundTask), 0);
 }
 
 /* Advances anim by the frames elapsed and returns the frame to show (0xFF at the end) */
@@ -461,7 +461,7 @@ PanelTask *CNTY_SEL_startLeftPanelTask(void) {
 }
 
 /* Moves the highlighted option with the pad */
-static inline void moveSelection(MenuTask *task) {
+static inline void moveSelection(CountryMenuTask *task) {
     /* Options 0-4 are a column moved through with Up and Down. Options 5
        and 6 are a second one reached with step 1, which nothing sets */
     switch (task->step) {
@@ -504,7 +504,7 @@ static inline void moveSelection(MenuTask *task) {
 /* The screen's controller: opens the panels one after the other and lets the player
    pick an option with Up and Down until Start, which in the European version sets
    LANGUAGE; then flashes it, closes the panels, fades out and moves on to the next mode */
-void CNTY_SEL_tickMenu(MenuTask *task, MenuChildren *children) {
+void CNTY_SEL_tickMenu(CountryMenuTask *task, MenuChildren *children) {
     switch (task->state) {
     case TASK_INIT:
     default:
@@ -597,11 +597,10 @@ void CNTY_SEL_tickMenu(MenuTask *task, MenuChildren *children) {
 #if VERSION_US
             GAME.funcs.requestMode(MODE_OPENING, 0);
 #elif VERSION_EU
-            /* the opening movie, or mode 0xE02 for a language but 0 */
             if (LANGUAGE == 0) {
                 GAME.funcs.requestMode(MODE_OPENING, 0);
             } else {
-                GAME.funcs.requestMode(0xE02, 0);
+                GAME.funcs.requestMode(MODE_OPENING_2, 0);
             }
 #endif
             task->setState(task, TASK_KILL);
@@ -615,6 +614,6 @@ void CNTY_SEL_tickMenu(MenuTask *task, MenuChildren *children) {
 }
 
 /* Creates the screen's controller (task), which starts the background and panels */
-MenuTask *CNTY_SEL_startMenuTask(void) {
-    return createTask(CNTY_SEL_tickMenu, sizeof(MenuTask), sizeof(MenuChildren));
+CountryMenuTask *CNTY_SEL_startMenuTask(void) {
+    return createTask(CNTY_SEL_tickMenu, sizeof(CountryMenuTask), sizeof(MenuChildren));
 }

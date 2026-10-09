@@ -32,6 +32,7 @@ static inline void flyToDest(Launch *task) {
             task->negY = 1;
         }
         task->nextStep(task);
+        /* fallthrough */
     case 1:
         task->counter += GFX.funcs.getFrameTime() * 24;
         if (task->counter > 0x1000) {
@@ -69,8 +70,8 @@ static inline void flyToDest(Launch *task) {
  * sine, spinning, until it lands; without such a task it ends at once. The
  * match depends on the distance written twice. */
 void FIELDSTG_runLaunch(Launch *task) {
-    Point pos;
-    Point near;
+    Vec2 pos;
+    Vec2 near;
     Task *t;
     Task *found;
     s32 best;
@@ -108,6 +109,7 @@ void FIELDSTG_runLaunch(Launch *task) {
         task->start.x = near.x + 0x14;
         task->start.y = near.y + 0xD;
         task->nextState(task);
+        /* fallthrough */
     case TASK_RUN:
         switch (task->substate) {
         case 0:
@@ -116,6 +118,7 @@ void FIELDSTG_runLaunch(Launch *task) {
                 task->actor->setGoal(task->actor, task->start.x, task->start.y, 0);
                 FIELDSTG_haltPartners();
                 task->nextStep(task);
+                /* fallthrough */
             case 1:
                 if (task->actor->isWalking(task->actor) == 0) {
                     task->nextSubstate(task);
@@ -130,6 +133,7 @@ void FIELDSTG_runLaunch(Launch *task) {
                 task->from->setState(task->from, TASK_DONE);
                 SOUND.playSound(SOUND_TELEPORT);
                 task->nextStep(task);
+                /* fallthrough */
             case 1:
                 if (task->from->state != TASK_DONE) {
                     task->nextSubstate(task);

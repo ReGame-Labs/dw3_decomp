@@ -138,16 +138,16 @@ void updateEvent1602(StageListMenu *task, StageListMenuChildren *children) {
             drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), 0xA, 0x124, 0xCD);
             drawer.setClutRow(0);
         }
-        if (task->tweens[0].value != 0) {
-            if (task->tweens[0].value != 0x1000) {
-                drawer.setScale(task->tweens[0].value, 0x1000, 0x1000);
+        if (task->tweens[0].level != 0) {
+            if (task->tweens[0].level != 0x1000) {
+                drawer.setScale(task->tweens[0].level, 0x1000, 0x1000);
                 drawer.setPivot(0x140, 0x56);
             }
             drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), event1602WindowFrames[task->count - 5], 0xA8, 0x18);
         }
-        if (task->tweens[1].value != 0) {
-            if (task->tweens[1].value != 0x1000) {
-                drawer.setScale(task->tweens[1].value, 0x1000, 0x1000);
+        if (task->tweens[1].level != 0) {
+            if (task->tweens[1].level != 0x1000) {
+                drawer.setScale(task->tweens[1].level, 0x1000, 0x1000);
                 drawer.setPivot(0x140, 0x56);
             }
             drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), 0x45, 0, 0xAC);
@@ -264,16 +264,16 @@ void updateEvent1604(StageListMenu *task, StageListMenuChildren *children) {
             drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), 0xA, 0x124, 0xCD);
             drawer.setClutRow(0);
         }
-        if (task->tweens[0].value != 0) {
-            if (task->tweens[0].value != 0x1000) {
-                drawer.setScale(task->tweens[0].value, 0x1000, 0x1000);
+        if (task->tweens[0].level != 0) {
+            if (task->tweens[0].level != 0x1000) {
+                drawer.setScale(task->tweens[0].level, 0x1000, 0x1000);
                 drawer.setPivot(0x140, 0x56);
             }
             drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), event1604WindowFrames[task->count - 5], 0xA8, 0x18);
         }
-        if (task->tweens[1].value != 0) {
-            if (task->tweens[1].value != 0x1000) {
-                drawer.setScale(task->tweens[1].value, 0x1000, 0x1000);
+        if (task->tweens[1].level != 0) {
+            if (task->tweens[1].level != 0x1000) {
+                drawer.setScale(task->tweens[1].level, 0x1000, 0x1000);
                 drawer.setPivot(0x140, 0x56);
             }
             drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), 0x45, 0, 0xAC);

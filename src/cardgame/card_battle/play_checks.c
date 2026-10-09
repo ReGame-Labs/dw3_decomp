@@ -5,7 +5,7 @@
 
 /* Sorts the opponent's cards by opponentDraws[].order, then swaps card effectStep.choice to reserveStart */
 void CARDGAME_sortOpponentCards(CardBattle *battle) {
-    CardDraw tmp;
+    CardDraw draw;
     s16 *cards = battle->sides[1].pile.deck;
     s16 card;
     s32 i;
@@ -18,16 +18,16 @@ void CARDGAME_sortOpponentCards(CardBattle *battle) {
                 card = cards[i];
                 cards[i] = cards[j];
                 cards[j] = card;
-                tmp = battle->opponentDraws[i];
+                draw = battle->opponentDraws[i];
                 battle->opponentDraws[i] = battle->opponentDraws[j];
-                battle->opponentDraws[j] = tmp;
+                battle->opponentDraws[j] = draw;
             }
         }
     }
     target = battle->reserveStart;
-    tmp = battle->opponentDraws[battle->effectStep.choice];
+    draw = battle->opponentDraws[battle->effectStep.choice];
     battle->opponentDraws[battle->effectStep.choice] = battle->opponentDraws[target];
-    battle->opponentDraws[target] = tmp;
+    battle->opponentDraws[target] = draw;
     card = cards[battle->effectStep.choice];
     cards[battle->effectStep.choice] = cards[target];
     cards[target] = card;
@@ -54,7 +54,7 @@ s32 CARDGAME_canPlayCardKind(CardBattle *battle, s32 index) {
 
 /* Whether a card can be played: in CARD_PHASE_PUT_OUT a kind 0x10 card needs as many
    points of its colour (points), otherwise CARDGAME_canPlayCardKind */
-s32 CARDGAME_canPlayCard(CardBattle *battle, u8 *arg1, s32 card) {
+s32 CARDGAME_canPlayCard(CardBattle *battle, u8 *points, s32 card) {
     CardDrawer drawer;
     s32 result = 0;
 
@@ -62,7 +62,7 @@ s32 CARDGAME_canPlayCard(CardBattle *battle, u8 *arg1, s32 card) {
         initCardDrawer(&drawer);
         drawer.setCard(battle->cards[card] + 1);
         if (drawer.card->kind == 0x10) {
-            result = arg1[drawer.card->color - 1] >= drawer.card->points;
+            result = points[drawer.card->color - 1] >= drawer.card->points;
         }
     } else {
         result = CARDGAME_canPlayCardKind(battle, card);

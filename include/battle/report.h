@@ -160,15 +160,29 @@ extern Evolution *STFGTREP_evolutions[8]; /* each partner's (STFGTREP_learnDigim
 extern s32 STFGTREP_animations[][7]; /* each partner Digimon's sprite frames, -1 ending them early */
 
 /* scene.c */
+void STFGTREP_updateScene(Task *task, FightReport **children);
+void STFGTREP_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
+void STFGTREP_drawFader(ScreenFade *task);
+void STFGTREP_updateFader(ScreenFade *task);
 ScreenFade *STFGTREP_createFader(void);
 
 /* partner.c */
+void STFGTREP_createPartnerWindows(ReportPartner *partner, ReportPartnerWindows *windows);
+void STFGTREP_fillPartnerWindows(ReportPartner *partner, ReportPartnerWindows *windows, s32 show);
 void STFGTREP_drawPartner(ReportPartner *partner);
+s32 STFGTREP_rollExp(ReportPartner *partner);
 void STFGTREP_runPartner(ReportPartner *partner, ReportPartnerWindows *windows);
 void STFGTREP_updatePartner(ReportPartner *partner, ReportPartnerWindows *windows);
+void STFGTREP_showPartner(ReportPartner *partner);
+void STFGTREP_hidePartner(ReportPartner *partner);
+void STFGTREP_raisePartner(ReportPartner *partner);
+s32 STFGTREP_boostExp(ReportPartner *partner);
+void STFGTREP_selectPartner(ReportPartner *partner);
 ReportPartner *STFGTREP_createPartner(FightReport *report, s32 index, s32 exp);
 
 /* report.c */
+void STFGTREP_createWindows(FightReport *report, FightReportChildren *children);
+void STFGTREP_drawReport(FightReport *report);
 void STFGTREP_runReport(FightReport *report, FightReportChildren *children);
 void STFGTREP_updateReport(FightReport *report, FightReportChildren *children);
 FightReport *STFGTREP_createScreen(void);
@@ -182,6 +196,7 @@ void STFGTREP_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
 s32 STFGTREP_updateLerp(MenuLerp *lerp);
 
 /* growth.c */
+void STFGTREP_raiseStats(s32 partner, s32 level);
 s32 STFGTREP_addExp(s32 partner, s32 exp);
 s32 STFGTREP_learnDigimon(s32 partner);
 s32 STFGTREP_addDigimonExp(s32 partner, s32 id, s32 exp);

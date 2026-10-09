@@ -23,7 +23,7 @@ void FIGHTSTG_showDigivolveNames(DigivolveMenu *task) {
     if (index == -1) {
         return;
     }
-    fighter = &FIGHTSTG_battle.fighters[0][index];
+    fighter = &FIGHTSTG_battle.state.fighters[0][index];
     if (fighter->temporary) {
         current = fighter->prevId;
     } else {
@@ -113,7 +113,7 @@ void FIGHTSTG_updateDigivolveMenu(DigivolveMenu *task, void *children) {
             }
             if (pressed & (1 << PAD_CROSS)) {
                 SOUND.playSound(SOUND_MENU_CONFIRM);
-                fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+                fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
                 if (fighter->temporary) {
                     current = fighter->prevId;
                 } else {

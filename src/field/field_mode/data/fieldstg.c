@@ -1502,7 +1502,7 @@ u8 FIELDSTG_slotOffsets[][2][2] = {
 s32 FIELDSTG_spriteDepths[] = {
     7, 3, 11,
 };
-Point FIELDSTG_slotImages[] = {
+Vec2 FIELDSTG_slotImages[] = {
     {640, 0},
     {640, 128},
     {768, 0},
@@ -1805,11 +1805,11 @@ s16 FIELDSTG_file5DModes[] = {
     0x026F, 0x026D, 0x0279, 0x0292, 0x029D, 0x02A5, 0x02AC, 0x02C4,
     0x02C6, 0x02CB, 0x02D6, 0x0249, 0x02B3, 0x0000,
 };
-u8 FIELDSTG_actorAnim0[][2] = {
+u8 FIELDSTG_iconAnim0[][2] = {
     {0x23, 8}, {0x24, 8}, {0x25, 8}, {0x26, 8},
     {0xFF, 0}, {0x00, 0},
 };
-u8 FIELDSTG_actorAnim1[][2] = {
+u8 FIELDSTG_iconAnim1[][2] = {
     {0x23, 3}, {0x27, 4}, {0x28, 4}, {0x2D, 4},
     {0x2E, 4}, {0x2F, 3}, {0x30, 2}, {0x2E, 2},
     {0x2D, 2}, {0x2E, 2}, {0x30, 2}, {0x2E, 2},
@@ -1817,12 +1817,12 @@ u8 FIELDSTG_actorAnim1[][2] = {
     {0x2D, 2}, {0x2E, 2}, {0x30, 2}, {0x31, 2},
     {0x2B, 2}, {0x29, 2}, {0x2A, 2}, {0xFF, 19},
 };
-u8 FIELDSTG_actorAnim2[][2] = {
+u8 FIELDSTG_iconAnim2[][2] = {
     {0x29, 6}, {0x2E, 3}, {0x30, 3}, {0x28, 6},
     {0x2C, 8}, {0x23, 8}, {0x24, 8}, {0x25, 8},
     {0x26, 8}, {0xFF, 5},
 };
-u8 FIELDSTG_actorAnim3[][2] = {
+u8 FIELDSTG_iconAnim3[][2] = {
     {0x23, 3}, {0x27, 4}, {0x28, 4}, {0x2D, 4},
     {0x2E, 4}, {0x2F, 3}, {0x30, 2}, {0x2E, 2},
     {0x2D, 2}, {0x2E, 2}, {0x30, 2}, {0x2E, 2},
@@ -1832,16 +1832,16 @@ u8 FIELDSTG_actorAnim3[][2] = {
     {0x23, 8}, {0x24, 8}, {0x25, 8}, {0x26, 8},
     {0xFF, 24}, {0x00, 0},
 };
-u8 (*FIELDSTG_actorAnims[])[2] = {
-    FIELDSTG_actorAnim0, FIELDSTG_actorAnim1, FIELDSTG_actorAnim2, FIELDSTG_actorAnim3,
+u8 (*FIELDSTG_iconAnims[])[2] = {
+    FIELDSTG_iconAnim0, FIELDSTG_iconAnim1, FIELDSTG_iconAnim2, FIELDSTG_iconAnim3,
 };
-s16 FIELDSTG_actorPath[][2] = {
+IconOffset FIELDSTG_iconPath[] = {
     {-5, -4}, {-5, -4}, {-5, -4}, {-5, -9},
     {-6, -13}, {-8, -17}, {-10, -20}, {-12, -23},
     {-13, -23}, {-14, -23}, {-15, -22}, {-16, -21},
     {-17, -20}, {-16, -22}, {-16, -22}, {0, 0},
 };
-s32 FIELDSTG_actorPathStep = 0;
+s32 FIELDSTG_iconPathStep = 0;
 TileMove FIELDSTG_tileMoves[] = {
     {&FIELDSTG_tiles[4][0].x, -1, 192},
     {&FIELDSTG_tiles[3][0].x, -1, 128},
@@ -2018,7 +2018,7 @@ u8 *FIELDSTG_gaugeRows[] = {
     FIELDSTG_gaugeRow8,
 #endif
 };
-Point FIELDSTG_shakeOffsets[] = {
+Vec2 FIELDSTG_shakeOffsets[] = {
     {0, 0},
     {-1, -1},
     {-1, 1},
@@ -2035,7 +2035,7 @@ u8 FIELDSTG_probes[][5] = {
     {0x09, 0x02, 0x03, 0x01, 0x04},
     {0x0D, 0x03, 0x04, 0x02, 0x05},
 };
-Point FIELDSTG_probePos[] = {
+Vec2 FIELDSTG_probePos[] = {
     {-6, -8},
     {6, -8},
     {8, -6},
@@ -2077,7 +2077,7 @@ s32 FIELDSTG_padDirs[] = {
     2, 3, 0, 0,
     1, 0, 0, 0,
 };
-s16 FIELDSTG_standIns[][2] = {
+StandIn FIELDSTG_standIns[] = {
     {0x0070, 0x0020},
     {0x0071, 0x0024},
     {0x00DB, 0x0014},
@@ -2104,7 +2104,7 @@ s32 FIELDSTG_haltedPartners[] = {
 s32 FIELDSTG_followingPartners[] = {
     2, 4, 8,
 };
-Point FIELDSTG_dirSteps[] = {
+Vec2 FIELDSTG_dirSteps[] = {
     {0, 16},
     {-11, 11},
     {-16, 0},
@@ -2141,16 +2141,17 @@ FieldImages FIELDSTG_images = {
     },
 };
 /* The FLAGS_00 conditions and actions of the field's talks: (code, value)
-   pairs up to code 0xFFFF, one list a line */
+   pairs up to CODES_END, one list a line, each padded with a 0 to a word as
+   the stages' separate lists are (flag 0x1C3D: the lift is up, Lift) */
 u16 FIELDSTG_talkFlags[] = {
-    0x1C3D, 0, 0xFFFF, 0,
-    0x904C, 1, 0x1C3D, 1, 0xFFFF, 0,
-    0x1C3D, 1, 0xFFFF, 0,
-    0x904D, 1, 0x1C3D, 0, 0xFFFF, 0,
-    0x1C3D, 0, 0xFFFF, 0,
-    0x904C, 1, 0x1C3D, 1, 0xFFFF, 0,
-    0x1C3D, 1, 0xFFFF, 0,
-    0x904D, 1, 0x1C3D, 0, 0xFFFF, 0,
+    FLAG(0x1C, 0x3D), 0, CODES_END, 0,
+    START_EVENT(0x4C), 1, FLAG(0x1C, 0x3D), 1, CODES_END, 0,
+    FLAG(0x1C, 0x3D), 1, CODES_END, 0,
+    START_EVENT(0x4D), 1, FLAG(0x1C, 0x3D), 0, CODES_END, 0,
+    FLAG(0x1C, 0x3D), 0, CODES_END, 0,
+    START_EVENT(0x4C), 1, FLAG(0x1C, 0x3D), 1, CODES_END, 0,
+    FLAG(0x1C, 0x3D), 1, CODES_END, 0,
+    START_EVENT(0x4D), 1, FLAG(0x1C, 0x3D), 0, CODES_END, 0,
 };
 /* What the field's characters say: a list for each, up to the entry
    without conditions, then an empty one */
@@ -2257,121 +2258,121 @@ FieldTalk FIELDSTG_talks[] = {
 };
 /* The conditions of the field's characters, as FIELDSTG_talkFlags */
 u16 FIELDSTG_actorFlags[] = {
-    0x6008, 1, 0xFFFF, 0,
-    0x600E, 1, 0xFFFF, 0,
-    0x6016, 1, 0xFFFF, 0,
-    0x601A, 1, 0xFFFF, 0,
-    0x601E, 1, 0xFFFF, 0,
-    0x6022, 1, 0xFFFF, 0,
-    0x6025, 1, 0xFFFF, 0,
-    0x6005, 1, 0xFFFF, 0,
-    0x600C, 1, 0xFFFF, 0,
-    0x6010, 1, 0xFFFF, 0,
-    0x6018, 1, 0xFFFF, 0,
-    0x601C, 1, 0xFFFF, 0,
-    0x601F, 1, 0xFFFF, 0,
-    0x6024, 1, 0xFFFF, 0,
-    0x6026, 1, 0xFFFF, 0,
-    0x6008, 1, 0xFFFF, 0,
-    0x600C, 1, 0xFFFF, 0,
-    0x600E, 1, 0xFFFF, 0,
-    0x6010, 1, 0xFFFF, 0,
-    0x6016, 1, 0xFFFF, 0,
-    0x6018, 1, 0xFFFF, 0,
-    0x601A, 1, 0xFFFF, 0,
-    0x601C, 1, 0xFFFF, 0,
-    0x601E, 1, 0xFFFF, 0,
-    0x601F, 1, 0xFFFF, 0,
-    0x6022, 1, 0xFFFF, 0,
-    0x6024, 1, 0xFFFF, 0,
-    0x6025, 1, 0xFFFF, 0,
-    0x6026, 1, 0xFFFF, 0,
-    0x6005, 1, 0xFFFF, 0,
-    0x6009, 1, 0xFFFF, 0,
-    0x600C, 1, 0xFFFF, 0,
-    0x6008, 1, 0xFFFF, 0,
-    0x600E, 1, 0xFFFF, 0,
-    0x6010, 1, 0xFFFF, 0,
-    0x6016, 1, 0xFFFF, 0,
-    0x6018, 1, 0xFFFF, 0,
-    0x601A, 1, 0xFFFF, 0,
-    0x601C, 1, 0xFFFF, 0,
-    0x601E, 1, 0xFFFF, 0,
-    0x601F, 1, 0xFFFF, 0,
-    0x6022, 1, 0xFFFF, 0,
-    0x6024, 1, 0xFFFF, 0,
-    0x6025, 1, 0xFFFF, 0,
-    0x6005, 1, 0xFFFF, 0,
-    0x6026, 1, 0xFFFF, 0,
-    0x6005, 1, 0xFFFF, 0,
-    0x6008, 1, 0xFFFF, 0,
-    0x600C, 1, 0xFFFF, 0,
-    0x600E, 1, 0xFFFF, 0,
-    0x6010, 1, 0xFFFF, 0,
-    0x6016, 1, 0xFFFF, 0,
-    0x6018, 1, 0xFFFF, 0,
-    0x601A, 1, 0xFFFF, 0,
-    0x601C, 1, 0xFFFF, 0,
-    0x601E, 1, 0xFFFF, 0,
-    0x601F, 1, 0xFFFF, 0,
-    0x6022, 1, 0xFFFF, 0,
-    0x6024, 1, 0xFFFF, 0,
-    0x6025, 1, 0xFFFF, 0,
-    0x6026, 1, 0xFFFF, 0,
-    0x600C, 1, 0xFFFF, 0,
-    0x6010, 1, 0xFFFF, 0,
-    0x6018, 1, 0xFFFF, 0,
-    0x601C, 1, 0xFFFF, 0,
-    0x601F, 1, 0xFFFF, 0,
-    0x6024, 1, 0xFFFF, 0,
-    0x6026, 1, 0xFFFF, 0,
-    0x6005, 1, 0xFFFF, 0,
-    0x6008, 1, 0xFFFF, 0,
-    0x600E, 1, 0xFFFF, 0,
-    0x6016, 1, 0xFFFF, 0,
-    0x601A, 1, 0xFFFF, 0,
-    0x601E, 1, 0xFFFF, 0,
-    0x6022, 1, 0xFFFF, 0,
-    0x6025, 1, 0xFFFF, 0,
-    0x6005, 1, 0xFFFF, 0,
-    0x600C, 1, 0xFFFF, 0,
-    0x6008, 1, 0xFFFF, 0,
-    0x600E, 1, 0xFFFF, 0,
-    0x6010, 1, 0xFFFF, 0,
-    0x6016, 1, 0xFFFF, 0,
-    0x6018, 1, 0xFFFF, 0,
-    0x601A, 1, 0xFFFF, 0,
-    0x601C, 1, 0xFFFF, 0,
-    0x601E, 1, 0xFFFF, 0,
-    0x601F, 1, 0xFFFF, 0,
-    0x6022, 1, 0xFFFF, 0,
-    0x6024, 1, 0xFFFF, 0,
-    0x6025, 1, 0xFFFF, 0,
-    0x6026, 1, 0xFFFF, 0,
-    0x6005, 1, 0xFFFF, 0,
-    0x600C, 1, 0xFFFF, 0,
-    0x6010, 1, 0xFFFF, 0,
-    0x6018, 1, 0xFFFF, 0,
-    0x601A, 1, 0xFFFF, 0,
-    0x601C, 1, 0xFFFF, 0,
-    0x601E, 1, 0xFFFF, 0,
-    0x601F, 1, 0xFFFF, 0,
-    0x6022, 1, 0xFFFF, 0,
-    0x6024, 1, 0xFFFF, 0,
-    0x6025, 1, 0xFFFF, 0,
-    0x6026, 1, 0xFFFF, 0,
-    0x6008, 1, 0xFFFF, 0,
-    0x600E, 1, 0xFFFF, 0,
-    0x6016, 1, 0xFFFF, 0,
-    0x7009, 1, 0x6005, 0, 0x6008, 0, 0x600C, 0, 0x600E, 0, 0x6010, 0, 0x6016, 0, 0x6018, 0, 0x601A, 0, 0x601C, 0, 0x601E, 0, 0x601F, 0, 0x6022, 0, 0x6024, 0, 0x6025, 0, 0x6026, 0, 0x6027, 0, 0x1C3D, 0, 0xFFFF, 0,
-    0x1C3D, 1, 0xFFFF, 0,
-    0x6027, 1, 0xFFFF, 0,
-    0x6027, 1, 0xFFFF, 0,
-    0x6027, 1, 0xFFFF, 0,
-    0x6027, 1, 0xFFFF, 0,
-    0x6027, 1, 0xFFFF, 0,
-    0x6027, 1, 0xFFFF, 0,
-    0x6027, 1, 0xFFFF, 0,
+    PROGRESS(8), 1, CODES_END, 0,
+    PROGRESS(0xE), 1, CODES_END, 0,
+    PROGRESS(0x16), 1, CODES_END, 0,
+    PROGRESS(0x1A), 1, CODES_END, 0,
+    PROGRESS(0x1E), 1, CODES_END, 0,
+    PROGRESS(0x22), 1, CODES_END, 0,
+    PROGRESS(0x25), 1, CODES_END, 0,
+    PROGRESS(5), 1, CODES_END, 0,
+    PROGRESS(0xC), 1, CODES_END, 0,
+    PROGRESS(0x10), 1, CODES_END, 0,
+    PROGRESS(0x18), 1, CODES_END, 0,
+    PROGRESS(0x1C), 1, CODES_END, 0,
+    PROGRESS(0x1F), 1, CODES_END, 0,
+    PROGRESS(0x24), 1, CODES_END, 0,
+    PROGRESS(0x26), 1, CODES_END, 0,
+    PROGRESS(8), 1, CODES_END, 0,
+    PROGRESS(0xC), 1, CODES_END, 0,
+    PROGRESS(0xE), 1, CODES_END, 0,
+    PROGRESS(0x10), 1, CODES_END, 0,
+    PROGRESS(0x16), 1, CODES_END, 0,
+    PROGRESS(0x18), 1, CODES_END, 0,
+    PROGRESS(0x1A), 1, CODES_END, 0,
+    PROGRESS(0x1C), 1, CODES_END, 0,
+    PROGRESS(0x1E), 1, CODES_END, 0,
+    PROGRESS(0x1F), 1, CODES_END, 0,
+    PROGRESS(0x22), 1, CODES_END, 0,
+    PROGRESS(0x24), 1, CODES_END, 0,
+    PROGRESS(0x25), 1, CODES_END, 0,
+    PROGRESS(0x26), 1, CODES_END, 0,
+    PROGRESS(5), 1, CODES_END, 0,
+    PROGRESS(9), 1, CODES_END, 0,
+    PROGRESS(0xC), 1, CODES_END, 0,
+    PROGRESS(8), 1, CODES_END, 0,
+    PROGRESS(0xE), 1, CODES_END, 0,
+    PROGRESS(0x10), 1, CODES_END, 0,
+    PROGRESS(0x16), 1, CODES_END, 0,
+    PROGRESS(0x18), 1, CODES_END, 0,
+    PROGRESS(0x1A), 1, CODES_END, 0,
+    PROGRESS(0x1C), 1, CODES_END, 0,
+    PROGRESS(0x1E), 1, CODES_END, 0,
+    PROGRESS(0x1F), 1, CODES_END, 0,
+    PROGRESS(0x22), 1, CODES_END, 0,
+    PROGRESS(0x24), 1, CODES_END, 0,
+    PROGRESS(0x25), 1, CODES_END, 0,
+    PROGRESS(5), 1, CODES_END, 0,
+    PROGRESS(0x26), 1, CODES_END, 0,
+    PROGRESS(5), 1, CODES_END, 0,
+    PROGRESS(8), 1, CODES_END, 0,
+    PROGRESS(0xC), 1, CODES_END, 0,
+    PROGRESS(0xE), 1, CODES_END, 0,
+    PROGRESS(0x10), 1, CODES_END, 0,
+    PROGRESS(0x16), 1, CODES_END, 0,
+    PROGRESS(0x18), 1, CODES_END, 0,
+    PROGRESS(0x1A), 1, CODES_END, 0,
+    PROGRESS(0x1C), 1, CODES_END, 0,
+    PROGRESS(0x1E), 1, CODES_END, 0,
+    PROGRESS(0x1F), 1, CODES_END, 0,
+    PROGRESS(0x22), 1, CODES_END, 0,
+    PROGRESS(0x24), 1, CODES_END, 0,
+    PROGRESS(0x25), 1, CODES_END, 0,
+    PROGRESS(0x26), 1, CODES_END, 0,
+    PROGRESS(0xC), 1, CODES_END, 0,
+    PROGRESS(0x10), 1, CODES_END, 0,
+    PROGRESS(0x18), 1, CODES_END, 0,
+    PROGRESS(0x1C), 1, CODES_END, 0,
+    PROGRESS(0x1F), 1, CODES_END, 0,
+    PROGRESS(0x24), 1, CODES_END, 0,
+    PROGRESS(0x26), 1, CODES_END, 0,
+    PROGRESS(5), 1, CODES_END, 0,
+    PROGRESS(8), 1, CODES_END, 0,
+    PROGRESS(0xE), 1, CODES_END, 0,
+    PROGRESS(0x16), 1, CODES_END, 0,
+    PROGRESS(0x1A), 1, CODES_END, 0,
+    PROGRESS(0x1E), 1, CODES_END, 0,
+    PROGRESS(0x22), 1, CODES_END, 0,
+    PROGRESS(0x25), 1, CODES_END, 0,
+    PROGRESS(5), 1, CODES_END, 0,
+    PROGRESS(0xC), 1, CODES_END, 0,
+    PROGRESS(8), 1, CODES_END, 0,
+    PROGRESS(0xE), 1, CODES_END, 0,
+    PROGRESS(0x10), 1, CODES_END, 0,
+    PROGRESS(0x16), 1, CODES_END, 0,
+    PROGRESS(0x18), 1, CODES_END, 0,
+    PROGRESS(0x1A), 1, CODES_END, 0,
+    PROGRESS(0x1C), 1, CODES_END, 0,
+    PROGRESS(0x1E), 1, CODES_END, 0,
+    PROGRESS(0x1F), 1, CODES_END, 0,
+    PROGRESS(0x22), 1, CODES_END, 0,
+    PROGRESS(0x24), 1, CODES_END, 0,
+    PROGRESS(0x25), 1, CODES_END, 0,
+    PROGRESS(0x26), 1, CODES_END, 0,
+    PROGRESS(5), 1, CODES_END, 0,
+    PROGRESS(0xC), 1, CODES_END, 0,
+    PROGRESS(0x10), 1, CODES_END, 0,
+    PROGRESS(0x18), 1, CODES_END, 0,
+    PROGRESS(0x1A), 1, CODES_END, 0,
+    PROGRESS(0x1C), 1, CODES_END, 0,
+    PROGRESS(0x1E), 1, CODES_END, 0,
+    PROGRESS(0x1F), 1, CODES_END, 0,
+    PROGRESS(0x22), 1, CODES_END, 0,
+    PROGRESS(0x24), 1, CODES_END, 0,
+    PROGRESS(0x25), 1, CODES_END, 0,
+    PROGRESS(0x26), 1, CODES_END, 0,
+    PROGRESS(8), 1, CODES_END, 0,
+    PROGRESS(0xE), 1, CODES_END, 0,
+    PROGRESS(0x16), 1, CODES_END, 0,
+    SPECIAL(9), 1, PROGRESS(5), 0, PROGRESS(8), 0, PROGRESS(0xC), 0, PROGRESS(0xE), 0, PROGRESS(0x10), 0, PROGRESS(0x16), 0, PROGRESS(0x18), 0, PROGRESS(0x1A), 0, PROGRESS(0x1C), 0, PROGRESS(0x1E), 0, PROGRESS(0x1F), 0, PROGRESS(0x22), 0, PROGRESS(0x24), 0, PROGRESS(0x25), 0, PROGRESS(0x26), 0, PROGRESS(0x27), 0, FLAG(0x1C, 0x3D), 0, CODES_END, 0,
+    FLAG(0x1C, 0x3D), 1, CODES_END, 0,
+    PROGRESS(0x27), 1, CODES_END, 0,
+    PROGRESS(0x27), 1, CODES_END, 0,
+    PROGRESS(0x27), 1, CODES_END, 0,
+    PROGRESS(0x27), 1, CODES_END, 0,
+    PROGRESS(0x27), 1, CODES_END, 0,
+    PROGRESS(0x27), 1, CODES_END, 0,
+    PROGRESS(0x27), 1, CODES_END, 0,
 };
 /* The field's characters (FieldState.actors) */
 FieldActorEntry FIELDSTG_actors[] = {
@@ -3195,7 +3196,10 @@ u8 FIELDSTG_actorWidths[] = {
     0x40, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x38,
     0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0x00, 0x00,
 };
-StageEntry FIELDSTG_stages[] = {
+/* The European version's extra chapter's stages (FIELD_PROGRESS_EXTRA), the
+   modes they take over first: the table has no end of its own, so
+   FIELDSTG_pickStage's search runs on into FIELDSTG_stages after it */
+StageEntry FIELDSTG_extraStages[] = {
     {624, 1851, WSTAG920_startStage},
     {625, 2217, WSTAG921_startStage},
     {626, 2219, WSTAG922_startStage},
@@ -3252,7 +3256,7 @@ StageEntry FIELDSTG_stages[] = {
     {749, 2270, WSTAG973_startStage},
     {750, 2271, WSTAG974_startStage},
 };
-StageEntry FIELDSTG_euStages[] = {
+StageEntry FIELDSTG_stages[] = {
     {512, 466, WSTAG200_startStage},
     {513, 523, WSTAG202_startStage},
     {514, 467, WSTAG205_startStage},
@@ -3594,7 +3598,7 @@ FieldMap FIELDSTG_map = {
     FIELDSTG_isTileFree,
 };
 s32 FIELDSTG_boxFrame = -1;
-Point FIELDSTG_dirVectors[][8] = {
+Vec2 FIELDSTG_dirVectors[][8] = {
     {
         {0, 2048},
         {-2896, 1448},
@@ -3670,11 +3674,11 @@ u8 FIELDSTG_mirrorDirs[] = {
     0x00, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01,
 };
 s16 FIELDSTG_heldVoice = 0;
-Point FIELDSTG_mapSize = {0, 0};
+Vec2 FIELDSTG_mapSize = {0, 0};
 StageTile *FIELDSTG_objectCursor = NULL;
 s32 FIELDSTG_objectId = 0;
-Point FIELDSTG_tiles[5][6] = {{{0}}};
-s32 FIELDSTG_tileRequests = 0;
+Vec2 FIELDSTG_tiles[5][6] = {{{0}}};
+s32 FIELDSTG_battleFileStep = 0;
 s32 FIELDSTG_transitionUnused = 0; /* among FIELDSTG_playBattleTransition's; nothing uses it */
 RECT FIELDSTG_screenRect = {0, 0, 0, 0};
 s16 FIELDSTG_slideVoice = 0;

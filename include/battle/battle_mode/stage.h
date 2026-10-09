@@ -75,7 +75,9 @@ Lights *FIGHTSTG_createLights(s32 layerId);
 
 /* Shared between the overlay's objects */
 extern s32 FIGHTSTG_stageMusic[];
+void FIGHTSTG_fadeStage(FightStage *task, Model **children);
 void FIGHTSTG_updateStage(FightStage *task, Model **children);
+void FIGHTSTG_setStage(FightStage *task, s32 id, s32 fadeOutTime, s32 fadeInTime);
 void FIGHTSTG_updateLights(Lights *task);
 void FIGHTSTG_setLights(Lights *task, LightSet *set);
 void FIGHTSTG_fadeLights(Lights *task, LightSet *from, LightSet *to, s32 time);

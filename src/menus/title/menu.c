@@ -11,7 +11,7 @@
 
 /* Draws the menu: the cursor while it is shown, then "PRESS START" or the two
    options, the one not picked dimmed */
-void STDWTITL_drawMenu(MenuTask *task) {
+void STDWTITL_drawMenu(TitleMenuTask *task) {
     SpriteDrawer sprite;
 
     if (task->showCursor) {
@@ -45,7 +45,7 @@ void STDWTITL_drawMenu(MenuTask *task) {
 
 /* "PRESS START": waits a moment, then for Start (choice 3 after ten seconds),
    blinks and spreads the two options out from it */
-static inline void runPressStart(MenuTask *task) {
+static inline void runPressStart(TitleMenuTask *task) {
     switch (task->substate) {
     case 1:
     default:
@@ -101,7 +101,7 @@ static inline void runPressStart(MenuTask *task) {
 
 /* The two options: up and down move between new game and continue, and the
    confirm button blinks the option and sets choice */
-static inline void runOptions(MenuTask *task) {
+static inline void runOptions(TitleMenuTask *task) {
     switch (task->substate) {
     case 0:
     default:
@@ -155,7 +155,7 @@ static inline void runOptions(MenuTask *task) {
 /* The menu's task: once shown, waits for Start on "PRESS START" (choice 3 after ten
    seconds), blinks and spreads out the two options; then moves between new game
    and continue, and the confirm button blinks the option and sets choice */
-void STDWTITL_tickMenu(MenuTask *task) {
+void STDWTITL_tickMenu(TitleMenuTask *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
@@ -182,7 +182,7 @@ void STDWTITL_tickMenu(MenuTask *task) {
 }
 
 /* Shows "PRESS START" (the task's show), only while it waits */
-void STDWTITL_showMenu(MenuTask *task) {
+void STDWTITL_showMenu(TitleMenuTask *task) {
     if (task->state == TASK_RUN) {
         task->setSubstate(task, 1);
     }
@@ -190,7 +190,7 @@ void STDWTITL_showMenu(MenuTask *task) {
 
 /* Back to waiting for Start on "PRESS START" (the task's reset), only while running;
    nothing in the overlay calls it */
-void STDWTITL_resetMenu(MenuTask *task) {
+void STDWTITL_resetMenu(TitleMenuTask *task) {
     if (task->state == TASK_RUN) {
         task->selection = 2;
         task->showCursor = 1;
@@ -201,13 +201,13 @@ void STDWTITL_resetMenu(MenuTask *task) {
 
 /* The menu's choice (the task's getChoice): 0 none yet, 1 new game, 2 continue,
    3 timed out */
-s32 STDWTITL_getMenuChoice(MenuTask *task) {
+s32 STDWTITL_getMenuChoice(TitleMenuTask *task) {
     return task->choice;
 }
 
 /* Creates the title screen's menu (task); skip: the two options shown from the start */
-MenuTask *STDWTITL_startMenuTask(s16 skip) {
-    MenuTask *task = createTask(STDWTITL_tickMenu, sizeof(MenuTask), 0);
+TitleMenuTask *STDWTITL_startMenuTask(s16 skip) {
+    TitleMenuTask *task = createTask(STDWTITL_tickMenu, sizeof(TitleMenuTask), 0);
 
     task->show = STDWTITL_showMenu;
     task->reset = STDWTITL_resetMenu;

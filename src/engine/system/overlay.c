@@ -9,19 +9,14 @@ Task *(*MODE_ENTRY_POINTS[23])(void) = {
     STSTATUS_start, NULL, STCRDABM_start, STCRDSHP_start,
     STFGTREP_start, STAGSLCT_start, CNTY_SEL_start,
 };
-#if VERSION_US
 s32 MODE_OVERLAY_FILES[23] = {
-    0, 0, 344, 344, 444, 504, 345, 339,
-    347, 346, 502, 340, 483, 479, 449, 503,
-    505, 0, 375, 448, 450, 374, 343,
+    0, 0, FILE_FIELDSTG, FILE_FIELDSTG,
+    FILE_STCRDDEK, FILE_STPLNMET, FILE_FIGHTSTG, FILE_CARDGAME,
+    FILE_SOUNDTST, FILE_SHOCKTST, FILE_STGTRAIN, FILE_STDGNAME,
+    FILE_STGMCARD, FILE_STGDGLAB, FILE_STDWTITL, FILE_STITSHOP,
+    FILE_STSTATUS, 0, FILE_STCRDABM, FILE_STCRDSHP,
+    FILE_STFGTREP, FILE_STAGSLCT, FILE_CNTY_SEL,
 };
-#elif VERSION_EU
-s32 MODE_OVERLAY_FILES[23] = {
-    0, 0, 358, 358, 458, 518, 359, 353,
-    361, 360, 498, 354, 494, 492, 464, 517,
-    519, 0, 389, 462, 465, 388, 357,
-};
-#endif
 
 OverlayLoader OVERLAY_LOADER = {0, 0, loadModeOverlay, loadSubOverlay};
 
@@ -51,7 +46,7 @@ void updateModeTask(Task *task, Task **children) {
 
 /* Creates the task that runs the current mode (updateModeTask) */
 void *createModeTask(void) {
-    return createTask(updateModeTask, 0x50, 4);
+    return createTask(updateModeTask, sizeof(Task), 4);
 }
 
 /* Copies the overlay of the current mode (mode >> 8) to OVERLAY_ADDRESS */

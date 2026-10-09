@@ -9,12 +9,12 @@ void STSTATUS_fillItemList(ItemList *panel) {
     s32 i;
 
     if (panel->list == 0) {
-        panel->count = ITEM_FUNCS->list(STSTATUS_itemLists[0], panel->bag);
+        panel->count = ITEM_FUNCS.list(STSTATUS_itemLists[0], panel->bag);
         for (i = 0; i < panel->count; i++) {
             panel->items[i] = panel->bag[i];
         }
     } else {
-        panel->count = ITEM_FUNCS->list(STSTATUS_itemLists[panel->list], panel->items);
+        panel->count = ITEM_FUNCS.list(STSTATUS_itemLists[panel->list], panel->items);
     }
 }
 

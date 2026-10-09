@@ -439,6 +439,7 @@ void STGTRAIN_updateSession(TrainSession *session, TrainSessionWindows *win) {
         break;
     case TASK_RUN:
         STGTRAIN_runSession(session, win);
+        /* fallthrough */
     case TASK_DONE:
         STGTRAIN_drawSession(session);
     case TASK_KILL:

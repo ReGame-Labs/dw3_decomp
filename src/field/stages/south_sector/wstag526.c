@@ -145,9 +145,10 @@ void updateClutTile(StageTileSolo *task) {
 
 /*
  * Makes the color-cycling map object by the Digi-Egg of Knowledge fade out
- * in 150 frames, once the player takes the egg (event 760)
+ * in 150 frames, once the player takes the egg (event 760); command and arg,
+ * a script command handler's (ScriptCommand.handle), are 0 and unread
  */
-void fadeOutClutTile(StageTileDuo *task, s32 arg1, s32 arg2) {
+void fadeOutClutTile(StageTileDuo *task, s32 command, s32 arg) {
     if (task != NULL) {
         task->mode = 2;
         task->wait = 0x96;
@@ -613,40 +614,40 @@ void setupStage(void) {
 }
 
 s16 script760[] = {
-    0x102, 2, 0x98, 0xBE, 3,
-    0x100, 0x83, 0x80, 0xB2,
-    0x101, 0x83, 1, 1,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 2,
-    0x102, 2, 0x90, 0xBA, 3,
-    0x302, 2,
-    0x101, 2, 1, 3,
-    0x300, 0x1E,
-    0x101, 0x323, 0x325, 2,
-    0x300, 0x3C,
-    0x101, 0x323, 0x326, 2,
-    0x300, 0x1E,
-    0x200, 0, 1, 2, 3,
-    0x301,
-    0x300, 0x1E,
-    0x100, 0x83, 0, 0,
-    0x101, 0x83, 1, 7,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON3, 2,
-    0x300, 0x1E,
-    0x300, 0x1E,
-    0x101, 0x33D, 0x34B, 2,
-    0x300, 0xD2,
-    0x200, 0, 2, 2, 3,
-    0x301,
-    0x300, 0x1E,
-    0x200, 0, 3, 2, 3,
-    0x301,
-    0x300, 0x1E,
-    0x102, 2, 0x98, 0xBE, 7,
-    0x302, 2,
-    0x102, 2, 0xD0, 0x100, 7,
-    0x304, 0x2AB, 0x41E, 0x1E8, 5,
-    0,
+    SCRIPT_WALK(2, 0x98, 0xBE, 3),
+    SCRIPT_PLACE(0x83, 0x80, 0xB2),
+    SCRIPT_POSE(0x83, 1, 1),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_WALK(2, 0x90, 0xBA, 3),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_POSE(2, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(0x323, 0x325, 2),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x323, 0x326, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 2, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_PLACE(0x83, 0, 0),
+    SCRIPT_POSE(0x83, 1, 7),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON3, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(0x33D, 0x34B, 2),
+    SCRIPT_WAIT(0xD2),
+    SCRIPT_TALK(0, 2, 2, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 3, 2, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(2, 0x98, 0xBE, 7),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_WALK(2, 0xD0, 0x100, 7),
+    SCRIPT_LEAVE(0x2AB, 0x41E, 0x1E8, 5),
+    SCRIPT_END,
 };
 AnimFrame updateClutTileFrames0[] = {
     { 0, 12 }, { 1, 12 }, { 2, 12 }, { 1, 12 },
@@ -718,53 +719,53 @@ u16 angleTangents[] = {
     0xAB0D, 0xB44A, 0xBDDC, 0xC7C8, 0xD217, 0xDCD2, 0xE805, 0xF3BA,
     0xFFFE, 0xFFFF,
 };
-Battle area0Battle0 = { 158, 27, MUSIC(2, 0) };
-Battle area0Battle1 = { 158, 27, MUSIC(2, 0) };
-Battle area0Battle2 = { 158, 27, MUSIC(2, 0) };
-Battle area0Battle3 = { 158, 27, MUSIC(2, 0) };
-Battle area0Battle4 = { 158, 27, MUSIC(2, 0) };
-Battle area0Battle5 = { 158, 27, MUSIC(2, 0) };
-Battle area0Battle6 = { 158, 27, MUSIC(2, 0) };
-Battle area0Battle7 = { 158, 27, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 158, 27, MUSIC(2, 0) };
+AreaBattle area0Battle1 = { 158, 27, MUSIC(2, 0) };
+AreaBattle area0Battle2 = { 158, 27, MUSIC(2, 0) };
+AreaBattle area0Battle3 = { 158, 27, MUSIC(2, 0) };
+AreaBattle area0Battle4 = { 158, 27, MUSIC(2, 0) };
+AreaBattle area0Battle5 = { 158, 27, MUSIC(2, 0) };
+AreaBattle area0Battle6 = { 158, 27, MUSIC(2, 0) };
+AreaBattle area0Battle7 = { 158, 27, MUSIC(2, 0) };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
       &area0Battle4, &area0Battle5, &area0Battle6, &area0Battle7 },
 };
-Battle area1Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area1Battles = {
     0,
     { &area1Battle0, &area1Battle1, &area1Battle2, &area1Battle3,
       &area1Battle4, &area1Battle5, &area1Battle6, &area1Battle7 },
 };
-Battle area2Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area2Battles = {
     0,
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-Battle area3Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area3Battles = {
     0,
     { &area3Battle0, &area3Battle1, &area3Battle2, &area3Battle3,

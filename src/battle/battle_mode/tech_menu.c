@@ -43,7 +43,7 @@ void FIGHTSTG_drawTechMenu(TechMenu *task) {
    MP over its max (or a text by its MP for a temporary Digimon), the six
    names, the description and the technique's MP cost */
 void FIGHTSTG_createTechWindows(TechMenu *task, TechMenuChild *children) {
-    BattleFighter *fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+    BattleFighter *fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
     void *text = FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU));
     s32 i;
 
@@ -85,7 +85,7 @@ void FIGHTSTG_createTechWindows(TechMenu *task, TechMenuChild *children) {
    for, 3 its signature one, 4 those passed on) and the description and MP
    cost of the one under the cursor, or text 0x13 when there are none */
 void FIGHTSTG_showTechPage(TechMenu *task, TechMenuChild *children) {
-    BattleFighter *fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+    BattleFighter *fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
     s32 index;
     s32 tech;
     s32 mp;
@@ -267,8 +267,8 @@ void FIGHTSTG_updateTechMenu(TechMenu *task, TechMenuChild *children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        member = GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]);
-        fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+        member = GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0]);
+        fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
         id = fighter->id;
         if (id == DIGIMON_DATA[member].id) {
             task->techs[0] = DIGIMON_DATA[member].skills[6] | 0x8000;
@@ -307,7 +307,7 @@ void FIGHTSTG_updateTechMenu(TechMenu *task, TechMenuChild *children) {
             } else if (pressed & (1 << PAD_CROSS)) {
                 SOUND.playSound(SOUND_MENU_CONFIRM);
                 if (task->count != 0) {
-                    active = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+                    active = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
                     /* the match depends on the choice written in both branches */
                     if (active->temporary != 0) {
                         *task->result = task->techs[task->page * TECH_MENU_LINES + children[0].cursor->sel] & SKILL_ID;

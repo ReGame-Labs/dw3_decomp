@@ -351,9 +351,10 @@ s32 CARDGAME_viewTable(CardBattle *battle, CardScreen *screen) {
     return done;
 }
 
-/* Starts CARDGAME_pickTableCard with effectStep.vars[4] */
-void CARDGAME_startPickTableCard(CardBattle *battle, CardScreen *screen, s32 arg2) {
-    battle->effectStep.vars[4] = arg2;
+/* Starts CARDGAME_pickTableCard, which triangle backs out of when cancelable
+   (effectStep.vars[4]) */
+void CARDGAME_startPickTableCard(CardBattle *battle, CardScreen *screen, s32 cancelable) {
+    battle->effectStep.vars[4] = cancelable;
     battle->effectStep.nextState = 1;
 }
 

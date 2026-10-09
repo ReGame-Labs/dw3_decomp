@@ -49,6 +49,7 @@ void updateTileEffect(StageTileEffect *task) {
                 }
                 SOUND.playSound(SOUND_LOGINEF);
                 task->nextStep(task);
+                /* fallthrough */
             case 1:
                 done = 0;
                 for (i = 0; i < 3; i++) {
@@ -74,6 +75,7 @@ void updateTileEffect(StageTileEffect *task) {
                     break;
                 }
                 task->nextStep(task);
+                /* fallthrough */
             case 2:
                 for (j = 0; j < 3; j++) {
                     task->anims[j].tile->visible = 0;
@@ -100,6 +102,7 @@ void handleCommand815(StageTileEffect *task, s32 id) {
         switch (id) {
         case 0x347:
             i = 1;
+            /* fallthrough */
         case 0x346:
             task->x = tileEffectPlaces[i][0];
             task->y = tileEffectPlaces[i][1];
@@ -190,52 +193,52 @@ void setupStage(void) {
 }
 
 s16 script5[] = {
-    0x601, 1, 0x11E, 0x127,
-    0x100, 1, 0, 0,
-    0x101, 1, 1, 0,
-    0x100, 0xD, 0x10F, 0x191,
-    0x101, 0xD, 1, 3,
-    0x101, 0x32F, 0x345, 1,
-    0x300, 0x78,
-    0x300, 0x1E,
-    0x101, 0x32F, 0x346, 1,
-    0x300, 0x5A,
-    0x300, 0x5A,
-    0x100, 1, 0x170, 0x11F,
-    0x101, 1, 1, 1,
-    0x300, 0xB4,
-    0x300, 0x1E,
-    0x102, 1, 0x150, 0x130, 1,
-    0x302, 1,
-    0x101, 1, 0x3A, 1,
-    0x300, 0xB4,
-    0x200, 0, 1, 1, 0,
-    0x101, 1, 1, 1,
-    0x301,
-    0x300, 0x1E,
-    0x102, 1, 0x130, 0x160, 1,
-    0x302, 1,
-    0x600, 0, 1,
-    0x102, 1, 0xF0, 0x180, 1,
-    0x302, 1,
-    0x101, 1, 1, 7,
-    0x300, 0x1E,
-    0x200, 0, 2, 0xD, 2,
-    0x101, 0xD, 7, 3,
-    0x301,
-    0x101, 0xD, 1, 3,
-    0x300, 0x1E,
-    0x200, 0, 3, 1, 1,
-    0x101, 1, 7, 7,
-    0x301,
-    0x101, 1, 1, 7,
-    0x300, 0x1E,
-    0x101, 0xD, 1, 1,
-    0x302, 1,
-    0x102, 1, 0x50, 0x1D0, 7,
-    0x300, 6,
-    0x304, 0x203, 0x2DA, 0x17E, 1,
-    0,
+    SCRIPT_LOOK_AT(1, 0x11E, 0x127),
+    SCRIPT_PLACE(1, 0, 0),
+    SCRIPT_POSE(1, 1, 0),
+    SCRIPT_PLACE(0xD, 0x10F, 0x191),
+    SCRIPT_POSE(0xD, 1, 3),
+    SCRIPT_COMMAND(0x32F, 0x345, 1),
+    SCRIPT_WAIT(0x78),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(0x32F, 0x346, 1),
+    SCRIPT_WAIT(0x5A),
+    SCRIPT_WAIT(0x5A),
+    SCRIPT_PLACE(1, 0x170, 0x11F),
+    SCRIPT_POSE(1, 1, 1),
+    SCRIPT_WAIT(0xB4),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(1, 0x150, 0x130, 1),
+    SCRIPT_WAIT_WALK(1),
+    SCRIPT_POSE(1, 0x3A, 1),
+    SCRIPT_WAIT(0xB4),
+    SCRIPT_TALK(0, 1, 1, 0),
+    SCRIPT_POSE(1, 1, 1),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(1, 0x130, 0x160, 1),
+    SCRIPT_WAIT_WALK(1),
+    SCRIPT_FOLLOW(0, 1),
+    SCRIPT_WALK(1, 0xF0, 0x180, 1),
+    SCRIPT_WAIT_WALK(1),
+    SCRIPT_POSE(1, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 2, 0xD, 2),
+    SCRIPT_POSE(0xD, 7, 3),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(0xD, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 3, 1, 1),
+    SCRIPT_POSE(1, 7, 7),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(1, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(0xD, 1, 1),
+    SCRIPT_WAIT_WALK(1),
+    SCRIPT_WALK(1, 0x50, 0x1D0, 7),
+    SCRIPT_WAIT(6),
+    SCRIPT_LEAVE(0x203, 0x2DA, 0x17E, 1),
+    SCRIPT_END,
     /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
     0x8FB0,

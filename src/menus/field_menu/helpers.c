@@ -4,7 +4,7 @@
 
 #include "menus/field_menu.h"
 
-/* The towns the map shows (a list up to 0), by STSTATUS_isLateGame and
+/* The towns the map shows (a list up to 0), by STSTATUS_getGameHalf and
    GAME.progress (STSTATUS_townLists) */
 s32 *STSTATUS_getTowns(s32 list, s32 index) {
     return STSTATUS_townLists[list][index];
@@ -15,7 +15,7 @@ s32 *STSTATUS_getTowns(s32 list, s32 index) {
    the items of kinds 4 and 5 (STSTATUS_slotLists) */
 s32 STSTATUS_listItems(s32 list, s16 *out) {
     if (list < 5) {
-        return ITEM_FUNCS->list(list, out);
+        return ITEM_FUNCS.list(list, out);
     }
     switch (list) {
     case 5:
@@ -35,11 +35,11 @@ s32 STSTATUS_listEquipItems(s16 *out) {
     s32 count;
     ItemData *data;
 
-    STSTATUS_data.itemCount = ITEM_FUNCS->list(2, STSTATUS_data.items);
-    STSTATUS_data.item2Count = ITEM_FUNCS->list(3, STSTATUS_data.items2);
+    STSTATUS_data.itemCount = ITEM_FUNCS.list(2, STSTATUS_data.items);
+    STSTATUS_data.item2Count = ITEM_FUNCS.list(3, STSTATUS_data.items2);
     count = 0;
     for (i = 0; i < STSTATUS_data.itemCount; i++) {
-        data = GET_ITEM[0](STSTATUS_data.items[i])->data.record;
+        data = ITEM_FUNCS.get(STSTATUS_data.items[i])->data.record;
         for (j = 0; j < 4; j++) {
             if (data->weapon.kind == STSTATUS_equipKinds[j]) {
                 out[count++] = STSTATUS_data.items[i];
@@ -47,7 +47,7 @@ s32 STSTATUS_listEquipItems(s16 *out) {
         }
     }
     for (i = 0; i < STSTATUS_data.item2Count; i++) {
-        data = GET_ITEM[0](STSTATUS_data.items2[i])->data.record;
+        data = ITEM_FUNCS.get(STSTATUS_data.items2[i])->data.record;
         for (j = 0; j < 4; j++) {
             if (data->weapon.kind == STSTATUS_equipKinds[j]) {
                 out[count++] = STSTATUS_data.items2[i];
@@ -62,16 +62,16 @@ s32 STSTATUS_listItemsOfKind(s32 kind, s16 *out) {
     s32 i;
     s32 count;
 
-    STSTATUS_data.itemCount = ITEM_FUNCS->list(2, STSTATUS_data.items);
-    STSTATUS_data.item2Count = ITEM_FUNCS->list(3, STSTATUS_data.items2);
+    STSTATUS_data.itemCount = ITEM_FUNCS.list(2, STSTATUS_data.items);
+    STSTATUS_data.item2Count = ITEM_FUNCS.list(3, STSTATUS_data.items2);
     count = 0;
     for (i = 0; i < STSTATUS_data.itemCount; i++) {
-        if (GET_ITEM[0](STSTATUS_data.items[i])->data.record->weapon.kind == kind) {
+        if (ITEM_FUNCS.get(STSTATUS_data.items[i])->data.record->weapon.kind == kind) {
             out[count++] = STSTATUS_data.items[i];
         }
     }
     for (i = 0; i < STSTATUS_data.item2Count; i++) {
-        if (GET_ITEM[0](STSTATUS_data.items2[i])->data.record->weapon.kind == kind) {
+        if (ITEM_FUNCS.get(STSTATUS_data.items2[i])->data.record->weapon.kind == kind) {
             out[count++] = STSTATUS_data.items2[i];
         }
     }
@@ -84,7 +84,7 @@ s32 STSTATUS_canEquip(s32 partner, s32 slot, s32 item) {
     ItemData *data;
 
     if (item != -1) {
-        data = GET_ITEM[0](item)->data.record;
+        data = ITEM_FUNCS.get(item)->data.record;
         if (!((data->weapon.partners >> partner) & 1)) {
             return 0;
         }
@@ -118,7 +118,7 @@ void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
     if (old != 0) {
         GAME.equippedItems[old]--;
         GAME.items[old]++;
-        data = GET_ITEM[0](old)->data.record;
+        data = ITEM_FUNCS.get(old)->data.record;
         if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             stats->equip[2] = 0;
             stats->equip[3] = 0;
@@ -127,7 +127,7 @@ void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
         }
     }
     if (id > 0) {
-        data = GET_ITEM[0](id)->data.record;
+        data = ITEM_FUNCS.get(id)->data.record;
         if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             pair = &stats->equip[2];
             if (stats->equip[2] == 0) {
@@ -146,7 +146,7 @@ void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
             for (i = 0; i < 2; i++) {
                 equip = &stats->equip[i + 4];
                 if (*equip != 0) {
-                    data = GET_ITEM[0](*equip)->data.record;
+                    data = ITEM_FUNCS.get(*equip)->data.record;
                     if (data->weapon.group == group) {
                         GAME.equippedItems[*equip]--;
                         GAME.items[*equip]++;
@@ -157,7 +157,7 @@ void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
         }
         GAME.equippedItems[id]++;
         GAME.items[id]--;
-        data = GET_ITEM[0](id)->data.record;
+        data = ITEM_FUNCS.get(id)->data.record;
         if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             stats->equip[2] = id;
             stats->equip[3] = id;
@@ -169,7 +169,7 @@ void STSTATUS_equip(s32 partner, s32 slot, s32 item) {
 
 /* 1 on the field maps of the second half of the game (0x270 on), 0 on those of
    the first, -1 past them (0x2D7 on) */
-s32 STSTATUS_isLateGame(void) {
+s32 STSTATUS_getGameHalf(void) {
     if (GAME.fieldMode >= 0x2D7) {
         return -1;
     }
@@ -190,7 +190,7 @@ void STSTATUS_getVisitedAreas(s32 *out) {
     s32 area;
     s32 found;
 
-    if (STSTATUS_isLateGame() == 0) {
+    if (STSTATUS_getGameHalf() == 0) {
         first = 0x200;
         last = 0x26F;
     } else {
@@ -217,7 +217,7 @@ Task *(*STSTATUS_screens[2][7])(FieldMenuScreen *menu, s32 extra) = {
     { STSTATUS_createItemScreen, STSTATUS_createSortScreen, STSTATUS_createMapScreen, STSTATUS_createTechScreen, STSTATUS_createStatusScreen, STSTATUS_createCardScreen, STSTATUS_createDemoScreen },
 };
 /* The partners' portrait animations */
-StatusAnim STSTATUS_partnerAnims[] = {
+PartnerAnim STSTATUS_partnerAnims[] = {
     { { 7, 8, 9, 10, 9, 8, -1 } },
     { { 14, 15, 16, 15, -1, -1, -1 } },
     { { 11, 12, 13, 12, -1, -1, -1 } },
@@ -348,7 +348,7 @@ s32 STSTATUS_townList3[] = {
     21, 22, 0,
 };
 s32 STSTATUS_noTowns = 0;
-/* The towns the map shows, by STSTATUS_isLateGame and GAME.progress */
+/* The towns the map shows, by STSTATUS_getGameHalf and GAME.progress */
 s32 *STSTATUS_townLists[][5] = {
     { STSTATUS_townList0, STSTATUS_townList1, STSTATUS_townList2, STSTATUS_townList2, STSTATUS_townList3 },
     { &STSTATUS_noTowns, &STSTATUS_noTowns, &STSTATUS_noTowns, STSTATUS_townList2, STSTATUS_townList3 },
@@ -408,7 +408,7 @@ u8 STSTATUS_mapAreas[] = {
 };
 /* Where the game is */
 StatusAreaFuncs STSTATUS_areaFuncs = {
-    STSTATUS_isLateGame,
+    STSTATUS_getGameHalf,
     STSTATUS_getArea,
     STSTATUS_getVisitedAreas,
 };

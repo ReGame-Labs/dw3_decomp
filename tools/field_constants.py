@@ -12,8 +12,8 @@ Writes the numbers the stages give FIELDSTG with the names of field_map.h.
   FIELD_MAP_ name;
 - the type of a StageSlot, the word after its two conditions, becomes its
   SLOT_ name, and a flag of its conditions, FLAG(0, n), its FIELD_FLAG_ name;
-- a field command of an event script, a pose command (0x101) of
-  FIELD_TASK_COMMANDS, becomes its FIELD_COMMAND_ name.
+- a field command of an event script, a script command (SCRIPT_COMMAND,
+  or its word 0x101) of FIELD_TASK_COMMANDS, becomes its FIELD_COMMAND_ name.
 
 It changes no bytes and only rewrites numbers, so it can be run again at any
 time; a stage file it changes that has none of the field's headers gets
@@ -80,8 +80,8 @@ RULES = [
     (re.compile(rf"\bcreateTaskWithId\([^;]*, {N}\);"), by(TASKS)),
     (re.compile(rf"\bFIELDSTG_map\.(?:setFile|getCell)\({N}"), by(MAPS)),
     (re.compile(rf"\bFIELDSTG_map\.files\[{N}\]"), by(MAPS)),
-    (re.compile(rf"\b0x101, (?P<n>0x32D)\b"), by(TASKS)),
-    (re.compile(rf"\b0x101, FIELD_TASK_COMMANDS, {N}"), by(COMMANDS)),
+    (re.compile(rf"(?:\b0x101, |\bSCRIPT_COMMAND\()(?P<n>0x32D)\b"), by(TASKS)),
+    (re.compile(rf"(?:\b0x101, |\bSCRIPT_COMMAND\()FIELD_TASK_COMMANDS, {N}"), by(COMMANDS)),
 ]
 # a StageSlot table, and the type of each of its records
 SLOT_TABLE = re.compile(r"^(?:static )?StageSlot \w+\[\w*\] = \{.*?^\};", re.M | re.S)

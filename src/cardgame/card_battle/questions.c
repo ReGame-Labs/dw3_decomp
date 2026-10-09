@@ -221,6 +221,7 @@ s32 CARDGAME_stepYesNo(CardBattle *battle, CardScreen *screen) {
         if (screen->panels[0].state != 0 || battle->anim.current != CARD_ANIM_NONE) {
             break;
         }
+        /* fallthrough */
     case 8:
         result = 2;
         if (battle->effectStep.choice == 0) {

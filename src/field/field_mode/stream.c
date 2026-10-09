@@ -29,7 +29,7 @@ s32 FIELDSTG_isStreamLoaded(StreamTask *task) {
 /* Draws a stream task's tile at (x, y) on a layer: its sprites at the three
    depths */
 void FIELDSTG_drawStream(StreamTask *task, Layer *layer, s32 x, s32 y) {
-    Point scroll;
+    Vec2 scroll;
     PrimPtr prim;
     u_long *ot;
     s32 i;

@@ -5,35 +5,36 @@
 
 RECT WFIGHTMN_screen = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 /* A technique's look (its scriptEffect and scriptSound) by its effect, for
-   WFIGHTMN_bringLastEnemy; the list ends at -1 */
+   WFIGHTMN_bringLastEnemy; the list ends at the first -1, so the USA
+   version's three entries after it are never read */
 #if VERSION_US
-s32 WFIGHTMN_effectVisuals[][3] = {
-    { 2, 19, 26 },
-    { 3, 20, 26 },
-    { 4, 21, 27 },
-    { 5, 22, 50 },
-    { 6, 26, 50 },
-    { 8, 28, 39 },
+EffectLook WFIGHTMN_effectVisuals[] = {
+    { TECH_EFFECT_POISON, 19, 26 },
+    { TECH_EFFECT_PARALYSIS, 20, 26 },
+    { TECH_EFFECT_CONFUSION, 21, 27 },
+    { TECH_EFFECT_SLEEP, 22, 50 },
+    { TECH_EFFECT_KNOCK_OUT, 26, 50 },
+    { TECH_EFFECT_DRAIN, 28, 39 },
     { -1, 37, 49 },
-    { 27, 39, 49 },
+    { TECH_EFFECT_LOWER_DEFENSE, 39, 49 },
     { 28, 41, 49 },
     { -1, 0, 0 },
 };
 #elif VERSION_EU
-s32 WFIGHTMN_effectVisuals[][3] = {
-    { 2, 19, 26 },
-    { 3, 20, 26 },
-    { 4, 21, 27 },
-    { 5, 22, 50 },
-    { 6, 26, 50 },
-    { 8, 28, 39 },
+EffectLook WFIGHTMN_effectVisuals[] = {
+    { TECH_EFFECT_POISON, 19, 26 },
+    { TECH_EFFECT_PARALYSIS, 20, 26 },
+    { TECH_EFFECT_CONFUSION, 21, 27 },
+    { TECH_EFFECT_SLEEP, 22, 50 },
+    { TECH_EFFECT_KNOCK_OUT, 26, 50 },
+    { TECH_EFFECT_DRAIN, 28, 39 },
     { -1, 37, 49 },
 };
 #endif
 /* A technique's look (its scriptEffect, scriptSound and scriptStage) by its
    element, for WFIGHTMN_bringLastEnemy when WFIGHTMN_effectVisuals gives
    none */
-s32 WFIGHTMN_elementVisuals[][4] = {
+ElementLook WFIGHTMN_elementVisuals[] = {
     { 2, 5, 64, 34 },
     { 3, 9, 45, 37 },
     { 4, 11, 44, 40 },
@@ -54,7 +55,7 @@ void (*WFIGHTMN_states[])(BattleMenu *task, BattleMenuChildren *children) = {
 };
 /* WFIGHTMN_startTech's effects (BattleScript.effect and sound) by the first of
    FIGHTSTG_action.effects[2..12] that is set: the kinds of WFIGHTMN_effectVisuals */
-s32 WFIGHTMN_actionEffects[][2] = {
+ScriptLook WFIGHTMN_actionEffects[] = {
     {19, 26}, {20, 26}, {21, 27}, {22, 50}, {26, 50}, {0, 0},
     {28, 39}, {0, 0}, {46, 30}, {0, 59}, {31, 58},
 };

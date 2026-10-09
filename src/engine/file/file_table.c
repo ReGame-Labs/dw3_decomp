@@ -1741,7 +1741,7 @@ s32 FILE_COUNT = sizeof(FILE_SECTORS) / sizeof(FILE_SECTORS[0]);
 /* The disc's file table */
 FileTableFuncs FILE_TABLE = {
     fileExists,
-    (s32 (*)(s32))getFileSectorCount,
+    getFileSectorCount,
     getFileSector,
     getFilePos,
 };
@@ -1752,7 +1752,7 @@ s32 fileExists(s32 file) {
 }
 
 /* The sectors of a file */
-u16 getFileSectorCount(s32 file) {
+s32 getFileSectorCount(s32 file) {
     return FILE_SECTOR_COUNTS[file];
 }
 

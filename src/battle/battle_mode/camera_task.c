@@ -35,6 +35,7 @@ void FIGHTSTG_updateCameraShots(CameraShots *task) {
         task->camera = TASK_REGISTRY.funcs.find(BATTLE_TASK_CAMERA, -1, -1);
         task->models = TASK_REGISTRY.funcs.find(BATTLE_TASK_MODELS, -1, -1);
         task->view = task->camera->getEnemyView(task->camera);
+        /* fallthrough */
     case 1:
         if (task->time <= 0) {
             if (FIGHTSTG_euCameraShots[task->list][++task->shot].time == -1) {

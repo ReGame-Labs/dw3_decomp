@@ -33,6 +33,12 @@ typedef struct SoundTest {
     /* 0x70 */ s32 voice;
 } SoundTest;
 
+void SOUNDTST_updateScene(Task *task, Task **items);
+void SOUNDTST_moveCursor(SoundTest *task, s32 delta, s32 *cursor, s32 *top, s32 count);
+void SOUNDTST_playSounds(SoundTest *task, SoundTestWindows *win);
+void SOUNDTST_loadBank(SoundTest *task, SoundTestWindows *win);
+void SOUNDTST_selectBank(SoundTest *task, SoundTestWindows *win);
+void SOUNDTST_updateSoundTest(SoundTest *task, SoundTestWindows *win);
 Task *SOUNDTST_createSoundTest(void);
 
 extern const char SOUNDTST_STR_CURSOR[];

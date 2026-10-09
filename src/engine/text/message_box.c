@@ -85,7 +85,7 @@ void updateMessageBoxFrame(MessageBoxFrame *task) {
 
 /* A message box frame on a layer, with the menu sound */
 MessageBoxFrame *createMessageBoxFrame(s32 layerId) {
-    MessageBoxFrame *task = createTask(updateMessageBoxFrame, 0x6C, 0);
+    MessageBoxFrame *task = createTask(updateMessageBoxFrame, sizeof(MessageBoxFrame), 0);
 
     task->layerId = layerId;
     SOUND.playSound(SOUND_MENU_OPEN);
@@ -93,7 +93,7 @@ MessageBoxFrame *createMessageBoxFrame(s32 layerId) {
 }
 
 /* The message box task: shows the text once the frame is open, closes when the text ends */
-void updateMessageBox(MessageBoxFrame *task, MessageBox *data) {
+void updateMessageBox(Task *task, MessageBox *data) {
     switch (task->state) {
     case 0:
     default:
@@ -140,7 +140,7 @@ void updateMessageBox(MessageBoxFrame *task, MessageBox *data) {
 
 /* A message box with string `index` of a table, typed out in three-line pages */
 Task *createMessageBox(s32 layerId, void *strings, s32 index) {
-    Task *task = createTask(updateMessageBox, 0x50, 8);
+    Task *task = createTask(updateMessageBox, sizeof(Task), sizeof(MessageBox));
     MessageBox *data = task->children;
 
     data->window = createTextWindow(layerId, 1, 0x12, 0xB0);

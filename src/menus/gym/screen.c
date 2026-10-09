@@ -327,14 +327,14 @@ void STGTRAIN_drawScreen(TrainScreen *screen) {
     initSpriteDrawer(&sprite);
     sprite.setLayerId(screen->layerId, 7);
     sprite.setTexture(0x240, 0x100);
-    if (screen->signTick != 0) {
-        screen->signPos++;
-        screen->signPos = screen->signPos < 0x60 ? screen->signPos : 0;
-        screen->signTick = 0;
+    if (screen->bgTick != 0) {
+        screen->bgScroll++;
+        screen->bgScroll = screen->bgScroll < 0x60 ? screen->bgScroll : 0;
+        screen->bgTick = 0;
     } else {
-        screen->signTick = 1;
+        screen->bgTick = 1;
     }
-    sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), screen->sign, screen->signPos, screen->signPos);
+    sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), screen->bgSprite, screen->bgScroll, screen->bgScroll);
 }
 
 /* Moves the cursor over the party (left, right), showing the partner's
@@ -688,7 +688,7 @@ TrainScreen *STGTRAIN_createScreen(void) {
         sign = 0x2D;
         break;
     }
-    screen->sign = sign;
+    screen->bgSprite = sign;
     return screen;
 }
 

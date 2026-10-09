@@ -176,7 +176,9 @@ void STSTATUS_runMapScreen(StatusMapScreen *screen, TextWindow **windows) {
 void STSTATUS_drawMapScreen(StatusMapScreen *screen) {
     SpriteDrawer sprite;
     s32 *towns;
+#if VERSION_EU
     s32 x;
+#endif
     s32 frame;
     s32 i;
 
@@ -244,7 +246,7 @@ void STSTATUS_drawMapScreen(StatusMapScreen *screen) {
         }
     }
     sprite.setLayerId(screen->layer, screen->depth + 1);
-    towns = STSTATUS_data.funcs.getList(screen->lateGame, screen->progress);
+    towns = STSTATUS_data.funcs.getList(screen->gameHalf, screen->progress);
     if (GAME.progress < 7) {
         screen->progress = 0;
     } else if (GAME.progress < 0xF) {
@@ -323,8 +325,8 @@ Task *STSTATUS_createMapScreen(FieldMenuScreen *menu, s32 extra) {
     screen->layer = SCREEN_LAYER;
     screen->depth = 5;
     screen->menu = menu;
-    screen->lateGame = STSTATUS_areaFuncs.isLateGame();
-    if (screen->lateGame == 0) {
+    screen->gameHalf = STSTATUS_areaFuncs.getGameHalf();
+    if (screen->gameHalf == 0) {
         screen->archive = FILE_STATUS_BG << 16;
         screen->archive1 = (FILE_STATUS_BG << 16) + 1;
         screen->archive2 = (FILE_STATUS_BG << 16) + 2;

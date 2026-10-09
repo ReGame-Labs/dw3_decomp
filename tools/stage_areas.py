@@ -3,7 +3,8 @@
 Moves each stage's C file into the folder of its area: src/field/stages/<area>/.
 
 FIELDSTG starts a stage for a mode (FIELDSTG_stages, and the European
-FIELDSTG_euStages: {mode, file, WSTAGnnn_startStage}), and shows the name of
+version's extra chapter's FIELDSTG_extraStages: {mode, file,
+WSTAGnnn_startStage}), and shows the name of
 the mode's area as the player enters (FIELDSTG_areaNames: {area, place,
 mode}; the area is a string of text file 0xAA, STAREA). Every mode of a
 stage is in one area, whose name in lower_snake_case is its folder:
@@ -68,7 +69,7 @@ def stage_areas():
     """{stage: area name}, from FIELDSTG's tables and STAREA"""
     text = FIELDSTG_DATA.read_text()
     modes = {}
-    for body in tables(text, "StageEntry FIELDSTG_stages") + tables(text, "StageEntry FIELDSTG_euStages"):
+    for body in tables(text, "StageEntry FIELDSTG_stages") + tables(text, "StageEntry FIELDSTG_extraStages"):
         for mode, stage in re.findall(r"\{(\d+), \w+, WSTAG(\d+)_startStage\}", body):
             modes.setdefault(f"wstag{stage}", set()).add(int(mode))
     mode_areas = {}

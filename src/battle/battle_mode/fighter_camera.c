@@ -50,6 +50,7 @@ void FIGHTSTG_updateCamera(FighterCamera *task) {
     case TASK_INIT:
     default:
         task->nextState(task);
+        /* fallthrough */
     case TASK_RUN:
         switch (task->step) {
         case 0:

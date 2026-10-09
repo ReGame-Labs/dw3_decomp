@@ -69,8 +69,8 @@ void FIGHTSTG_showSwitchInChoices(SwitchInMenu *task, SwitchInMenuWindows *w, s3
 
     text = FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU));
     if (visible) {
-        active = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
-        other = &FIGHTSTG_battle.fighters[0][task->fighter];
+        active = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
+        other = &FIGHTSTG_battle.state.fighters[0][task->fighter];
         data = GET_DIGIMON(task->ids[task->digimon]);
         w->choices[4]->setString(w->choices[4], FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), data->nameId);
         w->choices[0]->setString(w->choices[0], text, 0x1B);
@@ -153,8 +153,8 @@ static inline void findPairTech(SwitchInMenu *task) {
     DigimonData *data;
     DigimonData *partner;
 
-    if (FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]].temporary == 0) {
-        data = GET_DIGIMON(FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]].id);
+    if (FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]].temporary == 0) {
+        data = GET_DIGIMON(FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]].id);
         partner = GET_DIGIMON(task->ids[task->digimon]);
         if (data->pairPartner != 0 && data->pairPartner == partner->nameId) {
             task->tech = data->pairTech;
@@ -170,8 +170,8 @@ static inline void confirmSwitchIn(SwitchInMenu *task, SwitchInMenuWindows *w) {
     BattleFighter *active;
     BattleFighter *other;
 
-    active = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
-    other = &FIGHTSTG_battle.fighters[0][task->fighter];
+    active = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
+    other = &FIGHTSTG_battle.state.fighters[0][task->fighter];
     SOUND.playSound(SOUND_MENU_CONFIRM);
     if (w->techCursor->sel == 0) {
         if (!(active->flags & FIGHTER_NO_SWITCH) && !(other->flags & FIGHTER_NO_SWITCH)) {

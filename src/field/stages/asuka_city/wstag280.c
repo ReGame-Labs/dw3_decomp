@@ -14,7 +14,7 @@
 #endif
 
 /* A two-option menu: creates the event object of the chosen option */
-void updateMenu(StageMenu *task, StageMenuChildren *children) {
+void updateMenu(StageMenu *task, ChoiceChildren *children) {
     SpriteDrawer drawer;
     s32 prev;
     s32 i;
@@ -106,9 +106,9 @@ void updateMenu(StageMenu *task, StageMenuChildren *children) {
         drawer.setLayerId(FIELD_LAYER_MAP, 2);
         drawer.setTexture(0x140, 0);
         drawer.setFollowScroll(0);
-        if (task->tween.value != 0) {
-            if (task->tween.value != 0x1000) {
-                drawer.setScale(task->tween.value, 0x1000, 0x1000);
+        if (task->tween.level != 0) {
+            if (task->tween.level != 0x1000) {
+                drawer.setScale(task->tween.level, 0x1000, 0x1000);
                 drawer.setPivot(0, 0xC3);
             }
             drawer.draw(FILE_CACHE.getEntry(MENU_SPRITES), 0x45, 0, 0xAC);
@@ -125,7 +125,7 @@ void updateMenu(StageMenu *task, StageMenuChildren *children) {
  * yes starts event 57, no event 1523
  */
 void *startEvent1522(void) {
-    return createTask(updateMenu, sizeof(StageMenu), sizeof(StageMenuChildren));
+    return createTask(updateMenu, sizeof(StageMenu), sizeof(ChoiceChildren));
 }
 
 /* Creates the event object while flags 0x7201, 0x8008 and 0x701A are clear */
@@ -183,90 +183,90 @@ void setupStage(void) {
 #include "common/update_tween.inc.c"
 
 s16 script57[] = {
-    0x102, 2, 0x180, 0xB0, 3,
-    0x101, 0x10B, 1, 7,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 2,
-    0x300, 0x1E,
-    0x200, 0, 1, 0x10B, 2,
-    0x301,
-    0x300, 0x1E,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 2,
-    0x300, 0x1E,
-    0x200, 0, 2, 2, 4,
-    0x301,
-    0x300, 0x1E,
-    0x200, 0, 3, 0x10B, 4,
-    0x301,
-    0x300, 0x1E,
-    0x200, 0, 4, 2, 4,
-    0x301,
-    0x300, 0x1E,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 2,
-    0x300, 0x1E,
-    0x300, 0x1E,
-    0x200, 0, 5, 0x10B, 2,
-    0x301,
-    0x300, 0x1E,
-    0,
+    SCRIPT_WALK(2, 0x180, 0xB0, 3),
+    SCRIPT_POSE(0x10B, 1, 7),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 0x10B, 2),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 2, 2, 4),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 3, 0x10B, 4),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 4, 2, 4),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 5, 0x10B, 2),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_END,
 };
 s16 script66[] = {
-    0x100, 2, 0x218, 0xF4,
-    0x101, 2, 1, 3,
-    0x100, 0x2D, 0x1F6, 0xE4,
-    0x101, 0x2D, 1, 7,
-    0x300, 0x1E,
-    0x102, 2, 0x210, 0xF1, 3,
-    0x302, 2,
-    0x101, 2, 1, 3,
-    0x300, 0x1E,
-    0x300, 0x1E,
-    0x200, 0, 1, 0x2D, 0,
-    0x301,
-    0x300, 0x1E,
-    0x101, 2, 1, 7,
-    0x300, 0x1E,
-    0x102, 2, 0x22B, 0xFC, 7,
-    0x300, 0x1E,
-    0x304, 0x201, 0x180, 0xD8, 7,
-    0,
+    SCRIPT_PLACE(2, 0x218, 0xF4),
+    SCRIPT_POSE(2, 1, 3),
+    SCRIPT_PLACE(0x2D, 0x1F6, 0xE4),
+    SCRIPT_POSE(0x2D, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(2, 0x210, 0xF1, 3),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_POSE(2, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 0x2D, 0),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(2, 0x22B, 0xFC, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_LEAVE(0x201, 0x180, 0xD8, 7),
+    SCRIPT_END,
 };
 s16 script67[] = {
-    0x102, 2, 0x14F, 0xD0, 3,
-    0x100, 0x118, 0x131, 0xC1,
-    0x101, 0x118, 1, 7,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 2,
-    0x101, 2, 1, 3,
-    0x300, 0x1E,
-    0x200, 0, 1, 0x118, 2,
-    0x301,
-    0x101, 0x118, 1, 7,
-    0x300, 0x1E,
-    0x101, 2, 1, 5,
-    0x300, 0x1E,
-    0x102, 2, 0x168, 0xC4, 5,
-    0x302, 2,
-    0x101, 2, 1, 1,
-    0x102, 0x118, 0x170, 0xE0, 7,
-    0x302, 0x118,
-    0x102, 2, 0x14F, 0xD0, 3,
-    0x101, 0x118, 1, 3,
-    0x302, 2,
-    0x101, 2, 1, 3,
-    0x300, 0x1E,
-    0,
+    SCRIPT_WALK(2, 0x14F, 0xD0, 3),
+    SCRIPT_PLACE(0x118, 0x131, 0xC1),
+    SCRIPT_POSE(0x118, 1, 7),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_POSE(2, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 0x118, 2),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(0x118, 1, 7),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_POSE(2, 1, 5),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(2, 0x168, 0xC4, 5),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_POSE(2, 1, 1),
+    SCRIPT_WALK(0x118, 0x170, 0xE0, 7),
+    SCRIPT_WAIT_WALK(0x118),
+    SCRIPT_WALK(2, 0x14F, 0xD0, 3),
+    SCRIPT_POSE(0x118, 1, 3),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_POSE(2, 1, 3),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_END,
 };
 s16 script1523[] = {
-    0x102, 2, 0x180, 0xB0, 3,
-    0x101, 0x10B, 1, 7,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 2,
-    0x300, 0x1E,
-    0x200, 0, 1, 0x10B, 2,
-    0x301,
-    0x300, 0x1E,
-    0,
+    SCRIPT_WALK(2, 0x180, 0xB0, 3),
+    SCRIPT_POSE(0x10B, 1, 7),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 0x10B, 2),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_END,
 };
 ActorImage stageImages[] = {
     { 0x200, 0x100, 0x21C, 0x1A6, 0x70, 0xA6, 0x230, 0x1FE },

@@ -8,9 +8,9 @@
 /* Whether a flying actor runs into the map at an offset from it: a cell that
    isn't free, a wall higher than it or a ceiling lower than it (FLIGHT_WALL,
    FLIGHT_CEILING); then it steps back by offset */
-s32 FIELDSTG_checkFlightProbe(Actor *actor, s32 x, s32 y, Point offset) {
+s32 FIELDSTG_checkFlightProbe(Actor *actor, s32 x, s32 y, Vec2 offset) {
     s32 blocked = 0;
-    Point pos;
+    Vec2 pos;
     u8 cell;
 
     pos.x = (actor->pos.x >> 8) + x;
@@ -92,7 +92,7 @@ s32 FIELDSTG_checkFlightProbes(Actor *actor) {
     s32 i;
     u8 probe;
     u8 *sign;
-    Point offset;
+    Vec2 offset;
 
     for (i = 0; i < 5; i++) {
         probe = FIELDSTG_probes[actor->dir][i];
@@ -115,7 +115,7 @@ s32 FIELDSTG_checkFlightProbes(Actor *actor) {
 /* Walks or runs an actor in the direction of the pad's arrows (an index of
    FIELDSTG_padDirs), or stops it when none is held */
 void FIELDSTG_moveByPad(Actor *actor, s32 pad) {
-    if (pad != 0 && FIELDSTG_state.innOpen == 0) {
+    if (pad != 0 && FIELDSTG_state.menuOpen == 0) {
         actor->dir = FIELDSTG_padDirs[pad];
         if (actor->walks != 0) {
             if (actor->substate != ACTOR_WALK) {
@@ -139,7 +139,7 @@ void FIELDSTG_moveByPad(Actor *actor, s32 pad) {
  * each side of it, half that above and below. The match depends on the
  * registry being held in a variable.
  */
-Actor *FIELDSTG_findActorAt(Point *pos) {
+Actor *FIELDSTG_findActorAt(Vec2 *pos) {
     TaskRegistry *registry = &TASK_REGISTRY;
     Actor *actor = registry->funcs.find(FIELD_TASK_ACTOR, -1, 1);
 
@@ -161,7 +161,7 @@ Actor *FIELDSTG_findActorAt(Point *pos) {
    (FIELDSTG_standIns): it answers (ACTOR_TALK), or, for the objects 0x148,
    0x15F and 0x160, the player works it (ACTOR_USE). Returns 1 when the
    player acts */
-s32 FIELDSTG_talkToActorAt(Actor *actor, Point *pos) {
+s32 FIELDSTG_talkToActorAt(Actor *actor, Vec2 *pos) {
     Actor *target;
     s32 i;
     s32 result;
@@ -172,9 +172,9 @@ s32 FIELDSTG_talkToActorAt(Actor *actor, Point *pos) {
         if (target->key1 != 0x180) {
             if (target->key1 != 0x181) {
                 if (target->key1 != 0x182) {
-                    for (i = 0; FIELDSTG_standIns[i][0] != 0; i++) {
-                        if (target->key1 == FIELDSTG_standIns[i][0]) {
-                            target = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, FIELDSTG_standIns[i][1], -1);
+                    for (i = 0; FIELDSTG_standIns[i].character != 0; i++) {
+                        if (target->key1 == FIELDSTG_standIns[i].character) {
+                            target = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, FIELDSTG_standIns[i].answerer, -1);
                             break;
                         }
                     }
@@ -269,8 +269,8 @@ static inline void turnInFlight(Actor *actor, s32 held) {
    the map's cells hold floors (2 to 6) and ceilings (18 to 22). The match
    depends on the button's shift and mask as two statements. */
 void FIELDSTG_controlFlight(Actor *actor) {
-    Point facing;
-    Point pos;
+    Vec2 facing;
+    Vec2 pos;
     s32 held;
     s32 pressed;
     s32 cell;
@@ -280,7 +280,7 @@ void FIELDSTG_controlFlight(Actor *actor) {
     held = PAD.getHeld(0);
     pressed = (u32)PAD.getPressed(0) >> PAD_CROSS;
     pressed &= 1;
-    if (FIELDSTG_state.innOpen != 0 || FIELDSTG_state.busy != 0 || FIELDSTG_state.battleStarting != 0) {
+    if (FIELDSTG_state.menuOpen != 0 || FIELDSTG_state.busy != 0 || FIELDSTG_state.battleStarting != 0) {
         return;
     }
     if (pressed && actor->z < FLIGHT_LEVEL(2)) {
@@ -386,13 +386,13 @@ void FIELDSTG_controlFlight(Actor *actor) {
  * event's check is the rest of the block.
  */
 void FIELDSTG_controlPlayer(Actor *actor) {
-    Point pos;
+    Vec2 pos;
     HiddenSpots *obj;
     s32 pad;
     s32 pressed;
     s32 forced;
 
-    if (FIELDSTG_state.innOpen == 0 && FIELDSTG_state.busy == 0 && FIELDSTG_state.battleStarting == 0) {
+    if (FIELDSTG_state.menuOpen == 0 && FIELDSTG_state.busy == 0 && FIELDSTG_state.battleStarting == 0) {
         pad = (PAD.getHeld(0) >> PAD_UP) & 0xF;
         pressed = (PAD.getPressed(0) & (1 << PAD_CROSS)) != 0;
         forced = FLAGS_00.checkCondition(FIELD_FLAG_TALK_AHEAD, 1);
@@ -663,7 +663,7 @@ void FIELDSTG_startClimbDown(Actor *actor, s32 dir, s32 x, s32 y, s32 height) {
 }
 
 /* Starts a drop from a ledge of height */
-void FIELDSTG_startDrop(Actor *actor, s32 dir, Point pos, s32 height) {
+void FIELDSTG_startDrop(Actor *actor, s32 dir, Vec2 pos, s32 height) {
     s32 value;
 
     actor->control = NULL;
@@ -684,10 +684,10 @@ void FIELDSTG_startDrop(Actor *actor, s32 dir, Point pos, s32 height) {
 
 /* Starts the gauge game at an offset from an actor, turning the partners its
    way */
-void FIELDSTG_startActorGauge(Actor *actor, s32 dir, Point offset) {
+void FIELDSTG_startActorGauge(Actor *actor, s32 dir, Vec2 offset) {
     void **children;
     Actor *other;
-    Point pos;
+    Vec2 pos;
     s32 i;
 
     FIELDSTG_state.busy = 1;
@@ -755,13 +755,13 @@ s32 FIELDSTG_isActorAnimDone(Actor *actor) {
 /* The layer's sorted callback that draws an actor: its frame from its image,
  * mirrored for the directions 5 and up, and, when it has one, its shadow, a
  * sprite with its own texture page. The match depends on the shadow's y offset
- * cast to s16. */
-void FIELDSTG_drawActor(void *arg, void *arg2) {
-    Actor *actor = arg;
-    Layer *layer = arg2;
+ * cast to s16, and on the untyped parameters copied to typed locals. */
+void FIELDSTG_drawActor(void *data, void *drawLayer) {
+    Actor *actor = data;
+    Layer *layer = drawLayer;
     ActorImage *image = actor->image;
-    Point pos;
-    Point scroll;
+    Vec2 pos;
+    Vec2 scroll;
     u_long *ot;
     PrimPtr prim;
     FieldImage *shadow;
@@ -1063,7 +1063,7 @@ static inline void runStop(Actor *actor) {
 
 /* ACTOR_SLIDE: the slide on ice, with its sound */
 static inline void runSlide(Actor *actor) {
-    Point move;
+    Vec2 move;
 
     switch (actor->step) {
     case 0:
@@ -1201,12 +1201,14 @@ static inline void runDrop(Actor *actor) {
         actor->pos.y += actor->wallHeight;
         actor->pos.x += actor->climbSide != 0 ? 0x1000 : -0x1000;
         actor->nextStep(actor);
+        /* fallthrough */
     case 1:
         if (actor->animDone == 0) {
             break;
         }
         FIELDSTG_setActorAnim(actor, ACTOR_ANIM_FALL);
         actor->nextStep(actor);
+        /* fallthrough */
     case 2:
         actor->hasShadow = 1;
         actor->climbHeight -= 0x300;
@@ -1237,6 +1239,7 @@ static inline void runGauge(Actor *actor, ActorChildren *children) {
     default:
         FIELDSTG_setActorAnim(actor, ACTOR_ANIM_GAUGE_START);
         actor->nextStep(actor);
+        /* fallthrough */
     case 1:
         if (actor->animDone == 0) {
             break;
@@ -1244,6 +1247,7 @@ static inline void runGauge(Actor *actor, ActorChildren *children) {
         FIELDSTG_setActorAnim(actor, ACTOR_ANIM_GAUGE_PLAY);
         SOUND.playSound(SOUND_PLAYER09);
         actor->nextStep(actor);
+        /* fallthrough */
     case 2:
         if (actor->animDone == 0) {
             break;
@@ -1251,6 +1255,7 @@ static inline void runGauge(Actor *actor, ActorChildren *children) {
         FIELDSTG_setActorAnim(actor, ACTOR_ANIM_GAUGE_WAIT);
         SOUND.playSound(SOUND_PLAYER10);
         actor->nextStep(actor);
+        /* fallthrough */
     case 3:
         if (children->action != NULL) {
             break;
@@ -1258,6 +1263,7 @@ static inline void runGauge(Actor *actor, ActorChildren *children) {
         children->balloon = FIELDSTG_createBalloon(0, 1, 6);
         FIELDSTG_setActorAnim(actor, ACTOR_ANIM_GAUGE_RESULT);
         actor->nextStep(actor);
+        /* fallthrough */
     case 4:
         actor->counter += GFX.funcs.getFrameTime();
         if (actor->counter < 0x3C) {
@@ -1266,6 +1272,7 @@ static inline void runGauge(Actor *actor, ActorChildren *children) {
         children->balloon->setState(children->balloon, TASK_DONE);
         FIELDSTG_setActorAnim(actor, ACTOR_ANIM_GAUGE_END);
         actor->nextStep(actor);
+        /* fallthrough */
     case 5:
         if (actor->animDone != 0) {
             standAgain(actor);
@@ -1317,7 +1324,7 @@ static inline void runTalk(Actor *actor, ActorChildren *children) {
             talk++;
         }
         actor->talkActions = talk->actions;
-        if (!isTreasure && actor->isLarge == 0) {
+        if (!isTreasure && actor->keepsDir == 0) {
             actor->dir = (actor->talkPartner->dir + 4) & 7;
         }
         if (actor->animFile != 0 && !isTreasure) {
@@ -1386,6 +1393,7 @@ static inline void runUsed(Actor *actor) {
         setUsedFlag(actor->key1);
 #endif
         actor->nextStep(actor);
+        /* fallthrough */
     case 1:
         if (actor->animDone != 0) {
 #if VERSION_US
@@ -1409,10 +1417,10 @@ static inline void runUsed(Actor *actor) {
  * two steps.
  */
 void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
-    Point move2;
-    Point move3;
-    Point move4;
-    Point move5;
+    Vec2 move2;
+    Vec2 move3;
+    Vec2 move4;
+    Vec2 move5;
 
     switch (actor->substate) {
     case ACTOR_STAND:
@@ -1548,6 +1556,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
         }
         actor->setSubstate(actor, ACTOR_CLIMB);
         actor->control = FIELDSTG_controlClimb;
+        /* fallthrough */
     case ACTOR_POSED:
     default:
         actor->hasShadow = 1;

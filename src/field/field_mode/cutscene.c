@@ -23,6 +23,7 @@ void FIELDSTG_playCutsceneAnim(CutsceneAnim *task) {
                 FILE_CACHE.request(FIELD_ANIM_FILE);
             }
             task->nextSubstate(task);
+            /* fallthrough */
         case 1:
             if (task->kind) {
                 loading = FILE_CACHE.isLoading(FIELD_ANIM_FILE + 1);

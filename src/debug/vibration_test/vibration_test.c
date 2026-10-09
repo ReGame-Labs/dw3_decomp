@@ -7,7 +7,9 @@ ShockTestRow SHOCKTST_menuRows[4] = {
     {{1, 0}, {10, 0, 11, 0}},
 };
 
-/* The strings of the pattern, time and power windows (setString) */
+/* The strings of the pattern, time and power windows (setString), in font
+   codes: the label, icon 7 (01 07), then control code 5 (02 05 01), which
+   inserts work buffer 1, where setNumber writes the value */
 char SHOCKTST_numberFormats[3][0x40] = {
     "\xC3\xB1\xE8\xE3\x01\x07\x02\x05\x01",
     "\xC7\xDE\xE8\xD2\x01\x07\x02\x05\x01",
@@ -315,6 +317,7 @@ void SHOCKTST_updateEditor(ShockTest *task, ShockTestWindows *win) {
         switch (task->substate) {
         default:
             task->setSubstate(task, 0);
+            /* fallthrough */
         case 0:
             switch (SHOCKTST_moveCursor(task, win)) {
             case 2:
@@ -489,7 +492,7 @@ void SHOCKTST_convertText(ShockLoader *task) {
 
 /* The loader's task: creates the title and help windows, reads DLSKDATA.TXT
    from the PC and starts the editor on it; START goes back to the stage
-   select (mode 0x1500) */
+   select (MODE_STAGE_SELECT) */
 void SHOCKTST_updateLoader(ShockLoader *task, ShockLoaderWindows *win) {
     s32 fd;
 

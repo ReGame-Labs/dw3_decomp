@@ -40,26 +40,26 @@ void STGDGLAB_closeMenu(LabMenu *menu) {
    the lab's party member, or empty strings and a grey entries hint without one */
 void STGDGLAB_showMenuPage(LabMenu *menu, LabMenuWindows *windows) {
     PartnerTotals totals;
-    s32 *pos;
+    LabWindowPos *pos;
     s32 member;
     s32 i;
 
     for (i = 0; i < 5; i++) {
-        pos = &STGDGLAB_data.pos[i * 3];
+        pos = &STGDGLAB_data.layout[i];
         if (windows->statLabels[i] == NULL) {
-            windows->statLabels[i] = createTextWindow(menu->layer, 3, pos[1], pos[2]);
+            windows->statLabels[i] = createTextWindow(menu->layer, 3, pos->x, pos->y);
             windows->statLabels[i]->setDepth(windows->statLabels[i], menu->depth - 1);
         }
-        windows->statLabels[i]->setString(windows->statLabels[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), pos[0]);
+        windows->statLabels[i]->setString(windows->statLabels[i], FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), pos->string);
     }
     member = GAME.funcs.getPartyMember(menu->lab->member);
     if (member >= 0) {
         GAME.funcs.computeStats(member, &totals);
     }
     for (i = 0; i < 5; i++) {
-        pos = &STGDGLAB_data.pos[(i + 5) * 3];
+        pos = &STGDGLAB_data.layout[i + 5];
         if (windows->statValues[i] == NULL) {
-            windows->statValues[i] = createTextWindow(menu->layer, 3, pos[1], pos[2]);
+            windows->statValues[i] = createTextWindow(menu->layer, 3, pos->x, pos->y);
             windows->statValues[i]->setDepth(windows->statValues[i], menu->depth - 1);
         }
         if (member < 0) {
@@ -73,9 +73,9 @@ void STGDGLAB_showMenuPage(LabMenu *menu, LabMenuWindows *windows) {
         }
         windows->statValues[i]->setRightAlign(windows->statValues[i], 1);
     }
-    pos = &STGDGLAB_data.pos[30];
+    pos = &STGDGLAB_data.layout[10];
     if (windows->name == NULL) {
-        windows->name = createTextWindow(menu->layer, 1, pos[1], pos[2]);
+        windows->name = createTextWindow(menu->layer, 1, pos->x, pos->y);
         windows->name->setDepth(windows->name, menu->depth - 1);
     }
     if (member < 0) {
@@ -424,7 +424,7 @@ void STGDGLAB_runMenu(LabMenu *menu, LabMenuWindows *windows) {
 /* Draws the main menu's frames and the party's animations */
 void STGDGLAB_drawMenu(LabMenu *menu, void *children) {
     SpriteDrawer sprite;
-    LabAnim *anim;
+    PartnerAnim *anim;
     s32 member;
     s32 id;
     s32 i;

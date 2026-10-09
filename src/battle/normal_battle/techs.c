@@ -5,7 +5,7 @@
 #include "battle/normal_battle.h"
 
 /* In BATTLE_KIND_FINAL, keeps the partner's technique ID in
-   FIGHTSTG_battle.tech when its script is not 5 or 12 and it has an effect
+   FIGHTSTG_battle.state.tech when its script is not 5 or 12 and it has an effect
    (not 0-1, 9-10 or 12) or an element;
    WFIGHTMN_bringLastEnemy makes technique 440 from it */
 void WFIGHTMN_recordTech(u8 side, s32 id) {
@@ -13,7 +13,7 @@ void WFIGHTMN_recordTech(u8 side, s32 id) {
     s32 flag;
     u8 kind;
 
-    if (side == 0 && FIGHTSTG_battle.kind == BATTLE_KIND_FINAL) {
+    if (side == 0 && FIGHTSTG_battle.state.kind == BATTLE_KIND_FINAL) {
         flag = 0;
         if (info->script != 5 && info->script != 12) {
             kind = info->effect;
@@ -24,7 +24,7 @@ void WFIGHTMN_recordTech(u8 side, s32 id) {
                 flag = 1;
             }
             if (flag) {
-                FIGHTSTG_battle.tech = id;
+                FIGHTSTG_battle.state.tech = id;
             }
         }
     }
@@ -33,8 +33,8 @@ void WFIGHTMN_recordTech(u8 side, s32 id) {
 /* Adds what damage gives to the current partner's gauge
    (BATTLE_SETUP.gauges), up to 1000 */
 void WFIGHTMN_chargeGauge(u8 side, s32 damage) {
-    BattleFighter *unit = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
-    s32 member = GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]);
+    BattleFighter *unit = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
+    s32 member = GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0]);
 
     if (side != 0 && damage != 0 && unit->hp != 0 && unit->temporary == 0) {
         BATTLE_SETUP.gauges[member] += FIGHTSTG_battleFuncs.getGaugeGain(damage);
@@ -61,11 +61,11 @@ static inline void choosePartnerScript(BattleScript *task, TechData *info, Battl
                 if (FIGHTSTG_action.effects[i] != 0) {
                     task->index = 6;
                     {
-                        s32 (*table)[2] = WFIGHTMN_actionEffects; /* match depends on the pointer */
+                        ScriptLook *table = WFIGHTMN_actionEffects; /* match depends on the pointer */
 
                         j = i - 2;
-                        task->effect = table[j][0];
-                        task->sound = table[j][1];
+                        task->effect = table[j].effect;
+                        task->sound = table[j].sound;
                     }
                     break;
                 }
@@ -165,8 +165,8 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
 
     side = actor != 0;
     info = &TECHS[id - 1];
-    own = FIGHTSTG_battleFuncs.computeStats(actor, 1, FIGHTSTG_battle.active[side]);
-    other = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY - actor, 0, FIGHTSTG_battle.active[1 - side]);
+    own = FIGHTSTG_battleFuncs.computeStats(actor, 1, FIGHTSTG_battle.state.active[side]);
+    other = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY - actor, 0, FIGHTSTG_battle.state.active[1 - side]);
     task = FIGHTSTG_createBattleScript();
     task->enemy = actor;
     if (actor == 0) {
@@ -203,14 +203,14 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
     } else {
         chooseEnemyScript(task, info, other);
     }
-    units = FIGHTSTG_battle.fighters[1 - side];
+    units = FIGHTSTG_battle.state.fighters[1 - side];
     if (id == 0x1B5) {
         damage = 9999;
         task->hits[3] = 1;
     } else if (info->effect == TECH_EFFECT_DOUBLE_MAGIC) {
         if (FIGHTSTG_action.hitsLanded != 0) {
             damage = FIGHTSTG_action.hitDamage[0] + FIGHTSTG_action.hitDamage[1];
-            if (units[FIGHTSTG_battle.active[1 - side]].hp - damage <= 0) {
+            if (units[FIGHTSTG_battle.state.active[1 - side]].hp - damage <= 0) {
                 if (FIGHTSTG_action.hitsLanded == 1) {
                     task->hits[0] = 3;
                 } else {
@@ -233,7 +233,7 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
         }
     } else if (FIGHTSTG_action.effects[TECH_EFFECT_MULTI_HIT] != 0) {
         damage = FIGHTSTG_action.hitsLanded * FIGHTSTG_action.damage;
-        if (units[FIGHTSTG_battle.active[1 - side]].hp - damage <= 0) {
+        if (units[FIGHTSTG_battle.state.active[1 - side]].hp - damage <= 0) {
             for (i = 0; i < FIGHTSTG_action.hitsLanded - 1; i++) {
                 if (FIGHTSTG_action.hits[i] != 0) {
                     task->hits[i] = 0;
@@ -264,7 +264,7 @@ BattleScript *WFIGHTMN_startTech(u8 actor, s32 id) {
         damage = FIGHTSTG_action.damage;
     } else if (info->icon == TECH_PHYSICAL || info->icon == TECH_MAGIC) {
         if (FIGHTSTG_action.hits[0] != 0) {
-            if (units[FIGHTSTG_battle.active[1 - side]].hp - FIGHTSTG_action.damage <= 0) {
+            if (units[FIGHTSTG_battle.state.active[1 - side]].hp - FIGHTSTG_action.damage <= 0) {
                 task->hits[3] = 2;
             } else {
                 task->hits[3] = 1;
@@ -289,11 +289,11 @@ s32 WFIGHTMN_setIdleMotion(u8 id, s32 damage) {
     BattleMenuChildren *children = menu->children;
     BattleFighter *unit;
 
-    if (id == 0x10 && FIGHTSTG_battle.kind == BATTLE_KIND_FINAL_LAST) {
-        children->models->setIdleMotion(children->models, 0x10, FIGHTSTG_battle.weakened);
+    if (id == 0x10 && FIGHTSTG_battle.state.kind == BATTLE_KIND_FINAL_LAST) {
+        children->models->setIdleMotion(children->models, 0x10, FIGHTSTG_battle.state.weakened);
         return 1;
     }
-    unit = &FIGHTSTG_battle.fighters[side][FIGHTSTG_battle.active[side]];
+    unit = &FIGHTSTG_battle.state.fighters[side][FIGHTSTG_battle.state.active[side]];
     if (unit->hp - damage <= unit->maxHp / 4) {
         children->models->setIdleMotion(children->models, id, 1);
         return 1;
@@ -305,8 +305,8 @@ s32 WFIGHTMN_setIdleMotion(u8 id, s32 damage) {
 /* In BATTLE_KIND_FINAL_LAST, the partner's third hit that does damage weakens
    the enemy (FIGHTSTG's FIGHTSTG_weakenEnemy) */
 void WFIGHTMN_countHit(u8 side, s32 damage) {
-    if (FIGHTSTG_battle.kind == BATTLE_KIND_FINAL_LAST && side == 0 && FIGHTSTG_battle.weakened == 0 && damage != 0) {
-        if (++FIGHTSTG_battle.hitCount >= 3) {
+    if (FIGHTSTG_battle.state.kind == BATTLE_KIND_FINAL_LAST && side == 0 && FIGHTSTG_battle.state.weakened == 0 && damage != 0) {
+        if (++FIGHTSTG_battle.state.hitCount >= 3) {
             FIGHTSTG_weakenEnemy();
             WFIGHTMN_setIdleMotion(SIDE_ENEMY, damage);
         }
@@ -316,7 +316,7 @@ void WFIGHTMN_countHit(u8 side, s32 damage) {
 /* In BATTLE_KIND_FINAL_LAST, anything the partner does but an attack ends
    the enemy's weakness (FIGHTSTG's FIGHTSTG_endEnemyWeakness) */
 void WFIGHTMN_endWeakness(u8 side) {
-    if (FIGHTSTG_battle.kind == BATTLE_KIND_FINAL_LAST && side == 0 && FIGHTSTG_battle.weakened != 0) {
+    if (FIGHTSTG_battle.state.kind == BATTLE_KIND_FINAL_LAST && side == 0 && FIGHTSTG_battle.state.weakened != 0) {
         FIGHTSTG_endEnemyWeakness();
     }
 }
@@ -326,11 +326,11 @@ void WFIGHTMN_endWeakness(u8 side) {
    in BATTLE_KIND_NO_DAMAGE the partner does none */
 s32 WFIGHTMN_limitDamage(u8 side, s32 damage, s32 hits) {
     s32 other = side == 0;
-    BattleFighter *unit = &FIGHTSTG_battle.fighters[other][FIGHTSTG_battle.active[other]];
+    BattleFighter *unit = &FIGHTSTG_battle.state.fighters[other][FIGHTSTG_battle.state.active[other]];
     s32 limit;
     s32 total;
 
-    switch (FIGHTSTG_battle.kind) {
+    switch (FIGHTSTG_battle.state.kind) {
     case BATTLE_KIND_ESCAPE:
     case BATTLE_KIND_UNK2:
         if (side == 0) {

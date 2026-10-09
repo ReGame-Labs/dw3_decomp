@@ -126,6 +126,8 @@ extern BattleTestCursors WFIGHTTS_effectCursors;
 extern char *WFIGHTTS_motionNames[];
 extern char *WFIGHTTS_effectNames[];
 
+void WFIGHTTS_initLayers(void);
+void WFIGHTTS_loadImages(void);
 void WFIGHTTS_battleTest(BattleTest *task, BattleTestChildren *children);
 BattleTestList *WFIGHTTS_createFighterList(s32 *side, s32 *pick);
 BattleTestList *WFIGHTTS_createCameraList(s32 *side, s32 *pick);

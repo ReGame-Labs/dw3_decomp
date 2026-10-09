@@ -7,7 +7,7 @@
    task->target's, or one of the others at random (not the active one), -1
    for none */
 s32 FIGHTSTG_pickEnemySwitch(EnemyTurn *task) {
-    BattleFighter *enemies = FIGHTSTG_battle.fighters[1];
+    BattleFighter *enemies = FIGHTSTG_battle.state.fighters[1];
     s32 found[2];
     s32 count;
     s32 active;
@@ -15,7 +15,7 @@ s32 FIGHTSTG_pickEnemySwitch(EnemyTurn *task) {
 
     switch (task->target) {
     case -2:
-        if (enemies[0].id == enemies[FIGHTSTG_battle.active[1]].id) {
+        if (enemies[0].id == enemies[FIGHTSTG_battle.state.active[1]].id) {
             break;
         }
         if (enemies[0].hp != 0) {
@@ -23,7 +23,7 @@ s32 FIGHTSTG_pickEnemySwitch(EnemyTurn *task) {
         }
         break;
     case -3:
-        if (enemies[1].id == enemies[FIGHTSTG_battle.active[1]].id) {
+        if (enemies[1].id == enemies[FIGHTSTG_battle.state.active[1]].id) {
             break;
         }
         if (enemies[1].hp != 0) {
@@ -31,7 +31,7 @@ s32 FIGHTSTG_pickEnemySwitch(EnemyTurn *task) {
         }
         break;
     case -4:
-        if (enemies[2].id == enemies[FIGHTSTG_battle.active[1]].id) {
+        if (enemies[2].id == enemies[FIGHTSTG_battle.state.active[1]].id) {
             break;
         }
         if (enemies[2].hp != 0) {
@@ -42,9 +42,9 @@ s32 FIGHTSTG_pickEnemySwitch(EnemyTurn *task) {
         count = 0;
         found[0] = -1;
         found[1] = -1;
-        active = FIGHTSTG_battle.active[1];
+        active = FIGHTSTG_battle.state.active[1];
         for (i = 0; i < 3; i++) {
-            enemies = &FIGHTSTG_battle.fighters[1][i];
+            enemies = &FIGHTSTG_battle.state.fighters[1][i];
             if (active != i && enemies->id != 0 && enemies->hp != 0) {
                 found[count++] = i;
             }
@@ -66,8 +66,8 @@ s32 FIGHTSTG_pickEnemySwitch(EnemyTurn *task) {
 /* In BATTLE_KIND_ESCAPE, the enemy flees once its HP is under a tenth;
    otherwise its turn goes on to the next state. */
 static inline void fleeWhenWeak(EnemyTurn *task, BattleChild *children) {
-    if (FIGHTSTG_battle.kind == BATTLE_KIND_ESCAPE) {
-        BattleFighter *enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+    if (FIGHTSTG_battle.state.kind == BATTLE_KIND_ESCAPE) {
+        BattleFighter *enemy = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
 
         if (enemy->hp < (s16)(enemy->maxHp / 10)) {
             children->message = FIGHTSTG_createMessage();
@@ -92,7 +92,7 @@ static inline void showRunAway(EnemyTurn *task, BattleChild *children) {
     switch (task->step) {
     case 0:
     default:
-        index = FIGHTSTG_events.funcs.find(EVENT_RUN_AWAY, 0x10, FIGHTSTG_battle.active[1]);
+        index = FIGHTSTG_events.funcs.find(EVENT_RUN_AWAY, 0x10, FIGHTSTG_battle.state.active[1]);
         if (index >= 0) {
             children->message = FIGHTSTG_createMessage();
             task->lines[0] = 0x60;
@@ -121,7 +121,7 @@ static inline void useEnemyTech(EnemyTurn *task, BattleChild *children) {
     if (task->target == 1) {
         children->attack = FIGHTSTG_startFirstTech(0x10);
     } else {
-        fighter = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+        fighter = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
         tech = &TECHS[task->target - 1];
         if (fighter->mp >= tech->mp) {
             children->tech = FIGHTSTG_startTechAction(SIDE_ENEMY, task->target);
@@ -137,8 +137,8 @@ static inline void useEnemyTech(EnemyTurn *task, BattleChild *children) {
 
 /* Says the name of the enemy that came in. */
 static inline void showEnemyName(EnemyTurn *task, BattleChild *children) {
-    BattleFighter *enemies = FIGHTSTG_battle.fighters[1];
-    BattleTableEntry *enemy = FIGHTSTG_battleTableFunc(enemies[FIGHTSTG_battle.active[1]].id);
+    BattleFighter *enemies = FIGHTSTG_battle.state.fighters[1];
+    BattleTableEntry *enemy = FIGHTSTG_battleTableFunc(enemies[FIGHTSTG_battle.state.active[1]].id);
 
     children->message = FIGHTSTG_createMessage();
     task->lines[0] = enemy->nameId;
@@ -199,7 +199,7 @@ void FIGHTSTG_updateEnemyTurn(EnemyTurn *task, BattleChild *children) {
             showRunAway(task, children);
             break;
         case 1:
-            fighter = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+            fighter = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
             if (fighter->flags & FIGHTER_ASLEEP) {
                 children->message = FIGHTSTG_createMessage();
                 message = 0x90;
@@ -268,7 +268,7 @@ void FIGHTSTG_updateEnemyTurn(EnemyTurn *task, BattleChild *children) {
             break;
         case 5:
             if (children->message == NULL) {
-                BattleFighter *enemies = FIGHTSTG_battle.fighters[1];
+                BattleFighter *enemies = FIGHTSTG_battle.state.fighters[1];
 
                 children->entrance = FIGHTSTG_startEntrance(enemies[task->switchTo].id, 1, 0);
                 WFIGHTMN_setIdleMotion(SIDE_ENEMY, 0);
@@ -277,7 +277,7 @@ void FIGHTSTG_updateEnemyTurn(EnemyTurn *task, BattleChild *children) {
             break;
         case 6:
             if (children->entrance->done) {
-                FIGHTSTG_battle.active[1] = task->switchTo;
+                FIGHTSTG_battle.state.active[1] = task->switchTo;
                 task->substate = 4;
             }
             break;
@@ -301,7 +301,7 @@ EnemyTurn *FIGHTSTG_startEnemyTurn(void) {
    on case 1 keeping its roll in the same variable as the HP share, and on case 10's
    own loop counter. */
 s32 FIGHTSTG_testEnemyCondition(u8 condition, s16 arg) {
-    BattleFighter *fighter = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+    BattleFighter *fighter = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
     s32 result = 0;
     s32 percent;
     s32 j;
@@ -342,21 +342,21 @@ s32 FIGHTSTG_testEnemyCondition(u8 condition, s16 arg) {
         }
         break;
     case 6:
-        fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+        fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
         percent = arg * 100 / 128;
         if (fighter->hp < (s16)(fighter->maxHp / 100) * percent) {
             result = 1;
         }
         break;
     case 7:
-        fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+        fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
         percent = arg * 100 / 128;
         if (fighter->hp >= (s16)(fighter->maxHp / 100) * percent) {
             result = 1;
         }
         break;
     case 8:
-        fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+        fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
         for (i = 0, digimon = DIGIMON_DATA; i < 8; i++, digimon++) {
             if (fighter->id == digimon->id) {
                 result = 1;
@@ -365,23 +365,23 @@ s32 FIGHTSTG_testEnemyCondition(u8 condition, s16 arg) {
         }
         break;
     case 9:
-        fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+        fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
         if (fighter->flags & FIGHTER_ASLEEP) {
             result = 1;
         }
         break;
     case 10:
-        fighter = FIGHTSTG_battle.fighters[1];
+        fighter = FIGHTSTG_battle.state.fighters[1];
         if (arg == 0) {
             for (j = 0; j < 3; j++) {
-                if (j != FIGHTSTG_battle.active[1] && fighter[j].id != 0 && fighter[j].hp != 0) {
+                if (j != FIGHTSTG_battle.state.active[1] && fighter[j].id != 0 && fighter[j].hp != 0) {
                     result = 1;
                     break;
                 }
             }
         } else {
             for (j = 0; j < 3; j++) {
-                if (j != FIGHTSTG_battle.active[1] && fighter[j].id == arg && fighter[j].hp != 0) {
+                if (j != FIGHTSTG_battle.state.active[1] && fighter[j].id == arg && fighter[j].hp != 0) {
                     result = 1;
                     break;
                 }
@@ -389,7 +389,7 @@ s32 FIGHTSTG_testEnemyCondition(u8 condition, s16 arg) {
         }
         break;
     case 11:
-        if (FIGHTSTG_battle.boostElement == arg) {
+        if (FIGHTSTG_battle.state.boost.element == arg) {
             result = 1;
         }
         break;
@@ -436,7 +436,7 @@ s32 FIGHTSTG_testEnemyCondition(u8 condition, s16 arg) {
    technique, its battle table entry's second or third technique, or -1 to -5
    for the other actions */
 s32 FIGHTSTG_getEnemyAction(u8 kind) {
-    BattleFighter *enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+    BattleFighter *enemy = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
     s32 value = 0;
     BattleTableEntry *entry = FIGHTSTG_battleTableFunc(enemy->id);
 

@@ -50,7 +50,6 @@ void FIGHTSTG_drawSpriteAnim(void *arg, Layer *layer) {
    FIGHTSTG_drawSpriteAnim draw it, until its duration is over */
 void FIGHTSTG_updateSpriteAnim(SpriteAnim *task) {
     s16 *data;
-    s16 *values;
     s32 i;
 
     switch (task->state) {

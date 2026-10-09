@@ -333,7 +333,7 @@ typedef struct Jump {
     TASK_HEADER(Jump);
     /* 0x50 */ s32 kind;
     /* 0x54 */ s32 distance; /* kind 4: past 0x2800 */
-    /* 0x58 */ s32 dist;
+    /* 0x58 */ s32 zTravel; /* kinds 4 and 5: the z it moves from home, negated for the enemy */
     /* 0x5C */ ModelControl *control;
     /* 0x60 */ s32 height;
     /* 0x64 */ s32 y;
@@ -347,15 +347,28 @@ Models *FIGHTSTG_createModels(void);
 /* Shared between the overlay's objects */
 extern FighterCache FIGHTSTG_fighterCache;
 extern InterpFuncs FIGHTSTG_interp;
+void FIGHTSTG_blendBone(Model *model, ModelBone *bone);
+void FIGHTSTG_poseBone(Model *model, ModelBone *bone, s32 frame);
+void FIGHTSTG_poseBones(Model *model, Mesh **children);
+void FIGHTSTG_saveBlendPose(Model *model);
 void FIGHTSTG_setMotion(Model *model, s32 motion, s32 restart);
 void FIGHTSTG_updateModel(Model *model, Mesh **children);
 Mesh *FIGHTSTG_createMesh(void *archive, Vec2 texPos);
 void FIGHTSTG_setModelColor(Model *model, s32 mode, CVECTOR *color);
 void FIGHTSTG_setBoneNoBoundsCheck(Model *model, s32 bone, s32 value);
 s32 FIGHTSTG_isMotionDone(Model *model);
+Model *FIGHTSTG_createModel(s32 file, s32 motionFile, Vec2 texPos, ModelControl *control, s32 hasIdle);
 Model *FIGHTSTG_createPlainModel(s32 file, s32 motionFile, Vec2 texPos, ModelControl *control);
+void FIGHTSTG_lightMesh(Mesh *mesh);
+void FIGHTSTG_projectMesh(Mesh *mesh, Layer *layer);
+void FIGHTSTG_addMeshPolyGT(MeshDrawState *state);
+void FIGHTSTG_addMeshPolyFT(MeshDrawState *state);
+s32 FIGHTSTG_isMeshOnScreen(Mesh *mesh, Layer *layer);
 void FIGHTSTG_drawMesh(void *arg, Layer *layer);
 void FIGHTSTG_drawMeshWireframe(Mesh *mesh, Layer *layer);
+void FIGHTSTG_queueMeshDraw(Mesh *mesh, s32 layerId, MATRIX *matrix);
+void FIGHTSTG_queueMeshWireframe(Mesh *mesh, s32 layerId, MATRIX *matrix);
+void FIGHTSTG_updateMesh(Mesh *mesh);
 void FIGHTSTG_updateMove(MoveTask *task);
 FighterInfo *FIGHTSTG_getFighterInfo(s32 id);
 void FIGHTSTG_cacheFighter(s32 index);
@@ -372,17 +385,25 @@ s32 FIGHTSTG_getModelFighter(Models *task, s32 id);
 void FIGHTSTG_faceModel(Models *task, s32 id);
 void FIGHTSTG_setModelIdleMotion(Models *task, s32 id, s32 motion);
 Model *FIGHTSTG_createIdlingModel(s32 file, s32 motionFile, Vec2 texPos, ModelControl *control);
+void FIGHTSTG_updateJump(Jump *task);
 Jump *FIGHTSTG_startJump(ModelControl *control, s32 kind, s32 distance);
 MoveTask *FIGHTSTG_startMove(ModelControl *control, ShortVec3 *to, s32 time);
 void FIGHTSTG_drawShadedQuad(s32 layerId, s32 depth, DVECTOR *xy, CVECTOR *colors, s32 semi);
 void FIGHTSTG_stepMotion(Model *model);
 extern EffectModelEntry FIGHTSTG_effectModels[];
+s32 FIGHTSTG_getEyesFrame(Face *task);
+void FIGHTSTG_moveFacePart(Face *task, DR_MOVE *prim, s32 part, s32 frame);
+void FIGHTSTG_updateFace(Face *task);
 Face *FIGHTSTG_createFace(Model *model, s32 fighter);
 void FIGHTSTG_projectPoint(Layer *layer, SVECTOR *pos, ShortVec3 *out);
 extern JumpParams FIGHTSTG_jumps[];
 extern s32 FIGHTSTG_partnerIdleMotion;
+void FIGHTSTG_updateEffectModel(EffectModel *task, Model **children);
 s32 FIGHTSTG_getEffectModelFile(s32 id);
 EffectModel *FIGHTSTG_startEffectModel(s32 id, SVECTOR *pos, SVECTOR *rot);
+void FIGHTSTG_interpNop(void);
+void FIGHTSTG_lerpVector(SVECTOR *from, SVECTOR *to, s32 t, SVECTOR *out);
+s32 FIGHTSTG_ease(s32 curve, s32 t, s32 value);
 
 /* the functions of FIGHTSTG_battle, FIGHTSTG_action and FIGHTSTG_battleFuncs */
 void FIGHTSTG_drawQuad(s32 layerId, s32 depth, DVECTOR *xy, CVECTOR *colors);
