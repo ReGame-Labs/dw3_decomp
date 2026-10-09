@@ -353,6 +353,30 @@ smoke: $(EXE) $(OVL_BIN)
 	@command -v xvfb-run > /dev/null || { echo "make smoke runs DuckStation under xvfb-run: install xvfb (apt install xvfb)" >&2; exit 1; }
 	$(PYTHON) tools/smoke.py --disc "$(DISC)" --bios "$(BIOS)" --pad $(PAD) --emulator "$(DUCKSTATION)"
 
+# The API documentation, $(DOCS_DIR)/html/index.html, for the European
+# version (docs/Doxyfile): doxygen reads the C's comments through
+# tools/doxygen_filter.py, and the folders' descriptions from the READMEs
+# (tools/doxygen_dirs.py). It needs doxygen, graphviz for the graphs, and the
+# theme, the doxygen-awesome-css submodule, whose scripts go in doxygen's own
+# header (docs/doxygen_head.html).
+DOXYGEN ?= doxygen
+DOCS_DIR := build/docs
+DOXYGEN_THEME := external/doxygen-awesome-css
+docs:
+	@command -v $(DOXYGEN) > /dev/null || { echo "make docs needs doxygen, and graphviz for the graphs (apt install doxygen graphviz)" >&2; exit 1; }
+	@test -f $(DOXYGEN_THEME)/doxygen-awesome.css || { echo "make docs needs the theme: git submodule update --init $(DOXYGEN_THEME)" >&2; exit 1; }
+	@mkdir -p $(DOCS_DIR)
+	$(PYTHON) tools/doxygen_dirs.py $(DOCS_DIR)/dirs.dox
+	$(DOXYGEN) -w html $(DOCS_DIR)/default_header.html $(DOCS_DIR)/default_footer.html $(DOCS_DIR)/default.css docs/Doxyfile
+	awk '/<\/head>/ { while ((getline line < "docs/doxygen_head.html") > 0) print line } 1' \
+		$(DOCS_DIR)/default_header.html > $(DOCS_DIR)/header.html
+	{ cat docs/Doxyfile; echo "HTML_HEADER = $(DOCS_DIR)/header.html"; \
+		command -v dot > /dev/null || echo "HAVE_DOT = NO"; } | $(DOXYGEN) -
+	@echo "$(DOCS_DIR)/html/index.html; doxygen's warnings: $(DOCS_DIR)/warnings.log"
+
+docs-clean:
+	rm -rf $(DOCS_DIR)
+
 # The executable's .bss in C: maspsx turns the commons of these units into
 # definitions in order in their .bss when they aren't kept as .comm
 $(BUILDDIR)/src/engine/data/game_bss.c.o $(BUILDDIR)/src/engine/sound/sound.c.o: MASPSXFLAGS := $(filter-out --use-comm-section,$(MASPSXFLAGS))
@@ -401,4 +425,4 @@ reset: clean
 
 -include $(C_OBJ:.o=.d) $(C_OVL_OBJ:.o=.d)
 
-.PHONY: all generate regenerate compare expected objdiff report clean reset shiftcheck shiftreport links padcheck lint smoke
+.PHONY: all generate regenerate compare expected objdiff report clean reset shiftcheck shiftreport links padcheck lint smoke docs docs-clean

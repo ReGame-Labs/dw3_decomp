@@ -30,7 +30,8 @@
   with `-G8` as well, but its code is the same at `-G0`. Every module cut
   from a `-G8` object keeps it; the rest of the game uses `-G0`.
 - The C includes the PsyQ 4.7 headers from
-  [psyq_headers](https://github.com/jype0/psyq_headers). `libgte.h` names
+  [psyq_headers](https://github.com/Rivarux/psyq_headers) (a fork of
+  [jype0's](https://github.com/jype0/psyq_headers)). `libgte.h` names
   some parameters `$2`, hence `-fdollars-in-identifiers`. The game uses
   signed `char` (`-fsigned-char`).
 - Most global function pointers live in tables (the heap, `HEAP`, holds
@@ -74,6 +75,33 @@ on when it is set; without a command it opens a shell. No `bin/` or `.venv`
 is needed on the host: `BIN_DIR` points at the image's tools.
 The prebuilt tools are x86 Linux binaries, so the image is `linux/amd64`.
 
+## API documentation
+
+`make docs` builds the API documentation with
+[Doxygen](https://www.doxygen.nl) and the
+[Doxygen Awesome](https://github.com/jothepro/doxygen-awesome-css) theme, the
+submodule `external/doxygen-awesome-css`, into `build/docs/html/`: the
+European version's functions, types, globals and macros, with their source,
+call graphs and include graphs, and these pages. Without graphviz it leaves
+the graphs out:
+```
+sudo apt install doxygen graphviz
+git submodule update --init external/doxygen-awesome-css
+make docs          # build/docs/html/index.html, warnings in build/docs/warnings.log
+make docs-clean
+```
+The C keeps its plain `/* */` comments: as doxygen reads a file,
+`tools/doxygen_filter.py` turns the comment right above a function, type,
+global or macro, and the one after a field on its line, into its
+documentation, so the comments that [CONTRIBUTING.md](../CONTRIBUTING.md#code)
+asks for are the documentation. The folders' descriptions come from
+[src/README.md](../src/README.md) and
+[the stages' list](../src/field/stages/README.md) (`tools/doxygen_dirs.py`).
+None of it touches the game's build.
+
+The CI (`.github/workflows/docs.yaml`) builds it on every push to `main`
+and publishes it to GitHub Pages: <https://regame-labs.github.io/dw3_decomp/>.
+
 ## Layout
 
 | Path | Contents |
@@ -88,12 +116,13 @@ The prebuilt tools are x86 Linux binaries, so the image is `linux/amd64`.
 | `include/` | `common.h`, `version.h`, `include_asm.h` and the assembler macros |
 | `config/<version>/` | the version's splat configs, symbols, stage list and checksums |
 | `mk/version/` | each version's settings for the Makefile and the tools |
-| `docs/` | the status, the binaries and versions, the toolchain and the shiftable build |
+| `docs/` | the status, the binaries and versions, the toolchain and the shiftable build; `Doxyfile` and `doxygen_head.html`, the API documentation's settings and the theme's scripts |
 | `tools/` | build helpers, matching helpers and the report generator (see [Tools](#tools)) |
-| `external/` | submodules: maspsx, m2c, decomp-permuter, psyq_headers |
+| `external/` | submodules: maspsx, m2c, decomp-permuter, psyq_headers, doxygen-awesome-css |
 | `.github/workflows/build.yaml` | the CI: checks the names and the hacks, builds and compares both versions, uploads their reports |
+| `.github/workflows/docs.yaml` | builds the API documentation and publishes it to GitHub Pages |
 | `Dockerfile`, `tools/docker.sh`, `.github/workflows/docker.yaml` | the build environment as a Docker image, the script that runs a command in it, and its CI |
-| `asm/<version>/`, `build/<version>/`, `expected/<version>/`, `assets/<version>/` | generated; not in git |
+| `asm/<version>/`, `build/<version>/`, `expected/<version>/`, `assets/<version>/`, `build/docs/` | generated; not in git |
 | `disks/<version>/` | the extracted disc; not in git |
 
 ## Tools
@@ -124,6 +153,8 @@ The prebuilt tools are x86 Linux binaries, so the image is `linux/amd64`.
 | `tools/rename.py` | renames a symbol in every version's symbol files, `src/` and `include/` |
 | `tools/rename_field.py` | renames a struct field in its definition and wherever the code uses it, from the command line or a spec file |
 | `tools/docker.sh` | runs a command in the Docker build environment |
+| `tools/doxygen_filter.py` | turns the C's comments that document something into doc comments as doxygen reads them (`make docs`) |
+| `tools/doxygen_dirs.py` | describes the source's folders for doxygen, from `src/README.md` and `src/field/stages/README.md` (`make docs`) |
 | `tools/version.py` | the version being worked on and its paths, for the other tools |
 | `tools/shiftcheck.py` | finds the addresses in the code and data that aren't symbols (`make shiftcheck`) |
 | `tools/link_imports.py` | writes what a binary links with from the binaries that load after it (part of the build) |

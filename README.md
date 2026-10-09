@@ -9,6 +9,7 @@
 [![Stages](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=code&version=SLES_039.36&category=stages&label=Europe%20stages)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLES_039.36?category=stages)
 
 [![Build](https://github.com/ReGame-Labs/dw3_decomp/actions/workflows/build.yaml/badge.svg)](https://github.com/ReGame-Labs/dw3_decomp/actions/workflows/build.yaml)
+[![Docs](https://github.com/ReGame-Labs/dw3_decomp/actions/workflows/docs.yaml/badge.svg)](https://regame-labs.github.io/dw3_decomp/)
 [![Platform](https://img.shields.io/badge/platform-PlayStation-003791)](docs/binaries.md#the-games-binaries)
 [![Versions](https://img.shields.io/badge/versions-USA%20%7C%20Europe-blue)](docs/binaries.md#how-the-versions-are-organised)
 [![Compiler](https://img.shields.io/badge/compiler-GCC%202.8.1-orange)](docs/toolchain.md#toolchain)
@@ -160,13 +161,16 @@ python3 tools/check_names.py  # every version uses the USA version's names
 
 ## Documentation
 
+- [The API documentation](https://regame-labs.github.io/dw3_decomp/): the European version's functions,
+  types, globals and macros, with their source and graphs, and these pages
+  (`make docs` builds it locally).
 - [docs/status.md](docs/status.md): the status of each part, how the
   progress is measured, and the fake matches and hacks.
 - [docs/binaries.md](docs/binaries.md): the game's executable, overlays and
   stages, their memory maps, and how the versions are organised.
 - [docs/toolchain.md](docs/toolchain.md): the compiler and its flags, the
-  declaration check, the Docker image, the repository's layout and its
-  tools.
+  declaration check, the Docker image, the API documentation (`make docs`),
+  the repository's layout and its tools.
 - [docs/shifting.md](docs/shifting.md): the shiftable build and the checks
   that keep it (`shiftcheck`, `padcheck`, `inputcheck`).
 - [CONTRIBUTING.md](CONTRIBUTING.md): the matching workflow and the rules on
