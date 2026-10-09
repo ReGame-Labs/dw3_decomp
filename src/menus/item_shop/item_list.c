@@ -101,7 +101,7 @@ void STITSHOP_drawItemList(ShopItemList *list) {
                 x = (i % 2) * 0x83 + 0x28;
                 y = (i % list->pageSize) / 2 * 0xE + 0x24;
                 sprite.setTexture(0x140, 0);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS->getCategory(item), x, y);
+                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS.getCategory(item), x, y);
                 sprite.setTexture(0x280, 0x100);
                 sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0x31, x, y);
             }
@@ -333,9 +333,9 @@ void STITSHOP_listSellable(ShopItemList *list) {
     s32 n;
 
     list->count = 0;
-    n = ITEM_FUNCS->list(list->type, list->bag);
+    n = ITEM_FUNCS.list(list->type, list->bag);
     for (i = 0; i < n; i++) {
-        if (ITEM_FUNCS->get(list->bag[i])->sellPrice != 0) {
+        if (ITEM_FUNCS.get(list->bag[i])->sellPrice != 0) {
             list->items[list->count++] = list->bag[i];
         }
     }

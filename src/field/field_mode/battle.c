@@ -17,10 +17,10 @@ void FIELDSTG_rollBattleSteps(void) {
 /* Starts one of the eight battles of the player's battle area, at random */
 void FIELDSTG_startAreaBattle(void) {
     Actor *actor = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
-    Point tile;
+    Vec2 tile;
     s32 area;
     s32 index;
-    Battle *battle;
+    AreaBattle *battle;
 
     tile = actor->tile;
     area = (u8)FIELDSTG_map.getCell(FIELD_MAP_AREAS, &tile) - 1;
@@ -34,12 +34,12 @@ void FIELDSTG_startAreaBattle(void) {
    run out */
 void FIELDSTG_countBattleSteps(void) {
     Actor *actor;
-    Point tile;
+    Vec2 tile;
     s32 area;
     s32 rate;
 
     if (FIELDSTG_map.files[FIELD_MAP_AREAS] != 0 && FIELDSTG_state.battles != NULL && FIELDSTG_state.battleStarting == 0 &&
-        FIELDSTG_state.busy == 0 && FIELDSTG_state.acting == 0 && FIELDSTG_state.bannerShown == 0) {
+        FIELDSTG_state.busy == 0 && FIELDSTG_state.acting == 0 && FIELDSTG_state.frozen == 0) {
         actor = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
         tile = actor->tile;
         area = (u8)FIELDSTG_map.getCell(FIELD_MAP_AREAS, &tile);
@@ -59,7 +59,7 @@ void FIELDSTG_countBattleSteps(void) {
 
 /* Starts battle index of the fourth area, the one events start */
 void FIELDSTG_startEventBattle(s32 index) {
-    Battle *battle;
+    AreaBattle *battle;
 
     if (FIELDSTG_state.battles != NULL) {
         battle = FIELDSTG_state.battles->battles[3]->battles[index];

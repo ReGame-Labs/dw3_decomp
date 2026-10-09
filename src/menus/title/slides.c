@@ -34,6 +34,7 @@ void STDWTITL_tickTitle1Alt(SlideTask *task) {
         case 1:
             task->steps = 10;
             task->nextSubstate(task);
+            /* fallthrough */
         case 2:
             task->x = task->steps * 32 + 207;
             if (task->steps-- <= 0) {
@@ -102,6 +103,7 @@ void STDWTITL_tickTitle1(SlideTask *task) {
         case 1:
             task->steps = 10;
             task->nextSubstate(task);
+            /* fallthrough */
         case 2:
             task->x = task->steps * 32 + 19;
             if (task->steps-- <= 0) {
@@ -167,6 +169,7 @@ void STDWTITL_tickTitle0Alt(SlideTask *task) {
         case 1:
             task->steps = 10;
             task->nextSubstate(task);
+            /* fallthrough */
         case 2:
             task->x = -(task->steps * 320) / 10 + 17;
             if (task->steps-- <= 0) {
@@ -235,6 +238,7 @@ void STDWTITL_tickTitle0(SlideTask *task) {
         case 1:
             task->steps = 10;
             task->nextSubstate(task);
+            /* fallthrough */
         case 2:
             task->x = -(task->steps * 320) / 10 + 19;
             if (task->steps-- <= 0) {

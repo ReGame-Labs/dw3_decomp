@@ -100,7 +100,7 @@ void FIGHTSTG_setMessageName(BattleMessageBox *task, BattleMessageBoxWindows *w,
     if (side == 0) {
         w->lines[0]->setSubString(w->lines[0], GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(index)), -1, 1);
     } else {
-        fighter = &FIGHTSTG_battle.fighters[1][index];
+        fighter = &FIGHTSTG_battle.state.fighters[1][index];
         entry = FIGHTSTG_battleTableFunc(fighter->id);
         w->lines[0]->setSubString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), entry->nameId, 1);
     }
@@ -115,7 +115,7 @@ void FIGHTSTG_findFighters(BattleMessageBox *task, FighterFilter *filter) {
     s32 i;
 
     task->foundCount = 0;
-    fighters = FIGHTSTG_battle.fighters[side];
+    fighters = FIGHTSTG_battle.state.fighters[side];
     switch (filter->type) {
     case 0:
     default:
@@ -203,7 +203,7 @@ void FIGHTSTG_showFightersMessage(BattleMessageBox *task, BattleMessageBoxWindow
             }
         } else {
             for (i = 0; i < task->foundCount; i++) {
-                fighter = &FIGHTSTG_battle.fighters[1][task->found[i]];
+                fighter = &FIGHTSTG_battle.state.fighters[1][task->found[i]];
                 if (fighter->id != 0) {
                     entry = FIGHTSTG_battleTableFunc(fighter->id);
                     w->lines[0]->setSubString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), entry->nameId, i + 1);
@@ -276,34 +276,34 @@ void FIGHTSTG_showMessage(BattleMessageBox *task, s32 type, s32 *data) {
         w->lines[0]->setString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x16);
         w->lines[1]->setString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), data[0]);
         task->count = 2;
-        FIGHTSTG_setMessageName(task, w, data[1], FIGHTSTG_battle.active[data[1] != 0]);
+        FIGHTSTG_setMessageName(task, w, data[1], FIGHTSTG_battle.state.active[data[1] != 0]);
         break;
     case 3:
         w->lines[0]->setString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x16);
         w->lines[1]->setString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 9);
         w->lines[1]->setSubString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), data[1], 1);
         task->count = 2;
-        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.active[data[0] != 0]);
+        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.state.active[data[0] != 0]);
         break;
     case 4:
         w->lines[0]->setString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x16);
         w->lines[1]->setString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0xB);
         w->lines[1]->setNumber(w->lines[1], 1, data[1]);
         task->count = 2;
-        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.active[data[0] != 0]);
+        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.state.active[data[0] != 0]);
         break;
     case 5:
         w->lines[0]->setString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x16);
         w->lines[1]->setString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0xA);
         w->lines[1]->setSubString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_SKILL_NAMES)), data[1], 1);
         task->count = 2;
-        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.active[data[0] != 0]);
+        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.state.active[data[0] != 0]);
         break;
     case 6:
         w->lines[0]->setString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x16);
         w->lines[1]->setString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x25);
         task->count = 2;
-        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.active[data[0] != 0]);
+        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.state.active[data[0] != 0]);
         break;
     case 7:
         w->lines[0]->setString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x16);
@@ -316,7 +316,7 @@ void FIGHTSTG_showMessage(BattleMessageBox *task, s32 type, s32 *data) {
         w->lines[1]->setString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x22);
         w->lines[1]->setNumber(w->lines[1], 1, data[1]);
         task->count = 2;
-        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.active[data[0] != 0]);
+        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.state.active[data[0] != 0]);
         break;
     case 9:
         /* its args are read both as which fighters to find and as what to
@@ -348,7 +348,7 @@ void FIGHTSTG_showMessage(BattleMessageBox *task, s32 type, s32 *data) {
         w->lines[1]->setString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x37);
         w->lines[1]->setSubString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_DIGIMON_NAMES)), data[1], 1);
         task->count = 2;
-        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.active[data[0] != 0]);
+        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.state.active[data[0] != 0]);
         break;
     case 13:
         w->lines[0]->setString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x4E);
@@ -361,7 +361,7 @@ void FIGHTSTG_showMessage(BattleMessageBox *task, s32 type, s32 *data) {
         w->lines[1]->setString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 9);
         w->lines[1]->setSubString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_NAMES)), data[1], 1);
         task->count = 2;
-        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.active[data[0] != 0]);
+        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.state.active[data[0] != 0]);
         break;
     case 15:
         w->lines[0]->setString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x16);
@@ -378,7 +378,7 @@ void FIGHTSTG_showMessage(BattleMessageBox *task, s32 type, s32 *data) {
         w->lines[1]->setNumber(w->lines[1], 2, data[2]);
         w->lines[1]->setNumber(w->lines[1], 3, total);
         task->count = 2;
-        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.active[data[0] != 0]);
+        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.state.active[data[0] != 0]);
         break;
     case 17:
         w->lines[0]->setString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x26);
@@ -395,13 +395,13 @@ void FIGHTSTG_showMessage(BattleMessageBox *task, s32 type, s32 *data) {
         }
         w->lines[1]->setNumber(w->lines[1], 1, data[1]);
         task->count = 2;
-        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.active[data[0] != 0]);
+        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.state.active[data[0] != 0]);
         break;
     case 19:
         w->lines[0]->setString(w->lines[0], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x16);
         w->lines[1]->setString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), data[1] + 0x49);
         task->count = 2;
-        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.active[data[0] != 0]);
+        FIGHTSTG_setMessageName(task, w, data[0], FIGHTSTG_battle.state.active[data[0] != 0]);
         break;
     case 20:
         FIGHTSTG_showMessage(task, 4, data);
@@ -415,7 +415,7 @@ void FIGHTSTG_showMessage(BattleMessageBox *task, s32 type, s32 *data) {
         w->lines[1]->setString(w->lines[1], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x22);
         w->lines[1]->setNumber(w->lines[1], 1, task->queue[task->next + 2]);
         task->count = 2;
-        FIGHTSTG_setMessageName(task, w, side, FIGHTSTG_battle.active[side != 0]);
+        FIGHTSTG_setMessageName(task, w, side, FIGHTSTG_battle.state.active[side != 0]);
         task->next += 2;
         break;
     case 22:

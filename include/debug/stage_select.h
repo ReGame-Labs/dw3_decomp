@@ -1,7 +1,7 @@
 #ifndef STAGSLCT_H
 #define STAGSLCT_H
 
-/* STAGSLCT.PRO: the debug stage select (scene 0x1500), a menu of every
+/* STAGSLCT.PRO: the debug stage select (MODE_STAGE_SELECT), a menu of every
    scene of the game with some debug settings on the second controller */
 
 #include "engine/game.h"
@@ -44,6 +44,11 @@ typedef struct StageSelectWindows {
 } StageSelectWindows;
 
 Task *STAGSLCT_createStageSelect(void);
+void STAGSLCT_updateScene(Task *task, Task **items);
+void STAGSLCT_moveCursor(StageSelect *sel, s32 delta);
+void STAGSLCT_scrollPage(StageSelect *sel, s32 delta);
+void STAGSLCT_showBiosVersion(StageSelect *sel, StageSelectWindows *win);
+void STAGSLCT_zoomTitle(StageSelect *sel, StageSelectWindows *win);
 void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win);
 
 #if VERSION_EU

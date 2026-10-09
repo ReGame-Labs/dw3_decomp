@@ -80,6 +80,7 @@ void FIGHTSTG_updateEntrance(Entrance *task, WhiteFlash **children) {
             task->file = FIGHTSTG_fighterCache.funcs.getInfo(task->key1)->model >> 16;
             FILE_CACHE.request(task->file);
             task->nextSubstate(task);
+            /* fallthrough */
         case 1:
             if (FILE_CACHE.isLoading(task->file) != 0) {
                 break;
@@ -90,6 +91,7 @@ void FIGHTSTG_updateEntrance(Entrance *task, WhiteFlash **children) {
                 break;
             }
             task->nextSubstate(task);
+            /* fallthrough */
         case 2:
             loadEntranceExtras(task, is1D2);
             break;
@@ -100,6 +102,7 @@ void FIGHTSTG_updateEntrance(Entrance *task, WhiteFlash **children) {
         case 0:
             camera->fade(camera, NULL, camera->getFighterView(camera, task->key2, task->key2 != 0 ? 2 : 10), 60);
             task->nextSubstate(task);
+            /* fallthrough */
         case 1:
             task->counter += GFX.funcs.getFrameTime();
             switch (task->step) {
@@ -110,6 +113,7 @@ void FIGHTSTG_updateEntrance(Entrance *task, WhiteFlash **children) {
                 }
                 models->get(models, task->key2 == 0 ? 0x10 : 0)->layers[0].enabled = 0;
                 task->step++;
+                /* fallthrough */
             case 1:
                 if (task->counter >= 60) {
                     task->nextSubstate(task);
@@ -121,6 +125,7 @@ void FIGHTSTG_updateEntrance(Entrance *task, WhiteFlash **children) {
             SOUND.playSound(SOUND_PLAYER11);
             *children = FIGHTSTG_startWhiteFlash(60);
             task->nextSubstate(task);
+            /* fallthrough */
         case 3:
             if ((*children)->substate == 0) {
                 break;
@@ -133,17 +138,20 @@ void FIGHTSTG_updateEntrance(Entrance *task, WhiteFlash **children) {
         case 4:
             FIGHTSTG_endWhiteFlash(*children, 60);
             task->nextSubstate(task);
+            /* fallthrough */
         case 5:
             if (*children != NULL) {
                 break;
             }
             task->nextSubstate(task);
+            /* fallthrough */
         case 6:
             task->step += GFX.funcs.getFrameTime();
             if (is1D2 ? task->step < 10 : task->step < 120) {
                 break;
             }
             task->nextSubstate(task);
+            /* fallthrough */
         case 7:
             camera->fade(camera, NULL, camera->getEnemyView(camera), task->key2 != 0 ? 1 : 60);
             entering = models->get(models, task->key2);

@@ -371,14 +371,14 @@ void CARDGAME_pickLowestPlayerCard(CardBattle *battle, CardScreen *screen) {
 
 /* Shows the card being played as sprite 15 and the panels with flags, and
    starts CARDGAME_stepPileChoice's choice */
-void CARDGAME_startPileChoice(CardBattle *battle, CardScreen *screen, s32 arg2) {
+void CARDGAME_startPileChoice(CardBattle *battle, CardScreen *screen, s32 flags) {
     s32 i;
 
     screen->resetPanels(screen);
-    screen->setPanelFlags(screen, arg2);
+    screen->setPanelFlags(screen, flags);
     battle->effectStep.choice = 0;
     battle->effectStep.state = 1;
-    battle->effectStep.vars[4] = arg2;
+    battle->effectStep.vars[4] = flags;
     screen->addSprite(screen, 15, 0xE500, 0x6100);
     screen->setSpriteCard(screen, 15, battle->record.plays[battle->record.playCount].card);
     screen->sprites[15].scaleX = 0;

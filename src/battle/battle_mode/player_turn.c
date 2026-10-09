@@ -23,6 +23,7 @@ static inline void runCommandMenu(PlayerTurn *task, PlayerTurnChild *children) {
         }
         task->result = -1;
         task->tickCounter(task);
+        /* fallthrough */
     case 1:
         if (task->result != -1) {
             task->command = task->result;
@@ -60,9 +61,10 @@ static inline void runDigivolveMenu(PlayerTurn *task, PlayerTurnChild *children)
     switch (task->counter) {
     case 0:
     default:
-        task->result = GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]);
+        task->result = GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0]);
         children[3].digivolveMenu = FIGHTSTG_createDigivolveMenu(&task->result);
         task->tickCounter(task);
+        /* fallthrough */
     case 1:
         switch (task->result) {
         case -1:
@@ -72,7 +74,7 @@ static inline void runDigivolveMenu(PlayerTurn *task, PlayerTurnChild *children)
             break;
         default:
             task->action = 2;
-            task->arg = GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]);
+            task->arg = GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0]);
             task->digimon = task->result;
             task->setSubstate(task, 0);
             break;
@@ -89,6 +91,7 @@ static inline void runItemMenu(PlayerTurn *task, PlayerTurnChild *children) {
     default:
         children[3].itemMenu = FIGHTSTG_createItemMenu(&task->result);
         task->tickCounter(task);
+        /* fallthrough */
     case 1:
         switch (task->result) {
         case -1:
@@ -114,6 +117,7 @@ static inline void runTechMenu(PlayerTurn *task, PlayerTurnChild *children) {
     default:
         children[3].techMenu = FIGHTSTG_createTechMenu(&task->result);
         task->tickCounter(task);
+        /* fallthrough */
     case 1:
         switch (task->result) {
         case -1:
@@ -139,6 +143,7 @@ static inline void runSwitchMenu(PlayerTurn *task, PlayerTurnChild *children) {
     default:
         children[3].switchMenu = FIGHTSTG_createSwitchMenu(&task->result, &task->switchLine, 1);
         task->tickCounter(task);
+        /* fallthrough */
     case 1:
         switch (task->result) {
         case -1:
@@ -195,6 +200,7 @@ static inline void runConfusedMenu(PlayerTurn *task, PlayerTurnChild *children) 
         }
         task->result = -1;
         task->tickCounter(task);
+        /* fallthrough */
     case 1:
         switch (task->result) {
         case -1:
@@ -225,6 +231,7 @@ static inline void runKnockOutSwitchMenu(PlayerTurn *task, PlayerTurnChild *chil
             children[3].switchMenu = FIGHTSTG_createSwitchMenu(&task->result, &task->switchLine, 0);
         }
         task->tickCounter(task);
+        /* fallthrough */
     case 1:
         if (task->result != -1) {
             task->arg = task->result;

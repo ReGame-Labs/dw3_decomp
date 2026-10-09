@@ -600,14 +600,14 @@ static inline void STCRDDEK_startSort(DeckEditor *task, DeckEditorChildren *chil
 static inline void STCRDDEK_sortDeck(DeckEditor *task, DeckEditorChildren *children) {
     s32 i;
     s32 j;
-    s32 tmp;
+    s32 card;
 
     for (i = 0; i < 39; i++) {
         for (j = i + 1; j < 40; j++) {
             if (GAME.decks[task->deck].cards[i] > GAME.decks[task->deck].cards[j]) {
-                tmp = GAME.decks[task->deck].cards[i];
+                card = GAME.decks[task->deck].cards[i];
                 GAME.decks[task->deck].cards[i] = GAME.decks[task->deck].cards[j];
-                GAME.decks[task->deck].cards[j] = tmp;
+                GAME.decks[task->deck].cards[j] = card;
             }
         }
     }

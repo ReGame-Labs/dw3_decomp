@@ -19,8 +19,8 @@ extern AnimFrame updateMoverFrames2[];
 #define BG_FILE 0x769
 #endif
 
-/* Steps the looping animation of a StageFallBody, returning its frame */
-s32 stepFallBody(StageFallBody *body, AnimFrame *frames, s32 depth) {
+/* Steps the looping animation of a faller's StageBody, returning its frame */
+s32 stepFallBody(StageBody *body, AnimFrame *frames, s32 depth) {
     AnimFrame *frame = &frames[body->anim.index];
     s32 dt = GFX.funcs.getFrameTime();
 
@@ -72,7 +72,7 @@ void updateFaller(StageFaller *task) {
     default:
         task->body.x = updateFallerParams[task->key1].x << 8;
         task->body.y = updateFallerParams[task->key1].y << 8;
-        task->body.bounced = 0;
+        task->body.mode = 0;
         task->body.vy = 0;
         task->body.vx = updateFallerParams[task->key1].vx;
         task->nextState(task);
@@ -85,12 +85,12 @@ void updateFaller(StageFaller *task) {
         task->x = task->body.x >> 8;
         task->body.y += task->body.vy;
         task->y = task->body.y >> 8;
-        if (updateFallerParams[task->key1].bounce != 0 && task->body.bounced == 0 && task->y >= updateFallerParams[task->key1].floorY) {
+        if (updateFallerParams[task->key1].bounce != 0 && task->body.mode == 0 && task->y >= updateFallerParams[task->key1].floorY) {
             task->body.y = updateFallerParams[task->key1].floorY << 8;
             task->y = updateFallerParams[task->key1].floorY;
             task->body.vy = -(task->body.vy / updateFallerParams[task->key1].bounce);
             task->body.vx = updateFallerParams[task->key1].vx * 3;
-            task->body.bounced = 1;
+            task->body.mode = 1;
             SOUND.playSound(SOUND_MTL_DOWN);
         }
         if (task->frame != 0) {
@@ -167,8 +167,8 @@ Task *createCommand825(s32 id) {
     return createFaller(id, 9);
 }
 
-/* Steps the animation of a StageMoverBody, holding its last frame, and returns the frame */
-s32 stepMoverBody(StageMoverBody *body, AnimFrame *frames, s32 depth) {
+/* Steps the animation of the mover's StageBody, holding its last frame, and returns the frame */
+s32 stepMoverBody(StageBody *body, AnimFrame *frames, s32 depth) {
     AnimFrame *frame = &frames[body->anim.index];
     s32 dt = GFX.funcs.getFrameTime();
 
@@ -500,92 +500,92 @@ void setupStage(void) {
 }
 
 s16 script150[] = {
-    0x600, 1, 1,
-    0x100, 1, 0x114, 0x157,
-    0x101, 1, 1, 1,
-    0x101, 0x32B, 0x330, 1,
-    0x300, 0xB4,
-    0x101, 0x32C, 0x336, 0x32C,
-    0x303, 0x32C,
-    0x300, 0x1E,
-    0x101, 0x323, 0x325, 1,
-    0x300, 0x3C,
-    0x101, 0x323, 0x326, 1,
-    0x300, 0x1E,
-    0x300, 0x3C,
-    0x101, 1, 0x3A, 1,
-    0x300, 0x3C,
-    0x200, 0, 1, 1, 0,
-    0x301,
-    0x101, 1, 1, 1,
-    0x300, 0x1E,
-    0x200, 0, 2, 1, 4,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_GONDRA_S, 1,
-    0x301,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_SHAKE_CAMERA, 1,
-    0x300, 0x3C,
-    0x200, 0, 3, 1, 0,
-    0x101, 1, 0x33, 1,
-    0x301,
-    0x101, 1, 1, 1,
-    0x300, 0x3C,
-    0x601, 0, 0xD8, 0x175,
-    0x300, 0x3C,
-    0x101, 0x330, 0x335, 0x330,
-    0x300, 0x5A,
-    0x101, 0x331, 0x335, 0x331,
-    0x101, 0x337, 0x335, 0x337,
-    0x300, 0x3C,
-    0x101, 0x332, 0x335, 0x332,
-    0x101, 0x334, 0x335, 0x334,
-    0x101, 0x336, 0x335, 0x336,
-    0x300, 0x3C,
-    0x101, 0x333, 0x335, 0x333,
-    0x101, 0x339, 0x335, 0x339,
-    0x300, 0x3C,
-    0x101, 0x335, 0x335, 0x335,
-    0x101, 0x338, 0x335, 0x333,
-    0x300, 0x3C,
-    0x101, 0x32B, 0x331, 0x32B,
-    0x300, 0x78,
-    0x300, 0x1E,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_CAMERA_SHAKE, 1,
-    0x300, 0xC,
-    0x200, 0, 4, 1, 0,
-    0x101, 1, 0x33, 1,
-    0x301,
-    0x101, 1, 1, 1,
-    0x300, 0x1E,
-    0x101, 0x32B, 0x332, 0x32B,
-    0x300, 0x78,
-    0x300, 0x78,
-    0x101, 0x32B, 0x333, 0x32B,
-    0x300, 0xC,
-    0,
+    SCRIPT_FOLLOW(1, 1),
+    SCRIPT_PLACE(1, 0x114, 0x157),
+    SCRIPT_POSE(1, 1, 1),
+    SCRIPT_COMMAND(0x32B, 0x330, 1),
+    SCRIPT_WAIT(0xB4),
+    SCRIPT_COMMAND(0x32C, 0x336, 0x32C),
+    SCRIPT_WAIT_ANIM(0x32C),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(0x323, 0x325, 1),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x323, 0x326, 1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_POSE(1, 0x3A, 1),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_TALK(0, 1, 1, 0),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(1, 1, 1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 2, 1, 4),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_GONDRA_S, 1),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_SHAKE_CAMERA, 1),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_TALK(0, 3, 1, 0),
+    SCRIPT_POSE(1, 0x33, 1),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(1, 1, 1),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_LOOK_AT(0, 0xD8, 0x175),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x330, 0x335, 0x330),
+    SCRIPT_WAIT(0x5A),
+    SCRIPT_COMMAND(0x331, 0x335, 0x331),
+    SCRIPT_COMMAND(0x337, 0x335, 0x337),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x332, 0x335, 0x332),
+    SCRIPT_COMMAND(0x334, 0x335, 0x334),
+    SCRIPT_COMMAND(0x336, 0x335, 0x336),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x333, 0x335, 0x333),
+    SCRIPT_COMMAND(0x339, 0x335, 0x339),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x335, 0x335, 0x335),
+    SCRIPT_COMMAND(0x338, 0x335, 0x333),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x32B, 0x331, 0x32B),
+    SCRIPT_WAIT(0x78),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_CAMERA_SHAKE, 1),
+    SCRIPT_WAIT(0xC),
+    SCRIPT_TALK(0, 4, 1, 0),
+    SCRIPT_POSE(1, 0x33, 1),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(1, 1, 1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(0x32B, 0x332, 0x32B),
+    SCRIPT_WAIT(0x78),
+    SCRIPT_WAIT(0x78),
+    SCRIPT_COMMAND(0x32B, 0x333, 0x32B),
+    SCRIPT_WAIT(0xC),
+    SCRIPT_END,
 };
 s16 script151[] = {
-    0x601, 1, 0xD8, 0x175,
-    0x100, 1, 0x114, 0x157,
-    0x101, 1, 1, 1,
-    0x101, 0x32C, 0x336, 1,
-    0x300, 6,
-    0x300, 0x54,
-    0x101, 0x32B, 0x334, 1,
-    0x300, 0x9C,
-    0x600, 0, 1,
-    0x300, 0x1E,
-    0x200, 0, 2, 1, 2,
-    0x301,
-    0x300, 0x78,
-    0x200, 0, 1, 1, 4,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_GONDRA_S, 1,
-    0x301,
-    0x101, 0x323, 0x325, 1,
-    0x300, 0x3C,
-    0x101, 0x323, 0x326, 1,
-    0x300, 0x3C,
-    0x304, 0x232, 0x1EF, 0xB9, 1,
-    0,
+    SCRIPT_LOOK_AT(1, 0xD8, 0x175),
+    SCRIPT_PLACE(1, 0x114, 0x157),
+    SCRIPT_POSE(1, 1, 1),
+    SCRIPT_COMMAND(0x32C, 0x336, 1),
+    SCRIPT_WAIT(6),
+    SCRIPT_WAIT(0x54),
+    SCRIPT_COMMAND(0x32B, 0x334, 1),
+    SCRIPT_WAIT(0x9C),
+    SCRIPT_FOLLOW(0, 1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 2, 1, 2),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x78),
+    SCRIPT_TALK(0, 1, 1, 4),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_PLAY_GONDRA_S, 1),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_COMMAND(0x323, 0x325, 1),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_COMMAND(0x323, 0x326, 1),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_LEAVE(0x232, 0x1EF, 0xB9, 1),
+    SCRIPT_END,
 };
 AnimFrame updateFallerParams_0[] = {
     { 70, 8 }, { 71, 8 }, { 72, 8 }, { 73, 8 },
@@ -629,53 +629,53 @@ AnimFrame updateMoverFrames2[] = {
     { 41, 4 }, { 42, 4 }, { 43, 4 }, { 44, 4 },
     { 45, 4 }, { 46, 4 }, { 47, 4 }, { 255, 0x3E7 },
 };
-Battle area0Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area0Battles = {
     0,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
       &area0Battle4, &area0Battle5, &area0Battle6, &area0Battle7 },
 };
-Battle area1Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area1Battles = {
     0,
     { &area1Battle0, &area1Battle1, &area1Battle2, &area1Battle3,
       &area1Battle4, &area1Battle5, &area1Battle6, &area1Battle7 },
 };
-Battle area2Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area2Battles = {
     0,
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-Battle area3Battle0 = { 323, 10, MUSIC(0x22, 0) };
-Battle area3Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle0 = { 323, 10, MUSIC(0x22, 0) };
+AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area3Battles = {
     0,
     { &area3Battle0, &area3Battle1, &area3Battle2, &area3Battle3,

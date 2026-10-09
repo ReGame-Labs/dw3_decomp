@@ -153,10 +153,10 @@ void resetButtonMap(u16 port) {
 
 /* Swaps two logical buttons in a pad slot's button map */
 void swapButtons(u16 port, s32 a, s32 b) {
-    u8 tmp = PAD.slots[(u8)port >> 4][port & 3].buttonMap[a];
+    u8 bit = PAD.slots[(u8)port >> 4][port & 3].buttonMap[a];
 
     PAD.slots[(u8)port >> 4][port & 3].buttonMap[a] = PAD.slots[(u8)port >> 4][port & 3].buttonMap[b];
-    PAD.slots[(u8)port >> 4][port & 3].buttonMap[b] = tmp;
+    PAD.slots[(u8)port >> 4][port & 3].buttonMap[b] = bit;
 }
 
 /* The bit that logical button `index` sets on pad 1 or 2 */

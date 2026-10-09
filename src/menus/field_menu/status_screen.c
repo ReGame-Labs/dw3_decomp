@@ -247,7 +247,7 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
     StatsScreenWindows *windows = screen->children;
     PartnerTotals now;
     PartnerTotals then;
-    StatusEquip saved;
+    PartnerEquip saved;
     PartnerStats *stats;
     s16 *equip;
     s16 *hand;
@@ -268,9 +268,9 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
     GAME.funcs.computeStats(id, &now);
     /* the six slots are saved and restored as one struct copy;
        PartnerStats.equip is a plain array */
-    saved = *(StatusEquip *)stats->equip;
+    saved = *(PartnerEquip *)stats->equip;
     if (*(stats->equip + slot) != 0) {
-        data = GET_ITEM[0](*(stats->equip + slot))->data.record;
+        data = ITEM_FUNCS.get(*(stats->equip + slot))->data.record;
         if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             stats->equip[2] = 0;
             stats->equip[3] = 0;
@@ -279,7 +279,7 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
         }
     }
     if (item > 0) {
-        data = GET_ITEM[0](item)->data.record;
+        data = ITEM_FUNCS.get(item)->data.record;
         if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             hand = &stats->equip[2];
             if (*hand == 0) {
@@ -296,14 +296,14 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
             for (j = 0; j < 2; j++) {
                 equip = &stats->equip[j + 4];
                 if (*equip != 0) {
-                    data = GET_ITEM[0](*equip)->data.record;
+                    data = ITEM_FUNCS.get(*equip)->data.record;
                     if (data->weapon.group == group) {
                         *equip = 0;
                     }
                 }
             }
         }
-        data = GET_ITEM[0](item)->data.record;
+        data = ITEM_FUNCS.get(item)->data.record;
         if (data->weapon.kind == EQUIP_KIND_BOTH_HANDS) {
             stats->equip[2] = item;
             stats->equip[3] = item;
@@ -312,7 +312,7 @@ void STSTATUS_previewStats(StatsScreen *screen, s32 slot, s32 item) {
         }
     }
     GAME.funcs.computeStats(id, &then);
-    *(StatusEquip *)stats->equip = saved;
+    *(PartnerEquip *)stats->equip = saved;
     for (i = 0; i < 6; i++) {
         /* sums and not then.stats[...]: the match depends on them, which put
            the index first in the addu */
@@ -525,7 +525,7 @@ void STSTATUS_drawStatusScreen(StatsScreen *screen) {
                 item = stats->equip[i];
                 if (item > 0) {
                     sprite.setTexture(0x140, 0);
-                    sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS->getCategory(item), 0xB2,
+                    sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS.getCategory(item), 0xB2,
                                 i * 14 + 0x89);
                 }
             }

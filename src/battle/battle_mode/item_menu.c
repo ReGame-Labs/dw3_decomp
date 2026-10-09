@@ -19,7 +19,7 @@ void FIGHTSTG_drawItemMenu(ItemMenu *task) {
         if (index > task->count - 1) {
             break;
         }
-        drawer.draw(sheet, ITEM_FUNCS->getCategory(task->usable[index]), 0x1D, 0x45 + i * 0xE);
+        drawer.draw(sheet, ITEM_FUNCS.getCategory(task->usable[index]), 0x1D, 0x45 + i * 0xE);
     }
     sheet = FILE_CACHE.getEntry(FILE_BATTLE_MENU << 16);
     drawer.setTexture(0x200, 0);
@@ -113,13 +113,13 @@ void FIGHTSTG_updateItemMenu(ItemMenu *task, ItemMenuWindows *w) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        total = ITEM_FUNCS->list(1, task->items);
+        total = ITEM_FUNCS.list(1, task->items);
         task->count = 0;
         for (i = 0; i < total; i++) {
             if (task->items[i] == 0) {
                 break;
             }
-            if (GET_ITEM[0](task->items[i])->data.effect->flags & ITEM_USE_BATTLE) {
+            if (ITEM_FUNCS.get(task->items[i])->data.effect->flags & ITEM_USE_BATTLE) {
                 task->count++;
             }
         }
@@ -130,7 +130,7 @@ void FIGHTSTG_updateItemMenu(ItemMenu *task, ItemMenuWindows *w) {
                 if (task->items[i] == 0) {
                     break;
                 }
-                if (GET_ITEM[0](task->items[i])->data.effect->flags & ITEM_USE_BATTLE) {
+                if (ITEM_FUNCS.get(task->items[i])->data.effect->flags & ITEM_USE_BATTLE) {
                     task->usable[n++] = task->items[i];
                 }
             }

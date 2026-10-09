@@ -158,6 +158,7 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
                 break;
             }
             task->nextSubstate(task);
+            /* fallthrough */
         case 1:
             task->boxes[8].visible = 1;
             task->boxes[9].visible = 1;
@@ -170,8 +171,10 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
                 break;
             }
             task->nextSubstate(task);
+            /* fallthrough */
         case 2:
             task->nextSubstate(task);
+            /* fallthrough */
         case 3:
             task->boxes[4].visible = 1;
             if (task->boxes[4].stretch == 0) {
@@ -197,12 +200,14 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
                 break;
             }
             task->nextSubstate(task);
+            /* fallthrough */
         case 2:
             task->clip.w = 320;
             task->clip.x = 0;
             task->clip.y = 0;
             task->clip.h = 240;
             task->nextSubstate(task);
+            /* fallthrough */
         case 3:
             task->clip.y += 8;
             task->clip.h -= 16;
@@ -215,7 +220,7 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
         }
         break;
     case TASK_KILL:
-        FIELDSTG_state.bannerShown = 0;
+        FIELDSTG_state.frozen = 0;
         break;
     }
     if (task->state >= 1 && task->state <= 2 && task->key1 != 0) {
@@ -231,11 +236,12 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
     }
 }
 
-/* Creates the area name banner; the field waits while it shows */
-Task *FIELDSTG_createBanner(s32 arg0) {
+/* Creates the area name banner, which closes at once unless show; the
+   player is frozen until it ends */
+Task *FIELDSTG_createBanner(s32 show) {
     Task *task = createTaskWithId(FIELDSTG_updateBanner, sizeof(AreaBanner), 8, FIELD_TASK_BANNER);
 
-    task->key1 = arg0;
-    FIELDSTG_state.bannerShown = 1;
+    task->key1 = show;
+    FIELDSTG_state.frozen = 1;
     return task;
 }

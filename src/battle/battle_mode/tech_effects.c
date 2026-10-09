@@ -6,7 +6,7 @@
    strongly when the acting fighter is special */
 void FIGHTSTG_tryPoison(void) {
     s32 side = FIGHTSTG_action.side != 0;
-    BattleFighter *fighter = &FIGHTSTG_battle.fighters[side][FIGHTSTG_battle.active[side]];
+    BattleFighter *fighter = &FIGHTSTG_battle.state.fighters[side][FIGHTSTG_battle.state.active[side]];
     s32 value = FIGHTSTG_battleFuncs.rollPoison(FIGHTSTG_action.side, FIGHTSTG_action.tech);
 
     if (value != 0) {
@@ -24,7 +24,7 @@ void FIGHTSTG_tryParalysis(void) {
     BattleAction *action = &FIGHTSTG_action;
     BattleFuncs *funcs = &FIGHTSTG_battleFuncs;
     s32 side = action->side != 0;
-    BattleFighter *fighter = &FIGHTSTG_battle.fighters[side][FIGHTSTG_battle.active[side]];
+    BattleFighter *fighter = &FIGHTSTG_battle.state.fighters[side][FIGHTSTG_battle.state.active[side]];
     TechData *entry;
     s32 value;
 
@@ -49,7 +49,7 @@ void FIGHTSTG_tryConfusion(void) {
     BattleAction *action = &FIGHTSTG_action;
     BattleFuncs *funcs = &FIGHTSTG_battleFuncs;
     s32 side = action->side != 0;
-    BattleFighter *fighter = &FIGHTSTG_battle.fighters[side][FIGHTSTG_battle.active[side]];
+    BattleFighter *fighter = &FIGHTSTG_battle.state.fighters[side][FIGHTSTG_battle.state.active[side]];
     TechData *entry;
     s32 value;
 
@@ -71,7 +71,7 @@ void FIGHTSTG_tryConfusion(void) {
    as strongly when the acting fighter is special */
 void FIGHTSTG_trySleep(void) {
     s32 side = FIGHTSTG_action.side != 0;
-    BattleFighter *fighter = &FIGHTSTG_battle.fighters[side][FIGHTSTG_battle.active[side]];
+    BattleFighter *fighter = &FIGHTSTG_battle.state.fighters[side][FIGHTSTG_battle.state.active[side]];
     TechData *entry;
     s32 value;
 
@@ -116,7 +116,7 @@ void FIGHTSTG_rollMultiHit(void) {
     action->hitsLanded = action->hits[0];
     action->hitCount = 1;
 #endif
-    if (side == 0 && battle->kind == BATTLE_KIND_FINAL_LAST && action->hits[0] == 0) {
+    if (side == 0 && battle->state.kind == BATTLE_KIND_FINAL_LAST && action->hits[0] == 0) {
         action->hitCount = count;
     } else {
 #if VERSION_US
@@ -143,7 +143,7 @@ void FIGHTSTG_tryDrain(void) {
     BattleAction *action = &FIGHTSTG_action;
     BattleFuncs *funcs = &FIGHTSTG_battleFuncs;
     s32 side = action->side != 0;
-    BattleFighter *fighter = &FIGHTSTG_battle.fighters[side][FIGHTSTG_battle.active[side]];
+    BattleFighter *fighter = &FIGHTSTG_battle.state.fighters[side][FIGHTSTG_battle.state.active[side]];
     TechData *entry;
     s32 value;
 
@@ -192,10 +192,10 @@ void FIGHTSTG_markCritical(void) {
  * for CSE to share with the call's address. */
 void FIGHTSTG_trySteal(void) {
     BattleFuncs *const funcs = &FIGHTSTG_battleFuncs;
-    BattleFighter *enemies = FIGHTSTG_battle.fighters[1];
+    BattleFighter *enemies = FIGHTSTG_battle.state.fighters[1];
     TechData *entry;
 
-    if (enemies[FIGHTSTG_battle.active[1]].item > 0) {
+    if (enemies[FIGHTSTG_battle.state.active[1]].item > 0) {
         if (funcs->rollSteal(0, FIGHTSTG_action.tech) != 0) {
             entry = &TECHS[FIGHTSTG_action.tech - 1];
             FIGHTSTG_action.effects[entry->effect] = 1;
@@ -216,8 +216,8 @@ void FIGHTSTG_lowerAttack(void) {
         return;
     }
     entry = &TECHS[FIGHTSTG_action.tech - 1];
-    FIGHTSTG_battleFuncs.changeBoost(SIDE_ENEMY - FIGHTSTG_action.side, FIGHTSTG_battle.active[1 - team], 0, -entry->effectPower);
-    FIGHTSTG_queueBoostEnd(SIDE_ENEMY - FIGHTSTG_action.side, FIGHTSTG_battle.active[1 - team], 0, FIGHTSTG_action.tech);
+    FIGHTSTG_battleFuncs.changeBoost(SIDE_ENEMY - FIGHTSTG_action.side, FIGHTSTG_battle.state.active[1 - team], 0, -entry->effectPower);
+    FIGHTSTG_queueBoostEnd(SIDE_ENEMY - FIGHTSTG_action.side, FIGHTSTG_battle.state.active[1 - team], 0, FIGHTSTG_action.tech);
     FIGHTSTG_action.effects[entry->effect] = entry->effectPower;
 }
 
@@ -227,15 +227,15 @@ void FIGHTSTG_lowerDefense(void) {
     s32 other = 1 - (FIGHTSTG_action.side != 0);
     TechData *entry = &TECHS[FIGHTSTG_action.tech - 1];
 
-    FIGHTSTG_battleFuncs.changeBoost(SIDE_ENEMY - FIGHTSTG_action.side, FIGHTSTG_battle.active[other], 1, -entry->effectPower);
-    FIGHTSTG_queueBoostEnd(SIDE_ENEMY - FIGHTSTG_action.side, FIGHTSTG_battle.active[other], 1, FIGHTSTG_action.tech);
+    FIGHTSTG_battleFuncs.changeBoost(SIDE_ENEMY - FIGHTSTG_action.side, FIGHTSTG_battle.state.active[other], 1, -entry->effectPower);
+    FIGHTSTG_queueBoostEnd(SIDE_ENEMY - FIGHTSTG_action.side, FIGHTSTG_battle.state.active[other], 1, FIGHTSTG_action.tech);
     FIGHTSTG_action.effects[entry->effect] = entry->effectPower;
 }
 
 /* TECH_EFFECT_DRAIN_MP: takes the technique's effectPower in 128ths of the player's
    fighter's max MP, at most what it has, as the action's drain */
 void FIGHTSTG_drainMp(void) {
-    BattleFighter *fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+    BattleFighter *fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
     TechData *entry = &TECHS[FIGHTSTG_action.tech - 1];
 
     if (fighter->mp != 0) {
@@ -256,7 +256,7 @@ void FIGHTSTG_raiseOneStatus(void) {
 
     if (FIGHTSTG_battleFuncs.rollStatusRaise(FIGHTSTG_action.side, FIGHTSTG_action.tech)) {
         entry = &TECHS[FIGHTSTG_action.tech - 1];
-        stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]));
+        stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0]));
         stats->status[i] += entry->effectPower;
         FIGHTSTG_action.effects[entry->effect] = 1 << i;
     }
@@ -266,7 +266,7 @@ void FIGHTSTG_raiseOneStatus(void) {
    that rollStatusRaise lets by the technique's effectPower */
 void FIGHTSTG_raiseEachStatus(void) {
     TechData *entry = &TECHS[FIGHTSTG_action.tech - 1];
-    PartnerStats *stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]));
+    PartnerStats *stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0]));
     s32 i;
 
     for (i = 0; i < 3; i++) {
@@ -282,7 +282,7 @@ void FIGHTSTG_raiseEachStatus(void) {
 void FIGHTSTG_raiseAllStatus(void) {
     BattleAction *action = &FIGHTSTG_action;
     TechData *entry = &TECHS[action->tech - 1];
-    PartnerStats *stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]));
+    PartnerStats *stats = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0]));
     s32 i;
 
     if (FIGHTSTG_battleFuncs.rollStatusRaise(action->side, action->tech)) {
@@ -334,7 +334,7 @@ void FIGHTSTG_startDoubleMagic(void) {
 void FIGHTSTG_startEndBattle(void) {
     TechData *entry;
 
-    if (FIGHTSTG_battle.kind == BATTLE_KIND_UNK2) {
+    if (FIGHTSTG_battle.state.kind == BATTLE_KIND_UNK2) {
         entry = &TECHS[FIGHTSTG_action.tech - 1];
         FIGHTSTG_action.effects[entry->effect] = 1;
     } else {
@@ -415,7 +415,7 @@ void FIGHTSTG_startAction(u8 side, s32 tech) {
     } else {
         /* the match depends on the fighter's pointer sum */
         if (entry->effect == TECH_EFFECT_ENEMY_ONLY &&
-            (side == 0 || FIGHTSTG_battleTableFunc((FIGHTSTG_battle.fighters[1] + FIGHTSTG_battle.active[1])->id)->techs[0] != tech)) {
+            (side == 0 || FIGHTSTG_battleTableFunc((FIGHTSTG_battle.state.fighters[1] + FIGHTSTG_battle.state.active[1])->id)->techs[0] != tech)) {
             FIGHTSTG_markEnemyOnly();
             return;
         }
@@ -481,7 +481,7 @@ void FIGHTSTG_startAction(u8 side, s32 tech) {
             break;
         }
     }
-    if (FIGHTSTG_battle.kind != BATTLE_KIND_NORMAL) {
+    if (FIGHTSTG_battle.state.kind != BATTLE_KIND_NORMAL) {
         FIGHTSTG_action.damage = WFIGHTMN_limitDamage(side, FIGHTSTG_action.damage, FIGHTSTG_action.effects[TECH_EFFECT_MULTI_HIT] ? FIGHTSTG_action.hitsLanded : 0);
     }
 }

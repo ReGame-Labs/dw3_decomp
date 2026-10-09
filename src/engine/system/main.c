@@ -86,7 +86,7 @@ int main(void) {
     }
 }
 
-/* Where the modes' overlays (AAA/PRO/*.PRO) load, after the executable, and
- * the stages and other sub-overlays, after CARDGAME. */
+/* Where the modes' overlays (the .PRO files of AAA/PRO) load, after the
+ * executable, and the stages and other sub-overlays, after CARDGAME. */
 void *const OVERLAY_ADDRESS = OVERLAY_VRAM;
 void *const SUB_OVERLAY_ADDRESS = STAGE_VRAM;

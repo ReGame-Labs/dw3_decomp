@@ -72,7 +72,7 @@ void CARDGAME_sortOpponentHand(CardBattle *battle) {
     s32 i;
     s32 j;
     s32 swap;
-    s32 tmp;
+    s32 card;
     s32 ka;
     s32 kb;
     s32 va;
@@ -89,9 +89,9 @@ void CARDGAME_sortOpponentHand(CardBattle *battle) {
                 swap = 1;
             }
             if (swap) {
-                tmp = battle->sides[1].pile.hand[i];
+                card = battle->sides[1].pile.hand[i];
                 battle->sides[1].pile.hand[i] = battle->sides[1].pile.hand[j];
-                battle->sides[1].pile.hand[j] = tmp;
+                battle->sides[1].pile.hand[j] = card;
             }
         }
     }
@@ -589,15 +589,20 @@ void CARDGAME_updateCardAnims(CardBattle *battle, CardBattleItems *items) {
         case CARD_ANIM_SHOW_HAND:
         case CARD_ANIM_LAY_OUT_HAND:
             index++;
+            /* fallthrough */
         case CARD_ANIM_SHOW_DECK:
             index++;
+            /* fallthrough */
         case CARD_ANIM_SHOW_DISCARDS:
             index++;
+            /* fallthrough */
         case CARD_ANIM_SHOW_OPPONENT_HAND:
         case CARD_ANIM_LAY_OUT_OPPONENT_HAND:
             index++;
+            /* fallthrough */
         case CARD_ANIM_SHOW_OPPONENT_DECK:
             index++;
+            /* fallthrough */
         case CARD_ANIM_SHOW_OPPONENT_DISCARDS:
             index++;
             CARDGAME_layOutPile(battle, items, CARDGAME_animPiles[index][0], CARDGAME_animPiles[index][1]);
@@ -686,9 +691,9 @@ void CARDGAME_showPanelValues(CardBattle *battle, CardBattleItems *items) {
 /* Sorts the cards list[from..to) (range: to << 16 | from) by their values,
    moving opponentDraws (flags bit 0) and effectStep.eligible (bit 1) with them */
 void CARDGAME_sortCards(CardBattle *battle, s16 *list, s32 range, s32 flags) {
-    CardDraw tmp30A;
-    s16 tmp;
-    s8 tmp446;
+    CardDraw draw;
+    s16 id;
+    s8 eligible;
     s32 from;
     s32 to;
     s16 *ids;
@@ -703,18 +708,18 @@ void CARDGAME_sortCards(CardBattle *battle, s16 *list, s32 range, s32 flags) {
     for (i = from; i < to - 1; i++) {
         for (j = i + 1; j < to; j++) {
             if (battle->cards[ids[i]] > battle->cards[ids[j]]) {
-                tmp = ids[i];
+                id = ids[i];
                 ids[i] = ids[j];
-                ids[j] = tmp;
+                ids[j] = id;
                 if (flags & 1) {
-                    tmp30A = battle->opponentDraws[i];
+                    draw = battle->opponentDraws[i];
                     battle->opponentDraws[i] = battle->opponentDraws[j];
-                    battle->opponentDraws[j] = tmp30A;
+                    battle->opponentDraws[j] = draw;
                 }
                 if (flags & 2) {
-                    tmp446 = battle->effectStep.eligible[i - from];
+                    eligible = battle->effectStep.eligible[i - from];
                     battle->effectStep.eligible[i - from] = battle->effectStep.eligible[j - from];
-                    battle->effectStep.eligible[j - from] = tmp446;
+                    battle->effectStep.eligible[j - from] = eligible;
                 }
             }
         }
@@ -727,15 +732,15 @@ void CARDGAME_shufflePile(CardBattle *battle, s32 base, s32 n) {
     s32 i;
     s32 a;
     s32 b;
-    s32 tmp;
+    s32 card;
 
     if (n >= 2) {
         for (i = 0; i < 40; i++) {
             a = RANDOM.next() % n + base;
             b = RANDOM.next() % n + base;
-            tmp = pile->deck[a];
+            card = pile->deck[a];
             pile->deck[a] = pile->deck[b];
-            pile->deck[b] = tmp;
+            pile->deck[b] = card;
         }
     }
 }
@@ -1510,7 +1515,7 @@ s32 CARDGAME_runPutOut(CardBattle *battle, CardBattleItems *items) {
 /* Finds three or more of one card (with a CardImage.comboCard) among a side's slots, by id from start: flags them in effectStep.eligible; the index after them or -1 */
 s32 CARDGAME_findCardSet(CardBattle *battle, s32 side, s32 start) {
     CardSortEntry entries[6];
-    CardSortEntry tmp;
+    CardSortEntry entry;
     CardDrawer drawer;
     s32 count;
     s32 value;
@@ -1530,9 +1535,9 @@ s32 CARDGAME_findCardSet(CardBattle *battle, s32 side, s32 start) {
     for (i = 0; i < count - 1; i++) {
         for (j = i + 1; j < count; j++) {
             if (entries[i].card > entries[j].card) {
-                tmp = entries[i];
+                entry = entries[i];
                 entries[i] = entries[j];
-                entries[j] = tmp;
+                entries[j] = entry;
             }
         }
     }
@@ -2187,6 +2192,7 @@ u8 CARDGAME_resolveCard(CardBattle *battle, CardBattleItems *items) {
             break;
         }
         battle->resolveState = 3;
+        /* fallthrough */
     case 3:
         if (items->screen->panels[0].state == 0) {
             battle->resolveState = 4;

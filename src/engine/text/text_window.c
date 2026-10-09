@@ -152,7 +152,7 @@ void textWindowSetSubString(TextWindow *obj, char *text, s32 id, s32 index) {
 
 /* Text window method: draws the visible part of the text as sprites, running the control codes */
 void textWindowDraw(TextWindow *obj) {
-    TextDraw wait;
+    TextDraw draw;
     SVECTOR out;
     SVECTOR in[4];
     TextBuffer *text;
@@ -180,113 +180,113 @@ void textWindowDraw(TextWindow *obj) {
     }
     obj->finished = 0;
     obj->cursorX = -obj->alignWidth;
-    wait.lineCount = 0;
+    draw.lineCount = 0;
     text = obj->text;
     obj->cursorY = 0;
     if (obj->scaled != 0) {
-        if (obj->scaleX == 0 && obj->scaleY == 0) {
+        if (obj->scale.vx == 0 && obj->scale.vy == 0) {
             return;
         }
-        if (obj->scaleX == ONE && obj->scaleY == obj->scaleX) {
+        if (obj->scale.vx == ONE && obj->scale.vy == obj->scale.vx) {
             obj->scaled = 0;
         } else {
             rotated = 1;
             RotMatrixYXZ_gte(&obj->rot, &obj->mat);
-            ScaleMatrix(&obj->mat, (VECTOR *)&obj->scaleX); /* scaleX-Z as a VECTOR */
+            ScaleMatrix(&obj->mat, &obj->scale);
         }
     }
     i = 0;
-    wait.layer = GFX.funcs.getLayer(obj->layerId);
-    wait.ot = wait.layer->getOtEntry(wait.layer, obj->depth);
-    wait.prim.any = GFX.funcs.getPrim();
+    draw.layer = GFX.funcs.getLayer(obj->layerId);
+    draw.ot = draw.layer->getOtEntry(draw.layer, obj->depth);
+    draw.prim.any = GFX.funcs.getPrim();
     text->pos = obj->start;
     while (i < (s16)obj->visibleEnd - obj->start) {
         if (obj->finished != 0) {
             break;
         }
         c = FONT.decode(text->data + text->pos, (u8)text->sjis, obj->style);
-        wait.code = c;
-        wait.kind = (u32)(c << 16) >> 24;
-        switch (processTextChar(obj, text, &wait, &text->pos)) {
+        draw.code = c;
+        draw.kind = (u32)(c << 16) >> 24;
+        switch (processTextChar(obj, text, &draw, &text->pos)) {
         case 1:
             i++;
-            goto draw;
+            goto drawGlyph;
         case 4:
             i++;
             continue;
         case 2:
-        draw:
-            if (wait.glyph->page == 0xFF) {
-                wait.glyph = obj->style->glyphs;
+        drawGlyph:
+            if (draw.glyph->page == 0xFF) {
+                draw.glyph = obj->style->glyphs;
             }
-            x = obj->cursorX + (obj->x + wait.glyph->dx);
-            y = obj->cursorY + (obj->y + wait.glyph->dy);
-            clut = getClut(obj->texX + wait.glyph->clutX, obj->palette + (obj->texY + wait.glyph->clutY));
-            u = wait.glyph->u;
-            v = wait.glyph->v;
-            if ((s8)obj->blend == -1) {
-                tpage = getTPage(0, 1, obj->texX + (wait.glyph->page << 6), obj->texY);
+            x = obj->cursorX + (obj->x + draw.glyph->dx);
+            y = obj->cursorY + (obj->y + draw.glyph->dy);
+            clut = getClut(obj->texX + draw.glyph->clutX, obj->palette + (obj->texY + draw.glyph->clutY));
+            u = draw.glyph->u;
+            v = draw.glyph->v;
+            if (obj->blend == -1) {
+                tpage = getTPage(0, 1, obj->texX + (draw.glyph->page << 6), obj->texY);
             } else {
-                tpage = getTPage(0, obj->blend & 3, obj->texX + (wait.glyph->page << 6), obj->texY);
+                tpage = getTPage(0, obj->blend & 3, obj->texX + (draw.glyph->page << 6), obj->texY);
             }
             if (!rotated) {
                 if (i == 0) {
                     prevTpage = tpage;
                 }
                 if (tpage != prevTpage) {
-                    SetDrawTPage(wait.prim.tpage, 0, 1, prevTpage);
-                    addPrim(wait.ot, wait.prim.any);
+                    SetDrawTPage(draw.prim.tpage, 0, 1, prevTpage);
+                    addPrim(draw.ot, draw.prim.any);
                     prevTpage = tpage;
-                    wait.prim.tpage++;
+                    draw.prim.tpage++;
                 }
-                setlen(wait.prim.sprt, 4);
-                setcode(wait.prim.sprt, 0x64);
-                if ((s8)obj->blend != -1) {
-                    setSemiTrans(wait.prim.sprt, 1);
+                setlen(draw.prim.sprt, 4);
+                setcode(draw.prim.sprt, 0x64);
+                if (obj->blend != -1) {
+                    setSemiTrans(draw.prim.sprt, 1);
                 }
-                wait.prim.sprt->r0 = wait.prim.sprt->g0 = wait.prim.sprt->b0 = 0x80;
-                wait.prim.sprt->x0 = x;
-                wait.prim.sprt->y0 = y;
-                wait.prim.sprt->u0 = u;
-                wait.prim.sprt->v0 = v;
-                wait.prim.sprt->w = wait.glyph->w;
-                wait.prim.sprt->h = wait.glyph->h;
-                wait.prim.sprt->clut = clut;
-                addPrim(wait.ot, wait.prim.any);
-                wait.prim.sprt++;
-                SetDrawTPage(wait.prim.tpage, 0, 1, tpage);
-                addPrim(wait.ot, wait.prim.any);
-                wait.prim.tpage++;
+                draw.prim.sprt->r0 = draw.prim.sprt->g0 = draw.prim.sprt->b0 = 0x80;
+                draw.prim.sprt->x0 = x;
+                draw.prim.sprt->y0 = y;
+                draw.prim.sprt->u0 = u;
+                draw.prim.sprt->v0 = v;
+                draw.prim.sprt->w = draw.glyph->w;
+                draw.prim.sprt->h = draw.glyph->h;
+                draw.prim.sprt->clut = clut;
+                addPrim(draw.ot, draw.prim.any);
+                draw.prim.sprt++;
+                SetDrawTPage(draw.prim.tpage, 0, 1, tpage);
+                addPrim(draw.ot, draw.prim.any);
+                draw.prim.tpage++;
             } else {
-                setlen(wait.prim.ft4, 9);
-                setcode(wait.prim.ft4, 0x2C);
-                wait.prim.ft4->r0 = wait.prim.ft4->g0 = wait.prim.ft4->b0 = 0x80;
+                setlen(draw.prim.ft4, 9);
+                setcode(draw.prim.ft4, 0x2C);
+                draw.prim.ft4->r0 = draw.prim.ft4->g0 = draw.prim.ft4->b0 = 0x80;
                 in[0].vx = in[2].vx = x - obj->pivotX;
-                in[1].vx = in[3].vx = in[0].vx + wait.glyph->w;
+                in[1].vx = in[3].vx = in[0].vx + draw.glyph->w;
                 in[0].vy = in[1].vy = y - obj->pivotY;
-                in[2].vy = in[3].vy = in[0].vy + wait.glyph->h;
+                in[2].vy = in[3].vy = in[0].vy + draw.glyph->h;
                 in[0].vz = in[1].vz = in[2].vz = in[3].vz = 0;
                 for (j = 0; j < 4; j++) {
                     ApplyMatrixSV(&obj->mat, &in[j], &out);
-                    (&wait.prim.ft4->x0)[j * 4] = out.vx + obj->pivotX;
-                    (&wait.prim.ft4->y0)[j * 4] = out.vy + obj->pivotY;
+                    (&draw.prim.ft4->x0)[j * 4] = out.vx + obj->pivotX;
+                    (&draw.prim.ft4->y0)[j * 4] = out.vy + obj->pivotY;
                 }
-                wait.prim.ft4->u0 = wait.prim.ft4->u2 = u;
-                wait.prim.ft4->u1 = wait.prim.ft4->u3 = wait.prim.ft4->u0 + wait.glyph->w - 1;
-                wait.prim.ft4->v0 = wait.prim.ft4->v1 = v;
-                wait.prim.ft4->v2 = wait.prim.ft4->v3 = wait.prim.ft4->v0 + wait.glyph->h - 1;
-                if ((s8)obj->blend != -1) {
-                    setSemiTrans(wait.prim.ft4, 1);
+                draw.prim.ft4->u0 = draw.prim.ft4->u2 = u;
+                draw.prim.ft4->u1 = draw.prim.ft4->u3 = draw.prim.ft4->u0 + draw.glyph->w - 1;
+                draw.prim.ft4->v0 = draw.prim.ft4->v1 = v;
+                draw.prim.ft4->v2 = draw.prim.ft4->v3 = draw.prim.ft4->v0 + draw.glyph->h - 1;
+                if (obj->blend != -1) {
+                    setSemiTrans(draw.prim.ft4, 1);
                 }
-                wait.prim.ft4->tpage = tpage;
-                wait.prim.ft4->clut = clut;
-                addPrim(wait.ot, wait.prim.any);
-                wait.prim.ft4++;
+                draw.prim.ft4->tpage = tpage;
+                draw.prim.ft4->clut = clut;
+                addPrim(draw.ot, draw.prim.any);
+                draw.prim.ft4++;
             }
             if (obj->fixedSpacing != 0) {
                 obj->cursorX += obj->spacingX;
             } else {
-                obj->cursorX += wait.glyph->advance + wait.glyph->dx;
+                obj->cursorX += draw.glyph->advance + draw.glyph->dx;
             }
             break;
         case 3:
@@ -297,12 +297,12 @@ void textWindowDraw(TextWindow *obj) {
         }
     }
     if (!rotated) {
-        SetDrawTPage(wait.prim.tpage, 0, 1, tpage);
-        addPrim(wait.ot, wait.prim.any);
-        wait.prim.tpage++;
+        SetDrawTPage(draw.prim.tpage, 0, 1, tpage);
+        addPrim(draw.ot, draw.prim.any);
+        draw.prim.tpage++;
     }
 end:
-    GFX.funcs.setPrim(wait.prim.any);
+    GFX.funcs.setPrim(draw.prim.any);
 }
 
 /* Text window method: makes the whole current page visible at once */
@@ -416,13 +416,25 @@ void textWindowSetPalette(TextWindow *obj, u8 palette) {
     obj->palette = palette;
 }
 
-/* Text window method: the glyphs' blending */
-void textWindowSetBlend(TextWindow *obj, u8 blend) {
+/*
+ * Text window method: the glyphs' blending. An old-style definition, as
+ * TextWindow.setBlend's unprototyped callers suit: they pass an int, which
+ * it takes as a byte. setSpacing, setRightAlign, setLines and setUnusedC4
+ * are old-style for the same reason.
+ */
+void textWindowSetBlend(obj, blend)
+TextWindow *obj;
+u8 blend;
+{
     obj->blend = blend;
 }
 
 /* Text window method: a fixed advance and line height (0, 0: the style's) */
-void textWindowSetSpacing(TextWindow *obj, s16 x, s16 y) {
+void textWindowSetSpacing(obj, x, y)
+TextWindow *obj;
+s16 x;
+s16 y;
+{
     if (x != 0 || y != 0) {
         obj->fixedSpacing = 1;
         obj->spacingX = x;
@@ -444,7 +456,10 @@ void textWindowSetVisible(TextWindow *obj, u8 visible) {
 }
 
 /* Text window method: aligns the text to its right end, or back to the left */
-void textWindowSetRightAlign(TextWindow *obj, u8 type) {
+void textWindowSetRightAlign(obj, type)
+TextWindow *obj;
+u8 type;
+{
     TextTools cls;
 
     if (type != 0) {
@@ -505,9 +520,9 @@ void textWindowSetTypeSound(TextWindow *obj, s32 sound) {
 
 /* Text window method: scales the glyphs */
 void textWindowSetScale(TextWindow *obj, s32 x, s32 y) {
-    obj->scaleZ = ONE;
-    obj->scaleX = x;
-    obj->scaleY = y;
+    obj->scale.vz = ONE;
+    obj->scale.vx = x;
+    obj->scale.vy = y;
     obj->scaled = 1;
 }
 
@@ -523,22 +538,28 @@ void textWindowSetDepth(TextWindow *obj, s32 depth) {
 }
 
 /* Text window method: the lines of a page */
-void textWindowSetLines(TextWindow *obj, u8 lines) {
+void textWindowSetLines(obj, lines)
+TextWindow *obj;
+u8 lines;
+{
     obj->lines = lines;
 }
 
 /* Text window method: sets unusedC4, which nothing reads */
-void textWindowSetUnusedC4(TextWindow *obj, u8 value) {
+void textWindowSetUnusedC4(obj, value)
+TextWindow *obj;
+u8 value;
+{
     obj->unusedC4 = value;
 }
 
 /* Text window method: whether the end of the text was reached */
-u8 textWindowIsFinished(TextWindow *obj) {
+s32 textWindowIsFinished(TextWindow *obj) {
     return obj->finished;
 }
 
 /* Text window method: whether the window is shown */
-u8 textWindowIsVisible(TextWindow *obj) {
+s32 textWindowIsVisible(TextWindow *obj) {
     return obj->visible;
 }
 
@@ -551,34 +572,34 @@ s32 textWindowIsWaitingForButton(TextWindow *obj) {
  * Picks the glyph of the next character, or runs its control code; returns what the drawing does
  * next
  */
-s32 processTextChar(TextWindow *obj, TextBuffer *text, TextDraw *wait, s16 *pos) {
+s32 processTextChar(TextWindow *obj, TextBuffer *text, TextDraw *draw, s16 *pos) {
     TextStyle *style;
     s32 c;
     s32 ret;
     s32 n;
 
-    switch (wait->kind) {
+    switch (draw->kind) {
     case 2:
         if (text->sjis != 0) {
-            if ((u8)wait->code == 1) {
-                ret = TEXT_CODE_HANDLERS[1](obj, text, wait);
+            if ((u8)draw->code == 1) {
+                ret = TEXT_CODE_HANDLERS[1](obj, text, draw);
                 *pos += 1;
             } else {
-                return TEXT_CODE_HANDLERS[0](obj, text, wait);
+                return TEXT_CODE_HANDLERS[0](obj, text, draw);
             }
         } else {
             c = text->data[*pos + 1];
             if (TEXT_CODE_HANDLERS[c] == NULL) {
-                return TEXT_CODE_HANDLERS[0](obj, text, wait);
+                return TEXT_CODE_HANDLERS[0](obj, text, draw);
             }
-            ret = TEXT_CODE_HANDLERS[c](obj, text, wait);
+            ret = TEXT_CODE_HANDLERS[c](obj, text, draw);
             if (ret & 0x8000) {
                 *pos += FONT.codeLengths[c];
             }
         }
         return ret & ~0x8000;
     case 0:
-        wait->glyph = &obj->style->glyphs[wait->code - 4];
+        draw->glyph = &obj->style->glyphs[draw->code - 4];
         if (text->sjis != 0) {
             *pos += 2;
         } else {
@@ -587,11 +608,11 @@ s32 processTextChar(TextWindow *obj, TextBuffer *text, TextDraw *wait, s16 *pos)
         break;
     case 1:
         style = obj->style;
-        n = (u8)wait->code;
+        n = (u8)draw->code;
         if (n <= style->iconCount && n > 0) {
-            wait->glyph = &style->icons[n - 1];
+            draw->glyph = &style->icons[n - 1];
         } else {
-            wait->glyph = obj->style->glyphs;
+            draw->glyph = obj->style->glyphs;
         }
         *pos += 2;
         break;
@@ -600,7 +621,7 @@ s32 processTextChar(TextWindow *obj, TextBuffer *text, TextDraw *wait, s16 *pos)
         *pos += 1;
         return 3;
     default:
-        wait->glyph = obj->style->glyphs;
+        draw->glyph = obj->style->glyphs;
         if (text->sjis != 0) {
             *pos += 2;
         } else {
@@ -626,11 +647,11 @@ s32 textCodeDefault(TextWindow *obj, TextBuffer *buf) {
 }
 
 /* Control code 1: a new line, or a new page when the page is full */
-s32 textCodeNewLine(TextWindow *obj, TextBuffer *buf, TextDraw *wait) {
-    if (++wait->lineCount == 1) {
-        wait->pageStart = buf->pos + 2;
-    } else if (wait->lineCount >= obj->lines) {
-        obj->start = wait->pageStart;
+s32 textCodeNewLine(TextWindow *obj, TextBuffer *buf, TextDraw *draw) {
+    if (++draw->lineCount == 1) {
+        draw->pageStart = buf->pos + 2;
+    } else if (draw->lineCount >= obj->lines) {
+        obj->start = draw->pageStart;
         if (obj->lines >= 2) {
             obj->lines--;
             textWindowShowPage(obj);
@@ -703,7 +724,7 @@ s32 textCodeIgnore(void) {
 }
 
 /* Control code 5: draws the next character of a work buffer in its place */
-s32 textCodeInsert(TextWindow *obj, TextBuffer *buf, TextDraw *wait) {
+s32 textCodeInsert(TextWindow *obj, TextBuffer *buf, TextDraw *draw) {
     u8 index = buf->data[buf->pos + 2];
     s16 c;
     s32 ret;
@@ -716,15 +737,15 @@ s32 textCodeInsert(TextWindow *obj, TextBuffer *buf, TextDraw *wait) {
         return 0x8003;
     }
     c = FONT.decode(obj->text[index].data + obj->text[index].pos, (u8)obj->text[index].sjis, obj->style, obj->text[index].pos);
-    wait->code = c;
-    wait->kind = (u32)(c << 16) >> 24;
-    if (wait->kind == 2) {
+    draw->code = c;
+    draw->kind = (u32)(c << 16) >> 24;
+    if (draw->kind == 2) {
         return 0x8000;
     }
     if (obj->typeDelay != 0) {
-        return processTextChar(obj, &obj->text[index], wait, &obj->text[index].pos);
+        return processTextChar(obj, &obj->text[index], draw, &obj->text[index].pos);
     }
-    ret = processTextChar(obj, &obj->text[index], wait, &obj->text[index].pos);
+    ret = processTextChar(obj, &obj->text[index], draw, &obj->text[index].pos);
     if (ret == 1) {
         return 2;
     }
@@ -812,7 +833,7 @@ void updateTextWindow(TextWindow *obj) {
 /* A text window on a layer, in a font style, at (x, y) */
 TextWindow *createTextWindow(s16 layerId, s16 style, s16 x, s16 y) {
     TextWindow *ret;
-    TextWindow *obj = createTask(updateTextWindow, 0x174, 0);
+    TextWindow *obj = createTask(updateTextWindow, sizeof(TextWindow), 0);
 
     obj->setText = textWindowSetText;
     obj->setString = textWindowSetString;
@@ -851,7 +872,7 @@ TextWindow *createTextWindow(s16 layerId, s16 style, s16 x, s16 y) {
     ret->texY = 0;
     ret->lines = 1;
     ret->blend = ret->style->blend;
-    ret->scaleX = ret->scaleY = ret->scaleZ = ONE;
+    ret->scale.vx = ret->scale.vy = ret->scale.vz = ONE;
     return ret;
 }
 

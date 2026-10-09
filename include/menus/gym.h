@@ -107,9 +107,9 @@ typedef struct TrainScreen {
     TASK_HEADER(TrainScreen);
     /* 0x050 */ s32 layerId;
     /* 0x054 */ s32 depth;
-    /* 0x058 */ s32 sign; /* the sprite of the gym, by the mode it came from */
-    /* 0x05C */ s32 signPos;
-    /* 0x060 */ s32 signTick;
+    /* 0x058 */ s32 bgSprite; /* the gym's sign, by the mode it came from */
+    /* 0x05C */ s32 bgScroll;
+    /* 0x060 */ s32 bgTick;
     /* 0x064 */ s32 partyCount;
     /* 0x068 */ s32 partner; /* the one selected */
     /* 0x06C */ s32 cursorShown;
@@ -208,7 +208,7 @@ typedef struct TrainIdle {
    (STGTRAIN_createActor): mode 1 idle, 2 scaling, 4 animating, 8 ending */
 typedef struct TrainActor {
     TASK_HEADER(TrainActor);
-    /* 0x50 */ s32 mode;
+    /* 0x50 */ u32 mode;
     /* 0x54 */ s32 set;
     /* 0x58 */ s32 file; /* of STGTRAIN_files */
     /* 0x5C */ s32 anim;
@@ -398,7 +398,6 @@ TrainSprite *STGTRAIN_createSprite(void);
 
 /* scene.c */
 void STGTRAIN_updateRoot(Task *task, Task **children);
-Task *STGTRAIN_start(void);
 
 /* screen.c */
 void STGTRAIN_createScreenWindows(TrainScreen *screen, TrainScreenWindows *win);
@@ -428,7 +427,7 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win);
 void STGTRAIN_updateResult(TrainResult *result, TrainResultWindows *win);
 TrainResult *STGTRAIN_createResult(TrainScreen *screen, s32 partner, s32 training);
 void STGTRAIN_initIdle(TrainIdle *task, void *children);
-void STGTRAIN_showIdle(TrainIdle *task, void *children, s32 arg2);
+void STGTRAIN_showIdle(TrainIdle *task, void *children, s32 show);
 void STGTRAIN_drawIdle(TrainIdle *task);
 void STGTRAIN_runIdle(TrainIdle *task, void *children);
 void STGTRAIN_updateIdle(TrainIdle *task, void *children);

@@ -22,10 +22,9 @@ jobs:
 
     - run: python3 tools/hacks.py --check README.md docs/status.md
 
-  # A modern GCC parses each version's game C (make lint, tools/lint.py) for
-  # calls to undeclared functions and pointers of the wrong type: what it
-  # finds is config/<version>/lint.txt or fails, and the list only gets
-  # shorter, as shiftcheck's. It needs the PsyQ headers but no disc, and
+  # A modern GCC compiles each version's game C (make lint, tools/lint.py)
+  # for its warnings: what it finds is config/<version>/lint.txt or fails,
+  # and the list only gets shorter, as shiftcheck's. It needs the PsyQ headers but no disc, and
   # never touches the build.
   lint:
     runs-on: ubuntu-24.04
@@ -130,6 +129,12 @@ jobs:
 
     # and linked higher, the binaries only change where a relocation is
     - run: make padcheck
+
+    # A modern GCC builds the game too (make TOOLCHAIN=gcc,
+    # docs/toolchain.md): it doesn't match, but each binary must fit where
+    # the original's goes (tools/fitcheck.py). It doesn't fail the run yet.
+    - continue-on-error: true
+      run: make TOOLCHAIN=gcc -j$(nproc)
 
     - if: matrix.report
       run: make report

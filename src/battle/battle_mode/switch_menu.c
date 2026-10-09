@@ -14,7 +14,7 @@ s32 FIGHTSTG_getPairDigimon(SwitchMenu *task, s32 index, s32 member) {
 
     GAME.funcs.getPartyMember(index);
     partner = GAME.funcs.getPartyMember(member);
-    fighter = &FIGHTSTG_battle.fighters[0][index];
+    fighter = &FIGHTSTG_battle.state.fighters[0][index];
     next = GET_DIGIMON(fighter->id)->pairPartner;
     count = GAME.funcs.getPartnerSlots(partner, task->slots);
     if (count <= 0 || next == 0) {
@@ -77,7 +77,7 @@ void FIGHTSTG_showSwitchFighters(SwitchMenu *task, SwitchMenuWindows *w) {
     s32 i;
 
     for (i = 0; i < task->count; i++) {
-        fighter = &FIGHTSTG_battle.fighters[0][task->others[i]];
+        fighter = &FIGHTSTG_battle.state.fighters[0][task->others[i]];
         w->hp[i]->setNumber(w->hp[i], 0, fighter->hp);
         w->hp[i]->setRightAlign(w->hp[i], 1);
         w->maxHp[i]->setNumber(w->maxHp[i], 0, fighter->maxHp);
@@ -112,14 +112,14 @@ void FIGHTSTG_updateSwitchMenu(SwitchMenu *task, SwitchMenuWindows *w) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        active = FIGHTSTG_battle.active[0];
-        fighters = FIGHTSTG_battle.fighters[0];
+        active = FIGHTSTG_battle.state.active[0];
+        fighters = FIGHTSTG_battle.state.fighters[0];
         temporary = fighters[active].temporary;
         for (i = 0; i < 3; i++) {
-            if (fighters[i].id != 0 && i != FIGHTSTG_battle.active[0]) {
+            if (fighters[i].id != 0 && i != FIGHTSTG_battle.state.active[0]) {
                 task->others[task->count] = i;
                 if (task->canCancel != 0 && temporary == 0) {
-                    task->pairs[task->count] = FIGHTSTG_getPairDigimon(task, FIGHTSTG_battle.active[0], i);
+                    task->pairs[task->count] = FIGHTSTG_getPairDigimon(task, FIGHTSTG_battle.state.active[0], i);
                 }
                 task->count++;
             }
@@ -151,7 +151,7 @@ void FIGHTSTG_updateSwitchMenu(SwitchMenu *task, SwitchMenuWindows *w) {
             if (pressed & (1 << PAD_CROSS)) {
                 SOUND.playSound(SOUND_MENU_CONFIRM);
                 sel = w->cursor->sel;
-                fighter = &FIGHTSTG_battle.fighters[0][task->others[sel]];
+                fighter = &FIGHTSTG_battle.state.fighters[0][task->others[sel]];
                 if (fighter->hp != 0) {
                     *task->line = sel;
                     *task->result = task->others[w->cursor->sel];

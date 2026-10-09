@@ -147,7 +147,7 @@ typedef struct TextWindow {
     /* 0xB8 */ s16 cursorX;
     /* 0xBA */ u16 cursorY;
     /* 0xBC */ s16 alignWidth;
-    /* 0xBE */ u8 blend;
+    /* 0xBE */ s8 blend; /* -1 (TextStyle.blend 0xFF): opaque */
     /* 0xBF */ u8 lines;
     /* 0xC0 */ u8 palette; /* PALETTE_* */
     /* 0xC1 */ u8 visible;
@@ -156,10 +156,7 @@ typedef struct TextWindow {
     /* 0xC4 */ u8 unusedC4; /* only setUnusedC4 writes it, and nothing calls that */
     /* 0xC8 */ s32 typeSound;
     /* 0xCC */ s32 scaled;
-    /* 0xD0 */ s32 scaleX;
-    /* 0xD4 */ s32 scaleY;
-    /* 0xD8 */ s32 scaleZ;
-    /* 0xDC */ s32 padDC; /* nothing reads or writes it */
+    /* 0xD0 */ VECTOR scale; /* ScaleMatrix's */
     /* 0xE0 */ s32 pivotX;
     /* 0xE4 */ s32 pivotY;
     /* 0xE8 */ SVECTOR rot;
@@ -186,19 +183,18 @@ typedef struct TextWindow {
     /* 0x15C */ void (*setDepth)();
     /* 0x160 */ void (*setLines)(); /* no prototype: callers would truncate u8 args */
     /* 0x164 */ void (*setUnusedC4)(); /* no prototype: callers would truncate u8 args */
-    /* 0x168 */ s32 (*isFinished)(); /* no prototype: callers would truncate a u8 return */
-    /* 0x16C */ s32 (*isVisible)(); /* no prototype: callers would truncate a u8 return */
+    /* 0x168 */ s32 (*isFinished)(); /* s32: callers don't truncate the result to a byte */
+    /* 0x16C */ s32 (*isVisible)(); /* s32: callers don't truncate the result to a byte */
     /* 0x170 */ s32 (*isWaitingForButton)();
 } TextWindow;
 
 /* Where the parts of a TalkBox go, for each of its four types */
 typedef struct TalkBoxLayout {
     /* 0x00 */ s32 sprite;
-    /* 0x04 */ DVECTOR parts; /* four offsets (with the next fields) */
-    /* 0x08 */ u16 zoomX;
-    /* 0x0A */ u16 zoomY;
+    /* 0x04 */ DVECTOR spritePos; /* the four positions drawTalkBoxFrame walks */
+    /* 0x08 */ DVECTOR sprite0Pos; /* also the ZoomBox's offset */
     /* 0x0C */ DVECTOR panel;
-    /* 0x10 */ DVECTOR unused10; /* the panel, at x 125 on the right; nothing reads it */
+    /* 0x10 */ DVECTOR sprite2Pos; /* its y only for types 2 and 3 */
     /* 0x14 */ s16 nameX;
     /* 0x16 */ s16 nameY;
     /* 0x18 */ s16 textX;
@@ -283,8 +279,8 @@ typedef struct ZoomBox {
     /* 0x60 */ s32 zoom; /* 0-ONE */
     /* 0x64 */ s32 layerId;
     /* 0x68 */ s32 unused68; /* only cleared when the box starts; nothing reads it */
-    /* 0x6C */ u16 offsetX;
-    /* 0x6E */ u16 offsetY;
+    /* 0x6C */ s16 offsetX;
+    /* 0x6E */ s16 offsetY;
     /* 0x70 */ VECTOR scale;
     /* 0x80 */ SVECTOR rot;
     /* 0x88 */ VECTOR trans; /* the centre, set but not read */
@@ -301,24 +297,67 @@ void drawZoomBox(ZoomBox *task);
 void drawTalkBoxArrow(struct TalkBoxFrame *task);
 void drawTalkBoxFrame(struct TalkBoxFrame *task);
 void textWindowSetText(TextWindow *obj, const char *text);
+void textWindowSetString(TextWindow *obj, char *text, s32 id);
 void formatNumber(u8 *buf, s32 value);
+void textWindowSetNumber(TextWindow *obj, u32 index, s32 value);
+void textWindowSetSubText(TextWindow *obj, const char *text, s32 index);
 void textWindowSetTypeDelay(TextWindow *, s32);
+void textWindowSetPos(TextWindow *obj, s16 x, s16 y);
+void textWindowSetPalette(TextWindow *obj, u8 palette);
+void textWindowSetBlend(TextWindow *obj, s32 blend); /* old-style: u8 blend */
+void textWindowSetSpacing(TextWindow *obj, s32 x, s32 y); /* old-style: s16 x, y */
+void textWindowSetVisible(TextWindow *obj, u8 visible);
+void textWindowSetRightAlign(TextWindow *obj, s32 type); /* old-style: u8 type */
+void textWindowInsertPlayerName(TextWindow *obj);
+void textWindowSetTypeSound(TextWindow *obj, s32 sound);
+void textWindowSetScale(TextWindow *obj, s32 x, s32 y);
+void textWindowSetPivot(TextWindow *obj, s32 x, s32 y);
+void textWindowSetDepth(TextWindow *obj, s32 depth);
+void textWindowSetLines(TextWindow *obj, s32 lines); /* old-style: u8 lines */
+void textWindowSetUnusedC4(TextWindow *obj, s32 value); /* old-style: u8 value */
+s32 textWindowIsFinished(TextWindow *obj);
+s32 textWindowIsVisible(TextWindow *obj);
+s32 textWindowIsWaitingForButton(TextWindow *obj);
 void textWindowShowPage(TextWindow *obj);
+void textWindowSetStyle(TextWindow *obj, s32 style);
 void textWindowDraw(struct TextWindow *obj);
+void cursorSetVisible(Cursor *task, s32 visible);
+void cursorSetPos(Cursor *task, s32 x, s32 y);
+void cursorSetPalette(Cursor *task, s32 palette);
+void cursorSetIdleDelay(Cursor *task, s32 delay);
+void cursorSetFrameDelay(Cursor *task, s32 delay);
+void cursorSetStill(Cursor *task, s32 still);
+void updateCursor(Cursor *task, TextWindow **win);
 Cursor *createCursor(s16 layerId, s32 depth, s16 x, s16 y);
-void updateMessageBox(struct MessageBoxFrame *task, struct MessageBox *data);
-s32 processTextChar(TextWindow *obj, TextBuffer *text, TextDraw *wait, s16 *pos);
+void updateMessageBox(Task *task, struct MessageBox *data);
+s32 processTextChar(TextWindow *obj, TextBuffer *text, TextDraw *draw, s16 *pos);
+s32 textCodeDefault(TextWindow *obj, TextBuffer *buf);
+s32 textCodeNewLine(TextWindow *obj, TextBuffer *buf, TextDraw *draw);
+s32 textCodeWaitButton(TextWindow *obj, TextBuffer *buf);
+s32 textCodePageBreak(TextWindow *obj, TextBuffer *buf);
+s32 textCodeIgnore(void);
+s32 textCodeInsert(TextWindow *obj, TextBuffer *buf, TextDraw *draw);
+s32 textCodePause(TextWindow *obj, TextBuffer *buf);
+s32 textCodePlayerName(TextWindow *obj, TextBuffer *buf);
+void updateTextWindow(TextWindow *obj);
 void updateZoomBox(struct ZoomBox *task);
+ZoomBox *createZoomBox(s32 layerId, s16 x, s16 y, s32 w, s32 h, s32 type);
+void talkBoxSetPos(TalkBox *task, s32 x, s32 y);
+void updateTalkBox(TalkBox *task, TalkBoxChildren *children);
 TextWindow *createTextWindow(s16 id, s16 type, s16 x, s16 y);
 void updateMessageBoxFrame(struct MessageBoxFrame *task);
+MessageBoxFrame *createMessageBoxFrame(s32 layerId);
 void updateTalkBoxFrame(TalkBoxFrame *task);
+TalkBoxFrame *createTalkBoxFrame(TalkBox *parent);
 Task *createMessageBox(s32 layerId, void *strings, s32 index);
 TalkBox *createTalkBox(s32 id, s16 x, s16 y, void *strings, s32 index, u32 type);
 void bindTextTools(TextTools *obj);
 char *getString(s32 *table, s32 index);
-s32 measureText();
+s32 measureText(TextBuffer *text, TextStyle *style, s32 spacing); /* old-style: s16 spacing */
 void initTextTools(TextTools *obj);
 void convertText(void *buf, void *text, s32 mode);
+void loadFont(void);
+s16 decodeChar(u8 *s, u8 mode, TextStyle *font);
 
 extern const char STR_NULL_MESSAGE[];
 extern const char STR_BAD_DIGIT_BUFFER[];

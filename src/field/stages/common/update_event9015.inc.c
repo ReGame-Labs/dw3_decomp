@@ -6,8 +6,8 @@
  * then runs while the first effect is in children->party[0]
  */
 void updateEvent9015(StageTask *task, StagePartyChildren *children) {
-    StageActor *player;
-    StageActor *actor;
+    Actor *player;
+    Actor *actor;
     s32 i;
 
     switch (task->state) {
@@ -20,9 +20,10 @@ void updateEvent9015(StageTask *task, StagePartyChildren *children) {
             case 0:
             default:
                 player = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, 0);
-                player->setSubstate(player, 1);
+                player->setSubstate(player, ACTOR_STAND);
                 SOUND.playSound(SOUND_SWITCH02);
                 task->nextStep(task);
+                /* fallthrough */
             case 1:
                 task->counter += GFX.funcs.getFrameTime();
                 if (task->counter >= 0x1E) {
@@ -40,9 +41,9 @@ void updateEvent9015(StageTask *task, StagePartyChildren *children) {
                 i = task->substate - 1;
                 actor = TASK_REGISTRY.funcs.find(FIELD_TASK_ACTOR, -1, partyActorIds[i]);
                 if (actor != NULL) {
-                    children->party[i] = createSpritePair(actor->tileX, actor->tileY);
+                    children->party[i] = createSpritePair(actor->tile.x, actor->tile.y);
                     SOUND.playSound(SOUND_COMEX113);
-                    actor->setSubstate(actor, 4);
+                    actor->setSubstate(actor, ACTOR_STOP);
                     GAME.partners[GAME.party[i]].info.stats[STAT_HP] = 1;
                     task->nextStep(task);
                 } else {

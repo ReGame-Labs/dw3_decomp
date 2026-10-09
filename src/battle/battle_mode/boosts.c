@@ -19,10 +19,10 @@ void FIGHTSTG_changeBoost(u8 side, s32 index, s32 stat, s32 percent) {
 
     if (side == 0) {
         stats = FIGHTSTG_computeStats(SIDE_PLAYER, 0, index);
-        fighter = &FIGHTSTG_battle.fighters[0][index];
+        fighter = &FIGHTSTG_battle.state.fighters[0][index];
     } else {
         stats = FIGHTSTG_computeStats(SIDE_ENEMY, 0, index);
-        fighter = &FIGHTSTG_battle.fighters[1][index];
+        fighter = &FIGHTSTG_battle.state.fighters[1][index];
     }
     if (fighter->id == 0 || fighter->hp == 0) {
         return;
@@ -51,10 +51,10 @@ s32 FIGHTSTG_getGaugeGain(s32 damage) {
     s32 i;
     s16 *acc;
 
-    fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+    fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
     ratio = damage * 100 / fighter->maxHp;
     value = ratio * ratio / 20;
-    partner = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]));
+    partner = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0]));
     acc = &partner->equip[4];
     for (i = 0; i < 2; i++) {
         if (acc[i] == 0x149) {
@@ -81,7 +81,7 @@ s32 FIGHTSTG_getTechCost(u8 side, s32 id) {
     if (side != 0) {
         return cost;
     }
-    partner = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]));
+    partner = GAME.funcs.getPartnerStats(GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0]));
     item = 0;
     if (partner->equip[4] == 0x143 || partner->equip[4] == 0x144) {
         item = partner->equip[4];
@@ -91,7 +91,7 @@ s32 FIGHTSTG_getTechCost(u8 side, s32 id) {
     }
     if (item != 0) {
         /* the game reads this amount signed */
-        cost -= (s16)GET_ITEM[0](item)->data.acc->amount;
+        cost -= (s16)ITEM_FUNCS.get(item)->data.acc->amount;
         if (cost <= 0) {
             cost = 1;
         }

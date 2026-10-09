@@ -40,6 +40,7 @@ void STDWTITL_tickGlintAlt(GlintTask *task) {
         case 1:
             task->index = 0;
             task->nextSubstate(task);
+            /* fallthrough */
         case 2:
             task->frame = STDWTITL_glintAltFrames[task->index];
             task->index++;
@@ -122,6 +123,7 @@ void STDWTITL_tickGlint(GlintTask *task) {
             task->index = 0;
             task->frame = 0;
             task->nextSubstate(task);
+            /* fallthrough */
         case 2:
             task->frame = STDWTITL_glintFrames[task->index];
             if (task->frame == -1) {

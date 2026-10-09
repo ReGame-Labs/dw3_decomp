@@ -12,6 +12,7 @@ void WFIGHTMN_loadFiles(BattleLoader *task) {
     case TASK_INIT:
     default:
         task->nextState(task);
+        /* fallthrough */
     case TASK_RUN:
         switch (task->substate) {
         case 0:

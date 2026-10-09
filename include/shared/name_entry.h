@@ -6,8 +6,8 @@
  * deck names, for example). The name is kept as maxLength full-width
  * Shift-JIS characters, padded with spaces. STCRDDEK, STPLNMET and STDGNAME
  * each have a copy of its code, from src/shared/name_entry/; the
- * overlay's header defines, before including this one,
- * NAME_ENTRY_HAS_UNK98 and NAME_ENTRY_HAS_HIDE (see NameEntry), and
+ * overlay's header defines, before including this one, OVL_NAME,
+ * NAME_ENTRY_HAS_UNUSED98 and NAME_ENTRY_HAS_HIDE (see NameEntry), and
  * NAME_ENTRY_SPRITES and NAME_ENTRY_FILE_KEYBOARD, its sprite bank and its
  * archive of the keyboard's images.
  */
@@ -74,7 +74,7 @@ typedef struct NameEntryWindows {
     /* 0x00 */ TextWindow *title;
     /* 0x04 */ TextWindow *name;
     /* 0x08 */ TextWindow *tabs[3];
-    /* 0x14 */ TextWindow *unk14[3];
+    /* 0x14 */ TextWindow *unused14[3]; /* nothing creates or reads them */
     /* 0x20 */ TextWindow *leftLabel;
     /* 0x24 */ TextWindow *rightLabel;
     /* 0x28 */ TextWindow *l1Label;
@@ -86,11 +86,13 @@ typedef struct NameEntryWindows {
  * A name entry: the keyboard, the name typed so far and the panels that
  * open and close. STDGNAME's has a word more at 0x98, which moves what
  * follows by 4, and STPLNMET's a hide method before close: the including
- * overlay says so with NAME_ENTRY_HAS_UNK98 and NAME_ENTRY_HAS_HIDE (0 or
- * 1). The offsets are STCRDDEK's.
+ * overlay says so with NAME_ENTRY_HAS_UNUSED98 and NAME_ENTRY_HAS_HIDE (0
+ * or 1). The offsets are STCRDDEK's. With three layouts, each overlay's
+ * copy has a tag of its own (STCRDDEK_NameEntry, ...).
  */
-typedef struct NameEntry {
-    TASK_HEADER(NameEntry);
+typedef struct OVL_NAME(NameEntry) NameEntry;
+struct OVL_NAME(NameEntry) {
+    TASK_HEADER(OVL_NAME(NameEntry));
     /* 0x50 */ s32 mode;
     /* 0x54 */ s32 layer;
     /* 0x58 */ s32 depth;
@@ -104,8 +106,8 @@ typedef struct NameEntry {
     /* 0x78 */ u16 name[12];
     /* 0x90 */ s32 cursor;
     /* 0x94 */ s32 maxLength;
-#if NAME_ENTRY_HAS_UNK98
-    /* 0x98 */ s32 unk98;
+#if NAME_ENTRY_HAS_UNUSED98
+    /* 0x98 */ s32 unused98; /* nothing reads or writes it */
 #endif
     /* 0x98 */ s32 column;
     /* 0x9C */ s32 row;
@@ -115,15 +117,15 @@ typedef struct NameEntry {
     /* 0xAC */ s32 page;
     /* 0xB0 */ s32 arrowFrame;
     /* 0xB4 */ s32 arrowTime;
-    /* 0xB8 */ s32 unkB8;
-    /* 0xBC */ PanelAnim unkBC;
+    /* 0xB8 */ s32 unusedB8; /* nothing reads or writes it */
+    /* 0xBC */ PanelAnim unusedBC; /* given a duration of 10, as the two below, and never run */
     /* 0xCC */ PanelAnim keyboardScale;
     /* 0xDC */ PanelAnim messageScale;
-    /* 0xEC */ void (*getName)(struct NameEntry *task, char *out);
+    /* 0xEC */ void (*getName)(NameEntry *task, char *out);
 #if NAME_ENTRY_HAS_HIDE
-    /* 0xF0 */ void (*hide)(struct NameEntry *task, s32 hide);
+    /* 0xF0 */ void (*hide)(NameEntry *task, s32 hide);
 #endif
-    /* 0xF0 */ void (*close)(struct NameEntry *task);
-} NameEntry;
+    /* 0xF0 */ void (*close)(NameEntry *task);
+};
 
 #endif /* NAME_ENTRY_H */

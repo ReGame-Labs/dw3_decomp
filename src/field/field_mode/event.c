@@ -6,29 +6,29 @@
 
 /* The actor of an event's cast with the id, below the script commands' ids
    (0x320) */
-Actor *FIELDSTG_findEventActor(EventTask *arg0, s32 id) {
+Actor *FIELDSTG_findEventActor(EventTask *task, s32 id) {
     s32 i;
 
     if (id < 0x320) {
         for (i = 0; i < 30; i++) {
-            if (arg0->entries[i].id == 0) {
+            if (task->entries[i].id == 0) {
                 break;
             }
-            if (arg0->entries[i].id == id) {
-                return arg0->entries[i].actor;
+            if (task->entries[i].id == id) {
+                return task->entries[i].actor;
             }
         }
     }
     return NULL;
 }
 
-/* An event's pose command: puts its actor in a pose, or, for an id of the
-   script commands, creates the command's task if needed and hands it the two
-   arguments */
+/* An event's pose command (SCRIPT_POSE): puts its actor in a pose, or, for
+   an id of the script commands (SCRIPT_COMMAND), creates the command's task
+   if needed and hands it the other two words, a command and its argument */
 s32 FIELDSTG_setEventPose(EventTask *task, s16 *op, EventChildren *children) {
     s32 id = op[1];
-    s32 arg1 = op[2];
-    s32 arg2 = op[3];
+    s32 set = op[2]; /* or the command */
+    s32 dir = op[3]; /* or its argument */
     Actor *actor;
     s32 target;
     s32 i;
@@ -36,7 +36,7 @@ s32 FIELDSTG_setEventPose(EventTask *task, s16 *op, EventChildren *children) {
     if (id < 0x320) {
         actor = FIELDSTG_findEventActor(task, id);
         if (actor != NULL) {
-            actor->setPose(actor, arg1, arg2);
+            actor->setPose(actor, set, dir);
         }
     } else {
         target = (s32)TASK_REGISTRY.funcs.find(id, -1, -1);
@@ -52,7 +52,7 @@ s32 FIELDSTG_setEventPose(EventTask *task, s16 *op, EventChildren *children) {
             }
         }
         if (target != 0) {
-            FIELDSTG_handleScriptCommand(target, id, arg1, arg2);
+            FIELDSTG_handleScriptCommand(target, id, set, dir);
         }
     }
     return 4;
@@ -225,6 +225,7 @@ void FIELDSTG_runEvent(EventTask *task, EventChildren *children) {
         default:
             children->task = task->start();
             task->nextSubstate(task);
+            /* fallthrough */
         case 1:
             if (children->task == NULL) {
                 task->setState(task, TASK_KILL);

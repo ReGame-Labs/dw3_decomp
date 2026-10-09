@@ -98,9 +98,11 @@ void FIGHTSTG_updateCursor(MenuCursor *task) {
         default:
             GFX.vsyncFunc = FIGHTSTG_drawCursorBar;
             GFX.vsyncArg = (s32)task;
+            /* fallthrough */
         case 0:
         case 1:
             task->nextSubstate(task);
+            /* fallthrough */
         case 3:
             if (task->params.sprite != -1) {
                 FIGHTSTG_drawCursorSprites(task);

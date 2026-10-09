@@ -12,30 +12,30 @@ extern s16 tileLiftShake[];
 
 #include "common/update_tile_lift.inc.c"
 
-/* Sends the lift up (0x348) or down (0x349) */
-void handleTileLift(StageTileLift *task, s32 id) {
+/* Runs a script command of the lift's: moves it up or down */
+void handleTileLift(Lift *task, s32 id) {
     if (task != NULL) {
         switch (id) {
-        case 0x348:
+        case LIFT_UP:
             task->setState(task, TASK_DONE);
-            task->down = 0;
+            task->raised = 0;
             break;
-        case 0x349:
+        case LIFT_DOWN:
             task->setState(task, TASK_DONE);
-            task->down = 1;
+            task->raised = 1;
             break;
         }
     }
 }
 
-/* Creates the lift (updateTileLift), down if flag 0x1C3D is set; nothing in the game calls it */
-StageTileLift *createTileLift(s32 id) {
-    StageTileLift *task = createTaskWithId(updateTileLift, sizeof(StageTileLift), 0, id);
+/* Creates the lift (updateTileLift), raised when flag 0x1C3D is set; nothing in the game calls it */
+Lift *createTileLift(s32 id) {
+    Lift *task = createTaskWithId(updateTileLift, sizeof(Lift), 0, id);
 
     if (FLAGS_00.checkCondition(FLAG(0x1C, 0x3D), 1)) {
-        task->down = 1;
+        task->raised = 1;
     } else {
-        task->down = 0;
+        task->raised = 0;
     }
     return task;
 }

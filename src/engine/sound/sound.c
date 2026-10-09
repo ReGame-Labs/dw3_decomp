@@ -183,7 +183,7 @@ SoundState SOUND = {
     0,
     {NULL},
     initSound,
-    (short (*)(s32))playSound,
+    playSound,
     soundKeyOn,
     soundKeyOff,
     loadSoundBank,
@@ -208,7 +208,7 @@ s32 findSoundBank(s32 id) {
 }
 
 /* Plays a packed sound id (see engine/sound.h); returns the voice of a key-on */
-s32 playSound(s32 packed) {
+short playSound(s32 packed) {
     s32 id = SOUND_BANK(packed);
     u32 keyOn = SOUND_IS_KEY_ON(packed);
     s32 exclusive = SOUND_IS_EXCLUSIVE(packed);
@@ -374,6 +374,7 @@ void updateSoundLoading(void) {
         bank->vabId = SsVabOpenHeadSticky(FILE_CACHE.getArchiveEntry(loader->files->vhIndex, bank->headBuffer), slot, bank->spuAddr);
         FILE_CACHE.request(loader->files->bodyFile);
         loader->state++;
+        /* fallthrough */
     case SOUND_LOAD_BODY:
         if (FILE_CACHE.isLoading(loader->files->bodyFile) != 0) {
             return;
@@ -381,6 +382,7 @@ void updateSoundLoading(void) {
         HEAP.lock(FILE_CACHE.load(loader->files->bodyFile), 1);
         bank->vabId = SsVabTransBody(FILE_CACHE.getEntry(loader->files->bodyEntry), bank->vabId);
         loader->state++;
+        /* fallthrough */
     case SOUND_LOAD_TRANSFER:
         if (SsVabTransCompleted(0) == 0) {
             return;

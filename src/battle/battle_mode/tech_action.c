@@ -82,12 +82,12 @@ static inline void startTechScript(TechAction *task, BattleChild *children) {
         if (FIGHTSTG_action.effects[TECH_EFFECT_ENEMY_ONLY] == 0) {
             children[0].script = WFIGHTMN_startTech(task->side, task->tech);
             {
-                BattleFighter *fighters = FIGHTSTG_battle.fighters[0];
+                BattleFighter *fighters = FIGHTSTG_battle.state.fighters[0];
 
                 if (task->side != 0) {
-                    fighters = FIGHTSTG_battle.fighters[1];
+                    fighters = FIGHTSTG_battle.state.fighters[1];
                 }
-                fighters[FIGHTSTG_battle.active[task->side != 0]].charge = 0;
+                fighters[FIGHTSTG_battle.state.active[task->side != 0]].charge = 0;
             }
         } else {
             WFIGHTMN_endWeakness(task->side);
@@ -185,7 +185,7 @@ static inline void cureStatusTech(TechAction *task, BattleChild *children) {
         kind = 3;
         break;
     }
-    fighters = FIGHTSTG_battle.fighters[other];
+    fighters = FIGHTSTG_battle.state.fighters[other];
     switch (task->step) {
     case 0:
     default:
@@ -198,10 +198,10 @@ static inline void cureStatusTech(TechAction *task, BattleChild *children) {
             task->counter = 3;
             return;
         }
-        if (fighters[FIGHTSTG_battle.active[other]].flags & FIGHTSTG_statusTechFlags[kind]) {
+        if (fighters[FIGHTSTG_battle.state.active[other]].flags & FIGHTSTG_statusTechFlags[kind]) {
             task->lines[0] = FIGHTSTG_statusTechLines[kind];
             task->lines[1] = task->side;
-            task->lines[2] = FIGHTSTG_battle.active[0];
+            task->lines[2] = FIGHTSTG_battle.state.active[0];
             children[0].message->show(children[0].message, 2, task->lines);
             task->step = 1;
             task->counter = 1;
@@ -212,7 +212,7 @@ static inline void cureStatusTech(TechAction *task, BattleChild *children) {
         break;
     case 1:
         for (i = 0; i < task->counter; i++) {
-            FIGHTSTG_events.funcs.useItem(task->side, i, task->tech);
+            FIGHTSTG_events.funcs.cureStatus(task->side, i, task->tech);
         }
         break;
     }
@@ -224,7 +224,7 @@ static inline void reviveSide(TechAction *task, BattleChild *children) {
     BattleFighter *fighter;
     s32 i;
 
-    fighter = FIGHTSTG_battle.fighters[0];
+    fighter = FIGHTSTG_battle.state.fighters[0];
     switch (task->step) {
     case 0:
     default:
@@ -255,7 +255,7 @@ static inline void restoreSide(TechAction *task, BattleChild *children) {
     s32 i;
 
 #if VERSION_US
-    fighter = FIGHTSTG_battle.fighters[0];
+    fighter = FIGHTSTG_battle.state.fighters[0];
 #endif
     switch (task->step) {
     case 0:
@@ -294,9 +294,9 @@ static inline void healWithTech(TechAction *task, BattleChild *children) {
     BattleFighter *fighters;
     s32 kind;
 
-    fighters = FIGHTSTG_battle.fighters[0];
+    fighters = FIGHTSTG_battle.state.fighters[0];
     if (task->side != 0) {
-        fighters = FIGHTSTG_battle.fighters[1];
+        fighters = FIGHTSTG_battle.state.fighters[1];
     }
     switch (task->step) {
     case 0:
@@ -328,7 +328,7 @@ static inline void healWithTech(TechAction *task, BattleChild *children) {
         } else {
             s32 lost;
 
-            i = FIGHTSTG_battle.active[task->side != 0];
+            i = FIGHTSTG_battle.state.active[task->side != 0];
             lost = fighters[i].maxHp - fighters[i].hp;
             if (most < lost) {
                 most = lost;
@@ -359,7 +359,7 @@ static inline void healWithTech(TechAction *task, BattleChild *children) {
                     }
                 }
             } else {
-                i = FIGHTSTG_battle.active[task->side != 0];
+                i = FIGHTSTG_battle.state.active[task->side != 0];
                 if (fighters[i].hp + task->heal > fighters[i].maxHp) {
                     fighters[i].hp = fighters[i].maxHp;
                 } else {
@@ -386,7 +386,7 @@ static inline void useItemTech(TechAction *task, BattleChild *children) {
     switch (task->tech) {
     case 0xBD:
         FIGHTSTG_queueAutoRecoverEnd(task->side);
-        FIGHTSTG_queueRecovery(task->side, FIGHTSTG_battle.active[task->side != 0], task->tech);
+        FIGHTSTG_queueRecovery(task->side, FIGHTSTG_battle.state.active[task->side != 0], task->tech);
         children[0].message = FIGHTSTG_createMessage();
         task->lines[0] = 0x27;
         task->lines[1] = task->side;
@@ -440,11 +440,11 @@ static inline void boostFighterStat(TechAction *task, BattleChild *children, Tec
     if (ok == 0) {
         return;
     }
-    FIGHTSTG_battleFuncs.changeBoost(other << 4, FIGHTSTG_battle.active[other], boost->stat, boost->amount * tech->effectPower);
-    FIGHTSTG_queueBoostEnd(other << 4, FIGHTSTG_battle.active[other], boost->stat, task->tech);
+    FIGHTSTG_battleFuncs.changeBoost(other << 4, FIGHTSTG_battle.state.active[other], boost->stat, boost->amount * tech->effectPower);
+    FIGHTSTG_queueBoostEnd(other << 4, FIGHTSTG_battle.state.active[other], boost->stat, task->tech);
     task->lines[0] = boost->line;
     task->lines[1] = other << 4;
-    task->lines[2] = FIGHTSTG_battle.active[other];
+    task->lines[2] = FIGHTSTG_battle.state.active[other];
     children[0].message->show(children[0].message, 2, task->lines);
 }
 
@@ -460,7 +460,7 @@ static inline void boostSideStat(TechAction *task, BattleChild *children, TechDa
         }
     }
     for (i = 0; i < 3; i++) {
-        if (FIGHTSTG_battle.fighters[task->side >> 4][i].id != 0 && FIGHTSTG_battle.fighters[task->side >> 4][i].hp > 0) {
+        if (FIGHTSTG_battle.state.fighters[task->side >> 4][i].id != 0 && FIGHTSTG_battle.state.fighters[task->side >> 4][i].hp > 0) {
             FIGHTSTG_battleFuncs.changeBoost(task->side, i, boost->stat, boost->amount * tech->effectPower);
             FIGHTSTG_queueBoostEnd(task->side, i, boost->stat, task->tech);
         }
@@ -493,8 +493,8 @@ static inline void chargeUser(TechAction *task, BattleChild *children, TechData 
 /* Technique 0x188: the enemy drains the partner's MP by the technique's power
    in 128ths of its max MP */
 static inline void drainMp(TechAction *task, BattleChild *children, TechData *tech) {
-    BattleFighter *to = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
-    BattleFighter *from = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+    BattleFighter *to = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
+    BattleFighter *from = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
     s32 amount;
 
     if (from->mp != 0) {
@@ -523,7 +523,7 @@ static inline void drainMp(TechAction *task, BattleChild *children, TechData *te
 
 /* Technique 0x190: heals the enemy by FIGHTSTG_computeHeal and charges it */
 static inline void healEnemy(TechAction *task, BattleChild *children) {
-    BattleFighter *fighter = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+    BattleFighter *fighter = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
 
     task->heal = FIGHTSTG_battleFuncs.computeHeal(task->side, 0x190);
     fighter->hp += task->heal;
@@ -602,22 +602,23 @@ static inline void useSupportTech(TechAction *task, BattleChild *children, TechD
 }
 
 /* Icon 6's techniques: set the field's boosted element and its amount (the
-   user's spirit / 10 plus the technique's power), cleared after a time set by
-   the spirit */
+   user's spirit / 10 plus the technique's power, at most 0x7F), cleared after
+   a time set by the spirit. The element boosted is the technique's icon, so
+   always 6, while the message names the technique's own element. */
 static inline void boostFieldElement(TechAction *task, BattleChild *children, TechData *tech) {
     BattleStats *stats;
-    s16 level;
-    s32 element;
+    s16 spiritBonus;
+    s32 amount;
 
     children[0].message = FIGHTSTG_createMessage();
-    stats = FIGHTSTG_battleFuncs.computeStats(task->side, 1, FIGHTSTG_battle.active[task->side == 0x10]);
-    FIGHTSTG_battle.boostElement = tech->icon;
-    level = stats->stats[BATTLE_STAT_SPIRIT] / 10;
-    element = level + tech->effectPower;
-    if (element >= 0x80) {
-        element = 0x7F;
+    stats = FIGHTSTG_battleFuncs.computeStats(task->side, 1, FIGHTSTG_battle.state.active[task->side == 0x10]);
+    FIGHTSTG_battle.state.boost.element = tech->icon;
+    spiritBonus = stats->stats[BATTLE_STAT_SPIRIT] / 10;
+    amount = spiritBonus + tech->effectPower;
+    if (amount >= 0x80) {
+        amount = 0x7F;
     }
-    FIGHTSTG_battle.boostAmount = element;
+    FIGHTSTG_battle.state.boost.amount = amount;
     FIGHTSTG_queueClearField(stats->stats[BATTLE_STAT_SPIRIT] * 12 + 1000);
     task->lines[0] = tech->element + 0x61;
     children[0].message->show(children[0].message, 1, task->lines);
@@ -636,12 +637,12 @@ static inline void wakeUpOrCounter(TechAction *task, BattleChild *children) {
         if (task->asleep != 0 && FIGHTSTG_battleFuncs.testWakeUp(other << 4, task->damage) != 0) {
             task->lines[0] = 0x2B;
             task->lines[1] = SIDE_ENEMY - task->side;
-            task->lines[2] = FIGHTSTG_battle.active[other];
+            task->lines[2] = FIGHTSTG_battle.state.active[other];
             children[0].message = FIGHTSTG_createMessage();
             children[0].message->show(children[0].message, 7, task->lines);
             fighter->flags &= ~FIGHTER_ASLEEP;
             {
-                s32 event = FIGHTSTG_events.funcs.find(EVENT_STATUS_END + 2, SIDE_ENEMY - task->side, FIGHTSTG_battle.active[other]);
+                s32 event = FIGHTSTG_events.funcs.find(EVENT_STATUS_END + 2, SIDE_ENEMY - task->side, FIGHTSTG_battle.state.active[other]);
 
                 if (event >= 0) {
                     FIGHTSTG_events.events[event].type = 0;
@@ -663,7 +664,7 @@ static inline void wakeUpOrCounter(TechAction *task, BattleChild *children) {
    message (announceTech), substate 1 does what it does by its kind (2 and 3
    deal damage (dealTechDamage), 4 is an item's cure, revival or healing
    (useItemTech), 5 a boost, a drain or a heal of the enemy (useSupportTech),
-   6 an attack timed by the fighter's third stat (boostFieldElement)), then
+   6 a boost of the field's element (boostFieldElement)), then
    the wake-up when the other side's fighter is asleep (substate 4,
    wakeUpOrCounter) and the motion of the damage
    (FIGHTSTG_startCounterattack). The match depends on the other side's
@@ -714,7 +715,7 @@ void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children) {
 
                 if ((tech->icon == TECH_PHYSICAL || tech->icon == TECH_MAGIC) && task->step == 0) {
                     if (task->damage == 0) {
-                        if (task->side == 0 && FIGHTSTG_battle.kind == BATTLE_KIND_FINAL_LAST) {
+                        if (task->side == 0 && FIGHTSTG_battle.state.kind == BATTLE_KIND_FINAL_LAST) {
                             task->setSubstate(task, 7);
                             break;
                         }

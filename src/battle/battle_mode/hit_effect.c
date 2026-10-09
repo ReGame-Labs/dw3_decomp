@@ -20,12 +20,14 @@ void FIGHTSTG_updateHitEffect(HitEffect *task, HitEffectChildren *children) {
             task->models = TASK_REGISTRY.funcs.find(BATTLE_TASK_MODELS, -1, -1);
             task->camera = TASK_REGISTRY.funcs.find(BATTLE_TASK_CAMERA, -1, -1);
             task->nextSubstate(task);
+            /* fallthrough */
         case 1:
             switch (task->step) {
             case 0:
             default:
                 FIGHTSTG_findEffectSheet(0x33, &task->effectImages, &task->sheet, &task->texPos);
                 task->nextStep(task);
+                /* fallthrough */
             case 1:
                 if (FILE_CACHE.isLoading(task->sheet >> 16) == 0) {
                     task->nextState(task);
@@ -42,6 +44,7 @@ void FIGHTSTG_updateHitEffect(HitEffect *task, HitEffectChildren *children) {
             children->effect = FIGHTSTG_startSpriteEffect(0x33, &FIGHTSTG_hitEffectPos);
             SOUND.playSound(SOUND_COMCD103);
             task->nextSubstate(task);
+            /* fallthrough */
         case 1:
             task->counter += GFX.funcs.getFrameTime();
             if (task->counter < 10) {
@@ -52,6 +55,7 @@ void FIGHTSTG_updateHitEffect(HitEffect *task, HitEffectChildren *children) {
             children->script->index = task->result + 1;
             children->script->unk74 = task->unk5C;
             task->nextSubstate(task);
+            /* fallthrough */
         case 2:
             if (children->script == NULL) {
                 task->setState(task, 3);

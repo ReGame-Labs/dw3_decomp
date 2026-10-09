@@ -7,7 +7,7 @@
 void FIELDSTG_scrollCamera(Camera *task) {
     Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
     MapStreamer *map;
-    Point *size;
+    Vec2 *size;
     s32 x;
     s32 y;
     s32 shake;
@@ -59,8 +59,8 @@ void FIELDSTG_scrollCamera(Camera *task) {
 /* The camera's update: it follows its target actor (substate 0) or looks at
    a spot (1), panning there unless it snaps */
 void FIELDSTG_updateCamera(Camera *task) {
-    Point delta;
-    Point sign;
+    Vec2 delta;
+    Vec2 sign;
 
     switch (task->state) {
         default:

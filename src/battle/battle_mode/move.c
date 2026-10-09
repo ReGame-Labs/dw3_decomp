@@ -11,20 +11,20 @@ void FIGHTSTG_updateJump(Jump *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        task->dist = 0;
+        task->zTravel = 0;
         switch (task->kind) {
         case 4:
-            task->dist = task->distance + 0x2800;
+            task->zTravel = task->distance + 0x2800;
             break;
         case 5:
-            task->dist = task->control->pos.z - task->control->homePos.z;
-            if (task->dist < 0) {
-                task->dist = -task->dist;
+            task->zTravel = task->control->pos.z - task->control->homePos.z;
+            if (task->zTravel < 0) {
+                task->zTravel = -task->zTravel;
             }
             break;
         }
         if (task->control->id == 0x10) {
-            task->dist = -task->dist;
+            task->zTravel = -task->zTravel;
         }
         task->t = FIGHTSTG_battle.frames * task->speed;
         task->nextState(task);
@@ -44,10 +44,10 @@ void FIGHTSTG_updateJump(Jump *task) {
             break;
         }
         if (task->kind == 4) {
-            task->control->pos.z = task->control->homePos.z + FIGHTSTG_interp.ease(0, task->t, task->dist);
+            task->control->pos.z = task->control->homePos.z + FIGHTSTG_interp.ease(0, task->t, task->zTravel);
         }
         if (task->kind == 5) {
-            task->control->pos.z = task->control->homePos.z + task->dist - FIGHTSTG_interp.ease(0, task->t, task->dist);
+            task->control->pos.z = task->control->homePos.z + task->zTravel - FIGHTSTG_interp.ease(0, task->t, task->zTravel);
         }
         task->t += FIGHTSTG_battle.frames * task->speed;
         if (task->t < 0x1000) {
@@ -67,7 +67,7 @@ void FIGHTSTG_updateJump(Jump *task) {
             break;
         }
         if (task->kind == 4) {
-            task->control->pos.z = task->control->homePos.z + task->dist;
+            task->control->pos.z = task->control->homePos.z + task->zTravel;
         }
         if (task->kind == 5) {
             task->control->pos.z = task->control->homePos.z;

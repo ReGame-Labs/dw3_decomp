@@ -30,8 +30,8 @@ void FIELDSTG_resumePartners(void) {
 }
 
 /* The tile in front of an actor, one step in its direction */
-void FIELDSTG_getFacingTile(Actor *actor, Point *out) {
-    Point *delta = &FIELDSTG_dirSteps[actor->dir];
+void FIELDSTG_getFacingTile(Actor *actor, Vec2 *out) {
+    Vec2 *delta = &FIELDSTG_dirSteps[actor->dir];
 
     out->x = actor->tile.x + delta->x;
     out->y = actor->tile.y + delta->y;
@@ -54,7 +54,7 @@ void FIELDSTG_updateActor(Actor *actor, ActorChildren *children) {
             }
             break;
         case TASK_RUN:
-            if ((actor->key2 & 0xE) || FIELDSTG_state.bannerShown == 0) {
+            if ((actor->key2 & 0xE) || FIELDSTG_state.frozen == 0) {
                 if (actor->control != NULL) {
                     actor->control(actor);
                 }
@@ -127,7 +127,7 @@ static inline void takePartyDepth(Actor *actor) {
  */
 Actor *FIELDSTG_createActor(s32 key1, s32 kind, s32 image, FieldActorEntry *entry) {
     Actor *actor = createTaskWithId(FIELDSTG_updateActor, sizeof(Actor), 0x10, FIELD_TASK_ACTOR);
-    s32 isLarge;
+    s32 keepsDir;
 
     setActorMethods(actor);
     actor->key1 = key1;
@@ -189,20 +189,20 @@ Actor *FIELDSTG_createActor(s32 key1, s32 kind, s32 image, FieldActorEntry *entr
         }
         takePartyDepth(actor);
     } else {
-        isLarge = key1 == 0x28;
+        keepsDir = key1 == 0x28;
         if (key1 == 0x29) {
-            isLarge = 1;
+            keepsDir = 1;
         }
         if (key1 == 0x2A) {
-            isLarge = 1;
+            keepsDir = 1;
         }
         if (key1 == 0x3E) {
-            isLarge = 1;
+            keepsDir = 1;
         }
         if (key1 == 0x11A) {
-            isLarge = 1;
+            keepsDir = 1;
         }
-        actor->isLarge = isLarge;
+        actor->keepsDir = keepsDir;
         actor->hasShadow = 1;
         if (key1 == 0x82) {
             actor->hasShadow = 0;

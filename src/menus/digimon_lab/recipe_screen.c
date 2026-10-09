@@ -18,7 +18,7 @@ s32 STGDGLAB_findRecipe(LabRecipeScreen *screen, s32 row, u32 col, s32 slot) {
         return 0;
     }
     table = screen->table;
-    ids = &STGDGLAB_data.recipes[table][row * 4 + col][1];
+    ids = STGDGLAB_data.recipes[table][row * 4 + col].ids;
     found = screen->found[row][slot];
     screen->foundCount[row] = 0;
     for (i = 0; i < 5; i++) {
@@ -34,7 +34,7 @@ s32 STGDGLAB_findRecipe(LabRecipeScreen *screen, s32 row, u32 col, s32 slot) {
             }
         }
     }
-    if (screen->foundCount[row] < STGDGLAB_data.recipes[table][row * 4 + col][0]) {
+    if (screen->foundCount[row] < STGDGLAB_data.recipes[table][row * 4 + col].needed) {
         screen->complete[row] = 0;
     }
     return 5;
@@ -52,7 +52,7 @@ s32 STGDGLAB_hasRecipeId(LabRecipeScreen *screen, s32 row, u32 col) {
         return 0;
     }
     id = 0;
-    ids = &STGDGLAB_data.recipes[screen->table][row * 4 + col][1];
+    ids = STGDGLAB_data.recipes[screen->table][row * 4 + col].ids;
     for (i = 0; i < 5; i++) {
         if (*ids > 0) {
             id = *ids;
@@ -310,7 +310,7 @@ static inline void checkRecipes(LabRecipeScreen *screen) {
             if (found) {
                 STGDGLAB_findRecipe(screen, i, j, n);
                 n++;
-            } else if (STGDGLAB_data.recipes[screen->table][i * 4 + j][0] != 0) {
+            } else if (STGDGLAB_data.recipes[screen->table][i * 4 + j].needed != 0) {
                 screen->complete[i] = 0;
             }
         }

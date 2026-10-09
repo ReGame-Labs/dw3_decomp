@@ -151,12 +151,12 @@ The CI runs these on every push; run them before opening a pull request:
 make VERSION=eu report        # build/<version>/report.json, the progress
 make VERSION=eu shiftcheck    # every address in the code and data is a symbol
 make VERSION=eu padcheck      # linked higher, words change only at relocations
-make VERSION=eu lint          # a modern GCC checks the declarations
+make VERSION=eu lint          # a modern GCC checks the C
 python3 tools/hacks.py --check README.md docs/status.md   # the hacks badge and table
 python3 tools/check_names.py  # every version uses the USA version's names
 ```
 [docs/shifting.md](docs/shifting.md) explains `shiftcheck` and `padcheck`,
-[docs/toolchain.md](docs/toolchain.md#declaration-check) `lint`, and
+[docs/toolchain.md](docs/toolchain.md#lint) `lint`, and
 [docs/status.md](docs/status.md#progress) the report.
 
 ## Documentation

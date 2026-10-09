@@ -51,7 +51,7 @@ extern TechBoost FIGHTSTG_sideBoosts[];
 typedef struct StatusCure {
     /* 0x0 */ s16 message;
     /* 0x2 */ s16 flag; /* in BattleFighter.flags */
-    /* 0x4 */ s32 item; /* FIGHTSTG_events.funcs.useItem's */
+    /* 0x4 */ s32 item; /* FIGHTSTG_events.funcs.cureStatus's */
 } StatusCure;
 
 extern StatusCure FIGHTSTG_itemCures[4];
@@ -127,7 +127,7 @@ EnemyAttack *FIGHTSTG_startEnemyAttack(s32 kind, s32 noKnockout);
 /* Shared between the overlay's objects */
 void FIGHTSTG_updateOneHpTurn(OneHpTurn *task, BattleChild *children);
 Counterattack *FIGHTSTG_startCounterattack(s32 side, s32 received, s32 noKnockOutEvent);
-ActionEvents *FIGHTSTG_startActionEvents(s32 arg0);
+ActionEvents *FIGHTSTG_startActionEvents(s32 side);
 void FIGHTSTG_updateTechAction(TechAction *task, BattleChild *children);
 void FIGHTSTG_updateEnemyAttack(EnemyAttack *task, BattleChild *children);
 void FIGHTSTG_updateFirstTech(FirstTech *task, BattleChild *children);

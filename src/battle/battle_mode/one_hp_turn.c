@@ -13,7 +13,7 @@ void FIGHTSTG_updateOneHpTurn(OneHpTurn *task, BattleChild *children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        entry = FIGHTSTG_battleTableFunc(FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]].id);
+        entry = FIGHTSTG_battleTableFunc(FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]].id);
         children[0].message = FIGHTSTG_createMessage();
         task->lines[0] = 0x10;
         task->lines[1] = entry->techs[1];
@@ -31,7 +31,7 @@ void FIGHTSTG_updateOneHpTurn(OneHpTurn *task, BattleChild *children) {
             break;
         case 1:
             if (children[0].task == NULL) {
-                fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+                fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
                 children[0].message = FIGHTSTG_createMessage();
                 task->lines[0] = 0;
                 task->lines[1] = fighter->hp - 1;

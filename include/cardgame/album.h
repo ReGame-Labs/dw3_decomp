@@ -103,11 +103,27 @@ void STCRDABM_startFade(PanelAnim *fade, s32 fadeIn);
 s32 STCRDABM_updateFade(PanelAnim *fade);
 void STCRDABM_startLerp(MenuLerp *lerp, s32 from, s32 to, s32 frames);
 s32 STCRDABM_updateLerp(MenuLerp *lerp);
+void STCRDABM_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
 void STCRDABM_drawFader(ScreenFade *fader);
+void STCRDABM_updateFader(ScreenFade *task);
+ScreenFade *STCRDABM_createFader(void);
+void STCRDABM_loadIcons(CardAlbumGrid *grid);
+void STCRDABM_setPage(CardAlbumGrid *grid, s32 first);
+void STCRDABM_hideCards(CardAlbumGrid *grid);
 void STCRDABM_drawCards(CardAlbumGrid *grid, s32 previous);
+void STCRDABM_drawTurningSlots(CardAlbumGrid *grid);
 s32 STCRDABM_pageHasCards(CardAlbumGrid *grid);
+void STCRDABM_updateHiding(CardAlbumGrid *grid);
+void STCRDABM_updateGrid(CardAlbumGrid *grid);
+CardAlbumGrid *STCRDABM_createGrid(CardAlbum *album);
+void STCRDABM_updateScene(Task *task, CardAlbum **child);
+void STCRDABM_createWindows(CardAlbum *album, CardAlbumWindows *win);
+void STCRDABM_showPageInfo(CardAlbum *album, CardAlbumWindows *win, s32 show);
 void STCRDABM_showCardInfo(CardAlbum *album, CardAlbumWindows *win, s32 show);
 void STCRDABM_drawAlbum(CardAlbum *album);
+void STCRDABM_findPageCards(CardAlbum *album);
+void STCRDABM_runAlbum(CardAlbum *album, CardAlbumWindows *win);
+void STCRDABM_updateAlbum(CardAlbum *album, CardAlbumWindows *win);
 CardAlbum *STCRDABM_createAlbum(void);
 
 #endif /* STCRDABM_H */

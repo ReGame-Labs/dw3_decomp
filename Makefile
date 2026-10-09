@@ -21,15 +21,30 @@ include mk/version/$(VERSION).mk
 # the tools read it too (tools/version.py)
 export VERSION
 
-TOOLCHAIN ?= mipsel-linux-gnu-
+# The compiler that builds the game's C: gcc-psx, the original's GCC 2.8.1
+# and assembler (maspsx), gives the matching build; gcc, a modern GCC
+# (mk/toolchain/gcc.mk), a build that doesn't match but runs, into
+# build/<version>/gcc/ (docs/toolchain.md)
+TOOLCHAIN ?= gcc-psx
+TOOLCHAINS := gcc-psx gcc
+ifeq ($(filter $(TOOLCHAIN),$(TOOLCHAINS)),)
+$(error unsupported TOOLCHAIN $(TOOLCHAIN); supported: $(TOOLCHAINS) (the binutils' prefix is CROSS))
+endif
+MATCHING_TOOLCHAIN := gcc-psx
+
+# the binutils' prefix
+CROSS ?= mipsel-linux-gnu-
 
 # splat configs, symbols and checksums
 CONFIG_DIR := config/$(VERSION)
-BUILDDIR := build/$(VERSION)
+BUILDDIR := build/$(VERSION)$(if $(filter-out $(MATCHING_TOOLCHAIN),$(TOOLCHAIN)),/$(TOOLCHAIN))
 ASM_DIR := asm/$(VERSION)
 ASSETS_DIR := assets/$(VERSION)
 EXPECTEDDIR := expected/$(VERSION)
-GENDIR := $(BUILDDIR)/generated
+# splat's output, which every toolchain links with
+GENDIR := build/$(VERSION)/generated
+# the linker scripts: splat's, or the toolchain's own made from them
+LDSCRIPT_DIR := $(GENDIR)
 
 # A padding build (make padcheck) links every binary PAD bytes higher, from
 # the same objects, into its own directory
@@ -40,10 +55,10 @@ ELF := $(LINKDIR)/$(EXE_NAME).elf
 EXE := $(LINKDIR)/$(EXE_NAME)
 MAP := $(LINKDIR)/$(EXE_NAME).map
 
-CPP := $(TOOLCHAIN)cpp
-AS := $(TOOLCHAIN)as
-LD := $(TOOLCHAIN)ld
-OBJCOPY := $(TOOLCHAIN)objcopy
+CPP := $(CROSS)cpp
+AS := $(CROSS)as
+LD := $(CROSS)ld
+OBJCOPY := $(CROSS)objcopy
 
 PYTHON := python3
 SPLAT := $(PYTHON) -m splat split
@@ -101,6 +116,12 @@ $(G8_SRC:%.c=$(BUILDDIR)/%.c.o): SDATA_LIMIT := 8
 # the assembly sees every version as 0 or 1 too: .if VERSION_EU
 ASFLAGS := -EL -march=r3000 -mtune=r3000 -no-pad-sections -O1 -G0 $(INC) \
 	   $(foreach v,$(VERSIONS),--defsym VERSION_$(shell echo $(v) | tr a-z A-Z)=$(if $(filter $(v),$(VERSION)),1,0))
+# A toolchain other than the matching one has its flags, its compile rule
+# and its linker scripts in mk/toolchain/<toolchain>.mk
+ifneq ($(TOOLCHAIN),$(MATCHING_TOOLCHAIN))
+include mk/toolchain/$(TOOLCHAIN).mk
+endif
+
 # the hand-written symbols the executable links with (a version that is
 # still blobs has none)
 UNDEFINED_SYMS := $(wildcard $(CONFIG_DIR)/undefined_syms.txt)
@@ -114,7 +135,7 @@ MAIN_IMPORTS := $(LINKDIR)/main_imports.ld
 # and with where the heap begins, after the overlays (tools/link_heap.py)
 HEAP_SYMS := $(LINKDIR)/heap.ld
 LDFLAGS := -nostdlib --no-check-sections --emit-relocs -Map $(MAP) \
-	   $(MEMORY_MAP) -T $(GENDIR)/main.ld \
+	   $(MEMORY_MAP) -T $(LDSCRIPT_DIR)/main.ld \
 	   $(addprefix -T ,$(UNDEFINED_SYMS) $(MAIN_AUTO_SYMS) $(MAIN_IMPORTS) $(HEAP_SYMS))
 
 # The stage overlays the version has, from $(CONFIG_DIR)/stages.txt
@@ -204,7 +225,7 @@ $(GENDIR)/stages/%.yaml: $(CONFIG_DIR)/stages.txt tools/stage_yaml.py tools/vers
 
 # The executable's own symbols for the overlays to link against (not the
 # absolute ones it only references), from its layout link (CHILDREN_template)
-NM := $(TOOLCHAIN)nm
+NM := $(CROSS)nm
 NM_SYMS = $(NM) $< | awk '$$2 ~ /^[TDRBSG]$$/ { printf "%s = 0x%s;\n", $$3, $$1 }' > $@
 MAIN_SYMS := $(LINKDIR)/main_syms.ld
 
@@ -236,7 +257,7 @@ $(LINKDIR)/layout/$(1).elf: $(2) $(3) $(LINKDIR)/layout/$(1).ld
 $(LINKDIR)/$(1)_syms.ld: $(LINKDIR)/layout/$(1).elf
 	$$(NM_SYMS)
 endef
-$(eval $(call CHILDREN_template,main,$(OBJ),$(GENDIR)/main.ld,$(UNDEFINED_SYMS) $(MAIN_AUTO_SYMS)))
+$(eval $(call CHILDREN_template,main,$(OBJ),$(LDSCRIPT_DIR)/main.ld,$(UNDEFINED_SYMS) $(MAIN_AUTO_SYMS)))
 
 define OVERLAY_template
 $(1)_C_SRC := $$(filter $$(or $$(OVL_C_SRC_$(1)),$$(SRC_DIR_$(1))/%),$$(ALL_C_SRC))
@@ -266,10 +287,10 @@ $$($(1)_AUTO_SYMS): $$($(1)_OBJ) $$(GENDIR)/$(1).ld $$($(1)_SYMS) tools/link_imp
 	$$(PYTHON) tools/link_imports.py $$@ $$($(1)_OBJ) --from $$($(1)_SPLAT_SYMS) --linked $$($(1)_SYMS)
 # and its children's (CHILDREN_template)
 $(1)_IMPORTS := $$(if $$(CHILDREN_$(1)),$$(LINKDIR)/$(1)_imports.ld)
-$$(LINKDIR)/$(1).elf: $$($(1)_OBJ) $$(GENDIR)/$(1).ld $$($(1)_SYMS) $$($(1)_AUTO_SYMS) $$($(1)_IMPORTS)
+$$(LINKDIR)/$(1).elf: $$($(1)_OBJ) $$(LDSCRIPT_DIR)/$(1).ld $$($(1)_SYMS) $$($(1)_AUTO_SYMS) $$($(1)_IMPORTS)
 	@mkdir -p $$(dir $$@)
 	$$(LD) -nostdlib --no-check-sections --emit-relocs -Map $$(LINKDIR)/$(1).map \
-		$$(MEMORY_MAP) -T $$(GENDIR)/$(1).ld $$(addprefix -T ,$$($(1)_SYMS) $$($(1)_AUTO_SYMS) $$($(1)_IMPORTS)) -o $$@
+		$$(MEMORY_MAP) -T $$(LDSCRIPT_DIR)/$(1).ld $$(addprefix -T ,$$($(1)_SYMS) $$($(1)_AUTO_SYMS) $$($(1)_IMPORTS)) -o $$@
 	$$(PYTHON) tools/inputcheck.py $$(LINKDIR)/$(1).map $$($(1)_OBJ)
 
 $$(LINKDIR)/AAA/PRO/$$(OVL_FILE_$(1)): $$(LINKDIR)/$(1).elf
@@ -278,7 +299,7 @@ $$(LINKDIR)/AAA/PRO/$$(OVL_FILE_$(1)): $$(LINKDIR)/$(1).elf
 endef
 $(foreach o,$(OVERLAYS),$(eval $(call OVERLAY_template,$(o))))
 $(foreach o,$(OVERLAYS),$(if $(CHILDREN_$(o)),\
-	$(eval $(call CHILDREN_template,$(o),$($(o)_OBJ),$(GENDIR)/$(o).ld,$($(o)_SYMS) $($(o)_AUTO_SYMS)))))
+	$(eval $(call CHILDREN_template,$(o),$($(o)_OBJ),$(LDSCRIPT_DIR)/$(o).ld,$($(o)_SYMS) $($(o)_AUTO_SYMS)))))
 OVL_BIN := $(foreach o,$(OVERLAYS),$(LINKDIR)/AAA/PRO/$(OVL_FILE_$(o)))
 OVL_ELF := $(OVERLAYS:%=$(LINKDIR)/%.elf)
 
@@ -296,18 +317,16 @@ generate: $(GENDIR)/main.ld $(OVERLAYS:%=$(GENDIR)/%.ld)
 regenerate: reset
 	$(MAKE) generate
 
-compare: $(EXE) $(OVL_BIN)
-	@sha1sum -c $(CONFIG_DIR)/$(EXE_NAME).sha1 $(CONFIG_DIR)/overlays.sha1 $(CONFIG_DIR)/stages.sha1
-
 $(EXE): $(ELF)
 	$(OBJCOPY) -O binary $< $@
 	@truncate -s %2048 $@
 
-# The heap begins after the overlays (HEAP_SYMS)
+# The heap begins after the overlays (HEAP_SYMS), as they are loaded:
+# LINK_HEAP_ARGS, from a toolchain, can give their sizes on the disc
 $(HEAP_SYMS): $(OVL_ELF) tools/link_heap.py
-	$(PYTHON) tools/link_heap.py $@ $(OVL_ELF)
+	$(PYTHON) tools/link_heap.py $@ $(OVL_ELF) $(LINK_HEAP_ARGS)
 
-$(ELF): $(OBJ) $(GENDIR)/main.ld $(UNDEFINED_SYMS) $(MAIN_IMPORTS) $(HEAP_SYMS)
+$(ELF): $(OBJ) $(LDSCRIPT_DIR)/main.ld $(UNDEFINED_SYMS) $(MAIN_IMPORTS) $(HEAP_SYMS)
 	@mkdir -p $(dir $@)
 	$(LD) $(LDFLAGS) -o $@
 	$(PYTHON) tools/inputcheck.py $(MAP) $(OBJ) --blobs $(BIN_OBJ)
@@ -316,16 +335,24 @@ $(ELF): $(OBJ) $(GENDIR)/main.ld $(UNDEFINED_SYMS) $(MAIN_IMPORTS) $(HEAP_SYMS)
 # with it (tools/shiftcheck.py reads the relocations that --emit-relocs keeps
 # in the ELFs): shiftcheck fails on those that $(CONFIG_DIR)/shiftcheck.txt
 # doesn't list, shiftreport lists every one
+ifeq ($(TOOLCHAIN),$(MATCHING_TOOLCHAIN))
 shiftcheck shiftreport: $(ELF) $(OVL_BIN)
 shiftcheck:
 	$(PYTHON) tools/shiftcheck.py -v $(VERSION)
 shiftreport:
 	$(PYTHON) tools/shiftcheck.py -v $(VERSION) --all
+endif
 
-# The game C's declarations, checked by a modern GCC that only parses it
-# (tools/lint.py): it writes nothing, so the match never depends on it.
+# Whether the binaries fit where the original's go, in their files on the
+# disc and in memory (tools/fitcheck.py), as another toolchain changes their
+# sizes. FITCHECK_ARGS: --all lists them
+fitcheck: $(EXE) $(OVL_BIN)
+	$(PYTHON) tools/fitcheck.py --build $(BUILDDIR) $(FITCHECK_ARGS)
+
+# The game C, checked by a modern GCC for its warnings (tools/lint.py): it
+# writes nothing, so the match never depends on it.
 # LINT_ARGS: --update, --strict, --base REV
-LINT_CC ?= $(TOOLCHAIN)gcc
+LINT_CC ?= $(CROSS)gcc
 lint: export LINT_CC := $(LINT_CC)
 lint: export LINT_CPPFLAGS = $(CPPFLAGS)
 lint: export LINT_SRC = $(ALL_C_SRC)
@@ -336,9 +363,11 @@ lint:
 # words with a relocation may change (tools/padcheck.py). 0x10004 carries
 # into the upper half of every %hi/%lo pair.
 PADS := 0x4 0x10004
+ifeq ($(TOOLCHAIN),$(MATCHING_TOOLCHAIN))
 links: $(ELF) $(OVL_ELF)
 padcheck: links
 	$(foreach p,$(PADS),$(MAKE) PAD=$(p) links && $(PYTHON) tools/padcheck.py -v $(VERSION) $(p) &&) true
+endif
 
 # A boot test of the build, or of a padding build (make PAD=0x10004 smoke),
 # for your machine only (tools/smoke.py): it writes the binaries into a copy
@@ -351,7 +380,7 @@ smoke: $(EXE) $(OVL_BIN)
 	$(if $(DISC),,$(error make smoke needs DISC=<the original disc image, .bin>))
 	$(if $(BIOS),,$(error make smoke needs BIOS=<a directory with a PlayStation BIOS>))
 	@command -v xvfb-run > /dev/null || { echo "make smoke runs DuckStation under xvfb-run: install xvfb (apt install xvfb)" >&2; exit 1; }
-	$(PYTHON) tools/smoke.py --disc "$(DISC)" --bios "$(BIOS)" --pad $(PAD) --emulator "$(DUCKSTATION)"
+	$(PYTHON) tools/smoke.py --disc "$(DISC)" --bios "$(BIOS)" --pad $(PAD) --build $(BUILDDIR) --emulator "$(DUCKSTATION)"
 
 # The API documentation, $(DOCS_DIR)/html/index.html, for the European
 # version (docs/Doxyfile): doxygen reads the C's comments through
@@ -377,6 +406,7 @@ docs:
 docs-clean:
 	rm -rf $(DOCS_DIR)
 
+ifeq ($(TOOLCHAIN),$(MATCHING_TOOLCHAIN))
 # The executable's .bss in C: maspsx turns the commons of these units into
 # definitions in order in their .bss when they aren't kept as .comm
 $(BUILDDIR)/src/engine/data/game_bss.c.o $(BUILDDIR)/src/engine/sound/sound.c.o: MASPSXFLAGS := $(filter-out --use-comm-section,$(MASPSXFLAGS))
@@ -388,6 +418,7 @@ $(BUILDDIR)/%.c.o: %.c
 	$(MASPSX) $(MASPSXFLAGS) < $(@:.o=.cc1.s) | $(PYTHON) tools/data_sizes.py | $(PYTHON) tools/comm_align.py > $(@:.o=.s)
 	$(AS) $(ASFLAGS) -o $@ $(@:.o=.s)
 	@$(OBJCOPY) --set-section-alignment .text=4 --set-section-alignment .rodata=4 $@
+endif
 
 $(HEADER_OBJ): src/engine/header.s
 	@mkdir -p $(dir $@)
@@ -406,6 +437,12 @@ $(BUILDDIR)/$(ASSETS_DIR)/%.bin.o: $(ASSETS_DIR)/%.bin
 	@mkdir -p $(dir $@)
 	$(LD) -r -b binary -o $@ $<
 
+# What checks the match, and the binaries' addresses against it
+MATCHING_ONLY := compare expected objdiff report shiftcheck shiftreport links padcheck
+ifeq ($(TOOLCHAIN),$(MATCHING_TOOLCHAIN))
+compare: $(EXE) $(OVL_BIN)
+	@sha1sum -c $(CONFIG_DIR)/$(EXE_NAME).sha1 $(CONFIG_DIR)/overlays.sha1 $(CONFIG_DIR)/stages.sha1
+
 expected: $(TARGET_OBJ) $(C_OBJ) $(C_OVL_OBJ)
 	rm -rf $(EXPECTEDDIR)
 	@mkdir -p $(EXPECTEDDIR)
@@ -416,6 +453,10 @@ objdiff: expected
 
 report: objdiff
 	$(OBJDIFF) report generate -o $(BUILDDIR)/report.json
+else
+$(MATCHING_ONLY):
+	$(error make $@ works on the matching build, TOOLCHAIN=$(MATCHING_TOOLCHAIN))
+endif
 
 clean:
 	rm -rf $(BUILDDIR)
@@ -425,4 +466,7 @@ reset: clean
 
 -include $(C_OBJ:.o=.d) $(C_OVL_OBJ:.o=.d)
 
-.PHONY: all generate regenerate compare expected objdiff report clean reset shiftcheck shiftreport links padcheck lint smoke docs docs-clean
+# compile_commands.json for clangd, and the formatter (mk/editor.mk)
+include mk/editor.mk
+
+.PHONY: all generate regenerate compare expected objdiff report clean reset shiftcheck shiftreport links padcheck lint smoke fitcheck docs docs-clean

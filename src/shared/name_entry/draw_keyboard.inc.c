@@ -64,12 +64,12 @@ void OVL_NAME(drawKeyboard)(NameEntry *task) {
                 if (GFX.funcs.getTime() - task->partnerTime >= 13) {
                     task->partnerTime = GFX.funcs.getTime();
                     if (++task->partnerFrame >= 7 ||
-                        OVL_NAME(nameAnims)[task->partner * 7 + task->partnerFrame] == -1) {
+                        OVL_NAME(nameAnims)[task->partner][task->partnerFrame] == -1) {
                         task->partnerFrame = 0;
                     }
                 }
                 sprite.draw(FILE_CACHE.getEntry(NAME_ENTRY_SPRITES),
-                            OVL_NAME(nameAnims)[task->partner * 7 + task->partnerFrame], 0x22, 0x30);
+                            OVL_NAME(nameAnims)[task->partner][task->partnerFrame], 0x22, 0x30);
             } else {
                 sprite.draw(FILE_CACHE.getEntry(NAME_ENTRY_SPRITES), 0x36, 0x20, 0x2E);
             }

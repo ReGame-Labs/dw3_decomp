@@ -253,6 +253,7 @@ static inline void stepFieldMenuFade(FieldMenu *task) {
     switch (task->substate) {
     default:
         task->setState(task, TASK_DONE);
+        /* fallthrough */
     case 0:
     case 1:
     case 2:

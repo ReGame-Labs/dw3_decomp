@@ -14,25 +14,25 @@ void FIGHTSTG_updateHpTweens(HpDisplay *task, TextWindow **windows) {
 
     task->timer += GFX.funcs.getFrameTime();
     for (i = 0; i < 2; i++) {
-        row = FIGHTSTG_battle.fighters[i];
-        if (task->hp[i].fighter != FIGHTSTG_battle.active[i]) {
-            task->hp[i].from = row[FIGHTSTG_battle.active[i]].hp;
-            task->hp[i].to = row[FIGHTSTG_battle.active[i]].hp;
-            task->hp[i].value = row[FIGHTSTG_battle.active[i]].hp;
+        row = FIGHTSTG_battle.state.fighters[i];
+        if (task->hp[i].fighter != FIGHTSTG_battle.state.active[i]) {
+            task->hp[i].from = row[FIGHTSTG_battle.state.active[i]].hp;
+            task->hp[i].to = row[FIGHTSTG_battle.state.active[i]].hp;
+            task->hp[i].value = row[FIGHTSTG_battle.state.active[i]].hp;
             task->hp[i].active = 0;
-            task->hp[i].fighter = FIGHTSTG_battle.active[i];
+            task->hp[i].fighter = FIGHTSTG_battle.state.active[i];
         }
     }
     if (task->timer > task->interval) {
         task->timer -= task->interval;
         for (j = 0; j < 2; j++) {
-            row = FIGHTSTG_battle.fighters[j];
-            hp = row[FIGHTSTG_battle.active[j]].hp;
+            row = FIGHTSTG_battle.state.fighters[j];
+            hp = row[FIGHTSTG_battle.state.active[j]].hp;
             if (hp <= 0) {
                 hp = 0;
             }
-            if (hp > row[FIGHTSTG_battle.active[j]].maxHp) {
-                hp = row[FIGHTSTG_battle.active[j]].maxHp;
+            if (hp > row[FIGHTSTG_battle.state.active[j]].maxHp) {
+                hp = row[FIGHTSTG_battle.state.active[j]].maxHp;
             }
             if (hp != task->hp[j].to) {
                 task->hp[j].from = task->hp[j].value;
@@ -66,14 +66,14 @@ void FIGHTSTG_showFighterNames(HpDisplay *task, TextWindow **windows) {
     BattleTableEntry *enemy;
     s32 i;
 
-    if (FIGHTSTG_battle.active[0] != task->shown[0]) {
+    if (FIGHTSTG_battle.state.active[0] != task->shown[0]) {
         if (windows[0] == NULL) {
             windows[0] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0xAE, 0x15);
         }
-        windows[0]->setString(windows[0], GAME.partners[GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0])].info.name, -1);
+        windows[0]->setString(windows[0], GAME.partners[GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0])].info.name, -1);
     }
-    if (FIGHTSTG_battle.active[1] != task->shown[1]) {
-        enemy = FIGHTSTG_battleTableFunc(BATTLE_SETUP.enemies[FIGHTSTG_battle.active[1]].fighter);
+    if (FIGHTSTG_battle.state.active[1] != task->shown[1]) {
+        enemy = FIGHTSTG_battleTableFunc(BATTLE_SETUP.enemies[FIGHTSTG_battle.state.active[1]].fighter);
         if (windows[1] == NULL) {
             windows[1] = createTextWindow(BATTLE_LAYER_MENUS, 1, 0x11, 0x15);
         }
@@ -82,7 +82,7 @@ void FIGHTSTG_showFighterNames(HpDisplay *task, TextWindow **windows) {
         }
     }
     for (i = 0; i < 2; i++) {
-        task->shown[i] = FIGHTSTG_battle.active[i];
+        task->shown[i] = FIGHTSTG_battle.state.active[i];
     }
 }
 
@@ -141,7 +141,7 @@ void FIGHTSTG_drawHud(HpDisplay *task, TextWindow **windows) {
     drawer.draw(sheet, 0, 8, 0xF);
     drawer.draw(sheet, 1, 0xA1, 0xF);
     FIGHTSTG_showFighterNames(task, windows);
-    fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+    fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
     if (windows[4] == NULL) {
         windows[4] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x10B, 0x1A);
     }
@@ -153,7 +153,7 @@ void FIGHTSTG_drawHud(HpDisplay *task, TextWindow **windows) {
     windows[3]->setNumber(windows[3], 0, fighter->maxHp);
     windows[3]->setRightAlign(windows[3], 1);
     for (i = 0; i < 2; i++) {
-        fighter = &FIGHTSTG_battle.fighters[i][FIGHTSTG_battle.active[i]];
+        fighter = &FIGHTSTG_battle.state.fighters[i][FIGHTSTG_battle.state.active[i]];
         width = (task->hp[i].value << 7) / fighter->maxHp;
         if (task->hp[i].value > 0 && width < 4) {
             width = 3;
@@ -181,7 +181,7 @@ void FIGHTSTG_drawHud(HpDisplay *task, TextWindow **windows) {
         FIGHTSTG_battle.drawQuad(BATTLE_LAYER_MENUS, 1, FIGHTSTG_hpBars[i], colors);
     }
     blink = (GFX.funcs.getTime() >> 2) & 3;
-    member = GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]);
+    member = GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0]);
     drawer.draw(sheet, 0x1E, 0x104, 0x3D);
     if (BATTLE_SETUP.gauges[member] < 1000) {
         /* the match depends on storing [2] before [0] (the other order gives 2
@@ -197,10 +197,10 @@ void FIGHTSTG_drawHud(HpDisplay *task, TextWindow **windows) {
     drawer.draw(sheet, 0xB, 0x104, 0x3D);
     for (side = 0; side < 2; side++) {
         for (slot = 0; slot < 3; slot++) {
-            if (FIGHTSTG_battle.kind >= BATTLE_KIND_FINAL && slot > 0 && side > 0) {
+            if (FIGHTSTG_battle.state.kind >= BATTLE_KIND_FINAL && slot > 0 && side > 0) {
                 return;
             }
-            fighter = &FIGHTSTG_battle.fighters[side][slot];
+            fighter = &FIGHTSTG_battle.state.fighters[side][slot];
             if (fighter->id != 0) {
                 if (fighter->flags != 0) {
                     frame = 3;
@@ -209,7 +209,7 @@ void FIGHTSTG_drawHud(HpDisplay *task, TextWindow **windows) {
                 } else {
                     frame = fighter->hp != fighter->maxHp;
                 }
-                if (FIGHTSTG_battle.active[side] == slot) {
+                if (FIGHTSTG_battle.state.active[side] == slot) {
                     frame += 0xC;
                 } else {
                     frame += 0x3C;
@@ -235,19 +235,19 @@ void FIGHTSTG_updateHud(HpDisplay *task, TextWindow **windows) {
         FIGHTSTG_showFighterNames(task, windows);
         windows[2] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x10C, 0x1A);
         windows[2]->setString(windows[2], FILE_CACHE.load(TEXT_FILE(TEXT_BATTLE_MENU)), 0x10);
-        fighters = FIGHTSTG_battle.fighters;
+        fighters = FIGHTSTG_battle.state.fighters;
         windows[4] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x10B, 0x1A);
-        windows[4]->setNumber(windows[4], 0, fighters[0][FIGHTSTG_battle.active[0]].hp);
+        windows[4]->setNumber(windows[4], 0, fighters[0][FIGHTSTG_battle.state.active[0]].hp);
         windows[4]->setRightAlign(windows[4], 1);
         windows[3] = createTextWindow(BATTLE_LAYER_MENUS, 3, 0x12E, 0x1A);
-        windows[3]->setNumber(windows[3], 0, fighters[0][FIGHTSTG_battle.active[0]].maxHp);
+        windows[3]->setNumber(windows[3], 0, fighters[0][FIGHTSTG_battle.state.active[0]].maxHp);
         windows[3]->setRightAlign(windows[3], 1);
         for (i = 0; i < 2; i++) {
-            task->hp[i].from = fighters[i][FIGHTSTG_battle.active[i]].hp;
-            task->hp[i].to = fighters[i][FIGHTSTG_battle.active[i]].hp;
-            task->hp[i].value = fighters[i][FIGHTSTG_battle.active[i]].hp;
+            task->hp[i].from = fighters[i][FIGHTSTG_battle.state.active[i]].hp;
+            task->hp[i].to = fighters[i][FIGHTSTG_battle.state.active[i]].hp;
+            task->hp[i].value = fighters[i][FIGHTSTG_battle.state.active[i]].hp;
             task->hp[i].active = 0;
-            task->hp[i].fighter = FIGHTSTG_battle.active[i];
+            task->hp[i].fighter = FIGHTSTG_battle.state.active[i];
             task->hp[i].time = 0;
             task->hp[i].duration = 0;
         }

@@ -45,8 +45,8 @@ void FIELDSTG_waitWalkDone(s32 id, s32 *pc) {
 }
 
 /* Turns a map position into a screen one */
-void FIELDSTG_toScreenPos(Point *pos) {
-    Point scroll;
+void FIELDSTG_toScreenPos(Vec2 *pos) {
+    Vec2 scroll;
     Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
 
     layer->getScroll(layer, &scroll);
@@ -88,11 +88,12 @@ s32 FIELDSTG_createScriptCommand(s32 id) {
     return ret;
 }
 
-/* Hands a script command's task the command id's two arguments */
-void FIELDSTG_handleScriptCommand(s32 arg0, s32 id, s32 arg2, s32 arg3) {
+/* Hands the task of script command id a command and its argument, through
+   the command's handle */
+void FIELDSTG_handleScriptCommand(s32 task, s32 id, s32 command, s32 arg) {
     ScriptCommand *cmd = FIELDSTG_findScriptCommand(id);
 
     if (cmd != NULL && cmd->handle != NULL) {
-        cmd->handle(arg0, arg2, arg3);
+        cmd->handle(task, command, arg);
     }
 }

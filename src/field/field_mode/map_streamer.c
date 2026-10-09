@@ -63,7 +63,7 @@ void FIELDSTG_requestTiles(MapStreamer *map, StreamPool *pool) {
 
 /* Draws a 128-pixel block of the cover at (x, y), at a shade of level (8.8) */
 void FIELDSTG_drawCoverBlock(Layer *layer, s32 x, s32 y, s32 level) {
-    Point scroll;
+    Vec2 scroll;
     PrimPtr prim;
     u_long *ot;
     s32 i;
@@ -124,7 +124,7 @@ typedef struct MapSlot {
    and while the decompressor is free, gives the first loaded tile without an
    entry the oldest of the 12 */
 void FIELDSTG_drawMapTiles(MapStreamer *task, StreamPool *pool) {
-    Point tile;
+    Vec2 tile;
     MapSlot slots[12];
     Layer *layer;
     StreamTask *stream;
@@ -357,7 +357,7 @@ void FIELDSTG_runMapStreamer(MapStreamer *task, StreamPool *pool) {
 }
 
 /* The map's size in pixels */
-Point *FIELDSTG_getMapSize(MapStreamer *task) {
+Vec2 *FIELDSTG_getMapSize(MapStreamer *task) {
     FIELDSTG_mapSize.x = task->width << 7;
     FIELDSTG_mapSize.y = task->height << 7;
     return &FIELDSTG_mapSize;

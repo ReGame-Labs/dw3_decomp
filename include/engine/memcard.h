@@ -125,9 +125,18 @@ typedef struct MemCardFuncs {
 
 void initMemCard(void);
 void setSaveFileName(void);
+void setSaveHeader(char *title, CardClut *clut, s32 count, void **icons);
 s32 memCardCommand(s32 port, s32 op);
+s32 listSaves(s32 port);
+s32 createSave(s32 port);
+s32 formatMemCard(s32 port);
+s32 unformatMemCard(void);
+s32 verifyChecksum(void *data, s32 size, char expected);
+u8 computeChecksum(void *data, s32 size);
 s32 checkMemCard(s32 port);
 s32 acceptMemCard(s32 port);
+s32 readSave(s32 port, void *buf, s32 size, s32 section);
+s32 writeSave(s32 port, void *buf, s32 size, s32 section);
 s32 syncMemCard(void);
 
 /* The memory card library, declared here rather than from libmcrd.h, which

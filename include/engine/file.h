@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include <libcd.h>
 #include "engine/task.h"
 
 /* The disc's file table (FILE_TABLE): files are numbered, not named */
@@ -64,6 +65,19 @@ typedef struct CdReader {
 } CdReader;
 
 /*
+ * What cdCheckSector reads first of each sector, the 3 words that
+ * CdlModeSize1 puts before its data: the sector's header, whose position it
+ * compares with the one it expects, and the XA subheader, which nothing
+ * reads. The buffer takes 16 bytes in the .bss (the sound buffers follow
+ * 0x10 after it), so 4 more than it reads.
+ */
+typedef struct CdSectorHeader {
+    /* 0x0 */ CdlLOC pos;
+    /* 0x4 */ u_char subheader[8];
+    /* 0xC */ u_char pad[4];
+} CdSectorHeader;
+
+/*
  * The file cache (FILE_CACHE): up to 64 files loaded in the heap (tag 3),
  * read in the background one at a time and evicted least recently used
  * first when the heap is full.
@@ -117,6 +131,7 @@ FileSlot *findOldestFile(void);
 void evictOldestFile(void);
 void requestFile(s32);
 void updateFileCache(void);
+void waitForFile(s32 file);
 void *loadFile(u32 file);
 void freeFile(s32 file);
 void freeAllFiles(void);
@@ -127,24 +142,28 @@ void markCachedFiles(void);
 void touchMarkedFiles(void);
 void cdSyncCallback(s32 status, u_char *result);
 s32 cdCheckSector(void);
+void cdReadyCallback(s32 status, u_char *result);
 s32 isCdReading(void);
 void startCdRead(void);
 void readFile(s32 file, s32 offset, s32 size, void *buffer, s32 *done);
 s32 fileExists(s32 file);
-u16 getFileSectorCount(s32 file);
+s32 getFileSectorCount(s32 file);
 s32 getFileSector(s32 file);
 void getFilePos(s32 file, s32 offset, void *pos);
 
 void *decompressorRun(Decompressor *task, s32 *data);
+void decompressorFree(Decompressor *task);
+void decompressorSetData(Decompressor *task, s32 *data);
+void decompressorAllocBuffer(Decompressor *task);
 void decompressorStep(Decompressor *task);
 Decompressor *createDecompressor(void);
-void decompressorStart(Decompressor *task, s32 *data, s32 arg2);
+void decompressorStart(Decompressor *task, s32 *data, s32 chunkSize);
 void *decompressorGetData(Decompressor *task);
 void updateDecompressor(Decompressor *task);
 
 extern FileTableFuncs FILE_TABLE;
 extern CdReader CD_READER;
-extern u8 CD_SECTOR_HEADER[];
+extern CdSectorHeader CD_SECTOR_HEADER;
 extern FileCache FILE_CACHE;
 extern s32 FILE_SECTORS[];
 extern u16 FILE_SECTOR_COUNTS[];
@@ -167,7 +186,7 @@ extern s32 LANGUAGE; /* 2-5 */
 #endif
 
 /* The text files, by their USA disc names (US<name>.BIN), for TEXT_FILE() */
-#define TEXT_AMATERASU_MAP 0x02 /* AMTMAP: the map screen's once isLateGame */
+#define TEXT_AMATERASU_MAP 0x02 /* AMTMAP: the map screen's in the second half (STSTATUS_getGameHalf) */
 #define TEXT_ASUKA_MAP 0x09 /* ASKMAP: the map screen's before */
 #define TEXT_CARD_GAME 0x10 /* CARDGM: the card battle's */
 #define TEXT_CARD_NAMES 0x17 /* CARDNM */

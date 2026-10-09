@@ -4,7 +4,7 @@
 
 /* Takes the enemy's item into the bag (up to 99) and says so. */
 static inline void stealEnemyItem(ActionEvents *task, BattleChild *children) {
-    BattleFighter *enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+    BattleFighter *enemy = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
 
     task->args[0] = enemy->item;
     children[0].message->show(children[0].message, 0x11, task->args);
@@ -31,8 +31,8 @@ static inline void drainHp(ActionEvents *task, BattleChild *children, BattleFigh
 /* Moves the drained MP (as much as the partner has) from the partner to the
    enemy, up to its max MP, and says so. */
 static inline void drainMp(ActionEvents *task, BattleChild *children) {
-    BattleFighter *fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
-    BattleFighter *enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+    BattleFighter *fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
+    BattleFighter *enemy = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
 
     task->args[0] = 0x10;
     if (fighter->mp < FIGHTSTG_action.drain) {
@@ -88,7 +88,7 @@ static inline void applyStatusEvent(ActionEvents *task, BattleChild *children, s
     switch (i) {
     case TECH_EFFECT_POISON:
     default:
-        FIGHTSTG_inflictPoison(SIDE_ENEMY - task->side, FIGHTSTG_battle.active[1 - other], FIGHTSTG_action.effects[i]);
+        FIGHTSTG_inflictPoison(SIDE_ENEMY - task->side, FIGHTSTG_battle.state.active[1 - other], FIGHTSTG_action.effects[i]);
         task->args[0] = 0x1E;
         break;
     case TECH_EFFECT_PARALYSIS:
@@ -155,7 +155,7 @@ void FIGHTSTG_updateActionEvents(ActionEvents *task, BattleChild *children) {
                     task->step = i;
                     side = task->side >> 4;
                     task->substate++;
-                    fighter = &FIGHTSTG_battle.fighters[1 - side][FIGHTSTG_battle.active[1 - side]];
+                    fighter = &FIGHTSTG_battle.state.fighters[1 - side][FIGHTSTG_battle.state.active[1 - side]];
                     if (i == TECH_EFFECT_SLEEP && (fighter->flags & FIGHTER_ASLEEP)) {
                         FIGHTSTG_inflictSleep(SIDE_ENEMY - task->side, FIGHTSTG_action.tech, FIGHTSTG_action.effects[TECH_EFFECT_SLEEP]);
                         FIGHTSTG_action.effects[task->step] = 0;
@@ -167,7 +167,7 @@ void FIGHTSTG_updateActionEvents(ActionEvents *task, BattleChild *children) {
                             FIGHTSTG_action.effects[task->step] = 0;
                             break;
                         } else if (i == TECH_EFFECT_DRAIN) {
-                            fighter = &FIGHTSTG_battle.fighters[side][FIGHTSTG_battle.active[side]];
+                            fighter = &FIGHTSTG_battle.state.fighters[side][FIGHTSTG_battle.state.active[side]];
                             drainHp(task, children, fighter);
                             FIGHTSTG_action.effects[task->step] = 0;
                             break;
@@ -209,9 +209,9 @@ void FIGHTSTG_updateActionEvents(ActionEvents *task, BattleChild *children) {
 
 /* Starts running the current action's events for SIDE
    (FIGHTSTG_updateActionEvents) */
-ActionEvents *FIGHTSTG_startActionEvents(s32 arg0) {
+ActionEvents *FIGHTSTG_startActionEvents(s32 side) {
     ActionEvents *task = createTask(FIGHTSTG_updateActionEvents, sizeof(ActionEvents), sizeof(Task *));
 
-    task->side = arg0;
+    task->side = side;
     return task;
 }

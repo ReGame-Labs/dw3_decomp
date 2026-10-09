@@ -7,7 +7,7 @@
    whether the player's fighter was asleep. */
 static inline void announceEnemyTech(EnemyAttack *task, BattleChild *children, BattleTableEntry *entry) {
     FIGHTSTG_queueEnemyTurn(FIGHTSTG_events.funcs.getDelay(SIDE_ENEMY, 0));
-    if (FIGHTSTG_battle.weakened != 0) {
+    if (FIGHTSTG_battle.state.weakened != 0) {
         if (FIGHTSTG_events.funcs.first(EVENT_WEAKNESS_END) >= 0) {
             task->setState(task, 3);
         } else {
@@ -16,18 +16,18 @@ static inline void announceEnemyTech(EnemyAttack *task, BattleChild *children, B
             task->lines[1] = 0x10;
             task->tech = entry->techs[2];
             children[0].message->show(children[0].message, 2, task->lines);
-            FIGHTSTG_battle.weakened = 0;
-            FIGHTSTG_battle.hitCount = 0;
+            FIGHTSTG_battle.state.weakened = 0;
+            FIGHTSTG_battle.state.hitCount = 0;
             task->resetIdleMotion = 1;
         }
     } else {
         children[0].message = FIGHTSTG_createMessage();
         task->lines[0] = 0x10;
-        task->lines[1] = FIGHTSTG_battle.tech != 0 ? FIGHTSTG_battle.tech : entry->techs[0];
+        task->lines[1] = FIGHTSTG_battle.state.tech != 0 ? FIGHTSTG_battle.state.tech : entry->techs[0];
         children[0].message->show(children[0].message, 3, task->lines);
         task->tech = entry->techs[0];
     }
-    if ((FIGHTSTG_battle.fighters[0] + FIGHTSTG_battle.active[0])->flags & FIGHTER_ASLEEP) {
+    if ((FIGHTSTG_battle.state.fighters[0] + FIGHTSTG_battle.state.active[0])->flags & FIGHTER_ASLEEP) {
         task->asleep = 1;
     }
 }
@@ -38,7 +38,7 @@ static inline void damagePlayer(EnemyAttack *task, BattleChild *children) {
     BattleFighter *player;
 
 #if VERSION_EU
-    player = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+    player = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
     /* the European version's instant knockout */
     if (FIGHTSTG_action.effects[TECH_EFFECT_KNOCK_OUT]) {
         player->hp = 0;
@@ -56,7 +56,7 @@ static inline void damagePlayer(EnemyAttack *task, BattleChild *children) {
     task->lines[0] = 0;
     task->lines[1] = FIGHTSTG_action.damage;
     children[0].message->show(children[0].message, 4, task->lines);
-    player = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+    player = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
     player->hp -= FIGHTSTG_action.damage;
     if (player->hp <= 0) {
         player->hp = 0;
@@ -71,11 +71,11 @@ static inline void wakePlayerUp(EnemyAttack *task, BattleChild *children, Battle
 
     task->lines[0] = 0x2B;
     task->lines[1] = 0;
-    task->lines[2] = FIGHTSTG_battle.active[0];
+    task->lines[2] = FIGHTSTG_battle.state.active[0];
     children[0].message = FIGHTSTG_createMessage();
     children[0].message->show(children[0].message, 7, task->lines);
     fighter->flags &= ~FIGHTER_ASLEEP;
-    index = FIGHTSTG_events.funcs.find(EVENT_STATUS_END + 2, 0, FIGHTSTG_battle.active[0]);
+    index = FIGHTSTG_events.funcs.find(EVENT_STATUS_END + 2, 0, FIGHTSTG_battle.state.active[0]);
     if (index >= 0) {
         FIGHTSTG_events.events[index].type = 0;
     }
@@ -91,7 +91,7 @@ static inline void showOtherAttackResult(EnemyAttack *task, BattleChild *childre
         task->lines[0] = 0;
         task->lines[1] = FIGHTSTG_action.damage;
         children[0].message->show(children[0].message, 4, task->lines);
-        struck = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+        struck = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
         struck->hp -= FIGHTSTG_action.damage;
         if (struck->hp <= 0) {
             struck->hp = 0;
@@ -114,7 +114,7 @@ static inline void showOtherAttackResult(EnemyAttack *task, BattleChild *childre
    fighter variable of its own in each case and on the pointer sum of
    announceEnemyTech's FIGHTER_ASLEEP test. */
 void FIGHTSTG_updateEnemyAttack(EnemyAttack *task, BattleChild *children) {
-    BattleTableEntry *entry = FIGHTSTG_battleTableFunc(FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]].id);
+    BattleTableEntry *entry = FIGHTSTG_battleTableFunc(FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]].id);
     BattleFighter *fighter;
     BattleFighter *target;
 
@@ -157,7 +157,7 @@ void FIGHTSTG_updateEnemyAttack(EnemyAttack *task, BattleChild *children) {
             break;
         case 3:
             if (children[0].task == NULL) {
-                target = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+                target = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
 #if VERSION_EU
                 if (FIGHTSTG_action.effects[TECH_EFFECT_KNOCK_OUT]) {
                     target->hp = 0;
@@ -177,7 +177,7 @@ void FIGHTSTG_updateEnemyAttack(EnemyAttack *task, BattleChild *children) {
             break;
         case 4:
             if (children[0].task == NULL) {
-                fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+                fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
                 if (fighter->flags & FIGHTER_ASLEEP) {
                     if (task->asleep != 0 && FIGHTSTG_battleFuncs.testWakeUp(0, FIGHTSTG_action.damage) != 0) {
                         wakePlayerUp(task, children, fighter);

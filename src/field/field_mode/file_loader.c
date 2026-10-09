@@ -64,6 +64,7 @@ s32 FIELDSTG_loadFieldFiles(Task *task) {
         default:
             FILE_CACHE.request(FIELD_SPRITES_FILE);
             task->tickCounter(task);
+            /* fallthrough */
         case 1:
             if (FILE_CACHE.isLoading(FIELD_SPRITES_FILE) != 0) {
                 return 0;
@@ -95,6 +96,7 @@ s32 FIELDSTG_loadFieldFiles(Task *task) {
                 FILE_CACHE.request(FIELDSTG_state.imageFile);
             }
             task->tickCounter(task);
+            /* fallthrough */
         case 1:
             if (FIELDSTG_state.imageEntry != 0) {
                 if (FILE_CACHE.isLoading(FIELDSTG_state.imageEntry >> 16) != 0) {
@@ -106,6 +108,7 @@ s32 FIELDSTG_loadFieldFiles(Task *task) {
                 loader.loadArchive(FILE_CACHE.getEntry(FIELDSTG_state.imageEntry));
             }
             task->tickCounter(task);
+            /* fallthrough */
         case 2:
             if (FIELDSTG_state.imageFile != 0) {
                 if (FILE_CACHE.isLoading(FIELDSTG_state.imageFile) != 0) {
@@ -117,6 +120,7 @@ s32 FIELDSTG_loadFieldFiles(Task *task) {
                 loader.loadArchive(FILE_CACHE.load(FIELDSTG_state.imageFile));
             }
             task->tickCounter(task);
+            /* fallthrough */
         case 3:
             if (FIELDSTG_state.sheetEntry != 0 && FILE_CACHE.isLoading(FIELDSTG_state.sheetEntry >> 16) != 0) {
                 return 0;
@@ -130,6 +134,7 @@ s32 FIELDSTG_loadFieldFiles(Task *task) {
             FILE_CACHE.free(FIELDSTG_state.imageFile);
         }
         task->nextStep(task);
+        /* fallthrough */
     case 3:
         FILE_CACHE.request(FILE_MENU_SPRITES);
         FILE_CACHE.request(FIELDSTG_state.textFile);
@@ -152,6 +157,7 @@ void FIELDSTG_runFileLoader(Task *task) {
     default:
         task->nextState(task);
         task->substate = task->key2;
+        /* fallthrough */
     case TASK_RUN:
         if (FIELDSTG_loadFieldFiles(task) != 0) {
             task->setState(task, TASK_KILL);

@@ -34,11 +34,6 @@
 #define FIELD_CUTSCENE_CLUT_Y 0xF0
 #define FIELD_MENU_SPRITES_X 0x140 /* the executable's FILE_MENU_SPRITES */
 
-typedef struct Point {
-    s32 x;
-    s32 y;
-} Point;
-
 /*
  * The sounds only FIELDSTG plays (SOUND.playSound), by their SOUNDTST names.
  * Those that other overlays play too are in engine/sound.h.
@@ -79,31 +74,6 @@ typedef struct Point {
 #define SOUND_GAYALOOP 0xA10C703C /* held */
 
 /* --- actor.c --- */
-
-/* What an actor is doing, its substate (FIELDSTG_runActorAction) */
-#define ACTOR_POSED 0 /* in the pose an event set (FIELDSTG_setActorPose) */
-#define ACTOR_STAND 1
-#define ACTOR_WALK 2
-#define ACTOR_RUN 3
-#define ACTOR_STOP 4 /* stops after a run */
-#define ACTOR_WALK_OUT 5 /* walks off through an exit (FIELDSTG_walkActorInDir) */
-#define ACTOR_CLIMB 0x40 /* holds on to a wall (FIELDSTG_controlClimb) */
-#define ACTOR_CLIMB_UP 0x41
-#define ACTOR_CLIMB_DOWN 0x42
-#define ACTOR_GET_ON_WALL 0x43 /* from below (FIELDSTG_startClimbUp) */
-#define ACTOR_GET_OVER_EDGE 0x44 /* onto the wall from above (FIELDSTG_startClimbDown) */
-#define ACTOR_CLIMB_OFF_TOP 0x45
-#define ACTOR_CLIMB_OFF_BOTTOM 0x46
-#define ACTOR_DROP 0x47 /* FIELDSTG_startDrop */
-#define ACTOR_GAUGE 0x48 /* plays the gauge game (FIELDSTG_startActorGauge) */
-#define ACTOR_SEARCH 0x49 /* searches a hidden spot */
-#define ACTOR_TALK 0x4A /* answers the actor that talks to it (talkPartner) */
-#define ACTOR_FLY 0x4B /* flies on, triangle held (FIELDSTG_controlFlight) */
-#define ACTOR_FLOAT 0x4C /* slows down in the air */
-#define ACTOR_USE 0x4D /* works one of the objects 0x148, 0x15F and 0x160 */
-#define ACTOR_USED 0x4E /* that object */
-#define ACTOR_SLIDE 0x4F /* FIELDSTG_startActorSlide */
-#define ACTOR_STOP_SLIDE 0x50
 
 /* The animation sets that the actions play (FIELDSTG_setActorAnim), by the
    substate that plays them */
@@ -148,74 +118,7 @@ typedef struct Point {
 #define FLIGHT_SPEED_MAX 0x200
 #define FLIGHT_SPEED_MAX_PAL 0x266 /* FLIGHT_SPEED_MAX * 6 / 5, for 50 frames a second */
 
-/*
- * A character on the field (FIELDSTG_createActor): the player (kind 0) and the
- * other characters. Registered with id FIELD_TASK_ACTOR, key1 = character, key2 = kind.
- * x and y are in 1/256 tile units.
- */
-typedef struct Actor {
-    TASK_HEADER(Actor);
-    /* 0x050 */ Vec2 pos;
-    /* 0x058 */ Point tile;
-    /* 0x060 */ s32 dir;
-    /* 0x064 */ s32 z; /* how high it is off the ground, in 1/256 pixels (drawn that much higher) */
-    /* 0x068 */ s32 speed; /* 0x400, 0x4CC in PAL's 50 Hz */
-    /* 0x06C */ struct ActorImage *image;
-    /* 0x070 */ struct FieldImage *fieldImage; /* the field's image, for the shadow */
-    /* 0x074 */ s32 hasShadow; /* drawn with a shadow */
-    /* 0x078 */ s32 depth; /* the layer's ordering table entry */
-    /* 0x07C */ struct FieldActorEntry *entry; /* what created it, or NULL */
-    /* 0x080 */ s32 halfWidth; /* half its width (FIELDSTG_actorWidths): its box's half width, and half that its half height */
-    /* 0x084 */ s32 flying; /* the flying player (FIELDSTG_controlFlight) */
-    /* 0x088 */ struct Actor *talkPartner; /* the actor that talks to it */
-    /* 0x08C */ s32 climbSide; /* a climb shifts it a tile right (1) or left (0) */
-    /* 0x090 */ s32 climbHeight; /* how high it has climbed, in 1/256 pixels (its shadow stays below) */
-    /* 0x094 */ s32 wallHeight; /* the top of the climb */
-    /* 0x098 */ s32 unk98; /* nothing uses it */
-    /* 0x09C */ s32 animFile; /* its animations' file and index (FIELDSTG_fileEntries), or 0 */
-    /* 0x0A0 */ s32 animSet; /* the animation set it plays (setAnim) */
-    /* 0x0A4 */ s32 loadedSet; /* the set setAnims was loaded for */
-    /* 0x0A8 */ s32 setAnims[5]; /* the set's animations, for the directions 0 to 4 */
-    /* 0x0BC */ s32 walks; /* the pad walks it (ACTOR_WALK) instead of running */
-    /* 0x0C0 */ s32 reloadImage; /* set to reload the frame's image */
-    /* 0x0C4 */ s32 zSpeed; /* added to z each frame */
-    /* 0x0C8 */ s16 voice; /* a sound voice, or -1 */
-    /* 0x0CA */ s16 unkCA; /* nothing uses it */
-    /* 0x0CC */ s32 animPos; /* the next word of the direction's frames */
-    /* 0x0D0 */ s32 animTime; /* the frame's time left */
-    /* 0x0D4 */ s32 frame[4]; /* the frame's image, the one loaded, and two values */
-    /* 0x0E4 */ s16 frameWidth; /* the loaded image's width in pixels */
-    /* 0x0E6 */ s16 frameHeight; /* and its height */
-    /* 0x0E8 */ s32 animDone; /* the animation ended (isAnimDone) */
-    /* 0x0EC */ s32 walking; /* walking to the goal (setGoal, FIELDSTG_walkToGoal) */
-    /* 0x0F0 */ s32 goalX; /* the tile it walks to */
-    /* 0x0F4 */ s32 goalY;
-    /* 0x0F8 */ s32 goalDir; /* the direction it then faces */
-    /* 0x0FC */ u16 *talkActions; /* the talk's flag actions, applied when it ends, or NULL */
-    /* 0x100 */ s32 isLarge; /* one of the large characters */
-    /* 0x104 */ struct Trail *trail; /* a follower's: the leader's steps */
-    /* 0x108 */ void (*control)(struct Actor *); /* its update by kind, or NULL (resetControl) */
-    /* 0x10C */ s32 scriptFlag; /* cleared by FIELDSTG_clearScriptFlag; nothing in FIELDSTG or the stages reads it */
-    /* 0x110 */ void (*walkInDir)(struct Actor *, s32 dir);
-    /* 0x114 */ void (*climbUp)();
-    /* 0x118 */ void (*climbDown)();
-    /* 0x11C */ void (*dropDown)();
-    /* 0x120 */ void (*playGauge)();
-    /* 0x124 */ void (*warp)(struct Actor *, SlotDest *dest, s32 kind);
-    /* 0x128 */ void (*unk128)(); /* nothing uses it */
-    /* 0x12C */ void (*startWalk)(struct Actor *);
-    /* 0x130 */ void (*resetControl)(struct Actor *);
-    /* 0x134 */ void (*setDir)(struct Actor *, s32 dir);
-    /* 0x138 */ s32 (*isAnimDone)(struct Actor *);
-    /* 0x13C */ void (*setGoal)(struct Actor *, s32, s32, s32);
-    /* 0x140 */ s32 (*isWalking)(struct Actor *);
-    /* 0x144 */ void (*setAnim)(struct Actor *, s32);
-    /* 0x148 */ void (*setPose)(struct Actor *, s32, s32 dir);
-    /* 0x14C */ void (*getFacingTile)(struct Actor *, Point *out);
-    /* 0x150 */ void (*startSlide)(struct Actor *, s32 dir);
-    /* 0x154 */ void (*stopSlide)(struct Actor *);
-    /* 0x158 */ void (*launch)(struct Actor *, SlotDest *dest);
-} Actor;
+/* Actor and its substates (ACTOR_POSED...) are in field_map.h, where the stages see them too */
 
 /* The last TRAIL_STEPS steps of the actor that another one follows
    (Actor.trail), a ring from tail to head */
@@ -244,6 +147,13 @@ typedef struct ActorChildren {
 
 /* --- actor_icon.c --- */
 
+/* An offset of the icon from the player's tile along a climb over an edge
+   (FIELDSTG_iconPath), x away from the climb's side */
+typedef struct IconOffset {
+    /* 0x0 */ s16 x;
+    /* 0x2 */ s16 y;
+} IconOffset;
+
 /* The player's icon (FIELD_TASK_ICON, FIELDSTG_createActorIcon): the field
    commands FIELD_COMMAND_ICON1 to 3 and a special condition set its
    substate, the animation it plays */
@@ -271,6 +181,13 @@ typedef struct Balloon {
     /* 0x68 */ s32 time;
 } Balloon;
 
+/* A character that another answers for when the player talks to it
+   (FIELDSTG_talkToActorAt, FIELDSTG_standIns) */
+typedef struct StandIn {
+    /* 0x0 */ s16 character; /* Actor.key1 */
+    /* 0x2 */ s16 answerer; /* the key1 of the actor that answers */
+} StandIn;
+
 /* --- speech.c --- */
 
 /* A message box, or a talk box that follows an actor (FIELDSTG_createSpeech,
@@ -293,8 +210,8 @@ typedef struct Launch {
     /* 0x50 */ Actor *actor;
     /* 0x54 */ SlotDest *dest; /* the tile it lands on */
     /* 0x58 */ Task *from; /* the nearest FIELD_TASK_LAUNCHER */
-    /* 0x5C */ Point start;
-    /* 0x64 */ Point dist;
+    /* 0x5C */ Vec2 start;
+    /* 0x64 */ Vec2 dist;
     /* 0x6C */ s32 negX;
     /* 0x70 */ s32 negY;
 } Launch;
@@ -321,7 +238,7 @@ typedef struct Launch {
 
 typedef struct GaugeGame {
     TASK_HEADER(GaugeGame);
-    /* 0x50 */ Point pos;
+    /* 0x50 */ Vec2 pos;
     /* 0x58 */ s32 row; /* of FIELDSTG_gaugeRows */
     /* 0x5C */ s32 cursor; /* along the row, 0-GAUGE_CURSOR_MAX */
     /* 0x60 */ s32 speed;
@@ -335,13 +252,13 @@ typedef struct GaugeGame {
 typedef struct Camera {
     TASK_HEADER(Camera);
     /* 0x50 */ Actor *target; /* the actor it follows (substate 0) */
-    /* 0x54 */ Point center; /* where it looks */
+    /* 0x54 */ Vec2 center; /* where it looks */
     /* 0x5C */ s32 shaking;
     /* 0x60 */ s32 shake; /* the step of the shake, 0-3 */
     /* 0x64 */ s16 voice; /* of the shaking sound, or -1 */
-    /* 0x68 */ Point pan; /* where it looks while it pans to center */
+    /* 0x68 */ Vec2 pan; /* where it looks while it pans to center */
     /* 0x70 */ s32 hasBounds;
-    /* 0x74 */ Point bounds; /* the map's size */
+    /* 0x74 */ Vec2 bounds; /* the map's size */
     /* 0x7C */ s32 unk7C; /* cleared with each new target; nothing reads it */
     /* 0x80 */ s32 snap; /* goes to center at once instead of panning */
     /* 0x84 */ s32 targetId; /* the target's character (Actor.key1) */
@@ -396,25 +313,7 @@ typedef struct ScriptTimer {
 
 /* --- lift.c --- */
 
-/* The lift's script commands (FIELDSTG_moveLift) */
-#define LIFT_LOWER 0x348
-#define LIFT_RAISE 0x349
-
-/* A lift of the map objects 2 and 3 (FIELDSTG_createLift) */
-typedef struct Lift {
-    TASK_HEADER(Lift);
-    /* 0x50 */ struct StageTile *left; /* the map object 3 */
-    /* 0x54 */ struct StageTile *right; /* the map object 2 */
-    /* 0x58 */ s16 raised; /* the objects and the player are 0x7F lower */
-    /* 0x5A */ s16 time;
-    /* 0x5C */ s16 shake; /* the index into FIELDSTG_liftShake */
-    /* 0x5E */ s16 unk5E; /* nothing uses it */
-    /* 0x60 */ s16 leftY; /* the positions when the move started */
-    /* 0x62 */ s16 rightY;
-    /* 0x64 */ s32 playerY;
-    /* 0x68 */ s16 leftBaseY; /* the objects' positions on the map */
-    /* 0x6A */ s16 rightBaseY;
-} Lift;
+/* Lift is in field_map.h: WSTAG261 and WSTAG934 have a copy of the lift */
 
 /* --- story.c --- */
 
@@ -442,20 +341,14 @@ typedef struct ProgressEvent {
 
 /* --- choice.c --- */
 
-/* A yes/no question of the story (FIELDSTG_runChoice) */
+/* A yes/no question of the story (FIELDSTG_runChoice); its children are a
+   ChoiceChildren (field_map.h) */
 typedef struct ChoiceTask {
     TASK_HEADER(ChoiceTask);
     /* 0x50 */ s32 type; /* FIELDSTG_choices's */
     /* 0x54 */ s32 selection;
     /* 0x58 */ PanelAnim tween; /* the panel's width */
 } ChoiceTask;
-
-typedef struct ChoiceChildren {
-    /* 0x00 */ TextWindow *title;
-    /* 0x04 */ TextWindow *options[2];
-    /* 0x0C */ Cursor *cursor;
-    /* 0x10 */ EventTask *event;
-} ChoiceChildren;
 
 /* A question of a ChoiceTask */
 typedef struct ChoiceText {
@@ -570,7 +463,7 @@ typedef struct MapFileHeader {
     /* 0x04 */ s32 width; /* in 128-pixel tiles */
     /* 0x08 */ s32 height;
     /* 0x0C */ s32 tileBytes; /* the room of a tile on the CD */
-    /* 0x10 */ u16 tileSizes[0]; /* width * height: each tile's bytes, 0 for none */
+    /* 0x10 */ u16 tileSizes[FLEXIBLE]; /* width * height: each tile's bytes, 0 for none */
 } MapFileHeader;
 
 /* A tile of the map that MapStreamer streams */
@@ -592,10 +485,10 @@ typedef struct MapImage {
  */
 typedef struct MapStreamer {
     TASK_HEADER(MapStreamer);
-    /* 0x050 */ s32 unk50; /* nothing uses it */
+    /* 0x050 */ s32 pad50; /* never read or written */
     /* 0x054 */ MapFileHeader *header; /* the map file's, while it is read */
-    /* 0x058 */ Point scroll;
-    /* 0x060 */ s32 unk60; /* nothing uses it */
+    /* 0x058 */ Vec2 scroll;
+    /* 0x060 */ s32 pad60; /* never read or written */
     /* 0x064 */ s32 file; /* the map's tiles, read from the CD (FieldState.mapFile) */
     /* 0x068 */ s32 width; /* in 128-pixel tiles */
     /* 0x06C */ s32 height;
@@ -605,7 +498,7 @@ typedef struct MapStreamer {
     /* 0x108 */ u8 viewTiles[30]; /* by the slots around the view, their tiles */
     /* 0x128 */ s32 viewX; /* the tile column of the slots' left edge */
     /* 0x12C */ s32 viewY; /* their top row */
-    /* 0x130 */ Point *(*getSize)(struct MapStreamer *); /* in pixels (FIELDSTG_getMapSize) */
+    /* 0x130 */ Vec2 *(*getSize)(struct MapStreamer *); /* in pixels (FIELDSTG_getMapSize) */
 } MapStreamer;
 
 /* --- map_objects.c --- */
@@ -647,15 +540,15 @@ typedef struct SpotHint {
     /* 0x50 */ s32 time;
     /* 0x54 */ s32 speed; /* frames per palette step */
     /* 0x58 */ s32 frame;
-    /* 0x5C */ Point from;
-    /* 0x64 */ Point to;
+    /* 0x5C */ Vec2 from;
+    /* 0x64 */ Vec2 to;
 } SpotHint;
 
 /* A hidden spot: a map object with anim 0xFF */
 typedef struct HiddenSpot {
     /* 0x00 */ s32 frame; /* its object's */
     /* 0x04 */ s32 object; /* its index in FieldState.objects */
-    /* 0x08 */ Point pos;
+    /* 0x08 */ Vec2 pos;
     /* 0x10 */ s32 hasPrize; /* the one picked at random (GAME.prizeSpot) */
 } HiddenSpot;
 
@@ -667,7 +560,7 @@ typedef struct HiddenSpots {
     /* 0x54 */ HiddenSpot *entries;
     /* 0x58 */ s32 selected; /* the spot searched */
     /* 0x5C */ s32 forEvent; /* an event's search, without the prize or a hint */
-    /* 0x60 */ Point pos; /* the prize's */
+    /* 0x60 */ Vec2 pos; /* the prize's */
 } HiddenSpots;
 
 /* The children of an HiddenSpots */
@@ -735,7 +628,7 @@ typedef struct BannerBox {
     /* 0x14 */ s32 from;
     /* 0x18 */ s32 to;
     /* 0x1C */ s32 speed;
-    /* 0x20 */ s32 unk20; /* 0 in every box; nothing reads it */
+    /* 0x20 */ s32 pad20; /* 0 in every box; nothing reads it */
 } BannerBox;
 
 /* The area name banner (FIELD_TASK_BANNER, FIELDSTG_createBanner) */
@@ -812,7 +705,7 @@ typedef struct FieldTask {
     /* 0x68 */ s32 leaveDelay; /* the frames left before it closes the field */
     /* 0x6C */ s32 centerOnPlayer; /* the closing clip shrinks onto the player */
     /* 0x70 */ s32 warpKind; /* the effect and cutscene of a warp (FIELDSTG_startWarp) */
-    /* 0x74 */ Point warpPos; /* where the warp's effect plays */
+    /* 0x74 */ Vec2 warpPos; /* where the warp's effect plays */
     /* 0x7C */ SlotDest *warp; /* where it leads */
 } FieldTask;
 
@@ -873,6 +766,8 @@ void FIELDSTG_runStoryEvents(StoryEvents *task, StoryEventsChildren *children);
 StoryEvents *FIELDSTG_createStoryEvents(void *owner);
 
 /* event.c */
+Actor *FIELDSTG_findEventActor(EventTask *task, s32 id);
+s32 FIELDSTG_setEventPose(EventTask *task, s16 *op, EventChildren *children);
 void FIELDSTG_runEvent(EventTask *task, EventChildren *children);
 
 /* cutscene.c */
@@ -888,16 +783,25 @@ FieldEffect *FIELDSTG_createEffect(s32 x, s32 y, s32 set);
 StreamTask *FIELDSTG_findOldestStream(StreamPool *pool);
 void FIELDSTG_requestTiles(MapStreamer *task, StreamPool *pool);
 void FIELDSTG_drawCoverBlock(Layer *layer, s32 x, s32 y, s32 level);
+StreamTask *FIELDSTG_findStream(StreamPool *pool, s32 frame);
 void FIELDSTG_drawMapTiles(MapStreamer *task, StreamPool *pool);
 void FIELDSTG_pickViewTiles(MapStreamer *task);
 void FIELDSTG_runMapStreamer(MapStreamer *task, StreamPool *pool);
-Point *FIELDSTG_getMapSize(MapStreamer *task);
+Vec2 *FIELDSTG_getMapSize(MapStreamer *task);
 MapStreamer *FIELDSTG_createMapStreamer(s32 file);
 void FIELDSTG_drawCover(s32 id, s32 level);
 
 /* stream.c */
+void FIELDSTG_touchStream(StreamTask *task);
+void FIELDSTG_seekStream(StreamTask *task, s32 frame, s32 size);
+s32 FIELDSTG_isStreamLoaded(StreamTask *task);
 void FIELDSTG_drawStream(StreamTask *task, Layer *layer, s32 x, s32 y);
+void FIELDSTG_setStreamSource(StreamTask *task, s32 slot, Decompressor *source);
 void FIELDSTG_loadStreamSprites(StreamTask *task);
+void FIELDSTG_clearStreamSlot(StreamTask *task);
+s32 FIELDSTG_getStreamSlot(StreamTask *task);
+s32 FIELDSTG_getStreamFrame(StreamTask *task);
+void FIELDSTG_updateStream(StreamTask *task);
 StreamTask *FIELDSTG_createStream(s32 size, s32 file);
 
 /* start.c */
@@ -905,31 +809,40 @@ void FIELDSTG_updateRoot(Task *task, Task **children);
 
 /* banner.c */
 void FIELDSTG_showAreaName(AreaBanner *task, AreaNameWindows *windows);
+void FIELDSTG_stretchBannerBox(AreaBanner *task, BannerBox *box);
+void FIELDSTG_drawBannerBox(AreaBanner *task, u_long *ot, DVECTOR pos, DVECTOR size, s32 color);
 void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows);
-Task *FIELDSTG_createBanner(s32 arg0);
+Task *FIELDSTG_createBanner(s32 show);
 
 /* balloon.c */
+s32 FIELDSTG_stepBalloonAnim(Balloon *task);
+void FIELDSTG_drawBalloon(Balloon *task);
 void FIELDSTG_updateBalloon(Balloon *task);
 Balloon *FIELDSTG_createBalloon(s32 kind, s32 anim, s32 id);
 void FIELDSTG_createPlayerBalloon(s32 id);
 void FIELDSTG_balloonCommand(Balloon *task, s32 command, s32 id);
 
 /* trigger.c */
+s32 FIELDSTG_findTrigger(Triggers *task);
 s32 FIELDSTG_offerTrigger(Triggers *task, TriggerChildren *children);
 void FIELDSTG_setOffTrigger(Triggers *task);
 void FIELDSTG_updateTriggers(Triggers *task, TriggerChildren *children);
 Triggers *FIELDSTG_createTriggers(s32 sheetEntry, StageSlot *slots);
 
 /* speech.c */
+void FIELDSTG_getSpeechPos(Speech *task, Vec2 *out);
 void FIELDSTG_updateSpeech(Speech *task, void **box);
 Speech *FIELDSTG_createSpeech(Actor *actor, s32 entry, s32 type, s32 isMessage);
 Speech *FIELDSTG_createTalk(Actor *actor, s32 entry);
 
 /* map_objects.c */
+void FIELDSTG_drawMapObject(MapObjects *task, Layer *layer, s32 index);
 void FIELDSTG_updateMapObjects(MapObjects *task, HiddenSpots **children);
 MapObjects *FIELDSTG_createMapObjects(s32 sprites, StageTile *objects);
 
 /* file_loader.c */
+void FIELDSTG_requestInnNames(Task *task);
+void FIELDSTG_requestSlotFiles(Task *task);
 s32 FIELDSTG_loadFieldFiles(Task *task);
 void FIELDSTG_runFileLoader(Task *task);
 Task *FIELDSTG_createFileLoader(s32 step);
@@ -940,31 +853,34 @@ ActorIcon *FIELDSTG_createActorIcon(Actor *actor);
 
 /* field.c */
 void FIELDSTG_playBattleTransition(FieldTask *task, FieldChildren *children);
+void FIELDSTG_closeField(FieldTask *task, FieldChildren *children);
 s32 FIELDSTG_keepsFileCache(void);
 void FIELDSTG_updateField(FieldTask *task, FieldChildren *children);
 Task *FIELDSTG_createField(void);
 void FIELDSTG_leaveFieldAfter(s32 mode, s32 arg, s32 x, s32 y, s32 dir, s32 delay);
 void FIELDSTG_startEncounter(s32 encounter);
-void FIELDSTG_startWarp(s32 kind, Point *pos, SlotDest *dest);
+void FIELDSTG_startWarp(s32 kind, Vec2 *pos, SlotDest *dest);
 
 /* launch.c */
+s32 FIELDSTG_scaleSin(s32 angle, s32 radius);
 void FIELDSTG_runLaunch(Launch *task);
 Launch *FIELDSTG_createLaunch(Actor *actor, SlotDest *dest);
 
 /* hidden_spots.c */
 void FIELDSTG_showSpotHint(SpotHint *task);
-SpotHint *FIELDSTG_createSpotHint(Point from, Point to);
+SpotHint *FIELDSTG_createSpotHint(Vec2 from, Vec2 to);
 void FIELDSTG_hidePrize(HiddenSpots *task);
 void FIELDSTG_updateHiddenSpots(HiddenSpots *task, HiddenSpotsChildren *children);
 HiddenSpots *FIELDSTG_createHiddenSpots(s32 count);
-HiddenSpots *FIELDSTG_findHiddenSpot(Point *pos, s32 select);
+HiddenSpots *FIELDSTG_findHiddenSpot(Vec2 *pos, s32 select);
 void FIELDSTG_searchEventSpot(void);
+void FIELDSTG_drawSpotEffect(SpotEffect *task, Layer *layer);
 void FIELDSTG_updateSpotEffect(SpotEffect *task);
 SpotEffect *FIELDSTG_createSpotEffect(s32 forEvent);
 
 /* gauge.c */
 void FIELDSTG_runGauge(GaugeGame *task);
-GaugeGame *FIELDSTG_createGauge(Point pos);
+GaugeGame *FIELDSTG_createGauge(Vec2 pos);
 
 /* camera.c */
 void FIELDSTG_scrollCamera(Camera *task);
@@ -975,11 +891,14 @@ void FIELDSTG_pointCamera(s32 snap, s32 x, s32 y);
 void FIELDSTG_shakeCamera(s32 shaking);
 
 /* actor_control.c */
-s32 FIELDSTG_checkFlightProbe(Actor *actor, s32 x, s32 y, Point offset);
+s32 FIELDSTG_checkFlightProbe(Actor *actor, s32 x, s32 y, Vec2 offset);
+s32 FIELDSTG_checkFlightProbes(Actor *actor);
 void FIELDSTG_moveByPad(Actor *actor, s32 pad);
-Actor *FIELDSTG_findActorAt(Point *pos);
+Actor *FIELDSTG_findActorAt(Vec2 *pos);
+s32 FIELDSTG_talkToActorAt(Actor *actor, Vec2 *pos);
 void FIELDSTG_controlFlight(Actor *actor);
 void FIELDSTG_controlPlayer(Actor *actor);
+void FIELDSTG_controlClimb(Actor *actor);
 void FIELDSTG_followLeader(Actor *actor);
 void FIELDSTG_drainTrail(Actor *actor);
 void FIELDSTG_walkToGoal(Actor *actor);
@@ -992,22 +911,27 @@ void FIELDSTG_startActorSlide(Actor *actor, s32 dir);
 void FIELDSTG_stopActorSlide(Actor *actor);
 void FIELDSTG_startClimbUp(Actor *actor, s32 dir, s32 x, s32 y, s32 height);
 void FIELDSTG_startClimbDown(Actor *actor, s32 dir, s32 x, s32 y, s32 height);
-void FIELDSTG_startDrop(Actor *actor, s32 dir, Point pos, s32 height);
-void FIELDSTG_startActorGauge(Actor *actor, s32 dir, Point offset);
+void FIELDSTG_startDrop(Actor *actor, s32 dir, Vec2 pos, s32 height);
+void FIELDSTG_startActorGauge(Actor *actor, s32 dir, Vec2 offset);
 void FIELDSTG_warpActor(Actor *actor, SlotDest *dest, s32 kind);
 void FIELDSTG_launchActor(Actor *actor, SlotDest *dest);
 void FIELDSTG_setActorAnim(Actor *actor, s32 set);
 void FIELDSTG_setActorPose(Actor *actor, s32 set, s32 dir);
 s32 FIELDSTG_isActorAnimDone(Actor *actor);
-void FIELDSTG_drawActor(void *arg, void *arg2);
+void FIELDSTG_drawActor(void *data, void *drawLayer); /* (actor, layer) */
 void FIELDSTG_setActorDir(Actor *actor, s32 dir);
 void FIELDSTG_animateActor(Actor *actor);
+void FIELDSTG_restorePlayerControl(Actor *actor);
+void FIELDSTG_playStepSounds(Actor *actor, s32 moving, s32 canBattle);
+void FIELDSTG_playClimbSounds(Actor *actor);
 void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children);
 
 /* actor.c */
 void FIELDSTG_haltPartners(void);
 void FIELDSTG_resumePartners(void);
-Actor *FIELDSTG_createActor(s32 id, s32 arg1, s32 arg2, FieldActorEntry *entry);
+void FIELDSTG_getFacingTile(Actor *actor, Vec2 *out);
+void FIELDSTG_updateActor(Actor *actor, ActorChildren *children);
+Actor *FIELDSTG_createActor(s32 key1, s32 kind, s32 image, FieldActorEntry *entry);
 
 /* field_stage.c */
 void FIELDSTG_endChoice0Answer0(void), FIELDSTG_endChoice0Answer1(void), FIELDSTG_endChoice1Answer0(void), FIELDSTG_endChoice1Answer1(void);
@@ -1036,11 +960,11 @@ Actor *FIELDSTG_findActor(s32 character);
 void FIELDSTG_waitScriptTime(s32 time, s32 *pc);
 void FIELDSTG_waitAnimDone(s32 id, s32 *pc);
 void FIELDSTG_waitWalkDone(s32 id, s32 *pc);
-void FIELDSTG_toScreenPos(Point *pos);
+void FIELDSTG_toScreenPos(Vec2 *pos);
 void FIELDSTG_clearScriptFlag(void);
 ScriptCommand *FIELDSTG_findScriptCommand(s32 id);
 s32 FIELDSTG_createScriptCommand(s32 id);
-void FIELDSTG_handleScriptCommand(s32 arg0, s32 id, s32 arg2, s32 arg3);
+void FIELDSTG_handleScriptCommand(s32 task, s32 id, s32 command, s32 arg);
 
 /* battle.c */
 void FIELDSTG_rollBattleSteps(void);
@@ -1053,10 +977,10 @@ s32 FIELDSTG_selectMap(s32 index);
 void FIELDSTG_setMapFile(s32 index, s32 value);
 void FIELDSTG_setFirstMap(s32 index);
 void FIELDSTG_setMap(s32 index);
-s32 FIELDSTG_getMapCell(s32 index, Point *pos);
-s32 FIELDSTG_isTileFree(Point *pos);
-void FIELDSTG_getWalkStep(Point *pos, s32 scale, s32 index, Point *out);
-void FIELDSTG_getFlyStep(Point *pos, s32 scale, s32 index, Point *out);
+s32 FIELDSTG_getMapCell(s32 index, Vec2 *pos);
+s32 FIELDSTG_isTileFree(Vec2 *pos);
+void FIELDSTG_getWalkStep(Vec2 *pos, s32 scale, s32 index, Vec2 *out);
+void FIELDSTG_getFlyStep(Vec2 *pos, s32 scale, s32 index, Vec2 *out);
 
 /* FIELDSTG's data (fieldstg.c), in its order */
 extern Encounter FIELDSTG_encounters[];
@@ -1071,33 +995,33 @@ extern u8 FIELDSTG_slotLayouts[][4][5][6]; /* FIELDSTG_pickViewTiles's slot layo
 extern u8 FIELDSTG_dirLayouts[][2]; /* the layout and its flips for each direction */
 extern u8 FIELDSTG_slotOffsets[][2][2]; /* the slots' offset in tiles: [quadrant][x, y][unflipped, flipped] */
 extern s32 FIELDSTG_spriteDepths[]; /* depth of each layer of a StreamTask's sprites */
-extern Point FIELDSTG_slotImages[]; /* VRAM position of each StreamTask slot's image */
+extern Vec2 FIELDSTG_slotImages[]; /* VRAM position of each StreamTask slot's image */
 extern AreaName FIELDSTG_areaNames[];
 extern BannerBox FIELDSTG_bannerBoxes[10]; /* FIELDSTG_updateBanner's boxes */
 extern u8 FIELDSTG_triggerAnims[][9]; /* FIELDSTG_stepBalloonAnim's animations: (frame, time) pairs up to 0xFF */
 extern u8 FIELDSTG_nearDirs[][8]; /* whether two directions are at most 45 degrees apart */
 extern s16 FIELDSTG_file5DModes[]; /* the modes that load the field file 0x5D (FIELDSTG_requestInnNames) */
-extern u8 (*FIELDSTG_actorAnims[])[2]; /* FIELDSTG_updateActorIcon's animation of each substate */
-extern s16 FIELDSTG_actorPath[][2]; /* offsets, up to (0, 0) */
-extern s32 FIELDSTG_actorPathStep; /* the step in FIELDSTG_actorPath */
+extern u8 (*FIELDSTG_iconAnims[])[2]; /* FIELDSTG_updateActorIcon's animation of each substate */
+extern IconOffset FIELDSTG_iconPath[]; /* up to (0, 0) */
+extern s32 FIELDSTG_iconPathStep; /* the step in FIELDSTG_iconPath */
 extern TileMove FIELDSTG_tileMoves[];
 extern s16 FIELDSTG_eventIds[]; /* the events FIELDSTG_startListedEvent starts */
 extern u8 FIELDSTG_spotAnim[][2]; /* animation of FIELDSTG_updateHiddenSpots: (frame, time) pairs up to 0xFF */
 extern u8 *FIELDSTG_dirAnims[]; /* FIELDSTG_updateSpotEffect's animation for each direction */
 extern s32 FIELDSTG_dirDepths[]; /* and its depth offset */
 extern u8 *FIELDSTG_gaugeRows[];
-extern Point FIELDSTG_shakeOffsets[]; /* the camera's shake offsets */
+extern Vec2 FIELDSTG_shakeOffsets[]; /* the camera's shake offsets */
 extern u8 FIELDSTG_probes[][5]; /* the probes of each direction (FIELDSTG_checkFlightProbes) */
-extern Point FIELDSTG_probePos[]; /* a probe's position */
+extern Vec2 FIELDSTG_probePos[]; /* a probe's position */
 extern u8 FIELDSTG_probeSteps[][2]; /* a probe's offset: bit 0 set, bit 7 negative */
 extern s32 FIELDSTG_padDirs[]; /* the direction of each combination of the pad directions */
-extern s16 FIELDSTG_standIns[][2]; /* the actors that stand for other actors: {key, key of the actor that answers} */
+extern StandIn FIELDSTG_standIns[]; /* up to character 0 */
 /* the partners' kinds (Actor.key2): the ones FIELDSTG_startActorGauge turns, FIELDSTG_haltPartners
    stops and FIELDSTG_resumePartners makes follow again */
 extern s32 FIELDSTG_turnedPartners[];
 extern s32 FIELDSTG_haltedPartners[];
 extern s32 FIELDSTG_followingPartners[];
-extern Point FIELDSTG_dirSteps[]; /* tile offset of each direction */
+extern Vec2 FIELDSTG_dirSteps[]; /* tile offset of each direction */
 /* the field's own stage (FIELDSTG_setupField) */
 extern FieldImages FIELDSTG_images;
 extern FieldActorEntry *FIELDSTG_actorList[];
@@ -1109,31 +1033,31 @@ extern s32 (*FIELDSTG_tweenUpdate)(PanelAnim *tween); /* FIELDSTG_updateTween */
 extern FieldEvent FIELDSTG_events[];
 extern s32 FIELDSTG_fileEntries[]; /* by character (Actor.key1) */
 extern u8 FIELDSTG_actorWidths[]; /* by character, in pixels (FieldState.getActorWidth) */
-extern StageEntry FIELDSTG_stages[];
 #if VERSION_EU
-extern StageEntry FIELDSTG_euStages[]; /* the European version's, but in FIELD_PROGRESS_EXTRA */
+extern StageEntry FIELDSTG_extraStages[]; /* the extra chapter's, which run on into FIELDSTG_stages */
 #endif
+extern StageEntry FIELDSTG_stages[];
 extern ScriptTimer FIELDSTG_scriptTimer;
 extern void (*FIELDSTG_scriptHelpers[])(); /* the script helpers (FIELDSTG_toScreenPos...) */
 extern ScriptCommand FIELDSTG_scriptCommands[];
 extern void (*FIELDSTG_checkBattle)(); /* FIELDSTG_countBattleSteps */
 extern s32 FIELDSTG_battleRates[]; /* how much each area lowers GAME.battleSteps, the steps to the next battle */
 extern s32 FIELDSTG_boxFrame; /* the frame FIELDSTG_boxes was filled in */
-extern Point FIELDSTG_dirVectors[][8]; /* a direction's vector, scaled by 4096 */
+extern Vec2 FIELDSTG_dirVectors[][8]; /* a direction's vector, scaled by 4096 */
 extern u8 FIELDSTG_mirrorDirs[];
 extern s16 FIELDSTG_slideVoice; /* the voice of the slide's sound (ACTOR_SLIDE, SOUND_TRAP_ICE) */
 extern s16 FIELDSTG_heldVoice; /* the voice of FIELDSTG_handleFieldCommand's held sound */
-extern Point FIELDSTG_mapSize; /* FIELDSTG_getMapSize's */
+extern Vec2 FIELDSTG_mapSize; /* FIELDSTG_getMapSize's */
 extern StageTile *FIELDSTG_objectCursor; /* FIELDSTG_findNextObject's search of the map objects */
 extern s32 FIELDSTG_objectId; /* and the id it looks for */
-extern Point FIELDSTG_tiles[TRANSITION_COLUMNS][TRANSITION_ROWS]; /* FIELDSTG_playBattleTransition's */
-extern s32 FIELDSTG_tileRequests; /* FIELDSTG_playBattleTransition's file requests, 0 to 2 */
+extern Vec2 FIELDSTG_tiles[TRANSITION_COLUMNS][TRANSITION_ROWS]; /* FIELDSTG_playBattleTransition's */
+extern s32 FIELDSTG_battleFileStep; /* FIELDSTG_playBattleTransition's: 0 and 1 wait for the CD, 2 the battle's files are asked for */
 extern RECT FIELDSTG_screenRect;
 extern Box FIELDSTG_boxes[20]; /* the characters' boxes (FIELDSTG_isTileFree) */
 extern s32 FIELDSTG_boxCount; /* and their number */
 
 /* Starts a battle: its fight stage, its music and its encounter */
-static inline void FIELDSTG_startBattle(Battle *battle) {
+static inline void FIELDSTG_startBattle(AreaBattle *battle) {
     BATTLE_SETUP.stage = battle->stage;
     BATTLE_SETUP.music = battle->music;
     FIELDSTG_startEncounter(battle->encounter);

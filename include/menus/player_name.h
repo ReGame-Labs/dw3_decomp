@@ -1,20 +1,21 @@
 #ifndef STPLNMET_H
 #define STPLNMET_H
 
-/* STPLNMET.PRO: mode 0x500, the player's name entry. Its modules are in
+/* STPLNMET.PRO: the player's name entry (MODE_PLAYER_NAME). Its modules are in
    src/menus/player_name/, and the functions below are by module, in the order they
    link. */
 
 #include "engine/game.h"
+
+/* The name of this overlay's copy of a function or type of src/shared/ */
+#define OVL_NAME(name) STPLNMET_##name
+
 /* The overlay's NameEntry and the name entry's files (name_entry.h) */
-#define NAME_ENTRY_HAS_UNK98 0
+#define NAME_ENTRY_HAS_UNUSED98 0
 #define NAME_ENTRY_HAS_HIDE 1
 #define NAME_ENTRY_SPRITES PLNMET_BANK
 #define NAME_ENTRY_FILE_KEYBOARD FILE_PLNMET_KEYBOARD
 #include "shared/name_entry.h" /* the keyboard's types, as STDGNAME's and STCRDDEK's */
-
-/* The name of this overlay's copy of a function of src/shared/ */
-#define OVL_NAME(name) STPLNMET_##name
 
 /* The files of the screen */
 #if VERSION_US
@@ -157,11 +158,6 @@ typedef struct PartnerChoiceWindows {
     } partners[3];
 } PartnerChoiceWindows;
 
-/* A partner's animation: its frames, -1 ends */
-typedef struct PartnerAnim {
-    /* 0x0 */ s32 frames[7];
-} PartnerAnim;
-
 /* The screen's helpers (STPLNMET_funcs) */
 typedef struct PlayerNameFuncs {
     /* 0x00 */ PartnerAnim *anims;
@@ -177,7 +173,6 @@ typedef struct PlayerNameFuncs {
 /* scene.c */
 void STPLNMET_centerLayer(Task *task, PlayerNameScreen **screen, Layer *layer, RECT *rect);
 void STPLNMET_updateScene(Task *task, PlayerNameScreen **screen);
-Task *STPLNMET_start(void);
 
 /* backdrop.c */
 void STPLNMET_updateScroll(NameScroll *task);
@@ -246,7 +241,7 @@ extern PlayerNameFuncs STPLNMET_funcs;
 extern TextStyle STPLNMET_nameStyle;
 extern s32 STPLNMET_scrollEnds[];
 extern SparkleFrame STPLNMET_sparkleFrames[];
-extern s32 STPLNMET_nameAnims[];
+extern s32 STPLNMET_nameAnims[][7];
 extern BigKey STPLNMET_bigKeys[];
 extern s32 STPLNMET_keyArrowCluts[];
 extern KeyTabs STPLNMET_keyPagesJp[];

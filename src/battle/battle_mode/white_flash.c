@@ -37,6 +37,7 @@ void FIGHTSTG_updateWhiteFlash(WhiteFlash *task) {
     default:
         task->nextState(task);
         task->level = 0;
+        /* fallthrough */
     case TASK_RUN:
         if (task->substate == 0) {
             task->level += task->speed * GFX.funcs.getFrameTime();

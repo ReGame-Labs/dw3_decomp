@@ -18,11 +18,18 @@
  * bytes stay in a report unit.
  */
 s32 CRT0_SAVED_RA[2];
-s32 FIELD_MENU_CHOICE[2]; /* menu/field_menu.c's FieldMenuChoice */
+struct FieldMenuChoice FIELD_MENU_CHOICE; /* menu/field_menu.c's */
 u8 CD_MODE[8];            /* file/cd_reader.c's */
 s32 FLIP_PENDING[2];      /* gfx/display.c's */
 s32 CARD_DRAWER[2];       /* gfx/card_drawer.c's */
 s32 SPRITE_DRAWER[2];     /* gfx/sprite_drawer.c's */
 s32 TEXT_TOOLS[2];        /* text/text_tools.c's */
 s32 TIM_LOADER[2];        /* gfx/tim_loader.c's */
-s32 CD_SECTOR_HEADER[4];  /* file/cd_reader.c's */
+struct CdSectorHeader CD_SECTOR_HEADER; /* file/cd_reader.c's */
+
+/*
+ * The two structs above, completed (and checked against the declarations)
+ * only now: GCC emits the commons in the order of their first declaration,
+ * and the header's would come before the others.
+ */
+#include "engine/game.h"

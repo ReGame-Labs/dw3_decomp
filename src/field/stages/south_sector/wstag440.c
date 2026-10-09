@@ -70,25 +70,25 @@ void setupStage(void) {
 }
 
 s16 script144[] = {
-    0x102, 2, 0x1BF, 0x120, 5,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2,
-    0x302, 2,
-    0x101, 2, 1, 5,
-    0x300, 0x1E,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 2,
-    0x300, 0x78,
-    0x101, FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 2,
-    0x300, 0x1E,
-    0x200, 0, 1, 2, 4,
-    0x301,
-    0x101, 2, 1, 1,
-    0x300, 0x1E,
-    0x102, 2, 0x1A0, 0x130, 1,
-    0x302, 2,
-    0x102, 2, 0x150, 0x109, 3,
-    0x300, 0x3C,
-    0x304, 0x22C, 0x140, 0x140, 5,
-    0,
+    SCRIPT_WALK(2, 0x1BF, 0x120, 5),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_HALT_PARTNERS, 2),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_POSE(2, 1, 5),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON1, 2),
+    SCRIPT_WAIT(0x78),
+    SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_ICON2, 2),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_TALK(0, 1, 2, 4),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_POSE(2, 1, 1),
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(2, 0x1A0, 0x130, 1),
+    SCRIPT_WAIT_WALK(2),
+    SCRIPT_WALK(2, 0x150, 0x109, 3),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_LEAVE(0x22C, 0x140, 0x140, 5),
+    SCRIPT_END,
     /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
     0x8E02,
@@ -97,17 +97,17 @@ s16 script144[] = {
 #endif
 };
 s16 script152[] = {
-    0x601, 1, 0x1AF, 0xD9,
-    0x100, 2, 0x1EF, 0xB9,
-    0x101, 2, 1, 1,
-    0x300, 0x78,
-    0x200, 0, 1, 2, 1,
-    0x301,
-    0x300, 0x1E,
-    0x102, 2, 0x16F, 0xF9, 1,
-    0x300, 0x3C,
-    0x304, 0x233, 0x208, 0x9C, 7,
-    0,
+    SCRIPT_LOOK_AT(1, 0x1AF, 0xD9),
+    SCRIPT_PLACE(2, 0x1EF, 0xB9),
+    SCRIPT_POSE(2, 1, 1),
+    SCRIPT_WAIT(0x78),
+    SCRIPT_TALK(0, 1, 2, 1),
+    SCRIPT_WAIT_BOX,
+    SCRIPT_WAIT(0x1E),
+    SCRIPT_WALK(2, 0x16F, 0xF9, 1),
+    SCRIPT_WAIT(0x3C),
+    SCRIPT_LEAVE(0x233, 0x208, 0x9C, 7),
+    SCRIPT_END,
     /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
     0x8FBF,
@@ -115,53 +115,53 @@ s16 script152[] = {
     0x1FB,
 #endif
 };
-Battle area0Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area0Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area0Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
       &area0Battle4, &area0Battle5, &area0Battle6, &area0Battle7 },
 };
-Battle area1Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area1Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area1Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area1Battles = {
     0,
     { &area1Battle0, &area1Battle1, &area1Battle2, &area1Battle3,
       &area1Battle4, &area1Battle5, &area1Battle6, &area1Battle7 },
 };
-Battle area2Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area2Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area2Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area2Battles = {
     0,
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-Battle area3Battle0 = { 210, 20, MUSIC(3, 0) };
-Battle area3Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle0 = { 210, 20, MUSIC(3, 0) };
+AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area3Battles = {
     0,
     { &area3Battle0, &area3Battle1, &area3Battle2, &area3Battle3,

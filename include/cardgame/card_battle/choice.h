@@ -77,7 +77,7 @@ s32 CARDGAME_stepYesNo(CardBattle *battle, CardScreen *screen);
 void CARDGAME_clearCardInfo(CardBattle *battle, CardScreen *screen);
 void CARDGAME_showTableCardInfo(CardBattle *battle, CardScreen *screen, s32 kind);
 void CARDGAME_startHandPick(CardBattle *battle, CardScreen *screen, CardPile *pile);
-void CARDGAME_startPick(CardBattle *battle, CardScreen *screen, s32 all, s32 arg3);
+void CARDGAME_startPick(CardBattle *battle, CardScreen *screen, s32 all, s32 mode);
 void CARDGAME_moveSelection(CardBattle *battle, CardScreen *screen, s32 count, s32 step);
 void CARDGAME_movePileSelection(CardBattle *battle, CardScreen *screen, CardPile *pile, s32 step);
 void CARDGAME_flagPlayableCards(CardBattle *battle, CardScreen *screen, CardPile *pile);
@@ -94,7 +94,7 @@ void CARDGAME_switchCoinCard(CardBattle *battle, CardScreen *screen);
 void CARDGAME_startFirstPick(CardBattle *battle, CardScreen *screen);
 s32 CARDGAME_drawFirstPlayer(CardBattle *battle, CardScreen *screen);
 void CARDGAME_startViewTable(CardBattle *battle, CardScreen *screen);
-void CARDGAME_startPickTableCard(CardBattle *battle, CardScreen *screen, s32 arg2);
+void CARDGAME_startPickTableCard(CardBattle *battle, CardScreen *screen, s32 cancelable);
 s32 CARDGAME_getPickTableHeight(CardBattle *battle, CardScreen *screen);
 void CARDGAME_movePickHighlight(CardBattle *battle, CardScreen *screen, s32 kind, s32 delta);
 s32 CARDGAME_pickTableCard(CardBattle *battle, CardScreen *screen);
@@ -104,7 +104,7 @@ void CARDGAME_browseHand(CardBattle *battle, CardScreen *screen);
 s32 CARDGAME_chooseCard(CardBattle *battle, CardScreen *screen, s32 mode);
 s32 CARDGAME_pickComputerCards(CardBattle *battle, CardScreen *screen);
 void CARDGAME_pickComputerDeckCard(CardBattle *battle, CardScreen *screen);
-void CARDGAME_startPileChoice(CardBattle *battle, CardScreen *screen, s32 arg2);
+void CARDGAME_startPileChoice(CardBattle *battle, CardScreen *screen, s32 flags);
 
 /* The steps CARDGAME_runEffectStep starts (CardBattle.effectStep.next) and runs (effectStep.id) */
 s32 CARDGAME_stepChooseCards(CardBattle *battle, CardScreen *screen, CardPile *pile);

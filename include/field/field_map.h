@@ -13,8 +13,6 @@
 
 #include "engine/game.h"
 
-struct Point; /* fieldstg.h */
-
 /* The field's drawing layers, by their ids (GFX.funcs.createLayer), as
    FIELDSTG_updateField creates them */
 #define FIELD_LAYER_BACK 0x1000 /* the background's color */
@@ -100,13 +98,13 @@ typedef struct FieldMap {
     /* 0x38 */ s16 *cells8;
     /* 0x3C */ u8 *pixels;
     /* 0x40 */ void (*setFile)(s32 index, s32 file); /* FIELDSTG_setMapFile */
-    /* 0x44 */ s32 (*getCell)(s32 index, struct Point *pos); /* FIELDSTG_getMapCell */
-    /* 0x48 */ void (*getWalkStep)(struct Point *pos, s32 scale, s32 dir, struct Point *out); /* FIELDSTG_getWalkStep */
-    /* 0x4C */ void (*getFlyStep)(struct Point *pos, s32 scale, s32 dir, struct Point *out); /* FIELDSTG_getFlyStep */
+    /* 0x44 */ s32 (*getCell)(s32 index, Vec2 *pos); /* FIELDSTG_getMapCell */
+    /* 0x48 */ void (*getWalkStep)(Vec2 *pos, s32 scale, s32 dir, Vec2 *out); /* FIELDSTG_getWalkStep */
+    /* 0x4C */ void (*getFlyStep)(Vec2 *pos, s32 scale, s32 dir, Vec2 *out); /* FIELDSTG_getFlyStep */
     /* 0x50 */ void (*setFirstMap)(s32 index); /* FIELDSTG_setFirstMap: the map the player starts on
                                                   (GAME.mapIndex), when the mode is new */
     /* 0x54 */ void (*setMap)(s32 index); /* FIELDSTG_setMap: the map the player is on */
-    /* 0x58 */ s32 (*isTileFree)(struct Point *pos); /* FIELDSTG_isTileFree: 0 where a character or an object stands */
+    /* 0x58 */ s32 (*isTileFree)(Vec2 *pos); /* FIELDSTG_isTileFree: 0 where a character or an object stands */
 } FieldMap;
 
 extern FieldMap FIELDSTG_map;
@@ -148,6 +146,30 @@ typedef struct FieldEvent {
     /* 0x0C */ void *(*start)(void); /* without a script: the task it starts, or NULL */
     /* 0x10 */ void (*end)(void); /* or NULL */
 } FieldEvent;
+
+/*
+ * The commands of an event script (FieldEvent.script), as FIELDSTG_runEvent
+ * reads them: a halfword kind << 8 | variant, then a fixed number of
+ * arguments. x and y are in pixels, ids are the characters' (Actor.key1)
+ * below 0x320 and the script commands' from 0x320 on.
+ */
+#define SCRIPT_END 0 /* ends the event (and any unknown kind) */
+#define SCRIPT_PLACE(id, x, y) 0x100, id, x, y /* puts a character at (x, y) */
+#define SCRIPT_POSE(id, set, dir) 0x101, id, set, dir /* Actor.setPose: its animation set, facing dir */
+/* the same word for a script command's id: FIELDSTG_setEventPose creates its task
+   if none runs and hands it the command and the argument (FIELDSTG_handleScriptCommand) */
+#define SCRIPT_COMMAND(id, command, arg) 0x101, id, command, arg
+#define SCRIPT_WALK(id, x, y, dir) 0x102, id, x, y, dir /* Actor.setGoal: walks to (x, y), then faces dir */
+/* box of the event's boxes shows the event text's entry: a talk box at the corner
+   kind next to the character id, or for kind 4 a message box (FIELDSTG_createSpeech) */
+#define SCRIPT_TALK(box, entry, id, kind) 0x200, box, entry, id, kind
+#define SCRIPT_WAIT(frames) 0x300, frames
+#define SCRIPT_WAIT_BOX 0x301 /* until box 0 closes */
+#define SCRIPT_WAIT_WALK(id) 0x302, id /* until the character gets to its goal */
+#define SCRIPT_WAIT_ANIM(id) 0x303, id /* until its animation ends */
+#define SCRIPT_LEAVE(mode, x, y, dir) 0x304, mode, x, y, dir /* FIELDSTG_leaveField; ends the event */
+#define SCRIPT_FOLLOW(snap, id) 0x600, snap, id /* FIELDSTG_followWithCamera */
+#define SCRIPT_LOOK_AT(snap, x, y) 0x601, snap, x, y /* FIELDSTG_pointCamera */
 
 /* What a character says (FIELDSTG_runActorAction): the first whose conditions hold,
    or the last, which has none */
@@ -203,10 +225,33 @@ typedef struct StageTile {
     /* 0x10 */ s16 cycleTime; /* in 1/256 frames; bit 15: going back */
 } StageTile;
 
+/*
+ * The lift: the map objects 3 (always shown) and 2 (shown while it moves),
+ * which move 0x7F pixels up or down the screen with the player, shaking
+ * before and after, each time a script command sets TASK_DONE: FIELDSTG's
+ * (FIELDSTG_createLift, script command 826) and the copies of WSTAG261 and
+ * WSTAG934 (common/update_tile_lift.inc.c)
+ */
+#define LIFT_UP 0x348 /* the lift's script commands: up the screen, */
+#define LIFT_DOWN 0x349 /* and back down to the objects' place on the map */
+
+typedef struct Lift {
+    TASK_HEADER(Lift);
+    /* 0x50 */ StageTile *tiles[2]; /* the map objects 3 and 2 */
+    /* 0x58 */ s16 raised; /* the objects are 0x7F up from their place, and the next
+                              move takes them down (LIFT_DOWN; flag 0x1C3D at the start) */
+    /* 0x5A */ s16 timer;
+    /* 0x5C */ s16 shake; /* the step of the shake table, then a frame count */
+    /* 0x5E */ s16 pad5E; /* never read or written */
+    /* 0x60 */ s16 y[2]; /* the objects' y when the move started */
+    /* 0x64 */ s32 playerY;
+    /* 0x68 */ s16 homeY[2]; /* the objects' place on the map */
+} Lift;
+
 /* Points of the story (GAME.progress) where the field and the stages act differently */
 #define FIELD_PROGRESS_MOVIE_BATTLES 0x2B /* each encounter plays MODE_BATTLE_MOVIE first */
 #define FIELD_PROGRESS_EXTRA 0x2D /* the European version's extra chapter, whose stages are
-                                     its FIELDSTG_stages (WSTAG920 to WSTAG974) */
+                                     FIELDSTG_extraStages (WSTAG920 to WSTAG974) */
 
 /* The kinds of StageSlot (type). SLOT_DEPTH, SLOT_MAP, SLOT_EVENT, the slides
    and SLOT_LAUNCH act as the player steps on them; the others show a balloon
@@ -261,18 +306,115 @@ typedef struct SlotDest {
 /* A slot's destination: its arg on, read as signed halfwords */
 #define SLOT_DEST(slot) ((SlotDest *)&(slot)->arg)
 
-/* A battle that can start on the field (see FIELDSTG_startEncounter) */
-typedef struct Battle {
+/* What an actor is doing, its substate (FIELDSTG_runActorAction) */
+#define ACTOR_POSED 0 /* in the pose an event set (FIELDSTG_setActorPose) */
+#define ACTOR_STAND 1
+#define ACTOR_WALK 2
+#define ACTOR_RUN 3
+#define ACTOR_STOP 4 /* stops after a run */
+#define ACTOR_WALK_OUT 5 /* walks off through an exit (FIELDSTG_walkActorInDir) */
+#define ACTOR_CLIMB 0x40 /* holds on to a wall (FIELDSTG_controlClimb) */
+#define ACTOR_CLIMB_UP 0x41
+#define ACTOR_CLIMB_DOWN 0x42
+#define ACTOR_GET_ON_WALL 0x43 /* from below (FIELDSTG_startClimbUp) */
+#define ACTOR_GET_OVER_EDGE 0x44 /* onto the wall from above (FIELDSTG_startClimbDown) */
+#define ACTOR_CLIMB_OFF_TOP 0x45
+#define ACTOR_CLIMB_OFF_BOTTOM 0x46
+#define ACTOR_DROP 0x47 /* FIELDSTG_startDrop */
+#define ACTOR_GAUGE 0x48 /* plays the gauge game (FIELDSTG_startActorGauge) */
+#define ACTOR_SEARCH 0x49 /* searches a hidden spot */
+#define ACTOR_TALK 0x4A /* answers the actor that talks to it (talkPartner) */
+#define ACTOR_FLY 0x4B /* flies on, triangle held (FIELDSTG_controlFlight) */
+#define ACTOR_FLOAT 0x4C /* slows down in the air */
+#define ACTOR_USE 0x4D /* works one of the objects 0x148, 0x15F and 0x160 */
+#define ACTOR_USED 0x4E /* that object */
+#define ACTOR_SLIDE 0x4F /* FIELDSTG_startActorSlide */
+#define ACTOR_STOP_SLIDE 0x50
+
+/*
+ * A character on the field (FIELDSTG_createActor): the player (kind 0) and the
+ * other characters. Registered with id FIELD_TASK_ACTOR, key1 = character, key2 = kind.
+ * x and y are in 1/256 tile units.
+ */
+typedef struct Actor {
+    TASK_HEADER(Actor);
+    /* 0x050 */ Vec2 pos;
+    /* 0x058 */ Vec2 tile;
+    /* 0x060 */ s32 dir;
+    /* 0x064 */ s32 z; /* how high it is off the ground, in 1/256 pixels (drawn that much higher) */
+    /* 0x068 */ s32 speed; /* 0x400, 0x4CC in PAL's 50 Hz */
+    /* 0x06C */ struct ActorImage *image;
+    /* 0x070 */ struct FieldImage *fieldImage; /* the field's image, for the shadow */
+    /* 0x074 */ s32 hasShadow; /* drawn with a shadow */
+    /* 0x078 */ s32 depth; /* the layer's ordering table entry */
+    /* 0x07C */ struct FieldActorEntry *entry; /* what created it, or NULL */
+    /* 0x080 */ s32 halfWidth; /* half its width (FIELDSTG_actorWidths): its box's half width, and half that its half height */
+    /* 0x084 */ s32 flying; /* the flying player (FIELDSTG_controlFlight) */
+    /* 0x088 */ struct Actor *talkPartner; /* the actor that talks to it */
+    /* 0x08C */ s32 climbSide; /* a climb shifts it a tile right (1) or left (0) */
+    /* 0x090 */ s32 climbHeight; /* how high it has climbed, in 1/256 pixels (its shadow stays below) */
+    /* 0x094 */ s32 wallHeight; /* the top of the climb */
+    /* 0x098 */ s32 pad98; /* never read or written */
+    /* 0x09C */ s32 animFile; /* its animations' file and index (FIELDSTG_fileEntries), or 0 */
+    /* 0x0A0 */ s32 animSet; /* the animation set it plays (setAnim) */
+    /* 0x0A4 */ s32 loadedSet; /* the set setAnims was loaded for */
+    /* 0x0A8 */ s32 setAnims[5]; /* the set's animations, for the directions 0 to 4 */
+    /* 0x0BC */ s32 walks; /* the pad walks it (ACTOR_WALK) instead of running */
+    /* 0x0C0 */ s32 reloadImage; /* set to reload the frame's image */
+    /* 0x0C4 */ s32 zSpeed; /* added to z each frame */
+    /* 0x0C8 */ s16 voice; /* a sound voice, or -1 */
+    /* 0x0CA */ s16 padCA; /* never read or written */
+    /* 0x0CC */ s32 animPos; /* the next word of the direction's frames */
+    /* 0x0D0 */ s32 animTime; /* the frame's time left */
+    /* 0x0D4 */ s32 frame[4]; /* the frame's image, the one loaded, and two values */
+    /* 0x0E4 */ s16 frameWidth; /* the loaded image's width in pixels */
+    /* 0x0E6 */ s16 frameHeight; /* and its height */
+    /* 0x0E8 */ s32 animDone; /* the animation ended (isAnimDone) */
+    /* 0x0EC */ s32 walking; /* walking to the goal (setGoal, FIELDSTG_walkToGoal) */
+    /* 0x0F0 */ s32 goalX; /* the tile it walks to */
+    /* 0x0F4 */ s32 goalY;
+    /* 0x0F8 */ s32 goalDir; /* the direction it then faces */
+    /* 0x0FC */ u16 *talkActions; /* the talk's flag actions, applied when it ends, or NULL */
+    /* 0x100 */ s32 keepsDir; /* doesn't turn to the one who talks to it (characters 0x28-0x2A,
+                                   0x3E and 0x11A) */
+    /* 0x104 */ struct Trail *trail; /* a follower's: the leader's steps */
+    /* 0x108 */ void (*control)(struct Actor *); /* its update by kind, or NULL (resetControl) */
+    /* 0x10C */ s32 scriptFlag; /* cleared by FIELDSTG_clearScriptFlag; nothing in FIELDSTG or the stages reads it */
+    /* 0x110 */ void (*walkInDir)(struct Actor *, s32 dir);
+    /* 0x114 */ void (*climbUp)();
+    /* 0x118 */ void (*climbDown)();
+    /* 0x11C */ void (*dropDown)();
+    /* 0x120 */ void (*playGauge)();
+    /* 0x124 */ void (*warp)(struct Actor *, SlotDest *dest, s32 kind);
+    /* 0x128 */ void (*unused128)(); /* a method slot between warp and startWalk that
+                                       FIELDSTG_createActor never sets and nothing calls */
+    /* 0x12C */ void (*startWalk)(struct Actor *);
+    /* 0x130 */ void (*resetControl)(struct Actor *);
+    /* 0x134 */ void (*setDir)(struct Actor *, s32 dir);
+    /* 0x138 */ s32 (*isAnimDone)(struct Actor *);
+    /* 0x13C */ void (*setGoal)(struct Actor *, s32, s32, s32);
+    /* 0x140 */ s32 (*isWalking)(struct Actor *);
+    /* 0x144 */ void (*setAnim)(struct Actor *, s32);
+    /* 0x148 */ void (*setPose)(struct Actor *, s32, s32 dir);
+    /* 0x14C */ void (*getFacingTile)(struct Actor *, Vec2 *out);
+    /* 0x150 */ void (*startSlide)(struct Actor *, s32 dir);
+    /* 0x154 */ void (*stopSlide)(struct Actor *);
+    /* 0x158 */ void (*launch)(struct Actor *, SlotDest *dest);
+} Actor;
+
+/* A battle of an area's BattleList, which can start on the field (see
+   FIELDSTG_startEncounter); FIGHTSTG's Battle is the battle itself */
+typedef struct AreaBattle {
     /* 0x0 */ s32 encounter; /* of FIELDSTG_encounters */
     /* 0x4 */ s32 stage; /* the fight stage, for BATTLE_SETUP.stage */
     /* 0x8 */ s32 music; /* for BATTLE_SETUP.music */
-} Battle;
+} AreaBattle;
 
 /* The battles of an area of the map (its cells' value at FieldMap.files[4]),
    one picked at random */
 typedef struct BattleList {
     /* 0x0 */ s32 count; /* how often they come: an index of FIELDSTG_battleRates */
-    /* 0x4 */ Battle *battles[8];
+    /* 0x4 */ AreaBattle *battles[8];
 } BattleList;
 
 /*
@@ -284,7 +426,7 @@ typedef struct BattleList {
 typedef struct FieldBattles {
     /* 0x00 */ s32 serial; /* a number of its own, 1 to 448 over the stages; nothing reads it */
     /* 0x04 */ s32 id; /* the place, GAME.place */
-    /* 0x08 */ s32 unk8; /* 0 in every list; nothing reads it */
+    /* 0x08 */ s32 pad8; /* 0 in every list; nothing reads it */
     /* 0x0C */ BattleList *battles[4];
 } FieldBattles;
 
@@ -323,8 +465,10 @@ typedef struct FieldState {
     /* 0x44 */ s32 textFile; /* the stage's text file, for the talks */
     /* 0x48 */ s32 eventText; /* the running event's text file and entry */
     /* 0x4C */ FieldActorEntry **actors; /* the characters, up to the first NULL */
-    /* 0x50 */ s32 innOpen; /* the inn (FIELDSTG_openInn): the pad doesn't move the player */
-    /* 0x54 */ s32 bannerShown; /* the area name banner (FIELDSTG_createBanner) */
+    /* 0x50 */ s32 menuOpen; /* the field menu (START) or the inn (FIELDSTG_openInn) is open:
+                               the pad doesn't move the player */
+    /* 0x54 */ s32 frozen; /* no control, triggers or encounters for the player: while the
+                             area name banner shows (FIELDSTG_createBanner) and as the field closes */
     /* 0x58 */ s32 busy; /* an event, a warp, a launch or a battle has the player */
     /* 0x5C */ s32 battleStarting; /* an encounter started (FIELDSTG_startEncounter) */
     /* 0x60 */ s32 acting; /* the player talks, climbs, slides or searches */
@@ -337,6 +481,15 @@ typedef struct FieldState {
 } FieldState;
 
 extern FieldState FIELDSTG_state;
+
+/* The children of a yes/no question at the bottom of the screen: FIELDSTG's
+   ChoiceTask and the stages' copies of it (StageMenu) */
+typedef struct ChoiceChildren {
+    /* 0x00 */ TextWindow *title;
+    /* 0x04 */ TextWindow *options[2];
+    /* 0x0C */ Cursor *cursor;
+    /* 0x10 */ struct EventTask *event; /* the answer's (FIELDSTG_startEvent) */
+} ChoiceChildren;
 
 /* FIELDSTG functions the stages call */
 struct EventTask *FIELDSTG_startEvent(s32 id); /* creates the task of an event object */

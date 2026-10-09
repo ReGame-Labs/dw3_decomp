@@ -156,53 +156,53 @@ StageSlot stageSlots[] = {
 void (*stageFuncs[])(void) = {
     setupStage,
 };
-Battle area0Battle0 = { 40, 13, MUSIC(2, 0) };
-Battle area0Battle1 = { 40, 13, MUSIC(2, 0) };
-Battle area0Battle2 = { 40, 13, MUSIC(2, 0) };
-Battle area0Battle3 = { 40, 13, MUSIC(2, 0) };
-Battle area0Battle4 = { 45, 13, MUSIC(2, 0) };
-Battle area0Battle5 = { 45, 13, MUSIC(2, 0) };
-Battle area0Battle6 = { 45, 13, MUSIC(2, 0) };
-Battle area0Battle7 = { 45, 13, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 40, 13, MUSIC(2, 0) };
+AreaBattle area0Battle1 = { 40, 13, MUSIC(2, 0) };
+AreaBattle area0Battle2 = { 40, 13, MUSIC(2, 0) };
+AreaBattle area0Battle3 = { 40, 13, MUSIC(2, 0) };
+AreaBattle area0Battle4 = { 45, 13, MUSIC(2, 0) };
+AreaBattle area0Battle5 = { 45, 13, MUSIC(2, 0) };
+AreaBattle area0Battle6 = { 45, 13, MUSIC(2, 0) };
+AreaBattle area0Battle7 = { 45, 13, MUSIC(2, 0) };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
       &area0Battle4, &area0Battle5, &area0Battle6, &area0Battle7 },
 };
-Battle area1Battle0 = { 51, 4, MUSIC(2, 0) };
-Battle area1Battle1 = { 51, 4, MUSIC(2, 0) };
-Battle area1Battle2 = { 51, 4, MUSIC(2, 0) };
-Battle area1Battle3 = { 51, 4, MUSIC(2, 0) };
-Battle area1Battle4 = { 52, 4, MUSIC(2, 0) };
-Battle area1Battle5 = { 52, 4, MUSIC(2, 0) };
-Battle area1Battle6 = { 52, 4, MUSIC(2, 0) };
-Battle area1Battle7 = { 52, 4, MUSIC(2, 0) };
+AreaBattle area1Battle0 = { 51, 4, MUSIC(2, 0) };
+AreaBattle area1Battle1 = { 51, 4, MUSIC(2, 0) };
+AreaBattle area1Battle2 = { 51, 4, MUSIC(2, 0) };
+AreaBattle area1Battle3 = { 51, 4, MUSIC(2, 0) };
+AreaBattle area1Battle4 = { 52, 4, MUSIC(2, 0) };
+AreaBattle area1Battle5 = { 52, 4, MUSIC(2, 0) };
+AreaBattle area1Battle6 = { 52, 4, MUSIC(2, 0) };
+AreaBattle area1Battle7 = { 52, 4, MUSIC(2, 0) };
 BattleList area1Battles = {
     3,
     { &area1Battle0, &area1Battle1, &area1Battle2, &area1Battle3,
       &area1Battle4, &area1Battle5, &area1Battle6, &area1Battle7 },
 };
-Battle area2Battle0 = { 65, 2, MUSIC(2, 0) };
-Battle area2Battle1 = { 65, 2, MUSIC(2, 0) };
-Battle area2Battle2 = { 65, 2, MUSIC(2, 0) };
-Battle area2Battle3 = { 65, 2, MUSIC(2, 0) };
-Battle area2Battle4 = { 60, 2, MUSIC(2, 0) };
-Battle area2Battle5 = { 60, 2, MUSIC(2, 0) };
-Battle area2Battle6 = { 60, 2, MUSIC(2, 0) };
-Battle area2Battle7 = { 60, 2, MUSIC(2, 0) };
+AreaBattle area2Battle0 = { 65, 2, MUSIC(2, 0) };
+AreaBattle area2Battle1 = { 65, 2, MUSIC(2, 0) };
+AreaBattle area2Battle2 = { 65, 2, MUSIC(2, 0) };
+AreaBattle area2Battle3 = { 65, 2, MUSIC(2, 0) };
+AreaBattle area2Battle4 = { 60, 2, MUSIC(2, 0) };
+AreaBattle area2Battle5 = { 60, 2, MUSIC(2, 0) };
+AreaBattle area2Battle6 = { 60, 2, MUSIC(2, 0) };
+AreaBattle area2Battle7 = { 60, 2, MUSIC(2, 0) };
 BattleList area2Battles = {
     3,
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-Battle area3Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle3 = { 329, 13, MUSIC(2, 0) };
-Battle area3Battle4 = { 332, 2, MUSIC(2, 0) };
-Battle area3Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle area3Battle6 = { 156, 13, MUSIC(2, 0) };
-Battle area3Battle7 = { 179, 2, MUSIC(2, 0) };
+AreaBattle area3Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle3 = { 329, 13, MUSIC(2, 0) };
+AreaBattle area3Battle4 = { 332, 2, MUSIC(2, 0) };
+AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle area3Battle6 = { 156, 13, MUSIC(2, 0) };
+AreaBattle area3Battle7 = { 179, 2, MUSIC(2, 0) };
 BattleList area3Battles = {
     0,
     { &area3Battle0, &area3Battle1, &area3Battle2, &area3Battle3,

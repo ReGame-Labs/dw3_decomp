@@ -15,16 +15,16 @@ void vsyncCallback(void) {
 #if VERSION_US
     GFX.timeCounter += VSYNC_STEP_NTSC;
     GFX.frameTimeCounter += VSYNC_STEP_NTSC;
-    GAME.playFrames += VSYNC_STEP_NTSC;
+    GAME.playTime.frames += VSYNC_STEP_NTSC;
 #elif VERSION_EU
     if (NTSC_MODE) {
         GFX.timeCounter += VSYNC_STEP_NTSC;
         GFX.frameTimeCounter += VSYNC_STEP_NTSC;
-        GAME.playFrames += VSYNC_STEP_NTSC;
+        GAME.playTime.frames += VSYNC_STEP_NTSC;
     } else {
         GFX.timeCounter += VSYNC_STEP_PAL;
         GFX.frameTimeCounter += VSYNC_STEP_PAL;
-        GAME.playFrames += VSYNC_STEP_PAL;
+        GAME.playTime.frames += VSYNC_STEP_PAL;
     }
 #endif
     if (GFX.vsyncFunc != NULL) {

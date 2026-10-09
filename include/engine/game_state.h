@@ -69,7 +69,7 @@ typedef struct GameFlags {
 #define SPECIAL(id) (0x7000 | (id)) /* SPECIAL_CONDITIONS entry id */
 #define PARTY_STAT(id) (0x7200 | (id)) /* checkPartyStat */
 #define EVENT_BATTLE(id) (0x7400 | (id)) /* action: FIELDSTG_battleFuncs.startEventBattle */
-#define CARD_BATTLE(opponent, kind) (0x7600 + (kind) * 0x200 | (opponent)) /* action: startCardBattle */
+#define CARD_BATTLE(opponent, kind) ((0x7600 + (kind) * 0x200) | (opponent)) /* action: startCardBattle */
 #define WARP_ARG(id) (0x7E00 | (id)) /* checkWarpArg */
 /* an item, in the bag or equipped; kind (bits 9-11) isn't read, and the
    scripts set it after the item's kind loosely */
@@ -143,7 +143,7 @@ typedef struct WeaponData {
     /* 0x03 */ u8 group;
     /* 0x04 */ u8 partners; /* 1 << partner for each partner who can equip it (STSTATUS_canEquip) */
     /* 0x06 */ u16 amounts[2]; /* what it adds to stats[] */
-    /* 0x0A */ s16 atk;
+    /* 0x0A */ u16 atk;
     /* 0x0C */ u8 stats[2];
     /* 0x0E */ u8 accuracy; /* added to the battle's (FIGHTSTG_computeStats) */
     /* 0x0F */ u8 hitEffect; /* 1 none, 2 poison, 3 paralysis, 4 confusion, 6 knock-out, 8 drain,
@@ -217,12 +217,12 @@ typedef union ItemRecord {
 #define ITEM_KIND_ARMOR 4
 #define ITEM_KIND_ACCESSORY 5
 
-/* An item (ITEMS, GET_ITEM) */
+/* An item (ITEMS, ITEM_FUNCS) */
 typedef struct ItemInfo {
     /* 0x0 */ ItemRecord data; /* the type's record, or the usable items' effect */
     /* 0x4 */ u16 price;
     /* 0x6 */ u16 sellPrice; /* 0: cannot be sold */
-    /* 0x8 */ u8 kind; /* ITEM_KIND_* (ITEM_FUNCS->isKind) */
+    /* 0x8 */ u8 kind; /* ITEM_KIND_* (ITEM_FUNCS.isKind) */
     /* 0x9 */ u8 type; /* 2-14 weapons, 15-20 armour, 21-24 accessories */
 } ItemInfo;
 
@@ -286,6 +286,7 @@ typedef struct Deck {
 #define STAT_SPEED 10
 #define STAT_CHARISMA 11
 #define STAT_RESISTS 12 /* the first of the seven resistances */
+#define STAT_COUNT 19
 
 /*
  * A partner Digimon from its name on (Partner.info), as getPartnerStats gives
@@ -298,7 +299,7 @@ typedef struct Deck {
 typedef struct PartnerStats {
     /* 0x000 */ char name[0x18];
     /* 0x018 */ s32 exp;
-    /* 0x01C */ s16 stats[19];
+    /* 0x01C */ s16 stats[STAT_COUNT];
     /* 0x042 */ s16 status[3];
     /* 0x048 */ s16 slots[4]; /* PARTNER_SLOT_COUNT entries picked from entries[] */
     /* 0x050 */ PartnerEntry entries[PARTNER_ENTRY_COUNT];
@@ -306,6 +307,35 @@ typedef struct PartnerStats {
     /* 0x3CC */ u8 lastBonus; /* the training whose bonus try last worked, 0 for
                                  none: its try can't work again at once */
 } PartnerStats;
+
+/* PartnerStats.equip as a whole: STSTATUS and STITSHOP save it with a struct
+   copy before they equip an item to compute the stats with it, and put it
+   back */
+typedef struct PartnerEquip {
+    s16 items[6];
+} PartnerEquip;
+
+/* PartnerStats' stats[] and the status[] after them as one block, which
+   computeStats and STITSHOP_computeStats copy whole */
+typedef struct StatBlock {
+    /* 0x00 */ s16 stats[STAT_COUNT];
+    /* 0x26 */ s16 penalties[3]; /* subtracted from STAT_STRENGTH, STAT_DEFENSE and STAT_SPEED */
+} StatBlock;
+
+/* GameState's play time, which a memory card save copies whole */
+typedef struct PlayTime {
+    /* 0x0 */ s32 frames; /* 8.8, counted by the vsync callback */
+    /* 0x4 */ s16 hours;
+    /* 0x6 */ s16 minutes;
+    /* 0x8 */ s16 seconds;
+    /* 0xA */ s16 maxed; /* stopped at 999:59:59 */
+} PlayTime;
+
+/* A partner Digimon's animation in a menu: up to seven sprite ids, -1
+   ending it early (the sprites are each overlay's own) */
+typedef struct PartnerAnim {
+    s32 frames[7];
+} PartnerAnim;
 
 /* One of the eight partner Digimon */
 typedef struct Partner {
@@ -406,6 +436,8 @@ typedef union PartnerTotals {
 #define MODE_BATTLE_MOVIE 0xE09 /* STDWTITL's movie before each battle at GAME.progress 0x2B */
 #define MODE_ENDING 0xE0A /* STDWTITL's movie after the last battle */
 #elif VERSION_EU
+#define MODE_OPENING_2 0xE02 /* STDWTITL's second opening movie: LANGUAGE 0
+                                alternates the two, the others play only it */
 #define MODE_BATTLE_MOVIE 0xE0A
 #define MODE_ENDING 0xE0B
 #endif
@@ -440,7 +472,7 @@ typedef struct GameState {
     /* 0x0001 */ u8 pad1; /* nothing reads or writes it */
     /* 0x0002 */ u8 version; /* a save's MEMCARD_SAVE_VERSION (stgmcard.h) */
     /* 0x0003 */ u8 pad3; /* nothing reads or writes it */
-    /* 0x0004 */ s8 digivolveDemo;
+    /* 0x0004 */ u8 digivolveDemo;
     /* 0x0005 */ u8 pad5[7]; /* nothing reads or writes them */
     /* 0x000C */ s32 unusedC; /* newGame sets it to -1; nothing reads it */
     /* 0x0010 */ u8 pad10[0x18]; /* nothing reads or writes them */
@@ -452,11 +484,7 @@ typedef struct GameState {
     /* 0x0040 */ s32 fieldDir;
     /* 0x0044 */ u16 place; /* where the last warp or trigger put the player (FieldBattles.id) */
     /* 0x0046 */ u16 placeArg; /* the place's argument, which the stage reads with it */
-    /* 0x0048 */ s32 playFrames; /* 8.8, counted by the vsync callback */
-    /* 0x004C */ s16 playHours;
-    /* 0x004E */ s16 playMinutes;
-    /* 0x0050 */ s16 playSeconds;
-    /* 0x0052 */ s16 playTimeMaxed;
+    /* 0x0048 */ PlayTime playTime;
     /* 0x0054 */ char name[0x18]; /* the player's */
     /* 0x006C */ s32 money;
     /* 0x0070 */ s32 party[PARTY_SIZE]; /* partner indices */
@@ -541,17 +569,46 @@ typedef struct GameState {
 #define GAME_SAVE_SIZE 0x26C4
 #endif
 
+void newGame(void);
+void commitMode(void);
+s32 getPrevMode(void);
+s32 getMode(void);
+s32 getModeArg(void);
+void requestMode(s32 mode, s32 arg);
+s32 isModeChangePending(void);
 s32 unequipItem(s32 slot, s32 item);
+void changeItem(s32 item, s32 add);
+void changeCard(s32 card, s32 add);
+void startCardBattle(s32 opponent, s32 kind);
 s32 checkPartner(u32 op, s32 arg);
+s32 checkMoney(s32 op, s32 item);
+s32 checkProgressRange(s32 unused, s32 index);
+s32 checkFlagCount(s32 unused, s32 mode);
+s32 showActorIcon(s32 op, s32 arg);
+s32 checkSpecialCondition(s32 id, s32 expected);
+s32 checkProgress(s32 value, s32 mode);
+s32 checkItem(s32 index, s32 mode);
+s32 checkCard(s32 card, s32 have);
+s32 checkPartyStat(s32 index, s32 mode);
+s32 checkWarpArg(s32 id, s32 mode);
 s32 findDigimon(s32 id);
+void clearBattleGauges(void);
 ItemInfo *getItem(s32 id);
+s32 getItemCategory(s32 id);
+s32 isItemKind(s32 item, s32 kind);
+s32 listItems(s32 type, s16 *out);
 DigimonData *getDigimon(s32 id);
 void initNewGameData(void);
-void addCards(s32 item, s32 count);
+void addCards(s32 card, s32 count);
 s32 findPartnerEntry(s32 slot, s32 id);
 void applyAction(s32 code, s32 value);
+s32 checkConditions(u16 *list);
+void applyActions(u16 *list);
+void updateModeFlags(void);
 s32 checkCondition(u16, u16);
 s32 testBit(u8 *bits, s32 index, s32 set);
+void setBit(u8 *bits, s32 index, s32 set);
+s32 checkItemSet(s32 op, s32 arg);
 s32 getPartnerSlots(s32 partner, s16 *out);
 void setPartnerSlots(s32 partner, s16 *ids);
 s32 listPartnerEntries(s32 partner, u16 *out);
@@ -576,18 +633,27 @@ extern BattleSetup BATTLE_SETUP;
 extern BattleResult BATTLE_RESULT;
 extern ItemInfo ITEMS[];
 extern TechData TECHS[];
-extern struct ItemInfo *(*GET_ITEM[])(s32 item);
-/* GET_ITEM's entries, each with its own type */
+
+/* A special condition (SPECIAL(id)): checkSpecialCondition runs the check
+   function of kind `check >> 4` (checkItemSet, checkPartner, ...) with
+   `check & 0xF` and arg */
+typedef struct SpecialCondition {
+    /* 0x0 */ u8 id;
+    /* 0x1 */ u8 check;
+    /* 0x2 */ u8 arg;
+} SpecialCondition;
+
+/* The item functions (ITEM_FUNCS) */
 typedef struct ItemFuncs {
     /* 0x0 */ struct ItemInfo *(*get)(s32 item); /* getItem */
-    /* 0x4 */ s32 (*getCategory)(s32 item); /* getItemCategory (u8, but the menus read an int) */
+    /* 0x4 */ s32 (*getCategory)(s32 item); /* getItemCategory */
     /* 0x8 */ s32 (*isKind)(s32 item, s32 kind); /* ItemInfo.kind == kind */
     /* 0xC */ s32 (*list)(s32 type, s16 *out); /* listItems */
 } ItemFuncs;
-#define ITEM_FUNCS ((ItemFuncs *)GET_ITEM)
+extern ItemFuncs ITEM_FUNCS;
 extern u8 ITEM_TYPE_CATEGORIES[];
 extern s32 MONEY_REQUIRED[];
-extern u8 SPECIAL_CONDITIONS[];
+extern SpecialCondition SPECIAL_CONDITIONS[];
 extern s32 MONEY_GAINS[];
 extern s32 MONEY_LOSSES[];
 extern GameFlags FLAGS_00;

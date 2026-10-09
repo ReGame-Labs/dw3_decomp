@@ -32,12 +32,12 @@ s32 STDWTITL_leaveTitle(TitleTask *task, TitleChildren *children) {
 #elif VERSION_EU
             if (LANGUAGE == 0) {
                 if (GAME.funcs.getPrevMode() == MODE_OPENING) {
-                    GAME.funcs.requestMode(0xE02, 0);
+                    GAME.funcs.requestMode(MODE_OPENING_2, 0);
                 } else {
                     GAME.funcs.requestMode(MODE_OPENING, 0);
                 }
             } else {
-                GAME.funcs.requestMode(0xE02, 0);
+                GAME.funcs.requestMode(MODE_OPENING_2, 0);
             }
 #endif
             left = 1;

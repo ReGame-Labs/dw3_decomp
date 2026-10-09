@@ -204,7 +204,7 @@ void STGTRAIN_updateActor(TrainActor *actor, TrainActorSprites *sprites) {
             }
             actor->scaleChanged = 0;
         }
-        switch ((u32)actor->mode) {
+        switch (actor->mode) {
         case 1:
             break;
         case 2:

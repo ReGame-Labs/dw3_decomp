@@ -12,8 +12,8 @@ static inline void lowerEnemyStat(BattleItem *task, BattleChild *children) {
     s32 def;
     s32 min;
 
-    fighter = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
-    stats = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+    fighter = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
+    stats = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     if (stats->stats[BATTLE_STAT_ATTACK] > stats->stats[BATTLE_STAT_DEFENSE]) {
         if (BATTLE_SETUP.blocks[BATTLE_BLOCK_LOWER_ATTACK] == 0) {
             task->lowered = 1;
@@ -71,7 +71,7 @@ static inline void setUpDrain(BattleItem *task, BattleChild *children) {
     children[0].script->effect = 0x1C;
     children[0].script->sound = 0x27;
     if (BATTLE_SETUP.blocks[BATTLE_BLOCK_DRAIN] == 0) {
-        enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+        enemy = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
         task->damage = enemy->maxHp * 20 / 100;
         if (enemy->hp - task->damage <= 0) {
             children[0].script->hits[3] = 2;
@@ -98,9 +98,9 @@ static inline void setUpItemTech(BattleItem *task, BattleChild *children) {
     children[0].script->effect = tech->scriptEffect;
     children[0].script->sound = tech->scriptSound;
     task->damage = WFIGHTMN_limitDamage(0, FIGHTSTG_battleFuncs.computeMagicDamage(0, 0x89), 0);
-    row = FIGHTSTG_battle.fighters[1];
+    row = FIGHTSTG_battle.state.fighters[1];
     if (task->damage > 0) {
-        if (row[FIGHTSTG_battle.active[1]].hp - task->damage <= 0) {
+        if (row[FIGHTSTG_battle.state.active[1]].hp - task->damage <= 0) {
             children[0].script->hits[3] = 2;
         } else {
             children[0].script->hits[3] = 1;
@@ -126,9 +126,9 @@ static inline void setItemScript(BattleItem *task, BattleChild *children) {
         }
     }
     if (task->item >= 0x2B && task->item < 0x2F) {
-        WFIGHTMN_setIdleMotion(0, -GET_ITEM[0](task->item)->data.effect->amount);
+        WFIGHTMN_setIdleMotion(0, -ITEM_FUNCS.get(task->item)->data.effect->amount);
     } else if (task->item == 0x47) {
-        WFIGHTMN_setIdleMotion(0, -((FIGHTSTG_battle.fighters[0] + FIGHTSTG_battle.active[0])->maxHp >> 1));
+        WFIGHTMN_setIdleMotion(0, -((FIGHTSTG_battle.state.fighters[0] + FIGHTSTG_battle.state.active[0])->maxHp >> 1));
     }
 }
 
@@ -196,7 +196,7 @@ s32 FIGHTSTG_runItemScript(BattleItem *task, BattleChild *children) {
             break;
         }
         task->step++;
-        if (FIGHTSTG_battle.kind == BATTLE_KIND_FINAL_LAST) {
+        if (FIGHTSTG_battle.state.kind == BATTLE_KIND_FINAL_LAST) {
             if (task->item == 0x5A) {
                 WFIGHTMN_countHit(0, task->damage);
             } else {
@@ -259,8 +259,8 @@ static inline void healPartner(BattleItem *task, BattleChild *children) {
     ItemEffect *effect;
     s32 heal;
 
-    fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
-    effect = GET_ITEM[0](task->item)->data.effect;
+    fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
+    effect = ITEM_FUNCS.get(task->item)->data.effect;
     if (fighter->maxHp == fighter->hp) {
         children[0].message = FIGHTSTG_createMessage();
         task->lines[0] = 0x2F;
@@ -288,7 +288,7 @@ static inline void cureStatus(BattleItem *task, BattleChild *children) {
     BattleFighter *fighter;
     StatusCure *cure;
 
-    fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+    fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
     switch (task->item) {
     case 0x42:
     default:
@@ -307,7 +307,7 @@ static inline void cureStatus(BattleItem *task, BattleChild *children) {
     children[0].message = FIGHTSTG_createMessage();
     if (fighter->flags & cure->flag) {
         fighter->flags &= ~cure->flag;
-        FIGHTSTG_events.funcs.useItem(0, FIGHTSTG_battle.active[0], cure->item);
+        FIGHTSTG_events.funcs.cureStatus(0, FIGHTSTG_battle.state.active[0], cure->item);
         task->lines[0] = cure->message;
         task->lines[1] = 0;
         children[0].message->show(children[0].message, 2, task->lines);
@@ -334,8 +334,8 @@ static inline void reviveParty(BattleItem *task, BattleChild *children) {
     case 1:
         if (children[0].task == NULL) {
             for (i = 0; i < 3; i++) {
-                if (FIGHTSTG_battle.fighters[0][i].hp == 0) {
-                    FIGHTSTG_battle.fighters[0][i].hp = FIGHTSTG_battle.fighters[0][i].maxHp;
+                if (FIGHTSTG_battle.state.fighters[0][i].hp == 0) {
+                    FIGHTSTG_battle.state.fighters[0][i].hp = FIGHTSTG_battle.state.fighters[0][i].maxHp;
                     WFIGHTMN_checkEquip(i);
                 }
             }
@@ -356,7 +356,7 @@ static inline void reviveParty(BattleItem *task, BattleChild *children) {
 static inline void restoreHalfHpMp(BattleItem *task, BattleChild *children) {
     BattleFighter *fighter;
 
-    fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+    fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
     children[0].message = FIGHTSTG_createMessage();
     if (fighter->hp != fighter->maxHp || fighter->mp != fighter->maxMp) {
         s32 half;
@@ -392,9 +392,9 @@ static inline void boostSpeed(BattleItem *task, BattleChild *children) {
     ItemEffect *effect;
     s32 max;
 
-    effect = GET_ITEM[0](task->item)->data.effect;
-    fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
-    stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
+    effect = ITEM_FUNCS.get(task->item)->data.effect;
+    fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
+    stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
     if (fighter->boosts[2] != 0) {
         stats->stats[BATTLE_STAT_SPEED] -= fighter->boosts[2];
     }
@@ -403,11 +403,11 @@ static inline void boostSpeed(BattleItem *task, BattleChild *children) {
     if (fighter->boosts[2] > max) {
         fighter->boosts[2] = max;
     }
-    FIGHTSTG_queueBoostEnd(SIDE_PLAYER, FIGHTSTG_battle.active[0], 2, 0);
+    FIGHTSTG_queueBoostEnd(SIDE_PLAYER, FIGHTSTG_battle.state.active[0], 2, 0);
     children[0].message = FIGHTSTG_createMessage();
     task->lines[0] = 0x32;
     task->lines[1] = 0;
-    task->lines[2] = FIGHTSTG_battle.active[0];
+    task->lines[2] = FIGHTSTG_battle.state.active[0];
     children[0].message->show(children[0].message, 7, task->lines);
     task->nextSubstate(task);
 }
@@ -420,9 +420,9 @@ static inline void boostAttack(BattleItem *task, BattleChild *children) {
     s32 max;
     s32 min;
 
-    effect = GET_ITEM[0](task->item)->data.effect;
-    fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
-    stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
+    effect = ITEM_FUNCS.get(task->item)->data.effect;
+    fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
+    stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
     if (fighter->boosts[0] != 0) {
         stats->stats[BATTLE_STAT_ATTACK] -= fighter->boosts[0];
     }
@@ -439,8 +439,8 @@ static inline void boostAttack(BattleItem *task, BattleChild *children) {
     if (fighter->boosts[1] < min) {
         fighter->boosts[1] = min;
     }
-    FIGHTSTG_queueBoostEnd(SIDE_PLAYER, FIGHTSTG_battle.active[0], 0, 0);
-    FIGHTSTG_queueBoostEnd(SIDE_PLAYER, FIGHTSTG_battle.active[0], 1, 0);
+    FIGHTSTG_queueBoostEnd(SIDE_PLAYER, FIGHTSTG_battle.state.active[0], 0, 0);
+    FIGHTSTG_queueBoostEnd(SIDE_PLAYER, FIGHTSTG_battle.state.active[0], 1, 0);
     children[0].message = FIGHTSTG_createMessage();
     task->lines[0] = 0x3C;
     task->lines[1] = 0;
@@ -456,9 +456,9 @@ static inline void boostDefense(BattleItem *task, BattleChild *children) {
     s32 max;
     s32 min;
 
-    effect = GET_ITEM[0](task->item)->data.effect;
-    fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
-    stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.active[0]);
+    effect = ITEM_FUNCS.get(task->item)->data.effect;
+    fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
+    stats = FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0]);
     if (fighter->boosts[0] != 0) {
         stats->stats[BATTLE_STAT_ATTACK] -= fighter->boosts[0];
     }
@@ -475,8 +475,8 @@ static inline void boostDefense(BattleItem *task, BattleChild *children) {
     if (fighter->boosts[0] < min) {
         fighter->boosts[0] = min;
     }
-    FIGHTSTG_queueBoostEnd(SIDE_PLAYER, FIGHTSTG_battle.active[0], 0, 0);
-    FIGHTSTG_queueBoostEnd(SIDE_PLAYER, FIGHTSTG_battle.active[0], 1, 0);
+    FIGHTSTG_queueBoostEnd(SIDE_PLAYER, FIGHTSTG_battle.state.active[0], 0, 0);
+    FIGHTSTG_queueBoostEnd(SIDE_PLAYER, FIGHTSTG_battle.state.active[0], 1, 0);
     children[0].message = FIGHTSTG_createMessage();
     task->lines[0] = 0x3D;
     task->lines[1] = 0;
@@ -487,7 +487,7 @@ static inline void boostDefense(BattleItem *task, BattleChild *children) {
 /* Item 0x4B: puts the partner in its special state, which doubles its
    effects */
 static inline void startSpecial(BattleItem *task, BattleChild *children) {
-    (FIGHTSTG_battle.fighters[0] + FIGHTSTG_battle.active[0])->special = 1;
+    (FIGHTSTG_battle.state.fighters[0] + FIGHTSTG_battle.state.active[0])->special = 1;
 #if VERSION_US
     FIGHTSTG_queueSpecialEnd();
 #endif
@@ -503,8 +503,8 @@ static inline void fillGauge(BattleItem *task, BattleChild *children) {
     ItemEffect *effect;
     s32 i;
 
-    effect = GET_ITEM[0](task->item)->data.effect;
-    i = GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]);
+    effect = ITEM_FUNCS.get(task->item)->data.effect;
+    i = GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0]);
     BATTLE_SETUP.gauges[i] += effect->amount;
     if (BATTLE_SETUP.gauges[i] >= 999) {
         BATTLE_SETUP.gauges[i] = 999;
@@ -519,8 +519,8 @@ static inline void fillGauge(BattleItem *task, BattleChild *children) {
 /* Items 0x4D-0x53: boost one element on the field */
 static inline void boostElement(BattleItem *task, BattleChild *children) {
     FIGHTSTG_queueClearField(FIGHTSTG_events.funcs.getDelay(0, 8));
-    FIGHTSTG_battle.boostElement = task->item - 0x4B;
-    FIGHTSTG_battle.boostAmount = 0x40;
+    FIGHTSTG_battle.state.boost.element = task->item - 0x4B;
+    FIGHTSTG_battle.state.boost.amount = 0x40;
     children[0].message = FIGHTSTG_createMessage();
     task->lines[0] = task->item + 0x16;
     children[0].message->show(children[0].message, 1, task->lines);
@@ -530,8 +530,8 @@ static inline void boostElement(BattleItem *task, BattleChild *children) {
 /* Item 0x54: boosts the element its script picked at random on the field */
 static inline void boostRandomElement(BattleItem *task, BattleChild *children) {
     FIGHTSTG_queueClearField(FIGHTSTG_events.funcs.getDelay(0, 8));
-    FIGHTSTG_battle.boostElement = task->element;
-    FIGHTSTG_battle.boostAmount = 0x7F;
+    FIGHTSTG_battle.state.boost.element = task->element;
+    FIGHTSTG_battle.state.boost.amount = 0x7F;
     children[0].message = FIGHTSTG_createMessage();
     task->lines[0] = task->element + 0x61;
     children[0].message->show(children[0].message, 1, task->lines);
@@ -547,7 +547,7 @@ static inline void drainEnemy(BattleItem *task, BattleChild *children) {
         children[0].message = FIGHTSTG_createMessage();
         task->lines[0] = 0x10;
         task->lines[1] = task->damage;
-        fighter = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+        fighter = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
         if (fighter->hp - task->damage <= 0) {
             children[0].message->show(children[0].message, 4, task->lines);
             fighter->hp = 0;
@@ -555,7 +555,7 @@ static inline void drainEnemy(BattleItem *task, BattleChild *children) {
         } else {
             children[0].message->show(children[0].message, 0x14, task->lines);
             fighter->hp -= task->damage;
-            fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+            fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
             fighter->hp += task->damage;
             if (fighter->hp > fighter->maxHp) {
                 fighter->hp = fighter->maxHp;
@@ -576,9 +576,9 @@ static inline void confuseFighters(BattleItem *task, BattleChild *children) {
     BattleFighter *enemy;
     ItemEffect *effect;
 
-    effect = GET_ITEM[0](task->item)->data.effect;
-    fighter = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
-    enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+    effect = ITEM_FUNCS.get(task->item)->data.effect;
+    fighter = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
+    enemy = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
     switch (task->step) {
     case 0:
     default:
@@ -625,8 +625,8 @@ static inline void weakenEnemyDefense(BattleItem *task, BattleChild *children) {
     s32 def;
 
     if (BATTLE_SETUP.blocks[BATTLE_BLOCK_LOWER_DEFENSE] == 0) {
-        enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
-        stats = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        enemy = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
+        stats = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
         atk = stats->stats[BATTLE_STAT_ATTACK];
         def = stats->stats[BATTLE_STAT_DEFENSE];
         if (enemy->boosts[0] != 0) {
@@ -644,8 +644,8 @@ static inline void weakenEnemyDefense(BattleItem *task, BattleChild *children) {
         if (enemy->boosts[1] < -stats->stats[BATTLE_STAT_DEFENSE] / 2) {
             enemy->boosts[1] = -stats->stats[BATTLE_STAT_DEFENSE] / 2;
         }
-        FIGHTSTG_queueBoostEnd(SIDE_ENEMY, FIGHTSTG_battle.active[1], 0, 0);
-        FIGHTSTG_queueBoostEnd(SIDE_ENEMY, FIGHTSTG_battle.active[1], 1, 0);
+        FIGHTSTG_queueBoostEnd(SIDE_ENEMY, FIGHTSTG_battle.state.active[1], 0, 0);
+        FIGHTSTG_queueBoostEnd(SIDE_ENEMY, FIGHTSTG_battle.state.active[1], 1, 0);
         children[0].message = FIGHTSTG_createMessage();
         task->lines[0] = 0x40;
         task->lines[1] = 0x10;
@@ -663,19 +663,19 @@ static inline void weakenEnemyDefense(BattleItem *task, BattleChild *children) {
 static inline void showLoweredStat(BattleItem *task, BattleChild *children) {
     switch (task->lowered) {
     case 1:
-        FIGHTSTG_queueBoostEnd(SIDE_ENEMY, FIGHTSTG_battle.active[1], 0, 0);
+        FIGHTSTG_queueBoostEnd(SIDE_ENEMY, FIGHTSTG_battle.state.active[1], 0, 0);
         children[0].message = FIGHTSTG_createMessage();
         task->lines[0] = 0x33;
         task->lines[1] = 0x10;
-        task->lines[2] = FIGHTSTG_battle.active[1];
+        task->lines[2] = FIGHTSTG_battle.state.active[1];
         children[0].message->show(children[0].message, 2, task->lines);
         break;
     case 2:
-        FIGHTSTG_queueBoostEnd(SIDE_ENEMY, FIGHTSTG_battle.active[1], 1, 0);
+        FIGHTSTG_queueBoostEnd(SIDE_ENEMY, FIGHTSTG_battle.state.active[1], 1, 0);
         children[0].message = FIGHTSTG_createMessage();
         task->lines[0] = 0x34;
         task->lines[1] = 0x10;
-        task->lines[2] = FIGHTSTG_battle.active[1];
+        task->lines[2] = FIGHTSTG_battle.state.active[1];
         children[0].message->show(children[0].message, 2, task->lines);
         break;
     default:
@@ -696,9 +696,9 @@ static inline void lowerEnemySpeed(BattleItem *task, BattleChild *children) {
     s32 min;
 
     if (BATTLE_SETUP.blocks[BATTLE_BLOCK_LOWER_SPEED] == 0) {
-        effect = GET_ITEM[0](task->item)->data.effect;
-        enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
-        stats = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.active[1]);
+        effect = ITEM_FUNCS.get(task->item)->data.effect;
+        enemy = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
+        stats = FIGHTSTG_battleFuncs.computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
         if (enemy->boosts[2] != 0) {
             stats->stats[BATTLE_STAT_SPEED] -= enemy->boosts[2];
         }
@@ -707,11 +707,11 @@ static inline void lowerEnemySpeed(BattleItem *task, BattleChild *children) {
         if (enemy->boosts[2] < min) {
             enemy->boosts[2] = min;
         }
-        FIGHTSTG_queueBoostEnd(SIDE_ENEMY, FIGHTSTG_battle.active[1], 2, 0);
+        FIGHTSTG_queueBoostEnd(SIDE_ENEMY, FIGHTSTG_battle.state.active[1], 2, 0);
         children[0].message = FIGHTSTG_createMessage();
         task->lines[0] = 0x35;
         task->lines[1] = 0x10;
-        task->lines[2] = FIGHTSTG_battle.active[1];
+        task->lines[2] = FIGHTSTG_battle.state.active[1];
         children[0].message->show(children[0].message, 2, task->lines);
         task->nextSubstate(task);
         return;
@@ -731,7 +731,7 @@ static inline void damageEnemy(BattleItem *task, BattleChild *children) {
         task->lines[0] = 0x10;
         task->lines[1] = task->damage;
         children[0].message->show(children[0].message, 4, task->lines);
-        enemy = &FIGHTSTG_battle.fighters[1][FIGHTSTG_battle.active[1]];
+        enemy = &FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]];
         if (enemy->hp - task->damage <= 0) {
             enemy->hp = 0;
             FIGHTSTG_queueKnockOut(SIDE_ENEMY);
@@ -845,7 +845,7 @@ void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
         case 2:
             if (children[0].task == NULL) {
                 GAME.items[task->item]--;
-                if (task->item == 0x55 && FIGHTSTG_battle.kind == BATTLE_KIND_FINAL_LAST) {
+                if (task->item == 0x55 && FIGHTSTG_battle.state.kind == BATTLE_KIND_FINAL_LAST) {
                     children[0].enemyAttack = FIGHTSTG_startEnemyAttack(1, 0);
                     task->nextSubstate(task);
                 } else {

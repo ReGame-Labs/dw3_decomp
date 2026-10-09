@@ -156,8 +156,8 @@ struct BattleScript {
     /* 0x84 */ s32 pad; /* nothing uses it */
     /* 0x88 */ Models *models;
     /* 0x8C */ s16 *pc;
-    /* 0x90 */ s32 scripts; /* how many hits command 5 has played */
-    /* 0x94 */ s32 sounds; /* and the sound commands */
+    /* 0x90 */ s32 hitsPlayed; /* how many hits command 5 has played */
+    /* 0x94 */ s32 soundsPlayed; /* and the sound commands */
     /* 0x98 */ s32 waiting;
     /* 0x9C */ s32 wait; /* the time left */
     /* 0xA0 */ s32 loadStep; /* FIGHTSTG_runScriptEffect's, loading a 2D effect */
@@ -193,10 +193,21 @@ ScreenFade *FIGHTSTG_createFader(void);
 BattleScript *FIGHTSTG_createBattleScript(void);
 
 /* Shared between the overlay's objects */
+s32 FIGHTSTG_getScriptModel(BattleScript *script, s32 type);
+void FIGHTSTG_runScriptHits(BattleScript *script, BattleScriptChildren *children);
+s32 FIGHTSTG_runScriptModel(BattleScript *script, BattleScriptChildren *children);
+s32 FIGHTSTG_runScriptEffect(BattleScript *script, BattleScriptChildren *children);
+s32 FIGHTSTG_runScriptEffectModel(BattleScript *script, BattleScriptChildren *children);
+void FIGHTSTG_runScriptCamera(BattleScript *script, BattleScriptChildren *children);
+s32 FIGHTSTG_runScriptWait(BattleScript *script, BattleScriptChildren *children);
+s32 FIGHTSTG_runScriptStage(BattleScript *script, BattleScriptChildren *children);
+void FIGHTSTG_runScriptSound(BattleScript *script, BattleScriptChildren *children);
+void FIGHTSTG_runScriptFade(BattleScript *script, WhiteFlash **fade);
 void FIGHTSTG_updateBattleScript(BattleScript *script, BattleScriptChildren *children);
 void FIGHTSTG_updateHitEffect(HitEffect *task, HitEffectChildren *children);
 void FIGHTSTG_updateFader(ScreenFade *task);
 void FIGHTSTG_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
+void FIGHTSTG_drawFader(ScreenFade *task);
 void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *children);
 void FIGHTSTG_drawWhiteFlash(WhiteFlash *task);
 void FIGHTSTG_updateWhiteFlash(WhiteFlash *task);
@@ -206,9 +217,13 @@ WhiteFlash *FIGHTSTG_startWhiteFlash(s32 frames);
 extern s32 FIGHTSTG_battleSounds[]; /* sound ids */
 extern EffectSheet FIGHTSTG_effectSheets[];
 extern SpriteEffectEntry FIGHTSTG_spriteEffects[];
+void FIGHTSTG_nop(void);
 void FIGHTSTG_drawSpriteAnim(void *arg, Layer *layer);
+void FIGHTSTG_updateSpriteAnim(SpriteAnim *task);
+void FIGHTSTG_updateBattleSound(BattleSound *task);
 BattleSound *FIGHTSTG_playBattleSound(s32 index, s32 time);
 s32 FIGHTSTG_findEffectSheet(s32 effect, s32 *images, s32 *sheet, Vec2 *texPos);
+void FIGHTSTG_updateSpriteEffect(SpriteEffect *task, SpriteAnim **children);
 SpriteAnim *FIGHTSTG_createSpriteAnim(s16 *data, SVECTOR *pos, s32 sheet, Vec2 *texPos, s32 layerId);
 SpriteEffect *FIGHTSTG_startSpriteEffect(s32 effect, const SVECTOR *pos);
 

@@ -235,10 +235,7 @@ typedef struct SpriteDrawer {
     /* 0x2C */ s32 transformDirty;
     /* 0x30 */ s32 pivotX;
     /* 0x34 */ s32 pivotY;
-    /* 0x38 */ s32 scaleX;
-    /* 0x3C */ s32 scaleY;
-    /* 0x40 */ s32 scaleZ;
-    /* 0x44 */ u8 pad44[4]; /* nothing reads or writes them */
+    /* 0x38 */ VECTOR scale; /* ScaleMatrix's */
     /* 0x48 */ SVECTOR rot;
     /* 0x50 */ MATRIX matrix;
     /* 0x70 */ void (*bind)(); /* (drawer) */
@@ -291,7 +288,7 @@ typedef struct TimBlock {
     /* 0x6 */ u16 y;
     /* 0x8 */ u16 w; /* in halfwords */
     /* 0xA */ u16 h;
-    /* 0xC */ u_long pixels[0];
+    /* 0xC */ u_long pixels[FLEXIBLE];
 } TimBlock;
 
 /* Where timLoaderLoad is in a TIM: its words, then its blocks, which their
@@ -352,41 +349,78 @@ Layer *getLayer(s32 id);
 Layer *createLayer(RECT *rect, s32 otShift, s32 id);
 s32 destroyLayer(s32 id);
 void moveLayer(s32 id, s32 targetId, s32 delta);
+void layerClearOt(Layer *layer);
 u_long *layerGetOtEntryZ(Layer *layer, s32 z);
+u_long *layerGetOt(Layer *layer);
+s32 layerGetOtShift(LayerView *layer);
+void layerSetBgColor(LayerView *layer, s32 r, s32 g, s32 b); /* old-style: u8 r, g, b */
+void layerSetOffset(LayerView *layer, s32 x, s32 y); /* old-style: s16 x, y */
+void layerGetScroll(LayerView *layer, Vec2 *out);
+void layerSetScroll(LayerView *layer, s32 x, s32 y);
+void layerAddScroll(LayerView *layer, s32 dx, s32 dy);
+void layerSetClipPos(LayerView *layer, s32 x, s32 y); /* old-style: s16 x, y */
+void layerSetClipSize(LayerView *layer, s32 w, s32 h); /* old-style: s16 w, h */
+void layerGetViewRect(LayerView *layer, Rect16 *rect);
+void layerFree(Layer *layer);
+void layerResetCallbacks(Layer *layer);
+void layerAllocCallbacks(Layer *layer, s32 count);
+void layerAddSortedCallback(Layer *layer, void (*func)(s32, void *, s32), s32 arg, s32 priority, s32 param);
+void layerAddCallback(Layer *layer, void (*func)(s32, void *, s32), s32 arg);
+void layerRunCallbacks(Layer *layer);
+void layerSetKeepView(Layer *layer, s32 enable, s32 projection);
+void layerLoadView(Layer *layer);
+void layerSetKeepLightMatrix(Layer *layer, s32 enable);
+void layerLoadLightMatrix(Layer *layer);
 void layerSkipEmptyOt(Layer *layer);
+void layerDraw(Layer *layer);
+u_long *layerGetOtEntry(Layer *layer, s32 depth);
 Layer *newLayer(DRAWENV *env, s32 otShift);
 s32 findLayerSlot(s32 id);
 void removeLayerSlot(s32 index);
+void insertLayerSlot(s32 index, Layer *layer, s32 id);
 void initTimLoader(TimLoader *obj);
 void vsyncCallback(void);
+void startVSyncCallback(void);
+void drawFrame(s32 draw);
+s32 getFrameCount(void);
+s32 getTime(void);
+s32 getFrameTime(void);
+void resetGraphics(void);
+void allocPrimBuffers(s32 size);
+void *getPrim(void);
+void setPrim(void *next);
+void freePrimBuffers(void);
+void setDisplayMode(s32 w, s32 h, s32 hires, s32 interlace);
+void setDisplayArea(s32 x, s32 y, s32 w, s32 h);
 void bindCardDrawer(CardDrawer *obj);
-void cardDrawerSetCard();
-void cardDrawerLoadImage();
-void cardDrawerSetLayer();
-void cardDrawerSetImagePos();
-void cardDrawerSetClutPos();
-void cardDrawerSetCell();
-void cardDrawerSetClutStride();
-void cardDrawerSetSemiTrans();
-void cardDrawerDraw();
+void cardDrawerSetCard(s32 id);
+void cardDrawerLoadImage(void);
+void cardDrawerSetLayer(s32 id, s32 depth);
+void cardDrawerSetImagePos(s32 x, s32 y);
+void cardDrawerSetClutPos(s32 x, s32 y);
+void cardDrawerSetCell(s32 x, s32 y);
+void cardDrawerSetClutStride(s32 stride);
+void cardDrawerSetSemiTrans(s32 on);
+void cardDrawerDraw(s32 x, s32 y);
 s32 cardDrawerGetKind(void);
 void bindSpriteDrawer(SpriteDrawer *obj);
-void spriteDrawerSetTexture();
-void spriteDrawerSetAltClut();
-void spriteDrawerSetClutRow();
+void spriteDrawerSetTexture(s32 x, s32 y);
+void spriteDrawerSetAltClut(s32 x, s32 y);
+void spriteDrawerSetClutRow(s32 row);
 void spriteDrawerSetLayer(Layer *layer, s32 arg1);
+void spriteDrawerSetLayerId(s32 id, s32 depth);
 void spriteDrawerDraw(s32 *sheet, s32 frame, s32 x, s32 y);
-void spriteDrawerSetScale();
-void spriteDrawerSetRotation(s16 x, s16 y, s16 z);
-void spriteDrawerSetPivot();
-void spriteDrawerSetFollowScroll();
+void spriteDrawerSetScale(s32 x, s32 y, s32 z);
+void spriteDrawerSetRotation(s32 x, s32 y, s32 z); /* old-style: s16 x, y, z */
+void spriteDrawerSetPivot(s32 x, s32 y);
+void spriteDrawerSetFollowScroll(s32 on);
 void spriteDrawerSetColor(CVECTOR *color);
 void bindTimLoader(TimLoader *obj);
-void timLoaderSetImagePos();
-void timLoaderSetClutPos();
-void timLoaderLoad();
-void timLoaderLoadArchive();
-void timLoaderSetBufferSize();
+void timLoaderSetImagePos(s32 x, s32 y);
+void timLoaderSetClutPos(s32 x, s32 y);
+void timLoaderLoad(void *tim);
+void timLoaderLoadArchive(void *archive);
+void timLoaderSetBufferSize(s32 size);
 void initSpriteDrawer(struct SpriteDrawer *obj);
 void initCardDrawer(CardDrawer *obj);
 void screenFadeStart(ScreenFade *task, s32 fadeIn, s32 duration);

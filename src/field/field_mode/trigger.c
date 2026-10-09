@@ -8,7 +8,7 @@
    count only while the player faces them */
 s32 FIELDSTG_findTrigger(Triggers *task) {
     Actor *actor = task->actor;
-    Point tile;
+    Vec2 tile;
     u32 cell;
     s32 type;
 
@@ -138,7 +138,7 @@ s32 FIELDSTG_offerTrigger(Triggers *task, TriggerChildren *children) {
     return 1;
 }
 
-const Point FIELDSTG_noOffset = {0, 0};
+const Vec2 FIELDSTG_noOffset = {0, 0};
 
 /* Sets off the slot the player pressed cross on */
 void FIELDSTG_setOffTrigger(Triggers *task) {
@@ -178,7 +178,7 @@ void FIELDSTG_setOffTrigger(Triggers *task) {
             task->actor->dropDown(task->actor, task->dir, FIELDSTG_noOffset, task->entry->arg * 16);
             break;
         case SLOT_GAUGE:
-            task->actor->playGauge(task->actor, task->dir, (Point){task->entry->arg, task->entry->x});
+            task->actor->playGauge(task->actor, task->dir, (Vec2){task->entry->arg, task->entry->x});
             break;
         case SLOT_WARP0:
             task->actor->warp(task->actor, SLOT_DEST(task->entry), 0);
@@ -202,7 +202,7 @@ void FIELDSTG_updateTriggers(Triggers *task, TriggerChildren *children) {
             }
             break;
         case TASK_RUN:
-            if (FIELDSTG_state.busy != 0 || FIELDSTG_state.bannerShown != 0) {
+            if (FIELDSTG_state.busy != 0 || FIELDSTG_state.frozen != 0) {
                 break;
             }
             switch (task->substate) {
@@ -216,7 +216,7 @@ void FIELDSTG_updateTriggers(Triggers *task, TriggerChildren *children) {
                     if (FIELDSTG_findTrigger(task) == 0) {
                         task->setSubstate(task, 0);
                         children->balloon->setState(children->balloon, TASK_DONE);
-                    } else if ((PAD.getPressed(0) & (1 << PAD_CROSS)) && FIELDSTG_state.bannerShown == 0) {
+                    } else if ((PAD.getPressed(0) & (1 << PAD_CROSS)) && FIELDSTG_state.frozen == 0) {
                         children->balloon->setState(children->balloon, TASK_KILL);
                         FIELDSTG_setOffTrigger(task);
                         task->nextSubstate(task);

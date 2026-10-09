@@ -17,8 +17,8 @@ CdReader CD_READER = {
 s32 cdCheckSector(void) {
     s32 pos;
 
-    CdGetSector(CD_SECTOR_HEADER, 3);
-    pos = CdPosToInt(CD_SECTOR_HEADER);
+    CdGetSector(&CD_SECTOR_HEADER, 3);
+    pos = CdPosToInt(&CD_SECTOR_HEADER.pos);
     if (pos == CD_READER.nextSector) {
         CD_READER.nextSector = pos + 1;
         return 0;

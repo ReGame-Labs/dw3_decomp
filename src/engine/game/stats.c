@@ -14,18 +14,18 @@ void setStat(s32 partner, u32 stat, s16 value) {
     PartnerStats *d = &GAME.partners[partner].info;
     s16 *p = d->stats;
 
-    if (stat < 19) {
+    if (stat < STAT_COUNT) {
         p += stat;
         *p = value;
         if (value < 0) {
             *p = 0;
             return;
         }
-        if (stat < 2) {
+        if (stat < STAT_HP) {
             if (value >= 100) {
                 *p = 99;
             }
-        } else if (stat - 2 < 4) {
+        } else if (stat - STAT_HP < 4) {
             if (value >= 10000) {
                 *p = 9999;
             }
@@ -41,17 +41,17 @@ void addStat(s32 partner, u32 stat, s32 delta) {
     s16 *stats = d->stats;
     s16 value;
 
-    if (stat < 19) {
+    if (stat < STAT_COUNT) {
         stats += stat;
         value = *stats + delta;
         *stats = value;
         if (value < 0) {
             *stats = 0;
-        } else if (stat < 2) {
+        } else if (stat < STAT_HP) {
             if (value >= 100) {
                 *stats = 99;
             }
-        } else if (stat - 2 < 4) {
+        } else if (stat - STAT_HP < 4) {
             if (value >= 10000) {
                 *stats = 9999;
             }
@@ -60,14 +60,6 @@ void addStat(s32 partner, u32 stat, s32 delta) {
         }
     }
 }
-
-/*
- * PartnerStats' 19 stats and the 3 status values after them, which
- * computeStats copies into PartnerTotals as one struct
- */
-typedef struct StatBlock {
-    s16 v[22];
-} StatBlock;
 
 /* A partner's stats with its equipment (and its equipment set bonus) added */
 void computeStats(s32 partner, PartnerTotals *out) {
@@ -88,7 +80,7 @@ void computeStats(s32 partner, PartnerTotals *out) {
     equip = d->equip;
     for (i = 0; i < 6; i++) {
         if (equip[i] > 0) {
-            info = GET_ITEM[0](equip[i]);
+            info = ITEM_FUNCS.get(equip[i]);
             type = info->type;
             data = info->data.record;
             if (IS_WEAPON_TYPE(type)) {

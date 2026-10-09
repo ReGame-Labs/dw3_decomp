@@ -38,16 +38,16 @@ static inline void placeTransitionTiles(void) {
 
 /* Asks for the battle's files once the CD has been free on two frames */
 static inline void waitToRequestBattleFiles(void) {
-    switch (FIELDSTG_tileRequests) {
+    switch (FIELDSTG_battleFileStep) {
     case 0:
         if (CD_READER.isBusy() == 0) {
-            FIELDSTG_tileRequests++;
+            FIELDSTG_battleFileStep++;
         }
         break;
     case 1:
         if (CD_READER.isBusy() == 0) {
             requestBattleFiles();
-            FIELDSTG_tileRequests++;
+            FIELDSTG_battleFileStep++;
         }
         break;
     }
@@ -132,8 +132,9 @@ void FIELDSTG_playBattleTransition(FieldTask *task, FieldChildren *fieldChildren
             }
             children++;
         }
-        FIELDSTG_tileRequests = 0;
+        FIELDSTG_battleFileStep = 0;
         task->nextSubstate(task);
+        /* fallthrough */
     case 1:
         waitToRequestBattleFiles();
         layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
@@ -218,6 +219,7 @@ void FIELDSTG_closeField(FieldTask *task, FieldChildren *children) {
         task->fade = 0;
         task->height = SCREEN_HEIGHT;
         task->nextSubstate(task);
+        /* fallthrough */
     case 1:
         layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
         layer->setBgColor(layer, 1, 1, 1);
@@ -430,6 +432,7 @@ static inline void warpAway(FieldTask *task, FieldChildren *children) {
         children->effect = FIELDSTG_createEffect(task->warpPos.x, task->warpPos.y, task->warpKind);
         SOUND.playSound(SOUND_DIGIMENT);
         task->nextStep(task);
+        /* fallthrough */
     case 1:
         if (task->counter < 0x3C) {
             task->counter += GFX.funcs.getFrameTime();
@@ -438,6 +441,7 @@ static inline void warpAway(FieldTask *task, FieldChildren *children) {
         children->fade = createScreenFade(FIELD_LAYER_MAP);
         children->fade->start(children->fade, 0, 0x14);
         task->nextStep(task);
+        /* fallthrough */
     case 2:
         if (children->fade->state == TASK_DONE) {
             killCharacters(children);
@@ -463,12 +467,12 @@ static inline void warpAway(FieldTask *task, FieldChildren *children) {
  * the field is idle; the player's place is kept to come back to
  */
 static inline void openFieldMenu(FieldTask *task, FieldChildren *children) {
-    if (FIELDSTG_state.innOpen != 1 && FIELDSTG_state.busy == 0 && FIELDSTG_state.acting == 0) {
+    if (FIELDSTG_state.menuOpen != 1 && FIELDSTG_state.busy == 0 && FIELDSTG_state.acting == 0) {
         do {
             if (GAME.progress < 4 || !(PAD.getPressed(0) & (1 << PAD_START))) {
                 break;
             }
-            FIELDSTG_state.innOpen = 1;
+            FIELDSTG_state.menuOpen = 1;
             FIELDSTG_state.busy = 1;
             children->menu = createFieldMenu(FIELD_LAYER_MAP, 0);
             GAME.fieldMode = GAME.funcs.getMode();
@@ -541,6 +545,7 @@ static inline void showField(FieldTask *task, FieldChildren *children) {
             }
             children->mapStreamer = FIELDSTG_createMapStreamer(FIELDSTG_state.mapFile);
             task->nextStep(task);
+            /* fallthrough */
         case 1:
             if (children->mapStreamer->state == TASK_RUN && children->banner->state == TASK_DONE) {
                 children->banner->setSubstate(children->banner, 1);
@@ -573,6 +578,7 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
         case 0:
         default:
             startField(task, children);
+            /* fallthrough */
         case 1:
             switch (task->step) {
             case 0:
@@ -581,6 +587,7 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
                     SOUND.loadBank(FIELDSTG_state.soundBank);
                 }
                 task->nextStep(task);
+                /* fallthrough */
             case 1:
                 if (SOUND.isLoading() == 0) {
                     if (FIELDSTG_state.music != 0) {
@@ -632,14 +639,14 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
             break;
         case 1:
             if (children->menu == NULL) {
-                FIELDSTG_state.innOpen = 0;
+                FIELDSTG_state.menuOpen = 0;
                 FIELDSTG_state.busy = 0;
                 task->setSubstate(task, 0);
             }
             break;
         case 2:
             if (children->awaited.inn == NULL) {
-                FIELDSTG_state.innOpen = 0;
+                FIELDSTG_state.menuOpen = 0;
                 FIELDSTG_state.busy = 0;
                 task->setSubstate(task, 0);
             }
@@ -655,7 +662,7 @@ void FIELDSTG_updateField(FieldTask *task, FieldChildren *children) {
             break;
         }
         if (task->leaveDelay <= 0) {
-            FIELDSTG_state.bannerShown = 1;
+            FIELDSTG_state.frozen = 1;
             FIELDSTG_closeField(task, children);
             break;
         }
@@ -1000,7 +1007,7 @@ void FIELDSTG_startEncounter(s32 encounter) {
 
 /* Starts battle 5 of the fourth area: the end of the stages' events 9000 */
 void *FIELDSTG_startEventBattle5(void) {
-    Battle *battle = FIELDSTG_state.battles->battles[3]->battles[5];
+    AreaBattle *battle = FIELDSTG_state.battles->battles[3]->battles[5];
 
     FIELDSTG_startBattle(battle);
     FLAGS_00.applyAction(FIELD_FLAG_ENCOUNTERED, 1);
@@ -1020,7 +1027,7 @@ void FIELDSTG_openInn(void) {
     FieldTask *task = TASK_REGISTRY.funcs.find(FIELD_TASK_FIELD, -1, -1);
     FieldChildren *children = task->children;
 
-    FIELDSTG_state.innOpen = 1;
+    FIELDSTG_state.menuOpen = 1;
     FIELDSTG_state.busy = 1;
     children->awaited.inn = createInn(FIELD_LAYER_MAP);
     task->setSubstate(task, 2);
@@ -1028,7 +1035,7 @@ void FIELDSTG_openInn(void) {
 
 /* Starts a warp from pos: the field task plays the effect and the cutscene
    of kind, then leaves for the warp's mode */
-void FIELDSTG_startWarp(s32 kind, Point *pos, SlotDest *dest) {
+void FIELDSTG_startWarp(s32 kind, Vec2 *pos, SlotDest *dest) {
     FieldTask *task = TASK_REGISTRY.funcs.find(FIELD_TASK_FIELD, -1, -1);
 
     task->warpKind = kind;

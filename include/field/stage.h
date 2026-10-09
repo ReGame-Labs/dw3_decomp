@@ -86,22 +86,16 @@ typedef struct StageEffect {
     /* 0x64 */ StageSprite sprites[2]; /* drawn at depth 6 and 4 */
 } StageEffect;
 
-/* A value that goes between 0 and 0x1000 (1.0) by a step each frame */
-typedef struct StageTween {
-    /* 0x0 */ s32 duration; /* in frames, going up */
-    /* 0x4 */ s32 step;
-    /* 0x8 */ s32 value;
-    /* 0xC */ s32 active;
-} StageTween;
-
 /*
  * The table of a stage's functions: its setup, then the menu stages' tween
- * (startTween and updateTween)
+ * (startTween and updateTween), which opens and closes a menu panel as the
+ * menus' PanelAnim does (shared/start_fade.inc.c, update_fade.inc.c; the
+ * stages' copy sets step before level)
  */
 typedef struct StageFuncs {
     /* 0x0 */ void (*setup)(void); /* fills FIELDSTG_state */
-    /* 0x4 */ void (*start)(StageTween *tween, s32 up);
-    /* 0x8 */ s32 (*update)(StageTween *tween); /* whether it has ended */
+    /* 0x4 */ void (*start)(PanelAnim *tween, s32 up);
+    /* 0x8 */ s32 (*update)(PanelAnim *tween); /* whether it has ended */
 } StageFuncs;
 
 /* The task that animates the map objects */
@@ -126,21 +120,6 @@ typedef struct StageTileEffect {
     /* 0x54 */ s32 y;
     /* 0x58 */ StageTileAnim anims[3];
 } StageTileEffect;
-
-/* A character on the field (FIELDSTG's Actor), as far as the stages use it */
-typedef struct StageActor {
-    TASK_HEADER(StageActor);
-    /* 0x50 */ s32 x;
-    /* 0x54 */ s32 y;
-    /* 0x58 */ s32 tileX;
-    /* 0x5C */ s32 tileY;
-    /* 0x60 */ s32 dir;
-    /* 0x64 */ s32 z; /* how high it is off the ground, in 1/256 pixels */
-    /* 0x68 */ s32 speed;
-    /* 0x6C */ struct ActorImage *image;
-    /* 0x70 */ struct FieldImage *fieldImage; /* the field's image, for the shadow */
-    /* 0x74 */ s32 hasShadow; /* drawn with a shadow */
-} StageActor;
 
 /* The children of a task with one per party slot */
 typedef struct StagePartyChildren {
@@ -240,7 +219,7 @@ typedef struct StageTilePairN {
  */
 typedef struct StageSpritePair {
     TASK_HEADER(StageSpritePair);
-    /* 0x50 */ s32 unk50; /* unused */
+    /* 0x50 */ s32 pad50; /* never read or written */
     /* 0x54 */ s32 x;
     /* 0x58 */ s32 y;
     /* 0x5C */ AnimState anims[2];
@@ -315,16 +294,21 @@ typedef struct StageEffectSpot {
     /* 0x8 */ s32 y;
 } StageEffectSpot;
 
-/* The body of a StageFaller: falls at (x, y) in 8.8, bouncing once */
-typedef struct StageFallBody {
+/*
+ * What moves a StageFaller or the StageMover of WSTAG415 at (x, y) in 8.8,
+ * and its animation: one layout in both, whose animation the two step
+ * functions, copies of each other, play (stepFallBody loops it,
+ * stepMoverBody holds its last frame)
+ */
+typedef struct StageBody {
     /* 0x00 */ s32 x;
     /* 0x04 */ s32 y;
     /* 0x08 */ s32 vx;
     /* 0x0C */ s32 vy;
-    /* 0x10 */ s16 unk10; /* unused */
-    /* 0x12 */ s16 bounced;
+    /* 0x10 */ s16 timer; /* the mover's frames of falling; a faller never sets it */
+    /* 0x12 */ s16 mode; /* the mover's; a faller's is 1 once it has bounced */
     /* 0x14 */ AnimState anim;
-} StageFallBody;
+} StageBody;
 
 /* A sprite of WSTAG415 that falls from a point of a table, bounces once and dies at the bottom */
 typedef struct StageFaller {
@@ -332,7 +316,7 @@ typedef struct StageFaller {
     /* 0x50 */ s32 frame;
     /* 0x54 */ s32 x;
     /* 0x58 */ s32 y;
-    /* 0x5C */ StageFallBody body;
+    /* 0x5C */ StageBody body;
 } StageFaller;
 
 /* Where a StageFaller starts and how it falls */
@@ -346,17 +330,6 @@ typedef struct StageFallParams {
     /* 0xE */ s16 bounce; /* divides vy when bouncing, 0 for no bounce */
 } StageFallParams;
 
-/* What moves a StageMover at (x, y) in 8.8, and its animation */
-typedef struct StageMoverBody {
-    /* 0x00 */ s32 x;
-    /* 0x04 */ s32 y;
-    /* 0x08 */ s32 vx;
-    /* 0x0C */ s32 vy;
-    /* 0x10 */ s16 timer;
-    /* 0x12 */ s16 mode;
-    /* 0x14 */ AnimState anim;
-} StageMoverBody;
-
 /* The object of WSTAG415 that events 0x331 to 0x334 drive */
 typedef struct StageMover {
     TASK_HEADER(StageMover);
@@ -364,7 +337,7 @@ typedef struct StageMover {
     /* 0x54 */ s32 x;
     /* 0x58 */ s32 y;
     /* 0x5C */ StageTile *tile; /* the map object (FieldState.objects) with animation 1 */
-    /* 0x60 */ StageMoverBody body;
+    /* 0x60 */ StageBody body;
 } StageMover;
 
 /* A scrolling background of two images of an archive, moving by (vx, -vy) */
@@ -556,7 +529,7 @@ typedef struct StageQuadTexture {
 /* The map objects with animations 3 and 4, each animated once */
 typedef struct StageTileOnce {
     TASK_HEADER(StageTileOnce);
-    /* 0x50 */ s32 unk50; /* unused */
+    /* 0x50 */ s32 pad50; /* never read or written */
     /* 0x54 */ StageTileAnimFlag tiles[2];
 } StageTileOnce;
 
@@ -616,22 +589,6 @@ typedef struct StageTileQuad {
     /* 0x50 */ StageTileAnim anims[4];
 } StageTileQuad;
 
-/*
- * Two map objects (animations 3 and 2) that move 0x7F
- * up or down with the player, shaking before and after
- */
-typedef struct StageTileLift {
-    TASK_HEADER(StageTileLift);
-    /* 0x50 */ StageTile *tiles[2]; /* animations 3 and 2 */
-    /* 0x58 */ s16 down; /* the map objects are 0x7F up, and move down */
-    /* 0x5A */ s16 timer;
-    /* 0x5C */ s16 shake; /* the step of the stage's shake table, then a frame count */
-    /* 0x5E */ s16 unk5E; /* unused */
-    /* 0x60 */ s16 y[2]; /* the map objects' y when the move starts */
-    /* 0x64 */ s32 playerY;
-    /* 0x68 */ s16 homeY[2]; /* the map objects' y at the start */
-} StageTileLift;
-
 /* The map objects with animations 4 to 1, animated */
 typedef struct StageTileSet {
     TASK_HEADER(StageTileSet);
@@ -645,14 +602,14 @@ typedef struct StageTileSet {
 typedef struct StageActorMark {
     TASK_HEADER(StageActorMark);
     /* 0x50 */ s32 kind;
-    /* 0x54 */ StageActor *actor;
+    /* 0x54 */ Actor *actor;
 } StageActorMark;
 
 /* A frame the task sets on a map object */
 typedef struct StageFrameTask {
     TASK_HEADER(StageFrameTask);
     /* 0x50 */ s32 frame;
-    /* 0x54 */ u8 unk54[8]; /* unused */
+    /* 0x54 */ u8 pad54[8]; /* never read or written */
 } StageFrameTask;
 
 /* The map objects with animations 1 to 5, each playing a sequence */
@@ -705,19 +662,14 @@ typedef struct StageSpriteSpot {
     /* 0x5 */ u8 flip;
 } StageSpriteSpot;
 
-/* A yes/no menu at the bottom of the screen */
+/* A yes/no menu at the bottom of the screen, a copy of FIELDSTG's ChoiceTask
+   (FIELDSTG_runChoice) without its type; its children are a ChoiceChildren */
 typedef struct StageMenu {
     TASK_HEADER(StageMenu);
     /* 0x50 */ s32 cursor;
-    /* 0x54 */ StageTween tween;
+    /* 0x54 */ PanelAnim tween;
 } StageMenu; /* 0x64 */
 
-typedef struct StageMenuChildren {
-    /* 0x00 */ TextWindow *title;
-    /* 0x04 */ TextWindow *options[2];
-    /* 0x0C */ Cursor *cursor;
-    /* 0x10 */ void *event;
-} StageMenuChildren; /* 0x14 */
 
 /* A list menu whose entries show a message */
 typedef struct StageListMenu {
@@ -727,7 +679,7 @@ typedef struct StageListMenu {
     /* 0x58 */ s32 showArrow;
     /* 0x5C */ s32 arrowFrame;
     /* 0x60 */ s32 arrowTime;
-    /* 0x64 */ StageTween tweens[2]; /* list, message box */
+    /* 0x64 */ PanelAnim tweens[2]; /* list, message box */
 } StageListMenu; /* 0x84 */
 
 typedef struct StageListMenuChildren {

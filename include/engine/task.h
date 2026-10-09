@@ -77,9 +77,25 @@ typedef struct TaskRegistry {
 } TaskRegistry;
 
 void *createTask(void (*update)(), s32 size, s32 childrenSize);
+void taskSetState(Task *task, s32 state);
+void taskSetSubstate(Task *task, s32 substate);
+void taskSetStep(Task *task, s32 step);
+void taskSetCounter(Task *task, s32 counter);
+void taskNextState(Task *task);
+void taskNextSubstate(Task *task);
+void taskNextStep(Task *task);
+void taskTickCounter(Task *task);
+void destroyTask(Task *task);
 void *createTaskWithId(void (*update)(), s32 size, s32 childrenSize, s32 id);
 struct Task *executeTask(struct Task *task);
+void runChildTasks(Task *task);
+Task *runTask(Task *task);
+void killTask(Task *task);
+void clearTaskRegistry(void);
+void registerTask(Task *task);
+void unregisterTask(Task *task);
 void *findNextTask(void);
+void *findTask(s32 id, s32 key1, s32 key2);
 
 extern TaskRegistry TASK_REGISTRY;
 

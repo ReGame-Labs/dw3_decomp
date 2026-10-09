@@ -35,16 +35,18 @@ static inline void setUpBattle(BattleTest *task, BattleTestChildren *children) {
         FILE_CACHE.freeAll();
         WFIGHTTS_initLayers();
         task->nextSubstate(task);
+        /* fallthrough */
     case 1:
         switch (task->step) {
         case 0:
         default:
             SOUND.loadBank(2);
             task->nextStep(task);
+            /* fallthrough */
         case 1:
             if (SOUND.isLoading() == 0) {
-                SOUND.playSound(0x60080000);
-                BATTLE_SETUP.music = 0x60080000;
+                SOUND.playSound(MUSIC(2, 0));
+                BATTLE_SETUP.music = MUSIC(2, 0);
                 task->nextSubstate(task);
             }
             break;
@@ -53,6 +55,7 @@ static inline void setUpBattle(BattleTest *task, BattleTestChildren *children) {
     case 2:
         WFIGHTTS_loadImages();
         task->nextSubstate(task);
+        /* fallthrough */
     case 3:
         switch (task->step) {
         case 0:
@@ -90,6 +93,7 @@ static inline void runPlayPage(BattleTest *task, BattleTestChildren *children) {
     default:
         FIGHTSTG_setPlayerTurnStep(0);
         task->nextStep(task);
+        /* fallthrough */
     case 1:
         pressed = PAD.getPressed(0);
         if (pressed & (1 << PAD_CROSS)) {

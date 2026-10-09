@@ -1,5 +1,5 @@
 /* WFIGHTMN's display layers and the battle's fighters: their stats, the
-   ambush roll, the WFIGHTMN_ITEM checks and the record of who fought. */
+   ambush roll, the WFIGHTMN_RECOVERY_ITEM checks and the record of who fought. */
 
 #include "battle/normal_battle.h"
 
@@ -24,7 +24,7 @@ void WFIGHTMN_initFighters(s32 digimon) {
     BattleFighter *units;
     s32 partner;
     s32 i;
-    units = FIGHTSTG_battle.fighters[0];
+    units = FIGHTSTG_battle.state.fighters[0];
     for (i = 0; i < 3; i++) {
         partner = GAME.funcs.getPartyMember(i);
         if (partner >= 0) {
@@ -40,7 +40,7 @@ void WFIGHTMN_initFighters(s32 digimon) {
             units[i].maxMp = stats->stats[STAT_MAX_MP];
         }
     }
-    units = FIGHTSTG_battle.fighters[1];
+    units = FIGHTSTG_battle.state.fighters[1];
     for (i = 0; i < 3; i++) {
         fighter = &units[i];
         fighter->id = BATTLE_SETUP.enemies[i].fighter;
@@ -77,7 +77,7 @@ s32 WFIGHTMN_rollAmbush(void) {
 }
 
 /* Queues a recovery (FIGHTSTG_queueRecovery) for party member MEMBER's
-   partner when it has WFIGHTMN_ITEM in one of its last two equipment slots */
+   partner when it has WFIGHTMN_RECOVERY_ITEM in one of its last two equipment slots */
 void WFIGHTMN_checkEquip(s32 member) {
     s32 partner = GAME.funcs.getPartyMember(member);
     s16 *equip;
@@ -86,7 +86,7 @@ void WFIGHTMN_checkEquip(s32 member) {
     if (partner >= 0) {
         equip = &GAME.funcs.getPartnerStats(partner)->equip[4];
         for (i = 0; i < 2; i++) {
-            if (equip[i] == WFIGHTMN_ITEM) {
+            if (equip[i] == WFIGHTMN_RECOVERY_ITEM) {
                 FIGHTSTG_queueRecovery(0, member, 0);
                 return;
             }
@@ -94,7 +94,7 @@ void WFIGHTMN_checkEquip(s32 member) {
     }
 }
 
-/* Checks each of the party's three partners for WFIGHTMN_ITEM
+/* Checks each of the party's three partners for WFIGHTMN_RECOVERY_ITEM
    (WFIGHTMN_checkEquip) */
 void WFIGHTMN_checkParty(void) {
     s32 i;
@@ -113,14 +113,14 @@ void WFIGHTMN_markFought(void) {
     BattleFighter *unit;
     s32 i;
 
-    BATTLE_RESULT.partners[FIGHTSTG_battle.active[0]].fought = 1;
-    partner = GAME.funcs.getPartyMember(FIGHTSTG_battle.active[0]);
-    unit = &FIGHTSTG_battle.fighters[0][FIGHTSTG_battle.active[0]];
+    BATTLE_RESULT.partners[FIGHTSTG_battle.state.active[0]].fought = 1;
+    partner = GAME.funcs.getPartyMember(FIGHTSTG_battle.state.active[0]);
+    unit = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
     digimon = &DIGIMON_DATA[partner];
     if (digimon->id != unit->id && GAME.funcs.getPartnerSlots(partner, slots) > 0) {
         for (i = 0; i < 3; i++) {
             if (slots[i] == unit->id) {
-                BATTLE_RESULT.partners[FIGHTSTG_battle.active[0]].used[i] = 1;
+                BATTLE_RESULT.partners[FIGHTSTG_battle.state.active[0]].used[i] = 1;
                 return;
             }
         }

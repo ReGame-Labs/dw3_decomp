@@ -3,10 +3,10 @@
 #include "field/field_mode.h"
 
 /* The icon over the player's head: plays the animation of its substate
-   (FIELDSTG_actorAnims) and follows its climbs along FIELDSTG_actorPath */
+   (FIELDSTG_iconAnims) and follows its climbs along FIELDSTG_iconPath */
 void FIELDSTG_updateActorIcon(ActorIcon *task) {
     SpriteDrawer sprite;
-    Point pos;
+    Vec2 pos;
     u8 (*anim)[2];
     Actor *actor;
     s32 step;
@@ -16,9 +16,10 @@ void FIELDSTG_updateActorIcon(ActorIcon *task) {
     default:
     case TASK_INIT:
         task->nextState(task);
+        /* fallthrough */
     case TASK_RUN:
         if (task->step == 0) {
-            task->anim = FIELDSTG_actorAnims[task->substate];
+            task->anim = FIELDSTG_iconAnims[task->substate];
             task->animStep = 0;
             task->animTime = 0;
             switch (task->substate) {
@@ -48,32 +49,32 @@ void FIELDSTG_updateActorIcon(ActorIcon *task) {
             switch (actor->substate) {
             case ACTOR_CLIMB_OFF_TOP:
                 if (actor->climbSide != 0) {
-                    pos.x = actor->tile.x + FIELDSTG_actorPath[FIELDSTG_actorPathStep][0];
+                    pos.x = actor->tile.x + FIELDSTG_iconPath[FIELDSTG_iconPathStep].x;
                 } else {
-                    pos.x = actor->tile.x - FIELDSTG_actorPath[FIELDSTG_actorPathStep][0];
+                    pos.x = actor->tile.x - FIELDSTG_iconPath[FIELDSTG_iconPathStep].x;
                 }
-                pos.y = actor->tile.y + FIELDSTG_actorPath[FIELDSTG_actorPathStep][1];
-                if (FIELDSTG_actorPath[FIELDSTG_actorPathStep + 1][0] != 0) {
-                    FIELDSTG_actorPathStep++;
+                pos.y = actor->tile.y + FIELDSTG_iconPath[FIELDSTG_iconPathStep].y;
+                if (FIELDSTG_iconPath[FIELDSTG_iconPathStep + 1].x != 0) {
+                    FIELDSTG_iconPathStep++;
                 }
                 break;
             case ACTOR_GET_OVER_EDGE:
-                if (FIELDSTG_actorPathStep == 0) {
-                    FIELDSTG_actorPathStep = 0xE;
+                if (FIELDSTG_iconPathStep == 0) {
+                    FIELDSTG_iconPathStep = 0xE;
                 }
                 if (actor->climbSide != 0) {
-                    pos.x = actor->tile.x + FIELDSTG_actorPath[FIELDSTG_actorPathStep][0];
+                    pos.x = actor->tile.x + FIELDSTG_iconPath[FIELDSTG_iconPathStep].x;
                 } else {
-                    pos.x = actor->tile.x - FIELDSTG_actorPath[FIELDSTG_actorPathStep][0];
+                    pos.x = actor->tile.x - FIELDSTG_iconPath[FIELDSTG_iconPathStep].x;
                 }
-                pos.y = actor->tile.y + FIELDSTG_actorPath[FIELDSTG_actorPathStep][1];
-                if (FIELDSTG_actorPathStep != 1) {
-                    FIELDSTG_actorPathStep--;
+                pos.y = actor->tile.y + FIELDSTG_iconPath[FIELDSTG_iconPathStep].y;
+                if (FIELDSTG_iconPathStep != 1) {
+                    FIELDSTG_iconPathStep--;
                 }
                 break;
             default:
                 pos.x = actor->tile.x;
-                FIELDSTG_actorPathStep = 0;
+                FIELDSTG_iconPathStep = 0;
                 pos.y = actor->tile.y;
                 break;
             }

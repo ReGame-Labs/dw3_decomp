@@ -61,7 +61,7 @@ void FIELDSTG_setMap(s32 index) {
 
 /* The cell of map index at pos, down the tree from the grid to the pixel
    (FieldMap.getCell); 1 without a file */
-s32 FIELDSTG_getMapCell(s32 index, Point *pos) {
+s32 FIELDSTG_getMapCell(s32 index, Vec2 *pos) {
     s32 x;
     s32 y;
     s32 i;
@@ -99,7 +99,7 @@ s32 FIELDSTG_getMapCell(s32 index, Point *pos) {
 /* Whether nothing stands at pos: no character's box (gathered once a frame)
    and no object. The match depends on the boxes' variables being local to
    their blocks. */
-s32 FIELDSTG_isTileFree(Point *pos) {
+s32 FIELDSTG_isTileFree(Vec2 *pos) {
     s32 frame = GFX.funcs.getFrameCount();
     Actor *actor;
     s32 i;
@@ -146,7 +146,7 @@ s32 FIELDSTG_isTileFree(Point *pos) {
 
 /* A step of scale in a direction on the map the player is on, along the
    slope of its cell (FieldMap.getWalkStep) */
-void FIELDSTG_getWalkStep(Point *pos, s32 scale, s32 dir, Point *out) {
+void FIELDSTG_getWalkStep(Vec2 *pos, s32 scale, s32 dir, Vec2 *out) {
     s32 cell = (u8)FIELDSTG_getMapCell(GAME.mapIndex, pos);
     s32 row = cell & 0xF;
     s32 slopeDir;
@@ -160,7 +160,7 @@ void FIELDSTG_getWalkStep(Point *pos, s32 scale, s32 dir, Point *out) {
 }
 
 /* A step of scale in a direction, on the flat (FieldMap.getFlyStep) */
-void FIELDSTG_getFlyStep(Point *pos, s32 scale, s32 dir, Point *out) {
+void FIELDSTG_getFlyStep(Vec2 *pos, s32 scale, s32 dir, Vec2 *out) {
     out->x = FIELDSTG_dirVectors[0][dir].x * scale / 4096;
     out->y = FIELDSTG_dirVectors[0][dir].y * scale / 4096;
 }

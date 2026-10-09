@@ -126,9 +126,9 @@ s32 CARDGAME_stepReturnSlotCard(CardBattle *battle, CardScreen *screen, s32 side
     return ok;
 }
 
-/* Starts effect 3 (arg2 0) or 4 on the flagged cards in play, and plays a
+/* Starts effect 3 (which 0) or 4 on the flagged cards in play, and plays a
    sound if there were any */
-void CARDGAME_startSlotEffects(CardBattle *battle, CardScreen *screen, s32 arg2) {
+void CARDGAME_startSlotEffects(CardBattle *battle, CardScreen *screen, s32 which) {
     s32 found = 0;
     s32 i;
 
@@ -136,17 +136,17 @@ void CARDGAME_startSlotEffects(CardBattle *battle, CardScreen *screen, s32 arg2)
         if (battle->effectStep.marked[i] != 0) {
             if (i < 6) {
                 if (i < battle->players[0].slotCount) {
-                    screen->startEffect(screen, i, arg2);
+                    screen->startEffect(screen, i, which);
                     found = 1;
                 }
             } else if (i - 6 < battle->players[1].slotCount) {
-                screen->startEffect(screen, i, arg2);
+                screen->startEffect(screen, i, which);
                 found = 1;
             }
         }
     }
     if (found) {
-        switch (arg2) {
+        switch (which) {
         case 0:
         default:
             SOUND.playSound(0x9C0001);
@@ -533,8 +533,8 @@ s32 CARDGAME_markPileCardsByColor(CardBattle *battle, CardScreen *screen, s32 si
     return found;
 }
 
-/* Marks in effectStep.eligible the slots of the sides flags picks (0x100 its own, 0x200 the other) whose card colour has its bit (CARDGAME_colorFlags) in flags; 1 if any */
-s32 CARDGAME_markSlotsByColor(CardBattle *battle, CardScreen *screen, s32 arg2, s32 flags) {
+/* Marks in effectStep.eligible the slots of the sides flags picks (0x100 side's own, 0x200 the other) whose card colour has its bit (CARDGAME_colorFlags) in flags; 1 if any */
+s32 CARDGAME_markSlotsByColor(CardBattle *battle, CardScreen *screen, s32 side, s32 flags) {
     CardDrawer drawer;
     s32 found = 0;
     s32 card = 0;
@@ -547,7 +547,7 @@ s32 CARDGAME_markSlotsByColor(CardBattle *battle, CardScreen *screen, s32 arg2, 
     for (i = 0, skip = 0; i < 15; i++, skip = 0) {
         battle->effectStep.eligible[i] = 0;
         if (i < 6) {
-            if ((arg2 == 0 && (flags & 0x100)) || (arg2 != 0 && (flags & 0x200))) {
+            if ((side == 0 && (flags & 0x100)) || (side != 0 && (flags & 0x200))) {
                 battle->effectStep.flags |= 1;
                 if (i < battle->players[0].slotCount) {
                     card = battle->players[0].slots[i].card;
@@ -558,7 +558,7 @@ s32 CARDGAME_markSlotsByColor(CardBattle *battle, CardScreen *screen, s32 arg2, 
                 skip = 1;
             }
         } else if (i < 12) {
-            if ((arg2 == 0 && (flags & 0x200)) || (arg2 != 0 && (flags & 0x100))) {
+            if ((side == 0 && (flags & 0x200)) || (side != 0 && (flags & 0x100))) {
                 battle->effectStep.flags |= 2;
                 if (i - 6 < battle->players[1].slotCount) {
                     card = battle->players[1].slots[i - 6].card;

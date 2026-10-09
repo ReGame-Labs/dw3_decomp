@@ -184,7 +184,7 @@ void STCRDSHP_drawPackOpen(CardPackOpen *open) {
                     break;
                 }
                 sprite.setTexture(0x140, 0);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS->getCategory(pack), (i % 2) * 0x83 + 0x28, (i / 2) * 0xE + 0x39);
+                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS.getCategory(pack), (i % 2) * 0x83 + 0x28, (i / 2) * 0xE + 0x39);
                 sprite.setTexture(0x280, 0);
                 sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x31, (i % 2) * 0x83 + 0x28, (i / 2) * 0xE + 0x39);
             }
@@ -214,7 +214,7 @@ void STCRDSHP_drawPackOpen(CardPackOpen *open) {
         } else {
             sprite.setTexture(0x140, 0);
             pack = open->packs[open->cursor];
-            sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS->getCategory(pack), 0x80, 0x8A);
+            sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS.getCategory(pack), 0x80, 0x8A);
         }
         sprite.setTexture(0x280, 0);
         sprite.draw(FILE_CACHE.getEntry(FILE_CARDSHOP_SPRITES << 16), 0x2E, 0x79, 0x83);
@@ -282,10 +282,10 @@ void STCRDSHP_listPacks(CardPackOpen *open) {
     s32 count;
     s32 i;
 
-    count = ITEM_FUNCS->list(1, open->items);
+    count = ITEM_FUNCS.list(1, open->items);
     open->packCount = 0;
     for (i = 0; i < count; i++) {
-        if (ITEM_FUNCS->getCategory(open->items[i]) == CARD_PACK_CATEGORY) {
+        if (ITEM_FUNCS.getCategory(open->items[i]) == CARD_PACK_CATEGORY) {
             open->packs[open->packCount++] = open->items[i];
         }
     }

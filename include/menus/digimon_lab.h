@@ -56,14 +56,18 @@ typedef struct LabMenuWindows {
     /* 0x48 */ struct LabEntryList *panel;
 } LabMenuWindows;
 
-/* A recipe of STGDGLAB_data's tables: how many of the ids are needed, then up
-   to five ids (0: none) */
-typedef s16 LabRecipe[6];
+/* A recipe of STGDGLAB_data's tables */
+typedef struct LabRecipe {
+    /* 0x0 */ s16 needed; /* how many of the ids the partner must have */
+    /* 0x2 */ s16 ids[5]; /* 0: none */
+} LabRecipe;
 
-/* A partner's animation: up to seven sprite ids, -1 ends it */
-typedef struct LabAnim {
-    s32 frames[7];
-} LabAnim;
+/* Where a window of the menu or the first screen goes, and its string */
+typedef struct LabWindowPos {
+    /* 0x0 */ s32 string; /* of TEXT_DIGI_LAB, -1: none */
+    /* 0x4 */ s32 x;
+    /* 0x8 */ s32 y;
+} LabWindowPos;
 
 /* The main menu's first screen (STGDGLAB_createPartyScreen) */
 typedef struct LabPartyScreen {
@@ -260,8 +264,8 @@ typedef struct LabEntryListWindows {
 typedef struct Lab {
     TASK_HEADER(Lab);
     /* 0x50 */ s32 layer;
-    /* 0x54 */ s32 blinkPos;
-    /* 0x58 */ s32 blinkSkip;
+    /* 0x54 */ s32 bgScroll;
+    /* 0x58 */ s32 bgTick;
     /* 0x5C */ s32 partySize; /* the party's slots: PARTY_SIZE */
     /* 0x60 */ s32 partyCount;
     /* 0x64 */ s32 member; /* the party member the screens show */
@@ -300,15 +304,14 @@ typedef struct LabFuncs {
 
 /* The overlay's tables and helpers */
 typedef struct LabData {
-    /* 0x00 */ LabAnim *anim; /* STGDGLAB_partnerAnims, by partner */
-    /* 0x04 */ s32 *pos; /* STGDGLAB_layout */
+    /* 0x00 */ PartnerAnim *anim; /* STGDGLAB_partnerAnims, by partner */
+    /* 0x04 */ LabWindowPos *layout; /* STGDGLAB_layout */
     /* 0x08 */ LabRecipe *recipes[8]; /* [row * 4 + col] */
     /* 0x28 */ LabFuncs funcs;
 } LabData;
 
 /* scene.c */
 void STGDGLAB_updateScene(Task *task, Lab **child);
-Task *STGDGLAB_createScene(void);
 void STGDGLAB_startFader(ScreenFade *task, s32 fadeIn, s32 duration);
 void STGDGLAB_drawFader(ScreenFade *task);
 void STGDGLAB_updateFader(ScreenFade *task);
@@ -403,8 +406,8 @@ extern s32 STGDGLAB_tableItems[]; /* the item each table's screen shows */
 extern s32 STGDGLAB_menuStats[]; /* the stats the menu's page shows */
 extern s32 STGDGLAB_pageStats[]; /* the stats the first screen's page shows */
 extern Task *(*STGDGLAB_screens[])(Lab *lab);
-extern LabAnim STGDGLAB_partnerAnims[];
-extern s32 STGDGLAB_layout[];
+extern PartnerAnim STGDGLAB_partnerAnims[];
+extern LabWindowPos STGDGLAB_layout[];
 extern LabEntry STGDGLAB_entries[]; /* the items of the recipes */
 extern LabRecipe STGDGLAB_recipes0[]; /* to STGDGLAB_recipes7, by table */
 extern LabRecipe STGDGLAB_recipes1[];

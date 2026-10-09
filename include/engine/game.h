@@ -27,6 +27,8 @@ int strlen(const char *);
 char *strcpy(char *dst, const char *src);
 char *strncpy(char *dst, const char *src, s32 n);
 void *memcpy(void *dst, const void *src, int size);
+int atoi(u8 *s); /* stdlib.h's; SHOCKTST parses its text file with these two */
+int strcspn(u8 *s, char *reject);
 
 /* The kernel's file functions (libapi.h); the sim: device is the PC's */
 long open(char *name, unsigned long mode);

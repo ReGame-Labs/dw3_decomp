@@ -142,7 +142,7 @@ s32 CARDGAME_checkComputerCondition(CardBattle *battle, CardScreen *screen, s32 
 /* Scores the cards in a side's slots, counting runs of the same card */
 s32 CARDGAME_scoreHand(CardBattle *battle, s32 side, s32 mask) {
     CardSortEntry entries[6];
-    CardSortEntry tmp;
+    CardSortEntry entry;
     CardDrawer drawer;
     s32 count;
     s32 total6;
@@ -168,9 +168,9 @@ s32 CARDGAME_scoreHand(CardBattle *battle, s32 side, s32 mask) {
     for (i = 0; i < count - 1; i++) {
         for (j = i + 1; j < count; j++) {
             if (entries[i].card > entries[j].card) {
-                tmp = entries[i];
+                entry = entries[i];
                 entries[i] = entries[j];
-                entries[j] = tmp;
+                entries[j] = entry;
             }
         }
     }

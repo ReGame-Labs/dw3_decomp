@@ -62,11 +62,11 @@
 #endif
 
 /* STDWTITL_tickScreen's children */
-typedef struct ScreenChildren {
+typedef struct TitleModeChildren {
     /* 0x0 */ struct TitleLoaderTask *title;
     /* 0x4 */ struct MovieTask *movie;
     /* 0x8 */ Task *splash;
-} ScreenChildren;
+} TitleModeChildren;
 
 /* Mode 12 */
 typedef struct SplashTask {
@@ -87,7 +87,7 @@ typedef struct DecEnv {
     /* 0x18 */ RECT rect[2];
     /* 0x28 */ s32 rectid;
     /* 0x2C */ RECT slice;
-    /* 0x34 */ s32 isdone;
+    /* 0x34 */ INTERRUPT_SHARED s32 isdone; /* set by STDWTITL_onSliceDecoded, the MDEC's callback */
 } DecEnv;
 
 typedef struct MovieInfo {
@@ -165,8 +165,8 @@ typedef struct MenuOption {
     /* 0x8 */ u8 pad[8]; /* never read or written */
 } MenuOption;
 
-typedef struct MenuTask {
-    TASK_HEADER(MenuTask);
+typedef struct TitleMenuTask {
+    TASK_HEADER(TitleMenuTask);
     /* 0x50 */ s16 skip;
     /* 0x52 */ s16 choice; /* 1: new game, 2: continue, 3: timed out */
     /* 0x54 */ s16 timer;
@@ -179,10 +179,10 @@ typedef struct MenuTask {
     /* 0x8C */ s32 layerId;
     /* 0x90 */ s32 depth;
     /* 0x94 */ u8 pad94[8]; /* never read or written */
-    /* 0x9C */ void (*show)(struct MenuTask *task);
-    /* 0xA0 */ void (*reset)(struct MenuTask *task);
-    /* 0xA4 */ s32 (*getChoice)(struct MenuTask *task);
-} MenuTask;
+    /* 0x9C */ void (*show)(struct TitleMenuTask *task);
+    /* 0xA0 */ void (*reset)(struct TitleMenuTask *task);
+    /* 0xA4 */ s32 (*getChoice)(struct TitleMenuTask *task);
+} TitleMenuTask;
 
 typedef struct Point {
     /* 0x0 */ s32 x;
@@ -212,8 +212,8 @@ typedef struct Point16 {
     /* 0x2 */ s16 y;
 } Point16;
 
-typedef struct BackgroundTask {
-    TASK_HEADER(BackgroundTask);
+typedef struct TitleBackgroundTask {
+    TASK_HEADER(TitleBackgroundTask);
     /* 0x50 */ s32 skip;
     /* 0x54 */ AnimState anims[8];
     /* 0x74 */ Point16 pos6;
@@ -221,8 +221,8 @@ typedef struct BackgroundTask {
     /* 0x7C */ s32 layerId;
     /* 0x80 */ s32 depth;
     /* 0x84 */ u8 pad[0x10]; /* never read or written */
-    /* 0x94 */ void (*animate)(struct BackgroundTask *task);
-} BackgroundTask;
+    /* 0x94 */ void (*animate)(struct TitleBackgroundTask *task);
+} TitleBackgroundTask;
 
 typedef struct TitleChildren {
     /* 0x00 */ EdgeFadeTask *fade;
@@ -236,8 +236,8 @@ typedef struct TitleChildren {
     /* 0x0C */ SlideTask *title0;
 #endif
     /* 0x10 */ LogoTask *logo;
-    /* 0x14 */ MenuTask *menu;
-    /* 0x18 */ BackgroundTask *background;
+    /* 0x14 */ TitleMenuTask *menu;
+    /* 0x18 */ TitleBackgroundTask *background;
 } TitleChildren;
 
 typedef struct TitleTask {
@@ -313,8 +313,7 @@ extern u32 STDWTITL_movieEndFrame;
 /* scene.c */
 void STDWTITL_tickSplashLoader(Task *task, SplashTask **splash);
 Task *STDWTITL_startSplashLoaderTask(void);
-void STDWTITL_tickScreen(Task *task, ScreenChildren *children);
-Task *STDWTITL_start(void);
+void STDWTITL_tickScreen(Task *task, TitleModeChildren *children);
 
 /* logo.c */
 void STDWTITL_drawLogo(LogoTask *task);
@@ -372,12 +371,12 @@ void STDWTITL_tickTitle0(SlideTask *task);
 SlideTask *STDWTITL_startTitle0Task(s32 skip);
 
 /* menu.c */
-void STDWTITL_drawMenu(MenuTask *task);
-void STDWTITL_tickMenu(MenuTask *task);
-void STDWTITL_showMenu(MenuTask *task);
-void STDWTITL_resetMenu(MenuTask *task);
-s32 STDWTITL_getMenuChoice(MenuTask *task);
-MenuTask *STDWTITL_startMenuTask(s16 skip);
+void STDWTITL_drawMenu(TitleMenuTask *task);
+void STDWTITL_tickMenu(TitleMenuTask *task);
+void STDWTITL_showMenu(TitleMenuTask *task);
+void STDWTITL_resetMenu(TitleMenuTask *task);
+s32 STDWTITL_getMenuChoice(TitleMenuTask *task);
+TitleMenuTask *STDWTITL_startMenuTask(s16 skip);
 
 /* edge_fade.c */
 s32 STDWTITL_getEdgeFadeLevel(s32 time);
@@ -389,11 +388,11 @@ EdgeFadeTask *STDWTITL_startEdgeFadeTask(void);
 
 /* background.c */
 s32 STDWTITL_stepLoopingAnimation(AnimState *anim, AnimFrame *frames, s32 depth);
-void STDWTITL_drawBackground(BackgroundTask *task);
-void STDWTITL_drawBackgroundSprites(BackgroundTask *task);
-void STDWTITL_tickBackground(BackgroundTask *task);
-void STDWTITL_animateBackground(BackgroundTask *task);
-BackgroundTask *STDWTITL_startBackgroundTask(s32 skip);
+void STDWTITL_drawBackground(TitleBackgroundTask *task);
+void STDWTITL_drawBackgroundSprites(TitleBackgroundTask *task);
+void STDWTITL_tickBackground(TitleBackgroundTask *task);
+void STDWTITL_animateBackground(TitleBackgroundTask *task);
+TitleBackgroundTask *STDWTITL_startBackgroundTask(s32 skip);
 
 /* title.c */
 s32 STDWTITL_leaveTitle(TitleTask *task, TitleChildren *children);

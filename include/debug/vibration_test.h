@@ -78,14 +78,22 @@ typedef struct ShockTestRow {
     /* 0x8 */ s32 highlight[4]; /* per column: selected, then being edited */
 } ShockTestRow;
 
-/* The C library's functions the loader parses the text with */
-int atoi(u8 *s);
-int strcspn(u8 *s, char *reject);
-
 Task *SHOCKTST_createLoader(void);
 s32 SHOCKTST_playAllPatterns(ShockTest *task, ShockTestWindows *win);
+s32 SHOCKTST_moveCursor(ShockTest *task, ShockTestWindows *win);
+s32 SHOCKTST_editValue(ShockTest *task, ShockTestWindows *win, TextWindow **windows, u8 *value, u8 toggle);
+s32 SHOCKTST_editRow(ShockTest *task, ShockTestWindows *win);
+void SHOCKTST_updateEditor(ShockTest *task, ShockTestWindows *win);
+void SHOCKTST_loadPatterns(ShockTest *task, ShockFile *file);
+ShockTest *SHOCKTST_createEditor(s32 count);
 void SHOCKTST_convertText(ShockLoader *task);
+void SHOCKTST_updateLoader(ShockLoader *task, ShockLoaderWindows *win);
+void SHOCKTST_updateScene(Task *task, Task **child);
+void SHOCKTST_highlight(ShockTest *task, ShockTestWindows *win, s32 highlight);
+s32 SHOCKTST_selectPattern(ShockTest *task, ShockTestWindows *win);
 void SHOCKTST_showPattern(ShockTest *task, ShockTestWindows *win, s32 pattern);
+void SHOCKTST_showTimers(ShockTest *task, ShockTestWindows *win, s32 pattern);
+s32 SHOCKTST_playPattern(ShockTest *task, ShockTestWindows *win, s32 pattern);
 
 extern const char SHOCKTST_STR_START_BACK[];
 

@@ -129,7 +129,7 @@ void updateDecompressor(Decompressor *task) {
 
 /* A decompressor task */
 Decompressor *createDecompressor(void) {
-    Decompressor *task = createTask(updateDecompressor, 0x84, 0);
+    Decompressor *task = createTask(updateDecompressor, sizeof(Decompressor), 0);
 
     task->run = decompressorRun;
     task->free = decompressorFree;

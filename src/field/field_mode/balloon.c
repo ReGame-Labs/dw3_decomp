@@ -18,7 +18,7 @@ s32 FIELDSTG_stepBalloonAnim(Balloon *task) {
 /* Draws a balloon over its actor: its frame, and once open, its animation */
 void FIELDSTG_drawBalloon(Balloon *task) {
     SpriteDrawer sprite;
-    Point pos;
+    Vec2 pos;
     s32 frame;
 
     pos.x = task->actor->tile.x;
@@ -60,7 +60,7 @@ void FIELDSTG_updateBalloon(Balloon *task) {
             task->nextState(task);
             /* fallthrough */
         case TASK_RUN:
-            if (FIELDSTG_state.innOpen != 0) {
+            if (FIELDSTG_state.menuOpen != 0) {
                 break;
             }
             switch (task->substate) {

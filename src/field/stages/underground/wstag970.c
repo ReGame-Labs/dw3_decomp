@@ -398,313 +398,313 @@ StageSlot stageSlots[] = {
 void (*stageFuncs[])(void) = {
     setupStage,
 };
-Battle place1Area0Battle0 = { 140, 10, MUSIC(2, 0) };
-Battle place1Area0Battle1 = { 140, 10, MUSIC(2, 0) };
-Battle place1Area0Battle2 = { 140, 10, MUSIC(2, 0) };
-Battle place1Area0Battle3 = { 140, 10, MUSIC(2, 0) };
-Battle place1Area0Battle4 = { 141, 10, MUSIC(2, 0) };
-Battle place1Area0Battle5 = { 141, 10, MUSIC(2, 0) };
-Battle place1Area0Battle6 = { 141, 10, MUSIC(2, 0) };
-Battle place1Area0Battle7 = { 141, 10, MUSIC(2, 0) };
+AreaBattle place1Area0Battle0 = { 140, 10, MUSIC(2, 0) };
+AreaBattle place1Area0Battle1 = { 140, 10, MUSIC(2, 0) };
+AreaBattle place1Area0Battle2 = { 140, 10, MUSIC(2, 0) };
+AreaBattle place1Area0Battle3 = { 140, 10, MUSIC(2, 0) };
+AreaBattle place1Area0Battle4 = { 141, 10, MUSIC(2, 0) };
+AreaBattle place1Area0Battle5 = { 141, 10, MUSIC(2, 0) };
+AreaBattle place1Area0Battle6 = { 141, 10, MUSIC(2, 0) };
+AreaBattle place1Area0Battle7 = { 141, 10, MUSIC(2, 0) };
 BattleList place1Area0Battles = {
     3,
     { &place1Area0Battle0, &place1Area0Battle1, &place1Area0Battle2, &place1Area0Battle3,
       &place1Area0Battle4, &place1Area0Battle5, &place1Area0Battle6, &place1Area0Battle7 },
 };
-Battle place1Area1Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area1Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area1Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area1Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area1Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area1Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area1Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area1Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area1Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area1Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area1Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area1Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area1Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area1Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area1Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area1Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place1Area1Battles = {
     0,
     { &place1Area1Battle0, &place1Area1Battle1, &place1Area1Battle2, &place1Area1Battle3,
       &place1Area1Battle4, &place1Area1Battle5, &place1Area1Battle6, &place1Area1Battle7 },
 };
-Battle place1Area2Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area2Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area2Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area2Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area2Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area2Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area2Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area2Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area2Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area2Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area2Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area2Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area2Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area2Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area2Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area2Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place1Area2Battles = {
     0,
     { &place1Area2Battle0, &place1Area2Battle1, &place1Area2Battle2, &place1Area2Battle3,
       &place1Area2Battle4, &place1Area2Battle5, &place1Area2Battle6, &place1Area2Battle7 },
 };
-Battle place1Area3Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area3Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area3Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area3Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area3Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area3Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area3Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place1Area3Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area3Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area3Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area3Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area3Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area3Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area3Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area3Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place1Area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place1Area3Battles = {
     0,
     { &place1Area3Battle0, &place1Area3Battle1, &place1Area3Battle2, &place1Area3Battle3,
       &place1Area3Battle4, &place1Area3Battle5, &place1Area3Battle6, &place1Area3Battle7 },
 };
-Battle place2Area0Battle0 = { 83, 10, MUSIC(2, 0) };
-Battle place2Area0Battle1 = { 83, 10, MUSIC(2, 0) };
-Battle place2Area0Battle2 = { 83, 10, MUSIC(2, 0) };
-Battle place2Area0Battle3 = { 83, 10, MUSIC(2, 0) };
-Battle place2Area0Battle4 = { 84, 10, MUSIC(2, 0) };
-Battle place2Area0Battle5 = { 84, 10, MUSIC(2, 0) };
-Battle place2Area0Battle6 = { 84, 10, MUSIC(2, 0) };
-Battle place2Area0Battle7 = { 84, 10, MUSIC(2, 0) };
+AreaBattle place2Area0Battle0 = { 83, 10, MUSIC(2, 0) };
+AreaBattle place2Area0Battle1 = { 83, 10, MUSIC(2, 0) };
+AreaBattle place2Area0Battle2 = { 83, 10, MUSIC(2, 0) };
+AreaBattle place2Area0Battle3 = { 83, 10, MUSIC(2, 0) };
+AreaBattle place2Area0Battle4 = { 84, 10, MUSIC(2, 0) };
+AreaBattle place2Area0Battle5 = { 84, 10, MUSIC(2, 0) };
+AreaBattle place2Area0Battle6 = { 84, 10, MUSIC(2, 0) };
+AreaBattle place2Area0Battle7 = { 84, 10, MUSIC(2, 0) };
 BattleList place2Area0Battles = {
     3,
     { &place2Area0Battle0, &place2Area0Battle1, &place2Area0Battle2, &place2Area0Battle3,
       &place2Area0Battle4, &place2Area0Battle5, &place2Area0Battle6, &place2Area0Battle7 },
 };
-Battle place2Area1Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area1Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area1Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area1Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area1Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area1Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area1Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area1Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area1Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area1Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area1Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area1Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area1Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area1Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area1Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area1Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place2Area1Battles = {
     0,
     { &place2Area1Battle0, &place2Area1Battle1, &place2Area1Battle2, &place2Area1Battle3,
       &place2Area1Battle4, &place2Area1Battle5, &place2Area1Battle6, &place2Area1Battle7 },
 };
-Battle place2Area2Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area2Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area2Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area2Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area2Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area2Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area2Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area2Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area2Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area2Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area2Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area2Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area2Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area2Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area2Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area2Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place2Area2Battles = {
     0,
     { &place2Area2Battle0, &place2Area2Battle1, &place2Area2Battle2, &place2Area2Battle3,
       &place2Area2Battle4, &place2Area2Battle5, &place2Area2Battle6, &place2Area2Battle7 },
 };
-Battle place2Area3Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area3Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area3Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area3Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area3Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area3Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area3Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place2Area3Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area3Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area3Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area3Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area3Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area3Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area3Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area3Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place2Area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place2Area3Battles = {
     0,
     { &place2Area3Battle0, &place2Area3Battle1, &place2Area3Battle2, &place2Area3Battle3,
       &place2Area3Battle4, &place2Area3Battle5, &place2Area3Battle6, &place2Area3Battle7 },
 };
-Battle place3Area0Battle0 = { 136, 10, MUSIC(2, 0) };
-Battle place3Area0Battle1 = { 136, 10, MUSIC(2, 0) };
-Battle place3Area0Battle2 = { 137, 10, MUSIC(2, 0) };
-Battle place3Area0Battle3 = { 137, 10, MUSIC(2, 0) };
-Battle place3Area0Battle4 = { 183, 10, MUSIC(2, 0) };
-Battle place3Area0Battle5 = { 183, 10, MUSIC(2, 0) };
-Battle place3Area0Battle6 = { 118, 10, MUSIC(2, 0) };
-Battle place3Area0Battle7 = { 118, 10, MUSIC(2, 0) };
+AreaBattle place3Area0Battle0 = { 136, 10, MUSIC(2, 0) };
+AreaBattle place3Area0Battle1 = { 136, 10, MUSIC(2, 0) };
+AreaBattle place3Area0Battle2 = { 137, 10, MUSIC(2, 0) };
+AreaBattle place3Area0Battle3 = { 137, 10, MUSIC(2, 0) };
+AreaBattle place3Area0Battle4 = { 183, 10, MUSIC(2, 0) };
+AreaBattle place3Area0Battle5 = { 183, 10, MUSIC(2, 0) };
+AreaBattle place3Area0Battle6 = { 118, 10, MUSIC(2, 0) };
+AreaBattle place3Area0Battle7 = { 118, 10, MUSIC(2, 0) };
 BattleList place3Area0Battles = {
     3,
     { &place3Area0Battle0, &place3Area0Battle1, &place3Area0Battle2, &place3Area0Battle3,
       &place3Area0Battle4, &place3Area0Battle5, &place3Area0Battle6, &place3Area0Battle7 },
 };
-Battle place3Area1Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area1Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area1Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area1Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area1Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area1Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area1Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area1Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area1Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area1Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area1Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area1Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area1Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area1Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area1Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area1Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place3Area1Battles = {
     0,
     { &place3Area1Battle0, &place3Area1Battle1, &place3Area1Battle2, &place3Area1Battle3,
       &place3Area1Battle4, &place3Area1Battle5, &place3Area1Battle6, &place3Area1Battle7 },
 };
-Battle place3Area2Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area2Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area2Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area2Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area2Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area2Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area2Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area2Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area2Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area2Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area2Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area2Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area2Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area2Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area2Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area2Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place3Area2Battles = {
     0,
     { &place3Area2Battle0, &place3Area2Battle1, &place3Area2Battle2, &place3Area2Battle3,
       &place3Area2Battle4, &place3Area2Battle5, &place3Area2Battle6, &place3Area2Battle7 },
 };
-Battle place3Area3Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area3Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area3Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area3Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area3Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area3Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area3Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place3Area3Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area3Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area3Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area3Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area3Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area3Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area3Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area3Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place3Area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place3Area3Battles = {
     0,
     { &place3Area3Battle0, &place3Area3Battle1, &place3Area3Battle2, &place3Area3Battle3,
       &place3Area3Battle4, &place3Area3Battle5, &place3Area3Battle6, &place3Area3Battle7 },
 };
-Battle place4Area0Battle0 = { 117, 10, MUSIC(2, 0) };
-Battle place4Area0Battle1 = { 117, 10, MUSIC(2, 0) };
-Battle place4Area0Battle2 = { 184, 10, MUSIC(2, 0) };
-Battle place4Area0Battle3 = { 184, 10, MUSIC(2, 0) };
-Battle place4Area0Battle4 = { 187, 10, MUSIC(2, 0) };
-Battle place4Area0Battle5 = { 187, 10, MUSIC(2, 0) };
-Battle place4Area0Battle6 = { 187, 10, MUSIC(2, 0) };
-Battle place4Area0Battle7 = { 187, 10, MUSIC(2, 0) };
+AreaBattle place4Area0Battle0 = { 117, 10, MUSIC(2, 0) };
+AreaBattle place4Area0Battle1 = { 117, 10, MUSIC(2, 0) };
+AreaBattle place4Area0Battle2 = { 184, 10, MUSIC(2, 0) };
+AreaBattle place4Area0Battle3 = { 184, 10, MUSIC(2, 0) };
+AreaBattle place4Area0Battle4 = { 187, 10, MUSIC(2, 0) };
+AreaBattle place4Area0Battle5 = { 187, 10, MUSIC(2, 0) };
+AreaBattle place4Area0Battle6 = { 187, 10, MUSIC(2, 0) };
+AreaBattle place4Area0Battle7 = { 187, 10, MUSIC(2, 0) };
 BattleList place4Area0Battles = {
     3,
     { &place4Area0Battle0, &place4Area0Battle1, &place4Area0Battle2, &place4Area0Battle3,
       &place4Area0Battle4, &place4Area0Battle5, &place4Area0Battle6, &place4Area0Battle7 },
 };
-Battle place4Area1Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area1Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area1Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area1Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area1Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area1Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area1Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area1Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area1Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area1Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area1Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area1Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area1Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area1Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area1Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area1Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place4Area1Battles = {
     0,
     { &place4Area1Battle0, &place4Area1Battle1, &place4Area1Battle2, &place4Area1Battle3,
       &place4Area1Battle4, &place4Area1Battle5, &place4Area1Battle6, &place4Area1Battle7 },
 };
-Battle place4Area2Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area2Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area2Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area2Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area2Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area2Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area2Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area2Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area2Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area2Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area2Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area2Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area2Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area2Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area2Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area2Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place4Area2Battles = {
     0,
     { &place4Area2Battle0, &place4Area2Battle1, &place4Area2Battle2, &place4Area2Battle3,
       &place4Area2Battle4, &place4Area2Battle5, &place4Area2Battle6, &place4Area2Battle7 },
 };
-Battle place4Area3Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area3Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area3Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area3Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area3Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area3Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area3Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place4Area3Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area3Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area3Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area3Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area3Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area3Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area3Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area3Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place4Area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place4Area3Battles = {
     0,
     { &place4Area3Battle0, &place4Area3Battle1, &place4Area3Battle2, &place4Area3Battle3,
       &place4Area3Battle4, &place4Area3Battle5, &place4Area3Battle6, &place4Area3Battle7 },
 };
-Battle place5Area0Battle0 = { 116, 10, MUSIC(2, 0) };
-Battle place5Area0Battle1 = { 116, 10, MUSIC(2, 0) };
-Battle place5Area0Battle2 = { 164, 10, MUSIC(2, 0) };
-Battle place5Area0Battle3 = { 164, 10, MUSIC(2, 0) };
-Battle place5Area0Battle4 = { 139, 10, MUSIC(2, 0) };
-Battle place5Area0Battle5 = { 139, 10, MUSIC(2, 0) };
-Battle place5Area0Battle6 = { 163, 10, MUSIC(2, 0) };
-Battle place5Area0Battle7 = { 163, 10, MUSIC(2, 0) };
+AreaBattle place5Area0Battle0 = { 116, 10, MUSIC(2, 0) };
+AreaBattle place5Area0Battle1 = { 116, 10, MUSIC(2, 0) };
+AreaBattle place5Area0Battle2 = { 164, 10, MUSIC(2, 0) };
+AreaBattle place5Area0Battle3 = { 164, 10, MUSIC(2, 0) };
+AreaBattle place5Area0Battle4 = { 139, 10, MUSIC(2, 0) };
+AreaBattle place5Area0Battle5 = { 139, 10, MUSIC(2, 0) };
+AreaBattle place5Area0Battle6 = { 163, 10, MUSIC(2, 0) };
+AreaBattle place5Area0Battle7 = { 163, 10, MUSIC(2, 0) };
 BattleList place5Area0Battles = {
     3,
     { &place5Area0Battle0, &place5Area0Battle1, &place5Area0Battle2, &place5Area0Battle3,
       &place5Area0Battle4, &place5Area0Battle5, &place5Area0Battle6, &place5Area0Battle7 },
 };
-Battle place5Area1Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area1Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area1Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area1Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area1Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area1Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area1Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area1Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area1Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area1Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area1Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area1Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area1Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area1Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area1Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area1Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place5Area1Battles = {
     0,
     { &place5Area1Battle0, &place5Area1Battle1, &place5Area1Battle2, &place5Area1Battle3,
       &place5Area1Battle4, &place5Area1Battle5, &place5Area1Battle6, &place5Area1Battle7 },
 };
-Battle place5Area2Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area2Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area2Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area2Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area2Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area2Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area2Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area2Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area2Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area2Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area2Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area2Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area2Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area2Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area2Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area2Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place5Area2Battles = {
     0,
     { &place5Area2Battle0, &place5Area2Battle1, &place5Area2Battle2, &place5Area2Battle3,
       &place5Area2Battle4, &place5Area2Battle5, &place5Area2Battle6, &place5Area2Battle7 },
 };
-Battle place5Area3Battle0 = { 303, 10, MUSIC(0x22, 0) };
-Battle place5Area3Battle1 = { 309, 10, MUSIC(0x22, 0) };
-Battle place5Area3Battle2 = { 310, 10, MUSIC(0x22, 0) };
-Battle place5Area3Battle3 = { 312, 10, MUSIC(0x22, 0) };
-Battle place5Area3Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area3Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area3Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place5Area3Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area3Battle0 = { 303, 10, MUSIC(0x22, 0) };
+AreaBattle place5Area3Battle1 = { 309, 10, MUSIC(0x22, 0) };
+AreaBattle place5Area3Battle2 = { 310, 10, MUSIC(0x22, 0) };
+AreaBattle place5Area3Battle3 = { 312, 10, MUSIC(0x22, 0) };
+AreaBattle place5Area3Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area3Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area3Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place5Area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place5Area3Battles = {
     0,
     { &place5Area3Battle0, &place5Area3Battle1, &place5Area3Battle2, &place5Area3Battle3,
       &place5Area3Battle4, &place5Area3Battle5, &place5Area3Battle6, &place5Area3Battle7 },
 };
-Battle place6Area0Battle0 = { 162, 10, MUSIC(2, 0) };
-Battle place6Area0Battle1 = { 162, 10, MUSIC(2, 0) };
-Battle place6Area0Battle2 = { 162, 10, MUSIC(2, 0) };
-Battle place6Area0Battle3 = { 162, 10, MUSIC(2, 0) };
-Battle place6Area0Battle4 = { 135, 10, MUSIC(2, 0) };
-Battle place6Area0Battle5 = { 135, 10, MUSIC(2, 0) };
-Battle place6Area0Battle6 = { 135, 10, MUSIC(2, 0) };
-Battle place6Area0Battle7 = { 135, 10, MUSIC(2, 0) };
+AreaBattle place6Area0Battle0 = { 162, 10, MUSIC(2, 0) };
+AreaBattle place6Area0Battle1 = { 162, 10, MUSIC(2, 0) };
+AreaBattle place6Area0Battle2 = { 162, 10, MUSIC(2, 0) };
+AreaBattle place6Area0Battle3 = { 162, 10, MUSIC(2, 0) };
+AreaBattle place6Area0Battle4 = { 135, 10, MUSIC(2, 0) };
+AreaBattle place6Area0Battle5 = { 135, 10, MUSIC(2, 0) };
+AreaBattle place6Area0Battle6 = { 135, 10, MUSIC(2, 0) };
+AreaBattle place6Area0Battle7 = { 135, 10, MUSIC(2, 0) };
 BattleList place6Area0Battles = {
     3,
     { &place6Area0Battle0, &place6Area0Battle1, &place6Area0Battle2, &place6Area0Battle3,
       &place6Area0Battle4, &place6Area0Battle5, &place6Area0Battle6, &place6Area0Battle7 },
 };
-Battle place6Area1Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area1Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area1Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area1Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area1Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area1Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area1Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area1Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area1Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area1Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area1Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area1Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area1Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area1Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area1Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area1Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place6Area1Battles = {
     0,
     { &place6Area1Battle0, &place6Area1Battle1, &place6Area1Battle2, &place6Area1Battle3,
       &place6Area1Battle4, &place6Area1Battle5, &place6Area1Battle6, &place6Area1Battle7 },
 };
-Battle place6Area2Battle0 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area2Battle1 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area2Battle2 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area2Battle3 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area2Battle4 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area2Battle5 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area2Battle6 = { 0, 0, MUSIC(1, 0) };
-Battle place6Area2Battle7 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area2Battle0 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area2Battle1 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area2Battle2 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area2Battle3 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area2Battle4 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area2Battle5 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area2Battle6 = { 0, 0, MUSIC(1, 0) };
+AreaBattle place6Area2Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList place6Area2Battles = {
     0,
     { &place6Area2Battle0, &place6Area2Battle1, &place6Area2Battle2, &place6Area2Battle3,
       &place6Area2Battle4, &place6Area2Battle5, &place6Area2Battle6, &place6Area2Battle7 },
 };
-Battle place6Area3Battle0 = { 312, 10, MUSIC(0x22, 0) };
-Battle place6Area3Battle1 = { 312, 10, MUSIC(0x22, 0) };
-Battle place6Area3Battle2 = { 312, 10, MUSIC(0x22, 0) };
-Battle place6Area3Battle3 = { 312, 10, MUSIC(0x22, 0) };
-Battle place6Area3Battle4 = { 312, 10, MUSIC(0x22, 0) };
-Battle place6Area3Battle5 = { 312, 10, MUSIC(0x22, 0) };
-Battle place6Area3Battle6 = { 312, 10, MUSIC(0x22, 0) };
-Battle place6Area3Battle7 = { 312, 10, MUSIC(0x22, 0) };
+AreaBattle place6Area3Battle0 = { 312, 10, MUSIC(0x22, 0) };
+AreaBattle place6Area3Battle1 = { 312, 10, MUSIC(0x22, 0) };
+AreaBattle place6Area3Battle2 = { 312, 10, MUSIC(0x22, 0) };
+AreaBattle place6Area3Battle3 = { 312, 10, MUSIC(0x22, 0) };
+AreaBattle place6Area3Battle4 = { 312, 10, MUSIC(0x22, 0) };
+AreaBattle place6Area3Battle5 = { 312, 10, MUSIC(0x22, 0) };
+AreaBattle place6Area3Battle6 = { 312, 10, MUSIC(0x22, 0) };
+AreaBattle place6Area3Battle7 = { 312, 10, MUSIC(0x22, 0) };
 BattleList place6Area3Battles = {
     0,
     { &place6Area3Battle0, &place6Area3Battle1, &place6Area3Battle2, &place6Area3Battle3,

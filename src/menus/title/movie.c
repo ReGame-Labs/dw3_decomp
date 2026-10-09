@@ -164,6 +164,7 @@ void STDWTITL_tickMoviePlayer(MoviePlayerTask *task) {
         STDWTITL_decodeNextFrame(&STDWTITL_decEnv);
         STDWTITL_movieEnded = 0;
         task->nextState(task);
+        /* fallthrough */
     case TASK_RUN:
         DecDCTin(STDWTITL_decEnv.vlcbuf[STDWTITL_decEnv.vlcid], 3);
         DecDCTout(STDWTITL_decEnv.imgbuf[STDWTITL_decEnv.imgid], STDWTITL_decEnv.slice.w * STDWTITL_decEnv.slice.h / 2);

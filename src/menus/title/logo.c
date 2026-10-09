@@ -48,6 +48,7 @@ void STDWTITL_tickLogo(LogoTask *task) {
             task->nextSubstate(task);
             task->anims[0].index = 0;
             task->anims[1].index = 0;
+            /* fallthrough */
         case 2:
             for (i = 0; i < 2; i++) {
                 if (!task->anims[i].done) {

@@ -85,7 +85,7 @@ typedef struct SoundFiles {
     /* 0x04 */ s32 headFile; /* archive: VAB header and SEPs */
     /* 0x08 */ s32 vhIndex; /* of the VAB header in headFile */
     /* 0x0C */ s32 bodyEntry; /* (file << 16) | slot */
-    /* 0x10 */ s32 seps[0]; /* indices in headFile, 0-terminated */
+    /* 0x10 */ s32 seps[FLEXIBLE]; /* indices in headFile, 0-terminated */
 } SoundFiles;
 
 /* SoundLoader.state: waiting for the header file, the body file, then the SPU */
@@ -119,7 +119,7 @@ typedef struct SoundState {
 } SoundState;
 
 s32 findSoundBank(s32 id);
-s32 playSound(s32 packed);
+short playSound(s32 packed);
 void stopAllSounds(void);
 void stopSound(s32 packed);
 void fadeOutSound(s32 packed);

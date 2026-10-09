@@ -75,7 +75,7 @@ void STSTATUS_showDemoChoices(PartyScreen *screen, PartyScreenWindows *windows, 
         for (i = 0; i < 2; i++) {
             windows->options[i]->setString(windows->options[i], FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), i + 0x47);
         }
-        screen->choice = 1 - (u8)GAME.digivolveDemo;
+        screen->choice = 1 - GAME.digivolveDemo;
         windows->cursor->setPos(windows->cursor, 0xB8, screen->choice * 14 + 0x3A);
         if (screen->choice == 0) {
             windows->options[0]->setPalette(windows->options[0], PALETTE_BLUE);
