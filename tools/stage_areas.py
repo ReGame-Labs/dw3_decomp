@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """
-Moves each stage's C file into the folder of its area: src/stages/<area>/.
+Moves each stage's C file into the folder of its area: src/field/stages/<area>/.
 
 FIELDSTG starts a stage for a mode (FIELDSTG_stages, and the European
 FIELDSTG_euStages: {mode, file, WSTAGnnn_startStage}), and shows the name of
 the mode's area as the player enters (FIELDSTG_areaNames: {area, place,
 mode}; the area is a string of text file 0xAA, STAREA). Every mode of a
 stage is in one area, whose name in lower_snake_case is its folder:
-src/stages/wstag231.c goes to src/stages/amaterasu_city/wstag231.c, with
+src/field/stages/wstag231.c goes to src/field/stages/amaterasu_city/wstag231.c, with
 its head if it has one (wstag924_head.c). WSTAG260, the story events'
 scripts, which FIELDSTG starts with FIELDSTG_createStoryEvents, stays in
-src/stages/, and so does common/.
+src/field/stages/, and so does common/.
 
-It also writes src/stages/README.md, the list of the areas and their
-stages, with each stage's name from tools/stage_names_doc.py. The build finds a stage wherever it is under src/stages/, so the
+It also writes src/field/stages/README.md, the list of the areas and their
+stages, with each stage's name from tools/stage_names_doc.py. The build finds a stage wherever it is under src/field/stages/, so the
 bytes don't change. It can be run again at any time:
 
     tools/stage_areas.py [-n]
@@ -27,8 +27,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-STAGES = ROOT / "src" / "stages"
-FIELDSTG_DATA = ROOT / "src" / "fieldstg" / "data" / "fieldstg.c"
+STAGES = ROOT / "src" / "field" / "stages"
+FIELDSTG_DATA = ROOT / "src" / "field" / "field_mode" / "data" / "fieldstg.c"
 # STAREA, in either version's English text
 AREA_TEXT = [ROOT / "disks/us/AAA/DAT/COUNTRY/USA/USSTAREA.BIN",
              ROOT / "disks/eu/AAA/DAT/COUNTRY/ENG/ESSTAREA.BIN"]
@@ -94,7 +94,7 @@ def folder(area):
 
 
 def stage_files():
-    """{stage: its C file}, wherever it is under src/stages/"""
+    """{stage: its C file}, wherever it is under src/field/stages/"""
     out = {}
     for path in sorted(STAGES.glob("wstag*.c")) + sorted(STAGES.glob("*/wstag*.c")):
         name = path.stem[: -len("_head")] if path.stem.endswith("_head") else path.stem
@@ -104,7 +104,7 @@ def stage_files():
 
 
 def readme(areas):
-    """src/stages/README.md: the areas and their stages, with their names"""
+    """src/field/stages/README.md: the areas and their stages, with their names"""
     from stage_names_doc import STAGES as NAMES
 
     by_area = {}

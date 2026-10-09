@@ -23,11 +23,11 @@ A few functions no table or call names have names given by reading their
 code (GIVEN). An event's or a command's name comes before the name of the
 task it creates.
 A function that two tables (or two calls) name differently, two functions given one name,
-a name the stage already has (or includes from src/stages/common), and a
+a name the stage already has (or includes from src/field/stages/common), and a
 function only one version of a stage has keep their address names. The names
 go into the C, both versions' config/<version>/stages/<stage>.txt and, for a
-function FIELDSTG links against, its WSTAGnnn_ name in include/stages.h and
-src/fieldstg/ (and docs/) (then `make regenerate` each version). Only splat's names
+function FIELDSTG links against, its WSTAGnnn_ name in include/field/stages.h and
+src/field/field_mode/ (and docs/) (then `make regenerate` each version). Only splat's names
 (func_XXXXXXXX) are renamed, so it can be run again at any time:
 
     tools/name_stage_funcs.py [wstag200 ...]
@@ -42,14 +42,14 @@ from name_stage_data import (
 
 AUTO = re.compile(r"^func_([0-9A-F]{8})$")
 FUNCTION = re.compile(r"^(?:static\s+)?[\w\s\*]+?\b(\w+)\(([^;]*)\)\s*\{\s*$")
-COMMANDS = ROOT / "src" / "fieldstg" / "data" / "fieldstg.c"
-LINKED = ([ROOT / "include" / "stages.h"] + sorted((ROOT / "src" / "fieldstg").rglob("*.c"))
+COMMANDS = ROOT / "src" / "field" / "field_mode" / "data" / "fieldstg.c"
+LINKED = ([ROOT / "include" / "field" / "stages.h"] + sorted((ROOT / "src" / "field" / "field_mode").rglob("*.c"))
           + sorted((ROOT / "docs").glob("*.md")))
 HEADER = "// functions named by what calls them (tools/name_stage_funcs.py)"
 GENERIC_TASKS = {"StageTask", "Task"}
 
 # Names given by reading the code, where no table or call names a function
-# (the stages are those that share it, src/stages/common)
+# (the stages are those that share it, src/field/stages/common)
 GIVEN = {
     ("wstag745", "wstag746"): {
         "func_800A4CA4": "updateDarkness",  # draws the screen black in TASK_DONE
@@ -265,7 +265,7 @@ def structural_names(text, commands, stage):
 
 
 def included_names(text):
-    """The functions and data the stage takes from src/stages/common"""
+    """The functions and data the stage takes from src/field/stages/common"""
     names = set()
     for m in re.finditer(r'^#include "(common/\w+\.inc\.c)"', text, re.M):
         inc = (SRC / m.group(1)).read_text()

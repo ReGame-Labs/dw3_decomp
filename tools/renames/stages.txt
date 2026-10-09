@@ -1,6 +1,6 @@
 # The stages' renames (tools/renames.py), in the order they were made
 
-# GAME fields only the stages use (include/dw3/game_state.h)
+# GAME fields only the stages use (include/engine/game_state.h)
 GAME.unk26DC GAME.altTriggers
 GAME.unk26E8 GAME.dark
 

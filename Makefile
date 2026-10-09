@@ -58,9 +58,11 @@ CC1 ?= $(BIN_DIR)/gcc-$(GCC_VERSION)-psx/cc1
 MASPSX := $(PYTHON) external/maspsx/maspsx.py
 OBJDIFF ?= $(BIN_DIR)/objdiff-cli-linux-x86_64
 
-# src/stages last: a stage in its area's folder includes the shared code as
-# "common/<file>.inc.c" (src/stages/common/), and src/stages has no headers
-INC := -Iinclude -Iexternal/psyq_headers/psyq_lib47/include -Isrc/stages
+# src/field/stages and src last: a stage in its area's folder includes the
+# stages' shared code as "common/<file>.inc.c" (src/field/stages/common/), an
+# overlay the menus' shared code as "shared/<file>.inc.c" (src/shared/); they
+# have no headers
+INC := -Iinclude -Iexternal/psyq_headers/psyq_lib47/include -Isrc/field/stages -Isrc
 
 # -DVERSION_<VERSION>: include/version.h turns it into VERSION_US and
 # VERSION_EU, each 0 or 1, for #if; -Wundef warns about an #if on a name
@@ -80,14 +82,14 @@ MASPSXFLAGS = --aspsx-version=2.86 -G$(SDATA_LIMIT) --use-comm-section --use-com
 # a -G8 object of the original read their own small variables through $gp.
 # Their initialized small variables go to .sdata, which the original linked
 # after all the data (game/items.c's to gfx/display.c's, with the ones whose
-# module is unknown in src/main/data/ between them); the .sbss ones are
+# module is unknown in src/engine/data/ between them); the .sbss ones are
 # declared static, so maspsx emits them as common symbols that resolve to the
 # definitions in data/game_bss.c, 8 bytes apart as the linker laid them. With
 # -G8 GCC leaves the address of a small extern (LANGUAGE in menu/inn.c,
 # memcard/memcard.c and game/events.c, in the European version) to the
 # assembler, which loads it again for each read.
 SDATA_LIMIT := 0
-G8_SRC := $(addprefix src/main/, menu/inn.c gfx/screen_fade.c menu/field_menu.c \
+G8_SRC := $(addprefix src/engine/, menu/inn.c gfx/screen_fade.c menu/field_menu.c \
 	game/digimon.c game/items.c file/cd_reader.c file/file_cache.c \
 	file/file_table.c task/task.c system/main.c memcard/memcard.c \
 	game/events.c game/state.c game/party.c game/play_time.c game/stats.c \
@@ -117,35 +119,41 @@ LDFLAGS := -nostdlib --no-check-sections --emit-relocs -Map $(MAP) \
 
 # The stage overlays the version has, from $(CONFIG_DIR)/stages.txt
 STAGES := $(shell awk '!/^\#/ && NF { print tolower($$1) }' $(CONFIG_DIR)/stages.txt)
-# and where each one is under src/stages/ (and $(ASM_DIR)/stages/):
+# and where each one is under src/field/stages/ (and $(ASM_DIR)/stages/):
 # STAGE_PATH_<name> is <area>/<name>, in the folder of its area
 # (tools/stage_areas.py), or <name> for one in no area (WSTAG260)
 $(foreach s,$(STAGES),$(eval STAGE_PATH_$(s) := \
-	$(or $(patsubst src/stages/%.c,%,$(wildcard src/stages/*/$(s).c)),$(s))))
+	$(or $(patsubst src/field/stages/%.c,%,$(wildcard src/field/stages/*/$(s).c)),$(s))))
 
 # C_SRC, from mk/version/<version>.mk, has every binary's C files, but of
-# src/stages/ only the version's stages' (the USA version hasn't the European
+# src/field/stages/ only the version's stages' (the USA version hasn't the European
 # stages), with the head a stage may have (<name>_head.c, see
 # tools/stage_yaml.py)
-STAGE_C_SRC := $(foreach s,$(STAGES),src/stages/$(STAGE_PATH_$(s)).c src/stages/$(STAGE_PATH_$(s))_head.c)
-ALL_C_SRC := $(filter-out $(filter-out $(STAGE_C_SRC),$(filter src/stages/%,$(C_SRC))),$(C_SRC))
-MAIN_C_SRC := $(filter src/main/%,$(ALL_C_SRC))
+STAGE_C_SRC := $(foreach s,$(STAGES),src/field/stages/$(STAGE_PATH_$(s)).c src/field/stages/$(STAGE_PATH_$(s))_head.c)
+ALL_C_SRC := $(filter-out $(filter-out $(STAGE_C_SRC),$(filter src/field/stages/%,$(C_SRC))),$(C_SRC))
+MAIN_C_SRC := $(filter src/engine/%,$(ALL_C_SRC))
 
 # Target objects for objdiff: splat's full disassembly of every C unit (the
-# data files, src/<binary>/data/, and the stages with no code, "data" in
+# data files, <binary>/data/, and the stages with no code, "data" in
 # $(CONFIG_DIR)/stages.txt, have none: objdiff_generate.py compares them with
 # splat's data files), and a stage's head's rodata
-STAGE_HEADS := $(filter src/stages/%_head.c,$(ALL_C_SRC))
+STAGE_HEADS := $(filter src/field/stages/%_head.c,$(ALL_C_SRC))
 DATA_STAGES := $(shell awk '!/^\#/ && $$2 == "data" { print tolower($$1) }' $(CONFIG_DIR)/stages.txt)
+# each binary's C folder, its config's src_path (src/menus/item_shop for
+# STITSHOP), and where splat writes a C file's disassembly: under the
+# binary's name ($(ASM_DIR)/stitshop/)
+$(foreach b,main $(OVERLAYS),$(eval SRC_DIR_$(b) := $(shell sed -n 's/^ *src_path: *//p' $(CONFIG_DIR)/$(b).yaml)))
+SRC_DIR_stages := src/field/stages
+src_asm = $(foreach b,main stages $(OVERLAYS),$(patsubst $(SRC_DIR_$(b))/%.c,$(ASM_DIR)/$(b)/%.s,$(filter $(SRC_DIR_$(b))/%,$(1))))
 TARGET_ASM := $(filter-out $(foreach b,main $(OVERLAYS),$(ASM_DIR)/$(b)/data/%) $(foreach s,$(DATA_STAGES),$(ASM_DIR)/stages/$(STAGE_PATH_$(s)).s),\
-	      $(patsubst src/%.c,$(ASM_DIR)/%.s,$(filter-out $(STAGE_HEADS),$(ALL_C_SRC)))) \
-	      $(STAGE_HEADS:src/stages/%.c=$(ASM_DIR)/stages/data/%.rodata.s)
+	      $(call src_asm,$(filter-out $(STAGE_HEADS),$(ALL_C_SRC)))) \
+	      $(STAGE_HEADS:src/field/stages/%.c=$(ASM_DIR)/stages/data/%.rodata.s)
 
 ASM_SRC := $(filter-out $(TARGET_ASM) $(ASM_DIR)/main/header.s,$(shell find $(ASM_DIR)/main -name '*.s' \
 	   -not -path '*/nonmatchings/*' -not -path '*/matchings/*' 2> /dev/null))
 
 C_OBJ := $(MAIN_C_SRC:%.c=$(BUILDDIR)/%.c.o)
-# The executable's header is source too (src/main/header.s), built where
+# The executable's header is source too (src/engine/header.s), built where
 # main.ld looks for splat's
 HEADER_OBJ := $(BUILDDIR)/$(ASM_DIR)/main/header.s.o
 ASM_OBJ := $(ASM_SRC:%.s=$(BUILDDIR)/%.s.o) $(HEADER_OBJ)
@@ -157,7 +165,7 @@ OBJ := $(C_OBJ) $(ASM_OBJ) $(BIN_OBJ)
 
 # Overlays: the game's AAA/PRO/*.PRO files, loaded at 0x80082448 after the
 # executable's .bss. Each one, from the version's OVERLAYS, has its own splat
-# config ($(CONFIG_DIR)/<name>.yaml), sources (src/<name>, $(ASM_DIR)/<name>)
+# config ($(CONFIG_DIR)/<name>.yaml), sources (its src_path, $(ASM_DIR)/<name>)
 # and output ($(BUILDDIR)/AAA/PRO/<FILE>.PRO), and is linked against the
 # executable's symbols (MAIN_SYMS).
 $(foreach o,$(OVERLAYS),$(eval OVL_FILE_$(o) := $(shell echo $(o) | tr a-z A-Z).PRO))
@@ -172,21 +180,21 @@ CHILDREN_main := $(filter-out wfightmn wfightts,$(OVERLAYS))
 
 # The stage overlays (AAA/PRO/WSTAG###.PRO), listed in
 # $(CONFIG_DIR)/stages.txt, load on top of FIELDSTG. Their splat configs are
-# made by tools/stage_yaml.py and their sources are src/stages/<area>/<name>.c
+# made by tools/stage_yaml.py and their sources are src/field/stages/<area>/<name>.c
 # and $(ASM_DIR)/stages/ (STAGE_PATH_<name>).
 OVERLAYS += $(STAGES)
 $(foreach s,$(STAGES),\
 	$(eval OVL_FILE_$(s) := $(shell echo $(s) | tr a-z A-Z).PRO)\
 	$(eval OVL_PARENT_$(s) := fieldstg)\
 	$(eval OVL_YAML_$(s) := $(GENDIR)/stages/$(s).yaml)\
-	$(eval OVL_C_SRC_$(s) := src/stages/$(STAGE_PATH_$(s)).c src/stages/$(STAGE_PATH_$(s))_head.c)\
+	$(eval OVL_C_SRC_$(s) := src/field/stages/$(STAGE_PATH_$(s)).c src/field/stages/$(STAGE_PATH_$(s))_head.c)\
 	$(eval OVL_ASM_SRC_$(s) := $(wildcard $(ASM_DIR)/stages/data/$(STAGE_PATH_$(s)).*.s $(ASM_DIR)/stages/data/$(STAGE_PATH_$(s)).s \
 		$(ASM_DIR)/stages/data/$(s)_end.s $(ASM_DIR)/stages/$(STAGE_PATH_$(s)).s))\
 	$(eval OVL_SYMBOLS_$(s) := $(wildcard $(CONFIG_DIR)/symbols_fieldstg.txt $(CONFIG_DIR)/stages/$(s).txt)))
 
 # FIELDSTG starts the stages (FIELDSTG_stages), and links against their
 # symbols (CHILDREN_template). The stages name theirs alike, so each stage
-# gives its own prefixed with its name: WSTAG931_startStage (include/stages.h).
+# gives its own prefixed with its name: WSTAG931_startStage (include/field/stages.h).
 CHILDREN_fieldstg := $(STAGES)
 $(STAGES:%=$(LINKDIR)/%_syms.ld): $(LINKDIR)/%_syms.ld: $(LINKDIR)/%.elf
 	$(NM) $< | awk -v stage=$* '$$2 ~ /^[TDRBSG]$$/ { printf "%s_%s = 0x%s;\n", toupper(stage), $$3, $$1 }' > $@
@@ -231,7 +239,7 @@ endef
 $(eval $(call CHILDREN_template,main,$(OBJ),$(GENDIR)/main.ld,$(UNDEFINED_SYMS) $(MAIN_AUTO_SYMS)))
 
 define OVERLAY_template
-$(1)_C_SRC := $$(filter $$(or $$(OVL_C_SRC_$(1)),src/$(1)/%),$$(ALL_C_SRC))
+$(1)_C_SRC := $$(filter $$(or $$(OVL_C_SRC_$(1)),$$(SRC_DIR_$(1))/%),$$(ALL_C_SRC))
 $(1)_ASM_SRC := $$(filter-out $$(TARGET_ASM),$$(if $$(OVL_YAML_$(1)),$$(OVL_ASM_SRC_$(1)),\
 	$$(shell find $$(ASM_DIR)/$(1) -name '*.s' \
 	-not -path '*/nonmatchings/*' -not -path '*/matchings/*' 2> /dev/null)))
@@ -347,7 +355,7 @@ smoke: $(EXE) $(OVL_BIN)
 
 # The executable's .bss in C: maspsx turns the commons of these units into
 # definitions in order in their .bss when they aren't kept as .comm
-$(BUILDDIR)/src/main/data/game_bss.c.o $(BUILDDIR)/src/main/sound/sound.c.o: MASPSXFLAGS := $(filter-out --use-comm-section,$(MASPSXFLAGS))
+$(BUILDDIR)/src/engine/data/game_bss.c.o $(BUILDDIR)/src/engine/sound/sound.c.o: MASPSXFLAGS := $(filter-out --use-comm-section,$(MASPSXFLAGS))
 
 $(BUILDDIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)
@@ -357,7 +365,7 @@ $(BUILDDIR)/%.c.o: %.c
 	$(AS) $(ASFLAGS) -o $@ $(@:.o=.s)
 	@$(OBJCOPY) --set-section-alignment .text=4 --set-section-alignment .rodata=4 $@
 
-$(HEADER_OBJ): src/main/header.s
+$(HEADER_OBJ): src/engine/header.s
 	@mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) -o $@ $<
 

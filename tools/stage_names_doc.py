@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Writes, at the top of each stage's C file, a comment that says which map or
-event the stage is, and the same names in src/stages/README.md.
+event the stage is, and the same names in src/field/stages/README.md.
 
     tools/stage_names_doc.py [-n]
 

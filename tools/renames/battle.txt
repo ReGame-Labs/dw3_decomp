@@ -8,7 +8,7 @@ func_800A0EEC FIGHTSTG_interpNop
 # WFIGHTMN's state 6
 func_800A69D0 WFIGHTMN_pairTech
 
-# FIGHTSTG's screen fade, two of whose functions are src/menu_common's
+# FIGHTSTG's screen fade, two of whose functions are src/shared's
 FIGHTSTG_startScreenFade FIGHTSTG_startFader
 FIGHTSTG_drawScreenFade FIGHTSTG_drawFader
 FIGHTSTG_updateScreenFade FIGHTSTG_updateFader

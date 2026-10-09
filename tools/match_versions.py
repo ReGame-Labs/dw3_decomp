@@ -289,7 +289,7 @@ def analyse(f, words, gp):
 
 def module_ranges(mapfile, version):
     """(start, end, module) of each object's .text in MAPFILE, the module
-    named binary/path as the report does (main/inn, cardgame/cardgame,
+    named binary/path as the report does (main/inn, cardgame/effect_script,
     stages/central_sector/wstag200; main/text for a version's asm segment)."""
     out = []
     for m in re.finditer(r"^ \.text\s+0x([0-9a-f]+)\s+0x([0-9a-f]+)\s+(\S+)$", mapfile.read_text(), re.M):
@@ -998,7 +998,7 @@ def us_symbol_lines():
 
 def us_names(us_funcs, us_data):
     """The names us gives its functions and data, in its symbol files or in
-    its C (src/main/data/ defines most of the executable's data):
+    its C (src/engine/data/ defines most of the executable's data):
     {name: attributes of its symbol line, or "" for a name only the C gives}."""
     out = {name: attrs for name, (_, attrs) in us_symbol_lines().items()}
     for name in [f.name for f in us_funcs] + [n for n, _ in us_data.values()]:

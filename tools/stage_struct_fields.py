@@ -6,7 +6,7 @@ the code reads them through a pointer of that type.
 A field such as StageTile.unk2 is read as object->unk2, and unk2 is a field
 of many structs, so a plain rename can't change it. This renames OLD to NEW
 after a pointer that the same function (or file scope) declares with the
-struct's type, StageTile *object, in src/stages/ and src/fieldstg/; the
+struct's type, StageTile *object, in src/field/stages/ and src/field/field_mode/; the
 struct's declaration is changed by hand. It changes no bytes, and can be run
 again at any time:
 
@@ -17,9 +17,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FILES = sorted((ROOT / "src" / "stages").rglob("*.c")) + sorted((ROOT / "src" / "fieldstg").rglob("*.c"))
+FILES = sorted((ROOT / "src" / "field").rglob("*.c"))
 
-# struct: {old field: new field}, in include/field_map.h and include/stage.h
+# struct: {old field: new field}, in include/field/field_map.h and include/field/stage.h
 FIELDS = {
     "StageTile": {"unk2": "margin", "unkE": "sortY"},
     "StageActor": {"unk64": "z", "unk74": "hasShadow"},

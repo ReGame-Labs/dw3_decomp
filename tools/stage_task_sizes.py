@@ -4,14 +4,14 @@ Writes the sizes the stages give createTask and createTaskWithId as sizeof.
 
 createTask(update, size, childrenSize) takes the size of the task and of the
 block of its children. Where the update's first parameter is a pointer to a
-type of include/stage.h (or include/field_map.h) of that size, the size
+type of include/field/stage.h (or include/field/field_map.h) of that size, the size
 becomes sizeof(Type); and where its second parameter is a pointer to such a
 type of the children's size, so does that one. The sizes come from compiling
 a probe of the headers with the game's compiler (make's TOOLCHAIN, CC1). A
 number that is not the size of the type stays as it is. It changes no bytes,
 and can be run again at any time:
 
-    tools/stage_task_sizes.py [src/stages/central_sector/wstag200.c ...]
+    tools/stage_task_sizes.py [src/field/stages/central_sector/wstag200.c ...]
 """
 import argparse
 import glob
@@ -23,7 +23,7 @@ import tempfile
 
 from name_stage_funcs import functions
 
-HEADERS = ("include/stage.h", "include/field_map.h")
+HEADERS = ("include/field/stage.h", "include/field/field_map.h")
 CREATE = re.compile(r"\b(createTask(?:WithId)?\()(\w+), (0x[0-9A-Fa-f]+|\d+), (0x[0-9A-Fa-f]+|\d+)")
 INCLUDE = re.compile(r'^#include "(common/\w+\.inc\.c)"', re.M)
 POINTER = re.compile(r"^\s*(?:const\s+)?(?:struct\s+)?(\w+)\s*\*\s*\w*\s*$")
@@ -62,9 +62,9 @@ def version_sizes(version):
 
 def parameter_types(text):
     """{function: [the type each pointer parameter points to, or None]}, with
-    the functions of the src/stages/common files the text includes"""
+    the functions of the src/field/stages/common files the text includes"""
     out = {}
-    sources = [text] + [open(f"src/stages/{m.group(1)}").read() for m in INCLUDE.finditer(text)]
+    sources = [text] + [open(f"src/field/stages/{m.group(1)}").read() for m in INCLUDE.finditer(text)]
     for source in sources:
         for name, (params, _) in functions(source).items():
             types = []
@@ -96,7 +96,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[1])
     parser.add_argument("files", nargs="*")
     args = parser.parse_args()
-    files = args.files or sorted(glob.glob("src/stages/wstag*.c") + glob.glob("src/stages/*/wstag*.c"))
+    files = args.files or sorted(glob.glob("src/field/stages/wstag*.c") + glob.glob("src/field/stages/*/wstag*.c"))
     sizes = type_sizes()
     changed = 0
     for path in files:

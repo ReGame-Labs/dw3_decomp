@@ -9,7 +9,7 @@ options:
   compiler: GCC
 
   asm_path: asm/eu/main
-  src_path: src/main
+  src_path: src/engine
   asset_path: assets/eu
   build_path: build/eu
 
@@ -45,7 +45,7 @@ options:
   create_data_pads: False
 
 segments:
-  # src/main/header.s, which names the entry point and the size
+  # src/engine/header.s, which names the entry point and the size
   - name: header
     type: header
     start: 0x0

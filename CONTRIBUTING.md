@@ -119,7 +119,7 @@ give it real types once the code that uses it is understood.
   `tools/hacks.py --check README.md docs/status.md`. `tools/hacks.py --list`
   lists them all.
 - When a form recurs and has a likely origin, give it a name and say so
-  once, as `COUNTDOWN_BORROW` in `include/stage.h` does: a statement macro
+  once, as `COUNTDOWN_BORROW` in `include/field/stage.h` does: a statement macro
   for the timed stages' countdown, whose `do { } while (0)` the match
   depends on. Say it once for a form every copy shares too, as the comment
   above `StageInfo` does for the setup functions' `(Vec2){x, y}`.
@@ -149,7 +149,7 @@ how to fix what they find:
   name what the address points to (a declaration of the symbol, or a name
   in the symbol file so that splat writes a label), and for a binary that
   loads later, use its symbol as the binary imports it (`CHILDREN_<binary>`
-  in the Makefile: `WSTAG931_startStage`, `include/stages.h`).
+  in the Makefile: `WSTAG931_startStage`, `include/field/stages.h`).
   `config/<version>/shiftcheck.txt`, the addresses left to fix, is empty and
   may only get shorter; when the check warns that a listed one is fixed,
   `tools/shiftcheck.py -v <version> --update` drops it.
@@ -208,9 +208,9 @@ or 1; the assembly gets the same names from `--defsym`.
 
   ```
   tools/match_versions.py eu      # with both versions built: build/eu/version_pairs.tsv
-  tools/version_symbols.py eu src/<binary>/<file>.c --write
-  make VERSION=eu generate build/eu/src/<binary>/<file>.c.o
-  tools/version_symbols.py eu src/<binary>/<file>.c --write
+  tools/version_symbols.py eu src/<folder>/<file>.c --write
+  make VERSION=eu generate build/eu/src/<folder>/<file>.c.o
+  tools/version_symbols.py eu src/<folder>/<file>.c --write
   make VERSION=eu regenerate && make VERSION=eu && make VERSION=eu compare
   ```
 
@@ -252,7 +252,7 @@ does:
       /* 0x50 */ void *owner;
   } StageTask;
   ```
-  A task's struct starts with `TASK_HEADER(Type)` (`include/dw3/task.h`),
+  A task's struct starts with `TASK_HEADER(Type)` (`include/engine/task.h`),
   and its state machine uses `TASK_INIT`, `TASK_RUN`, `TASK_DONE` and
   `TASK_KILL`.
 - The engine is reached through its tables, as the original does:
@@ -263,40 +263,46 @@ does:
   to struct fields past the load of a scalar's function pointer.
 - In a `-G8` file, the small variables the code reads through `$gp` are
   declared `static` at the top of the file.
-- Headers: `include/game.h` includes the engine's headers, one per module in
-  `include/dw3/<module>.h`, each with its own types and prototypes;
-  `include/<overlay>.h` has an overlay's, and `include/stage.h` what the
-  stages share. A large overlay's are split by module into
-  `include/<overlay>/*.h` (FIGHTSTG, CARDGAME): `types.h` first, with the
-  types the others point to before they are defined, and
-  `include/<overlay>.h` includes them all. Every header has an `#ifndef <NAME>_H` guard, and most a
+- Headers: `include/engine/game.h` includes the engine's headers, one per module in
+  `include/engine/<module>.h`, each with its own types and prototypes;
+  `include/<group>/<folder>.h` has an overlay's (in the groups of `src/`),
+  and `include/field/stage.h` what the stages share. A large overlay's are
+  split by module into `include/<group>/<folder>/*.h` (FIGHTSTG, CARDGAME):
+  `types.h` first, with the types the others point to before they are
+  defined, and `include/<group>/<folder>.h` includes them all. Every header has an `#ifndef <NAME>_H` guard, and most a
   comment at the top that says what the module or overlay is.
 - A `.c` file keeps the externs and prototypes only it uses at its top,
   after the includes. Anything a second file needs moves to a header.
 
 ## Layout
 
-- One folder per binary under `src/`: `src/main/` for the executable,
-  `src/<overlay>/` for each overlay, and `src/stages/` with one
+- One folder per binary under `src/`: `src/engine/` for the executable,
+  `src/<group>/<overlay>/` for each overlay, grouped by the part of the game
+  it runs (`field/`, `battle/`, `cardgame/`, `menus/`, `debug/`) and named
+  after what it is: `src/menus/item_shop/` is STITSHOP.PRO
+  ([src/README.md](src/README.md) lists them with their files on the disc).
+  The disc's name stays the binary's: its config (`config/<version>/stitshop.yaml`,
+  whose `src_path` gives the folder), its asm, its functions' prefix
+  (`STITSHOP_`) and its unit in the report. `src/field/stages/` has one
   `wstag###.c` per stage, in the folder of the area FIELDSTG names when
-  the player enters it (`src/stages/asuka_city/wstag210.c`): the 18 areas
-  and their stages are listed in [src/stages/README.md](src/stages/README.md),
+  the player enters it (`src/field/stages/asuka_city/wstag210.c`): the 18 areas
+  and their stages are listed in [src/field/stages/README.md](src/field/stages/README.md),
   which `tools/stage_areas.py` writes as it moves a stage there.
   `wstag260.c` (the story events' scripts, in no area) and `common/` stay in
-  `src/stages/`. A stage includes the shared code as `"common/<file>.inc.c"`
-  (`-Isrc/stages`).
+  `src/field/stages/`. A stage includes the shared code as `"common/<file>.inc.c"`
+  (`-Isrc/field/stages`).
 - Code that several binaries have, each its own copy of the same C, is one
   `.inc.c` file that their C files include where the function is, named
-  after it: `src/stages/common/` for the stages, `src/menu_common/` for the
-  menu overlays (and STFGTREP's and FIGHTSTG's copies of their functions). An overlay's copy keeps the overlay's prefix: its header
+  after it: `src/field/stages/common/` for the stages, `src/shared/` for the
+  menu overlays (included as `"shared/<file>.inc.c"`, `-Isrc`) (and STFGTREP's and FIGHTSTG's copies of their functions). An overlay's copy keeps the overlay's prefix: its header
   defines `OVL_NAME(name)` (`STGMCARD_##name`), and the shared file names
   its functions with it (`void OVL_NAME(drawFader)(ScreenFade *task)` is
   `STGMCARD_drawFader` in STGMCARD). A copy that differs in a constant
   takes it from a macro that the including file defines just before the
   include (`FADER_DEPTH` for `create_fader.inc.c`).
-- The executable is split into modules, a folder each under `src/main/`:
+- The executable is split into modules, a folder each under `src/engine/`:
 
-  | Folder | What | Header (`include/dw3/`) |
+  | Folder | What | Header (`include/engine/`) |
   |---|---|---|
   | `system/` | the boot and the frame loop (`main.c`), the heap, the random numbers, the modes' overlays | `overlay.h`, `heap.h`, `random.h` |
   | `task/` | the tasks' methods and creation, the task registry | `task.h` |
@@ -317,13 +323,13 @@ does:
   in order (and a datum that starts a file is word-aligned). The modules cut
   from a `-G8` object keep `-G8` (`G8_SRC` in the Makefile). Each module
   declares its types, functions and data once, in its header;
-  `include/game.h` includes them all.
+  `include/engine/game.h` includes them all.
 - The SDK, Sony's code, isn't in `src/`: the build takes it from the
   original as splat's disassembly (`asm/<version>/main/psyq/`), and the C
   decompiled of it earlier is in this repository's history.
 - An overlay's file `X_2.c` is the second half of an original object that
   the splat config splits in two; the report counts both halves as the unit `X`.
-- The executable's data is in `src/main/data/` until it moves to the module
+- The executable's data is in `src/engine/data/` until it moves to the module
   that defines it. Its European tables differ all over (file numbers,
   screen positions, overlay addresses) and splat names them at other
   addresses: they are `data_to_c.py`'s output for `asm/eu/` next to the USA
@@ -333,7 +339,7 @@ does:
   datum where the rest can wait: give it a `.data` subsegment
   of its own in both versions' `main.yaml` (`[0x2F1D8, .data, menu/inn]`).
   What is left on each side stays
-  in `src/main/data/`, one file per range, listed in address order in
+  in `src/engine/data/`, one file per range, listed in address order in
   `GAME_DATA` (`tools/objdiff_generate.py`) and in `mk/version/eu.mk`. A
   struct that splat sees as several labels (the code reads some of its
   fields by their own names) needs its size in the symbol files, and those
@@ -382,7 +388,7 @@ The stages are all loaded at the same address and many have functions at the
 same addresses, so their functions keep splat's names for now; the
 Makefile already reads a stage's own symbol file,
 `config/<version>/stages/<stage>.txt`, when there is one. Their data is
-named after where the tables of `include/stage.h` put it (`actor3Talks`,
+named after where the tables of `include/field/stage.h` put it (`actor3Talks`,
 `area0Battle2`, `script50`): `tools/name_stage_data.py` names it in the C
 and in both versions' symbol files, and can be run again after new data
 comes in.

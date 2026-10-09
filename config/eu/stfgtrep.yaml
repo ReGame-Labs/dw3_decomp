@@ -9,7 +9,7 @@ options:
   compiler: GCC
 
   asm_path: asm/eu/stfgtrep
-  src_path: src/stfgtrep
+  src_path: src/battle/report
   build_path: build/eu
 
   ld_script_path: build/eu/generated/stfgtrep.ld

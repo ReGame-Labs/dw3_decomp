@@ -38,13 +38,13 @@ from gdb_rsp import GdbClient
 from patch_disc import patch
 from version import BUILD_DIR, EXE_NAME, VERSION
 
-# GAME.mode (include/dw3/game_state.h), and the mode in which the game waits
+# GAME.mode (include/engine/game_state.h), and the mode in which the game waits
 # for a button on its first screen: STDWTITL's title screen, or the
 # European language menu (CNTY_SEL), which comes before it
 MODE_OFFSET = {"us": 0x26BC, "eu": 0x26C4}[VERSION]
 FIRST_MENU = {"us": 0xE01, "eu": 0x1600}[VERSION]
 
-# GFX.frameCount (include/dw3/graphics.h): the frames that drawFrame ended
+# GFX.frameCount (include/engine/graphics.h): the frames that drawFrame ended
 FRAME_COUNT_OFFSET = 0x08
 
 TIMEOUT = 120  # seconds until the first menu

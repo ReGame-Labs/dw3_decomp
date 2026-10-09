@@ -21,8 +21,8 @@ takes a color that comes before the jump tables from a C file of its own,
 <name>_head.c next to the stage's, linked first: in the stage's C file GCC
 would align the jump tables to 8 bytes after it (WSTAG924).
 
-The stage's C file is src/stages/<area>/<name>.c, in the folder of its area
-(tools/stage_areas.py), or src/stages/<name>.c for one in no area: the
+The stage's C file is src/field/stages/<area>/<name>.c, in the folder of its area
+(tools/stage_areas.py), or src/field/stages/<name>.c for one in no area: the
 subsegments are named <area>/<name>, so that splat finds it there and
 writes its assembly to asm/<version>/stages/<area>/.
 
@@ -58,7 +58,7 @@ options:
 
   asm_path: asm/{version}/stages
   asset_path: asm/{version}/stages/bin
-  src_path: src/stages
+  src_path: src/field/stages
   build_path: build/{version}
 
   ld_script_path: build/{version}/generated/{name}.ld
@@ -125,7 +125,7 @@ options:
 
   asm_path: asm/{version}/stages
   asset_path: asm/{version}/stages/bin
-  src_path: src/stages
+  src_path: src/field/stages
   build_path: build/{version}
 
   ld_script_path: build/{version}/generated/{name}.ld
@@ -191,7 +191,7 @@ def main():
     if os.path.exists(os.path.join(root, f"{config}/stages/{name}.txt")):
         symbols.append(f"{config}/stages/{name}.txt")
 
-    # the stage's C file is src/stages/<path>.c (and its head <path>_head.c)
+    # the stage's C file is src/field/stages/<path>.c (and its head <path>_head.c)
     path = version.stage_path(name)
     if data_only:
         subsegments = f"      - [0x0, {data_type}, {path}]\n"
