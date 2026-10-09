@@ -9,7 +9,7 @@ options:
   compiler: GCC
 
   asm_path: asm/eu/cnty_sel
-  src_path: src/cnty_sel
+  src_path: src/menus/cnty_sel
   asset_path: asm/eu/cnty_sel/bin
   build_path: build/eu
 

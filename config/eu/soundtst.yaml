@@ -9,7 +9,7 @@ options:
   compiler: GCC
 
   asm_path: asm/eu/soundtst
-  src_path: src/soundtst
+  src_path: src/debug/soundtst
   build_path: build/eu
 
   ld_script_path: build/eu/generated/soundtst.ld

@@ -9,7 +9,7 @@ options:
   compiler: GCC
 
   asm_path: asm/eu/shocktst
-  src_path: src/shocktst
+  src_path: src/debug/shocktst
   build_path: build/eu
 
   ld_script_path: build/eu/generated/shocktst.ld

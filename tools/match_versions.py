@@ -998,7 +998,7 @@ def us_symbol_lines():
 
 def us_names(us_funcs, us_data):
     """The names us gives its functions and data, in its symbol files or in
-    its C (src/main/data/ defines most of the executable's data):
+    its C (src/engine/data/ defines most of the executable's data):
     {name: attributes of its symbol line, or "" for a name only the C gives}."""
     out = {name: attrs for name, (_, attrs) in us_symbol_lines().items()}
     for name in [f.name for f in us_funcs] + [n for n, _ in us_data.values()]:

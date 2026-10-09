@@ -37,60 +37,60 @@ GP_VALUE := 0x8005CB50
 # are split into the USA version's modules (tools/split_version.py), so that
 # their asm lands at the same paths under asm/eu/ as under asm/us/; only the
 # PsyQ libraries and the functions behind INCLUDE_ASM stay asm.
-C_SRC := src/soundtst/soundtst.c
+C_SRC := src/debug/soundtst/soundtst.c
 
 # game: every module of the executable, and its data
-C_SRC += $(shell find src/main -name '*.c')
+C_SRC += $(shell find src/engine -name '*.c')
 
 # menus
-C_SRC += src/stitshop/stitshop.c src/stgdglab/stgdglab.c src/ststatus/ststatus.c
+C_SRC += src/menus/stitshop/stitshop.c src/menus/stgdglab/stgdglab.c src/menus/ststatus/ststatus.c
 # stitshop's modules, and its data
-C_SRC += $(addprefix src/stitshop/, trade.c item_list.c info.c shop.c equip.c data/stitshop.c)
+C_SRC += $(addprefix src/menus/stitshop/, trade.c item_list.c info.c shop.c equip.c data/stitshop.c)
 # stgdglab's modules
-C_SRC += $(addprefix src/stgdglab/, recipe_screen.c entry_panel.c slot_screen.c menu.c scroll_bar.c)
-C_SRC += $(addprefix src/stgdglab/, party_screen.c skill_panel.c entry_list.c lab.c)
+C_SRC += $(addprefix src/menus/stgdglab/, recipe_screen.c entry_panel.c slot_screen.c menu.c scroll_bar.c)
+C_SRC += $(addprefix src/menus/stgdglab/, party_screen.c skill_panel.c entry_list.c lab.c)
 # ststatus's modules
-C_SRC += $(addprefix src/ststatus/, demo_screen.c equip_panel.c digivolve_panel.c status_screen.c item_screen.c item_list.c tech_screen.c sort_screen.c map_screen.c menu.c helpers.c)
+C_SRC += $(addprefix src/menus/ststatus/, demo_screen.c equip_panel.c digivolve_panel.c status_screen.c item_screen.c item_list.c tech_screen.c sort_screen.c map_screen.c menu.c helpers.c)
 
 # cardgame
-C_SRC += src/cardgame/cardgame.c
+C_SRC += src/cardgame/cardgame/cardgame.c
 # cardgame's other objects and modules (cardgame.c is above), and the
 # second and third objects' data
-C_SRC += $(filter-out src/cardgame/cardgame.c,$(wildcard src/cardgame/*.c))
-C_SRC += src/cardgame/data/cardgame_2.c src/cardgame/data/cardgame_3.c
+C_SRC += $(filter-out src/cardgame/cardgame/cardgame.c,$(wildcard src/cardgame/cardgame/*.c))
+C_SRC += src/cardgame/cardgame/data/cardgame_2.c src/cardgame/cardgame/data/cardgame_3.c
 
 # fightstg's other objects and modules (fightstg.c is with the overlays)
-C_SRC += $(filter-out src/fightstg/fightstg.c,$(wildcard src/fightstg/*.c))
+C_SRC += $(filter-out src/battle/fightstg/fightstg.c,$(wildcard src/battle/fightstg/*.c))
 
 # small overlays
-C_SRC += src/stgmcard/stgmcard.c src/stfgtrep/scene.c src/stfgtrep/partner.c src/stfgtrep/report.c src/stfgtrep/fade.c src/stfgtrep/growth.c src/stfgtrep/data/stfgtrep.c src/wfightmn/wfightmn.c src/wfightmn/setup.c src/wfightmn/menu.c src/wfightmn/techs.c src/wfightmn/data/wfightmn_2.c src/stcrdshp/stcrdshp.c src/stplnmet/stplnmet.c src/wfightts/wfightts.c
+C_SRC += src/menus/stgmcard/stgmcard.c src/battle/stfgtrep/scene.c src/battle/stfgtrep/partner.c src/battle/stfgtrep/report.c src/battle/stfgtrep/fade.c src/battle/stfgtrep/growth.c src/battle/stfgtrep/data/stfgtrep.c src/battle/wfightmn/wfightmn.c src/battle/wfightmn/setup.c src/battle/wfightmn/menu.c src/battle/wfightmn/techs.c src/battle/wfightmn/data/wfightmn_2.c src/cardgame/stcrdshp/stcrdshp.c src/menus/stplnmet/stplnmet.c src/debug/wfightts/wfightts.c
 # stcrdshp's modules
-C_SRC += $(addprefix src/stcrdshp/, pack_open.c fader.c card_grid.c buy.c shop.c)
+C_SRC += $(addprefix src/cardgame/stcrdshp/, pack_open.c fader.c card_grid.c buy.c shop.c)
 # stgmcard's modules, and its data
-C_SRC += $(addprefix src/stgmcard/, info.c panel.c menu.c saves.c screen.c data/stgmcard.c)
+C_SRC += $(addprefix src/menus/stgmcard/, info.c panel.c menu.c saves.c screen.c data/stgmcard.c)
 # stplnmet's modules, and its data
-C_SRC += $(addprefix src/stplnmet/, backdrop.c welcome.c name_entry.c confirm.c choice.c screen.c data/stplnmet.c)
+C_SRC += $(addprefix src/menus/stplnmet/, backdrop.c welcome.c name_entry.c confirm.c choice.c screen.c data/stplnmet.c)
 
 # overlays
-C_SRC += src/shocktst/shocktst.c src/cnty_sel/cnty_sel.c src/stcrdabm/stcrdabm.c
-C_SRC += src/stagslct/stagslct.c src/stdgname/stdgname.c
+C_SRC += src/debug/shocktst/shocktst.c src/menus/cnty_sel/cnty_sel.c src/cardgame/stcrdabm/stcrdabm.c
+C_SRC += src/debug/stagslct/stagslct.c src/menus/stdgname/stdgname.c
 # stdgname's modules, and its data
-C_SRC += $(addprefix src/stdgname/, name_entry.c menu.c screen.c data/stdgname.c)
-C_SRC += src/stdwtitl/stdwtitl.c
+C_SRC += $(addprefix src/menus/stdgname/, name_entry.c menu.c screen.c data/stdgname.c)
+C_SRC += src/menus/stdwtitl/stdwtitl.c
 # stdwtitl's modules, and its data
-C_SRC += $(addprefix src/stdwtitl/, logo.c movie.c glint.c splash.c title_loader.c slides.c menu.c)
-C_SRC += $(addprefix src/stdwtitl/, edge_fade.c background.c title.c)
-C_SRC += $(addprefix src/stdwtitl/data/, stdwtitl.c title.c movie.c)
-C_SRC += src/stcrddek/stcrddek.c src/stgtrain/stgtrain.c src/fightstg/fightstg.c
+C_SRC += $(addprefix src/menus/stdwtitl/, logo.c movie.c glint.c splash.c title_loader.c slides.c menu.c)
+C_SRC += $(addprefix src/menus/stdwtitl/, edge_fade.c background.c title.c)
+C_SRC += $(addprefix src/menus/stdwtitl/data/, stdwtitl.c title.c movie.c)
+C_SRC += src/cardgame/stcrddek/stcrddek.c src/menus/stgtrain/stgtrain.c src/battle/fightstg/fightstg.c
 # stcrddek's modules, and its data
-C_SRC += $(addprefix src/stcrddek/, deck_cards.c editor.c name_entry.c scroll_bar.c screen.c data/stcrddek.c)
+C_SRC += $(addprefix src/cardgame/stcrddek/, deck_cards.c editor.c name_entry.c scroll_bar.c screen.c data/stcrddek.c)
 # fieldstg's modules, and its data
-C_SRC += $(wildcard src/fieldstg/*.c) src/fieldstg/data/fieldstg.c
+C_SRC += $(wildcard src/field/fieldstg/*.c) src/field/fieldstg/data/fieldstg.c
 # stgtrain's modules
-C_SRC += $(addprefix src/stgtrain/, sprite.c screen.c result.c session.c actor.c menu.c files.c)
+C_SRC += $(addprefix src/menus/stgtrain/, sprite.c screen.c result.c session.c actor.c menu.c files.c)
 
 # The stages: the USA version's, built from its C, and those it doesn't have,
 # each in the folder of its area (tools/stage_areas.py), with WSTAG924's
 # color in a file of its own before the stage's jump tables (wstag924_head.c,
 # tools/stage_yaml.py)
-C_SRC += $(sort $(shell find src/stages -name '*.c' ! -name '*.inc.c'))
+C_SRC += $(sort $(shell find src/field/stages -name '*.c' ! -name '*.inc.c'))

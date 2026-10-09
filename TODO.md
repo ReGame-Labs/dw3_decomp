@@ -28,7 +28,7 @@ and the tooling around it. The counts below are from commit `f5763800`.
   `spriteDrawerDraw`, `textWindowDraw`...), or is a flat switch of short
   cases (`FIGHTSTG_showMessage`, `FIGHTSTG_testEnemyCondition`).
 - [ ] Each stage's file says which map or event it is, and
-  [src/stages/README.md](src/stages/README.md) lists the names
+  [src/field/stages/README.md](src/field/stages/README.md) lists the names
   (`tools/stage_names_doc.py` writes both). The 30 Underground tunnels
   (WSTAG825 to 895, and the European 960 to 974) only have the game's names
   for their region, Seabed or Circuit Board, and the maps that lead to them:
@@ -54,7 +54,7 @@ and the tooling around it. The counts below are from commit `f5763800`.
 - [ ] The stages' data repeats between stages, and between the versions as
   `#if VERSION_US` / `VERSION_EU` rows: write what is the same once, where
   the bytes allow it.
-- [ ] `src/main/data/` holds the executable's data no module can hold yet,
+- [ ] `src/engine/data/` holds the executable's data no module can hold yet,
   each file with the reason: `matrices.c` (nothing in the executable reads
   it, between `system/random.c`'s data and `text/text_window.c`'s),
   `heap_start.c`, `get_digimon.c`, `eu_settings.c` and `all_files_pattern.c`

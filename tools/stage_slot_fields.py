@@ -2,7 +2,7 @@
 """
 Renames the fields of StageSlot, StagePoint and StagePoints where the code uses them.
 
-The two structs (include/field_map.h, include/stage.h) had their offsets'
+The two structs (include/field/field_map.h, include/field/stage.h) had their offsets'
 names (unkA...). A stage's place points are copied into its exit slots
 field by field (copyPlacePoints), so a point's fields are named after the
 slot's they go to, and a place's two ids after the slot's too. This renames them in the code that reads them, through
@@ -39,8 +39,8 @@ PLACE = {"unk0": "place", "unk2": "placeArg"}
 
 # file: [(the pointer the fields are read through, the struct's renames)]
 USES = {
-    "src/stages/common/copy_place_points.inc.c": [(r"\bslots", SLOT), (r"\bpoint", POINT), (r"\b(?:place|entry)", PLACE)],
-    "src/fieldstg/trigger.c": [(r"\btask->entry", SLOT)],
+    "src/field/stages/common/copy_place_points.inc.c": [(r"\bslots", SLOT), (r"\bpoint", POINT), (r"\b(?:place|entry)", PLACE)],
+    "src/field/fieldstg/trigger.c": [(r"\btask->entry", SLOT)],
 }
 
 

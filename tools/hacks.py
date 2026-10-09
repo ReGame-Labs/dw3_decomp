@@ -83,7 +83,7 @@ NON_MATCHING = re.compile(r"\bNON_?MATCHING\b")
 IF_0 = re.compile(r"^[ \t]*#[ \t]*if[ \t]+0\b", re.M)
 FUNC_NAME = re.compile(r"(\w+)\s*\([^;{}]*\)\s*$")
 DIRECTIVE = re.compile(r"^[ \t]*#(?:[^\n]*\\\n)*[^\n]*", re.M)
-# the shared files (src/menu_common/*.inc.c) name their functions with
+# the shared files (src/shared/*.inc.c) name their functions with
 # OVL_NAME(name), directly or through a macro of their own, which each
 # overlay that includes them defines to its prefix
 OVL_NAME = re.compile(r"\bOVL_NAME\s*\(\s*(\w+)\s*\)")
@@ -168,11 +168,16 @@ def line_of(text, pos):
 
 def includers():
     """{shared file: the prefix its functions get}, as {A,B}_ for the
-    overlays A and B (src/a, src/b) that include it, or A_ for one."""
+    overlays A and B (src/<group>/a, src/<group>/b) that include it, or A_
+    for one."""
     users = {}
     for path in sorted((ROOT / "src").rglob("*.c")):
         for m in INCLUDE_INC.finditer(path.read_text(errors="replace")):
-            inc = (path.parent / m[1]).resolve().relative_to(ROOT).as_posix()
+            # found as the compiler finds it: next to the file, else in the
+            # Makefile's -I folders
+            found = [d / m[1] for d in (path.parent, ROOT / "src/field/stages", ROOT / "src")
+                     if (d / m[1]).exists()]
+            inc = (found[0] if found else path.parent / m[1]).resolve().relative_to(ROOT).as_posix()
             users.setdefault(inc, set()).add(path.parent.name.upper())
     return {inc: (f"{{{','.join(sorted(names))}}}_" if len(names) > 1 else f"{min(names)}_")
             for inc, names in users.items()}

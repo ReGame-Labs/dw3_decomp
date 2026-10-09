@@ -9,7 +9,7 @@ options:
   compiler: GCC
 
   asm_path: asm/eu/wfightts
-  src_path: src/wfightts
+  src_path: src/debug/wfightts
   build_path: build/eu
 
   ld_script_path: build/eu/generated/wfightts.ld

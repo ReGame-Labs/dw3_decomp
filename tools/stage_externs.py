@@ -5,16 +5,16 @@ Drops the declarations of a stage's own data and functions that nothing needs.
 data_to_c.py writes an extern for every datum of a stage before its code, but
 a datum or a function that is defined before every use of it needs no
 declaration. This keeps an extern or a prototype only where something (a
-function, a table before the datum, or a src/stages/common file included
+function, a table before the datum, or a src/field/stages/common file included
 before it) uses the name before its definition, and drops copies of the
 same declaration. The declarations before the first function go in one
 block, and each block gets a comment that says why it is there.
 It changes no bytes, and can be run again at any time:
 
-    tools/stage_externs.py [src/stages/central_sector/wstag200.c ...]
+    tools/stage_externs.py [src/field/stages/central_sector/wstag200.c ...]
 
-With no files it goes through every stage, src/stages/<area>/wstag###.c
-(and src/stages/wstag260.c).
+With no files it goes through every stage, src/field/stages/<area>/wstag###.c
+(and src/field/stages/wstag260.c).
 """
 import argparse
 import glob
@@ -31,10 +31,10 @@ FUNCTION = re.compile(r"^(?!extern\b)(?:static\s+)?\w+(?:\s+\w+)*[\s*]*\b\w+\([^
 
 
 def tokens(line):
-    """The names a line uses: an #include of src/stages/common uses the file's"""
+    """The names a line uses: an #include of src/field/stages/common uses the file's"""
     m = INCLUDE.match(line)
     if m:
-        with open(f"src/stages/{m.group(1)}") as f:
+        with open(f"src/field/stages/{m.group(1)}") as f:
             return TOKEN.findall(f.read())
     return TOKEN.findall(line)
 
@@ -190,7 +190,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[1])
     parser.add_argument("files", nargs="*")
     args = parser.parse_args()
-    files = args.files or sorted(glob.glob("src/stages/wstag*.c") + glob.glob("src/stages/*/wstag*.c"))
+    files = args.files or sorted(glob.glob("src/field/stages/wstag*.c") + glob.glob("src/field/stages/*/wstag*.c"))
     changed = 0
     for path in files:
         with open(path) as f:

@@ -100,7 +100,7 @@ FIELDSTG_checkBattle = 0x8009A6E8; // size:0x4
 FIELDSTG_battleFuncs = 0x8009A6EC; // size:0x8
 FIELDSTG_battleRates = 0x8009A6F4; // size:0x18
 // The field's map and the functions that read it, one struct that the data
-// splits in pieces (FieldMap, include/field_map.h, which the stages share)
+// splits in pieces (FieldMap, include/field/field_map.h, which the stages share)
 FIELDSTG_map = 0x8009A70C; // size:0x5C
 FIELDSTG_boxFrame = 0x8009A768; // size:0x4
 FIELDSTG_dirVectors = 0x8009A76C; // size:0x1C0

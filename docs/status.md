@@ -8,7 +8,7 @@ matched C needs.
 
 - The executable's game code is all C, and its rodata. Its data is C too:
   each module holds its own, its small data (`.sdata`) included, and
-  `src/main/data/` the pieces no module can hold, each file saying why:
+  `src/engine/data/` the pieces no module can hold, each file saying why:
   the matrices nothing in the executable reads (`matrices.c`), the small
   data of modules the evidence doesn't name (`heap_start.c`,
   `get_digimon.c`, `eu_settings.c`, `all_files_pattern.c`) and the commons
@@ -20,17 +20,17 @@ matched C needs.
 - The 21 overlays are all C. The menu overlays have their own copies of the
   same helpers (the screen fader, the panels' fades, the lerps, the scroll
   bar, and the name entry's keyboard in STCRDDEK, STPLNMET and STDGNAME),
-  built from one file each in `src/menu_common/` that they include, named
+  built from one file each in `src/shared/` that they include, named
   with each overlay's prefix (`OVL_NAME`). STFGTREP has the fader, the
   fades and the lerps too, and FIGHTSTG the fader's start and drawing.
 - The stages are all C, the 238 USA ones and the 55 of the European version
   alone. Many stages share functions built from the same source, so one
   match often repeats across stages: those have the same name in every
   stage, and the copies that are the same C are one file in
-  `src/stages/common/` that the stages include. The stages' data is
+  `src/field/stages/common/` that the stages include. The stages' data is
   C too, as splat's words, at the end of each stage's C file. Each stage
-  is in the folder of its area, `src/stages/<area>/` (see
-  [src/stages/README.md](../src/stages/README.md)).
+  is in the folder of its area, `src/field/stages/<area>/` (see
+  [src/field/stages/README.md](../src/field/stages/README.md)).
 - The European version is the main one: the build's default and the one
   decomp.dev shows first. It is split into the USA version's files, with the
   USA names, and builds all of them from the same C: the executable's game
@@ -195,7 +195,7 @@ README's badge counts them: fake matches, then the other kinds together.
   `int` as two-byte character constants, in its `STAGSLCT_showBiosVersion`, the do-while of
   `COUNTDOWN_BORROW`, the statement macro of the timed stages' countdown,
   and the start position that every stage's setup function sets as a
-  `(Vec2){x, y}` constructor (both in `include/stage.h`).
+  `(Vec2){x, y}` constructor (both in `include/field/stage.h`).
 - The functions still in assembly are not in the badge: they would be the
   work left, and there are none.
 
