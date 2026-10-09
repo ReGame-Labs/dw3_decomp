@@ -40,7 +40,7 @@ PLACE = {"unk0": "place", "unk2": "placeArg"}
 # file: [(the pointer the fields are read through, the struct's renames)]
 USES = {
     "src/field/stages/common/copy_place_points.inc.c": [(r"\bslots", SLOT), (r"\bpoint", POINT), (r"\b(?:place|entry)", PLACE)],
-    "src/field/fieldstg/trigger.c": [(r"\btask->entry", SLOT)],
+    "src/field/field_mode/trigger.c": [(r"\btask->entry", SLOT)],
 }
 
 

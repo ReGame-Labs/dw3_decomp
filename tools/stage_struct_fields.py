@@ -6,7 +6,7 @@ the code reads them through a pointer of that type.
 A field such as StageTile.unk2 is read as object->unk2, and unk2 is a field
 of many structs, so a plain rename can't change it. This renames OLD to NEW
 after a pointer that the same function (or file scope) declares with the
-struct's type, StageTile *object, in src/field/stages/ and src/field/fieldstg/; the
+struct's type, StageTile *object, in src/field/stages/ and src/field/field_mode/; the
 struct's declaration is changed by hand. It changes no bytes, and can be run
 again at any time:
 

@@ -289,7 +289,7 @@ def analyse(f, words, gp):
 
 def module_ranges(mapfile, version):
     """(start, end, module) of each object's .text in MAPFILE, the module
-    named binary/path as the report does (main/inn, cardgame/cardgame,
+    named binary/path as the report does (main/inn, cardgame/effect_script,
     stages/central_sector/wstag200; main/text for a version's asm segment)."""
     out = []
     for m in re.finditer(r"^ \.text\s+0x([0-9a-f]+)\s+0x([0-9a-f]+)\s+(\S+)$", mapfile.read_text(), re.M):

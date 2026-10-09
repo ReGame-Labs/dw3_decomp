@@ -46,6 +46,8 @@ import re
 import sys
 from pathlib import Path
 
+from version import unit_path
+
 ROOT = Path(__file__).resolve().parent.parent
 DIRS = ("src", "include")
 # where INCLUDE_ASM and INCLUDE_RODATA are defined
@@ -168,8 +170,8 @@ def line_of(text, pos):
 
 def includers():
     """{shared file: the prefix its functions get}, as {A,B}_ for the
-    overlays A and B (src/<group>/a, src/<group>/b) that include it, or A_
-    for one."""
+    overlays A and B that include it, or A_ for one (a stage's area for the
+    stages)."""
     users = {}
     for path in sorted((ROOT / "src").rglob("*.c")):
         for m in INCLUDE_INC.finditer(path.read_text(errors="replace")):
@@ -178,7 +180,8 @@ def includers():
             found = [d / m[1] for d in (path.parent, ROOT / "src/field/stages", ROOT / "src")
                      if (d / m[1]).exists()]
             inc = (found[0] if found else path.parent / m[1]).resolve().relative_to(ROOT).as_posix()
-            users.setdefault(inc, set()).add(path.parent.name.upper())
+            binary = unit_path(path).split("/")[0]
+            users.setdefault(inc, set()).add((path.parent.name if binary == "stages" else binary).upper())
     return {inc: (f"{{{','.join(sorted(names))}}}_" if len(names) > 1 else f"{min(names)}_")
             for inc, names in users.items()}
 

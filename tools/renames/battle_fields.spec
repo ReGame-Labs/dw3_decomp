@@ -8,10 +8,10 @@ MotionStep unk6 endFrame --via step --via 'step\[-1\]'
 Model unkD24 blendTargets
 Model unk19A4 blendSources
 FightStageInfo unk10 noBoundsBones --via 'stages\[[^]]*\]'
-FighterInfo unk10 distance --via info --files src/battle/fightstg/models.c
-BattleScriptChildren unk4 jump --via children --files 'src/battle/fightstg/*.c'
-BattleScriptChildren unk8 move --via children --files 'src/battle/fightstg/*.c'
-BattleScriptChildren unk10 spriteEffects --via children --files 'src/battle/fightstg/*.c'
+FighterInfo unk10 distance --via info --files src/battle/battle_mode/models.c
+BattleScriptChildren unk4 jump --via children --files 'src/battle/battle_mode/*.c'
+BattleScriptChildren unk8 move --via children --files 'src/battle/battle_mode/*.c'
+BattleScriptChildren unk10 spriteEffects --via children --files 'src/battle/battle_mode/*.c'
 
 # the executable's battle records, read by the battle
 BattleSetup unk0 randomBattles --via BATTLE_SETUP

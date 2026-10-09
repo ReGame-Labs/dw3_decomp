@@ -28,7 +28,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 STAGES = ROOT / "src" / "field" / "stages"
-FIELDSTG_DATA = ROOT / "src" / "field" / "fieldstg" / "data" / "fieldstg.c"
+FIELDSTG_DATA = ROOT / "src" / "field" / "field_mode" / "data" / "fieldstg.c"
 # STAREA, in either version's English text
 AREA_TEXT = [ROOT / "disks/us/AAA/DAT/COUNTRY/USA/USSTAREA.BIN",
              ROOT / "disks/eu/AAA/DAT/COUNTRY/ENG/ESSTAREA.BIN"]
