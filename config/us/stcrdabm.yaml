@@ -9,7 +9,7 @@ options:
   compiler: GCC
 
   asm_path: asm/us/stcrdabm
-  src_path: src/stcrdabm
+  src_path: src/cardgame/stcrdabm
   build_path: build/us
 
   ld_script_path: build/us/generated/stcrdabm.ld

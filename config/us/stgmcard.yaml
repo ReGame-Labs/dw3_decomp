@@ -9,7 +9,7 @@ options:
   compiler: GCC
 
   asm_path: asm/us/stgmcard
-  src_path: src/stgmcard
+  src_path: src/menus/stgmcard
   build_path: build/us
 
   ld_script_path: build/us/generated/stgmcard.ld
@@ -51,7 +51,7 @@ segments:
     subsegments:
       # each module's rodata: the ones with jump tables or strings
       - [0x0, .rodata, menu]
-      # the modules (src/stgmcard/), in the order they link
+      # the modules (src/menus/stgmcard/), in the order they link
       - [0x20, c, stgmcard]
       - [0x408, c, info]
       - [0xEE0, c, panel]

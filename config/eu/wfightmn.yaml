@@ -9,7 +9,7 @@ options:
   compiler: GCC
 
   asm_path: asm/eu/wfightmn
-  src_path: src/wfightmn
+  src_path: src/battle/wfightmn
   build_path: build/eu
 
   ld_script_path: build/eu/generated/wfightmn.ld

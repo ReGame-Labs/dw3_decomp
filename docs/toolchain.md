@@ -78,12 +78,13 @@ The prebuilt tools are x86 Linux binaries, so the image is `linux/amd64`.
 
 | Path | Contents |
 |---|---|
-| `src/main/<module>/` | the executable's game code, one folder per module, cut from the original objects in their link order (see [binaries.md](binaries.md#the-games-binaries)) |
-| `src/main/data/` | the executable's data that no module can hold, each file saying why |
-| `src/<overlay>/` | each overlay's C; `<overlay>_2.c` is the second half of an object split in two. `src/fieldstg/` has a file per module instead, more than the original's five objects, split only where each jump table keeps its place, and its data in `data/fieldstg.c`; `src/fightstg/` has its third to sixth objects cut the same way into modules (`entrance.c` to `interp.c`, between `stage.c`, the second object, and `fightstg_7.c`, the last), each with its own data; `src/cardgame/` has its second and third objects cut so too (`play_checks.c` to `round.c`, `battle_steps.c` to `fader.c`), with their data in `data/cardgame_2.c` and `data/cardgame_3.c`; `src/wfightmn/` has its second object in `setup.c`, `menu.c` and `techs.c`, with its data in `data/wfightmn_2.c`, and `src/stfgtrep/` is cut into `scene.c` to `growth.c`, with its data in `data/stfgtrep.c` |
-| `src/stages/<area>/` | one C file per stage, `wstag###.c`, in the folder of its area (the list: [src/stages/README.md](../src/stages/README.md)); `src/stages/common/` holds the code the stages share, and `wstag260.c`, in no area, the story events' scripts |
-| `include/game.h`, `include/dw3/` | types and declarations of the game code, one header per module of `src/main/` (`task.h`, `heap.h`, `gfx.h`, `file.h`, `pad.h`, `random.h`, `sound.h`, `overlay.h`, `text.h`, `game_state.h`, `memcard.h`, `menu.h`) |
-| `include/<overlay>.h`, `include/stage.h` | the overlays' types and declarations, and the stages'; FIGHTSTG's and CARDGAME's are split by module into `include/<overlay>/` |
+| `src/engine/<module>/` | the executable's game code, one folder per module, cut from the original objects in their link order (see [binaries.md](binaries.md#the-games-binaries)) |
+| `src/engine/data/` | the executable's data that no module can hold, each file saying why |
+| `src/<group>/<overlay>/` | each overlay's C, grouped by the part of the game it runs: `field/` (FIELDSTG and the stages), `battle/` (FIGHTSTG, WFIGHTMN, STFGTREP), `cardgame/` (CARDGAME and the STCRD* menus), `menus/` (the other menus and screens) and `debug/` (the developers' test menus); `<overlay>_2.c` is the second half of an object split in two. `src/field/fieldstg/` has a file per module instead, more than the original's five objects, split only where each jump table keeps its place, and its data in `data/fieldstg.c`; `src/battle/fightstg/` has its third to sixth objects cut the same way into modules (`entrance.c` to `interp.c`, between `stage.c`, the second object, and `fightstg_7.c`, the last), each with its own data; `src/cardgame/cardgame/` has its second and third objects cut so too (`play_checks.c` to `round.c`, `battle_steps.c` to `fader.c`), with their data in `data/cardgame_2.c` and `data/cardgame_3.c`; `src/battle/wfightmn/` has its second object in `setup.c`, `menu.c` and `techs.c`, with its data in `data/wfightmn_2.c`, and `src/battle/stfgtrep/` is cut into `scene.c` to `growth.c`, with its data in `data/stfgtrep.c` |
+| `src/shared/` | the code several overlays share, each its own copy of the same C, which their files include as `"shared/<file>.inc.c"` |
+| `src/field/stages/<area>/` | one C file per stage, `wstag###.c`, in the folder of its area (the list: [src/field/stages/README.md](../src/field/stages/README.md)); `src/field/stages/common/` holds the code the stages share, and `wstag260.c`, in no area, the story events' scripts |
+| `include/engine/game.h`, `include/engine/` | types and declarations of the game code, one header per module of `src/engine/` (`task.h`, `heap.h`, `gfx.h`, `file.h`, `pad.h`, `random.h`, `sound.h`, `overlay.h`, `text.h`, `game_state.h`, `memcard.h`, `menu.h`) |
+| `include/<group>/<overlay>.h`, `include/field/stage.h` | the overlays' types and declarations, in the groups of `src/`, and the stages'; FIGHTSTG's and CARDGAME's are split by module into `include/battle/fightstg/` and `include/cardgame/cardgame/`; `include/shared/` has the shared code's |
 | `include/` | `common.h`, `version.h`, `include_asm.h` and the assembler macros |
 | `config/<version>/` | the version's splat configs, symbols, stage list and checksums |
 | `mk/version/` | each version's settings for the Makefile and the tools |
@@ -102,13 +103,13 @@ The prebuilt tools are x86 Linux binaries, so the image is `linux/amd64`.
 | `tools/dl_deps.sh` | downloads the PSX GCC, objdiff-cli and mkpsxiso into `bin/` |
 | `tools/extract_disc.py` | extracts a disc image, `AAA/` included |
 | `tools/stage_yaml.py` | writes a stage's splat config from `config/<version>/stages.txt` |
-| `tools/stage_areas.py` | moves each stage's C file into the folder of its area, `src/stages/<area>/`, from FIELDSTG's stage and area tables, and writes `src/stages/README.md` |
+| `tools/stage_areas.py` | moves each stage's C file into the folder of its area, `src/field/stages/<area>/`, from FIELDSTG's stage and area tables, and writes `src/field/stages/README.md` |
 | `tools/stage_externs.py` | drops the declarations of a stage's own data and functions that are defined before every use, and says above each block that is left why it is needed |
 | `tools/stage_struct_fields.py` | renames the fields of `StageTile` and `StageActor` where the stages and FIELDSTG read them through a pointer of that type |
 | `tools/name_stage_data.py` | names the stages' data by its place in the stage's tables, in the C and every version's symbol files (then `make regenerate`) |
-| `tools/stage_constants.py` | writes the stages' music, sound ids, story points and flag codes with the names of `include/dw3/sound.h`, `include/stage.h`, `include/field_map.h` and `include/dw3/game_state.h` |
+| `tools/stage_constants.py` | writes the stages' music, sound ids, story points and flag codes with the names of `include/engine/sound.h`, `include/field/stage.h`, `include/field/field_map.h` and `include/engine/game_state.h` |
 | `tools/stage_task_sizes.py` | writes the sizes the stages give `createTask` as `sizeof` of the update's task and children types, where the compiler gives that size |
-| `tools/stage_common.py` | includes a `src/stages/common/` file in place of a stage's copy of its code |
+| `tools/stage_common.py` | includes a `src/field/stages/common/` file in place of a stage's copy of its code |
 | `tools/try_match.py` | compiles a draft and compares each of its functions with the original |
 | `tools/permuter_import.py` | sets up a [decomp-permuter](https://github.com/simonlindholm/decomp-permuter) directory for one function |
 | `tools/data_to_c.py` | turns a splat data file into C definitions that reproduce its bytes |

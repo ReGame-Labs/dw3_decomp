@@ -9,7 +9,7 @@ options:
   compiler: GCC
 
   asm_path: asm/eu/cardgame
-  src_path: src/cardgame
+  src_path: src/cardgame/cardgame
   build_path: build/eu
 
   ld_script_path: build/eu/generated/cardgame.ld

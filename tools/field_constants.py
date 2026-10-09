@@ -19,7 +19,7 @@ It changes no bytes and only rewrites numbers, so it can be run again at any
 time; a stage file it changes that has none of the field's headers gets
 field_map.h after its first include. -n lists what it would change, file by file, without writing:
 
-    tools/field_constants.py [-n] [src/stages/central_sector/wstag200.c ...]
+    tools/field_constants.py [-n] [src/field/stages/central_sector/wstag200.c ...]
 """
 import argparse
 import difflib
@@ -29,7 +29,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-HEADER = ROOT / "include/field_map.h"
+HEADER = ROOT / "include/field/field_map.h"
 NUMBER = r"0x[0-9A-Fa-f]+|\d+"
 
 
@@ -112,7 +112,7 @@ def main():
     ap.add_argument("files", nargs="*")
     ap.add_argument("-n", "--dry-run", action="store_true", help="only list what would change")
     args = ap.parse_args()
-    paths = args.files or sorted(glob.glob(str(ROOT / "src/stages/**/*.c"), recursive=True))
+    paths = args.files or sorted(glob.glob(str(ROOT / "src/field/stages/**/*.c"), recursive=True))
     changed = 0
     for path in paths:
         old = Path(path).read_text()

@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
 Writes the stages' sound ids, story points and flag codes by name: MUSIC and
-the SOUND_ names (include/dw3/sound.h, include/stage.h), the FIELD_PROGRESS_
-names (include/field_map.h), and the condition codes
-(include/dw3/game_state.h).
+the SOUND_ names (include/engine/sound.h, include/field/stage.h), the FIELD_PROGRESS_
+names (include/field/field_map.h), and the condition codes
+(include/engine/game_state.h).
 
 - a field's or a battle's music (FieldState.music, the third word of a
   Battle) becomes MUSIC(bank, n);
 - a sound the stages play, given to SOUND.playSound, stopSound or
   fadeOutSound or in a table of them, becomes its SOUND_ name from
-  include/dw3/sound.h or include/stage.h;
-- a story point that include/field_map.h names (FIELD_PROGRESS_), compared
+  include/engine/sound.h or include/field/stage.h;
+- a story point that include/field/field_map.h names (FIELD_PROGRESS_), compared
   with or stored in GAME.progress or in a PROGRESS code, becomes its name;
 - the codes of the FLAGS_00 conditions and actions (the lists of the
   characters and their talks, a StageSlot's conditions, and the codes given
@@ -20,7 +20,7 @@ names (include/field_map.h), and the condition codes
 
 It changes no bytes, and can be run again at any time:
 
-    tools/stage_constants.py [src/stages/central_sector/wstag200.c ...]
+    tools/stage_constants.py [src/field/stages/central_sector/wstag200.c ...]
 """
 import argparse
 import functools
@@ -28,7 +28,7 @@ import glob
 import re
 import sys
 
-HEADERS = ("include/dw3/sound.h", "include/stage.h")
+HEADERS = ("include/engine/sound.h", "include/field/stage.h")
 NUMBER = r"0x[0-9A-Fa-f]+|\d+"
 VERSIONS = {"US", "EU"}
 
@@ -48,8 +48,8 @@ def music(value):
 
 @functools.lru_cache(maxsize=None)
 def progress_names():
-    """{value: FIELD_PROGRESS_ name} of include/field_map.h"""
-    text = open("include/field_map.h").read()
+    """{value: FIELD_PROGRESS_ name} of include/field/field_map.h"""
+    text = open("include/field/field_map.h").read()
     return {int(m.group(2), 0): m.group(1)
             for m in re.finditer(r"^#define (FIELD_PROGRESS_\w+) (" + NUMBER + r")\b", text, re.M)}
 
@@ -69,7 +69,7 @@ SIMPLE_CODES = {0x60: "PROGRESS", 0x70: "SPECIAL", 0x72: "PARTY_STAT", 0x74: "EV
 
 
 def code(word):
-    """A condition or action code by name (include/dw3/game_state.h), or the word as it is"""
+    """A condition or action code by name (include/engine/game_state.h), or the word as it is"""
     if not re.fullmatch(NUMBER, word):
         return word
     v = int(word, 0)
@@ -235,7 +235,7 @@ def main():
     parser = argparse.ArgumentParser(description="Writes the stages' sound ids and flag codes by name.")
     parser.add_argument("files", nargs="*")
     args = parser.parse_args()
-    files = args.files or sorted(glob.glob("src/stages/**/*.c", recursive=True))
+    files = args.files or sorted(glob.glob("src/field/stages/**/*.c", recursive=True))
     sounds = sound_names()
     changed = 0
     for path in files:

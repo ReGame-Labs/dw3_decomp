@@ -50,11 +50,11 @@ A source file X_2.c of an overlay is the second half of an original object
 split in its splat config (X.c and X_2.c come from one file before the
 split). Its unit is reported together with X's under X's name, from the two
 objects linked with `ld -r`, so progress keeps being tracked per unit as
-before. The executable's modules (src/main/<module>/X.c) are units of their
+before. The executable's modules (src/engine/<module>/X.c) are units of their
 own, main/<module>/X.
 An overlay split into several objects, X.c, X_2.c, X_3.c..., is not a pair
 of halves: each of its files is a unit of its own (CARDGAME, FIGHTSTG).
-A stage is a unit stages/<area>/X, from src/stages/<area>/X.c in the
+A stage is a unit stages/<area>/X, from src/field/stages/<area>/X.c in the
 folder of its area (tools/stage_areas.py), in the category "stages" with
 the others. Its head, X_head.c next to it (the color linked before
 WSTAG924's jump tables, tools/stage_yaml.py), is reported with the stage,
@@ -66,8 +66,8 @@ code, not the game's: like other PSX decomps (jype0/dw_decomp), it stays
 splat's asm and gets no unit.
 
 The executable's game data is one unit, main/game_data: splat's data files
-(GAME_DATA) against the C files in src/main/data/ that hold it until it moves
-next to the code that uses it. An overlay's data in C, src/<overlay>/data/X.c
+(GAME_DATA) against the C files in src/engine/data/ that hold it until it moves
+next to the code that uses it. An overlay's data in C, src/<group>/<overlay>/data/X.c
 (STDWTITL's movie player's variables), is a unit of its own against splat's
 segments of it (asm/<version>/<overlay>/data/data/X.data.s...). So is a
 stage with no code (WSTAG260, "data" in config/<version>/stages.txt), against
@@ -103,7 +103,7 @@ ROOT = version.ROOT
 V = version.VERSION
 ASM = version.ASM_DIR
 
-# The executable's game code and one category per overlay (src/<overlay>/,
+# The executable's game code and one category per overlay (src/<group>/<overlay>/,
 # see OVERLAYS in the Makefile).
 CATEGORIES = [
     {"id": "game", "name": "Game (executable)"},
@@ -627,8 +627,15 @@ def asm_units(names: list) -> list:
 
 
 def main() -> None:
-    names = [src.relative_to(ROOT / "src").with_suffix("").as_posix()
-             for src in sorted((ROOT / "src").rglob("*.c"))]
+    # units are named by the C file's path under its binary (main/menu/inn
+    # for src/engine/menu/inn.c), as splat's asm is
+    sources = {version.unit_path(src): src.relative_to(ROOT).with_suffix("").as_posix()
+               for src in sorted((ROOT / "src").rglob("*.c"))}
+
+    def obj(n):
+        return f"build/{V}/{sources[n]}.c.o"
+
+    names = list(sources)
     overlay_data = [n for n in names if n.split("/")[1:2] == ["data"] and not n.startswith("main/")]
     names = [n for n in names if not n.startswith("main/data/") and n not in overlay_data]
     # the stages with no code, which splat writes only the data of; a
@@ -637,14 +644,14 @@ def main() -> None:
                    and not (ASM / f"{n}.s").exists() and data_segments(n)]
     # a stage's head: its target, and its object if this version builds it
     heads = {n[:-len("_head")]: (f"expected/{V}/asm/stages/data/{n[len('stages/'):]}.rodata.s.o",
-                                 f"build/{V}/src/{n}.c.o")
+                                 obj(n))
              for n in names if n.startswith("stages/") and n.endswith("_head")
-             and (ROOT / f"build/{V}/src/{n}.c.o").exists()}
+             and (ROOT / obj(n)).exists()}
     # the modules of this version: the ones splat writes the code of at the
     # C file's path (a full disassembly of a C segment, or an asm segment of
     # a module the version doesn't build from C yet)
     names = [n for n in names if (ASM / f"{n}.s").exists()]
-    built = {n for n in names if (ROOT / f"build/{V}/src/{n}.c.o").exists()}
+    built = {n for n in names if (ROOT / obj(n)).exists()}
     halves = {n[:-2]: n for n in names
               if n.endswith("_2") and n[:-2] in names and f"{n[:-2]}_3" not in names}
     units = []
@@ -661,10 +668,10 @@ def main() -> None:
             combine(target, ([head_target] if head_target else [])
                     + [f"expected/{V}/asm/{n}.s.o" for n in parts])
             if len(parts) == 1 and not head_base:
-                combine(base, [f"build/{V}/src/{parts[0]}.c.o"])
+                combine(base, [obj(parts[0])])
             else:
                 link_halves(base, ([head_base] if head_base else [])
-                            + [f"build/{V}/src/{n}.c.o" for n in parts])
+                            + [obj(n) for n in parts])
             complete_tail(name, target)
             prepare(base, target)
             wrong_sizes += [f"{name}: {m}" for m in function_sizes(base, target)]
@@ -692,7 +699,7 @@ def main() -> None:
             "metadata": {"progress_categories": ["game"]},
         }
         # in the order of the target's files, the order the build links them in
-        base = [f"build/{V}/src/main/{d.rsplit('.', 1)[0]}.c.o" for d in GAME_DATA
+        base = [f"build/{V}/src/engine/{d.rsplit('.', 1)[0]}.c.o" for d in GAME_DATA
                 if (ASM / f"main/data/{d}.s").exists()]
         if base and all((ROOT / b).exists() for b in base):
             unit["base_path"] = f"build/{V}/report/main/game_data.c.o"
@@ -710,9 +717,9 @@ def main() -> None:
         # WSTAG260 ends inside a word
         complete_tail(name, target)
         unit = {"name": name, "target_path": target}
-        if (ROOT / f"build/{V}/src/{name}.c.o").exists():
+        if (ROOT / obj(name)).exists():
             unit["base_path"] = f"build/{V}/report/{name}.c.o"
-            combine(unit["base_path"], [f"build/{V}/src/{name}.c.o"])
+            combine(unit["base_path"], [obj(name)])
             prepare(unit["base_path"], target)
         unit["metadata"] = {"progress_categories": [category_for(name)]}
         units.append(unit)

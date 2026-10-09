@@ -44,6 +44,34 @@ EXPECTED_DIR = ROOT / "expected" / VERSION
 # the prebuilt compiler and tools (tools/dl_deps.sh), as the Makefile's BIN_DIR
 BIN_DIR = Path(os.environ.get("BIN_DIR") or ROOT / "bin")
 
+# where each binary's C is under src/, grouped by the part of the game it
+# runs (engine, field, battle, cardgame, menus, debug); src/shared/ holds the
+# code several overlays include
+SRC = ROOT / "src"
+SRC_DIRS = {"main": "engine", "fieldstg": "field/fieldstg", "stages": "field/stages"}
+SRC_DIRS.update({b: f"battle/{b}" for b in ("fightstg", "wfightmn", "stfgtrep")})
+SRC_DIRS.update({b: f"cardgame/{b}" for b in ("cardgame", "stcrddek", "stcrdshp", "stcrdabm")})
+SRC_DIRS.update({b: f"menus/{b}" for b in ("stdwtitl", "ststatus", "stitshop", "stgmcard", "stgdglab",
+                                            "stgtrain", "stplnmet", "stdgname", "cnty_sel")})
+SRC_DIRS.update({b: f"debug/{b}" for b in ("stagslct", "wfightts", "shocktst", "soundtst")})
+
+
+def src_dir(binary: str) -> Path:
+    """The folder of a binary's C ("stages" for the stage overlays)."""
+    return SRC / SRC_DIRS[binary]
+
+
+def unit_path(source) -> str:
+    """A C file's path as splat's asm/<version>/ and objdiff's units name it,
+    under its binary: src/engine/menu/inn.c is main/menu/inn,
+    src/field/stages/x/wstag200.c stages/x/wstag200. Files outside a binary's
+    folder (src/shared/) keep their path under src/."""
+    rel = Path(source).resolve().relative_to(SRC).with_suffix("").as_posix()
+    for binary, folder in SRC_DIRS.items():
+        if rel.startswith(folder + "/"):
+            return binary + rel[len(folder):]
+    return rel
+
 
 def stage_entries(version: str = VERSION) -> list:
     """The words of each line of config/<version>/stages.txt, without its
@@ -56,11 +84,11 @@ def stage_entries(version: str = VERSION) -> list:
 
 
 def stage_path(stage: str) -> str:
-    """Where a stage is under src/stages/ (and asm/<version>/stages/), without
+    """Where a stage is under src/field/stages/ (and asm/<version>/stages/), without
     the .c: <area>/<stage> in the folder of its area (tools/stage_areas.py),
     or <stage> for one in no area (wstag260), as the Makefile's
     STAGE_PATH_<stage>."""
-    found = sorted((ROOT / "src" / "stages").glob(f"*/{stage}.c"))
+    found = sorted(src_dir("stages").glob(f"*/{stage}.c"))
     return f"{found[0].parent.name}/{stage}" if found else stage
 
 

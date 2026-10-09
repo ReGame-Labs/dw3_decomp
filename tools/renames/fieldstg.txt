@@ -1,6 +1,6 @@
 # FIELDSTG's renames (tools/renames.py), in the order they were made
 
-# the field's map and state, which the stages use too (include/field_map.h)
+# the field's map and state, which the stages use too (include/field/field_map.h)
 D_8009A70C FIELDSTG_map
 D_800990B4 FIELDSTG_state
 

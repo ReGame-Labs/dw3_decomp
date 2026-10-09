@@ -8,7 +8,7 @@ is in overlays, `AAA/PRO/*.PRO` on the disc, which load right after the
 executable's `.bss`. Every engine module is a
 global struct holding its state and a table of methods (`GFX`, `HEAP`,
 `FILE_CACHE`, `PAD`, `SOUND`, `GAME`...), and every game object is a task
-(`createTask`, `include/dw3/task.h`); the overlays reach the engine through
+(`createTask`, `include/engine/task.h`); the overlays reach the engine through
 those tables. Each overlay has its own splat config, source folder and symbol
 prefix (`CNTY_SEL_`, `STDWTITL_`...):
 
@@ -22,7 +22,7 @@ prefix (`CNTY_SEL_`, `STDWTITL_`...):
 | `SOUNDTST` | `0x80082448` | 8 / 8 | the debug sound test |
 | `STAGSLCT` | `0x80082448` | 8 / 8 | the debug stage select, a menu of every scene of the game |
 | `STCRDABM` | `0x80082448` | 29 / 29 | the card album |
-| `STCRDDEK` | `0x80082448` | 55 / 55 | the decks, which it names with the on-screen keyboard (`include/name_entry.h`) |
+| `STCRDDEK` | `0x80082448` | 55 / 55 | the decks, which it names with the on-screen keyboard (`include/shared/name_entry.h`) |
 | `STCRDSHP` | `0x80082448` | 45 / 45 | the card packs (mode 0x1300): opening a pack uses it up and draws six cards, one from each slot's list in `STCRDSHP_packs` |
 | `STDGNAME` | `0x80082448` | 32 / 32 | a name entry screen, a keyboard of character pages |
 | `STDWTITL` | `0x80082448` | 91 / 91 | the title screen, the opening movies and a notice screen |
@@ -43,7 +43,7 @@ prefix (`CNTY_SEL_`, `STDWTITL_`...):
 reachable through the ISO 9660 path table, which is why
 `tools/extract_disc.py` is needed: dumpsxiso doesn't see them.
 
-The executable's game code is in modules (`src/main/<module>/`, see
+The executable's game code is in modules (`src/engine/<module>/`, see
 CONTRIBUTING.md), cut from its original objects in their link order:
 
 | Original object | Files | Address (us) |
@@ -106,7 +106,7 @@ One source tree builds every version, one at a time, picked with `VERSION`
   marked `asm-data` only its data; no stage is marked either today.
   `c-rodata` takes the bytes before the code, a color or jump tables, from
   the stage's C file too. `head-word` takes `WSTAG924`'s first word from a
-  C file of its own, `src/stages/amaterasu_city/wstag924_head.c`, linked
+  C file of its own, `src/field/stages/amaterasu_city/wstag924_head.c`, linked
   before the stage's jump tables (which GCC would align to 8 bytes after
   it). `data`
   marks the stage with no code, `WSTAG260`, all of it its C file's data.

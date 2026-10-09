@@ -2,7 +2,7 @@
 """
 Names a stage's data after where its tables put it.
 
-The tables setupStage gives FIELDSTG (include/stage.h) point at the rest of a
+The tables setupStage gives FIELDSTG (include/field/stage.h) point at the rest of a
 stage's data, which splat named by address (D_800A5424). This names each
 datum by the place the structure gives it, and nothing else:
 
@@ -42,7 +42,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "src" / "stages"
+SRC = ROOT / "src" / "field" / "stages"
 CONFIG = ROOT / "config"
 VERSIONS = ("us", "eu")
 AUTO = re.compile(r"^D_([0-9A-F]{8})$")
@@ -53,8 +53,8 @@ DEFINITION = re.compile(
 
 
 def stage_sources():
-    """{stage: its C file}: src/stages/<area>/wstag###.c (tools/stage_areas.py),
-    or src/stages/wstag###.c for a stage in no area"""
+    """{stage: its C file}: src/field/stages/<area>/wstag###.c (tools/stage_areas.py),
+    or src/field/stages/wstag###.c for a stage in no area"""
     paths = sorted(SRC.glob("wstag[0-9][0-9][0-9].c")) + sorted(SRC.glob("*/wstag[0-9][0-9][0-9].c"))
     return {p.stem: p for p in paths}
 
