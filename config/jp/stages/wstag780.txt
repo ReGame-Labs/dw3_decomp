@@ -1,0 +1,40 @@
+// WSTAG780.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+drawFlyer = 0x800A5770; // type:func
+updateFlyer = 0x800A5850; // type:func
+createFlyer = 0x800A59EC; // type:func
+drawGlow = 0x800A5AC0; // type:func
+updateGlow = 0x800A5B58; // type:func
+createCommand802 = 0x800A5CEC; // type:func
+stepLoopingAnimation = 0x800A5D1C; // type:func
+drawEffect = 0x800A5E10; // type:func
+updateEffect = 0x800A5EBC; // type:func
+createEffect = 0x800A6008; // type:func
+stepTileLoopAnimation = 0x800A6040; // type:func
+updateTileLoop2 = 0x800A6134; // type:func
+createTileLoop2 = 0x800A62A4; // type:func
+updateEffectSet = 0x800A62D0; // type:func
+createEffectSet = 0x800A6368; // type:func
+releaseFlyers = 0x800A6394; // type:func
+drawFlyerGate = 0x800A64DC; // type:func
+updateFlyerGate = 0x800A6754; // type:func
+handleCommand800 = 0x800A68D0; // type:func
+createCommand800 = 0x800A691C; // type:func
+drawByteAnims = 0x800A694C; // type:func
+updateByteAnims = 0x800A6C40; // type:func
+handleCommand801 = 0x800A6DE0; // type:func
+createCommand801 = 0x800A6E2C; // type:func
+updateStage = 0x800A6E5C; // type:func
+startStage = 0x800A6F40; // type:func
+endEvent0 = 0x800A6F9C; // type:func
+endEvent885 = 0x800A6FA8; // type:func
+setupStage = 0x800A6FE4; // type:func
+flyerFrames = 0x800A7D48;
+flyerStarts = 0x800A7D50;
+updateEffectSpots = 0x800A7DA8;
+updateTileLoop2Frames = 0x800A7EA0;
+drawByteAnimsTextures = 0x800A7EA8;
+drawByteAnimsQuads = 0x800A83D8;
+byteAnims = 0x800A879C;
+// end of the names from us

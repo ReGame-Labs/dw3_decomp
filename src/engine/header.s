@@ -21,9 +21,11 @@
 .word 0x801FFFF0                    /* initial $sp and $fp: the top of the RAM */
 .word 0                             /* initial $sp and $fp offset */
 .word 0, 0, 0, 0, 0                 /* reserved */
-.if VERSION_EU
-.ascii "Sony Computer Entertainment Inc. for Europe area"
-.else
+.if VERSION_US
 .ascii "Sony Computer Entertainment Inc. for North America area"
+.elseif VERSION_EU
+.ascii "Sony Computer Entertainment Inc. for Europe area"
+.elseif VERSION_JP
+.ascii "Sony Computer Entertainment Inc. for Japan area"
 .endif
 .org 0x800

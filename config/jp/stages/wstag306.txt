@@ -1,0 +1,11 @@
+// WSTAG306.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+stepAnimationOnce = 0x800A5770; // type:func
+updateSoundTile = 0x800A5848; // type:func
+handleCommand851 = 0x800A59A8; // type:func
+createSoundTile = 0x800A5A14; // type:func
+updateStage = 0x800A5A44; // type:func
+startStage = 0x800A5AF0; // type:func
+setupStage = 0x800A5B4C; // type:func
+// end of the names from us

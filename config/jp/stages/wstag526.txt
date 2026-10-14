@@ -1,0 +1,40 @@
+// WSTAG526.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+updateCommand829 = 0x800A5770; // type:func
+handleCommand829 = 0x800A5980; // type:func
+createCommand829 = 0x800A59B8; // type:func
+stepTileAnimation = 0x800A59E8; // type:func
+updateClutTile = 0x800A5B08; // type:func
+fadeOutClutTile = 0x800A5CF4; // type:func
+createClutTile = 0x800A5D10; // type:func
+createClutTileTask = 0x800A5D40; // type:func
+stepTileAnimation2 = 0x800A5D6C; // type:func
+updateTileDuo = 0x800A5E8C; // type:func
+fadeOutTileDuo = 0x800A6134; // type:func
+createTileDuo = 0x800A6150; // type:func
+createTileDuoTask = 0x800A6180; // type:func
+stepTileAnimation3 = 0x800A61AC; // type:func
+updateStillTile = 0x800A62CC; // type:func
+fadeOutStillTile = 0x800A6484; // type:func
+createStillTile = 0x800A64A0; // type:func
+createStillTileTask = 0x800A64D0; // type:func
+stepTileAnimation4 = 0x800A64FC; // type:func
+isFarFromHome = 0x800A661C; // type:func
+getAngle = 0x800A6658; // type:func
+moveWanderPair = 0x800A67C8; // type:func
+updateWanderPair = 0x800A6944; // type:func
+fadeOutWanderPair = 0x800A6CDC; // type:func
+createWanderPair = 0x800A6CF8; // type:func
+createWanderPairTask = 0x800A6D28; // type:func
+updateStage = 0x800A6D80; // type:func
+startStage = 0x800A6DF0; // type:func
+endEvent760 = 0x800A6E4C; // type:func
+setupStage = 0x800A6E84; // type:func
+updateClutTileFrames0 = 0x800A7070;
+updateClutTileFrames1 = 0x800A7084;
+updateStillTileFrames = 0x800A7118;
+updateWanderPairFrames0 = 0x800A71E4;
+updateWanderPairFrames1 = 0x800A71EC;
+wanderPairSpeeds = 0x800A71F4;
+// end of the names from us

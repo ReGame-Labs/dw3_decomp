@@ -6,7 +6,7 @@ each, config/<version>/stages.txt lists them with the offsets where their code s
 and ends:
 
     WSTAG200 0x4 0x2B8 [asm | asm-data | head-word | c-rodata]
-    WSTAG260 data
+    WSTAG260 data [asm]
 
 A stage loads at STAGE_VRAM (mk/version/<version>.mk; 0x800A4CA4 in us), after
 the largest main overlay (CARDGAME), on top of FIELDSTG, whose functions it calls. Most stages start right with code; the
@@ -27,12 +27,14 @@ subsegments are named <area>/<name>, so that splat finds it there and
 writes its assembly to asm/<version>/stages/<area>/.
 
 A stage with no code, "data" (WSTAG260, the story events' scripts that
-FIELDSTG runs), is all data, from its C file.
+FIELDSTG runs), is all data, from its C file, or splat's assembly ("data
+asm").
 
 A stage file that ends inside a word (seven European ones) has its last
 bytes in its C's data too, and no section after them is aligned; one whose
 data is still asm keeps them in a databin of their own ({name}_end), as
-splat's data segment drops them.
+splat's data segment drops them (a blob, which tools/inputcheck.py lets
+the stage link as it is shorter than a word).
 
 usage: stage_yaml.py wstag200 build/us/generated/stages/wstag200.yaml
 (VERSION, as for make, picks the version; eu by default)
@@ -160,12 +162,13 @@ def main():
         words = line.split("#", 1)[0].split()
         if words and words[0].lower() == name:
             found = True
-            # "data": the stage has no code, its C file holds it all
-            data_only = words[1:] == ["data"]
+            # "data": the stage has no code, its C file holds it all ("data
+            # asm": splat's assembly does, in this version)
+            data_only = words[1:2] == ["data"]
             if len(words) == 1 or data_only:
                 blob = not data_only
                 text_start = text_end = 0
-                marks = []
+                marks = words[2:]
             else:
                 text_start, text_end = int(words[1], 16), int(words[2], 16)
                 # "asm": the code and data are still splat's assembly in this
@@ -173,7 +176,7 @@ def main():
                 # before the code are the C file's
                 marks = words[3:]
             if marks != ["asm"] and [m for m in ("asm-data", "head-word", "c-rodata") if m in marks] != marks or (
-                    "head-word" in marks and "c-rodata" not in marks):
+                    "head-word" in marks and "c-rodata" not in marks) or (data_only and marks not in ([], ["asm"])):
                 sys.exit(f"{config}/stages.txt: unknown mark in {line.strip()}")
             code = "asm" if marks == ["asm"] else "c"
             data_type = "data" if "asm" in marks or "asm-data" in marks else ".data"

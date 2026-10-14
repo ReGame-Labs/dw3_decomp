@@ -1,0 +1,14 @@
+// WSTAG226.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+stepAnimationOnce = 0x800A5770; // type:func
+resetTileEffect = 0x800A5848; // type:func
+updateTileEffect = 0x800A5880; // type:func
+startTileEffect = 0x800A5AF4; // type:func
+createTileEffect = 0x800A5B5C; // type:func
+createTileEffectTask = 0x800A5B8C; // type:func
+updateStage = 0x800A5BB8; // type:func
+startStage = 0x800A5C58; // type:func
+endEvent935 = 0x800A5CB4; // type:func
+setupStage = 0x800A5CC4; // type:func
+// end of the names from us

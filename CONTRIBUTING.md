@@ -52,8 +52,9 @@ The folder is relative to `asm/<version>/`, so the function above is
    ```
    make -j$(nproc) && make compare
    make VERSION=us -j$(nproc) && make VERSION=us compare
+   make VERSION=jp -j$(nproc) && make VERSION=jp compare
    ```
-   Every line of both versions has to say `OK`.
+   Every line of every version has to say `OK`.
 5. **Check it in objdiff.** `make objdiff` and the objdiff GUI show the
    function and its data against the original inside the whole unit;
    `make report` writes the progress that decomp.dev will show.
@@ -68,9 +69,9 @@ give it real types once the code that uses it is understood.
 ## Matching
 
 - A change only counts if `make compare` still says `OK` for every binary of
-  both versions: the executable, the overlays and the stages have to stay
-  byte for byte identical. Run it for `us` and for `eu` before opening a pull
-  request; the CI runs both.
+  every version: the executable, the overlays and the stages have to stay
+  byte for byte identical. Run it for `us`, `eu` and `jp` before opening a
+  pull request; the CI runs them all.
 - Only byte-identical matches go in. No `NON_MATCHING` code, no `#if 0`
   blocks, no inline assembly in place of C, and no tricks that wouldn't pass
   review. A function that doesn't match yet stays behind its `INCLUDE_ASM`; a
@@ -186,10 +187,11 @@ isn't `duckstation-qt`, `DUCKSTATION=`, on the command line or in
 
 ## Versions
 
-The same source builds every version of the game (`make VERSION=eu`, the default, or `us`).
-The Makefile passes one `-DVERSION_<VERSION>`, and `include/version.h`
-(through `common.h`) makes `VERSION_US` and `VERSION_EU` both defined, each 0
-or 1; the assembly gets the same names from `--defsym`.
+The same source builds every version of the game (`make VERSION=eu`, the
+default, `us` or `jp`). The Makefile passes one `-DVERSION_<VERSION>`, and
+`include/version.h` (through `common.h`) makes `VERSION_US`, `VERSION_EU`
+and `VERSION_JP` all defined, each 0 or 1; the assembly gets the same names
+from `--defsym`.
 
 - Test a version with `#if`, never `#ifdef` or `defined()`: `#if VERSION_EU`.
   A misspelt name is then a `-Wundef` warning instead of silently false.
@@ -202,11 +204,13 @@ or 1; the assembly gets the same names from `--defsym`.
 - Each version lists the C files it builds in `mk/version/<version>.mk`
   (`C_SRC`), and the Makefile builds nothing else. `us` builds every C file
   under `src/`; `eu` the ones it shares (all of them so far) and its own
-  stages'. The rest of `eu`'s executable and overlays is split into the USA
-  files as asm segments with the same names (`tools/split_version.py`).
-- To build a file for `eu` too: add it to `eu`'s `C_SRC`, make its segments
-  in `config/eu/` `c` (with `.rodata` and `.data` when those are C in
-  `us`), then name what the C uses at the European addresses:
+  stages'; `jp` none yet. The rest of `eu`'s executable and overlays, and
+  all of `jp`'s, is split into the USA files as asm segments with the same
+  names (`tools/split_version.py`).
+- To build a file for `eu` or `jp` too: add it to the version's `C_SRC`,
+  make its segments in `config/<version>/` `c` (with `.rodata` and `.data`
+  when those are C in `us`), then name what the C uses at the version's
+  addresses:
 
   ```
   tools/match_versions.py eu      # with both versions built: build/eu/version_pairs.tsv
@@ -221,8 +225,8 @@ or 1; the assembly gets the same names from `--defsym`.
   every function and datum it reads from where the original has them.
   `version_symbols.py` lists what it can't name: a name whose reads
   disagree, or one of splat's names from `us` (`D_80081E20`) that the
-  European asm has at another address. For a stage, drop the `asm` mark of
-  its line in `config/eu/stages.txt` once it has a C file there.
+  version's asm has at another address. For a stage, drop the `asm` mark of
+  its line in `config/<version>/stages.txt` once it has a C file there.
 - A file whose contents differ throughout between versions gets one copy per
   version instead of an `#if` around all of it, named after the version
   (`<module>_eu.c` next to `<module>.c`).
@@ -410,15 +414,16 @@ and in both versions' symbol files, and can be run again after new data
 comes in.
 
 The versions share their names: a function or datum is called the same in
-every version, each at its own address, and a name in `eu`'s symbol files
-means what that name means in `us`'s. The CI runs `tools/check_names.py`,
-which fails when a name in `eu`'s symbol files isn't `us`'s name in the same
-binary (a function there if it is one here), or is named twice. splat's
-automatic names (`func_`, `D_`) and the binaries `us` doesn't have (`eu`'s
-own stages) aren't checked. So a rename touches every version's symbol
-files the same way: `tools/rename.py OLD NEW` renames in every version's
-symbol files, `src/` and `include/` (an overlay's name keeps its prefix),
-then `make VERSION=<version> regenerate` each version.
+every version, each at its own address, and a name in `eu`'s or `jp`'s
+symbol files means what that name means in `us`'s. The CI runs
+`tools/check_names.py`, which fails when a name in their symbol files isn't
+`us`'s name in the same binary (a function there if it is one here), or is
+named twice. splat's automatic names (`func_`, `D_`) and the binaries `us`
+doesn't have (the stages `WSTAG920`-`974`) aren't checked. So a rename
+touches every version's symbol files the same way: `tools/rename.py OLD NEW`
+renames in every version's symbol files, `src/` and `include/` (an overlay's
+name keeps its prefix), then `make VERSION=<version> regenerate` each
+version.
 
 - A name only one version has, for its own code, says so with
   `version-only` in its comment:
@@ -429,14 +434,15 @@ then `make VERSION=<version> regenerate` each version.
   that binary's names in `us`:
   `drawWindow = 0x800A5123; // type:func us-main`.
 
-The European version's names come from `us`: `tools/match_versions.py eu`
-pairs its functions with the USA ones (by their instructions with the
-addresses masked, their order, their calls and their strings) and the data
-they read, and `--seed` writes the USA names of the confident pairs into
-`config/eu/symbols*.txt`, between the lines it marks, keeping the names
-written by hand. Name a function in `us` and run it again to give `eu` the
-name too; a function whose code differs too much to pair is named by hand,
-above the seeded block.
+The European and Japanese versions' names come from `us`:
+`tools/match_versions.py eu` (or `jp`) pairs their functions with the USA
+ones (by their instructions with the addresses masked, their order, their
+calls and their strings) and the data they read, and `--seed` writes the USA
+names of the confident pairs into `config/<version>/symbols*.txt`, between
+the lines it marks, keeping the names written by hand. Name a function in
+`us` and run it again to give the other versions the name too; a function
+whose code differs too much to pair is named by hand, above the seeded
+block.
 
 ## Clean code
 

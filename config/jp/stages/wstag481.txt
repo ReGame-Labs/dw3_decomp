@@ -1,0 +1,10 @@
+// WSTAG481.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+stepTileSequences = 0x800A5788; // type:func
+updateTileCursors = 0x800A5914; // type:func
+createTileCursors = 0x800A5AF4; // type:func
+updateStage = 0x800A5B20; // type:func
+startStage = 0x800A5B84; // type:func
+setupStage = 0x800A5BE0; // type:func
+// end of the names from us

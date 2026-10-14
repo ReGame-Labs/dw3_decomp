@@ -1,0 +1,32 @@
+// WSTAG800.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+stepTileAnimation = 0x800A5770; // type:func
+updateTilePair16 = 0x800A5890; // type:func
+handleCommand837 = 0x800A5B04; // type:func
+createTilePair16 = 0x800A5B50; // type:func
+createTilePair16Done = 0x800A5B80; // type:func
+stepTileAnimation2 = 0x800A5BB4; // type:func
+updateTileOnce = 0x800A5CD4; // type:func
+createCommand839 = 0x800A5EA0; // type:func
+drawTimer = 0x800A5ED0; // type:func
+updateTimer = 0x800A6018; // type:func
+createTimer = 0x800A61E8; // type:func
+updateStage = 0x800A6214; // type:func
+startStage = 0x800A635C; // type:func
+stepAnimation = 0x800A63B8; // type:func
+drawStageEffect = 0x800A64D8; // type:func
+isOnScreen = 0x800A65C0; // type:func
+updateStageEffect = 0x800A6684; // type:func
+createStageEffect = 0x800A6914; // type:func
+endEvent850 = 0x800A6970; // type:func
+endEvent870 = 0x800A69BC; // type:func
+endEvent871 = 0x800A6A08; // type:func
+setupStage = 0x800A6A54; // type:func
+updateTilePair16Frames0 = 0x800A6F8C;
+updateTilePair16Frames2 = 0x800A6F98;
+updateTilePair16Frames1 = 0x800A6FC4;
+updateTileOnceFrames_0 = 0x800A6FE0;
+updateTileOnceFrames_1 = 0x800A702C;
+updateTileOnceFrames = 0x800A7078;
+// end of the names from us

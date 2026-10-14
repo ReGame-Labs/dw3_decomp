@@ -1,0 +1,12 @@
+// WSTAG375.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+updateFarSprites = 0x800A5774; // type:func
+createFarSprites = 0x800A58C8; // type:func
+updateStage = 0x800A58F4; // type:func
+startStage = 0x800A59A8; // type:func
+endEvent1260 = 0x800A5A04; // type:func
+endEvent1261 = 0x800A5A50; // type:func
+setupStage = 0x800A5A9C; // type:func
+farSpriteSpots = 0x800A5D50;
+// end of the names from us

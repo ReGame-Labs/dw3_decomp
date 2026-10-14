@@ -1,0 +1,14 @@
+// WSTAG205.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+stageColor = 0x800A5770;
+updateSpriteField = 0x800A5774; // type:func
+createSpriteField = 0x800A5A40; // type:func
+updateStage = 0x800A5A6C; // type:func
+startStage = 0x800A5B24; // type:func
+endEvent100 = 0x800A5B80; // type:func
+endEvent101 = 0x800A5BCC; // type:func
+setupStage = 0x800A5BF8; // type:func
+spriteFieldAnims = 0x800A5FE8;
+updateSpriteFieldSpots = 0x800A600C;
+// end of the names from us

@@ -1,0 +1,12 @@
+// WSTAG680.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+stepRiser = 0x800A586C; // type:func
+updateRisers = 0x800A5968; // type:func
+handleCommand814 = 0x800A5C0C; // type:func
+createCommand814 = 0x800A5D3C; // type:func
+updateStage = 0x800A5D6C; // type:func
+startStage = 0x800A5DE4; // type:func
+setupStage = 0x800A5E40; // type:func
+updateRisersFrames = 0x800A6118;
+// end of the names from us

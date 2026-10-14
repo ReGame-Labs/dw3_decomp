@@ -14,8 +14,8 @@
  * condition names the versions it is for: the versions have no order.
  * A new version gets its line here and in the Makefile's VERSIONS.
  */
-#if defined(VERSION_US) + defined(VERSION_EU) != 1
-#error "build with exactly one of -DVERSION_US and -DVERSION_EU, as make VERSION=<version> does"
+#if defined(VERSION_US) + defined(VERSION_EU) + defined(VERSION_JP) != 1
+#error "build with exactly one of -DVERSION_US, -DVERSION_EU and -DVERSION_JP, as make VERSION=<version> does"
 #endif
 
 #ifndef VERSION_US
@@ -23,6 +23,9 @@
 #endif
 #ifndef VERSION_EU
 #define VERSION_EU 0
+#endif
+#ifndef VERSION_JP
+#define VERSION_JP 0
 #endif
 
 #endif /* VERSION_H */

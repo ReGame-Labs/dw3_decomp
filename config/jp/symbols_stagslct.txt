@@ -1,0 +1,16 @@
+// STAGSLCT.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+STAGSLCT_updateScene = 0x80084CE4; // type:func
+STAGSLCT_start = 0x80084D48; // type:func
+STAGSLCT_moveCursor = 0x80084D74; // type:func
+STAGSLCT_scrollPage = 0x80084E44; // type:func
+STAGSLCT_showBiosVersion = 0x80084E88; // type:func
+STAGSLCT_zoomTitle = 0x80084FAC; // type:func
+STAGSLCT_updateStageSelect = 0x800850B4; // type:func
+STAGSLCT_createStageSelect = 0x80086158; // type:func
+STAGSLCT_entries = 0x800861A0;
+STAGSLCT_screenRect = 0x80087710;
+STAGSLCT_biosVersion = 0x80087718;
+STAGSLCT_biosVersionEnd = 0x8008772C;
+// end of the names from us

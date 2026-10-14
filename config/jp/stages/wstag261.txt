@@ -1,0 +1,11 @@
+// WSTAG261.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+updateTileLift = 0x800A578C; // type:func
+handleCommand827 = 0x800A5BA8; // type:func
+createCommand827 = 0x800A5C1C; // type:func
+updateStage = 0x800A5C84; // type:func
+startStage = 0x800A5CDC; // type:func
+setupStage = 0x800A5D38; // type:func
+tileLiftShake = 0x800A6028;
+// end of the names from us

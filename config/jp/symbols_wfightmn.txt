@@ -1,0 +1,51 @@
+// WFIGHTMN.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+WFIGHTMN_loadFiles = 0x800A585C; // type:func
+WFIGHTMN_createLoader = 0x800A5D68; // type:func
+WFIGHTMN_createLayers = 0x800A5D94; // type:func
+WFIGHTMN_initFighters = 0x800A6004; // type:func
+WFIGHTMN_rollAmbush = 0x800A61A0; // type:func
+WFIGHTMN_checkEquip = 0x800A6274; // type:func
+WFIGHTMN_checkParty = 0x800A630C; // type:func
+WFIGHTMN_markFought = 0x800A6344; // type:func
+WFIGHTMN_markPicked = 0x800A646C; // type:func
+WFIGHTMN_updateMenu = 0x800A6598; // type:func
+WFIGHTMN_cancelBlast = 0x800A6C7C; // type:func
+WFIGHTMN_runCommand = 0x800A6D6C; // type:func
+WFIGHTMN_digivolve = 0x800A7108; // type:func
+WFIGHTMN_tag = 0x800A722C; // type:func
+WFIGHTMN_pairTech = 0x800A745C; // type:func
+WFIGHTMN_endBattle = 0x800A7554; // type:func
+WFIGHTMN_runAway = 0x800A7938; // type:func
+WFIGHTMN_endAutoRecover = 0x800A7A6C; // type:func
+WFIGHTMN_recover = 0x800A7BB4; // type:func
+WFIGHTMN_clearField = 0x800A7DAC; // type:func
+WFIGHTMN_takeDamage = 0x800A7E24; // type:func
+WFIGHTMN_cureStatus = 0x800A80C4; // type:func
+WFIGHTMN_endBoost = 0x800A8220; // type:func
+WFIGHTMN_runConfusedCommand = 0x800A8344; // type:func
+WFIGHTMN_endRestriction = 0x800A841C; // type:func
+WFIGHTMN_blast = 0x800A8548; // type:func
+WFIGHTMN_endBlast = 0x800A87E4; // type:func
+WFIGHTMN_knockOut = 0x800A88DC; // type:func
+WFIGHTMN_endSpecial = 0x800A8ED8; // type:func
+WFIGHTMN_digidevolve = 0x800A8F94; // type:func
+WFIGHTMN_showWon = 0x800A9110; // type:func
+WFIGHTMN_bringLastEnemy = 0x800A91E0; // type:func
+WFIGHTMN_restoreEnemy = 0x800A9564; // type:func
+WFIGHTMN_runTurn = 0x800A9608; // type:func
+WFIGHTMN_start = 0x800A9944; // type:func
+WFIGHTMN_recordTech = 0x800A99C0; // type:func
+WFIGHTMN_chargeGauge = 0x800A9A64; // type:func
+WFIGHTMN_startTech = 0x800A9B44; // type:func
+WFIGHTMN_setIdleMotion = 0x800AA344; // type:func
+WFIGHTMN_countHit = 0x800AA464; // type:func
+WFIGHTMN_endWeakness = 0x800AA4F4; // type:func
+WFIGHTMN_limitDamage = 0x800AA544; // type:func
+WFIGHTMN_screen = 0x800AA65C;
+WFIGHTMN_effectVisuals = 0x800AA664;
+WFIGHTMN_elementVisuals = 0x800AA6B8;
+WFIGHTMN_states = 0x800AA738;
+WFIGHTMN_actionEffects = 0x800AA7A4;
+// end of the names from us

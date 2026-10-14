@@ -9,10 +9,11 @@
 
 # The version of the game to build. Each one has its settings in
 # mk/version/<version>.mk: the executable's name, the disc, the overlays and
-# the source files. The C and the assembly see VERSION_US and VERSION_EU, the
-# one being built as 1 and the other as 0 (include/version.h).
+# the source files. The C and the assembly see VERSION_US, VERSION_EU and
+# VERSION_JP, the one being built as 1 and the others as 0
+# (include/version.h).
 VERSION ?= eu
-VERSIONS := eu us
+VERSIONS := eu us jp
 ifeq ($(filter $(VERSION),$(VERSIONS)),)
 $(error unsupported VERSION $(VERSION); supported: $(VERSIONS))
 endif
@@ -79,9 +80,9 @@ OBJDIFF ?= $(BIN_DIR)/objdiff-cli-linux-x86_64
 # have no headers
 INC := -Iinclude -Iexternal/psyq_headers/psyq_lib47/include -Isrc/field/stages -Isrc
 
-# -DVERSION_<VERSION>: include/version.h turns it into VERSION_US and
-# VERSION_EU, each 0 or 1, for #if; -Wundef warns about an #if on a name
-# that isn't defined, such as a misspelt version
+# -DVERSION_<VERSION>: include/version.h turns it into VERSION_US,
+# VERSION_EU and VERSION_JP, each 0 or 1, for #if; -Wundef warns about an #if
+# on a name that isn't defined, such as a misspelt version
 CPPFLAGS = $(INC) -undef -nostdinc -Wundef \
 	    -D__GNUC__=2 -D__GNUC_MINOR__=$(word 2,$(subst ., ,$(GCC_VERSION))) -Dmips -D__mips__ -D__mips -Dpsx -D__psx__ -D__psx \
 	    -D_PSYQ -D__EXTENSIONS__ -D_MIPSEL -D_LANGUAGE_C -DLANGUAGE_C \
