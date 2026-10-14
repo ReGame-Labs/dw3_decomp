@@ -1,0 +1,20 @@
+// WSTAG785.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+stepAnimation = 0x800A5774; // type:func
+updateTileSet = 0x800A5894; // type:func
+createTileSet = 0x800A5B34; // type:func
+createCommand835 = 0x800A5B68; // type:func
+drawActorMark = 0x800A5B98; // type:func
+updateActorMark = 0x800A5C44; // type:func
+createCommand807 = 0x800A5EA0; // type:func
+handleCommand807 = 0x800A5ED0; // type:func
+updateStage = 0x800A5F9C; // type:func
+startStage = 0x800A6040; // type:func
+endEvent1 = 0x800A609C; // type:func
+setupStage = 0x800A60AC; // type:func
+updateTileSetFrames1 = 0x800A6AA0;
+updateTileSetFrames2 = 0x800A6ADC;
+updateTileSetFrames3 = 0x800A6B10;
+updateTileSetFrames0 = 0x800A6B2C;
+// end of the names from us

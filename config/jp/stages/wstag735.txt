@@ -1,0 +1,14 @@
+// WSTAG735.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+updateStage = 0x800A5770; // type:func
+startStage = 0x800A5874; // type:func
+stepAnimation = 0x800A58D0; // type:func
+drawStageEffect = 0x800A59F0; // type:func
+isOnScreen = 0x800A5AD8; // type:func
+updateStageEffect = 0x800A5B9C; // type:func
+createStageEffect = 0x800A5E2C; // type:func
+endEvent790 = 0x800A5E88; // type:func
+endEvent791 = 0x800A5ED4; // type:func
+setupStage = 0x800A5F20; // type:func
+// end of the names from us

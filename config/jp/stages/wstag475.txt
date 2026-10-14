@@ -1,0 +1,9 @@
+// WSTAG475.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+updateStage = 0x800A5770; // type:func
+startStage = 0x800A5918; // type:func
+endEvent180 = 0x800A5974; // type:func
+endEvent230 = 0x800A59A0; // type:func
+setupStage = 0x800A59D8; // type:func
+// end of the names from us

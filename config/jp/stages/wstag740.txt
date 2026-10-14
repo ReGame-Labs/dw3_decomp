@@ -1,0 +1,35 @@
+// WSTAG740.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+updateEvent9015 = 0x800A5774; // type:func
+startEvents9000To9015 = 0x800A59FC; // type:func
+updateStage = 0x800A5A28; // type:func
+startStage = 0x800A5AC8; // type:func
+stepAnimationOnce = 0x800A5B24; // type:func
+drawPairSprite = 0x800A5BFC; // type:func
+updateSpritePair = 0x800A5CB4; // type:func
+createSpritePair = 0x800A5E4C; // type:func
+endEvent800 = 0x800A5E94; // type:func
+endEvent801 = 0x800A5EE0; // type:func
+endEvent9000 = 0x800A5F2C; // type:func
+endEvent9001 = 0x800A5F58; // type:func
+endEvent9002 = 0x800A5F84; // type:func
+endEvent9003 = 0x800A5FB0; // type:func
+endEvent9004 = 0x800A5FDC; // type:func
+endEvent9005 = 0x800A6008; // type:func
+endEvent9006 = 0x800A6034; // type:func
+endEvent9007 = 0x800A6060; // type:func
+endEvent9008 = 0x800A608C; // type:func
+endEvent9009 = 0x800A60B8; // type:func
+endEvent9010 = 0x800A60E4; // type:func
+endEvent9011 = 0x800A6110; // type:func
+endEvent9012 = 0x800A613C; // type:func
+endEvent9013 = 0x800A6168; // type:func
+endEvent9014 = 0x800A6194; // type:func
+endEvent9015 = 0x800A61C0; // type:func
+setupStage = 0x800A61EC; // type:func
+partyActorIds = 0x800A6458;
+updateSpritePairFrames_0 = 0x800A6464;
+updateSpritePairFrames_1 = 0x800A6480;
+updateSpritePairFrames = 0x800A64B8;
+// end of the names from us

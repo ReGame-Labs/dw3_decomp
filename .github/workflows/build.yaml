@@ -56,19 +56,28 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # deps: where the version's executable and AAA/PRO are in the
-        # dependencies repository. report: upload build/<version>/report.json
-        # as <exe>_report, the artifact decomp.dev reads.
+        # The dependencies repository has each version's executable and
+        # AAA/PRO in a folder named after it (us/, eu/, jp/). report: upload
+        # build/<version>/report.json as <exe>_report, the artifact
+        # decomp.dev reads. shiftable: run shiftcheck and padcheck, which
+        # need every address in the code and data to be a symbol.
         include:
           # the default version, and decomp.dev's
           - version: eu
             exe: SLES_039.36
-            deps: eu
             report: true
+            shiftable: true
           - version: us
             exe: SLUS_014.36
-            deps: .
             report: true
+            shiftable: true
+          # still splat's assembly, whose addresses into the other binaries
+          # are numbers: not shiftable yet. decomp.dev doesn't show it yet,
+          # but its report is uploaded all the same.
+          - version: jp
+            exe: SLPS_034.46
+            report: true
+            shiftable: false
     name: build (${{ matrix.version }})
     env:
       VERSION: ${{ matrix.version }}
@@ -89,11 +98,10 @@ jobs:
 
     - run: |
         mkdir -p "disks/$VERSION/AAA"
-        cp "dependencies/$DEPS/$EXE" "disks/$VERSION/"
-        cp -r "dependencies/$DEPS/AAA/PRO" "disks/$VERSION/AAA/"
+        cp "dependencies/$VERSION/$EXE" "disks/$VERSION/"
+        cp -r "dependencies/$VERSION/AAA/PRO" "disks/$VERSION/AAA/"
         rm -rf dependencies
       env:
-        DEPS: ${{ matrix.deps }}
         EXE: ${{ matrix.exe }}
 
     - run: |
@@ -120,7 +128,8 @@ jobs:
     # it has no entry that is fixed, nor one that the parent commit's (for a
     # pull request, the base branch's) doesn't have. The root commit has no
     # parent to compare against.
-    - run: |
+    - if: matrix.shiftable
+      run: |
         if git rev-parse -q --verify HEAD^ >/dev/null; then
           python3 tools/shiftcheck.py -v "$VERSION" --strict --base HEAD^
         else
@@ -128,7 +137,8 @@ jobs:
         fi
 
     # and linked higher, the binaries only change where a relocation is
-    - run: make padcheck
+    - if: matrix.shiftable
+      run: make padcheck
 
     # A modern GCC builds the game too (make TOOLCHAIN=gcc,
     # docs/toolchain.md): it doesn't match, but each binary must fit where

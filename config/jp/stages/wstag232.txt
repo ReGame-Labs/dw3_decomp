@@ -1,0 +1,11 @@
+// WSTAG232.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+stepLoopingAnimation = 0x800A5770; // type:func
+updateTileAnims = 0x800A5864; // type:func
+createTileAnims = 0x800A595C; // type:func
+updateStage = 0x800A5988; // type:func
+startStage = 0x800A59EC; // type:func
+setupStage = 0x800A5A48; // type:func
+updateTileAnimsFrames1 = 0x800A5BA4;
+// end of the names from us

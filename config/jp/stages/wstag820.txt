@@ -1,0 +1,20 @@
+// WSTAG820.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+stepAnimationOnce = 0x800A5770; // type:func
+updateTileTask = 0x800A5848; // type:func
+createCommand853 = 0x800A5944; // type:func
+updateStage = 0x800A5998; // type:func
+startStage = 0x800A5AF0; // type:func
+stepAnimation = 0x800A5B4C; // type:func
+drawStageEffect = 0x800A5C6C; // type:func
+isOnScreen = 0x800A5D54; // type:func
+updateStageEffect = 0x800A5E18; // type:func
+createStageEffect = 0x800A60A8; // type:func
+createStageEffectWithId = 0x800A6104; // type:func
+handleCommand845 = 0x800A614C; // type:func
+endEvent1060 = 0x800A6184; // type:func
+endEvent1070 = 0x800A61D0; // type:func
+endEvent1080 = 0x800A61FC; // type:func
+setupStage = 0x800A6234; // type:func
+// end of the names from us

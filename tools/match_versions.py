@@ -67,7 +67,7 @@ import Levenshtein
 from elftools.elf.elffile import ELFFile
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from version import ROOT, overlay_parents, stage_entries  # noqa: E402
+from version import ROOT, overlay_parents, stage_entries, unit_path  # noqa: E402
 
 # confidence thresholds (similarity of the opcode sequences)
 ADJ_SIM = 0.6           # with a neighbour, caller or callee paired
@@ -296,11 +296,13 @@ def module_ranges(mapfile, version):
         start, size, obj = int(m[1], 16), int(m[2], 16), m[3]
         if not size:
             continue
-        path = obj
-        for prefix in (f"build/{version}/src/", f"build/{version}/asm/{version}/"):
-            if path.startswith(prefix):
-                path = path[len(prefix):]
-        path = re.sub(r"\.(c|s)\.o$", "", path)
+        path = re.sub(r"\.(c|s)\.o$", "", obj)
+        if path.startswith(f"build/{version}/src/"):
+            # a C file, under its binary's name (src/engine/menu/inn.c is
+            # main/menu/inn)
+            path = unit_path(ROOT / path[len(f"build/{version}/"):])
+        elif path.startswith(f"build/{version}/asm/{version}/"):
+            path = path[len(f"build/{version}/asm/{version}/"):]
         out.append((start, start + size, path))
     return sorted(out)
 

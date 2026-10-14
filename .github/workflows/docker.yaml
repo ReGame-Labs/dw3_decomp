@@ -37,15 +37,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # deps: where the version's executable and AAA/PRO are in the
+        # each version's files are in a folder named after it in the
         # dependencies repository, as in build.yaml
         include:
           - version: us
             exe: SLUS_014.36
-            deps: .
           - version: eu
             exe: SLES_039.36
-            deps: eu
+          - version: jp
+            exe: SLPS_034.46
     name: docker (${{ matrix.version }})
     env:
       VERSION: ${{ matrix.version }}
@@ -64,11 +64,10 @@ jobs:
 
     - run: |
         mkdir -p "disks/$VERSION/AAA"
-        cp "dependencies/$DEPS/$EXE" "disks/$VERSION/"
-        cp -r "dependencies/$DEPS/AAA/PRO" "disks/$VERSION/AAA/"
+        cp "dependencies/$VERSION/$EXE" "disks/$VERSION/"
+        cp -r "dependencies/$VERSION/AAA/PRO" "disks/$VERSION/AAA/"
         rm -rf dependencies
       env:
-        DEPS: ${{ matrix.deps }}
         EXE: ${{ matrix.exe }}
 
     # tools/docker.sh passes VERSION on to make and the tools

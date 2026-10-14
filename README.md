@@ -4,6 +4,7 @@
 |---|---|---|---|
 | 🇪🇺 Europe (`SLES_039.36`) | [![Code](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=code&version=SLES_039.36&label=Code)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLES_039.36) | [![Data](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=data&version=SLES_039.36&label=Data)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLES_039.36) | [![Functions](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=functions&version=SLES_039.36&label=Functions)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLES_039.36) |
 | 🇺🇸 USA (`SLUS_014.36`) | [![Code](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=code&version=SLUS_014.36&label=Code)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLUS_014.36) | [![Data](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=data&version=SLUS_014.36&label=Data)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLUS_014.36) | [![Functions](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=functions&version=SLUS_014.36&label=Functions)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLUS_014.36) |
+| 🇯🇵 Japan (`SLPS_034.46`) | assembly, not on decomp.dev yet | | |
 
 [![Executable](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=code&version=SLES_039.36&category=game&label=Europe%20executable)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLES_039.36?category=game)
 [![Stages](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=code&version=SLES_039.36&category=stages&label=Europe%20stages)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLES_039.36?category=stages)
@@ -11,7 +12,7 @@
 [![Build](https://github.com/ReGame-Labs/dw3_decomp/actions/workflows/build.yaml/badge.svg)](https://github.com/ReGame-Labs/dw3_decomp/actions/workflows/build.yaml)
 [![Docs](https://github.com/ReGame-Labs/dw3_decomp/actions/workflows/docs.yaml/badge.svg)](https://regame-labs.github.io/dw3_decomp/)
 [![Platform](https://img.shields.io/badge/platform-PlayStation-003791)](docs/binaries.md#the-games-binaries)
-[![Versions](https://img.shields.io/badge/versions-USA%20%7C%20Europe-blue)](docs/binaries.md#how-the-versions-are-organised)
+[![Versions](https://img.shields.io/badge/versions-USA%20%7C%20Europe%20%7C%20Japan-blue)](docs/binaries.md#how-the-versions-are-organised)
 [![Compiler](https://img.shields.io/badge/compiler-GCC%202.8.1-orange)](docs/toolchain.md#toolchain)
 [![Fake matches | hacks](https://img.shields.io/badge/fake%20matches%20%7C%20hacks-0%20%7C%20183-yellow)](docs/status.md#fake-matches-and-hacks)
 [![License](https://img.shields.io/github/license/ReGame-Labs/dw3_decomp)](LICENSE)
@@ -22,7 +23,9 @@ game's executable, its overlays and its stages. The European release,
 *Digimon World 2003* (`SLES_039.36`), the most complete one, is the main
 version: the build's default and the one decomp.dev shows first. The USA
 release, *Digimon World 3* (`SLUS_014.36`), builds from the same C and
-matches byte for byte too.
+matches byte for byte too. The Japanese release, *Digimon World 3:
+Aratanaru Bouken no Tobira* (`SLPS_034.46`), builds byte for byte from
+splat's assembly so far, split and named after the USA version.
 
 This repository does not contain any game data. You need your own copy of the
 game to build it.
@@ -34,8 +37,8 @@ Click it for the details on decomp.dev.</sub>
 
 ## Status
 
-Measured with `make report` on both versions; the badges above are always
-current:
+Measured with `make report` on the European and USA versions; the badges
+above are always current:
 
 | Part | Version | Functions in C | Code | Data |
 |---|---|---|---|---|
@@ -48,8 +51,10 @@ current:
 | **Total** | **Europe** | **3,606 / 3,606** | **100.00 %** | **100.00 %** |
 | | **USA** | **3,380 / 3,380** | **100.00 %** | **100.00 %** |
 
-- The game's code and data are all C in both versions: the executable,
-  the 21 overlays and all the stages.
+- The game's code and data are all C in the European and USA versions: the
+  executable, the 21 overlays and all the stages.
+- The Japanese version builds from splat's assembly so far, split into the
+  USA version's files and named after it: its C is the next step.
 - The PsyQ libraries are Sony's code, not the game's: the build takes them
   from the original as splat's disassembly and the progress leaves them out.
 - [docs/status.md](docs/status.md) has the details of each part, how the
@@ -90,6 +95,9 @@ sha1sum disks/us/SLUS_014.36   # 444653259f78ddb483fd22af72cce9276f42f214
 
 python3 tools/extract_disc.py "/path/to/Digimon World 2003 (Europe).bin" disks/eu
 sha1sum disks/eu/SLES_039.36   # d1b7e4d646e3a9c2b88fdb25d20b5f7116bbb06d
+
+python3 tools/extract_disc.py "/path/to/Digimon World 3 - Aratanaru Bouken no Tobira (Japan).bin" disks/jp
+sha1sum disks/jp/SLPS_034.46   # 0e5b6b9ee2f99a804ed8c4117c805482c10e260b
 ```
 
 Only `disks/<version>/<executable>` and `disks/<version>/AAA/PRO/` are
@@ -99,8 +107,8 @@ against: `<executable>.sha1`, `overlays.sha1` and `stages.sha1`.
 
 ### Build
 
-The same steps build each version, with `VERSION` set to `eu` or `us` (`eu`
-when it is left out):
+The same steps build each version, with `VERSION` set to `eu`, `us` or `jp`
+(`eu` when it is left out):
 ```
 # Split the executable, the overlays and the stages with splat
 # (asm/<version>/, build/<version>/generated/)
@@ -115,14 +123,14 @@ make VERSION=eu compare
 
 `make compare` prints one `OK` per binary, and a change only counts once
 every line still says `OK`: 261 lines for `us` (the executable, 21 overlays
-and 239 stages, `WSTAG260` among them), 316 for `eu` (the executable, 21
-overlays and 294 stages):
+and 239 stages, `WSTAG260` among them), 316 for `eu` and for `jp` (the
+executable, 21 overlays and 294 stages):
 ```
 build/eu/SLES_039.36: OK
 build/eu/AAA/PRO/CNTY_SEL.PRO: OK
 ...
 ```
-The CI builds and compares both versions on every push.
+The CI builds and compares every version on every push.
 
 `make VERSION=<version> regenerate` deletes `asm/<version>/`,
 `build/<version>/`, `expected/<version>/` and `assets/<version>/`, and splits
@@ -184,7 +192,7 @@ short: every function starts as an `INCLUDE_ASM` line in `src/`. To
 decompile one, get a first draft from m2c, make it match with
 `tools/try_match.py`, objdiff and, for a near miss, the permuter, then replace
 the `INCLUDE_ASM` with it and check that `make compare` still says `OK` for
-every binary of both versions.
+every binary of every version.
 
 The PsyQ functions were named from the
 [PsyQ 4.7 signatures](https://github.com/lab313ru/psx_psyq_signatures).

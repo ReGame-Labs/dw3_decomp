@@ -1,0 +1,51 @@
+// WSTAG310.PRO's own symbols, which only its splat config reads
+
+// names from us (tools/match_versions.py --seed): the same function or datum
+stepLoopingAnimation = 0x800A57D0; // type:func
+updateTileAnims = 0x800A58C4; // type:func
+createTileAnims = 0x800A5A14; // type:func
+stepTileAnimation = 0x800A5A40; // type:func
+updateTileSix = 0x800A5B60; // type:func
+handleCommand831 = 0x800A5F28; // type:func
+createCommand831 = 0x800A5F64; // type:func
+createTileSix = 0x800A5F9C; // type:func
+stepTileAnimation2 = 0x800A5FC8; // type:func
+updateTileSixW = 0x800A60E8; // type:func
+handleCommand832 = 0x800A64AC; // type:func
+createCommand832 = 0x800A64E8; // type:func
+createTileSixW = 0x800A6520; // type:func
+updateStage = 0x800A654C; // type:func
+startStage = 0x800A670C; // type:func
+stepAnimation = 0x800A6768; // type:func
+drawEffect = 0x800A6888; // type:func
+isOnScreen = 0x800A6978; // type:func
+updateEffect = 0x800A6A3C; // type:func
+createCommand852 = 0x800A6C5C; // type:func
+stepAnimation2 = 0x800A6CC8; // type:func
+drawStageEffect = 0x800A6DE8; // type:func
+isOnScreen2 = 0x800A6ED0; // type:func
+updateStageEffect = 0x800A6F94; // type:func
+createEffect = 0x800A7224; // type:func
+endEvent680 = 0x800A727C; // type:func
+endEvent681 = 0x800A72DC; // type:func
+endEvent682 = 0x800A7328; // type:func
+endEvent961 = 0x800A7354; // type:func
+setupStage = 0x800A7364; // type:func
+updateTileAnimsFrames2 = 0x800A7C2C;
+updateTileAnimsFrames3 = 0x800A7C48;
+updateTileSixFrames0 = 0x800A7C68;
+updateTileSixFrames1 = 0x800A7C9C;
+updateTileSixFrames2 = 0x800A7CD0;
+updateTileSixFrames3 = 0x800A7CDC;
+updateTileSixFrames4 = 0x800A7D4C;
+updateTileSixWFrames0 = 0x800A7D80;
+updateTileSixWFrames1 = 0x800A7DB4;
+updateTileSixWFrames2 = 0x800A7DE8;
+updateTileSixWFrames3 = 0x800A7DF4;
+updateTileSixWFrames4 = 0x800A7E58;
+updateStageSpots = 0x800A7E8C;
+updateEffectFrames1 = 0x800A7EA4;
+updateEffectFrames0 = 0x800A7EBC;
+effectClutFrames = 0x800A7F14;
+effectFrames = 0x800A7F2C;
+// end of the names from us

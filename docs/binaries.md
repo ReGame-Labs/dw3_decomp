@@ -2,8 +2,9 @@
 
 ## The game's binaries
 
-The executable, `SLES_039.36` in the European release and `SLUS_014.36` in
-the USA one, holds the engine and the PsyQ libraries. The rest of the game
+The executable, `SLES_039.36` in the European release, `SLUS_014.36` in
+the USA one and `SLPS_034.46` in the Japanese one, holds the engine and the
+PsyQ libraries. The rest of the game
 is in overlays, `AAA/PRO/*.PRO` on the disc, which load right after the
 executable's `.bss`. Every engine module is a
 global struct holding its state and a table of methods (`GFX`, `HEAP`,
@@ -63,15 +64,15 @@ CONTRIBUTING.md), cut from its original objects in their link order:
 
 Memory maps (psylink puts `.rodata` in front of `.text`):
 
-| | `us` (`SLUS_014.36`) | `eu` (`SLES_039.36`) |
-|---|---|---|
-| `.rodata` | `0x80010000`-`0x80010EBC` | `0x80010000`-`0x80010E88` |
-| `.text` | `0x80010EBC`-`0x8003E9D8` | `0x80010E88`-`0x8003EDCC` |
-| `.data` | `0x8003E9D8`-`0x8005C480` | `0x8003EDCC`-`0x8005CCE8` |
-| `.bss` | `0x8005C480`-`0x80082448` | `0x8005CCE8`-`0x80082CB0` |
-| `$gp` | `0x8005C2F8` | `0x8005CB50` |
-| Overlays (`OVERLAY_VRAM`) | `0x80082448` | `0x80082CB0` |
-| Stages, `WFIGHTMN`, `WFIGHTTS` (`STAGE_VRAM`) | `0x800A4CA4` | `0x800A5DE0` |
+| | `us` (`SLUS_014.36`) | `eu` (`SLES_039.36`) | `jp` (`SLPS_034.46`) |
+|---|---|---|---|
+| `.rodata` | `0x80010000`-`0x80010EBC` | `0x80010000`-`0x80010E88` | `0x80010000`-`0x80010E68` |
+| `.text` | `0x80010EBC`-`0x8003E9D8` | `0x80010E88`-`0x8003EDCC` | `0x80010E68`-`0x8003EBF8` |
+| `.data` | `0x8003E9D8`-`0x8005C480` | `0x8003EDCC`-`0x8005CCE8` | `0x8003EBF8`-`0x8005CA98` |
+| `.bss` | `0x8005C480`-`0x80082448` | `0x8005CCE8`-`0x80082CB0` | `0x8005CA98`-`0x80082A60` |
+| `$gp` | `0x8005C2F8` | `0x8005CB50` | `0x8005C90C` |
+| Overlays (`OVERLAY_VRAM`) | `0x80082448` | `0x80082CB0` | `0x80082A60` |
+| Stages, `WFIGHTMN`, `WFIGHTTS` (`STAGE_VRAM`) | `0x800A4CA4` | `0x800A5DE0` | `0x800A5770` |
 
 A 320x480 16-bit TIM image is loaded together with the program, so the
 executable stores `.bss` and the gap after it as zeros; splat keeps that tail
@@ -87,6 +88,7 @@ One source tree builds every version, one at a time, picked with `VERSION`
 |---|---|---|---|---|---|---|
 | `us` | *Digimon World 3*, USA, SLUS-01436 | `SLUS_014.36` (`444653259f78ddb483fd22af72cce9276f42f214`) | `Digimon World 3 (USA).bin` (`f0b022f9be53cbce14640abd8f01beaadcb35208`) | 21 | 238 | yes |
 | `eu` | *Digimon World 2003*, Europe, SLES-03936 | `SLES_039.36` (`d1b7e4d646e3a9c2b88fdb25d20b5f7116bbb06d`) | `Digimon World 2003 (Europe).bin` (`457cb233349ba841e03b33d8060f8fbcadd45cb3`) | 21 | 293 | the USA version's, and its own stages' |
+| `jp` | *Digimon World 3: Aratanaru Bouken no Tobira*, Japan, SLPS-03446 | `SLPS_034.46` (`0e5b6b9ee2f99a804ed8c4117c805482c10e260b`) | `Digimon World 3 - Aratanaru Bouken no Tobira (Japan).bin` (`8594fb44f601da64087a8996ffd89ab26abb11ea`) | 21 | 293 | none yet: splat's assembly |
 
 - `mk/version/<version>.mk` has each version's settings: the release's name,
   the executable's name, the disc directory, the overlays, where they load
@@ -103,14 +105,18 @@ One source tree builds every version, one at a time, picked with `VERSION`
   `tools/stage_yaml.py` writes their splat configs into
   `build/<version>/generated/stages/`. A stage marked `asm` there keeps its
   code and data in asm segments until it has a C file in that version; one
-  marked `asm-data` only its data; no stage is marked either today.
+  marked `asm-data` only its data: every stage of `jp` is `asm`, and no
+  stage of `us` or `eu` is marked either.
   `c-rodata` takes the bytes before the code, a color or jump tables, from
   the stage's C file too. `head-word` takes `WSTAG924`'s first word from a
   C file of its own, `src/field/stages/amaterasu_city/wstag924_head.c`, linked
   before the stage's jump tables (which GCC would align to 8 bytes after
   it). `data`
-  marks the stage with no code, `WSTAG260`, all of it its C file's data.
-- The C sees `VERSION_US` and `VERSION_EU`, each 0 or 1
+  marks the stage with no code, `WSTAG260`, all of it its C file's data
+  (`data asm`: splat's assembly). The last bytes of a stage that ends inside
+  a word are a databin of their own while its data is asm, which
+  `tools/inputcheck.py` lets link as it is shorter than a word.
+- The C sees `VERSION_US`, `VERSION_EU` and `VERSION_JP`, each 0 or 1
   (`include/version.h`), and so does the assembly (`--defsym`). Code tests
   them with `#if VERSION_EU`, never `#ifdef`; CONTRIBUTING.md has the rules.
 - `us` builds every C file under `src/`, and `eu` builds them all too
@@ -123,7 +129,14 @@ One source tree builds every version, one at a time, picked with `VERSION`
   are C where they are the code of a USA stage's C. The European release
   has the USA one's 21 overlays and 238 stages plus 55 stages of its own
   (`WSTAG920`-`974`).
-- The versions share their names: the European symbol files hold the USA
-  names of the functions and data paired between the two
+- `jp` builds no C yet (`C_SRC` is empty): every binary is splat's assembly,
+  which builds the original byte for byte. Its executable and overlays are
+  split into the USA version's files as asm segments
+  (`tools/split_version.py`), as `eu`'s were before they became C, and its
+  stages are marked `asm` in `config/jp/stages.txt` (`WSTAG260`, which has
+  no code, `data asm`). The Japanese release has the same overlays and
+  stages as the European one, each a little different in size.
+- The versions share their names: the European and Japanese symbol files
+  hold the USA names of the functions and data paired with the USA version's
   (`tools/match_versions.py`), and `tools/check_names.py` checks that they
   stay the same.
