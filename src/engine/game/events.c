@@ -685,12 +685,12 @@ void updateModeFlags(void) {
         applyAction(0x12, 0);
     }
     if (GAME.funcs.getPrevMode() == MODE_CARD_GAME) {
-        applyAction(0x11, 1);
+        applyAction(FLAG_CARD_BATTLE_ENDED, 1);
         applyAction(0x12, 1);
         if (FLAGS_00.pendingFlag10 != 0) {
-            applyAction(0x10, 1);
+            applyAction(FLAG_CARD_BATTLE_WON, 1);
         } else {
-            applyAction(0x10, 0);
+            applyAction(FLAG_CARD_BATTLE_WON, 0);
         }
         FLAGS_00.pendingFlag10 = 0;
     }
@@ -768,14 +768,42 @@ s32 MONEY_LOSSES[] = {
     800, 1600, 2700, 4000, 6000, 8700, 11500, 17500, 24000, 32000,
 };
 
-/* checkProgressRange's ranges of GAME.progress: { min, max } */
+/* checkProgressRange's ranges of GAME.progress: { min, max }; 0x63 is past the end of the story */
 u8 PROGRESS_RANGES[][2] = {
-    { 0x02, 0x12 }, { 0x04, 0x17 }, { 0x04, 0x2C }, { 0x14, 0x17 }, { 0x18, 0x25 }, { 0x27, 0x2A },
-    { 0x04, 0x63 }, { 0x07, 0x63 }, { 0x18, 0x63 }, { 0x16, 0x2A }, { 0x12, 0x63 }, { 0x14, 0x63 },
-    { 0x0F, 0x63 }, { 0x1E, 0x63 }, { 0x05, 0x0A }, { 0x0F, 0x12 }, { 0x14, 0x16 }, { 0x18, 0x1A },
-    { 0x1B, 0x25 }, { 0x27, 0x28 }, { 0x25, 0x26 }, { 0x1B, 0x24 }, { 0x22, 0x26 }, { 0x1B, 0x26 },
-    { 0x1C, 0x25 }, { 0x1B, 0x21 }, { 0x04, 0x26 }, { 0x04, 0x15 }, { 0x0E, 0x26 }, { 0x11, 0x26 },
-    { 0x0A, 0x0D }, { 0x1D, 0x26 }, { 0x0C, 0x16 }, { 0x00, 0x00 },
+    { STORY_LOGGED_IN, STORY_LISA_SAVED },
+    { STORY_GENJI_BEATEN, STORY_GAME_MASTER_CAUGHT },
+    { STORY_GENJI_BEATEN, 0x2C },
+    { STORY_BYAKKO_LEADER_FOUGHT, STORY_GAME_MASTER_CAUGHT },
+    { STORY_KNIGHTMON_REPROGRAMMED, STORY_AMATERASU_BRIDGE },
+    { STORY_ASUKA_HEADQUARTERS, 0x2A },
+    { STORY_GENJI_BEATEN, 0x63 },
+    { STORY_SOUTH_STATION_GHOST, 0x63 },
+    { STORY_KNIGHTMON_REPROGRAMMED, 0x63 },
+    { STORY_CONTROL_ROOM, 0x2A },
+    { STORY_LISA_SAVED, 0x63 },
+    { STORY_BYAKKO_LEADER_FOUGHT, 0x63 },
+    { STORY_DE_SINCERITY, 0x63 },
+    { STORY_DE_KNOWLEDGE, 0x63 },
+    { STORY_SEIRYU_BADGE, STORY_ZANBAMON_DRIVEN_OFF },
+    { STORY_DE_SINCERITY, STORY_LISA_SAVED },
+    { STORY_BYAKKO_LEADER_FOUGHT, STORY_CONTROL_ROOM },
+    { STORY_KNIGHTMON_REPROGRAMMED, STORY_BULBMON_FOUND },
+    { STORY_JUNGLE_SOUND, STORY_AMATERASU_BRIDGE },
+    { STORY_ASUKA_HEADQUARTERS, STORY_OPERATION_SIGMA },
+    { STORY_AMATERASU_BRIDGE, STORY_PRESIDENT_ARRESTED },
+    { STORY_JUNGLE_SOUND, STORY_BLACK_ID_PASS },
+    { STORY_WAY_TO_AMATERASU, STORY_PRESIDENT_ARRESTED },
+    { STORY_JUNGLE_SOUND, STORY_PRESIDENT_ARRESTED },
+    { STORY_BLUE_ID_PASS, STORY_AMATERASU_BRIDGE },
+    { STORY_JUNGLE_SOUND, STORY_NETWORK_OFFLINE },
+    { STORY_GENJI_BEATEN, STORY_PRESIDENT_ARRESTED },
+    { STORY_GENJI_BEATEN, STORY_STAFF_PASS },
+    { STORY_TEDDY_FOUND, STORY_PRESIDENT_ARRESTED },
+    { STORY_BYAKKO_BADGE, STORY_PRESIDENT_ARRESTED },
+    { STORY_ZANBAMON_DRIVEN_OFF, STORY_AGUMON_DISGUISE },
+    { STORY_BULBMON_BEATEN, STORY_PRESIDENT_ARRESTED },
+    { STORY_LOOKING_FOR_TEDDY, STORY_CONTROL_ROOM },
+    { 0x00, 0x00 },
 };
 
 /* checkPartyStat's thresholds */

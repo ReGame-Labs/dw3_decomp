@@ -103,9 +103,24 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1A0, 0x168, 0x180, 0x68, 0x150, 0x1FA },
     { 0x180, 0x100, 0x1A6, 0x168, 0x198, 0x68, 0x160, 0x1FA },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x18), 1, ITEM(5, 0xFC), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(2, 0x19), 1, ITEM(1, 0x2B), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor2Talk0Actions[] = { SPECIAL(0x8F), 1, FLAG(2, 0x1A), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_BUG_MAZE_RUBBER_SUIT_FOUND, 1,
+    ITEM(5, 0xFC), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor1Talk0Actions[] = {
+    FLAG_BUG_MAZE_POWER_CHARGE_FOUND, 1,
+    ITEM(1, 0x2B), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor2Talk0Actions[] = {
+    SPECIAL(0x8F), 1,
+    FLAG_BUG_MAZE_1600_BIT_FOUND, 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x261 },
     { NULL, NULL, 0 },
@@ -118,9 +133,9 @@ FieldTalk actor2Talks[] = {
     { NULL, actor2Talk0Actions, 0x32D },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x18), 0, CODES_END };
-u16 actor1Conditions[] = { FLAG(2, 0x19), 0, CODES_END };
-u16 actor2Conditions[] = { FLAG(2, 0x1A), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_BUG_MAZE_RUBBER_SUIT_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { FLAG_BUG_MAZE_POWER_CHARGE_FOUND, 0, CODES_END };
+u16 actor2Conditions[] = { FLAG_BUG_MAZE_1600_BIT_FOUND, 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 369, 1218, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x4D, 5, 1072, 601, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x4E, 6, 1313, 1138, 1 };

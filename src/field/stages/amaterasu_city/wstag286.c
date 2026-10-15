@@ -18,7 +18,7 @@
 #endif
 /*
  * Sets the stage up: its map, actors and battles, playing KANRIBGM; BGM_0029
- * instead except at story step 0x26 once flag 0x1A0A is set
+ * instead except at STORY_PRESIDENT_ARRESTED once flag 0x1A0A is set
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -37,7 +37,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress != 0x26 || FLAGS_00.checkCondition(FLAG(0x1A, 0xA), 0) != 0) {
+    if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -115,11 +115,32 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1B2, 0x128, 0x1C8, 0x28, 0x150, 0x1FC },
     { 0x180, 0x100, 0x1B6, 0x150, 0x1D8, 0x50, 0x160, 0x1FC },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x5F), 1, ITEM(1, 0x2D), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor5Talk0Actions[] = { FLAG(0xC, 0x26), 1, EVENT_BATTLE(0), 1, CODES_END };
-u16 actor6Talk0Actions[] = { FLAG(0xC, 0x27), 1, EVENT_BATTLE(1), 1, CODES_END };
-u16 actor7Talk0Actions[] = { FLAG(0xC, 0x27), 1, EVENT_BATTLE(1), 1, CODES_END };
-u16 actor8Talk0Actions[] = { FLAG(0xC, 0x25), 1, EVENT_BATTLE(0), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_AMATERASU_ADMIN_1F_ULTRA_CHARGE_FOUND, 1,
+    ITEM(1, 0x2D), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor5Talk0Actions[] = {
+    FLAG_AMATERASU_ADMIN_1F_SOLDIER_B_FOUGHT, 1,
+    EVENT_BATTLE(0), 1,
+    CODES_END,
+};
+u16 actor6Talk0Actions[] = {
+    FLAG_AMATERASU_ADMIN_1F_ATTACKER_A_FOUGHT, 1,
+    EVENT_BATTLE(1), 1,
+    CODES_END,
+};
+u16 actor7Talk0Actions[] = {
+    FLAG_AMATERASU_ADMIN_1F_ATTACKER_A_FOUGHT, 1,
+    EVENT_BATTLE(1), 1,
+    CODES_END,
+};
+u16 actor8Talk0Actions[] = {
+    FLAG_AMATERASU_ADMIN_1F_SOLDIER_A_FOUGHT, 1,
+    EVENT_BATTLE(0), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x16E },
     { NULL, NULL, 0 },
@@ -156,15 +177,31 @@ FieldTalk actor8Talks[] = {
     { NULL, actor8Talk0Actions, 0x1BD },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x5F), 0, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor0Conditions[] = { FLAG_AMATERASU_ADMIN_1F_ULTRA_CHARGE_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor5Conditions[] = { FLAG(0xC, 0x26), 0, PROGRESS(0x25), 1, CODES_END };
-u16 actor6Conditions[] = { FLAG(0xC, 0x27), 0, PROGRESS(0x25), 1, CODES_END };
-u16 actor7Conditions[] = { FLAG(0xC, 0x27), 0, PROGRESS(0x25), 1, CODES_END };
-u16 actor8Conditions[] = { FLAG(0xC, 0x25), 0, PROGRESS(0x25), 1, CODES_END };
+u16 actor5Conditions[] = {
+    FLAG_AMATERASU_ADMIN_1F_SOLDIER_B_FOUGHT, 0,
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    CODES_END,
+};
+u16 actor6Conditions[] = {
+    FLAG_AMATERASU_ADMIN_1F_ATTACKER_A_FOUGHT, 0,
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    CODES_END,
+};
+u16 actor7Conditions[] = {
+    FLAG_AMATERASU_ADMIN_1F_ATTACKER_A_FOUGHT, 0,
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    CODES_END,
+};
+u16 actor8Conditions[] = {
+    FLAG_AMATERASU_ADMIN_1F_SOLDIER_A_FOUGHT, 0,
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 825, 285, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x25, 5, 560, 673, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x26, 6, 371, 574, 7 };

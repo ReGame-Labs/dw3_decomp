@@ -10,16 +10,16 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == 8 && FLAGS_00.checkCondition(FLAG(0x1A, 0x17), 0) && FLAGS_00.checkCondition(FLAG(0x1C, 0x43), 1)) {
+        if (GAME.progress == STORY_SEPIKMON_MASK_LOST && FLAGS_00.checkCondition(FLAG_SEPIKMON_LOST_MASK_SEEN, 0) && FLAGS_00.checkCondition(FLAG_SWAMP_INN_SEPIKMON_HINT_TALKED, 1)) {
             children[0] = FIELDSTG_startEvent(0xB4);
-        } else if (GAME.progress == 8 && FLAGS_00.checkCondition(FLAG(0x1C, 0x43), 0)) {
+        } else if (GAME.progress == STORY_SEPIKMON_MASK_LOST && FLAGS_00.checkCondition(FLAG_SWAMP_INN_SEPIKMON_HINT_TALKED, 0)) {
             children[0] = FIELDSTG_startEvent(0xB5);
-        } else if (FLAGS_00.checkCondition(FLAG(0x1A, 0x17), 1) && FLAGS_00.checkCondition(FLAG(0x1A, 0x19), 0)) {
+        } else if (FLAGS_00.checkCondition(FLAG_SEPIKMON_LOST_MASK_SEEN, 1) && FLAGS_00.checkCondition(FLAG_BRIDGE_SEPIKMON_TALKED, 0)) {
             children[0] = FIELDSTG_startEvent(0xBE);
-        } else if (FLAGS_00.checkCondition(FLAG(0x1A, 0x17), 1) && FLAGS_00.checkCondition(FLAG(0x1A, 0x19), 1) &&
+        } else if (FLAGS_00.checkCondition(FLAG_SEPIKMON_LOST_MASK_SEEN, 1) && FLAGS_00.checkCondition(FLAG_BRIDGE_SEPIKMON_TALKED, 1) &&
                    FLAGS_00.checkCondition(ITEM(0, 0x15), 0)) {
             children[0] = FIELDSTG_startEvent(0xC8);
-        } else if (GAME.progress == 9 && FLAGS_00.checkCondition(ITEM(0, 0x15), 1)) {
+        } else if (GAME.progress == STORY_AGUMON_SUITS && FLAGS_00.checkCondition(ITEM(0, 0x15), 1)) {
             children[0] = FIELDSTG_startEvent(0xE6);
         }
         task->nextState(task);
@@ -36,15 +36,15 @@ void updateStage(StageTask *task, void **children) {
 
 /* After event 180, with Voice and Sepikmon: keeps it from playing again */
 void endEvent180(void) {
-    FLAGS_00.applyAction(FLAG(0x1A, 0x17), 1);
+    FLAGS_00.applyAction(FLAG_SEPIKMON_LOST_MASK_SEEN, 1);
 }
 
 /*
- * After event 230, with Sepikmon: moves the story on to its step 0xA and
+ * After event 230, with Sepikmon: moves the story on to STORY_ZANBAMON_DRIVEN_OFF and
  * gives the player the Smelly Herb
  */
 void endEvent230(void) {
-    GAME.progress = 0xA;
+    GAME.progress = STORY_ZANBAMON_DRIVEN_OFF;
     FLAGS_00.applyAction(ITEM(0, 0xD), 1);
 }
 
@@ -336,14 +336,14 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x154, 0x100, 0x50, 0, 0x170, 0x1FF },
     { 0x140, 0x100, 0x15C, 0x100, 0x70, 0, 0x140, 0x1FE },
 };
-u16 actor0Talk0Conditions[] = { FLAG(0x1C, 0x35), 0, CODES_END };
-u16 actor0Talk0Actions[] = { FLAG(0x1C, 0x35), 1, CODES_END };
-u16 actor0Talk1Conditions[] = { FLAG(0x1C, 0x35), 1, CODES_END };
+u16 actor0Talk0Conditions[] = { FLAG_BARONMON_CHANGE_ACCOUNT_TALKED, 0, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_BARONMON_CHANGE_ACCOUNT_TALKED, 1, CODES_END };
+u16 actor0Talk1Conditions[] = { FLAG_BARONMON_CHANGE_ACCOUNT_TALKED, 1, CODES_END };
 u16 actor0Talk1Actions[] = { 0x7C01, 1, CODES_END };
-u16 actor8Talk0Conditions[] = { FLAG(0x1A, 0x2A), 0, CODES_END };
-u16 actor8Talk1Conditions[] = { FLAG(0x1A, 0x2A), 1, ITEM(0, 0xE), 0, CODES_END };
-u16 actor8Talk1Actions[] = { FLAG(0x1A, 0x2B), 1, CODES_END };
-u16 actor8Talk2Conditions[] = { FLAG(0x1A, 0x2A), 1, ITEM(0, 0xE), 1, CODES_END };
+u16 actor8Talk0Conditions[] = { FLAG_SINCERITY_SYMBOL_FOUND, 0, CODES_END };
+u16 actor8Talk1Conditions[] = { FLAG_SINCERITY_SYMBOL_FOUND, 1, ITEM(0, 0xE), 0, CODES_END };
+u16 actor8Talk1Actions[] = { FLAG_SEPIKMON_BOMB_HINT_TALKED, 1, CODES_END };
+u16 actor8Talk2Conditions[] = { FLAG_SINCERITY_SYMBOL_FOUND, 1, ITEM(0, 0xE), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, actor0Talk0Actions, 0x30F },
     { actor0Talk1Conditions, actor0Talk1Actions, 0x35E },
@@ -400,22 +400,22 @@ FieldTalk actor13Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { SPECIAL(0x93), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(9), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x18), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_AGUMON_SUITS), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_KNIGHTMON_REPROGRAMMED), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0xA), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0xC), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_ZANBAMON_DRIVEN_OFF), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor9Conditions[] = { SPECIAL(0x16), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x17), 1, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x19), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(0x1A), 1, CODES_END };
-u16 actor14Conditions[] = { PROGRESS(8), 1, CODES_END };
-u16 actor15Conditions[] = { PROGRESS(7), 1, CODES_END };
-u16 actor16Conditions[] = { PROGRESS(9), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_CODE_PASSES_NEEDED), 1, CODES_END };
+u16 actor13Conditions[] = { PROGRESS(STORY_BULBMON_FOUND), 1, CODES_END };
+u16 actor14Conditions[] = { PROGRESS(STORY_SEPIKMON_MASK_LOST), 1, CODES_END };
+u16 actor15Conditions[] = { PROGRESS(STORY_SOUTH_STATION_GHOST), 1, CODES_END };
+u16 actor16Conditions[] = { PROGRESS(STORY_AGUMON_SUITS), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x3D, 4, 288, 296, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0x84, 5, 0, 0, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x84, 5, 144, 257, 7 };
@@ -464,7 +464,7 @@ StageTile stageObjects[] = {
 };
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x237, 0x412, 0x1A4, 1, 0, 0, 0 },
-    { { { PROGRESS(7), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0xA0, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_SOUTH_STATION_GHOST), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0xA0, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

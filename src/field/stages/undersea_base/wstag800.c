@@ -229,7 +229,7 @@ void updateTimer(StageTask *task, void **children) {
 
     switch (task->state) {
     case TASK_RUN:
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x43), 0) || FIELDSTG_state.busy != 0 || FIELDSTG_state.battleStarting != 0 ||
+        if (FLAGS_00.checkCondition(FLAG_MAGASTA_BUTTON_PRESSED, 0) || FIELDSTG_state.busy != 0 || FIELDSTG_state.battleStarting != 0 ||
             FIELDSTG_state.frozen != 0 || FIELDSTG_state.menuOpen != 0 || FIELDSTG_state.acting != 0) {
             break;
         }
@@ -272,10 +272,10 @@ void updateStage(StageTask *task, void **children) {
                 children[i + 1] = createStageEffect(updateStageSpots[i].x, updateStageSpots[i].y, updateStageSpots[i].frame);
             }
         }
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x44), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x45), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_MECH_SOLDIER_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_ROYAL_GUARD_CHALLENGE_SEEN, 0)) {
             children[7] = FIELDSTG_startEvent(0x367);
         }
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x61), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_MECH_SOLDIER_ALERT_SEEN, 0)) {
             children[5] = createTilePair16(0x345);
         } else {
             children[5] = createTilePair16Done();
@@ -300,7 +300,7 @@ void updateStage(StageTask *task, void **children) {
 /* After event 850, with the player: sets flag 0x1C0A and keeps it from playing again */
 void endEvent850(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0xA), 1);
-    FLAGS_00.applyAction(FLAG(0x40, 0x61), 1);
+    FLAGS_00.applyAction(FLAG_MECH_SOLDIER_ALERT_SEEN, 1);
 }
 
 /*
@@ -308,7 +308,7 @@ void endEvent850(void) {
  * keeps it from playing again
  */
 void endEvent870(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x44), 1);
+    FLAGS_00.applyAction(FLAG_MECH_SOLDIER_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -317,7 +317,7 @@ void endEvent870(void) {
  * keeps it from playing again
  */
 void endEvent871(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x45), 1);
+    FLAGS_00.applyAction(FLAG_ROYAL_GUARD_CHALLENGE_SEEN, 1);
     FLAGS_00.applyAction(ITEM(2, 0xCB), 1);
 }
 
@@ -652,11 +652,11 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x16E, 0x1A8, 0xB8, 0xA8, 0x170, 0x1D4 },
     { 0x140, 0x100, 0x17A, 0x1B0, 0xE8, 0xB0, 0x170, 0x1D3 },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x45), 1, ITEM(5, 0xE0), 1, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(2, 0x46), 1, ITEM(5, 0xEA), 1, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(2, 0x47), 1, ITEM(1, 0x2C), 1, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_MAGASTA_B2F_BERET_FOUND, 1, ITEM(5, 0xE0), 1, CODES_END };
+u16 actor1Talk0Actions[] = { FLAG_MAGASTA_B2F_ROYAL_CROWN_FOUND, 1, ITEM(5, 0xEA), 1, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_MAGASTA_B2F_SUPER_CHARGE_FOUND, 1, ITEM(1, 0x2C), 1, CODES_END };
 u16 actor3Talk0Actions[] = { FLAG(2, 0x48), 1, CODES_END };
-u16 actor4Talk0Actions[] = { FLAG(2, 0x49), 1, ITEM(5, 0x111), 1, CODES_END };
+u16 actor4Talk0Actions[] = { FLAG_MAGASTA_B2F_MISTY_ARMOR_FOUND, 1, ITEM(5, 0x111), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x21B },
     { NULL, NULL, 0 },
@@ -677,13 +677,17 @@ FieldTalk actor4Talks[] = {
     { NULL, actor4Talk0Actions, 0x21F },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x45), 0, CODES_END };
-u16 actor1Conditions[] = { FLAG(2, 0x46), 0, CODES_END };
-u16 actor2Conditions[] = { FLAG(2, 0x47), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_MAGASTA_B2F_BERET_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { FLAG_MAGASTA_B2F_ROYAL_CROWN_FOUND, 0, CODES_END };
+u16 actor2Conditions[] = { FLAG_MAGASTA_B2F_SUPER_CHARGE_FOUND, 0, CODES_END };
 u16 actor3Conditions[] = { FLAG(2, 0x48), 0, CODES_END };
-u16 actor4Conditions[] = { FLAG(2, 0x49), 0, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x20), 1, FLAG(0x40, 0x44), 0, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x20), 1, CODES_END };
+u16 actor4Conditions[] = { FLAG_MAGASTA_B2F_MISTY_ARMOR_FOUND, 0, CODES_END };
+u16 actor5Conditions[] = {
+    PROGRESS(STORY_REAL_WORLD), 1,
+    FLAG_MECH_SOLDIER_WIN_SEEN, 0,
+    CODES_END,
+};
+u16 actor6Conditions[] = { PROGRESS(STORY_REAL_WORLD), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 1024, 168, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x4D, 5, 640, 938, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x4E, 6, 1217, 328, 1 };
@@ -729,8 +733,8 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2DA, 0x522, 0x1F6, 3, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2DA, 0x552, 0x28E, 3, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2DA, 0x554, 0x400, 3, 0, 0, 0 },
-    { { { PROGRESS(0x20), 1 }, { FLAG(0x40, 0x44), 0 } }, SLOT_EVENT, 0x366, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x1C, 5), 1 }, { FLAG(0x40, 0x61), 0 } }, SLOT_EVENT, 0x352, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_REAL_WORLD), 1 }, { FLAG_MECH_SOLDIER_WIN_SEEN, 0 } }, SLOT_EVENT, 0x366, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG(0x1C, 5), 1 }, { FLAG_MECH_SOLDIER_ALERT_SEEN, 0 } }, SLOT_EVENT, 0x352, 0, 0, 0, 0, 0, 0 },
     { { { FLAG(0x1C, 5), 1 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x2DB, 0x450, 0x330, 1, 0, 0, 0 },
     { { { FLAG(0x1C, 5), 1 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x2DB, 0x2D0, 0xE0, 5, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },

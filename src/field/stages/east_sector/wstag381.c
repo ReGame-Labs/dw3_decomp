@@ -19,7 +19,7 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #endif
 /*
  * Sets the stage up: its map, actors and battles, playing FIELDBGM; BGM_0029
- * instead except at story step 0x26 once flag 0x1A0A is set
+ * instead except at STORY_PRESIDENT_ARRESTED once flag 0x1A0A is set
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -40,7 +40,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress != 0x26 || FLAGS_00.checkCondition(FLAG(0x1A, 0xA), 0) != 0) {
+    if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -112,12 +112,17 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x172, 0x19C, 0xC8, 0x9C, 0x160, 0x1FF },
     { 0x140, 0x100, 0x140, 0x1C2, 0, 0xC2, 0x170, 0x1FF },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x1C), 1, ITEM(5, 0x116), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_DIVERMON_LAKE_KNIGHT_SHIELD_FOUND, 1,
+    ITEM(5, 0x116), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x17C },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x1C), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_DIVERMON_LAKE_KNIGHT_SHIELD_FOUND, 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 129, 417, 1 };
 FieldActorEntry actor1 = { NULL, NULL, 0x4B, 5, 760, 357, 7 };
 FieldActorEntry actor2 = { NULL, NULL, 0x4C, 6, 670, 280, 1 };

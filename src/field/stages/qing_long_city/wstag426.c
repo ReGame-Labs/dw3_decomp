@@ -53,13 +53,17 @@ u16 actor1Talk0Actions[] = { 0x7A15, 1, CODES_END };
 u16 actor2Talk0Actions[] = { 0x7A14, 1, CODES_END };
 u16 actor3Talk0Conditions[] = { SPECIAL(0x20), 1, CODES_END };
 u16 actor3Talk0Actions[] = { 0x7A46, 1, CODES_END };
-u16 actor3Talk1Conditions[] = { SPECIAL(0x21), 1, PROGRESS(0x26), 0, CODES_END };
+u16 actor3Talk1Conditions[] = {
+    SPECIAL(0x21), 1,
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 0,
+    CODES_END,
+};
 u16 actor3Talk1Actions[] = { 0x7A46, 1, CODES_END };
-u16 actor3Talk2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor3Talk2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor3Talk2Actions[] = { 0x7A47, 1, CODES_END };
 u16 actor3Talk3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor3Talk3Actions[] = { 0x7A47, 1, CODES_END };
-u16 actor3Talk4Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor3Talk4Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor3Talk4Actions[] = { 0x7A47, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x1A3 },

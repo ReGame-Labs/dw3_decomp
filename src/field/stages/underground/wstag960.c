@@ -1,7 +1,7 @@
 /*
  * WSTAG960: Seabed, Underground: below the Sewers, Duel Island, Kicking Forest
  * and the UG Lake, in the extra chapter. The European version's: in its extra
- * chapter (FIELD_PROGRESS_EXTRA), mode 736 starts it instead of WSTAG825.
+ * chapter (STORY_EXTRA), mode 736 starts it instead of WSTAG825.
  */
 
 #include "common.h"

@@ -11,11 +11,11 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         do {
-            if (GAME.progress == 0x11 && FLAGS_00.checkCondition(FLAG(0x40, 0x3C), 0)) {
+            if (GAME.progress == STORY_BYAKKO_BADGE && FLAGS_00.checkCondition(FLAG_NUMEMON_MISSING_SEEN, 0)) {
                 children[0] = FIELDSTG_startEvent(0x1B8);
                 break;
             }
-            if (GAME.progress == 0x12 && FLAGS_00.checkCondition(FLAG(0x40, 0x38), 0)) {
+            if (GAME.progress == STORY_LISA_SAVED && FLAGS_00.checkCondition(FLAG_NICK_KEITH_FACTORY_SEEN, 0)) {
                 children[0] = FIELDSTG_startEvent(0x208);
                 break;
             }
@@ -34,7 +34,7 @@ void updateStage(StageTask *task, void **children) {
 
 /* After event 440, with Numemon: sets flag 0x1C1F and keeps it from playing again */
 void endEvent440(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x3C), 1);
+    FLAGS_00.applyAction(FLAG_NUMEMON_MISSING_SEEN, 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x1F), 1);
 }
 
@@ -43,7 +43,7 @@ void endEvent440(void) {
  * keeps it from playing again
  */
 void endEvent450(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x21), 1);
+    FLAGS_00.applyAction(FLAG_NUMEMON_FACTORY_FOUND_SEEN, 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x20), 1);
 }
 
@@ -85,7 +85,7 @@ void endEvent500(void) {
 
 /* After event 520, with the player: keeps it from playing again */
 void endEvent520(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x38), 1);
+    FLAGS_00.applyAction(FLAG_NICK_KEITH_FACTORY_SEEN, 1);
 }
 
 #if VERSION_US || VERSION_JP
@@ -472,14 +472,46 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x150, 0x1DB, 0x40, 0xDB, 0x160, 0x1FF },
     { 0x140, 0x100, 0x158, 0x1DB, 0x60, 0xDB, 0x170, 0x1FF },
 };
-u16 actor0Conditions[] = { PROGRESS(0), 1, FLAG(0x40, 0x21), 0, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0), 1, FLAG(2, 0xD), 1, FLAG(0x40, 0x34), 0, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0), 1, FLAG(2, 0xE), 1, FLAG(0x40, 0x35), 0, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0), 1, FLAG(2, 0xF), 1, FLAG(0x40, 0x36), 0, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0), 1, FLAG(2, 0x10), 1, FLAG(0x40, 0x37), 0, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x12), 1, FLAG(0x40, 0x38), 0, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x11), 1, CODES_END };
-u16 actor7Conditions[] = { FLAG(0x40, 0x3C), 0, PROGRESS(0x11), 1, CODES_END };
+u16 actor0Conditions[] = {
+    PROGRESS(STORY_START), 1,
+    FLAG_NUMEMON_FACTORY_FOUND_SEEN, 0,
+    CODES_END,
+};
+u16 actor1Conditions[] = {
+    PROGRESS(STORY_START), 1,
+    FLAG_DUCT_ROOM_01_HP_CHIP_FOUND, 1,
+    FLAG(0x40, 0x34), 0,
+    CODES_END,
+};
+u16 actor2Conditions[] = {
+    PROGRESS(STORY_START), 1,
+    FLAG_DUCT_ROOM_04_MIND_CHIP_FOUND, 1,
+    FLAG(0x40, 0x35), 0,
+    CODES_END,
+};
+u16 actor3Conditions[] = {
+    PROGRESS(STORY_START), 1,
+    FLAG_DUCT_ROOM_02_MP_CHIP_FOUND, 1,
+    FLAG(0x40, 0x36), 0,
+    CODES_END,
+};
+u16 actor4Conditions[] = {
+    PROGRESS(STORY_START), 1,
+    FLAG_DUCT_ROOM_03_POWER_CHIP_FOUND, 1,
+    FLAG(0x40, 0x37), 0,
+    CODES_END,
+};
+u16 actor5Conditions[] = {
+    PROGRESS(STORY_LISA_SAVED), 1,
+    FLAG_NICK_KEITH_FACTORY_SEEN, 0,
+    CODES_END,
+};
+u16 actor6Conditions[] = { PROGRESS(STORY_BYAKKO_BADGE), 1, CODES_END };
+u16 actor7Conditions[] = {
+    FLAG_NUMEMON_MISSING_SEEN, 0,
+    PROGRESS(STORY_BYAKKO_BADGE), 1,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, NULL, 0x69, 4, 825, 876, 7 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0x69, 4, 830, 216, 1 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0x69, 4, 1241, 708, 7 };
@@ -579,11 +611,11 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 5, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 8, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 7, 0, 0, 0, 0, 0, 0 },
-    { { { PROGRESS(0x11), 1 }, { FLAG(0x40, 0x21), 0 } }, SLOT_EVENT, 0x1C2, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(2, 0xD), 1 }, { FLAG(0x40, 0x34), 0 } }, SLOT_EVENT, 0x1D6, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(2, 0xE), 1 }, { FLAG(0x40, 0x35), 0 } }, SLOT_EVENT, 0x1E0, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(2, 0xF), 1 }, { FLAG(0x40, 0x36), 0 } }, SLOT_EVENT, 0x1EA, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(2, 0x10), 1 }, { FLAG(0x40, 0x37), 0 } }, SLOT_EVENT, 0x1F4, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_BYAKKO_BADGE), 1 }, { FLAG_NUMEMON_FACTORY_FOUND_SEEN, 0 } }, SLOT_EVENT, 0x1C2, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_DUCT_ROOM_01_HP_CHIP_FOUND, 1 }, { FLAG(0x40, 0x34), 0 } }, SLOT_EVENT, 0x1D6, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_DUCT_ROOM_04_MIND_CHIP_FOUND, 1 }, { FLAG(0x40, 0x35), 0 } }, SLOT_EVENT, 0x1E0, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_DUCT_ROOM_02_MP_CHIP_FOUND, 1 }, { FLAG(0x40, 0x36), 0 } }, SLOT_EVENT, 0x1EA, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_DUCT_ROOM_03_POWER_CHIP_FOUND, 1 }, { FLAG(0x40, 0x37), 0 } }, SLOT_EVENT, 0x1F4, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

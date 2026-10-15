@@ -54,14 +54,14 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x15C, 0x178, 0x70, 0x78, 0x170, 0x1F3 },
 };
 u16 actor0Talk0Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
-u16 actor0Talk1Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor0Talk2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor0Talk1Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor0Talk2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor1Talk0Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
-u16 actor1Talk1Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor1Talk2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor1Talk1Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor1Talk2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor2Talk0Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
-u16 actor2Talk1Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor2Talk2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor2Talk1Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor2Talk2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor9Talk0Conditions[] = { ITEM(3, 0x68), 1, CODES_END };
 u16 actor9Talk1Conditions[] = { ITEM(3, 0x68), 0, FLAG(0, 0), 0, CODES_END };
 u16 actor9Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };

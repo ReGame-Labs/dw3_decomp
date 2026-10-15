@@ -10,7 +10,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (FLAGS_00.checkCondition(FLAG(0x1A, 0x26), 1) && FLAGS_00.checkCondition(FLAG(0x1C, 0x4B), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 1) && FLAGS_00.checkCondition(FLAG(0x1C, 0x4B), 0)) {
             children[0] = FIELDSTG_startEvent(0x514);
         }
         task->nextState(task);
@@ -58,7 +58,7 @@ void endEvent1303(void) {
  */
 void endEvent1304(void) {
     FLAGS_00.applyAction(FLAG(0x1A, 0x27), 1);
-    FLAGS_00.applyAction(FLAG(0x1A, 0x26), 0);
+    FLAGS_00.applyAction(FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 0);
 }
 
 /*
@@ -67,7 +67,7 @@ void endEvent1304(void) {
  * so the search starts over
  */
 void endEvents1507To1509(void) {
-    FLAGS_00.applyAction(FLAG(0x1A, 0x26), 0);
+    FLAGS_00.applyAction(FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 0);
     FLAGS_00.applyAction(FLAG(0x1C, 0x4B), 0);
     FLAGS_00.applyAction(FLAG(0x1C, 0x4C), 0);
     FLAGS_00.applyAction(FLAG(0x1C, 0x4D), 0);
@@ -89,7 +89,7 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #endif
 /*
  * Sets the stage up: its map, actors, battles and events, playing the
- * ambience ENV05_00; battle list 0 before story step 0xE, 1 from then on
+ * ambience ENV05_00; battle list 0 before STORY_TEDDY_FOUND, 1 from then on
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -110,7 +110,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress < 0xE) {
+    if (GAME.progress < STORY_TEDDY_FOUND) {
         FIELDSTG_state.battles = stageBattles0;
     } else {
         FIELDSTG_state.battles = stageBattles1;
@@ -393,7 +393,12 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1B0, 0x160, 0x1C0, 0x60, 0x170, 0x1FE },
     { 0x180, 0x100, 0x1B0, 0x180, 0x1C0, 0x80, 0x140, 0x1FD },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x28), 1, ITEM(5, 0xFE), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_KICKING_FOREST_DOWN_JACKET_FOUND, 1,
+    ITEM(5, 0xFE), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 u16 actor1Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor1Talk0Actions[] = { START_EVENT(0x31), 1, FLAG(0, 0), 1, CODES_END };
 u16 actor1Talk1Conditions[] = { FLAG(0, 0), 1, CODES_END };
@@ -403,11 +408,11 @@ u16 actor4Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor4Talk1Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(9), 0, CODES_END };
 u16 actor4Talk2Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(9), 1, CODES_END };
 u16 actor4Talk2Actions[] = { CARD_BATTLE(0x11, 0), 1, CODES_END };
-u16 actor6Talk0Conditions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor6Talk1Conditions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 1, CODES_END };
-u16 actor6Talk1Actions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor6Talk2Conditions[] = { FLAG(0, 0x10), 1, FLAG(0, 0x11), 1, CODES_END };
-u16 actor6Talk2Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, CODES_END };
+u16 actor6Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor6Talk1Conditions[] = { FLAG_CARD_BATTLE_WON, 0, FLAG_CARD_BATTLE_ENDED, 1, CODES_END };
+u16 actor6Talk1Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor6Talk2Conditions[] = { FLAG_CARD_BATTLE_WON, 1, FLAG_CARD_BATTLE_ENDED, 1, CODES_END };
+u16 actor6Talk2Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG_CARD_BATTLE_WON, 0, CODES_END };
 u16 actor7Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor7Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor7Talk1Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(9), 0, CODES_END };
@@ -418,25 +423,35 @@ u16 actor8Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor8Talk1Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(9), 0, CODES_END };
 u16 actor8Talk2Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(9), 1, CODES_END };
 u16 actor8Talk2Actions[] = { CARD_BATTLE(0x11, 0), 1, CODES_END };
-u16 actor9Talk0Conditions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor9Talk1Conditions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 1, CODES_END };
-u16 actor9Talk1Actions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor9Talk2Conditions[] = { FLAG(0, 0x10), 1, CARD(7), 0, FLAG(0, 0x11), 1, CODES_END };
-u16 actor9Talk2Actions[] = {
-    FLAG(0, 0x11), 0,
-    CARD(7), 1,
-    SPECIAL(0x13), 1,
-    FLAG(0, 0x10), 0,
+u16 actor9Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor9Talk1Conditions[] = { FLAG_CARD_BATTLE_WON, 0, FLAG_CARD_BATTLE_ENDED, 1, CODES_END };
+u16 actor9Talk1Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor9Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 1,
+    CARD(7), 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
     CODES_END,
 };
-u16 actor9Talk3Conditions[] = { FLAG(0, 0x10), 1, CARD(7), 1, FLAG(0, 0x11), 1, CODES_END };
-u16 actor9Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, CODES_END };
+u16 actor9Talk2Actions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
+    CARD(7), 1,
+    SPECIAL(0x13), 1,
+    FLAG_CARD_BATTLE_WON, 0,
+    CODES_END,
+};
+u16 actor9Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 1,
+    CARD(7), 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    CODES_END,
+};
+u16 actor9Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG_CARD_BATTLE_WON, 0, CODES_END };
 u16 actor10Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor10Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor10Talk1Conditions[] = { FLAG(0, 0), 1, FLAG(0xE, 7), 0, CODES_END };
-u16 actor10Talk1Actions[] = { FLAG(0xE, 7), 1, EVENT_BATTLE(0), 1, CODES_END };
-u16 actor10Talk2Conditions[] = { FLAG(0, 0), 1, FLAG(0xE, 7), 1, PARTY_STAT(0xD), 0, CODES_END };
-u16 actor10Talk3Conditions[] = { FLAG(0, 0), 1, FLAG(0xE, 7), 1, PARTY_STAT(0xD), 1, CODES_END };
+u16 actor10Talk1Conditions[] = { FLAG(0, 0), 1, FLAG_BOB_FOUGHT, 0, CODES_END };
+u16 actor10Talk1Actions[] = { FLAG_BOB_FOUGHT, 1, EVENT_BATTLE(0), 1, CODES_END };
+u16 actor10Talk2Conditions[] = { FLAG(0, 0), 1, FLAG_BOB_FOUGHT, 1, PARTY_STAT(0xD), 0, CODES_END };
+u16 actor10Talk3Conditions[] = { FLAG(0, 0), 1, FLAG_BOB_FOUGHT, 1, PARTY_STAT(0xD), 1, CODES_END };
 u16 actor10Talk3Actions[] = { CARD_BATTLE(0x11, 1), 1, CODES_END };
 u16 actor11Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor11Talk1Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(9), 0, CODES_END };
@@ -531,12 +546,12 @@ FieldTalk actor15Talks[] = {
     { NULL, NULL, 0x32F },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x28), 0, CODES_END };
-u16 actor1Conditions[] = { FLAG(0x1A, 0x26), 1, FLAG(0x1C, 0x4C), 0, CODES_END };
-u16 actor2Conditions[] = { FLAG(0x1A, 0x26), 1, FLAG(0x1C, 0x4C), 1, CODES_END };
-u16 actor3Conditions[] = { FLAG(0x1A, 0x26), 1, CODES_END };
+u16 actor0Conditions[] = { FLAG_KICKING_FOREST_DOWN_JACKET_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 1, FLAG(0x1C, 0x4C), 0, CODES_END };
+u16 actor2Conditions[] = { FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 1, FLAG(0x1C, 0x4C), 1, CODES_END };
+u16 actor3Conditions[] = { FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 1, CODES_END };
 u16 actor4Conditions[] = {
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     ITEM(0, 0x192), 1,
     SPECIAL(3), 1,
     ITEM(0, 0x12), 0,
@@ -545,13 +560,13 @@ u16 actor4Conditions[] = {
 u16 actor5Conditions[] = { ITEM(0, 0x192), 0, SPECIAL(9), 1, SPECIAL(0x1A), 0, CODES_END };
 u16 actor6Conditions[] = {
     ITEM(0, 0x192), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     SPECIAL(0x22), 1,
     ITEM(0, 0x12), 0,
     CODES_END,
 };
 u16 actor7Conditions[] = {
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     SPECIAL(4), 1,
     ITEM(0, 0x192), 1,
     ITEM(0, 0x12), 0,
@@ -559,14 +574,14 @@ u16 actor7Conditions[] = {
 };
 u16 actor8Conditions[] = {
     ITEM(0, 0x192), 1,
-    FLAG(0, 0x11), 0,
-    PROGRESS(0x26), 1,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
     ITEM(0, 0x12), 0,
     CODES_END,
 };
 u16 actor9Conditions[] = {
     ITEM(0, 0x192), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     ITEM(0, 0x12), 1,
     SPECIAL(0x22), 1,
     CODES_END,
@@ -574,15 +589,15 @@ u16 actor9Conditions[] = {
 u16 actor10Conditions[] = {
     ITEM(0, 0x192), 1,
     ITEM(0, 0x12), 1,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     SPECIAL(0x22), 1,
     CODES_END,
 };
 u16 actor11Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor12Conditions[] = { FLAG(0x1A, 0x26), 1, FLAG(0x1C, 0x4D), 0, CODES_END };
-u16 actor13Conditions[] = { FLAG(0x1A, 0x26), 1, FLAG(0x1C, 0x4D), 1, CODES_END };
-u16 actor14Conditions[] = { FLAG(0x1A, 0x26), 1, FLAG(0x1C, 0x4E), 0, CODES_END };
-u16 actor15Conditions[] = { FLAG(0x1A, 0x26), 1, FLAG(0x1C, 0x4E), 1, CODES_END };
+u16 actor12Conditions[] = { FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 1, FLAG(0x1C, 0x4D), 0, CODES_END };
+u16 actor13Conditions[] = { FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 1, FLAG(0x1C, 0x4D), 1, CODES_END };
+u16 actor14Conditions[] = { FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 1, FLAG(0x1C, 0x4E), 0, CODES_END };
+u16 actor15Conditions[] = { FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 1, FLAG(0x1C, 0x4E), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 1407, 809, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x22, 5, 977, 238, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x22, 5, 1048, 276, 7 };
@@ -839,9 +854,9 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x22B, 0xB0, 0x4F8, 5, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x229, 0x654, 0x442, 3, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x22C, 0x384, 0x160, 3, 0x64, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { FLAG(0x1A, 0x26), 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 1, 1 },
+    { { { SPECIAL(0x93), 1 }, { FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 1, 1 },
     { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 2, 1 },
-    { { { SPECIAL(0x94), 1 }, { FLAG(0x1A, 0x26), 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 3, 4 },
+    { { { SPECIAL(0x94), 1 }, { FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 3, 4 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 7, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 7, 0x34D, 0xFA, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 7, 0x33F, 0x16C, 0, 0, 0, 0 },
@@ -857,9 +872,9 @@ StageSlot stageSlots[] = {
     { { { ITEM(0, 5), 1 }, { ITEM(0, 4), 1 } }, SLOT_GAUGE, 0xFFC0, 0xFFF0, 0, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { ITEM(0, 4), 1 } }, SLOT_GAUGE, 0xFFD0, 0xFFF0, 0, 0, 0, 0, 0 },
     { { { FLAG(0, FIELD_FLAG_ENCOUNTERED), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2328, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x1A, 0x26), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x5E3, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x1A, 0x26), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x5E4, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x1A, 0x26), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x5E5, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x5E3, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x5E4, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_VEEMON_HIDE_AND_SEEK_ACTIVE, 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x5E5, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

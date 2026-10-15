@@ -1,7 +1,7 @@
 /*
  * WSTAG973: Circuit Board, Underground: a deep tunnel with guides to both
  * servers, in the extra chapter. The European version's: in its extra chapter
- * (FIELD_PROGRESS_EXTRA), mode 749 starts it instead of WSTAG890.
+ * (STORY_EXTRA), mode 749 starts it instead of WSTAG890.
  */
 
 #include "common.h"
@@ -183,26 +183,30 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x140, 0x140, 0, 0x40, 0x160, 0x1FE },
     { 0x140, 0x100, 0x160, 0x140, 0x80, 0x40, 0x170, 0x1FE },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x76), 1, ITEM(2, 0x8B), 1, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(2, 0x75), 1, ITEM(2, 0x7E), 1, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(2, 0x74), 1, ITEM(2, 0x97), 1, CODES_END };
-u16 actor3Talk0Actions[] = { FLAG(2, 0x79), 1, ITEM(0, 0x29), 1, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_CIRCUIT_BOARD_CRYSTAL_ROD_FOUND, 1, ITEM(2, 0x8B), 1, CODES_END };
+u16 actor1Talk0Actions[] = {
+    FLAG_CIRCUIT_BOARD_LASER_CANNON_FOUND, 1,
+    ITEM(2, 0x7E), 1,
+    CODES_END,
+};
+u16 actor2Talk0Actions[] = { FLAG_CIRCUIT_BOARD_VENOM_FANG_FOUND, 1, ITEM(2, 0x97), 1, CODES_END };
+u16 actor3Talk0Actions[] = { FLAG_CIRCUIT_BOARD_GOLD_ID_FOUND, 1, ITEM(0, 0x29), 1, CODES_END };
 u16 actor18Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor18Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor18Talk1Conditions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor18Talk1Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xA, 0xE), 1, CODES_END };
+u16 actor18Talk1Actions[] = { EVENT_BATTLE(0), 1, FLAG_B_SENT_GARGOYLEMON_FOUGHT, 1, CODES_END };
 u16 actor19Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor19Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor19Talk1Conditions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor19Talk1Actions[] = { EVENT_BATTLE(1), 1, FLAG(0xA, 0xF), 1, CODES_END };
+u16 actor19Talk1Actions[] = { EVENT_BATTLE(1), 1, FLAG_B_IP_DORAMON_FOUGHT, 1, CODES_END };
 u16 actor20Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor20Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor20Talk1Conditions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor20Talk1Actions[] = { FLAG(0xA, 0x11), 1, EVENT_BATTLE(2), 1, CODES_END };
+u16 actor20Talk1Actions[] = { FLAG_B_MEGAROGROWLMON_FOUGHT, 1, EVENT_BATTLE(2), 1, CODES_END };
 u16 actor21Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor21Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor21Talk1Conditions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor21Talk1Actions[] = { EVENT_BATTLE(3), 1, FLAG(0xA, 0x12), 1, CODES_END };
+u16 actor21Talk1Actions[] = { EVENT_BATTLE(3), 1, FLAG_B_WARGREYMON_FOUGHT, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0xE },
     { NULL, NULL, 0 },
@@ -239,13 +243,28 @@ FieldTalk actor21Talks[] = {
     { actor21Talk1Conditions, actor21Talk1Actions, 0xFA },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { WARP_ARG(4), 1, WARP_ARG(0x22), 1, FLAG(2, 0x76), 0, CODES_END };
-u16 actor1Conditions[] = { WARP_ARG(4), 1, WARP_ARG(0x23), 1, FLAG(2, 0x75), 0, CODES_END };
-u16 actor2Conditions[] = { WARP_ARG(5), 1, WARP_ARG(0x20), 1, FLAG(2, 0x74), 0, CODES_END };
+u16 actor0Conditions[] = {
+    WARP_ARG(4), 1,
+    WARP_ARG(0x22), 1,
+    FLAG_CIRCUIT_BOARD_CRYSTAL_ROD_FOUND, 0,
+    CODES_END,
+};
+u16 actor1Conditions[] = {
+    WARP_ARG(4), 1,
+    WARP_ARG(0x23), 1,
+    FLAG_CIRCUIT_BOARD_LASER_CANNON_FOUND, 0,
+    CODES_END,
+};
+u16 actor2Conditions[] = {
+    WARP_ARG(5), 1,
+    WARP_ARG(0x20), 1,
+    FLAG_CIRCUIT_BOARD_VENOM_FANG_FOUND, 0,
+    CODES_END,
+};
 u16 actor3Conditions[] = {
     WARP_ARG(5), 1,
     WARP_ARG(0x23), 1,
-    FLAG(2, 0x79), 0,
+    FLAG_CIRCUIT_BOARD_GOLD_ID_FOUND, 0,
     ITEM(0, 0x29), 0,
     CODES_END,
 };
@@ -262,10 +281,30 @@ u16 actor14Conditions[] = { WARP_ARG(0), 0, WARP_ARG(0x1F), 1, FLAG(0, 9), 0, CO
 u16 actor15Conditions[] = { WARP_ARG(0), 0, WARP_ARG(0x20), 1, FLAG(0, 9), 0, CODES_END };
 u16 actor16Conditions[] = { WARP_ARG(0), 0, WARP_ARG(0x21), 1, FLAG(0, 9), 0, CODES_END };
 u16 actor17Conditions[] = { WARP_ARG(0), 0, WARP_ARG(0x22), 1, FLAG(0, 9), 0, CODES_END };
-u16 actor18Conditions[] = { WARP_ARG(0), 1, WARP_ARG(0x1E), 1, FLAG(0xA, 0xE), 0, CODES_END };
-u16 actor19Conditions[] = { WARP_ARG(0), 1, WARP_ARG(0x1F), 1, FLAG(0xA, 0xF), 0, CODES_END };
-u16 actor20Conditions[] = { WARP_ARG(0), 1, WARP_ARG(0x21), 1, FLAG(0xA, 0x11), 0, CODES_END };
-u16 actor21Conditions[] = { WARP_ARG(0), 1, WARP_ARG(0x22), 1, FLAG(0xA, 0x12), 0, CODES_END };
+u16 actor18Conditions[] = {
+    WARP_ARG(0), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_B_SENT_GARGOYLEMON_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor19Conditions[] = {
+    WARP_ARG(0), 1,
+    WARP_ARG(0x1F), 1,
+    FLAG_B_IP_DORAMON_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor20Conditions[] = {
+    WARP_ARG(0), 1,
+    WARP_ARG(0x21), 1,
+    FLAG_B_MEGAROGROWLMON_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor21Conditions[] = {
+    WARP_ARG(0), 1,
+    WARP_ARG(0x22), 1,
+    FLAG_B_WARGREYMON_FOUGHT, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 672, 216, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x21, 4, 672, 216, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x21, 4, 672, 216, 1 };

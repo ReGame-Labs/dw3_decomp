@@ -11,10 +11,10 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (GAME.progress == 0x21) {
-            if (FLAGS_00.checkCondition(FLAG(0x1C, 0x39), 0) && FLAGS_00.checkCondition(FLAG(0x40, 0x57), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x58), 0)) {
+        if (GAME.progress == STORY_NETWORK_OFFLINE) {
+            if (FLAGS_00.checkCondition(FLAG_LISA_RESISTANCE_REPORT_SEEN, 0) && FLAGS_00.checkCondition(FLAG_AMATERASU_PLAN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_DESTROMON_REVEAL_SEEN, 0)) {
                 children[0] = FIELDSTG_startEvent(0x37B);
-            } else if (FLAGS_00.checkCondition(FLAG(0x1C, 0x39), 0) && FLAGS_00.checkCondition(FLAG(0x40, 0x58), 1)) {
+            } else if (FLAGS_00.checkCondition(FLAG_LISA_RESISTANCE_REPORT_SEEN, 0) && FLAGS_00.checkCondition(FLAG_DESTROMON_REVEAL_SEEN, 1)) {
                 children[0] = FIELDSTG_startEvent(0x37C);
             }
         }
@@ -41,7 +41,7 @@ void endEvent580(void) {
 
 /* After event 891, with Lisa, Game Master and Teddy: keeps it from playing again */
 void endEvent891(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x58), 1);
+    FLAGS_00.applyAction(FLAG_DESTROMON_REVEAL_SEEN, 1);
 }
 
 /*
@@ -399,27 +399,35 @@ FieldTalk actor11Talks[] = {
     { NULL, NULL, 0x492 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(0x1C, 0x1A), 0, PROGRESS(0x16), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x21), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x16), 1, FLAG(0x1C, 0x1A), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x16), 1, CODES_END };
+u16 actor0Conditions[] = { FLAG(0x1C, 0x1A), 0, PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, FLAG(0x1C, 0x1A), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x1E), 1, CODES_END };
 u16 actor8Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor9Conditions[] = { SPECIAL(0x1E), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(0x21), 1, CODES_END };
-u16 actor11Conditions[] = { SPECIAL(0x18), 1, PROGRESS(0x1A), 0, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x21), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
+u16 actor11Conditions[] = { SPECIAL(0x18), 1, PROGRESS(STORY_BULBMON_FOUND), 0, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
 u16 actor13Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor14Conditions[] = { SPECIAL(0x1E), 1, PROGRESS(0x21), 0, CODES_END };
-u16 actor15Conditions[] = { PROGRESS(0x21), 1, FLAG(0x40, 0x58), 0, CODES_END };
-u16 actor16Conditions[] = { PROGRESS(0x21), 1, FLAG(0x40, 0x58), 1, CODES_END };
+u16 actor14Conditions[] = { SPECIAL(0x1E), 1, PROGRESS(STORY_NETWORK_OFFLINE), 0, CODES_END };
+u16 actor15Conditions[] = {
+    PROGRESS(STORY_NETWORK_OFFLINE), 1,
+    FLAG_DESTROMON_REVEAL_SEEN, 0,
+    CODES_END,
+};
+u16 actor16Conditions[] = {
+    PROGRESS(STORY_NETWORK_OFFLINE), 1,
+    FLAG_DESTROMON_REVEAL_SEEN, 1,
+    CODES_END,
+};
 u16 actor17Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor18Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor19Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor20Conditions[] = { PROGRESS(0x16), 1, FLAG(0x1C, 0x1A), 1, CODES_END };
+u16 actor20Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, FLAG(0x1C, 0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 0xC, 4, 123, 110, 7 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0xC, 4, 0, 0, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0xC, 4, 197, 139, 7 };
@@ -482,7 +490,7 @@ StageTile stageObjects[] = {
 };
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x205, 0x70, 0xE4, 7, 0, 0, 0 },
-    { { { PROGRESS(0x16), 1 }, { FLAG(0x40, 0x4D), 0 } }, SLOT_EVENT, 0x244, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_CONTROL_ROOM), 1 }, { FLAG(0x40, 0x4D), 0 } }, SLOT_EVENT, 0x244, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

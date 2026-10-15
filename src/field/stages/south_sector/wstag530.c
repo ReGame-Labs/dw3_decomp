@@ -22,7 +22,7 @@ extern StageSlot stageSlots1[];
 #endif
 /*
  * Sets the stage up: its map, actors, battles and events, playing BGM_0015;
- * slot list 0 before story step 0x1A, 1 from then on
+ * slot list 0 before STORY_BULBMON_FOUND, 1 from then on
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -42,7 +42,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress < 0x1A) {
+    if (GAME.progress < STORY_BULBMON_FOUND) {
         FIELDSTG_state.slots = stageSlots0;
     } else {
         FIELDSTG_state.slots = stageSlots1;
@@ -113,12 +113,17 @@ ActorImage stageImages[] = {
     { 0x200, 0x100, 0x200, 0x1BC, 0, 0xBC, 0x230, 0x1FD },
     { 0x140, 0x100, 0x178, 0x100, 0xE0, 0, 0x150, 0x1FA },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 5), 1, ITEM(1, 0x2B), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_JUNGLE_SHRINE_POWER_CHARGE_FOUND, 1,
+    ITEM(1, 0x2B), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x16D },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 5), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_JUNGLE_SHRINE_POWER_CHARGE_FOUND, 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 671, 176, 1 };
 FieldActorEntry *stageActors[] = {
     &actor0,

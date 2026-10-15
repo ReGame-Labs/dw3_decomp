@@ -423,21 +423,21 @@ void updateStage(StageTask *task, void **children) {
             }
         }
         do {
-            if (GAME.progress == 0x17 && FLAGS_00.checkCondition(FLAG(0x40, 0x4E), 0)) {
+            if (GAME.progress == STORY_GAME_MASTER_CAUGHT && FLAGS_00.checkCondition(FLAG_OPERATION_SIGMA_SEEN, 0)) {
                 children[5] = FIELDSTG_startEvent(0x2A8);
                 break;
             }
-            if (GAME.progress == 0x17 && FLAGS_00.checkCondition(FLAG(0x40, 0x4E), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x4F), 0)) {
+            if (GAME.progress == STORY_GAME_MASTER_CAUGHT && FLAGS_00.checkCondition(FLAG_OPERATION_SIGMA_SEEN, 1) && FLAGS_00.checkCondition(FLAG_GAME_MASTER_WIN_SEEN, 0)) {
                 children[5] = FIELDSTG_startEvent(0x2A9);
                 children[1] = createCommand831(0x33F);
                 children[2] = createCommand832(0x340);
                 break;
             }
-            if (GAME.progress == 0x17 && FLAGS_00.checkCondition(FLAG(0x40, 0x4F), 1)) {
+            if (GAME.progress == STORY_GAME_MASTER_CAUGHT && FLAGS_00.checkCondition(FLAG_GAME_MASTER_WIN_SEEN, 1)) {
                 children[5] = FIELDSTG_startEvent(0x2AA);
                 break;
             }
-            if (GAME.progress == 0x26) {
+            if (GAME.progress == STORY_PRESIDENT_ARRESTED) {
                 children[5] = FIELDSTG_startEvent(0x3C1);
                 break;
             }
@@ -692,9 +692,9 @@ StageEffect *createEffect(s32 x, s32 y, s32 frame) {
  * event battle 1, sets flag 0x0C13 and keeps it from playing again
  */
 void endEvent680(void) {
-    FLAGS_00.applyAction(FLAG(0xC, 0x13), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_AOA_HQ_GUARDS_FOUGHT, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
-    FLAGS_00.applyAction(FLAG(0x40, 0x4E), 1);
+    FLAGS_00.applyAction(FLAG_OPERATION_SIGMA_SEEN, 1);
 }
 
 /*
@@ -702,7 +702,7 @@ void endEvent680(void) {
  * keeps it from playing again
  */
 void endEvent681(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x4F), 1);
+    FLAGS_00.applyAction(FLAG_GAME_MASTER_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -714,9 +714,9 @@ void endEvent682(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x50), 1);
 }
 
-/* After event 961, with the player: moves the story on to its step 0x27 */
+/* After event 961, with the player: moves the story on to STORY_ASUKA_HEADQUARTERS */
 void endEvent961(void) {
-    GAME.progress = 0x27;
+    GAME.progress = STORY_ASUKA_HEADQUARTERS;
 }
 
 #if VERSION_US || VERSION_JP
@@ -1229,18 +1229,34 @@ ActorImage stageImages[] = {
     { 0x1C0, 0x100, 0x1EA, 0x178, 0x2A8, 0x78, 0x150, 0x1ED },
     { 0x1C0, 0x100, 0x1CA, 0x180, 0x228, 0x80, 0x160, 0x1ED },
 };
-u16 actor0Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor5Conditions[] = { FLAG(0x40, 0x4E), 0, PROGRESS(0x17), 1, CODES_END };
-u16 actor6Conditions[] = { FLAG(0x40, 0x4E), 0, PROGRESS(0x17), 1, CODES_END };
-u16 actor7Conditions[] = { FLAG(0x40, 0x4E), 0, PROGRESS(0x17), 1, CODES_END };
-u16 actor8Conditions[] = { FLAG(0x40, 0x4F), 0, PROGRESS(0x17), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor5Conditions[] = {
+    FLAG_OPERATION_SIGMA_SEEN, 0,
+    PROGRESS(STORY_GAME_MASTER_CAUGHT), 1,
+    CODES_END,
+};
+u16 actor6Conditions[] = {
+    FLAG_OPERATION_SIGMA_SEEN, 0,
+    PROGRESS(STORY_GAME_MASTER_CAUGHT), 1,
+    CODES_END,
+};
+u16 actor7Conditions[] = {
+    FLAG_OPERATION_SIGMA_SEEN, 0,
+    PROGRESS(STORY_GAME_MASTER_CAUGHT), 1,
+    CODES_END,
+};
+u16 actor8Conditions[] = {
+    FLAG_GAME_MASTER_WIN_SEEN, 0,
+    PROGRESS(STORY_GAME_MASTER_CAUGHT), 1,
+    CODES_END,
+};
+u16 actor9Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0xC, 5, 0, 0, 1 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0x65, 6, 0, 0, 1 };

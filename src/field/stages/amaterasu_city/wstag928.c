@@ -1,7 +1,7 @@
 /*
  * WSTAG928: Amaterasu Inn 1F, Amaterasu City, in the extra chapter. The
- * European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 633
- * starts it instead of WSTAG236.
+ * European version's: in its extra chapter (STORY_EXTRA), mode 633 starts it
+ * instead of WSTAG236.
  */
 
 #include "common.h"
@@ -64,13 +64,18 @@ ActorImage stageImages[] = {
 };
 u16 actor0Talk0Actions[] = { 0x7A28, 1, CODES_END };
 u16 actor1Talk0Actions[] = { START_EVENT(0x70), 1, CODES_END };
-u16 actor2Talk0Conditions[] = { FLAG(0x18, 5), 1, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0x18, 5), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor2Talk0Conditions[] = { FLAG_AMATERASU_INN_BIT_FOUND, 1, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_AMATERASU_INN_BIT_FOUND, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor2Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor2Talk2Conditions[] = { FLAG(0x18, 5), 0, FLAG(0, 0), 1, FLAG(0, 1), 0, CODES_END };
+u16 actor2Talk2Conditions[] = {
+    FLAG_AMATERASU_INN_BIT_FOUND, 0,
+    FLAG(0, 0), 1,
+    FLAG(0, 1), 0,
+    CODES_END,
+};
 u16 actor2Talk2Actions[] = { FLAG(0, 1), 1, CODES_END };
 u16 actor2Talk3Conditions[] = {
-    FLAG(0x18, 5), 0,
+    FLAG_AMATERASU_INN_BIT_FOUND, 0,
     FLAG(0, 0), 1,
     FLAG(0, 1), 1,
     FLAG(0, 2), 0,
@@ -78,7 +83,7 @@ u16 actor2Talk3Conditions[] = {
 };
 u16 actor2Talk3Actions[] = { FLAG(0, 2), 1, CODES_END };
 u16 actor2Talk4Conditions[] = {
-    FLAG(0x18, 5), 0,
+    FLAG_AMATERASU_INN_BIT_FOUND, 0,
     FLAG(0, 0), 1,
     FLAG(0, 1), 1,
     FLAG(0, 2), 1,
@@ -87,7 +92,7 @@ u16 actor2Talk4Conditions[] = {
 };
 u16 actor2Talk4Actions[] = { FLAG(0, 3), 1, CODES_END };
 u16 actor2Talk5Conditions[] = {
-    FLAG(0x18, 5), 0,
+    FLAG_AMATERASU_INN_BIT_FOUND, 0,
     FLAG(0, 0), 1,
     FLAG(0, 1), 1,
     FLAG(0, 2), 1,
@@ -98,14 +103,19 @@ u16 actor2Talk5Conditions[] = {
 u16 actor2Talk5Actions[] = { FLAG(0, 4), 1, CODES_END };
 u16 actor2Talk6Conditions[] = {
     FLAG(0, 3), 1,
-    FLAG(0x18, 5), 0,
+    FLAG_AMATERASU_INN_BIT_FOUND, 0,
     FLAG(0, 0), 1,
     FLAG(0, 1), 1,
     FLAG(0, 2), 1,
     FLAG(0, 4), 1,
     CODES_END,
 };
-u16 actor2Talk6Actions[] = { SPECIAL(0x13), 1, FLAG(0x18, 5), 1, SPECIAL(0x92), 1, CODES_END };
+u16 actor2Talk6Actions[] = {
+    SPECIAL(0x13), 1,
+    FLAG_AMATERASU_INN_BIT_FOUND, 1,
+    SPECIAL(0x92), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x2B },
     { NULL, NULL, 0 },

@@ -27,7 +27,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x84), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x85), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_FIRE_MASTER_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_DARK_MASTER_CHALLENGE_SEEN, 0)) {
             children[1] = FIELDSTG_startEvent(0x510);
         }
         break;
@@ -54,7 +54,7 @@ void updateStage(StageTask *task, void **children) {
  * keeps it from playing again
  */
 void endEvent1295(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x84), 1);
+    FLAGS_00.applyAction(FLAG_FIRE_MASTER_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -63,88 +63,88 @@ void endEvent1295(void) {
  * keeps it from playing again
  */
 void endEvent1296(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x85), 1);
+    FLAGS_00.applyAction(FLAG_DARK_MASTER_CHALLENGE_SEEN, 1);
     FLAGS_00.applyAction(ITEM(1, 0x33), 1);
 }
 
 /* After the trap of event 9000 goes off: keeps it from going off again */
 void endEvent9000(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xBA), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9000_SPRUNG, 1);
 }
 
 /* After the trap of event 9001 goes off: keeps it from going off again */
 void endEvent9001(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xBB), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9001_SPRUNG, 1);
 }
 
 /* After the trap of event 9002 goes off: keeps it from going off again */
 void endEvent9002(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xBC), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9002_SPRUNG, 1);
 }
 
 /* After the trap of event 9003 goes off: keeps it from going off again */
 void endEvent9003(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xBD), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9003_SPRUNG, 1);
 }
 
 /* After the trap of event 9004 goes off: keeps it from going off again */
 void endEvent9004(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xBE), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9004_SPRUNG, 1);
 }
 
 /* After the trap of event 9005 goes off: keeps it from going off again */
 void endEvent9005(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xBF), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9005_SPRUNG, 1);
 }
 
 /* After the trap of event 9006 goes off: keeps it from going off again */
 void endEvent9006(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xC0), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9006_SPRUNG, 1);
 }
 
 /* After the trap of event 9007 goes off: keeps it from going off again */
 void endEvent9007(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xC1), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9007_SPRUNG, 1);
 }
 
 /* After the trap of event 9008 goes off: keeps it from going off again */
 void endEvent9008(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xC2), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9008_SPRUNG, 1);
 }
 
 /* After the trap of event 9009 goes off: keeps it from going off again */
 void endEvent9009(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xC3), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9009_SPRUNG, 1);
 }
 
 /* After the trap of event 9010 goes off: keeps it from going off again */
 void endEvent9010(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xC4), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9010_SPRUNG, 1);
 }
 
 /* After the trap of event 9011 goes off: keeps it from going off again */
 void endEvent9011(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xC5), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9011_SPRUNG, 1);
 }
 
 /* After the trap of event 9012 goes off: keeps it from going off again */
 void endEvent9012(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xC6), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9012_SPRUNG, 1);
 }
 
 /* After the trap of event 9013 goes off: keeps it from going off again */
 void endEvent9013(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xC7), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9013_SPRUNG, 1);
 }
 
 /* After the trap of event 9014 goes off: keeps it from going off again */
 void endEvent9014(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xC8), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9014_SPRUNG, 1);
 }
 
 /* After the trap of event 9015 goes off: keeps it from going off again */
 void endEvent9015(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xC9), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_FIRE_TRAP_9015_SPRUNG, 1);
 }
 
 #if VERSION_US || VERSION_JP
@@ -319,13 +319,13 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1A6, 0x158, 0x198, 0x58, 0x150, 0x1FB },
 };
 u16 actor2Talk0Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
-u16 actor2Talk1Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor2Talk2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor2Talk3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor2Talk1Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor2Talk2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor2Talk3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor3Talk0Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
-u16 actor3Talk1Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor3Talk2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor3Talk3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor3Talk1Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor3Talk2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor3Talk3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x214 },
     { NULL, NULL, 0 },
@@ -348,10 +348,20 @@ FieldTalk actor3Talks[] = {
     { actor3Talk3Conditions, NULL, 0x215 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(0x40, 0x85), 0, SPECIAL(0x1A), 1, CODES_END };
-u16 actor1Conditions[] = { SPECIAL(0x1A), 1, FLAG(0x40, 0x85), 1, CODES_END };
-u16 actor2Conditions[] = { SPECIAL(8), 1, FLAG(0x40, 0x85), 0, SPECIAL(0x1A), 0, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(8), 1, FLAG(0x40, 0x85), 1, SPECIAL(0x1A), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_DARK_MASTER_CHALLENGE_SEEN, 0, SPECIAL(0x1A), 1, CODES_END };
+u16 actor1Conditions[] = { SPECIAL(0x1A), 1, FLAG_DARK_MASTER_CHALLENGE_SEEN, 1, CODES_END };
+u16 actor2Conditions[] = {
+    SPECIAL(8), 1,
+    FLAG_DARK_MASTER_CHALLENGE_SEEN, 0,
+    SPECIAL(0x1A), 0,
+    CODES_END,
+};
+u16 actor3Conditions[] = {
+    SPECIAL(8), 1,
+    FLAG_DARK_MASTER_CHALLENGE_SEEN, 1,
+    SPECIAL(0x1A), 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x9D, 4, 512, 673, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x9D, 4, 464, 648, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0xCC, 5, 512, 673, 7 };
@@ -385,23 +395,23 @@ StageTile stageObjects[] = {
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2D2, 0x70, 0x2EC, 5, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2D4, 0x448, 0x288, 1, 0, 0, 0 },
-    { { { FLAG(0x40, 0xBA), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2328, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xBB), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2329, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xBC), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232A, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xBD), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232B, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xBE), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232C, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xBF), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232D, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xC0), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232E, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xC1), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232F, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xC2), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2330, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xC3), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2331, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xC4), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2332, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xC5), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2333, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xC6), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2334, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xC7), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2335, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xC8), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2336, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xC9), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2337, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0x84), 0 }, { SPECIAL(0x1A), 0 } }, SLOT_EVENT, 0x50F, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9000_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2328, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9001_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2329, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9002_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232A, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9003_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232B, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9004_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232C, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9005_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232D, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9006_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232E, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9007_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232F, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9008_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2330, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9009_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2331, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9010_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2332, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9011_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2333, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9012_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2334, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9013_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2335, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9014_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2336, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_AMATERASU_FIRE_TRAP_9015_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2337, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_FIRE_MASTER_WIN_SEEN, 0 }, { SPECIAL(0x1A), 0 } }, SLOT_EVENT, 0x50F, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

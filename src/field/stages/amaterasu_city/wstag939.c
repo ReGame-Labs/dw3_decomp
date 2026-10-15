@@ -1,7 +1,7 @@
 /*
  * WSTAG939: Control Room, Amaterasu City, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 651 starts it
- * instead of WSTAG326.
+ * version's: in its extra chapter (STORY_EXTRA), mode 651 starts it instead of
+ * WSTAG326.
  */
 
 #include "common.h"
@@ -51,8 +51,8 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x178, 0x100, 0xE0, 0, 0x140, 0x1EC },
 };
 u16 actor2Talk0Conditions[] = { SPECIAL(0x54), 0, CODES_END };
-u16 actor2Talk1Conditions[] = { SPECIAL(0x54), 1, FLAG(0x10, 0xC), 0, CODES_END };
-u16 actor2Talk2Conditions[] = { SPECIAL(0x54), 1, FLAG(0x10, 0xC), 1, CODES_END };
+u16 actor2Talk1Conditions[] = { SPECIAL(0x54), 1, FLAG_KURT_ARENA_WIN_SEEN, 0, CODES_END };
+u16 actor2Talk2Conditions[] = { SPECIAL(0x54), 1, FLAG_KURT_ARENA_WIN_SEEN, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x6D },
     { NULL, NULL, 0 },

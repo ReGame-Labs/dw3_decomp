@@ -1,7 +1,7 @@
 /*
  * WSTAG922: Amaterasu Bridge, Central Sector, in the extra chapter. The
- * European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 626
- * starts it instead of WSTAG206.
+ * European version's: in its extra chapter (STORY_EXTRA), mode 626 starts it
+ * instead of WSTAG206.
  */
 
 #include "common.h"
@@ -53,7 +53,12 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x180, 0x144, 0x100, 0x44, 0x160, 0x1FF },
     { 0x180, 0x100, 0x188, 0x144, 0x120, 0x44, 0x170, 0x1FF },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x66), 1, ITEM(1, 0x35), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_AMATERASU_BRIDGE_BOOST_CHIP_FOUND, 1,
+    ITEM(1, 0x35), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 1 },
     { NULL, NULL, 0 },
@@ -66,7 +71,7 @@ FieldTalk actor2Talks[] = {
     { NULL, NULL, 0x17 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x66), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_AMATERASU_BRIDGE_BOOST_CHIP_FOUND, 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 304, 160, 1 };
 FieldActorEntry actor1 = { NULL, actor1Talks, 0x25, 5, 736, 184, 1 };
 FieldActorEntry actor2 = { NULL, actor2Talks, 0x26, 6, 848, 240, 1 };

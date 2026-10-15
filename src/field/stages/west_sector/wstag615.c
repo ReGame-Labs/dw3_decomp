@@ -10,7 +10,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == 0x12 && FLAGS_00.checkCondition(FLAG(0x40, 0x39), 1)) {
+        if (GAME.progress == STORY_LISA_SAVED && FLAGS_00.checkCondition(FLAG(0x40, 0x39), 1)) {
             children[0] = FIELDSTG_startEvent(0x213);
         }
         task->nextState(task);
@@ -34,9 +34,9 @@ void endEvent530(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-/* After event 531, with Lisa, Numemon and Lucky Mouse: moves the story on to its step 0x13 */
+/* After event 531, with Lisa, Numemon and Lucky Mouse: moves the story on to STORY_LUCKY_MOUSE */
 void endEvent531(void) {
-    GAME.progress = 0x13;
+    GAME.progress = STORY_LUCKY_MOUSE;
 }
 
 /* Defined below, after the code that uses them */
@@ -54,7 +54,7 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #endif
 /*
  * Sets the stage up: its map, actors, battles and events, playing the
- * ambience ENV_0018; slot list 0 before story step 0x15, 1 from then on
+ * ambience ENV_0018; slot list 0 before STORY_STAFF_PASS, 1 from then on
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -75,7 +75,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress < 0x15) {
+    if (GAME.progress < STORY_STAFF_PASS) {
         FIELDSTG_state.slots = stageSlots0;
     } else {
         FIELDSTG_state.slots = stageSlots1;
@@ -351,18 +351,18 @@ FieldTalk actor10Talks[] = {
     { NULL, NULL, 0x155 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x12), 1, FLAG(0x40, 0x39), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x12), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x12), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x12), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_LISA_SAVED), 1, FLAG(0x40, 0x39), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_LISA_SAVED), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_LISA_SAVED), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_LISA_SAVED), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x17), 1, CODES_END };
 u16 actor5Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor8Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(0x12), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(0x12), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_LISA_SAVED), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_LISA_SAVED), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0x65, 5, 640, 570, 5 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0x68, 6, 0, 0, 1 };
@@ -533,14 +533,14 @@ StageSlot stageSlots0[] = {
     { { { SPECIAL(0x41), 1 }, { CODES_END, 0 } }, SLOT_EXIT, 0x255, 0x268, 0x1AC, 3, 0x64, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0xB3, 0x238, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0xC3, 0x2A0, 0, 0, 0, 0 },
-    { { { PROGRESS(0x12), 1 }, { FLAG(0x40, 0x39), 0 } }, SLOT_EVENT, 0x212, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_LISA_SAVED), 1 }, { FLAG(0x40, 0x39), 0 } }, SLOT_EVENT, 0x212, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots1[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x253, 0x90, 0x240, 7, 0, 0, 0 },
     { { { SPECIAL(0x41), 1 }, { CODES_END, 0 } }, SLOT_EXIT, 0x256, 0x268, 0x1AC, 3, 0x64, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0xB3, 0x238, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0xC3, 0x2A0, 0, 0, 0, 0 },
-    { { { PROGRESS(0x12), 1 }, { FLAG(0x40, 0x39), 0 } }, SLOT_EVENT, 0x212, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_LISA_SAVED), 1 }, { FLAG(0x40, 0x39), 0 } }, SLOT_EVENT, 0x212, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

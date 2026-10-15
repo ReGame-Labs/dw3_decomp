@@ -183,25 +183,25 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x180, 0x19C, 0x100, 0x9C, 0x170, 0x1FE },
     { 0x180, 0x100, 0x1B6, 0x100, 0x1D8, 0, 0x140, 0x1FD },
 };
-u16 actor0Talk0Conditions[] = { FLAG(0x1A, 0x2F), 0, CODES_END };
-u16 actor0Talk0Actions[] = { FLAG(0x1A, 0x2F), 1, CODES_END };
-u16 actor0Talk1Conditions[] = { FLAG(0x1A, 0x2F), 1, SPECIAL(0x2E), 0, CODES_END };
+u16 actor0Talk0Conditions[] = { FLAG_DRI_KEN_TALKED, 0, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_DRI_KEN_TALKED, 1, CODES_END };
+u16 actor0Talk1Conditions[] = { FLAG_DRI_KEN_TALKED, 1, SPECIAL(0x2E), 0, CODES_END };
 u16 actor0Talk2Conditions[] = {
-    FLAG(0x1A, 0x2F), 1,
+    FLAG_DRI_KEN_TALKED, 1,
     SPECIAL(0x2E), 1,
     SPECIAL(0x27), 0,
     CODES_END,
 };
 u16 actor0Talk3Conditions[] = {
-    FLAG(0x1A, 0x2F), 1,
+    FLAG_DRI_KEN_TALKED, 1,
     SPECIAL(0x2E), 1,
     SPECIAL(0x27), 1,
     SPECIAL(0x29), 0,
     CODES_END,
 };
-u16 actor0Talk3Actions[] = { FLAG(6, 4), 1, CODES_END };
+u16 actor0Talk3Actions[] = { FLAG_KOTEMON_DDNA_REQUESTED, 1, CODES_END };
 u16 actor0Talk4Conditions[] = {
-    FLAG(0x1A, 0x2F), 1,
+    FLAG_DRI_KEN_TALKED, 1,
     SPECIAL(0x2E), 1,
     SPECIAL(0x27), 1,
     SPECIAL(0x29), 1,
@@ -210,25 +210,25 @@ u16 actor0Talk4Conditions[] = {
 u16 actor1Talk0Conditions[] = { SPECIAL(0x10), 0, CODES_END };
 u16 actor1Talk0Actions[] = { SPECIAL(0x37), 1, SPECIAL(0x13), 1, CODES_END };
 u16 actor1Talk1Conditions[] = { SPECIAL(0x10), 1, CODES_END };
-u16 actor2Talk0Conditions[] = { FLAG(0x1A, 0x30), 0, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(0x1A, 0x30), 1, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0x1A, 0x30), 1, SPECIAL(0x30), 0, CODES_END };
+u16 actor2Talk0Conditions[] = { FLAG_DRI_YUJI_TALKED, 0, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_DRI_YUJI_TALKED, 1, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_DRI_YUJI_TALKED, 1, SPECIAL(0x30), 0, CODES_END };
 u16 actor2Talk2Conditions[] = {
-    FLAG(0x1A, 0x30), 1,
+    FLAG_DRI_YUJI_TALKED, 1,
     SPECIAL(0x30), 1,
     SPECIAL(0x27), 0,
     CODES_END,
 };
 u16 actor2Talk3Conditions[] = {
-    FLAG(0x1A, 0x30), 1,
+    FLAG_DRI_YUJI_TALKED, 1,
     SPECIAL(0x30), 1,
     SPECIAL(0x27), 1,
     SPECIAL(0x29), 0,
     CODES_END,
 };
-u16 actor2Talk3Actions[] = { FLAG(6, 5), 1, CODES_END };
+u16 actor2Talk3Actions[] = { FLAG_KUMAMON_DDNA_REQUESTED, 1, CODES_END };
 u16 actor2Talk4Conditions[] = {
-    FLAG(0x1A, 0x30), 1,
+    FLAG_DRI_YUJI_TALKED, 1,
     SPECIAL(0x30), 1,
     SPECIAL(0x27), 1,
     SPECIAL(0x29), 1,
@@ -237,25 +237,25 @@ u16 actor2Talk4Conditions[] = {
 u16 actor3Talk0Conditions[] = { SPECIAL(0x12), 0, CODES_END };
 u16 actor3Talk0Actions[] = { SPECIAL(0x39), 1, SPECIAL(0x13), 1, CODES_END };
 u16 actor3Talk1Conditions[] = { SPECIAL(0x12), 1, CODES_END };
-u16 actor7Talk0Conditions[] = { FLAG(0x1A, 0x31), 0, CODES_END };
-u16 actor7Talk0Actions[] = { FLAG(0x1A, 0x31), 1, CODES_END };
-u16 actor7Talk1Conditions[] = { FLAG(0x1A, 0x31), 1, SPECIAL(0x2F), 0, CODES_END };
+u16 actor7Talk0Conditions[] = { FLAG_DRI_YANG_TALKED, 0, CODES_END };
+u16 actor7Talk0Actions[] = { FLAG_DRI_YANG_TALKED, 1, CODES_END };
+u16 actor7Talk1Conditions[] = { FLAG_DRI_YANG_TALKED, 1, SPECIAL(0x2F), 0, CODES_END };
 u16 actor7Talk2Conditions[] = {
-    FLAG(0x1A, 0x31), 1,
+    FLAG_DRI_YANG_TALKED, 1,
     SPECIAL(0x2F), 1,
     SPECIAL(0x27), 0,
     CODES_END,
 };
 u16 actor7Talk3Conditions[] = {
-    FLAG(0x1A, 0x31), 1,
+    FLAG_DRI_YANG_TALKED, 1,
     SPECIAL(0x2F), 1,
     SPECIAL(0x27), 1,
     SPECIAL(0x29), 0,
     CODES_END,
 };
-u16 actor7Talk3Actions[] = { FLAG(6, 6), 1, CODES_END };
+u16 actor7Talk3Actions[] = { FLAG_MONMON_DDNA_REQUESTED, 1, CODES_END };
 u16 actor7Talk4Conditions[] = {
-    FLAG(0x1A, 0x31), 1,
+    FLAG_DRI_YANG_TALKED, 1,
     SPECIAL(0x2F), 1,
     SPECIAL(0x27), 1,
     SPECIAL(0x29), 1,

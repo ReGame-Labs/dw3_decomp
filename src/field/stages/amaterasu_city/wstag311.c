@@ -407,24 +407,24 @@ void updateStage(StageTask *task, void **children) {
     default:
         children[0] = createTileAnims();
         for (i = 0; i < 3; i++) {
-            if (updateStageSpots[i].kind == 0 || (updateStageSpots[i].kind == 2 && GAME.progress >= 0x28)) {
+            if (updateStageSpots[i].kind == 0 || (updateStageSpots[i].kind == 2 && GAME.progress >= STORY_OPERATION_SIGMA)) {
                 children[3 + i] = createStageEffect(updateStageSpots[i].x, updateStageSpots[i].y, updateStageSpots[i].frame);
             }
         }
         switch (GAME.progress) {
-        case 0x25:
-            if (FLAGS_00.checkCondition(FLAG(0x40, 0x5E), 0)) {
+        case STORY_AMATERASU_BRIDGE:
+            if (FLAGS_00.checkCondition(FLAG_CHIEF_OFFICER_MEETING_SEEN, 0)) {
                 children[6] = FIELDSTG_startEvent(0x3A3);
-            } else if (FLAGS_00.checkCondition(FLAG(0x40, 0x67), 0)) {
+            } else if (FLAGS_00.checkCondition(FLAG_CHIEF_OFFICER_ARREST_SEEN, 0)) {
                 children[6] = FIELDSTG_startEvent(0x3A4);
             } else if (FLAGS_00.checkCondition(FLAG(0x40, 0x5F), 0)) {
                 children[6] = FIELDSTG_startEvent(0x3A5);
-            } else if (FLAGS_00.checkCondition(FLAG(0x40, 0x60), 0)) {
+            } else if (FLAGS_00.checkCondition(FLAG_VEMMON_AT_HQ_SEEN, 0)) {
                 children[6] = FIELDSTG_startEvent(0x3A6);
             }
             break;
-        case 0x27:
-            children[6] = FIELDSTG_startEvent(FLAGS_00.checkCondition(FLAG(0x40, 0x6C), 0) ? 0x3D5 : 0x3D6);
+        case STORY_ASUKA_HEADQUARTERS:
+            children[6] = FIELDSTG_startEvent(FLAGS_00.checkCondition(FLAG_DIGITIZE_WAVE_PLAN_SEEN, 0) ? 0x3D5 : 0x3D6);
             break;
         }
         task->nextState(task);
@@ -462,8 +462,8 @@ StageEffect *createCommand838(s32 id) {
  * playing again
  */
 void endEvent931(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x5E), 1);
-    FLAGS_00.applyAction(FLAG(0xC, 0x33), 1);
+    FLAGS_00.applyAction(FLAG_CHIEF_OFFICER_MEETING_SEEN, 1);
+    FLAGS_00.applyAction(FLAG_ROYAL_GUARDS_FOUGHT, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
@@ -472,7 +472,7 @@ void endEvent931(void) {
  * keeps it from playing again
  */
 void endEvent932(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x67), 1);
+    FLAGS_00.applyAction(FLAG_CHIEF_OFFICER_ARREST_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -483,17 +483,17 @@ void endEvent933(void) {
 
 /* After event 934, with Teddy and Nick: keeps it from playing again */
 void endEvent934(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x60), 1);
+    FLAGS_00.applyAction(FLAG_VEMMON_AT_HQ_SEEN, 1);
 }
 
 /* After event 981, with the player: keeps it from playing again */
 void endEvent981(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x6C), 1);
+    FLAGS_00.applyAction(FLAG_DIGITIZE_WAVE_PLAN_SEEN, 1);
 }
 
-/* After event 982, with the player: moves the story on to its step 0x28 */
+/* After event 982, with the player: moves the story on to STORY_OPERATION_SIGMA */
 void endEvent982(void) {
-    GAME.progress = 0x28;
+    GAME.progress = STORY_OPERATION_SIGMA;
 }
 
 #if VERSION_US || VERSION_JP
@@ -1127,15 +1127,27 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x19C, 0x198, 0x170, 0x98, 0x150, 0x1EC },
     { 0x180, 0x100, 0x1A6, 0x1D0, 0x198, 0xD0, 0x160, 0x1EC },
 };
-u16 actor0Conditions[] = { PROGRESS(0x27), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x25), 1, FLAG(0xC, 0x33), 0, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x25), 1, FLAG(0xC, 0x33), 0, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x25), 1, FLAG(0xC, 0x33), 0, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0x27), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x25), 1, FLAG(0x40, 0x5F), 0, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_ASUKA_HEADQUARTERS), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor4Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_ROYAL_GUARDS_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor5Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_ROYAL_GUARDS_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor6Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_ROYAL_GUARDS_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor7Conditions[] = { PROGRESS(STORY_ASUKA_HEADQUARTERS), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, FLAG(0x40, 0x5F), 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0xC, 5, 0, 0, 1 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0x65, 6, 0, 0, 1 };
@@ -1189,7 +1201,7 @@ StageTile stageObjects[] = {
 };
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x287, 0x178, 0xFC, 1, 0, 0, 0 },
-    { { { PROGRESS(0x28), 1 }, { CODES_END, 0 } }, SLOT_LAUNCH_OUT, 0x2DD, 0xE0, 0x418, 5, 0, 0, 0 },
+    { { { PROGRESS(STORY_OPERATION_SIGMA), 1 }, { CODES_END, 0 } }, SLOT_LAUNCH_OUT, 0x2DD, 0xE0, 0x418, 5, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

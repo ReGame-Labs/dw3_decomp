@@ -111,7 +111,7 @@ ActorImage stageImages[] = {
 };
 u16 actor1Talk0Conditions[] = { FLAG(0x1A, 1), 0, CODES_END };
 u16 actor1Talk1Conditions[] = { FLAG(0x1A, 1), 1, CODES_END };
-u16 actor1Talk1Actions[] = { START_EVENT(0x37), 1, FLAG(0x1A, 0xA), 1, CODES_END };
+u16 actor1Talk1Actions[] = { START_EVENT(0x37), 1, FLAG_OINKMON_CITIZENS_RESTORED, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x6E },
     { NULL, NULL, 0 },
@@ -169,21 +169,29 @@ FieldTalk actor13Talks[] = {
     { NULL, NULL, 0x16F },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(4), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 0, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(0x1A), 1, FLAG(0x1A, 0xA), 0, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
+u16 actor1Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor3Conditions[] = { SPECIAL(0x1A), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor5Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x17), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0xE), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0xC), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(9), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_AGUMON_SUITS), 1, CODES_END };
 u16 actor12Conditions[] = { SPECIAL(0x3C), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(0xE), 1, CODES_END };
-u16 actor14Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 0, CODES_END };
+u16 actor13Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
+u16 actor14Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x3E, 4, 256, 455, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x3E, 4, 256, 455, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x3E, 4, 255, 456, 1 };

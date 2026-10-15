@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Writes the stages' sound ids, story points and flag codes by name: MUSIC and
-the SOUND_ names (include/engine/sound.h, include/field/stage.h), the FIELD_PROGRESS_
-names (include/field/field_map.h), and the condition codes
+the SOUND_ names (include/engine/sound.h, include/field/stage.h), the STORY_
+names (include/engine/story.h), and the condition codes
 (include/engine/game_state.h).
 
 - a field's or a battle's music (FieldState.music, the third word of a
@@ -10,8 +10,9 @@ names (include/field/field_map.h), and the condition codes
 - a sound the stages play, given to SOUND.playSound, stopSound or
   fadeOutSound or in a table of them, becomes its SOUND_ name from
   include/engine/sound.h or include/field/stage.h;
-- a story point that include/field/field_map.h names (FIELD_PROGRESS_), compared
-  with or stored in GAME.progress or in a PROGRESS code, becomes its name;
+- a story point (STORY_, include/engine/story.h), compared with or stored in
+  GAME.progress or in a PROGRESS code, becomes its name, and a flag that
+  include/engine/story.h names (FLAG_) its name;
 - the codes of the FLAGS_00 conditions and actions (the lists of the
   characters and their talks, a StageSlot's conditions, and the codes given
   to FLAGS_00.checkCondition and applyAction) become FLAG(group, id),
@@ -48,10 +49,18 @@ def music(value):
 
 @functools.lru_cache(maxsize=None)
 def progress_names():
-    """{value: FIELD_PROGRESS_ name} of include/field/field_map.h"""
-    text = open("include/field/field_map.h").read()
+    """{value: STORY_ name} of include/engine/story.h"""
+    text = open("include/engine/story.h").read()
     return {int(m.group(2), 0): m.group(1)
-            for m in re.finditer(r"^#define (FIELD_PROGRESS_\w+) (" + NUMBER + r")\b", text, re.M)}
+            for m in re.finditer(r"^\s*(STORY_\w+) = (" + NUMBER + r"),", text, re.M)}
+
+
+@functools.lru_cache(maxsize=None)
+def flag_names():
+    """{(group, id): FLAG_ name} of include/engine/story.h"""
+    text = open("include/engine/story.h").read()
+    return {(int(g, 0), int(n, 0)): name for name, g, n in re.findall(
+        r"^#define (FLAG_\w+) FLAG\((" + NUMBER + r"), (" + NUMBER + r")\)", text, re.M)}
 
 
 def sound_names():
@@ -80,7 +89,7 @@ def code(word):
     group = v >> 8 & 0xFE
     n = v & 0x1FF
     if group in FLAG_GROUPS:
-        return f"FLAG({number(group)}, {number(n)})"
+        return flag_names().get((group, n), f"FLAG({number(group)}, {number(n)})")
     if group == 0x60 and n in progress_names():
         return f"PROGRESS({progress_names()[n]})"
     if group in SIMPLE_CODES:
@@ -197,7 +206,7 @@ def rewrite(text, sounds):
         v = int(m.group(2), 0)
         return m.group(1) + points[v] if v in points else m.group(0)
 
-    text = re.sub(r"(GAME\.progress (?:==|!=|=) )(" + NUMBER + r")\b", progress, text)
+    text = re.sub(r"(GAME\.progress (?:==|!=|<=|>=|<|>|=) )(" + NUMBER + r")\b", progress, text)
     text = re.sub(r"(\bPROGRESS\()(" + NUMBER + r")(?=\))", progress, text)
 
     # a table of sounds that a function plays: s32 D_[] = { ids }
@@ -228,6 +237,11 @@ def rewrite(text, sounds):
         return m.group(1) + code(m.group(2)) + ","
 
     text = re.sub(r"(FLAGS_00\.(?:checkCondition|applyAction)\()(" + NUMBER + r"),", flag_call, text)
+
+    def flag(m):
+        return flag_names().get((int(m.group(1), 0), int(m.group(2), 0)), m.group(0))
+
+    text = re.sub(r"\bFLAG\((" + NUMBER + r"), (" + NUMBER + r")\)", flag, text)
     return text
 
 

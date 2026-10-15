@@ -156,9 +156,9 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x174, 0x148, 0xD0, 0x48, 0x170, 0x1FE },
     { 0x140, 0x100, 0x16C, 0x150, 0xB0, 0x50, 0x150, 0x1FD },
 };
-u16 actor1Talk0Conditions[] = { FLAG(0x1A, 0x34), 0, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(0x1A, 0x34), 1, START_EVENT(0x48), 1, CODES_END };
-u16 actor1Talk1Conditions[] = { FLAG(0x1A, 0x34), 1, CODES_END };
+u16 actor1Talk0Conditions[] = { FLAG_RESISTANCE_CHUCK_MET, 0, CODES_END };
+u16 actor1Talk0Actions[] = { FLAG_RESISTANCE_CHUCK_MET, 1, START_EVENT(0x48), 1, CODES_END };
+u16 actor1Talk1Conditions[] = { FLAG_RESISTANCE_CHUCK_MET, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x157 },
     { NULL, NULL, 0 },
@@ -200,12 +200,16 @@ FieldTalk actor9Talks[] = {
     { NULL, NULL, 0x156 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
+u16 actor0Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
 u16 actor1Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x1C), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x1C), 1, CODES_END };
-u16 actor5Conditions[] = { SPECIAL(0x1C), 1, FLAG(0x1A, 0xA), 0, CODES_END };
+u16 actor5Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
 u16 actor8Conditions[] = { SPECIAL(0x1A), 1, CODES_END };

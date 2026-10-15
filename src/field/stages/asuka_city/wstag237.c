@@ -8,9 +8,9 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
-/* After event 300, with Kail: moves the story on to its step 0xD */
+/* After event 300, with Kail: moves the story on to STORY_AGUMON_DISGUISE */
 void endEvent300(void) {
-    GAME.progress = 0xD;
+    GAME.progress = STORY_AGUMON_DISGUISE;
 }
 
 #if VERSION_US || VERSION_JP
@@ -85,7 +85,7 @@ FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x58 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0xC), 1, ITEM(0, 0xF), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, ITEM(0, 0xF), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0xB, 4, 417, 145, 7 };
 FieldActorEntry *stageActors[] = {
     &actor0,

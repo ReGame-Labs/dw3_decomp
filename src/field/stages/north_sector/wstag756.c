@@ -13,9 +13,9 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (GAME.progress == 0xD && FLAGS_00.checkCondition(FLAG(0x1C, 0xD), 1)) {
+        if (GAME.progress == STORY_AGUMON_DISGUISE && FLAGS_00.checkCondition(FLAG_GAME_MASTER_MEETING_SEEN, 1)) {
             children[0] = FIELDSTG_startEvent(0x160);
-        } else if (GAME.progress == 0x23 && FLAGS_00.checkCondition(FLAG(0x40, 0x5B), 1)) {
+        } else if (GAME.progress == STORY_WHITE_ID_PASS && FLAGS_00.checkCondition(FLAG_XUEN_WU_CHIEF_WIN_SEEN, 1)) {
             children[0] = FIELDSTG_startEvent(0x38F);
         }
         break;
@@ -34,16 +34,16 @@ void updateStage(StageTask *task, void **children) {
  * keeps it from playing again
  */
 void endEvent910(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x5B), 1);
+    FLAGS_00.applyAction(FLAG_XUEN_WU_CHIEF_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
 /*
- * After event 911, with the player: moves the story on to its step 0x24 and
+ * After event 911, with the player: moves the story on to STORY_BLACK_ID_PASS and
  * gives the player the Black ID Pass
  */
 void endEvent911(void) {
-    GAME.progress = 0x24;
+    GAME.progress = STORY_BLACK_ID_PASS;
     FLAGS_00.applyAction(ITEM(0, 0x19), 1);
 }
 
@@ -204,11 +204,11 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x16C, 0x1A3, 0xB0, 0xA3, 0x160, 0x1FC },
 };
 u16 actor0Talk0Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
-u16 actor0Talk1Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor0Talk2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor0Talk1Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor0Talk2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor3Talk0Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
-u16 actor3Talk1Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor3Talk2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor3Talk1Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor3Talk2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, NULL, 0x1DA },
     { actor0Talk1Conditions, NULL, 0x1DB },
@@ -275,20 +275,25 @@ FieldTalk actor14Talks[] = {
 };
 u16 actor0Conditions[] = { SPECIAL(0x1E), 1, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x1E), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x23), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor8Conditions[] = { FLAG(0x40, 0x5B), 0, PROGRESS(0x24), 0, SPECIAL(0x1D), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_WHITE_ID_PASS), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor8Conditions[] = {
+    FLAG_XUEN_WU_CHIEF_WIN_SEEN, 0,
+    PROGRESS(STORY_BLACK_ID_PASS), 0,
+    SPECIAL(0x1D), 1,
+    CODES_END,
+};
 u16 actor9Conditions[] = { SPECIAL(0x1E), 1, SPECIAL(0x21), 0, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(0x22), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_WAY_TO_AMATERASU), 1, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x1E), 1, SPECIAL(0x21), 0, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x22), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_WAY_TO_AMATERASU), 1, CODES_END };
 u16 actor13Conditions[] = { SPECIAL(0x1E), 1, SPECIAL(0x21), 0, CODES_END };
-u16 actor14Conditions[] = { PROGRESS(0x22), 1, CODES_END };
-u16 actor15Conditions[] = { PROGRESS(0x23), 1, CODES_END };
+u16 actor14Conditions[] = { PROGRESS(STORY_WAY_TO_AMATERASU), 1, CODES_END };
+u16 actor15Conditions[] = { PROGRESS(STORY_WHITE_ID_PASS), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x22, 4, 641, 449, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x22, 4, 641, 449, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x22, 4, 641, 449, 1 };
@@ -357,7 +362,7 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 7, 0x318, 0x180, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 7, 0x3D8, 0xC0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 7, 0x3C8, 0x138, 0, 0, 0, 0 },
-    { { { PROGRESS(0x23), 1 }, { FLAG(0x40, 0x5B), 0 } }, SLOT_EVENT, 0x38E, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_WHITE_ID_PASS), 1 }, { FLAG_XUEN_WU_CHIEF_WIN_SEEN, 0 } }, SLOT_EVENT, 0x38E, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

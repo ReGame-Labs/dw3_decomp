@@ -122,16 +122,16 @@ void updateStage(StageTask *task, void **children) {
         if (updateStageSpots[0].kind == 0) {
             children[0] = createStageEffect(updateStageSpots[0].x, updateStageSpots[0].y, updateStageSpots[0].frame);
         }
-        if (GAME.progress == 0x20 && FLAGS_00.checkCondition(FLAG(0x40, 0x48), 0) && FLAGS_00.checkCondition(FLAG(0x40, 0x46), 0) &&
+        if (GAME.progress == STORY_REAL_WORLD && FLAGS_00.checkCondition(FLAG_FORCED_DIGITIZATION_SEEN, 0) && FLAGS_00.checkCondition(FLAG_JUGGERNAUT_LAUNCH_SEEN, 0) &&
             FLAGS_00.checkCondition(FLAG(0x40, 0x66), 0)) {
             children[2] = FIELDSTG_startEvent(0x35C);
-        } else if (GAME.progress == 0x20 && FLAGS_00.checkCondition(FLAG(0x40, 0x46), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x48), 0) &&
-                   FLAGS_00.checkCondition(FLAG(0x40, 0x47), 0) && FLAGS_00.checkCondition(FLAG(0x40, 0x66), 0)) {
+        } else if (GAME.progress == STORY_REAL_WORLD && FLAGS_00.checkCondition(FLAG_JUGGERNAUT_LAUNCH_SEEN, 1) && FLAGS_00.checkCondition(FLAG_FORCED_DIGITIZATION_SEEN, 0) &&
+                   FLAGS_00.checkCondition(FLAG_JUGGERNAUT_TAKEN_SEEN, 0) && FLAGS_00.checkCondition(FLAG(0x40, 0x66), 0)) {
             children[2] = FIELDSTG_startEvent(0x373);
-        } else if (GAME.progress == 0x20 && FLAGS_00.checkCondition(FLAG(0x40, 0x48), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x46), 0) &&
+        } else if (GAME.progress == STORY_REAL_WORLD && FLAGS_00.checkCondition(FLAG_FORCED_DIGITIZATION_SEEN, 1) && FLAGS_00.checkCondition(FLAG_JUGGERNAUT_LAUNCH_SEEN, 0) &&
                    FLAGS_00.checkCondition(FLAG(0x40, 0x62), 0) && FLAGS_00.checkCondition(FLAG(0x40, 0x66), 0)) {
             children[2] = FIELDSTG_startEvent(0x374);
-        } else if (GAME.progress == 0x20 && FLAGS_00.checkCondition(FLAG(0x40, 0x66), 1)) {
+        } else if (GAME.progress == STORY_REAL_WORLD && FLAGS_00.checkCondition(FLAG(0x40, 0x66), 1)) {
             children[2] = FIELDSTG_startEvent(0x376);
         }
         children[1] = createTileEffect(0x34E);
@@ -152,19 +152,19 @@ void updateStage(StageTask *task, void **children) {
 #include "common/update_stage_effect.inc.c"
 #include "common/create_stage_effect.inc.c"
 
-/* After event 820, with Chamber Officer: moves the story on to its step 0x20 */
+/* After event 820, with Chamber Officer: moves the story on to STORY_REAL_WORLD */
 void endEvent820(void) {
-    GAME.progress = 0x20;
+    GAME.progress = STORY_REAL_WORLD;
 }
 
 /* After event 860, with Chamber Office: keeps it from playing again */
 void endEvent860(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x48), 1);
+    FLAGS_00.applyAction(FLAG_FORCED_DIGITIZATION_SEEN, 1);
 }
 
 /* After event 883, with Chamber Officer: keeps it from playing again */
 void endEvent883(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x47), 1);
+    FLAGS_00.applyAction(FLAG_JUGGERNAUT_TAKEN_SEEN, 1);
 }
 
 /* After event 884, with the player: keeps it from playing again */
@@ -172,9 +172,9 @@ void endEvent884(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x62), 1);
 }
 
-/* After event 886, with the player: moves the story on to its step 0x21 */
+/* After event 886, with the player: moves the story on to STORY_NETWORK_OFFLINE */
 void endEvent886(void) {
-    GAME.progress = 0x21;
+    GAME.progress = STORY_NETWORK_OFFLINE;
 }
 
 /*
@@ -513,9 +513,19 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor0Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor0Talk1Conditions[] = { ITEM(0, 0xC), 0, FLAG(0, 0), 1, CODES_END };
-u16 actor0Talk2Conditions[] = { ITEM(0, 0xC), 1, FLAG(0x1C, 2), 0, FLAG(0, 0), 1, CODES_END };
-u16 actor0Talk2Actions[] = { START_EVENT(0x45), 1, FLAG(0x1C, 2), 1, CODES_END };
-u16 actor0Talk3Conditions[] = { ITEM(0, 0xC), 1, FLAG(0x1C, 2), 1, FLAG(0, 0), 1, CODES_END };
+u16 actor0Talk2Conditions[] = {
+    ITEM(0, 0xC), 1,
+    FLAG_MATRIX_CHAMBER_USED, 0,
+    FLAG(0, 0), 1,
+    CODES_END,
+};
+u16 actor0Talk2Actions[] = { START_EVENT(0x45), 1, FLAG_MATRIX_CHAMBER_USED, 1, CODES_END };
+u16 actor0Talk3Conditions[] = {
+    ITEM(0, 0xC), 1,
+    FLAG_MATRIX_CHAMBER_USED, 1,
+    FLAG(0, 0), 1,
+    CODES_END,
+};
 u16 actor1Talk0Actions[] = { 0x7A27, 1, CODES_END };
 u16 actor2Talk0Actions[] = { START_EVENT(0x19), 1, CODES_END };
 FieldTalk actor0Talks[] = {
@@ -578,16 +588,16 @@ FieldTalk actor13Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { SPECIAL(0xA), 1, SPECIAL(0x1A), 0, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x21), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x22), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x23), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0x24), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_WAY_TO_AMATERASU), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_WHITE_ID_PASS), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(0x1F), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x1E), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_GENBU_BADGE), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_DE_KNOWLEDGE), 1, CODES_END };
 u16 actor13Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0xD, 4, 129, 281, 7 };
 FieldActorEntry actor1 = { NULL, actor1Talks, 0x14, 5, 162, 473, 7 };

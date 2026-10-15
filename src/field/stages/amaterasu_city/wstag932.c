@@ -1,7 +1,7 @@
 /*
  * WSTAG932: Junk Shop, Amaterasu City, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 637 starts it
- * instead of WSTAG251.
+ * version's: in its extra chapter (STORY_EXTRA), mode 637 starts it instead of
+ * WSTAG251.
  */
 
 #include "common.h"

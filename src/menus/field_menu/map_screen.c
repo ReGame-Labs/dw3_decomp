@@ -247,13 +247,13 @@ void STSTATUS_drawMapScreen(StatusMapScreen *screen) {
     }
     sprite.setLayerId(screen->layer, screen->depth + 1);
     towns = STSTATUS_data.funcs.getList(screen->gameHalf, screen->progress);
-    if (GAME.progress < 7) {
+    if (GAME.progress < STORY_SOUTH_STATION_GHOST) {
         screen->progress = 0;
-    } else if (GAME.progress < 0xF) {
+    } else if (GAME.progress < STORY_DE_SINCERITY) {
         screen->progress = 1;
-    } else if (GAME.progress < 0x1B) {
+    } else if (GAME.progress < STORY_JUNGLE_SOUND) {
         screen->progress = 2;
-    } else if (GAME.progress < 0x1E) {
+    } else if (GAME.progress < STORY_DE_KNOWLEDGE) {
         screen->progress = 3;
     } else {
         screen->progress = 4;

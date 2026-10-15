@@ -1,7 +1,7 @@
 /*
  * WSTAG959: Gale Tower, Qing Long City, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 671 starts it
- * instead of WSTAG436.
+ * version's: in its extra chapter (STORY_EXTRA), mode 671 starts it instead of
+ * WSTAG436.
  */
 
 #include "common.h"

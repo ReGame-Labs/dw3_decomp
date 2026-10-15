@@ -105,7 +105,12 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x168, 0x1A0, 0xA0, 0xA0, 0x160, 0x1FF },
     { 0x180, 0x100, 0x1B4, 0x12B, 0x1D0, 0x2B, 0x170, 0x1FF },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x2B), 1, ITEM(0, 0x29), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_KICKING_FOREST_GOLD_ID_FOUND, 1,
+    ITEM(0, 0x29), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 u16 actor1Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor1Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor1Talk1Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(6), 0, CODES_END };
@@ -115,15 +120,15 @@ u16 actor1Talk3Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(6), 1,
     PARTY_STAT(8), 1,
-    FLAG(0xE, 0x1F), 0,
+    FLAG_KICKING_FOREST_TROOPER_FOUGHT, 0,
     CODES_END,
 };
-u16 actor1Talk3Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xE, 0x1F), 1, CODES_END };
+u16 actor1Talk3Actions[] = { EVENT_BATTLE(0), 1, FLAG_KICKING_FOREST_TROOPER_FOUGHT, 1, CODES_END };
 u16 actor1Talk4Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(6), 1,
     PARTY_STAT(8), 1,
-    FLAG(0xE, 0x1F), 1,
+    FLAG_KICKING_FOREST_TROOPER_FOUGHT, 1,
     CODES_END,
 };
 u16 actor2Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
@@ -146,11 +151,11 @@ u16 actor2Talk4Conditions[] = {
     CODES_END,
 };
 u16 actor2Talk4Actions[] = { CARD_BATTLE(0x2C, 1), 1, CODES_END };
-u16 actor4Talk0Conditions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor4Talk1Conditions[] = { FLAG(0, 0x10), 0, CODES_END };
-u16 actor4Talk1Actions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor4Talk2Conditions[] = { FLAG(0, 0x10), 1, CODES_END };
-u16 actor4Talk2Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, CODES_END };
+u16 actor4Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor4Talk1Conditions[] = { FLAG_CARD_BATTLE_WON, 0, CODES_END };
+u16 actor4Talk1Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor4Talk2Conditions[] = { FLAG_CARD_BATTLE_WON, 1, CODES_END };
+u16 actor4Talk2Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG_CARD_BATTLE_WON, 0, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x181 },
     { NULL, NULL, 0 },
@@ -181,23 +186,28 @@ FieldTalk actor4Talks[] = {
     { actor4Talk2Conditions, actor4Talk2Actions, 0x24A },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x2B), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_KICKING_FOREST_GOLD_ID_FOUND, 0, CODES_END };
 u16 actor1Conditions[] = {
     ITEM(0, 0x192), 1,
     SPECIAL(0x19), 1,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     ITEM(0, 0x14), 0,
     CODES_END,
 };
 u16 actor2Conditions[] = {
     ITEM(0, 0x192), 1,
     SPECIAL(0x19), 1,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     ITEM(0, 0x14), 1,
     CODES_END,
 };
 u16 actor3Conditions[] = { ITEM(0, 0x192), 0, SPECIAL(0x19), 1, CODES_END };
-u16 actor4Conditions[] = { ITEM(0, 0x192), 1, FLAG(0, 0x11), 1, SPECIAL(0x19), 1, CODES_END };
+u16 actor4Conditions[] = {
+    ITEM(0, 0x192), 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    SPECIAL(0x19), 1,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 1407, 809, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x45, 5, 1655, 1299, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x45, 5, 1655, 1299, 7 };

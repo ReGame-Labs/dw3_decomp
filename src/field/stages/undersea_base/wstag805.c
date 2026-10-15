@@ -322,16 +322,16 @@ void updateStage(StageTask *task, void **children) {
         children[0] = createFloaterChain(0x349);
         children[1] = createTileQuad(0x348);
         do {
-            if (FLAGS_00.checkCondition(FLAG(0x40, 0x48), 0) && FLAGS_00.checkCondition(FLAG(0x40, 0x46), 0)) {
+            if (FLAGS_00.checkCondition(FLAG_FORCED_DIGITIZATION_SEEN, 0) && FLAGS_00.checkCondition(FLAG_JUGGERNAUT_LAUNCH_SEEN, 0)) {
                 children[2] = FIELDSTG_startEvent(0x370);
                 break;
             }
-            if (FLAGS_00.checkCondition(FLAG(0x40, 0x48), 0) && FLAGS_00.checkCondition(FLAG(0x40, 0x46), 1) &&
+            if (FLAGS_00.checkCondition(FLAG_FORCED_DIGITIZATION_SEEN, 0) && FLAGS_00.checkCondition(FLAG_JUGGERNAUT_LAUNCH_SEEN, 1) &&
                 FLAGS_00.checkCondition(FLAG(0x40, 0x64), 0)) {
                 children[2] = FIELDSTG_startEvent(0x371);
                 break;
             }
-            if (FLAGS_00.checkCondition(FLAG(0x40, 0x48), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x46), 0) &&
+            if (FLAGS_00.checkCondition(FLAG_FORCED_DIGITIZATION_SEEN, 1) && FLAGS_00.checkCondition(FLAG_JUGGERNAUT_LAUNCH_SEEN, 0) &&
                 FLAGS_00.checkCondition(FLAG(0x40, 0x65), 0)) {
                 children[2] = FIELDSTG_startEvent(0x372);
                 break;
@@ -353,7 +353,7 @@ void updateStage(StageTask *task, void **children) {
  * keeps it from playing again
  */
 void endEvent880(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x46), 1);
+    FLAGS_00.applyAction(FLAG_JUGGERNAUT_LAUNCH_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -743,9 +743,13 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x147, 0x100, 0x1C, 0, 0x150, 0x1F5 },
     { 0x140, 0x100, 0x144, 0x1D8, 0x10, 0xD8, 0x160, 0x1F5 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x20), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x20), 1, FLAG(0x40, 0x46), 0, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x20), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_REAL_WORLD), 1, CODES_END };
+u16 actor1Conditions[] = {
+    PROGRESS(STORY_REAL_WORLD), 1,
+    FLAG_JUGGERNAUT_LAUNCH_SEEN, 0,
+    CODES_END,
+};
+u16 actor2Conditions[] = { PROGRESS(STORY_REAL_WORLD), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 0 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0xD2, 5, 360, 197, 3 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0x13C, 6, 0, 0, 1 };

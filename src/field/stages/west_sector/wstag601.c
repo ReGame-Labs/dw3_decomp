@@ -101,12 +101,17 @@ ActorImage stageImages[] = {
     { 0x200, 0x100, 0x200, 0x1BC, 0, 0xBC, 0x230, 0x1FD },
     { 0x140, 0x100, 0x158, 0x100, 0x60, 0, 0x150, 0x1FF },
 };
-u16 actor0Talk0Actions[] = { ITEM(1, 0x36), 1, FLAG(2, 0x4F), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    ITEM(1, 0x36), 1,
+    FLAG_DUCT_ROOM_04_CHARISMA_CHIP_FOUND, 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x187 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x4F), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_DUCT_ROOM_04_CHARISMA_CHIP_FOUND, 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 379, 318, 1 };
 FieldActorEntry *stageActors[] = {
     &actor0,

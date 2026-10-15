@@ -103,7 +103,12 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x16C, 0x128, 0xB0, 0x28, 0x160, 0x1FF },
     { 0x140, 0x100, 0x174, 0x100, 0xD0, 0, 0x170, 0x1FF },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x24), 1, ITEM(1, 0x2B), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_FREEZE_MOUNTAIN_POWER_CHARGE_FOUND, 1,
+    ITEM(1, 0x2B), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 u16 actor1Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor1Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor1Talk1Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(6), 0, CODES_END };
@@ -117,16 +122,16 @@ u16 actor1Talk3Conditions[] = {
     CODES_END,
 };
 u16 actor1Talk4Conditions[] = {
-    FLAG(0xE, 0x13), 0,
+    FLAG_SHINGO_FOUGHT, 0,
     FLAG(0, 0), 1,
     PARTY_STAT(6), 1,
     ITEM(0, 0x14), 1,
     PARTY_STAT(8), 1,
     CODES_END,
 };
-u16 actor1Talk4Actions[] = { FLAG(0xE, 0x13), 1, EVENT_BATTLE(0), 1, CODES_END };
+u16 actor1Talk4Actions[] = { FLAG_SHINGO_FOUGHT, 1, EVENT_BATTLE(0), 1, CODES_END };
 u16 actor1Talk5Conditions[] = {
-    FLAG(0xE, 0x13), 1,
+    FLAG_SHINGO_FOUGHT, 1,
     PARTY_STAT(0xA), 0,
     FLAG(0, 0), 1,
     PARTY_STAT(6), 1,
@@ -135,7 +140,7 @@ u16 actor1Talk5Conditions[] = {
     CODES_END,
 };
 u16 actor1Talk6Conditions[] = {
-    FLAG(0xE, 0x13), 1,
+    FLAG_SHINGO_FOUGHT, 1,
     PARTY_STAT(0xA), 1,
     FLAG(0, 0), 1,
     PARTY_STAT(6), 1,
@@ -144,11 +149,11 @@ u16 actor1Talk6Conditions[] = {
     CODES_END,
 };
 u16 actor1Talk6Actions[] = { CARD_BATTLE(0x1D, 1), 1, CODES_END };
-u16 actor3Talk0Conditions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor3Talk1Conditions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 1, CODES_END };
-u16 actor3Talk1Actions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor3Talk2Conditions[] = { FLAG(0, 0x10), 1, FLAG(0, 0x11), 1, CODES_END };
-u16 actor3Talk2Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, CODES_END };
+u16 actor3Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor3Talk1Conditions[] = { FLAG_CARD_BATTLE_WON, 0, FLAG_CARD_BATTLE_ENDED, 1, CODES_END };
+u16 actor3Talk1Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor3Talk2Conditions[] = { FLAG_CARD_BATTLE_WON, 1, FLAG_CARD_BATTLE_ENDED, 1, CODES_END };
+u16 actor3Talk2Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG_CARD_BATTLE_WON, 0, CODES_END };
 u16 actor4Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor4Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor4Talk1Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(6), 0, CODES_END };
@@ -163,18 +168,18 @@ u16 actor4Talk3Conditions[] = {
 };
 u16 actor4Talk4Conditions[] = {
     PARTY_STAT(6), 1,
-    FLAG(0xE, 0x13), 0,
+    FLAG_SHINGO_FOUGHT, 0,
     FLAG(0, 0), 1,
     ITEM(0, 0x14), 1,
     PARTY_STAT(8), 1,
     CODES_END,
 };
-u16 actor4Talk4Actions[] = { FLAG(0xE, 0x13), 1, EVENT_BATTLE(0), 1, CODES_END };
+u16 actor4Talk4Actions[] = { FLAG_SHINGO_FOUGHT, 1, EVENT_BATTLE(0), 1, CODES_END };
 u16 actor4Talk5Conditions[] = {
     FLAG(0, 0), 1,
     ITEM(0, 0x14), 1,
     PARTY_STAT(8), 1,
-    FLAG(0xE, 0x13), 1,
+    FLAG_SHINGO_FOUGHT, 1,
     PARTY_STAT(0xA), 0,
     PARTY_STAT(6), 1,
     CODES_END,
@@ -182,14 +187,19 @@ u16 actor4Talk5Conditions[] = {
 u16 actor4Talk6Conditions[] = {
     PARTY_STAT(6), 1,
     PARTY_STAT(8), 1,
-    FLAG(0xE, 0x13), 1,
+    FLAG_SHINGO_FOUGHT, 1,
     PARTY_STAT(0xA), 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x14), 1,
     CODES_END,
 };
 u16 actor4Talk6Actions[] = { CARD_BATTLE(0x1D, 1), 1, CODES_END };
-u16 actor5Talk0Actions[] = { FLAG(2, 0x25), 1, ITEM(5, 0x116), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor5Talk0Actions[] = {
+    FLAG_FREEZE_MOUNTAIN_KNIGHT_SHIELD_FOUND, 1,
+    ITEM(5, 0x116), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 u16 actor6Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor6Talk1Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(6), 0, CODES_END };
 u16 actor6Talk2Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(6), 1, ITEM(0, 0x14), 0, CODES_END };
@@ -206,16 +216,16 @@ u16 actor6Talk4Conditions[] = {
     PARTY_STAT(6), 1,
     ITEM(0, 0x14), 1,
     PARTY_STAT(8), 1,
-    FLAG(0xE, 0x13), 0,
+    FLAG_SHINGO_FOUGHT, 0,
     CODES_END,
 };
-u16 actor6Talk4Actions[] = { FLAG(0xE, 0x13), 1, CODES_END };
+u16 actor6Talk4Actions[] = { FLAG_SHINGO_FOUGHT, 1, CODES_END };
 u16 actor6Talk5Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(6), 1,
     ITEM(0, 0x14), 1,
     PARTY_STAT(8), 1,
-    FLAG(0xE, 0x13), 1,
+    FLAG_SHINGO_FOUGHT, 1,
     PARTY_STAT(0xA), 0,
     CODES_END,
 };
@@ -224,7 +234,7 @@ u16 actor6Talk6Conditions[] = {
     PARTY_STAT(6), 1,
     ITEM(0, 0x14), 1,
     PARTY_STAT(8), 1,
-    FLAG(0xE, 0x13), 1,
+    FLAG_SHINGO_FOUGHT, 1,
     PARTY_STAT(0xA), 1,
     CODES_END,
 };
@@ -277,12 +287,17 @@ FieldTalk actor6Talks[] = {
     { actor6Talk6Conditions, actor6Talk6Actions, 0x172 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x24), 0, CODES_END };
-u16 actor1Conditions[] = { FLAG(0, 0x11), 0, ITEM(0, 0x192), 1, SPECIAL(4), 1, CODES_END };
+u16 actor0Conditions[] = { FLAG_FREEZE_MOUNTAIN_POWER_CHARGE_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, ITEM(0, 0x192), 1, SPECIAL(4), 1, CODES_END };
 u16 actor2Conditions[] = { ITEM(0, 0x192), 0, SPECIAL(9), 1, SPECIAL(0x1A), 0, CODES_END };
-u16 actor3Conditions[] = { FLAG(0, 0x11), 1, SPECIAL(9), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor4Conditions[] = { FLAG(0, 0x11), 0, PROGRESS(0x26), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor5Conditions[] = { FLAG(2, 0x25), 0, CODES_END };
+u16 actor3Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, SPECIAL(9), 1, ITEM(0, 0x192), 1, CODES_END };
+u16 actor4Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor5Conditions[] = { FLAG_FREEZE_MOUNTAIN_KNIGHT_SHIELD_FOUND, 0, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 992, 273, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x2F, 5, 576, 448, 1 };

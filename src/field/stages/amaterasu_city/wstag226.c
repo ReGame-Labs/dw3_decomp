@@ -127,7 +127,7 @@ void updateStage(StageTask *task, void **children) {
     default:
         children[1] = createTileEffectTask();
         do {
-            if (GAME.progress == 0x25 && FLAGS_00.checkCondition(FLAG(0x40, 0x60), 1)) {
+            if (GAME.progress == STORY_AMATERASU_BRIDGE && FLAGS_00.checkCondition(FLAG_VEMMON_AT_HQ_SEEN, 1)) {
                 children[0] = FIELDSTG_startEvent(0x3A7);
                 break;
             }
@@ -144,9 +144,9 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
-/* After event 935, with Teddy, Kail and Kurt: moves the story on to its step 0x26 */
+/* After event 935, with Teddy, Kail and Kurt: moves the story on to STORY_PRESIDENT_ARRESTED */
 void endEvent935(void) {
-    GAME.progress = 0x26;
+    GAME.progress = STORY_PRESIDENT_ARRESTED;
 }
 
 #if VERSION_US || VERSION_JP
@@ -160,7 +160,7 @@ void endEvent935(void) {
 #endif
 /*
  * Sets the stage up: its map, actors and events, playing KANRIBGM; BGM_0029
- * instead except at story step 0x26 once flag 0x1A0A is set
+ * instead except at STORY_PRESIDENT_ARRESTED once flag 0x1A0A is set
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -179,7 +179,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress != 0x26 || FLAGS_00.checkCondition(FLAG(0x1A, 0xA), 0) != 0) {
+    if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -365,13 +365,13 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x14A, 0x190, 0x28, 0x90, 0x160, 0x1FB },
     { 0x140, 0x100, 0x14A, 0x170, 0x28, 0x70, 0x170, 0x1FB },
 };
-u16 actor3Talk0Conditions[] = { FLAG(0x1A, 0xA), 0, CODES_END };
-u16 actor3Talk1Conditions[] = { FLAG(0x1A, 0xA), 1, CODES_END };
+u16 actor3Talk0Conditions[] = { FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
+u16 actor3Talk1Conditions[] = { FLAG_OINKMON_CITIZENS_RESTORED, 1, CODES_END };
 u16 actor6Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor6Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor6Talk1Conditions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor9Talk0Conditions[] = { FLAG(0x1A, 0xA), 0, CODES_END };
-u16 actor9Talk1Conditions[] = { FLAG(0x1A, 0xA), 1, CODES_END };
+u16 actor9Talk0Conditions[] = { FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
+u16 actor9Talk1Conditions[] = { FLAG_OINKMON_CITIZENS_RESTORED, 1, CODES_END };
 FieldTalk actor3Talks[] = {
     { actor3Talk0Conditions, NULL, 0x1B4 },
     { actor3Talk1Conditions, NULL, 0x209 },
@@ -407,18 +407,46 @@ FieldTalk actor10Talks[] = {
     { NULL, NULL, 0x1FB },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x25), 1, FLAG(0x40, 0x60), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x25), 1, FLAG(0x40, 0x60), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x25), 1, FLAG(0x40, 0x60), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor5Conditions[] = { ITEM(4, 0x2B), 1, PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor7Conditions[] = { FLAG(0x1A, 0xA), 0, SPECIAL(0x1C), 1, CODES_END };
+u16 actor0Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_VEMMON_AT_HQ_SEEN, 1,
+    CODES_END,
+};
+u16 actor1Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_VEMMON_AT_HQ_SEEN, 1,
+    CODES_END,
+};
+u16 actor2Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_VEMMON_AT_HQ_SEEN, 1,
+    CODES_END,
+};
+u16 actor3Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor4Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor5Conditions[] = { ITEM(4, 0x2B), 1, PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor6Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor7Conditions[] = { FLAG_OINKMON_CITIZENS_RESTORED, 0, SPECIAL(0x1C), 1, CODES_END };
 u16 actor8Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 0, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(0x25), 1, FLAG(0x40, 0x60), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor10Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor11Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_VEMMON_AT_HQ_SEEN, 1,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0xB, 5, 0, 0, 1 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0xC, 6, 0, 0, 1 };

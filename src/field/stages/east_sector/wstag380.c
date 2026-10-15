@@ -8,9 +8,9 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
-/* After event 205, with Man and Nick: moves the story on to its step 9 */
+/* After event 205, with Man and Nick: moves the story on to STORY_AGUMON_SUITS */
 void endEvent205(void) {
-    GAME.progress = 9;
+    GAME.progress = STORY_AGUMON_SUITS;
 }
 
 /* Defined below, after the code that uses them */
@@ -32,7 +32,7 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 /*
  * Sets the stage up: its map, actors, battles and events, playing FIELDBGM;
  * BGM_0029 instead at story steps 0x27 to 0x28; battle list 0 before story
- * step 0xB, 1 before story step 0x18, 2 from then on
+ * step 0xB, 1 before STORY_KNIGHTMON_REPROGRAMMED, 2 from then on
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -53,13 +53,13 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
-    if (GAME.progress < 0xB) {
+    if (GAME.progress < STORY_SUZAKU_BADGE) {
         FIELDSTG_state.battles = stageBattles0;
-    } else if (GAME.progress < 0x18) {
+    } else if (GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
         FIELDSTG_state.battles = stageBattles1;
     } else {
         FIELDSTG_state.battles = stageBattles2;
@@ -302,10 +302,20 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x18A, 0x120, 0x128, 0x20, 0x170, 0x1FE },
     { 0, 0, 0, 0, 0, 0, 0, 0 },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 3), 1, ITEM(5, 0xD7), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor1Talk0Conditions[] = { FLAG(0x1A, 0x2C), 0, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(0x1A, 0x2C), 1, ITEM(0, 7), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor1Talk1Conditions[] = { FLAG(0x1A, 0x2C), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_DIVERMON_LAKE_BANDANNA_FOUND, 1,
+    ITEM(5, 0xD7), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor1Talk0Conditions[] = { FLAG_DIVERMON_RED_SNAPPER_TAKEN, 0, CODES_END };
+u16 actor1Talk0Actions[] = {
+    FLAG_DIVERMON_RED_SNAPPER_TAKEN, 1,
+    ITEM(0, 7), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor1Talk1Conditions[] = { FLAG_DIVERMON_RED_SNAPPER_TAKEN, 1, CODES_END };
 u16 actor4Talk0Actions[] = { START_EVENT(0x20), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x16F },
@@ -320,10 +330,22 @@ FieldTalk actor4Talks[] = {
     { NULL, actor4Talk0Actions, 0x248 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 3), 0, CODES_END };
-u16 actor1Conditions[] = { FLAG(0x1A, 0x21), 1, FLAG(0x1A, 0x2C), 0, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(8), 1, FLAG(0x1A, 0x1A), 1, CODES_END };
-u16 actor5Conditions[] = { FLAG(0x1A, 0x21), 1, FLAG(0x1A, 0x2C), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_DIVERMON_LAKE_BANDANNA_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = {
+    FLAG_TAI_KONG_WANG_POLE_TALKED, 1,
+    FLAG_DIVERMON_RED_SNAPPER_TAKEN, 0,
+    CODES_END,
+};
+u16 actor4Conditions[] = {
+    PROGRESS(STORY_SEPIKMON_MASK_LOST), 1,
+    FLAG_ETEMON_DIVERMON_LAKE_TALKED, 1,
+    CODES_END,
+};
+u16 actor5Conditions[] = {
+    FLAG_TAI_KONG_WANG_POLE_TALKED, 1,
+    FLAG_DIVERMON_RED_SNAPPER_TAKEN, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 776, 125, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x4B, 5, 530, 430, 1 };
 FieldActorEntry actor2 = { NULL, NULL, 0x4C, 6, 760, 357, 7 };

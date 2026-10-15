@@ -30,7 +30,7 @@ void handleCommand827(Lift *task, s32 id) {
 Lift *createCommand827(s32 id) {
     Lift *task = createTaskWithId(updateTileLift, sizeof(Lift), 0, id);
 
-    if (FLAGS_00.checkCondition(FLAG(0x1C, 0x3D), 1)) {
+    if (FLAGS_00.checkCondition(FLAG_LIFT_RAISED, 1)) {
         task->raised = 1;
     } else {
         task->raised = 0;
@@ -179,14 +179,14 @@ ActorImage stageImages[] = {
     { 0x200, 0x100, 0x200, 0x1BC, 0, 0xBC, 0x230, 0x1FD },
     { 0, 0, 0, 0, 0, 0, 0, 0 },
 };
-u16 actor0Talk0Conditions[] = { FLAG(0x1C, 0x3D), 0, CODES_END };
-u16 actor0Talk0Actions[] = { START_EVENT(0x62), 1, FLAG(0x1C, 0x3D), 1, CODES_END };
-u16 actor0Talk1Conditions[] = { FLAG(0x1C, 0x3D), 1, CODES_END };
-u16 actor0Talk1Actions[] = { START_EVENT(0x63), 1, FLAG(0x1C, 0x3D), 0, CODES_END };
-u16 actor1Talk0Conditions[] = { FLAG(0x1C, 0x3D), 0, CODES_END };
-u16 actor1Talk0Actions[] = { START_EVENT(0x62), 1, FLAG(0x1C, 0x3D), 1, CODES_END };
-u16 actor1Talk1Conditions[] = { FLAG(0x1C, 0x3D), 1, CODES_END };
-u16 actor1Talk1Actions[] = { START_EVENT(0x63), 1, FLAG(0x1C, 0x3D), 0, CODES_END };
+u16 actor0Talk0Conditions[] = { FLAG_LIFT_RAISED, 0, CODES_END };
+u16 actor0Talk0Actions[] = { START_EVENT(0x62), 1, FLAG_LIFT_RAISED, 1, CODES_END };
+u16 actor0Talk1Conditions[] = { FLAG_LIFT_RAISED, 1, CODES_END };
+u16 actor0Talk1Actions[] = { START_EVENT(0x63), 1, FLAG_LIFT_RAISED, 0, CODES_END };
+u16 actor1Talk0Conditions[] = { FLAG_LIFT_RAISED, 0, CODES_END };
+u16 actor1Talk0Actions[] = { START_EVENT(0x62), 1, FLAG_LIFT_RAISED, 1, CODES_END };
+u16 actor1Talk1Conditions[] = { FLAG_LIFT_RAISED, 1, CODES_END };
+u16 actor1Talk1Actions[] = { START_EVENT(0x63), 1, FLAG_LIFT_RAISED, 0, CODES_END };
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, actor0Talk0Actions, 0x203 },
     { actor0Talk1Conditions, actor0Talk1Actions, 0x204 },
@@ -197,8 +197,8 @@ FieldTalk actor1Talks[] = {
     { actor1Talk1Conditions, actor1Talk1Actions, 0x204 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(0x1C, 0x3D), 0, CODES_END };
-u16 actor1Conditions[] = { FLAG(0x1C, 0x3D), 1, CODES_END };
+u16 actor0Conditions[] = { FLAG_LIFT_RAISED, 0, CODES_END };
+u16 actor1Conditions[] = { FLAG_LIFT_RAISED, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x3F, 4, 176, 392, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x3F, 4, 176, 265, 1 };
 FieldActorEntry *stageActors[] = {

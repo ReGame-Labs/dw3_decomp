@@ -8,6 +8,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include "engine/gfx.h" /* Vec2 */
+#include "engine/story.h"
 
 union PartnerTotals;
 

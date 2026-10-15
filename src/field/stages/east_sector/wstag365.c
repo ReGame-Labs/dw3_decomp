@@ -99,17 +99,21 @@ FieldTalk actor11Talks[] = {
     { NULL, NULL, 0x10D },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(4), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0xC), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x16), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor8Conditions[] = { SPECIAL(0x17), 1, CODES_END };
 u16 actor9Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(6), 1, FLAG(0x1C, 0x47), 1, CODES_END };
+u16 actor10Conditions[] = {
+    PROGRESS(STORY_FAKE_BLUE_CARD), 1,
+    FLAG_FAKE_BLUE_CARD_TALKED, 1,
+    CODES_END,
+};
 u16 actor11Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x2D, 4, 241, 201, 5 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x2D, 4, 241, 201, 3 };

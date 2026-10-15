@@ -1,7 +1,7 @@
 /*
  * WSTAG929: Underground Path, Amaterasu City, in the extra chapter. The
- * European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 634
- * starts it instead of WSTAG238.
+ * European version's: in its extra chapter (STORY_EXTRA), mode 634 starts it
+ * instead of WSTAG238.
  */
 
 #include "common.h"

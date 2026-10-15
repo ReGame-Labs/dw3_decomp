@@ -291,10 +291,10 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x51), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_ZHU_QUE_CHIEF_CHALLENGE_SEEN, 0)) {
             children[0] = createTileTask(0x34F);
         }
-        if (GAME.progress == 0x1A && FLAGS_00.checkCondition(FLAG(0x40, 0x51), 1)) {
+        if (GAME.progress == STORY_BULBMON_FOUND && FLAGS_00.checkCondition(FLAG_ZHU_QUE_CHIEF_CHALLENGE_SEEN, 1)) {
             children[2] = FIELDSTG_startEvent(0x2C7);
         }
         break;
@@ -313,13 +313,13 @@ void updateStage(StageTask *task, void **children) {
  * keeps it from playing again
  */
 void endEvent710(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x51), 1);
+    FLAGS_00.applyAction(FLAG_ZHU_QUE_CHIEF_CHALLENGE_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-/* After event 711, with the player: moves the story on to its step 0x1B */
+/* After event 711, with the player: moves the story on to STORY_JUNGLE_SOUND */
 void endEvent711(void) {
-    GAME.progress = 0x1B;
+    GAME.progress = STORY_JUNGLE_SOUND;
 }
 
 #if VERSION_US || VERSION_JP
@@ -530,7 +530,12 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1A8, 0x1C8, 0x1A0, 0xC8, 0x150, 0x1FC },
     { 0x180, 0x100, 0x1A0, 0x1C8, 0x180, 0xC8, 0x160, 0x1FC },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x1B), 1, ITEM(5, 0x109), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_BUG_MAZE_PIT_DIGITAMA_MAIL_FOUND, 1,
+    ITEM(5, 0x109), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x264 },
     { NULL, NULL, 0 },
@@ -551,11 +556,11 @@ FieldTalk actor4Talks[] = {
     { NULL, NULL, 0x110 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x1B), 0, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x1A), 1, CODES_END };
+u16 actor0Conditions[] = { FLAG_BUG_MAZE_PIT_DIGITAMA_MAIL_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_BULBMON_FOUND), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 785, 697, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x45, 5, 559, 1145, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x45, 5, 559, 1145, 1 };
@@ -588,7 +593,7 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x245, 0x708, 0x2DC, 3, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x245, 0x708, 0x3BC, 3, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x245, 0x708, 0x50E, 3, 0, 0, 0 },
-    { { { PROGRESS(0x1A), 1 }, { FLAG(0x40, 0x51), 0 } }, SLOT_EVENT, 0x2C6, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_BULBMON_FOUND), 1 }, { FLAG_ZHU_QUE_CHIEF_CHALLENGE_SEEN, 0 } }, SLOT_EVENT, 0x2C6, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

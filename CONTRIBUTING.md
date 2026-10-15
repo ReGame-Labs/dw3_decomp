@@ -334,7 +334,7 @@ does:
   | `pad/` | the controllers and the demos | `pad.h` |
   | `sound/` | the sound banks | `sound.h` |
   | `memcard/` | the memory card saves | `memcard.h` |
-  | `game/` | the game state and modes, the events, the party, the stats, the partners, the Digimon and the items | `game_state.h` |
+  | `game/` | the game state and modes, the events, the party, the stats, the partners, the Digimon and the items | `game_state.h`, `story.h` |
   | `menu/` | the inn and the field menu | `menu.h` |
 
   The original's objects (`inn`, `system`, `memcard`, `game3`...) are cut

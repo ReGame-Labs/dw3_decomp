@@ -445,7 +445,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == 6) {
+        if (GAME.progress == STORY_FAKE_BLUE_CARD) {
             if (FLAGS_00.checkCondition(FLAG(0x40, 0x18), 0)) {
                 children[0] = createScroller(0);
                 children[1] = FIELDSTG_startEvent(0x96);

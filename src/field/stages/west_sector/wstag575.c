@@ -10,7 +10,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == 0x10 && FLAGS_00.checkCondition(FLAG(0x40, 0xA2), 0)) {
+        if (GAME.progress == STORY_NUMEMON_FOUND && FLAGS_00.checkCondition(FLAG_NUMEMON_BULLET_VALLEY_SEEN, 0)) {
             children[0] = FIELDSTG_startEvent(0x1A6);
         }
         task->nextState(task);
@@ -27,7 +27,7 @@ void updateStage(StageTask *task, void **children) {
 
 /* After event 422, with Numemon: keeps it from playing again */
 void endEvent422(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xA2), 1);
+    FLAGS_00.applyAction(FLAG_NUMEMON_BULLET_VALLEY_SEEN, 1);
 }
 
 #if VERSION_US || VERSION_JP
@@ -203,7 +203,7 @@ FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x310 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x10), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_NUMEMON_FOUND), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x69, 4, 0, 0, 0 };
 FieldActorEntry *stageActors[] = {
     &actor0,

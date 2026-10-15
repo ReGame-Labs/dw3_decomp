@@ -1,7 +1,7 @@
 /*
  * WSTAG923: Main Lobby, Amaterasu City, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 627 starts it
- * instead of WSTAG211.
+ * version's: in its extra chapter (STORY_EXTRA), mode 627 starts it instead of
+ * WSTAG211.
  */
 
 #include "common.h"

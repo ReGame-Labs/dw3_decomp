@@ -129,8 +129,8 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x188, 0x100, 0x120, 0, 0x170, 0x1FF },
     { 0x180, 0x100, 0x190, 0x100, 0x140, 0, 0x140, 0x1FE },
 };
-u16 actor1Talk0Conditions[] = { FLAG(0x1C, 0x1C), 0, CODES_END };
-u16 actor1Talk1Conditions[] = { FLAG(0x1C, 0x1C), 1, CODES_END };
+u16 actor1Talk0Conditions[] = { FLAG_KEITH_NICK_SEARCH_STARTED, 0, CODES_END };
+u16 actor1Talk1Conditions[] = { FLAG_KEITH_NICK_SEARCH_STARTED, 1, CODES_END };
 u16 actor9Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor9Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor9Talk1Conditions[] = { FLAG(0, 0), 1, CODES_END };
@@ -236,24 +236,34 @@ FieldTalk actor17Talks[] = {
     { actor17Talk1Conditions, NULL, 4 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0xF), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x14), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor5Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x17), 1, PROGRESS(0x14), 0, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0x10), 1, CODES_END };
-u16 actor8Conditions[] = { SPECIAL(0x16), 1, PROGRESS(0x10), 0, PROGRESS(0xF), 0, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0xF), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL(0x17), 1, PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 0, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_NUMEMON_FOUND), 1, CODES_END };
+u16 actor8Conditions[] = {
+    SPECIAL(0x16), 1,
+    PROGRESS(STORY_NUMEMON_FOUND), 0,
+    PROGRESS(STORY_DE_SINCERITY), 0,
+    CODES_END,
+};
+u16 actor9Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor13Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor14Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor15Conditions[] = { SPECIAL(0x17), 1, CODES_END };
-u16 actor16Conditions[] = { PROGRESS(0xF), 0, PROGRESS(0x10), 0, SPECIAL(0x16), 1, CODES_END };
-u16 actor17Conditions[] = { PROGRESS(0x10), 1, CODES_END };
+u16 actor16Conditions[] = {
+    PROGRESS(STORY_DE_SINCERITY), 0,
+    PROGRESS(STORY_NUMEMON_FOUND), 0,
+    SPECIAL(0x16), 1,
+    CODES_END,
+};
+u16 actor17Conditions[] = { PROGRESS(STORY_NUMEMON_FOUND), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x22, 4, 433, 280, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x22, 4, 433, 280, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x22, 4, 433, 280, 7 };

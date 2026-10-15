@@ -158,7 +158,7 @@ void updateStage(StageTask *task, void **children) {
     default:
         children[2] = createCommand809(0x329);
         children[1] = createCommand808(0x328);
-        if (GAME.progress == 1) {
+        if (GAME.progress == STORY_ACCOUNT_REGISTERED) {
             children[0] = FIELDSTG_startEvent(4);
         }
         task->nextState(task);
@@ -323,8 +323,8 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1B4, 0x1A3, 0x1D0, 0xA3, 0x170, 0x1F9 },
     { 0x180, 0x100, 0x1A6, 0x130, 0x198, 0x30, 0x170, 0x1F8 },
 };
-u16 actor1Conditions[] = { PROGRESS(1), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(1), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_ACCOUNT_REGISTERED), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_ACCOUNT_REGISTERED), 1, CODES_END };
 FieldActorEntry actor0 = { NULL, NULL, 1, 4, 0, 0, 0 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0xB, 5, 0, 0, 0 };
 FieldActorEntry actor2 = { NULL, NULL, 0xC, 6, 0, 0, 0 };

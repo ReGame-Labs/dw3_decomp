@@ -1,7 +1,7 @@
 /*
  * WSTAG955: East Station, East Sector, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 667 starts it
- * instead of WSTAG411.
+ * version's: in its extra chapter (STORY_EXTRA), mode 667 starts it instead of
+ * WSTAG411.
  */
 
 #include "common.h"
@@ -51,13 +51,18 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x174, 0x130, 0xD0, 0x30, 0x160, 0x1FE },
     { 0x140, 0x100, 0x16A, 0x14E, 0xA8, 0x4E, 0x170, 0x1FE },
 };
-u16 actor2Talk0Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 0, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 1, CODES_END };
-u16 actor2Talk1Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, FLAG(0, 0), 0, CODES_END };
-u16 actor2Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor2Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 0, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 1, CODES_END };
+u16 actor2Talk1Actions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
+u16 actor2Talk2Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor2Talk2Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor2Talk3Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, CODES_END };
+u16 actor2Talk3Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 1, CODES_END };
 u16 actor2Talk3Actions[] = { CARD_BATTLE(0x38, 1), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x93 },

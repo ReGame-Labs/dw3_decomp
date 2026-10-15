@@ -104,8 +104,18 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1B8, 0x100, 0x1E0, 0, 0x140, 0x1F4 },
     { 0x180, 0x100, 0x19E, 0x130, 0x178, 0x30, 0x160, 0x1F4 },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x64), 1, ITEM(5, 0x122), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor1Talk0Actions[] = { SPECIAL(0x91), 1, FLAG(2, 0x65), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_AMATERASU_SEWER_HIGH_SECURITY_FOUND, 1,
+    ITEM(5, 0x122), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor1Talk0Actions[] = {
+    SPECIAL(0x91), 1,
+    FLAG_AMATERASU_SEWER_5000_BIT_FOUND, 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x16D },
     { NULL, NULL, 0 },
@@ -114,8 +124,8 @@ FieldTalk actor1Talks[] = {
     { NULL, actor1Talk0Actions, 0x173 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x64), 0, CODES_END };
-u16 actor1Conditions[] = { FLAG(2, 0x65), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_AMATERASU_SEWER_HIGH_SECURITY_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { FLAG_AMATERASU_SEWER_5000_BIT_FOUND, 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 465, 169, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x4D, 5, 272, 217, 1 };
 FieldActorEntry *stageActors[] = {

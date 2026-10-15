@@ -49,12 +49,12 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x160, 0x100, 0x80, 0, 0x140, 0x1FB },
     { 0x140, 0x100, 0x168, 0x100, 0xA0, 0, 0x150, 0x1FB },
 };
-u16 actor0Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 0x45, 4, 210, 74, 5 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0x46, 5, 178, 74, 7 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0x9D, 6, 146, 97, 7 };

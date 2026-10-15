@@ -1333,24 +1333,40 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x140, 0x100, 0, 0, 0x140, 0x1FA },
     { 0x140, 0x100, 0x154, 0x100, 0x50, 0, 0x150, 0x1FA },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x2D), 1, ITEM(1, 0x2F), 1, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(2, 0x2E), 1, ITEM(1, 0x30), 1, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(2, 0x2F), 1, ITEM(1, 0x31), 1, CODES_END };
-u16 actor3Talk0Actions[] = { FLAG(2, 0x30), 1, ITEM(1, 0x32), 1, CODES_END };
-u16 actor4Talk0Actions[] = { FLAG(2, 0x31), 1, ITEM(1, 0x33), 1, CODES_END };
-u16 actor5Talk0Actions[] = { FLAG(2, 0x32), 1, ITEM(1, 0x34), 1, CODES_END };
-u16 actor6Talk0Actions[] = { FLAG(2, 0x33), 1, ITEM(1, 0x35), 1, CODES_END };
-u16 actor7Talk0Actions[] = { FLAG(2, 0x34), 1, ITEM(1, 0x37), 1, CODES_END };
-u16 actor8Talk0Actions[] = { FLAG(2, 0x35), 1, ITEM(1, 0x38), 1, CODES_END };
-u16 actor9Talk0Actions[] = { FLAG(2, 0x36), 1, ITEM(1, 0x39), 1, CODES_END };
-u16 actor10Talk0Actions[] = { FLAG(2, 0x37), 1, ITEM(1, 0x3A), 1, CODES_END };
-u16 actor11Talk0Actions[] = { FLAG(2, 0x56), 1, ITEM(1, 0x3B), 1, CODES_END };
-u16 actor15Talk0Actions[] = { FLAG(2, 0x57), 1, ITEM(1, 0x3C), 1, CODES_END };
-u16 actor16Talk0Actions[] = { FLAG(2, 0x58), 1, ITEM(1, 0x3D), 1, CODES_END };
-u16 actor17Talk0Actions[] = { FLAG(2, 0x59), 1, ITEM(2, 0x70), 1, CODES_END };
-u16 actor18Talk0Actions[] = { FLAG(2, 0x5A), 1, ITEM(5, 0x11B), 1, CODES_END };
-u16 actor19Talk0Actions[] = { FLAG(2, 0x5B), 1, ITEM(5, 0x11C), 1, CODES_END };
-u16 actor20Talk0Actions[] = { FLAG(2, 0x5C), 1, ITEM(5, 0xFF), 1, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_CIRCUIT_BOARD_HP_CHIP_FOUND, 1, ITEM(1, 0x2F), 1, CODES_END };
+u16 actor1Talk0Actions[] = { FLAG_CIRCUIT_BOARD_MP_CHIP_FOUND, 1, ITEM(1, 0x30), 1, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_CIRCUIT_BOARD_POWER_CHIP_FOUND, 1, ITEM(1, 0x31), 1, CODES_END };
+u16 actor3Talk0Actions[] = { FLAG_CIRCUIT_BOARD_ARMOR_CHIP_FOUND, 1, ITEM(1, 0x32), 1, CODES_END };
+u16 actor4Talk0Actions[] = { FLAG_CIRCUIT_BOARD_MIND_CHIP_FOUND, 1, ITEM(1, 0x33), 1, CODES_END };
+u16 actor5Talk0Actions[] = { FLAG_CIRCUIT_BOARD_WISDOM_CHIP_FOUND, 1, ITEM(1, 0x34), 1, CODES_END };
+u16 actor6Talk0Actions[] = { FLAG_CIRCUIT_BOARD_BOOST_CHIP_FOUND, 1, ITEM(1, 0x35), 1, CODES_END };
+u16 actor7Talk0Actions[] = { FLAG_CIRCUIT_BOARD_FIRE_CHIP_FOUND, 1, ITEM(1, 0x37), 1, CODES_END };
+u16 actor8Talk0Actions[] = { FLAG_CIRCUIT_BOARD_WATER_CHIP_FOUND, 1, ITEM(1, 0x38), 1, CODES_END };
+u16 actor9Talk0Actions[] = { FLAG_CIRCUIT_BOARD_ICE_CHIP_FOUND, 1, ITEM(1, 0x39), 1, CODES_END };
+u16 actor10Talk0Actions[] = { FLAG_CIRCUIT_BOARD_WIND_CHIP_FOUND, 1, ITEM(1, 0x3A), 1, CODES_END };
+u16 actor11Talk0Actions[] = {
+    FLAG_CIRCUIT_BOARD_THUNDER_CHIP_FOUND, 1,
+    ITEM(1, 0x3B), 1,
+    CODES_END,
+};
+u16 actor15Talk0Actions[] = { FLAG_CIRCUIT_BOARD_METAL_CHIP_FOUND, 1, ITEM(1, 0x3C), 1, CODES_END };
+u16 actor16Talk0Actions[] = { FLAG_CIRCUIT_BOARD_DEVIL_CHIP_FOUND, 1, ITEM(1, 0x3D), 1, CODES_END };
+u16 actor17Talk0Actions[] = { FLAG_CIRCUIT_BOARD_WILD_GLOVE_FOUND, 1, ITEM(2, 0x70), 1, CODES_END };
+u16 actor18Talk0Actions[] = {
+    FLAG_CIRCUIT_BOARD_YIN_YANG_WARD_FOUND, 1,
+    ITEM(5, 0x11B), 1,
+    CODES_END,
+};
+u16 actor19Talk0Actions[] = {
+    FLAG_CIRCUIT_BOARD_RONIN_SHIELD_FOUND, 1,
+    ITEM(5, 0x11C), 1,
+    CODES_END,
+};
+u16 actor20Talk0Actions[] = {
+    FLAG_CIRCUIT_BOARD_DIVINE_ROBE_FOUND, 1,
+    ITEM(5, 0xFF), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x38E },
     { NULL, NULL, 0 },
@@ -1423,26 +1439,116 @@ FieldTalk actor20Talks[] = {
     { NULL, actor20Talk0Actions, 0x399 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { WARP_ARG(0x15), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x2D), 0, CODES_END };
-u16 actor1Conditions[] = { WARP_ARG(0x12), 1, WARP_ARG(0x21), 1, FLAG(2, 0x2E), 0, CODES_END };
-u16 actor2Conditions[] = { WARP_ARG(0), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x2F), 0, CODES_END };
-u16 actor3Conditions[] = { WARP_ARG(0x18), 1, WARP_ARG(0x1F), 1, FLAG(2, 0x30), 0, CODES_END };
-u16 actor4Conditions[] = { WARP_ARG(0xE), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x31), 0, CODES_END };
-u16 actor5Conditions[] = { WARP_ARG(3), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x32), 0, CODES_END };
-u16 actor6Conditions[] = { WARP_ARG(0x11), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x33), 0, CODES_END };
-u16 actor7Conditions[] = { WARP_ARG(0xF), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x34), 0, CODES_END };
-u16 actor8Conditions[] = { WARP_ARG(0x1C), 1, WARP_ARG(0x1F), 1, FLAG(2, 0x35), 0, CODES_END };
-u16 actor9Conditions[] = { WARP_ARG(0xD), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x36), 0, CODES_END };
-u16 actor10Conditions[] = { WARP_ARG(0x10), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x37), 0, CODES_END };
-u16 actor11Conditions[] = { FLAG(2, 0x56), 0, WARP_ARG(0xC), 1, WARP_ARG(0x1E), 1, CODES_END };
+u16 actor0Conditions[] = {
+    WARP_ARG(0x15), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_CIRCUIT_BOARD_HP_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor1Conditions[] = {
+    WARP_ARG(0x12), 1,
+    WARP_ARG(0x21), 1,
+    FLAG_CIRCUIT_BOARD_MP_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor2Conditions[] = {
+    WARP_ARG(0), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_CIRCUIT_BOARD_POWER_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor3Conditions[] = {
+    WARP_ARG(0x18), 1,
+    WARP_ARG(0x1F), 1,
+    FLAG_CIRCUIT_BOARD_ARMOR_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor4Conditions[] = {
+    WARP_ARG(0xE), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_CIRCUIT_BOARD_MIND_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor5Conditions[] = {
+    WARP_ARG(3), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_CIRCUIT_BOARD_WISDOM_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor6Conditions[] = {
+    WARP_ARG(0x11), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_CIRCUIT_BOARD_BOOST_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor7Conditions[] = {
+    WARP_ARG(0xF), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_CIRCUIT_BOARD_FIRE_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor8Conditions[] = {
+    WARP_ARG(0x1C), 1,
+    WARP_ARG(0x1F), 1,
+    FLAG_CIRCUIT_BOARD_WATER_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor9Conditions[] = {
+    WARP_ARG(0xD), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_CIRCUIT_BOARD_ICE_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor10Conditions[] = {
+    WARP_ARG(0x10), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_CIRCUIT_BOARD_WIND_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor11Conditions[] = {
+    FLAG_CIRCUIT_BOARD_THUNDER_CHIP_FOUND, 0,
+    WARP_ARG(0xC), 1,
+    WARP_ARG(0x1E), 1,
+    CODES_END,
+};
 u16 actor13Conditions[] = { WARP_ARG(0x18), 1, FLAG(0, 8), 0, CODES_END };
 u16 actor14Conditions[] = { WARP_ARG(0x1B), 1, FLAG(0, 8), 0, CODES_END };
-u16 actor15Conditions[] = { WARP_ARG(6), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x57), 0, CODES_END };
-u16 actor16Conditions[] = { WARP_ARG(0x13), 1, WARP_ARG(0x20), 1, FLAG(2, 0x58), 0, CODES_END };
-u16 actor17Conditions[] = { WARP_ARG(0x13), 1, WARP_ARG(0x23), 1, FLAG(2, 0x59), 0, CODES_END };
-u16 actor18Conditions[] = { WARP_ARG(0x19), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x5A), 0, CODES_END };
-u16 actor19Conditions[] = { WARP_ARG(0x17), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x5B), 0, CODES_END };
-u16 actor20Conditions[] = { WARP_ARG(0x1B), 1, WARP_ARG(0x1F), 1, FLAG(2, 0x5C), 0, CODES_END };
+u16 actor15Conditions[] = {
+    WARP_ARG(6), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_CIRCUIT_BOARD_METAL_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor16Conditions[] = {
+    WARP_ARG(0x13), 1,
+    WARP_ARG(0x20), 1,
+    FLAG_CIRCUIT_BOARD_DEVIL_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor17Conditions[] = {
+    WARP_ARG(0x13), 1,
+    WARP_ARG(0x23), 1,
+    FLAG_CIRCUIT_BOARD_WILD_GLOVE_FOUND, 0,
+    CODES_END,
+};
+u16 actor18Conditions[] = {
+    WARP_ARG(0x19), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_CIRCUIT_BOARD_YIN_YANG_WARD_FOUND, 0,
+    CODES_END,
+};
+u16 actor19Conditions[] = {
+    WARP_ARG(0x17), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_CIRCUIT_BOARD_RONIN_SHIELD_FOUND, 0,
+    CODES_END,
+};
+u16 actor20Conditions[] = {
+    WARP_ARG(0x1B), 1,
+    WARP_ARG(0x1F), 1,
+    FLAG_CIRCUIT_BOARD_DIVINE_ROBE_FOUND, 0,
+    CODES_END,
+};
 u16 actor21Conditions[] = { WARP_ARG(0x1E), 1, FLAG(0, 9), 0, CODES_END };
 u16 actor22Conditions[] = { WARP_ARG(0x1F), 1, FLAG(0, 9), 0, CODES_END };
 u16 actor23Conditions[] = { WARP_ARG(0x20), 1, FLAG(0, 9), 0, CODES_END };

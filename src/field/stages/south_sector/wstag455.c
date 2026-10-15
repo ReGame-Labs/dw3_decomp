@@ -65,7 +65,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == 0xE && FLAGS_00.checkCondition(ITEM(0, 0xE), 1)) {
+        if (GAME.progress == STORY_TEDDY_FOUND && FLAGS_00.checkCondition(ITEM(0, 0xE), 1)) {
             children[0] = FIELDSTG_startEvent(0x168);
         }
         task->nextState(task);
@@ -82,7 +82,7 @@ void updateStage(StageTask *task, void **children) {
 
 /* After event 360, with the player: sets flag 0x4007 (which decides whether actor 0 appears) */
 void endEvent360(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 7), 1);
+    FLAGS_00.applyAction(FLAG_SINCERITY_EGG_FOUND, 1);
 }
 
 #if VERSION_US || VERSION_JP
@@ -228,17 +228,22 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1AE, 0x120, 0x1B8, 0x20, 0x170, 0x1FF },
     { 0, 0, 0, 0, 0, 0, 0, 0 },
 };
-u16 actor1Talk0Conditions[] = { FLAG(0x1A, 2), 0, CODES_END };
-u16 actor1Talk1Conditions[] = { FLAG(0x1A, 2), 1, ITEM(0, 0x10), 0, CODES_END };
-u16 actor1Talk1Actions[] = { FLAG(0x1A, 0x2A), 1, CODES_END };
-u16 actor1Talk2Conditions[] = { FLAG(0x1A, 2), 1, ITEM(0, 0x10), 1, CODES_END };
+u16 actor1Talk0Conditions[] = { FLAG_NAMI_SWAMP_CREST_TALKED, 0, CODES_END };
+u16 actor1Talk1Conditions[] = { FLAG_NAMI_SWAMP_CREST_TALKED, 1, ITEM(0, 0x10), 0, CODES_END };
+u16 actor1Talk1Actions[] = { FLAG_SINCERITY_SYMBOL_FOUND, 1, CODES_END };
+u16 actor1Talk2Conditions[] = { FLAG_NAMI_SWAMP_CREST_TALKED, 1, ITEM(0, 0x10), 1, CODES_END };
 FieldTalk actor1Talks[] = {
     { actor1Talk0Conditions, NULL, 0x2EA },
     { actor1Talk1Conditions, actor1Talk1Actions, 0x2EB },
     { actor1Talk2Conditions, NULL, 0x2EC },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0xE), 1, ITEM(0, 0xE), 1, FLAG(0x40, 7), 0, CODES_END };
+u16 actor0Conditions[] = {
+    PROGRESS(STORY_TEDDY_FOUND), 1,
+    ITEM(0, 0xE), 1,
+    FLAG_SINCERITY_EGG_FOUND, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { NULL, actor1Talks, 0x3F, 5, 1051, 195, 5 };
 FieldActorEntry *stageActors[] = {

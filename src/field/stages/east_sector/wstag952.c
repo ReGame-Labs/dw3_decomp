@@ -1,7 +1,7 @@
 /*
  * WSTAG952: Wind Prairie, East Sector, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 664 starts it
- * instead of WSTAG396.
+ * version's: in its extra chapter (STORY_EXTRA), mode 664 starts it instead of
+ * WSTAG396.
  */
 
 #include "common.h"
@@ -52,14 +52,24 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x18A, 0x15A, 0x128, 0x5A, 0x150, 0x1FF },
     { 0x180, 0x100, 0x1B0, 0x14C, 0x1C0, 0x4C, 0x160, 0x1FF },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x6C), 1, ITEM(1, 0x3A), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor2Talk0Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 0, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 1, CODES_END };
-u16 actor2Talk1Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, FLAG(0, 0), 0, CODES_END };
-u16 actor2Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_WIND_PRAIRIE_WIND_CHIP_FOUND, 1,
+    ITEM(1, 0x3A), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor2Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 0, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 1, CODES_END };
+u16 actor2Talk1Actions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
+u16 actor2Talk2Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor2Talk2Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor2Talk3Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, CODES_END };
+u16 actor2Talk3Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 1, CODES_END };
 u16 actor2Talk3Actions[] = { CARD_BATTLE(0x3A, 1), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 4 },
@@ -80,7 +90,7 @@ FieldTalk actor3Talks[] = {
     { NULL, NULL, 0x8C },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x6C), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_WIND_PRAIRIE_WIND_CHIP_FOUND, 0, CODES_END };
 u16 actor1Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor2Conditions[] = { ITEM(0, 0x192), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 1566, 529, 1 };

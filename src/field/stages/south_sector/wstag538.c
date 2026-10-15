@@ -16,7 +16,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x7C), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x7D), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_BK_SERAPHIMON_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x7D), 0)) {
             children[0] = FIELDSTG_startEvent(0x508);
         }
         break;
@@ -35,7 +35,7 @@ void updateStage(StageTask *task, void **children) {
  * stage's event battle 0
  */
 void endEvent1287(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x7C), 1);
+    FLAGS_00.applyAction(FLAG_BK_SERAPHIMON_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -219,21 +219,21 @@ u16 actor0Talk3Actions[] = {
     SPECIAL(0x13), 1,
     CODES_END,
 };
-u16 actor1Talk0Conditions[] = { FLAG(0xA, 0xA), 0, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(0xA, 0xA), 1, START_EVENT(0x3B), 1, CODES_END };
-u16 actor1Talk1Conditions[] = { FLAG(0xA, 0xA), 1, CODES_END };
-u16 actor2Talk0Conditions[] = { FLAG(0xA, 0xA), 0, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(0xA, 0xA), 1, START_EVENT(0x3B), 1, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0xA, 0xA), 1, CODES_END };
-u16 actor3Talk0Conditions[] = { FLAG(0xA, 0xA), 0, CODES_END };
-u16 actor3Talk0Actions[] = { FLAG(0xA, 0xA), 1, START_EVENT(0x3B), 1, CODES_END };
-u16 actor3Talk1Conditions[] = { FLAG(0xA, 0xA), 1, CODES_END };
-u16 actor4Talk0Conditions[] = { FLAG(0xA, 0xA), 0, CODES_END };
-u16 actor4Talk0Actions[] = { FLAG(0xA, 0xA), 1, START_EVENT(0x3B), 1, CODES_END };
-u16 actor4Talk1Conditions[] = { FLAG(0xA, 0xA), 1, CODES_END };
-u16 actor5Talk0Conditions[] = { FLAG(0xA, 0xA), 0, CODES_END };
-u16 actor5Talk0Actions[] = { FLAG(0xA, 0xA), 1, START_EVENT(0x3B), 1, CODES_END };
-u16 actor5Talk1Conditions[] = { FLAG(0xA, 0xA), 1, CODES_END };
+u16 actor1Talk0Conditions[] = { FLAG_BK_SERAPHIMON_BEATEN, 0, CODES_END };
+u16 actor1Talk0Actions[] = { FLAG_BK_SERAPHIMON_BEATEN, 1, START_EVENT(0x3B), 1, CODES_END };
+u16 actor1Talk1Conditions[] = { FLAG_BK_SERAPHIMON_BEATEN, 1, CODES_END };
+u16 actor2Talk0Conditions[] = { FLAG_BK_SERAPHIMON_BEATEN, 0, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_BK_SERAPHIMON_BEATEN, 1, START_EVENT(0x3B), 1, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_BK_SERAPHIMON_BEATEN, 1, CODES_END };
+u16 actor3Talk0Conditions[] = { FLAG_BK_SERAPHIMON_BEATEN, 0, CODES_END };
+u16 actor3Talk0Actions[] = { FLAG_BK_SERAPHIMON_BEATEN, 1, START_EVENT(0x3B), 1, CODES_END };
+u16 actor3Talk1Conditions[] = { FLAG_BK_SERAPHIMON_BEATEN, 1, CODES_END };
+u16 actor4Talk0Conditions[] = { FLAG_BK_SERAPHIMON_BEATEN, 0, CODES_END };
+u16 actor4Talk0Actions[] = { FLAG_BK_SERAPHIMON_BEATEN, 1, START_EVENT(0x3B), 1, CODES_END };
+u16 actor4Talk1Conditions[] = { FLAG_BK_SERAPHIMON_BEATEN, 1, CODES_END };
+u16 actor5Talk0Conditions[] = { FLAG_BK_SERAPHIMON_BEATEN, 0, CODES_END };
+u16 actor5Talk0Actions[] = { FLAG_BK_SERAPHIMON_BEATEN, 1, START_EVENT(0x3B), 1, CODES_END };
+u16 actor5Talk1Conditions[] = { FLAG_BK_SERAPHIMON_BEATEN, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, NULL, 0x2E6 },
     { actor0Talk1Conditions, actor0Talk1Actions, 0x2E7 },
@@ -274,10 +274,10 @@ u16 actor0Conditions[] = {
     CODES_END,
 };
 u16 actor1Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x25), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0xAD, 4, 962, 353, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x107, 5, 887, 133, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x107, 5, 887, 133, 1 };

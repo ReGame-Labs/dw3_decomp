@@ -14,7 +14,7 @@
  * ID and keeps it from playing again
  */
 void endEvent720(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x1D), 1);
+    FLAGS_00.applyAction(FLAG_TEDDY_FOREST_INN_SEEN, 1);
     FLAGS_00.applyAction(ITEM(0, 0x18C), 1);
 }
 
@@ -157,7 +157,11 @@ ActorImage stageImages[] = {
     { 0x200, 0x100, 0x200, 0x1BC, 0, 0xBC, 0x230, 0x1FD },
     { 0x140, 0x100, 0x170, 0x150, 0xC0, 0x50, 0x160, 0x1FF },
 };
-u16 actor0Conditions[] = { PROGRESS(0x1B), 1, FLAG(0x40, 0x1D), 0, CODES_END };
+u16 actor0Conditions[] = {
+    PROGRESS(STORY_JUNGLE_SOUND), 1,
+    FLAG_TEDDY_FOREST_INN_SEEN, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, NULL, 0x2D, 4, 241, 201, 5 };
 FieldActorEntry *stageActors[] = {
     &actor0,
@@ -182,7 +186,7 @@ StageTile stageObjects[] = {
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x292, 0x156, 0x1B0, 3, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x245, 0x5E8, 0xDC, 3, 0, 0, 0 },
-    { { { PROGRESS(0x1B), 1 }, { FLAG(0x40, 0x1D), 0 } }, SLOT_EVENT, 0x2D0, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_JUNGLE_SOUND), 1 }, { FLAG_TEDDY_FOREST_INN_SEEN, 0 } }, SLOT_EVENT, 0x2D0, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

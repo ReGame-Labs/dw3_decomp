@@ -198,7 +198,7 @@ ActorImage stageImages[] = {
     { 0x200, 0x100, 0x200, 0x1BC, 0, 0xBC, 0x230, 0x1FD },
     { 0x180, 0x100, 0x1B0, 0x180, 0x1C0, 0x80, 0x170, 0x1FF },
 };
-u16 actor0Conditions[] = { PROGRESS(0xF), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 0x69, 4, 0, 0, 7 };
 FieldActorEntry *stageActors[] = {
     &actor0,
@@ -238,7 +238,7 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x257, 0x320, 0x88, 1, 0, 0, 0 },
     { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 0x1B, 1 },
     { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 1, 2 },
-    { { { PROGRESS(0xF), 1 }, { FLAG(0x40, 0xC), 0 } }, SLOT_EVENT, 0x17C, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_DE_SINCERITY), 1 }, { FLAG(0x40, 0xC), 0 } }, SLOT_EVENT, 0x17C, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

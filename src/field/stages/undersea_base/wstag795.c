@@ -131,7 +131,7 @@ void updateTimer(StageTask *task, void **children) {
 
     switch (task->state) {
     case TASK_RUN:
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x43), 0) || FIELDSTG_state.busy != 0 || FIELDSTG_state.battleStarting != 0 ||
+        if (FLAGS_00.checkCondition(FLAG_MAGASTA_BUTTON_PRESSED, 0) || FIELDSTG_state.busy != 0 || FIELDSTG_state.battleStarting != 0 ||
             FIELDSTG_state.frozen != 0 || FIELDSTG_state.menuOpen != 0 || FIELDSTG_state.acting != 0) {
             break;
         }
@@ -173,7 +173,7 @@ void updateStage(StageTask *task, void **children) {
             children[1] = createTilePairDone();
         }
         task->nextState(task);
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x43), 0) && GAME.progress == 0x20) {
+        if (FLAGS_00.checkCondition(FLAG_MAGASTA_BUTTON_PRESSED, 0) && GAME.progress == STORY_REAL_WORLD) {
             children[2] = FIELDSTG_startEvent(0x33E);
         }
         break;
@@ -189,7 +189,7 @@ void updateStage(StageTask *task, void **children) {
 
 /* After event 830, with the player: keeps it from playing again */
 void endEvent830(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x43), 1);
+    FLAGS_00.applyAction(FLAG_MAGASTA_BUTTON_PRESSED, 1);
 }
 
 /*
@@ -420,18 +420,22 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x176, 0x1C0, 0xD8, 0xC0, 0x160, 0x1F7 },
     { 0x140, 0x100, 0x140, 0x1C2, 0, 0xC2, 0x170, 0x1F7 },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x39), 1, ITEM(2, 0xD5), 1, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_MAGASTA_B1F_TRIHORN_FOUND, 1, ITEM(2, 0xD5), 1, CODES_END };
 u16 actor1Talk0Actions[] = { FLAG(2, 0x3A), 1, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(2, 0x3B), 1, ITEM(1, 0x2B), 1, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_MAGASTA_B1F_POWER_CHARGE_FOUND, 1, ITEM(1, 0x2B), 1, CODES_END };
 u16 actor3Talk0Actions[] = { FLAG(2, 0x3C), 1, CODES_END };
 u16 actor4Talk0Actions[] = { FLAG(2, 0x3D), 1, CODES_END };
-u16 actor5Talk0Actions[] = { FLAG(2, 0x3E), 1, ITEM(4, 0xA5), 1, CODES_END };
-u16 actor6Talk0Actions[] = { FLAG(2, 0x3F), 1, ITEM(2, 0xAE), 1, CODES_END };
+u16 actor5Talk0Actions[] = { FLAG_MAGASTA_B1F_GREY_SWORD_FOUND, 1, ITEM(4, 0xA5), 1, CODES_END };
+u16 actor6Talk0Actions[] = { FLAG_MAGASTA_B1F_ROYAL_SPEAR_FOUND, 1, ITEM(2, 0xAE), 1, CODES_END };
 u16 actor7Talk0Actions[] = { FLAG(2, 0x40), 1, CODES_END };
-u16 actor8Talk0Actions[] = { FLAG(2, 0x41), 1, ITEM(1, 0x2C), 1, CODES_END };
-u16 actor9Talk0Actions[] = { FLAG(2, 0x42), 1, ITEM(2, 0x64), 1, CODES_END };
-u16 actor10Talk0Actions[] = { FLAG(2, 0x43), 1, ITEM(2, 0x97), 1, CODES_END };
-u16 actor11Talk0Actions[] = { FLAG(2, 0x44), 1, ITEM(5, 0x122), 1, CODES_END };
+u16 actor8Talk0Actions[] = { FLAG_MAGASTA_B1F_SUPER_CHARGE_FOUND, 1, ITEM(1, 0x2C), 1, CODES_END };
+u16 actor9Talk0Actions[] = { FLAG_MAGASTA_B1F_TENJINMARU_FOUND, 1, ITEM(2, 0x64), 1, CODES_END };
+u16 actor10Talk0Actions[] = { FLAG_MAGASTA_B1F_VENOM_FANG_FOUND, 1, ITEM(2, 0x97), 1, CODES_END };
+u16 actor11Talk0Actions[] = {
+    FLAG_MAGASTA_B1F_HIGH_SECURITY_FOUND, 1,
+    ITEM(5, 0x122), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x201 },
     { NULL, NULL, 0 },
@@ -480,18 +484,18 @@ FieldTalk actor11Talks[] = {
     { NULL, actor11Talk0Actions, 0x18F },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x39), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_MAGASTA_B1F_TRIHORN_FOUND, 0, CODES_END };
 u16 actor1Conditions[] = { FLAG(2, 0x3A), 0, CODES_END };
-u16 actor2Conditions[] = { FLAG(2, 0x3B), 0, CODES_END };
+u16 actor2Conditions[] = { FLAG_MAGASTA_B1F_POWER_CHARGE_FOUND, 0, CODES_END };
 u16 actor3Conditions[] = { FLAG(2, 0x3C), 0, CODES_END };
 u16 actor4Conditions[] = { FLAG(2, 0x3D), 0, CODES_END };
-u16 actor5Conditions[] = { FLAG(2, 0x3E), 0, CODES_END };
-u16 actor6Conditions[] = { FLAG(2, 0x3F), 0, CODES_END };
+u16 actor5Conditions[] = { FLAG_MAGASTA_B1F_GREY_SWORD_FOUND, 0, CODES_END };
+u16 actor6Conditions[] = { FLAG_MAGASTA_B1F_ROYAL_SPEAR_FOUND, 0, CODES_END };
 u16 actor7Conditions[] = { FLAG(2, 0x40), 0, CODES_END };
-u16 actor8Conditions[] = { FLAG(2, 0x41), 0, CODES_END };
-u16 actor9Conditions[] = { FLAG(2, 0x42), 0, CODES_END };
-u16 actor10Conditions[] = { FLAG(2, 0x43), 0, CODES_END };
-u16 actor11Conditions[] = { FLAG(2, 0x44), 0, CODES_END };
+u16 actor8Conditions[] = { FLAG_MAGASTA_B1F_SUPER_CHARGE_FOUND, 0, CODES_END };
+u16 actor9Conditions[] = { FLAG_MAGASTA_B1F_TENJINMARU_FOUND, 0, CODES_END };
+u16 actor10Conditions[] = { FLAG_MAGASTA_B1F_VENOM_FANG_FOUND, 0, CODES_END };
+u16 actor11Conditions[] = { FLAG_MAGASTA_B1F_HIGH_SECURITY_FOUND, 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 961, 678, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x4D, 5, 737, 855, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x4E, 6, 640, 903, 1 };
@@ -549,7 +553,7 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2DB, 0x128, 0x19C, 7, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2DB, 0x128, 0x35C, 7, 0, 0, 0 },
     { { { FLAG(0x1C, 0xA), 1 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2DC, 0x2B4, 0x198, 3, 0x64, 0, 0 },
-    { { { PROGRESS(0x20), 1 }, { FLAG(0x40, 0x63), 0 } }, SLOT_EVENT, 0x348, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_REAL_WORLD), 1 }, { FLAG(0x40, 0x63), 0 } }, SLOT_EVENT, 0x348, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

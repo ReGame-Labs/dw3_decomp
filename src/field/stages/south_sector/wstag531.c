@@ -104,7 +104,12 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x168, 0x140, 0xA0, 0x40, 0x160, 0x1FA },
     { 0x140, 0x100, 0x140, 0x15D, 0, 0x5D, 0x170, 0x1FA },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x1E), 1, ITEM(1, 0x2B), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_AMATERASU_JUNGLE_SHRINE_POWER_CHARGE_FOUND, 1,
+    ITEM(1, 0x2B), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x17E },
     { NULL, NULL, 0 },
@@ -125,10 +130,10 @@ FieldTalk actor4Talks[] = {
     { NULL, NULL, 0xB2 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x1E), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_AMATERASU_JUNGLE_SHRINE_POWER_CHARGE_FOUND, 0, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 671, 176, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x45, 5, 402, 153, 5 };

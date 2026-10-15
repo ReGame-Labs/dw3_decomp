@@ -18,7 +18,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == 4 && FLAGS_00.checkCondition(FLAG(0x40, 0xF), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x10), 0)) {
+        if (GAME.progress == STORY_GENJI_BEATEN && FLAGS_00.checkCondition(FLAG_MASTERTYRANNO_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_SEIRYU_LEADER_CHALLENGE_SEEN, 0)) {
             children[0] = FIELDSTG_startEvent(0x3D);
         }
         children[1] = createTileAnims();
@@ -36,7 +36,7 @@ void updateStage(StageTask *task, void **children) {
 
 /* After event 60, with MasterTyranno: lets event 61 start and starts the stage's event battle 0 */
 void endEvent60(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xF), 1);
+    FLAGS_00.applyAction(FLAG_MASTERTYRANNO_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -45,7 +45,7 @@ void endEvent60(void) {
  * keeps it from playing again
  */
 void endEvent61(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x10), 1);
+    FLAGS_00.applyAction(FLAG_SEIRYU_LEADER_CHALLENGE_SEEN, 1);
     FLAGS_00.applyAction(ITEM(3, 0x99), 1);
 }
 
@@ -220,52 +220,52 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1A0, 0x120, 0x180, 0x20, 0x150, 0x1FE },
     { 0x180, 0x100, 0x1AA, 0x148, 0x1A8, 0x48, 0x160, 0x1FE },
 };
-u16 actor0Talk0Conditions[] = { FLAG(0x1A, 0x2D), 0, CODES_END };
-u16 actor0Talk0Actions[] = { FLAG(0x1A, 0x2D), 1, CODES_END };
-u16 actor0Talk1Conditions[] = { FLAG(0x1A, 0x2D), 1, SPECIAL(0x2A), 0, CODES_END };
+u16 actor0Talk0Conditions[] = { FLAG_DRI_JOHANN_TALKED, 0, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_DRI_JOHANN_TALKED, 1, CODES_END };
+u16 actor0Talk1Conditions[] = { FLAG_DRI_JOHANN_TALKED, 1, SPECIAL(0x2A), 0, CODES_END };
 u16 actor0Talk2Conditions[] = {
     SPECIAL(0x25), 0,
-    FLAG(0x1A, 0x2D), 1,
+    FLAG_DRI_JOHANN_TALKED, 1,
     SPECIAL(0x2A), 1,
     CODES_END,
 };
 u16 actor0Talk3Conditions[] = {
     SPECIAL(0x25), 1,
     SPECIAL(0x27), 0,
-    FLAG(0x1A, 0x2D), 1,
+    FLAG_DRI_JOHANN_TALKED, 1,
     SPECIAL(0x2A), 1,
     CODES_END,
 };
-u16 actor0Talk3Actions[] = { FLAG(6, 0), 1, CODES_END };
+u16 actor0Talk3Actions[] = { FLAG_AGUMON_DDNA_REQUESTED, 1, CODES_END };
 u16 actor0Talk4Conditions[] = {
     SPECIAL(0x25), 1,
     SPECIAL(0x27), 1,
-    FLAG(0x1A, 0x2D), 1,
+    FLAG_DRI_JOHANN_TALKED, 1,
     SPECIAL(0x2A), 1,
     CODES_END,
 };
 u16 actor1Talk0Conditions[] = { SPECIAL(0xB), 0, CODES_END };
 u16 actor1Talk0Actions[] = { SPECIAL(0x31), 1, SPECIAL(0x13), 1, CODES_END };
 u16 actor1Talk1Conditions[] = { SPECIAL(0xB), 1, CODES_END };
-u16 actor2Talk0Conditions[] = { FLAG(0x1A, 0x2D), 0, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(0x1A, 0x2D), 1, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0x1A, 0x2D), 1, SPECIAL(0x2A), 0, CODES_END };
+u16 actor2Talk0Conditions[] = { FLAG_DRI_JOHANN_TALKED, 0, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_DRI_JOHANN_TALKED, 1, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_DRI_JOHANN_TALKED, 1, SPECIAL(0x2A), 0, CODES_END };
 u16 actor2Talk2Conditions[] = {
-    FLAG(0x1A, 0x2D), 1,
+    FLAG_DRI_JOHANN_TALKED, 1,
     SPECIAL(0x2A), 1,
     SPECIAL(0x25), 0,
     CODES_END,
 };
 u16 actor2Talk3Conditions[] = {
-    FLAG(0x1A, 0x2D), 1,
+    FLAG_DRI_JOHANN_TALKED, 1,
     SPECIAL(0x2A), 1,
     SPECIAL(0x25), 1,
     SPECIAL(0x27), 0,
     CODES_END,
 };
-u16 actor2Talk3Actions[] = { FLAG(6, 0), 1, CODES_END };
+u16 actor2Talk3Actions[] = { FLAG_AGUMON_DDNA_REQUESTED, 1, CODES_END };
 u16 actor2Talk4Conditions[] = {
-    FLAG(0x1A, 0x2D), 1,
+    FLAG_DRI_JOHANN_TALKED, 1,
     SPECIAL(0x2A), 1,
     SPECIAL(0x25), 1,
     SPECIAL(0x27), 1,
@@ -274,15 +274,15 @@ u16 actor2Talk4Conditions[] = {
 u16 actor3Talk0Conditions[] = { SPECIAL(0xB), 0, CODES_END };
 u16 actor3Talk0Actions[] = { SPECIAL(0x31), 1, SPECIAL(0x13), 1, CODES_END };
 u16 actor3Talk1Conditions[] = { SPECIAL(0xB), 1, CODES_END };
-u16 actor4Talk0Conditions[] = { FLAG(0x1C, 0x10), 0, CODES_END };
-u16 actor4Talk1Conditions[] = { FLAG(0x1C, 0x10), 1, FLAG(0x1C, 0x11), 0, CODES_END };
+u16 actor4Talk0Conditions[] = { FLAG_SEIRYU_LEADER_REFUSED, 0, CODES_END };
+u16 actor4Talk1Conditions[] = { FLAG_SEIRYU_LEADER_REFUSED, 1, FLAG(0x1C, 0x11), 0, CODES_END };
 u16 actor4Talk1Actions[] = {
     START_EVENT(0x2F), 1,
     FLAG(0x1C, 0x11), 1,
-    FLAG(0xA, 1), 1,
+    FLAG_MASTER_TYRANNO_BEATEN, 1,
     CODES_END,
 };
-u16 actor4Talk2Conditions[] = { FLAG(0x1C, 0x10), 1, FLAG(0x1C, 0x11), 1, CODES_END };
+u16 actor4Talk2Conditions[] = { FLAG_SEIRYU_LEADER_REFUSED, 1, FLAG(0x1C, 0x11), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, actor0Talk0Actions, 0x2B2 },
     { actor0Talk1Conditions, NULL, 0x2B7 },
@@ -359,21 +359,31 @@ FieldTalk actor15Talks[] = {
     { NULL, NULL, 0x2B5 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(4), 0, ITEM(0, 6), 0, SPECIAL(0x22), 1, CODES_END };
-u16 actor1Conditions[] = { SPECIAL(0x22), 1, PROGRESS(4), 0, ITEM(0, 6), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 6), 0, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 6), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(4), 1, CODES_END };
+u16 actor0Conditions[] = {
+    PROGRESS(STORY_GENJI_BEATEN), 0,
+    ITEM(0, 6), 0,
+    SPECIAL(0x22), 1,
+    CODES_END,
+};
+u16 actor1Conditions[] = {
+    SPECIAL(0x22), 1,
+    PROGRESS(STORY_GENJI_BEATEN), 0,
+    ITEM(0, 6), 1,
+    CODES_END,
+};
+u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, ITEM(0, 6), 0, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, ITEM(0, 6), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor5Conditions[] = { SPECIAL(0x15), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0xC), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor9Conditions[] = { SPECIAL(0x16), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x17), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor13Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor14Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor14Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor15Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x2B, 4, 764, 1138, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x2B, 4, 764, 1138, 1 };

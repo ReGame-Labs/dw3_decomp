@@ -1,7 +1,7 @@
 /*
  * WSTAG974: Circuit Board, Underground: a deep tunnel with guides to both
  * servers, in the extra chapter. The European version's: in its extra chapter
- * (FIELD_PROGRESS_EXTRA), mode 750 starts it instead of WSTAG895.
+ * (STORY_EXTRA), mode 750 starts it instead of WSTAG895.
  */
 
 #include "common.h"

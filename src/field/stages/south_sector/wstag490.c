@@ -11,9 +11,9 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x25), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x26), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_WARGROWLMON_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_GRAPLEOMON_DDNA_REQUEST_SEEN, 0)) {
             children[0] = FIELDSTG_startEvent(0x4F4);
-        } else if (FLAGS_00.checkCondition(FLAG(0x40, 0x2F), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x30), 0)) {
+        } else if (FLAGS_00.checkCondition(FLAG_GRAPLEOMON_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_PAILDRAMON_DDNA_REQUEST_SEEN, 0)) {
             children[0] = FIELDSTG_startEvent(0x4FE);
         }
         task->nextState(task);
@@ -33,7 +33,7 @@ void updateStage(StageTask *task, void **children) {
  * stage's event battle 0
  */
 void endEvent1267(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x25), 1);
+    FLAGS_00.applyAction(FLAG_WARGROWLMON_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -42,13 +42,13 @@ void endEvent1267(void) {
  * keeps it from playing again
  */
 void endEvent1268(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x26), 1);
+    FLAGS_00.applyAction(FLAG_GRAPLEOMON_DDNA_REQUEST_SEEN, 1);
     FLAGS_00.applyAction(ITEM(0, 0x22), 1);
 }
 
 /* After event 1277, with GrapLeomon: lets event 1278 start and starts the stage's event battle 1 */
 void endEvent1277(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x2F), 1);
+    FLAGS_00.applyAction(FLAG_GRAPLEOMON_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
@@ -57,7 +57,7 @@ void endEvent1277(void) {
  * keeps it from playing again
  */
 void endEvent1278(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x30), 1);
+    FLAGS_00.applyAction(FLAG_PAILDRAMON_DDNA_REQUEST_SEEN, 1);
     FLAGS_00.applyAction(ITEM(0, 0x18B), 1);
 }
 
@@ -247,12 +247,12 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1B0, 0x1CC, 0x1C0, 0xCC, 0x160, 0x1FD },
     { 0x1C0, 0x100, 0x1C8, 0x15A, 0x220, 0x5A, 0x170, 0x1FD },
 };
-u16 actor6Talk0Conditions[] = { FLAG(0x1C, 0x13), 0, CODES_END };
-u16 actor6Talk0Actions[] = { START_EVENT(0x26), 1, FLAG(0x1C, 0x13), 1, CODES_END };
-u16 actor6Talk1Conditions[] = { FLAG(0x1C, 0x13), 1, CODES_END };
-u16 actor7Talk0Conditions[] = { FLAG(0x1C, 0x18), 0, CODES_END };
-u16 actor7Talk0Actions[] = { START_EVENT(0x2B), 1, FLAG(0x1C, 0x18), 1, CODES_END };
-u16 actor7Talk1Conditions[] = { FLAG(0x1C, 0x18), 1, CODES_END };
+u16 actor6Talk0Conditions[] = { FLAG_WARGROWLMON_DDNA_FOUGHT, 0, CODES_END };
+u16 actor6Talk0Actions[] = { START_EVENT(0x26), 1, FLAG_WARGROWLMON_DDNA_FOUGHT, 1, CODES_END };
+u16 actor6Talk1Conditions[] = { FLAG_WARGROWLMON_DDNA_FOUGHT, 1, CODES_END };
+u16 actor7Talk0Conditions[] = { FLAG_GRAPLEOMON_DDNA_FOUGHT, 0, CODES_END };
+u16 actor7Talk0Actions[] = { START_EVENT(0x2B), 1, FLAG_GRAPLEOMON_DDNA_FOUGHT, 1, CODES_END };
+u16 actor7Talk1Conditions[] = { FLAG_GRAPLEOMON_DDNA_FOUGHT, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x22 },
     { NULL, NULL, 0 },
@@ -291,14 +291,14 @@ FieldTalk actor8Talks[] = {
     { NULL, NULL, 0x146 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x19), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_CODE_PASSES_NEEDED), 1, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x1A), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_BULBMON_FOUND), 1, CODES_END };
 u16 actor5Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor6Conditions[] = { FLAG(6, 1), 1, ITEM(0, 0x22), 0, CODES_END };
-u16 actor7Conditions[] = { FLAG(6, 5), 1, ITEM(0, 0x18B), 0, CODES_END };
+u16 actor6Conditions[] = { FLAG_GUILMON_DDNA_REQUESTED, 1, ITEM(0, 0x22), 0, CODES_END };
+u16 actor7Conditions[] = { FLAG_KUMAMON_DDNA_REQUESTED, 1, ITEM(0, 0x18B), 0, CODES_END };
 u16 actor8Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x2E, 4, 561, 458, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x2E, 4, 561, 458, 7 };

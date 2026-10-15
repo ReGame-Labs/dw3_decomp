@@ -1,7 +1,7 @@
 /*
  * WSTAG934: Cargo Tower, Amaterasu City, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 639 starts it
- * instead of WSTAG261.
+ * version's: in its extra chapter (STORY_EXTRA), mode 639 starts it instead of
+ * WSTAG261.
  */
 
 #include "common.h"
@@ -32,7 +32,7 @@ void handleTileLift(Lift *task, s32 id) {
 Lift *createTileLift(s32 id) {
     Lift *task = createTaskWithId(updateTileLift, sizeof(Lift), 0, id);
 
-    if (FLAGS_00.checkCondition(FLAG(0x1C, 0x3D), 1)) {
+    if (FLAGS_00.checkCondition(FLAG_LIFT_RAISED, 1)) {
         task->raised = 1;
     } else {
         task->raised = 0;

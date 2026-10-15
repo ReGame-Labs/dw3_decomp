@@ -77,7 +77,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (FLAGS_00.checkCondition(FLAG(0x40, 8), 1) && FLAGS_00.checkCondition(FLAG(0x40, 9), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_DATAMON_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_DATAMON_OPENS_GATE_SEEN, 0)) {
             children[1] = FIELDSTG_startEvent(0x178);
         }
         break;
@@ -93,7 +93,7 @@ void updateStage(StageTask *task, void **children) {
 
 /* After event 375, with Datamon: lets event 376 start and starts the stage's event battle 0 */
 void endEvent375(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 8), 1);
+    FLAGS_00.applyAction(FLAG_DATAMON_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -102,13 +102,13 @@ void endEvent375(void) {
  * it from playing again
  */
 void endEvent376(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 9), 1);
+    FLAGS_00.applyAction(FLAG_DATAMON_OPENS_GATE_SEEN, 1);
     FLAGS_00.applyAction(ITEM(3, 0x74), 1);
 }
 
-/* After event 560, with Datamon: moves the story on to its step 0x16 */
+/* After event 560, with Datamon: moves the story on to STORY_CONTROL_ROOM */
 void endEvent560(void) {
-    GAME.progress = 0x16;
+    GAME.progress = STORY_CONTROL_ROOM;
 }
 
 #if VERSION_US || VERSION_JP
@@ -285,10 +285,10 @@ ActorImage stageImages[] = {
     { 0x200, 0x100, 0x200, 0x1BC, 0, 0xBC, 0x230, 0x1FD },
     { 0x140, 0x100, 0x168, 0x100, 0xA0, 0, 0x140, 0x1EE },
 };
-u16 actor1Talk0Actions[] = { START_EVENT(0x41), 1, FLAG(0xA, 3), 1, CODES_END };
-u16 actor3Talk0Conditions[] = { FLAG(0x1C, 0x1B), 0, CODES_END };
-u16 actor3Talk0Actions[] = { FLAG(0x1C, 0x1B), 1, CODES_END };
-u16 actor3Talk1Conditions[] = { FLAG(0x1C, 0x1B), 1, CODES_END };
+u16 actor1Talk0Actions[] = { START_EVENT(0x41), 1, FLAG_DATAMON_BEATEN, 1, CODES_END };
+u16 actor3Talk0Conditions[] = { FLAG_DATAMON_STAFF_PASS_TALKED, 0, CODES_END };
+u16 actor3Talk0Actions[] = { FLAG_DATAMON_STAFF_PASS_TALKED, 1, CODES_END };
+u16 actor3Talk1Conditions[] = { FLAG_DATAMON_STAFF_PASS_TALKED, 1, CODES_END };
 u16 actor4Talk0Conditions[] = { ITEM(0, 0x191), 0, CODES_END };
 u16 actor4Talk1Conditions[] = { ITEM(0, 0x191), 1, CODES_END };
 u16 actor4Talk1Actions[] = {
@@ -339,16 +339,24 @@ FieldTalk actor9Talks[] = {
     { NULL, NULL, 0x415 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { SPECIAL(0x16), 1, FLAG(0xA, 3), 1, CODES_END };
-u16 actor1Conditions[] = { FLAG(0xA, 3), 0, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, FLAG(0xA, 3), 1, CODES_END };
-u16 actor3Conditions[] = { FLAG(0xA, 3), 1, PROGRESS(0x14), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x15), 1, FLAG(0xA, 3), 1, CODES_END };
-u16 actor5Conditions[] = { FLAG(0xA, 3), 1, PROGRESS(0x16), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x18), 1, FLAG(0xA, 3), 1, CODES_END };
-u16 actor7Conditions[] = { FLAG(0xA, 3), 1, SPECIAL(0x19), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x26), 1, FLAG(0xA, 3), 1, CODES_END };
-u16 actor9Conditions[] = { FLAG(0xA, 3), 1, SPECIAL(0x1A), 1, CODES_END };
+u16 actor0Conditions[] = { SPECIAL(0x16), 1, FLAG_DATAMON_BEATEN, 1, CODES_END };
+u16 actor1Conditions[] = { FLAG_DATAMON_BEATEN, 0, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, FLAG_DATAMON_BEATEN, 1, CODES_END };
+u16 actor3Conditions[] = {
+    FLAG_DATAMON_BEATEN, 1,
+    PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1,
+    CODES_END,
+};
+u16 actor4Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, FLAG_DATAMON_BEATEN, 1, CODES_END };
+u16 actor5Conditions[] = { FLAG_DATAMON_BEATEN, 1, PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL(0x18), 1, FLAG_DATAMON_BEATEN, 1, CODES_END };
+u16 actor7Conditions[] = { FLAG_DATAMON_BEATEN, 1, SPECIAL(0x19), 1, CODES_END };
+u16 actor8Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_DATAMON_BEATEN, 1,
+    CODES_END,
+};
+u16 actor9Conditions[] = { FLAG_DATAMON_BEATEN, 1, SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0xA5, 4, 433, 260, 5 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0xA5, 4, 433, 260, 5 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0xA5, 4, 433, 260, 5 };

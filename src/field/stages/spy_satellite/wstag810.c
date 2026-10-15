@@ -161,7 +161,7 @@ void updateStage(StageTask *task, void **children) {
         } else {
             children[62] = createTilePairNDone(1);
         }
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x6F), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_GUNSLINGER_1F_SOLDIER_SEEN, 0)) {
             children[63] = createTilePairN3(0x34B);
         } else {
             children[63] = createTilePairNDone(3);
@@ -230,13 +230,13 @@ void endEvent1000(void) {
  * actor 2 appears) and keeps it from playing again
  */
 void endEvent1010(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x6F), 1);
+    FLAGS_00.applyAction(FLAG_GUNSLINGER_1F_SOLDIER_SEEN, 1);
     FLAGS_00.applyAction(FLAG(0x1C, 0x3C), 1);
 }
 
-/* After event 1035, with the player: moves the story on to its step 0x29 */
+/* After event 1035, with the player: moves the story on to STORY_GUNSLINGER */
 void endEvent1035(void) {
-    GAME.progress = 0x29;
+    GAME.progress = STORY_GUNSLINGER;
 }
 
 #if VERSION_US || VERSION_JP
@@ -706,8 +706,8 @@ StageSlot stageSlots0[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH_OUT, 0x2DE, 0x40C, 0x2D2, 1, 0, 0, 0 },
     { { { FLAG(0x40, 0x6D), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x3DE, 0, 0, 0, 0, 0, 0 },
     { { { FLAG(0x40, 0x6E), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x3E8, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0x6F), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x3F2, 0, 0, 0, 0, 0, 0 },
-    { { { PROGRESS(0x28), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x40B, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_GUNSLINGER_1F_SOLDIER_SEEN, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x3F2, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_OPERATION_SIGMA), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x40B, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2329, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots1[] = {

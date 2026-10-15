@@ -118,7 +118,7 @@ void updateGlow(StageGlow *task) {
     case TASK_INIT:
     default:
         task->level = 12;
-        if (GAME.progress == 0x27) {
+        if (GAME.progress == STORY_ASUKA_HEADQUARTERS) {
             SOUND.playSound(SOUND_DOOROPEN);
         } else {
             SOUND.playSound(SOUND_SE000000);
@@ -584,18 +584,18 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         children[1] = createCommand801(0x321);
-        if (GAME.progress == 0) {
+        if (GAME.progress == STORY_START) {
             children[0] = FIELDSTG_startEvent(0);
-        } else if (GAME.progress == 0x17) {
+        } else if (GAME.progress == STORY_GAME_MASTER_CAUGHT) {
             children[0] = FIELDSTG_startEvent(0x2AC);
-        } else if (GAME.progress == 0x1B) {
+        } else if (GAME.progress == STORY_JUNGLE_SOUND) {
             children[0] = FIELDSTG_startEvent(0x2E6);
             children[2] = createEffectSet();
-        } else if (GAME.progress == 0x20) {
+        } else if (GAME.progress == STORY_REAL_WORLD) {
             children[0] = FIELDSTG_startEvent(0x375);
-        } else if (GAME.progress == 0x27) {
+        } else if (GAME.progress == STORY_ASUKA_HEADQUARTERS) {
             children[0] = FIELDSTG_startEvent(0x3CB);
-        } else if (GAME.progress == FIELD_PROGRESS_MOVIE_BATTLES) {
+        } else if (GAME.progress == STORY_MOVIE_BATTLES) {
             children[0] = FIELDSTG_startEvent(0x5DC);
         }
         task->nextState(task);
@@ -610,9 +610,9 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0xC
 #include "common/start_stage.inc.c"
 
-/* After event 0, with Junior, Ivy and Teddy: moves the story on to its step 0 */
+/* After event 0, with Junior, Ivy and Teddy: moves the story on to STORY_START */
 void endEvent0(void) {
-    GAME.progress = 0;
+    GAME.progress = STORY_START;
 }
 
 /* After event 885: lets event 886 of WSTAG750 start */
@@ -623,7 +623,7 @@ void endEvent885(void) {
 #if VERSION_EU || VERSION_JP
 /* The end of event 1500, only in the European version: the story goes on to its extra chapter */
 void endEvent1500(void) {
-    GAME.progress = FIELD_PROGRESS_EXTRA;
+    GAME.progress = STORY_EXTRA;
 }
 #endif
 
@@ -640,7 +640,7 @@ void endEvent1500(void) {
 #endif
 /*
  * Sets the stage up: its map, actors and events, playing BGM00000, or
- * BGM00001 at story step 0x1B, BGM00002 at 0x20 and BGM00003 at 0x27
+ * BGM00001 at STORY_JUNGLE_SOUND, BGM00002 at 0x20 and BGM00003 at 0x27
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -658,15 +658,15 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
     switch (GAME.progress) {
-    case 0x1B:
+    case STORY_JUNGLE_SOUND:
         FIELDSTG_state.soundBank = 0x29;
         FIELDSTG_state.music = MUSIC(0x29, 1);
         break;
-    case 0x20:
+    case STORY_REAL_WORLD:
         FIELDSTG_state.soundBank = 0x29;
         FIELDSTG_state.music = MUSIC(0x29, 2);
         break;
-    case 0x27:
+    case STORY_ASUKA_HEADQUARTERS:
         FIELDSTG_state.soundBank = 0x29;
         FIELDSTG_state.music = MUSIC(0x29, 3);
         break;
@@ -1431,17 +1431,17 @@ FieldTalk actor6Talks[] = {
     { NULL, NULL, 1 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x27), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(0x27), 1, CODES_END };
-u16 actor14Conditions[] = { PROGRESS(0x27), 1, CODES_END };
-u16 actor15Conditions[] = { PROGRESS(0x27), 1, CODES_END };
-u16 actor16Conditions[] = { PROGRESS(0x27), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_ASUKA_HEADQUARTERS), 1, CODES_END };
+u16 actor13Conditions[] = { PROGRESS(STORY_ASUKA_HEADQUARTERS), 1, CODES_END };
+u16 actor14Conditions[] = { PROGRESS(STORY_ASUKA_HEADQUARTERS), 1, CODES_END };
+u16 actor15Conditions[] = { PROGRESS(STORY_ASUKA_HEADQUARTERS), 1, CODES_END };
+u16 actor16Conditions[] = { PROGRESS(STORY_ASUKA_HEADQUARTERS), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0xB, 5, 0, 0, 1 };

@@ -70,7 +70,7 @@ void updateStage(StageTask *task, void **children) {
                 children[i] = createStageEffect(updateStageSpots[i].x, updateStageSpots[i].y, updateStageSpots[i].frame);
             }
         }
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x86), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x87), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_DARK_MASTER_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x87), 0)) {
             children[21] = FIELDSTG_startEvent(0x512);
         }
         task->nextState(task);
@@ -95,7 +95,7 @@ void updateStage(StageTask *task, void **children) {
  * keeps it from playing again
  */
 void endEvent1297(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x86), 1);
+    FLAGS_00.applyAction(FLAG_DARK_MASTER_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -302,15 +302,20 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x170, 0x180, 0xC0, 0x80, 0x150, 0x1FA },
     { 0x140, 0x100, 0x140, 0x160, 0, 0x60, 0x160, 0x1FA },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x5D), 1, ITEM(5, 0x10E), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_DARK_DUNGEON_HAZARD_ARMOR_FOUND, 1,
+    ITEM(5, 0x10E), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 u16 actor3Talk0Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
-u16 actor3Talk1Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor3Talk2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor3Talk3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor3Talk1Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor3Talk2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor3Talk3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor4Talk0Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
-u16 actor4Talk1Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor4Talk2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor4Talk3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor4Talk1Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor4Talk2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor4Talk3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x18D },
     { NULL, NULL, 0 },
@@ -337,7 +342,7 @@ FieldTalk actor4Talks[] = {
     { actor4Talk3Conditions, NULL, 0x21A },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x5D), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_DARK_DUNGEON_HAZARD_ARMOR_FOUND, 0, CODES_END };
 u16 actor1Conditions[] = { FLAG(0x40, 0x87), 0, SPECIAL(0x1A), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x1A), 1, FLAG(0x40, 0x87), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x1A), 0, FLAG(0x40, 0x87), 0, SPECIAL(8), 1, CODES_END };
@@ -374,7 +379,7 @@ StageTile stageObjects[] = {
 };
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2D3, 0xD0, 0x33C, 5, 0, 0, 0 },
-    { { { FLAG(0x40, 0x86), 0 }, { SPECIAL(0x1A), 0 } }, SLOT_EVENT, 0x511, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_DARK_MASTER_WIN_SEEN, 0 }, { SPECIAL(0x1A), 0 } }, SLOT_EVENT, 0x511, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x1F40, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x1F41, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x1F42, 0, 0, 0, 0, 0, 0 },

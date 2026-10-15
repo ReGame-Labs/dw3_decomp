@@ -108,15 +108,49 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x172, 0x1CD, 0xC8, 0xCD, 0x150, 0x1FA },
     { 0x180, 0x100, 0x1A0, 0x100, 0x180, 0, 0x160, 0x1FA },
 };
-u16 actor0Talk0Actions[] = { SPECIAL(0x92), 1, FLAG(2, 0x61), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(2, 0x62), 1, ITEM(1, 0x2D), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    SPECIAL(0x92), 1,
+    FLAG_AMATERASU_ADMIN_B1F_8500_BIT_FOUND, 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor1Talk0Actions[] = {
+    FLAG_AMATERASU_ADMIN_B1F_ULTRA_CHARGE_FOUND, 1,
+    ITEM(1, 0x2D), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 u16 actor2Talk0Actions[] = { FLAG(2, 0x63), 1, CODES_END };
-u16 actor3Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0x34), 1, CODES_END };
-u16 actor4Talk0Actions[] = { EVENT_BATTLE(1), 1, FLAG(0xC, 0x38), 1, CODES_END };
-u16 actor5Talk0Actions[] = { EVENT_BATTLE(1), 1, FLAG(0xC, 0x39), 1, CODES_END };
-u16 actor6Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0x35), 1, CODES_END };
-u16 actor7Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0x36), 1, CODES_END };
-u16 actor8Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0x35), 1, CODES_END };
+u16 actor3Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_AMATERASU_ADMIN_B1F_SOLDIER_A_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor4Talk0Actions[] = {
+    EVENT_BATTLE(1), 1,
+    FLAG_AMATERASU_ADMIN_B1F_ATTACKER_A_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor5Talk0Actions[] = {
+    EVENT_BATTLE(1), 1,
+    FLAG_AMATERASU_ADMIN_B1F_ATTACKER_B_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor6Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_AMATERASU_ADMIN_B1F_SOLDIER_B_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor7Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_AMATERASU_ADMIN_B1F_SOLDIER_C_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor8Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_AMATERASU_ADMIN_B1F_SOLDIER_B_FOUGHT, 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x1F8 },
     { NULL, NULL, 0 },
@@ -153,15 +187,39 @@ FieldTalk actor8Talks[] = {
     { NULL, actor8Talk0Actions, 0x1CC },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x61), 0, CODES_END };
-u16 actor1Conditions[] = { FLAG(2, 0x62), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_AMATERASU_ADMIN_B1F_8500_BIT_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { FLAG_AMATERASU_ADMIN_B1F_ULTRA_CHARGE_FOUND, 0, CODES_END };
 u16 actor2Conditions[] = { FLAG(2, 0x63), 0, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x25), 1, FLAG(0xC, 0x34), 0, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x25), 1, FLAG(0xC, 0x38), 0, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x25), 1, FLAG(0xC, 0x39), 0, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x25), 1, FLAG(0xC, 0x35), 0, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0x25), 1, FLAG(0xC, 0x36), 0, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x25), 1, FLAG(0xC, 0x35), 0, CODES_END };
+u16 actor3Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_AMATERASU_ADMIN_B1F_SOLDIER_A_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor4Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_AMATERASU_ADMIN_B1F_ATTACKER_A_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor5Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_AMATERASU_ADMIN_B1F_ATTACKER_B_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor6Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_AMATERASU_ADMIN_B1F_SOLDIER_B_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor7Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_AMATERASU_ADMIN_B1F_SOLDIER_C_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor8Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_AMATERASU_ADMIN_B1F_SOLDIER_B_FOUGHT, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 144, 647, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x4D, 5, 209, 201, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x4E, 6, 768, 490, 1 };

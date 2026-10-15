@@ -1,7 +1,7 @@
 /*
  * WSTAG925: Login Room, Amaterasu City, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 630 starts it
- * instead of WSTAG226.
+ * version's: in its extra chapter (STORY_EXTRA), mode 630 starts it instead of
+ * WSTAG226.
  */
 
 #include "common.h"

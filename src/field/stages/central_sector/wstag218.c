@@ -40,11 +40,11 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x14 && GAME.progress < 0x18) {
+    if (GAME.progress >= STORY_BYAKKO_LEADER_FOUGHT && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -115,8 +115,18 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x178, 0x158, 0xE0, 0x58, 0x170, 0x1FE },
     { 0x140, 0x100, 0x178, 0x1B0, 0xE0, 0xB0, 0x170, 0x1FD },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x16), 1, SPECIAL(0x8E), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(2, 0x17), 1, ITEM(1, 0x2B), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_ASUKA_CITY_1000_BIT_FOUND, 1,
+    SPECIAL(0x8E), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor1Talk0Actions[] = {
+    FLAG_ASUKA_CITY_POWER_CHARGE_FOUND, 1,
+    ITEM(1, 0x2B), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x48A },
     { NULL, NULL, 0 },
@@ -125,8 +135,8 @@ FieldTalk actor1Talks[] = {
     { NULL, actor1Talk0Actions, 0x2B6 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x16), 0, CODES_END };
-u16 actor1Conditions[] = { FLAG(2, 0x17), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_ASUKA_CITY_1000_BIT_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { FLAG_ASUKA_CITY_POWER_CHARGE_FOUND, 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 809, 389, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x4D, 5, 919, 300, 1 };
 FieldActorEntry *stageActors[] = {

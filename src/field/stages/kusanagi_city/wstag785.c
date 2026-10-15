@@ -250,10 +250,10 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         switch (GAME.progress) {
-        case 0:
+        case STORY_START:
             children[0] = FIELDSTG_startEvent(1);
             break;
-        case 1:
+        case STORY_ACCOUNT_REGISTERED:
             children[1] = createTileSet();
             children[0] = FIELDSTG_startEvent(3);
             break;
@@ -271,9 +271,9 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0x8
 #include "common/start_stage.inc.c"
 
-/* After event 1, with Junior, Teddy, Account Clerk and Ivy: moves the story on to its step 1 */
+/* After event 1, with Junior, Teddy, Account Clerk and Ivy: moves the story on to STORY_ACCOUNT_REGISTERED */
 void endEvent1(void) {
-    GAME.progress = 1;
+    GAME.progress = STORY_ACCOUNT_REGISTERED;
 }
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
@@ -680,18 +680,18 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1B6, 0x110, 0x1D8, 0x10, 0x160, 0x1F0 },
     { 0x180, 0x100, 0x194, 0x11F, 0x150, 0x1F, 0x170, 0x1F0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(1), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(1), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(1), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(1), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(1), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(1), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_ACCOUNT_REGISTERED), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_ACCOUNT_REGISTERED), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_ACCOUNT_REGISTERED), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_ACCOUNT_REGISTERED), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_ACCOUNT_REGISTERED), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_ACCOUNT_REGISTERED), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0xB, 5, 0, 0, 1 };
