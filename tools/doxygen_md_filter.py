@@ -20,6 +20,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAINPAGE = "README.md"
 HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
 LINK = re.compile(r"\]\(([^)\s#]*)#([^)\s]+)\)")
+# a link to a file or folder of the repository, such as "(../src/engine/system/main.c)"
+FILE_LINK = re.compile(r"\]\(([^)\s#:]+)\)")
+SOURCE = re.compile(r"^(src|include)/.*(\.[ch]|/)$")
+REPOSITORY = "https://github.com/ReGame-Labs/dw3_decomp"
 
 
 def page_id(path):
@@ -31,6 +35,19 @@ def github_anchor(title):
     """GitHub's anchor of a heading: lower case, without punctuation, - for spaces"""
     title = re.sub(r"`|\*\*|\[([^]]*)\]\([^)]*\)", r"\1", title).lower()
     return re.sub(r"[^\w\- ]", "", title).replace(" ", "-")
+
+
+def file_link(here, target):
+    """A link to a source file or folder goes to its page; one to another file
+    (a tool, a Markdown page doxygen links itself) stays or goes to GitHub"""
+    if target.endswith(".md"):
+        return target
+    path = os.path.normpath(os.path.join(here, target))
+    folder = os.path.isdir(os.path.join(ROOT, path))
+    if SOURCE.match(path + ("/" if folder else "")):
+        # doxygen finds a file by its path after STRIP_FROM_INC_PATH (src, include)
+        return "@ref " + (path if folder else path.split("/", 1)[1])
+    return f"{REPOSITORY}/{'tree' if folder else 'blob'}/main/{path}"
 
 
 def filter_md(text, path):
@@ -56,6 +73,7 @@ def filter_md(text, path):
                     target = page if not m.group(1) else page_id(os.path.normpath(os.path.join(here, m.group(1))))
                     return f"](#{target}_{m.group(2)})"
                 line = LINK.sub(relink, line)
+                line = FILE_LINK.sub(lambda m: "](" + file_link(here, m.group(1)) + ")", line)
         out.append(line)
     return "\n".join(out)
 

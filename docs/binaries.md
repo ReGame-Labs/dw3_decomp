@@ -88,7 +88,7 @@ One source tree builds every version, one at a time, picked with `VERSION`
 |---|---|---|---|---|---|---|
 | `us` | *Digimon World 3*, USA, SLUS-01436 | `SLUS_014.36` (`444653259f78ddb483fd22af72cce9276f42f214`) | `Digimon World 3 (USA).bin` (`f0b022f9be53cbce14640abd8f01beaadcb35208`) | 21 | 238 | yes |
 | `eu` | *Digimon World 2003*, Europe, SLES-03936 | `SLES_039.36` (`d1b7e4d646e3a9c2b88fdb25d20b5f7116bbb06d`) | `Digimon World 2003 (Europe).bin` (`457cb233349ba841e03b33d8060f8fbcadd45cb3`) | 21 | 293 | the USA version's, and its own stages' |
-| `jp` | *Digimon World 3: Aratanaru Bouken no Tobira*, Japan, SLPS-03446 | `SLPS_034.46` (`0e5b6b9ee2f99a804ed8c4117c805482c10e260b`) | `Digimon World 3 - Aratanaru Bouken no Tobira (Japan).bin` (`8594fb44f601da64087a8996ffd89ab26abb11ea`) | 21 | 293 | none yet: splat's assembly |
+| `jp` | *Digimon World 3: Aratanaru Bouken no Tobira*, Japan, SLPS-03446 | `SLPS_034.46` (`0e5b6b9ee2f99a804ed8c4117c805482c10e260b`) | `Digimon World 3 - Aratanaru Bouken no Tobira (Japan).bin` (`8594fb44f601da64087a8996ffd89ab26abb11ea`) | 21 | 293 | the European version's |
 
 - `mk/version/<version>.mk` has each version's settings: the release's name,
   the executable's name, the disc directory, the overlays, where they load
