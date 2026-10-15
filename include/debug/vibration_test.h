@@ -12,7 +12,7 @@
 
 /* A file the editor loads when it starts and never reads (ShockTest.file);
    the discs number their files differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define SHOCKTST_FILE 0xC5
 #elif VERSION_EU
 #define SHOCKTST_FILE 0xBE

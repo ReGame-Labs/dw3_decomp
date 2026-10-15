@@ -75,7 +75,7 @@ s32 FIGHTSTG_adjustDamage(u8 side, s32 id, s32 value) {
     if (result > value * 5) {
         result = value * 5;
     }
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     if (result >= 10000) {
         result = 9999;
     }
@@ -177,7 +177,7 @@ s32 FIGHTSTG_computeMagicDamage(u8 side, s32 id) {
     if (result > power * 5) {
         result = power * 5;
     }
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     if (result >= 10000) {
         result = 9999;
     }
@@ -269,7 +269,7 @@ s32 FIGHTSTG_computeHeal(u8 side, s32 id) {
     u16 value;
     s32 flag;
     s32 fighter;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     s32 result;
 #endif
 
@@ -286,7 +286,7 @@ s32 FIGHTSTG_computeHeal(u8 side, s32 id) {
     value = entry->power;
 #if VERSION_US
     return (value << 6) + stats->stats[BATTLE_STAT_WISDOM] * value / 8;
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     result = (value << 6) + stats->stats[BATTLE_STAT_WISDOM] * value / 8;
     if (result > 9999) {
         result = 9999;
@@ -311,7 +311,7 @@ s32 FIGHTSTG_getHeal(u8 side, s32 index, s32 big) {
     } else {
         value = fighter->maxHp * (RANDOM.next() % 5 + 4) / 128;
     }
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     if (value > 9999) {
         value = 9999;
     }

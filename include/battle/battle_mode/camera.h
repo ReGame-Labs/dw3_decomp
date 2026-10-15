@@ -124,7 +124,7 @@ CameraView *FIGHTSTG_getEnemyView(BattleCamera *task);
 extern CameraView FIGHTSTG_fighterView;
 extern CameraShot FIGHTSTG_cameraShots[4][6];
 extern u8 FIGHTSTG_nextShotLists[8][3];
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
 extern CameraShot FIGHTSTG_euCameraShots[3][3];
 #endif
 

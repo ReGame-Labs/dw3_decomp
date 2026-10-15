@@ -29,7 +29,7 @@ BattleFuncs FIGHTSTG_battleFuncs = {
     FIGHTSTG_rollMagicHit, FIGHTSTG_rollPoison, FIGHTSTG_rollParalysis, FIGHTSTG_rollConfusion,
     FIGHTSTG_rollSleep, FIGHTSTG_rollKnockOut, FIGHTSTG_rollSteal, FIGHTSTG_rollDrain,
     FIGHTSTG_rollDedigivolve, FIGHTSTG_rollStatusRaise, FIGHTSTG_rollNoSwitch, FIGHTSTG_rollNoDigivolve,
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     FIGHTSTG_rollCounter,
 #endif
     FIGHTSTG_testRunAway, FIGHTSTG_testWakeUp, FIGHTSTG_testConfusion, FIGHTSTG_testParalysis,
@@ -130,7 +130,7 @@ void FIGHTSTG_queueSpecialEnd(void) {
         FIGHTSTG_newEvent.args[1] = FIGHTSTG_battle.state.active[0];
         FIGHTSTG_pushEvent(&FIGHTSTG_newEvent);
     }
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     FIGHTSTG_newEvent.type = EVENT_SPECIAL_END;
     FIGHTSTG_newEvent.delay = 1;
     FIGHTSTG_newEvent.args[0] = 0;

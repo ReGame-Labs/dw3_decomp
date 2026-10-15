@@ -412,22 +412,22 @@ s32 CARDGAME_removeMarkedSlots(CardBattle *battle, CardScreen *screen) {
             CARDGAME_slotMoveCounts[side] = count;
             if (side == 0) {
                 for (i = 0; i < count; i++) {
-#if VERSION_US
-                    screen->startMove(screen, CARDGAME_slotMoves[0][i][1], 10, CARDGAME_slotMoves[0][i][0] * 0x2900 + 0x1800, 0x9000);
-#elif VERSION_EU
+#if PAL_VIDEO
                     screen->startMove(screen, CARDGAME_slotMoves[0][i][1], 10,
                                    CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][0] + CARDGAME_slotMoves[0][i][0] * 0x2900,
                                    CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][1]);
+#else
+                    screen->startMove(screen, CARDGAME_slotMoves[0][i][1], 10, CARDGAME_slotMoves[0][i][0] * 0x2900 + 0x1800, 0x9000);
 #endif
                 }
             } else {
                 for (i = 0; i < count; i++) {
-#if VERSION_US
-                    screen->startMove(screen, CARDGAME_slotMoves[1][i][1] + 6, 10, CARDGAME_slotMoves[1][i][0] * 0x2900 + 0x1800, 0x3200);
-#elif VERSION_EU
+#if PAL_VIDEO
                     screen->startMove(screen, CARDGAME_slotMoves[1][i][1] + 6, 10,
                                    CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][2] + CARDGAME_slotMoves[1][i][0] * 0x2900,
                                    CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][3]);
+#else
+                    screen->startMove(screen, CARDGAME_slotMoves[1][i][1] + 6, 10, CARDGAME_slotMoves[1][i][0] * 0x2900 + 0x1800, 0x3200);
 #endif
                 }
             }

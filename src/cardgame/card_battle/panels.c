@@ -60,7 +60,7 @@ void CARDGAME_drawPanel(CardPanel *panel, CardScreenItems *items, s32 side) {
 
     y = panel->y;
     imageY = panel->winsY;
-#if VERSION_EU
+#if PAL_VIDEO
     if (SHIFT_PAL_SCREEN) {
         if (side == 0) {
             y += 12;
@@ -121,7 +121,7 @@ void CARDGAME_drawPanel(CardPanel *panel, CardScreenItems *items, s32 side) {
         }
 #if VERSION_US
         drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 3), CARDGAME_panelBarSprites[1][0], panel->x + CARDGAME_panelLayouts[side].apBar.x, y + CARDGAME_panelLayouts[side].apBar.y);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
         drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 3), CARDGAME_panelBarSprites[LANGUAGE][0], panel->x + CARDGAME_panelLayouts[side].apBar.x, y + CARDGAME_panelLayouts[side].apBar.y);
 #endif
         if (panel->flags[9] != 0) {
@@ -131,7 +131,7 @@ void CARDGAME_drawPanel(CardPanel *panel, CardScreenItems *items, s32 side) {
         }
 #if VERSION_US
         drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 3), CARDGAME_panelBarSprites[1][1], panel->x + CARDGAME_panelLayouts[side].hpBar.x, y + CARDGAME_panelLayouts[side].hpBar.y);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
         drawer.draw(FILE_CACHE.getEntry(FILE_CARDGAME_TIMS << 16 | 3), CARDGAME_panelBarSprites[LANGUAGE][1], panel->x + CARDGAME_panelLayouts[side].hpBar.x, y + CARDGAME_panelLayouts[side].hpBar.y);
 #endif
 
@@ -343,19 +343,7 @@ void CARDGAME_drawPanelIcon(CardScreen *screen, CardScreenItems *items, s32 side
     s32 textX;
     s32 textY;
 
-#if VERSION_US
-    if (side == 0) {
-        iconX = 0x7C;
-        iconY = 0x33;
-        textX = 0x8A;
-        textY = 0x34;
-    } else {
-        iconX = 0x7C;
-        iconY = 0x23;
-        textX = 0x8A;
-        textY = 0x24;
-    }
-#elif VERSION_EU
+#if PAL_VIDEO
     if (side == 0) {
         iconX = CARDGAME_panelIconPositions[SHIFT_PAL_SCREEN][0][0].x;
         iconY = CARDGAME_panelIconPositions[SHIFT_PAL_SCREEN][0][0].y;
@@ -366,6 +354,18 @@ void CARDGAME_drawPanelIcon(CardScreen *screen, CardScreenItems *items, s32 side
         iconY = CARDGAME_panelIconPositions[SHIFT_PAL_SCREEN][0][1].y;
         textX = CARDGAME_panelIconPositions[SHIFT_PAL_SCREEN][1][1].x;
         textY = CARDGAME_panelIconPositions[SHIFT_PAL_SCREEN][1][1].y;
+    }
+#else
+    if (side == 0) {
+        iconX = 0x7C;
+        iconY = 0x33;
+        textX = 0x8A;
+        textY = 0x34;
+    } else {
+        iconX = 0x7C;
+        iconY = 0x23;
+        textX = 0x8A;
+        textY = 0x24;
     }
 #endif
     if (scale->state != 0) {

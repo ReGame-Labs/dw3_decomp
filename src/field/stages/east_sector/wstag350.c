@@ -12,8 +12,8 @@
 extern FieldBattles stageBattles0[];
 extern FieldBattles stageBattles1[];
 extern FieldBattles stageBattles2[];
-#if VERSION_US
-#define STAGE_TEXT 0xF7
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF7)
 #define STAGE_FILE 0x1AB
 #define STAGE_ARCHIVE 0x3C4
 #elif VERSION_EU

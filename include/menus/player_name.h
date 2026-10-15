@@ -18,7 +18,7 @@
 #include "shared/name_entry.h" /* the keyboard's types, as STDGNAME's and STCRDDEK's */
 
 /* The files of the screen */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FILE_PLNMET_SPRITES 0x27C
 #define FILE_PLNMET_KEYBOARD 0x762
 #define FILE_PLNMET_IMAGE 0x896

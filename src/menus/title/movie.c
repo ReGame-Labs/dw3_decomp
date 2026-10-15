@@ -219,7 +219,7 @@ void STDWTITL_tickMovie(MovieTask *task, MoviePlayerTask **player) {
             *player = STDWTITL_startMoviePlayerTask(STDWTITL_movies[11].file, STDWTITL_movies[11].endFrame);
             task->nextMode = STDWTITL_movies[11].nextMode;
         }
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
         /* movie 11 is one of three, by the language */
         if (task->movie != 11) {
             *player = STDWTITL_startMoviePlayerTask(STDWTITL_movies[task->movie].file, STDWTITL_movies[task->movie].endFrame);

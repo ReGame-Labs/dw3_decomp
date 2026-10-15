@@ -172,7 +172,13 @@ extern u16 FILE_SECTOR_COUNTS[];
  * Files the engine loads by number. The European disc numbers its files
  * differently, and has each text file once per language, in a row:
  * TEXT_FILE() gives the copy of the language the player picked (LANGUAGE,
- * set by CNTY_SEL), copy 1 being at the USA version's number.
+ * set by CNTY_SEL), copy 1 being at the USA version's number. Every disc
+ * has all the copies; the Japanese version reads copy 0, Japanese, which
+ * is the European version's LANGUAGE 0 (NAME_ENTRY_JAPANESE), so it is
+ * the European code with LANGUAGE a constant. The Japanese disc otherwise
+ * numbers its files as the USA one does: every file of the USA disc is at
+ * the same number on it (its 55 more stages' files come after), so the
+ * Japanese version takes the USA version's file numbers.
  */
 #if VERSION_US
 #define FILE_MENU_SPRITES 0x277 /* the menu graphics, a sprite sheet */
@@ -183,6 +189,11 @@ extern u16 FILE_SECTOR_COUNTS[];
 #define FILE_FONT 0x287
 #define TEXT_FILE(file) (LANGUAGE + (file) - 1)
 extern s32 LANGUAGE; /* 2-5 */
+#elif VERSION_JP
+#define FILE_MENU_SPRITES 0x277
+#define FILE_FONT 0x278
+#define TEXT_FILE(file) (LANGUAGE + (file) - 1)
+#define LANGUAGE 0
 #endif
 
 /* The text files, by their USA disc names (US<name>.BIN), for TEXT_FILE() */
@@ -217,7 +228,7 @@ extern s32 LANGUAGE; /* 2-5 */
 /* The battle menu's files (WFIGHTMN, WFIGHTTS): FILE_BATTLE_IMAGES is an
    archive whose entries go through FILE_CACHE.getEntry, the four after it
    are archives of images for VRAM */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FILE_BATTLE_MENU 0x445
 #define FILE_BATTLE_IMAGES 0x446
 #define FILE_BATTLE_IMAGES_1 0x78F

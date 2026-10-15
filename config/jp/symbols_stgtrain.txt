@@ -108,3 +108,10 @@ STGTRAIN_animCursor = 0x8008CF68;
 STGTRAIN_imageCursor = 0x8008CF6C;
 STGTRAIN_setCursor = 0x8008CF70;
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+STGTRAIN_waitAnims = 0x8008BE90; // size:0xE0
+STGTRAIN_resistGainsLow = 0x8008BFE8; // size:0x48
+STGTRAIN_resistGainsMid = 0x8008C030; // size:0x48
+STGTRAIN_resistGainsHigh = 0x8008C078; // size:0x48
+STGTRAIN_trainings = 0x8008C850; // size:0x258

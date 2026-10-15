@@ -5,7 +5,7 @@
 
 #include "common.h"
 #include "field/stage.h"
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define TIMER_SHEET 0x6EE
 #elif VERSION_EU
 #define TIMER_SHEET 0x6FE
@@ -321,8 +321,8 @@ void endEvent871(void) {
     FLAGS_00.applyAction(ITEM(2, 0xCB), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define EVENT_TEXT_FILE 0x14A
 #define STAGE_FILE 0x6EE
 #define STAGE_FILE_8 0x715

@@ -8,8 +8,8 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
-#if VERSION_US
-#define STAGE_TEXT 0xDB
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xDB)
 #define STAGE_FILE 0x299
 #define STAGE_ARCHIVE 0x30E
 #elif VERSION_EU

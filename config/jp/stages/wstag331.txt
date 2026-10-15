@@ -7,3 +7,8 @@ endEvent920 = 0x800A5818; // type:func
 endEvent970 = 0x800A5844; // type:func
 setupStage = 0x800A5870; // type:func
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+stageColor = 0x800A5770;
+script970 = 0x800A5B70;
+area3Battle5 = 0x800A60C8;

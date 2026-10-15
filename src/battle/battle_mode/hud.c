@@ -93,7 +93,7 @@ DVECTOR FIGHTSTG_hpBars[2][4] = {
     { { 0xAF, 0x25 }, { 0x12F, 0x25 }, { 0xAF, 0x2B }, { 0x12F, 0x2B } },
     { { 0x0F, 0x25 }, { 0x8F, 0x25 }, { 0x0F, 0x2B }, { 0x8F, 0x2B } },
 };
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 DVECTOR FIGHTSTG_hpBars[2][4] = {
     { { 0xAF, 0x25 }, { 0x12F, 0x25 }, { 0xAF, 0x2B }, { 0x12F, 0x2B } },
     { { 0x8F, 0x25 }, { 0x0F, 0x25 }, { 0x8F, 0x2B }, { 0x0F, 0x2B } },
@@ -158,7 +158,7 @@ void FIGHTSTG_drawHud(HpDisplay *task, TextWindow **windows) {
         if (task->hp[i].value > 0 && width < 4) {
             width = 3;
         }
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         /* the match depends on testing i == 0 first (i != 0 gives 13 diffs) */
         if (i == 0) {
             FIGHTSTG_hpBars[i][1].vx = FIGHTSTG_hpBars[i][0].vx + width;

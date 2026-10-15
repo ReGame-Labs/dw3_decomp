@@ -40,8 +40,8 @@ void endEvent690(void) {
     GAME.progress = 0x19;
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xD4
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xD4)
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x4B4
 #elif VERSION_EU

@@ -34,7 +34,7 @@ void FIGHTSTG_updateCameraTurn(CameraTurn *task, BattleScript **children) {
         task->nextState(task);
         /* fallthrough */
     case 1:
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         task->substate += GFX.funcs.getFrameTime();
         if (task->substate >= 240) {
             task->setState(task, 2);

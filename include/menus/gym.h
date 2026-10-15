@@ -11,8 +11,8 @@
 #define OVL_NAME(name) STGTRAIN_##name
 
 /* The overlay's files: the discs number them differently */
-#if VERSION_US
-#define STGTRAIN_TEXT 0x105 /* its strings */
+#if VERSION_US || VERSION_JP
+#define STGTRAIN_TEXT TEXT_FILE(0x105) /* its strings */
 #define STGTRAIN_FILE_SPRITES 0x27D
 #define STGTRAIN_FILE_IMAGES 0x27E /* a TIM archive */
 #elif VERSION_EU

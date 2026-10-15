@@ -15,8 +15,9 @@ typedef struct OverlayLoader {
 } OverlayLoader;
 
 /* The mode overlays' files (MODE_OVERLAY_FILES), by their disc names: each
-   one's sector count in FILE_SECTOR_COUNTS is its .PRO file's */
-#if VERSION_US
+   one's sector count in FILE_SECTOR_COUNTS is its .PRO file's. The Japanese
+   disc numbers them as the USA one does */
+#if VERSION_US || VERSION_JP
 #define FILE_CARDGAME 0x153
 #define FILE_STDGNAME 0x154
 #define FILE_CNTY_SEL 0x157

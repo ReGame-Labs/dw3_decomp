@@ -37,7 +37,7 @@ static inline void lowerEnemyStat(BattleItem *task, BattleChild *children) {
                 stats->stats[BATTLE_STAT_DEFENSE] -= fighter->boosts[1];
             }
             min = -(stats->stats[BATTLE_STAT_DEFENSE] / 2);
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             fighter->boosts[1] -= def - atk;
 #else
             fighter->boosts[1] -= atk - def; /* raises it */

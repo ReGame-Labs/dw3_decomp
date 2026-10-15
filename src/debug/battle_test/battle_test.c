@@ -997,6 +997,8 @@ const char WFIGHTTS_strings[0x9C0] =
     "\0\0\x62\xAC"
 #elif VERSION_EU
     "\0\0\x62\x10"
+#elif VERSION_JP
+    "\0\x40\x08\x80"
 #endif
     /* 0x0B0 ＭＥＦＴ００５５ */
     "\x82\x6C\x82\x64\x82\x65\x82\x73\x82\x4F\x82\x4F\x82\x54\x82\x54\0\0\0\0"
@@ -1112,6 +1114,8 @@ const char WFIGHTTS_strings[0x9C0] =
     "\0\xFF\0\0"
 #elif VERSION_EU
     "\0\xF8\x40\0"
+#elif VERSION_JP
+    "\0\xD9\x08\x80"
 #endif
     /* 0x4FC ジョグレス−５ */
     "\x83\x57\x83\x87\x83\x4F\x83\x8C\x83\x58\x81\x7C\x82\x54\0\0"
@@ -1241,6 +1245,8 @@ const char WFIGHTTS_strings[0x9C0] =
     "\0\x02\xC3\x02"
 #elif VERSION_EU
     "\0\xF8\x40\0"
+#elif VERSION_JP
+    "\0\x90\xA0\0"
 #endif
     /* 0x8B8 ＰＲＯ：どく */
     "\x82\x6F\x82\x71\x82\x6E\x81\x46\x82\xC7\x82\xAD\0\0\0\0"
@@ -1286,6 +1292,8 @@ const char WFIGHTTS_strings[0x9C0] =
     "\0\0\0\0";
 #elif VERSION_EU
     "\0\0\x84\x8E";
+#elif VERSION_JP
+    "\0\0\xB7\xAF";
 #endif
 #define WFIGHTTS_STR(offset) ((char *)WFIGHTTS_strings + (offset))
 

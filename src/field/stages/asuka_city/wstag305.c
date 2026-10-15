@@ -128,8 +128,8 @@ void endEvent960(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x69), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xF0
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF0)
 #define EVENT_TEXT_FILE 0x127
 #define STAGE_FILE 0x33C
 #elif VERSION_EU

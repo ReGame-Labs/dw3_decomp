@@ -1,5 +1,7 @@
 // STGDGLAB.PRO's own symbols, which only its splat config reads
 
+STGDGLAB_moveRecipeCursor = 0x80083F94; // type:func version-only
+
 // names from us (tools/match_versions.py --seed): the same function or datum
 STGDGLAB_updateScene = 0x80082CF8; // type:func
 STGDGLAB_createScene = 0x80082DF0; // type:func
@@ -75,3 +77,18 @@ STGDGLAB_screens = 0x8008F0A4;
 STGDGLAB_entries = 0x8008F214;
 STGDGLAB_data = 0x8008F954;
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+STGDGLAB_tableItems = 0x8008F05C; // size:0x20
+STGDGLAB_menuStats = 0x8008F07C; // size:0x14
+STGDGLAB_pageStats = 0x8008F090; // size:0x14
+STGDGLAB_partnerAnims = 0x8008F0B0; // size:0xE0
+STGDGLAB_layout = 0x8008F190; // size:0x84
+STGDGLAB_recipes0 = 0x8008F354; // size:0xC0
+STGDGLAB_recipes1 = 0x8008F414; // size:0xC0
+STGDGLAB_recipes2 = 0x8008F4D4; // size:0xC0
+STGDGLAB_recipes3 = 0x8008F594; // size:0xC0
+STGDGLAB_recipes4 = 0x8008F654; // size:0xC0
+STGDGLAB_recipes5 = 0x8008F714; // size:0xC0
+STGDGLAB_recipes6 = 0x8008F7D4; // size:0xC0
+STGDGLAB_recipes7 = 0x8008F894; // size:0xC0

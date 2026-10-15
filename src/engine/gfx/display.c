@@ -12,11 +12,7 @@ static s32 FLIP_PENDING;
  * finished buffer and ticks the music
  */
 void vsyncCallback(void) {
-#if VERSION_US
-    GFX.timeCounter += VSYNC_STEP_NTSC;
-    GFX.frameTimeCounter += VSYNC_STEP_NTSC;
-    GAME.playTime.frames += VSYNC_STEP_NTSC;
-#elif VERSION_EU
+#if PAL_VIDEO
     if (NTSC_MODE) {
         GFX.timeCounter += VSYNC_STEP_NTSC;
         GFX.frameTimeCounter += VSYNC_STEP_NTSC;
@@ -26,6 +22,10 @@ void vsyncCallback(void) {
         GFX.frameTimeCounter += VSYNC_STEP_PAL;
         GAME.playTime.frames += VSYNC_STEP_PAL;
     }
+#else
+    GFX.timeCounter += VSYNC_STEP_NTSC;
+    GFX.frameTimeCounter += VSYNC_STEP_NTSC;
+    GAME.playTime.frames += VSYNC_STEP_NTSC;
 #endif
     if (GFX.vsyncFunc != NULL) {
         GFX.vsyncFunc(GFX.vsyncArg);
@@ -80,14 +80,14 @@ void drawFrame(s32 draw) {
         }
     }
     GFX.buffer = GFX.buffer == 0;
-#if VERSION_US
-    GFX.frameCounter += VSYNC_STEP_NTSC;
-#elif VERSION_EU
+#if PAL_VIDEO
     if (NTSC_MODE) {
         GFX.frameCounter += VSYNC_STEP_NTSC;
     } else {
         GFX.frameCounter += VSYNC_STEP_PAL;
     }
+#else
+    GFX.frameCounter += VSYNC_STEP_NTSC;
 #endif
     GFX.frameCount = GFX.frameCounter >> 8;
     GFX.time = GFX.timeCounter >> 8;
@@ -189,7 +189,7 @@ void setDisplayMode(s32 w, s32 h, s32 hires, s32 interlace) {
         SetDefDispEnv(&GFX.disp[0], 0, 0, w, h);
         SetDefDispEnv(&GFX.disp[1], 0, 256, w, h);
     }
-#if VERSION_EU
+#if PAL_VIDEO
     if (SHIFT_PAL_SCREEN) {
         GFX.disp[0].screen.y = 0x18;
         GFX.disp[1].screen.y = 0x18;

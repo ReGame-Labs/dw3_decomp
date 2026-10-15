@@ -32,6 +32,26 @@ STAGE_VRAM := 0x800A5770
 # reads too (the overlays don't use $gp)
 GP_VALUE := 0x8005C90C
 
-# The C files this version builds: none yet. Every binary is splat's
-# assembly, which builds the original byte for byte.
-C_SRC :=
+# The C files this version builds, from the same C as the other versions at
+# this version's addresses (tools/version_symbols.py names what they use).
+# The executable and the overlays are split into the USA version's modules
+# (tools/split_version.py), so that their asm lands at the same paths under
+# asm/jp/ as under asm/us/; the rest is still splat's assembly.
+
+# game: every module of the executable, and its data
+C_SRC := $(shell find src/engine -name '*.c')
+
+# the overlays whose directory holds all their modules and data, one
+# directory each
+OVERLAY_DIRS := src/debug/sound_test src/debug/vibration_test \
+	src/menus/country_select src/menus/item_shop src/menus/digimon_lab \
+	src/menus/field_menu src/menus/memory_card src/menus/player_name \
+	src/menus/partner_name src/cardgame/album src/cardgame/card_packs \
+	src/cardgame/deck_editor src/battle/report src/battle/normal_battle \
+	src/debug/battle_test src/battle/battle_mode src/field/field_mode \
+	src/menus/gym src/cardgame/card_battle src/menus/title \
+	src/debug/stage_select
+C_SRC += $(shell find $(OVERLAY_DIRS) -name '*.c')
+
+# The stages: the USA version's and the European version's 55 more
+C_SRC += $(sort $(shell find src/field/stages -name '*.c' ! -name '*.inc.c'))

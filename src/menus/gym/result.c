@@ -325,7 +325,7 @@ void STGTRAIN_drawResult(TrainResult *result) {
     }
 }
 
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
 /* A battle stat (1-5) or a resistance (8-14) of TOTALS: the match depends on
    reading them through these (indexed in place, the stat's address is
    summed with the index first) */
@@ -376,7 +376,7 @@ static inline void STGTRAIN_takeTry(TrainResult *result, TrainResultWindows *win
 static inline void STGTRAIN_showGains(TrainResult *result, TrainResultWindows *win) {
     TrainEntry *entry;
     s32 sums[2];
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     s32 shown[2]; /* the sums, up to the stats' limits */
     s16 other;
 #endif
@@ -407,7 +407,7 @@ static inline void STGTRAIN_showGains(TrainResult *result, TrainResultWindows *w
     if (sums[0] == 0 && sums[1] == 0) {
         win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), 0x71);
     } else {
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         for (i = 0; i < 2; i++) {
             shown[i] = sums[i];
         }
@@ -459,26 +459,26 @@ static inline void STGTRAIN_showGains(TrainResult *result, TrainResultWindows *w
             win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), entry->stat + 0x5D);
 #if VERSION_US
             win->message[0]->setNumber(win->message[0], 1, sums[0]);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
             win->message[0]->setNumber(win->message[0], 1, shown[0]);
 #endif
         } else if (sums[1] != 0) {
             win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), entry->stat + 0x62);
 #if VERSION_US
             win->message[0]->setNumber(win->message[0], 1, sums[0]);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
             win->message[0]->setNumber(win->message[0], 1, shown[0]);
 #endif
 #if VERSION_US
             win->message[0]->setNumber(win->message[0], 2, sums[1]);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
             win->message[0]->setNumber(win->message[0], 2, shown[1]);
 #endif
         } else {
             win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), entry->stat + 0x5B);
 #if VERSION_US
             win->message[0]->setNumber(win->message[0], 1, sums[0]);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
             win->message[0]->setNumber(win->message[0], 1, shown[0]);
 #endif
         }

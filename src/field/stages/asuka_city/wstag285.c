@@ -46,8 +46,8 @@ void endEvent340(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0xC), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xF0
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF0)
 #define EVENT_TEXT_FILE 0x10B
 #define STAGE_FILE 0x2A6
 #define STAGE_ARCHIVE 0x31E

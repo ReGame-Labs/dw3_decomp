@@ -79,7 +79,7 @@ TitleFuncs STDWTITL_titleFuncs = {
 /* The title's TIM archives and sprite banks; the European version picks one
    by the language */
 TitleImages STDWTITL_titleImages[] = {
-#if VERSION_US
+#if VERSION_US || VERSION_JP
     {0x08750001, 0x08750000}, {0x08930001, 0x08930000},
     {0x08750001, 0x08750000}, {0x08750001, 0x08750000},
     {0x08750001, 0x08750000}, {0x08750001, 0x08750000},

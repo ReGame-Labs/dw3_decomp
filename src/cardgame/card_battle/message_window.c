@@ -38,7 +38,7 @@ static inline void showMessagePrompt(CardScreen *screen, CardScreenItems *items)
         items->moreTexts[7]->setVisible(items->moreTexts[7], 0);
         items->cursor->setVisible(items->cursor, 0);
     }
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     switch (screen->message.prompt) {
     case 0:
     default:
@@ -149,7 +149,7 @@ void CARDGAME_updateMessageWindow(CardScreen *screen, CardScreenItems *items) {
     case 5:
         items->cursor->setVisible(items->cursor, 0);
         items->moreTexts[1]->setVisible(items->moreTexts[1], 0);
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         items->moreTexts[7]->setPalette(items->moreTexts[7], PALETTE_WHITE);
 #endif
         items->moreTexts[7]->setVisible(items->moreTexts[7], 0);

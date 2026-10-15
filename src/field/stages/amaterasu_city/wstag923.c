@@ -13,14 +13,25 @@
 #include "common/start_stage.inc.c"
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
+#if VERSION_EU
+#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_FILE 0x8E2
+#define STAGE_FILE_8 0x19A
+#define STAGE_ARCHIVE 0x8E0
+#elif VERSION_JP
+#define STAGE_TEXT 0x89A
+#define STAGE_FILE 0x897
+#define STAGE_FILE_8 0x18C
+#define STAGE_ARCHIVE 0xC2
+#endif
 /* Sets the stage up: its map, actors and events, playing KANRIBGM */
 void setupStage(void) {
-    FIELDSTG_state.textFile = LANGUAGE + 0xFD;
-    FIELDSTG_state.mapFile = 0x19A;
-    FIELDSTG_state.sheetEntry = 0x8E20003;
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE_8;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16 | 3;
     FIELDSTG_state.objects = stageObjects;
     FIELDSTG_state.slots = stageSlots;
-    FIELDSTG_state.imageFile = 0x8E0;
+    FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x11C00, 0x13400};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.soundBank = 5;
@@ -29,8 +40,8 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8E20004);
-    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x8E20005);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 4);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 5);
     FIELDSTG_map.setFirstMap(0);
 }
 

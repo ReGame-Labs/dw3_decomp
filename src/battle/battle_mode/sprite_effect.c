@@ -4,7 +4,7 @@
 #include "battle/battle_mode.h"
 
 /* the 2D effects' sheets; the European version's differ */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 EffectSheet FIGHTSTG_effectSheets[] = {
     { 0, 0x78E0026, { 320, 256 } },
     { 0, 0x7940000, { 448, 256 } },
@@ -114,7 +114,7 @@ EffectSheet FIGHTSTG_effectSheets[] = {
 };
 #endif
 /* the 2D effects, ended by an id of -1; the European version's differ */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 SpriteEffectEntry FIGHTSTG_spriteEffects[] = {
     { 0, 0, 0x78E0000 },
     { 1, 0, 0x78E0001 },

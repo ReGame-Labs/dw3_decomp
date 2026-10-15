@@ -105,8 +105,8 @@ One source tree builds every version, one at a time, picked with `VERSION`
   `tools/stage_yaml.py` writes their splat configs into
   `build/<version>/generated/stages/`. A stage marked `asm` there keeps its
   code and data in asm segments until it has a C file in that version; one
-  marked `asm-data` only its data: every stage of `jp` is `asm`, and no
-  stage of `us` or `eu` is marked either.
+  marked `asm-data` only its data: no stage of any version is marked
+  either now.
   `c-rodata` takes the bytes before the code, a color or jump tables, from
   the stage's C file too. `head-word` takes `WSTAG924`'s first word from a
   C file of its own, `src/field/stages/amaterasu_city/wstag924_head.c`, linked
@@ -129,13 +129,18 @@ One source tree builds every version, one at a time, picked with `VERSION`
   are C where they are the code of a USA stage's C. The European release
   has the USA one's 21 overlays and 238 stages plus 55 stages of its own
   (`WSTAG920`-`974`).
-- `jp` builds no C yet (`C_SRC` is empty): every binary is splat's assembly,
-  which builds the original byte for byte. Its executable and overlays are
-  split into the USA version's files as asm segments
-  (`tools/split_version.py`), as `eu`'s were before they became C, and its
-  stages are marked `asm` in `config/jp/stages.txt` (`WSTAG260`, which has
-  no code, `data asm`). The Japanese release has the same overlays and
-  stages as the European one, each a little different in size.
+- `jp` builds every C file too, with `VERSION_JP` in the tests of the
+  blocks: the European release was made from the Japanese one, so the
+  Japanese code and data are mostly the European ones (its 55 extra stages,
+  the scripts the USA version left as they were), with `LANGUAGE` 0 and no
+  PAL video, at the USA disc's file numbers (`include/engine/file.h`), its
+  text the Japanese copies of the USA text files. Its executable and
+  overlays are split into the USA version's files (`tools/split_version.py`),
+  its `WSTAG920`-`974` take the European names
+  (`config/jp/stages/wstag9NN.txt`). Only the PsyQ SDK and `libpress`
+  (asm by policy) and `crt0` are assembly. The Japanese release has the
+  same overlays and stages as the European one, each a little different in
+  size.
 - The versions share their names: the European and Japanese symbol files
   hold the USA names of the functions and data paired with the USA version's
   (`tools/match_versions.py`), and `tools/check_names.py` checks that they

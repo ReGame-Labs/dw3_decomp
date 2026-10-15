@@ -36,3 +36,20 @@ updateWandererFrames1 = 0x800A6D90;
 wandererSpeeds = 0x800A6DC0;
 angleTangents = 0x800A6DC8;
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+script370 = 0x800A6B2C;
+updateTileDuoFrames0_0 = 0x800A6C68;
+updateTileDuoFrames1_0 = 0x800A6CA8;
+updateTileDuoFrames0_1 = 0x800A6CDC;
+updateTileDuoFrames1_1 = 0x800A6D1C;
+stageImages = 0x800A6E0C;
+actor0Talks = 0x800A6E8C;
+actor1Conditions = 0x800A6EA4;
+actor0 = 0x800A6EAC;
+actor1 = 0x800A6EC0;
+stageActors = 0x800A6ED4;
+stageObjects = 0x800A6EE0;
+stageSlots = 0x800A7000;
+stageFuncs = 0x800A7060; // size:0x4
+stageEvents = 0x800A7064;

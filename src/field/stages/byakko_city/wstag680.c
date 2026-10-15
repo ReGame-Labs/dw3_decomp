@@ -191,8 +191,8 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-#if VERSION_US
-#define STAGE_TEXT 0xD4
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xD4)
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x62D
 #elif VERSION_EU

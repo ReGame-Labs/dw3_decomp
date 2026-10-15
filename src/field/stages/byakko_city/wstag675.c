@@ -45,8 +45,8 @@ void endEvent410(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xD4
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xD4)
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x4A0
 #elif VERSION_EU
@@ -108,6 +108,8 @@ s16 script390[] = {
     0xA622,
 #elif VERSION_EU
     0x1F9,
+#elif VERSION_JP
+    0x301,
 #endif
 };
 s16 script400[] = {

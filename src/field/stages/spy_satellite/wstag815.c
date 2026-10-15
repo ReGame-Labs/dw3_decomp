@@ -9,7 +9,7 @@
 extern StageEffectSpot updateStageSpots[];
 
 /* The files of the background, which the versions number differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define BG_ARCHIVE 0x767
 #define BG_FILE 0x766
 #define BG_FILE2 0x887
@@ -145,8 +145,8 @@ void endEvent1050(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define EVENT_TEXT_FILE 0x14A
 #define STAGE_FILE 0x767
 #elif VERSION_EU
@@ -266,7 +266,7 @@ s16 script1040[] = {
     SCRIPT_COMMAND(FIELD_TASK_COMMANDS, FIELD_COMMAND_STOP_CAMERA_SHAKE, 2),
 #if VERSION_US
     SCRIPT_LEAVE(0xE08, 0x27D, 0x1F9, 1),
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     SCRIPT_LEAVE(0xE09, 0x27D, 0x1F9, 1),
 #endif
     SCRIPT_END,

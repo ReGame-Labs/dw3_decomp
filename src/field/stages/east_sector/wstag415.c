@@ -11,7 +11,7 @@ extern AnimFrame updateMoverFrames1[];
 extern AnimFrame updateMoverFrames2[];
 
 /* The files of the background, which the versions number differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define BG_ARCHIVE 0x74E
 #define BG_FILE 0x759
 #elif VERSION_EU
@@ -473,8 +473,8 @@ void endEvent150(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xF7
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF7)
 #define EVENT_TEXT_FILE 0x12E
 #define STAGE_FILE 0x74E
 #elif VERSION_EU

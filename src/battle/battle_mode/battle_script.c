@@ -647,7 +647,7 @@ BattleScript *FIGHTSTG_createBattleScript(void) {
     return createTask(FIGHTSTG_updateBattleScript, sizeof(BattleScript), 16 * sizeof(Task *));
 }
 
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
 /* the European version has the task of FIGHTSTG_updateCameraTurn here */
 #include "camera_turn.h"
 #endif

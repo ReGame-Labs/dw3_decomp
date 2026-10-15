@@ -21,8 +21,8 @@ void endEvent925(void) {
 }
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
-#if VERSION_US
-#define STAGE_TEXT 0xE2
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xE2)
 #define EVENT_TEXT_FILE 0x10B
 #define STAGE_FILE 0x494
 #elif VERSION_EU
@@ -90,6 +90,8 @@ s16 script925[] = {
     /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_EU
     0x6961,
+#elif VERSION_JP
+    0x6004,
 #endif
 };
 AreaBattle area0Battle0 = { 0, 0, MUSIC(1, 0) };

@@ -373,7 +373,7 @@ typedef struct CutsceneAnim {
 
 /* The two animations of FIELDSTG_playCutsceneAnim, kind 0's file and kind 1's after it:
    the discs number their files differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FIELD_ANIM_FILE 0x87B
 #elif VERSION_EU
 #define FIELD_ANIM_FILE 0x88C
@@ -584,7 +584,7 @@ typedef struct SpotEffect {
 
 /* The field's effect sprites (FIELDSTG_drawSpotEffect): the discs number their files
    differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FIELD_SPRITES_FILE 0x152
 #elif VERSION_EU
 #define FIELD_SPRITES_FILE 0x160
@@ -592,7 +592,7 @@ typedef struct SpotEffect {
 
 /* The files of the player's actions, which FIELDSTG_requestSlotFiles loads
    when the map has slots for them: the discs number their files differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FIELD_ACTION_FILES 0x3B9
 #elif VERSION_EU
 #define FIELD_ACTION_FILES 0x3C9
@@ -1033,7 +1033,7 @@ extern s32 (*FIELDSTG_tweenUpdate)(PanelAnim *tween); /* FIELDSTG_updateTween */
 extern FieldEvent FIELDSTG_events[];
 extern s32 FIELDSTG_fileEntries[]; /* by character (Actor.key1) */
 extern u8 FIELDSTG_actorWidths[]; /* by character, in pixels (FieldState.getActorWidth) */
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
 extern StageEntry FIELDSTG_extraStages[]; /* the extra chapter's, which run on into FIELDSTG_stages */
 #endif
 extern StageEntry FIELDSTG_stages[];

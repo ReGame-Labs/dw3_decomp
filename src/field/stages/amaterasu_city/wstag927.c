@@ -46,13 +46,22 @@ void endEvent1608(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
+#if VERSION_EU
+#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_FILE 0x8ED
+#define STAGE_FILE_8 0x346
+#elif VERSION_JP
+#define STAGE_TEXT 0x89A
+#define STAGE_FILE 0x8AA
+#define STAGE_FILE_8 0x337
+#endif
 /* Sets the stage up: its map, actors, battles and events, playing KANRIBGM */
 void setupStage(void) {
-    FIELDSTG_state.textFile = LANGUAGE + 0xFD;
-    FIELDSTG_state.mapFile = 0x346;
-    FIELDSTG_state.sheetEntry = 0x8ED0000;
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE_8;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
     FIELDSTG_state.objects = stageObjects;
-    FIELDSTG_state.imageFile = 0x8EC;
+    FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x11D00, 0x12800};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.soundBank = 5;
@@ -61,7 +70,7 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8ED0001);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -121,7 +130,7 @@ StageTile stageObjects[] = {
 void (*stageFuncs[])(void) = {
     setupStage,
 };
-#define EVENT_TEXT_FILE 0x158
+#define EVENT_TEXT_FILE EXTRA_TEXT
 FieldEvent stageEvents[] = {
     { 1608, script1608, EVENT_TEXT(4), NULL, endEvent1608 },
     { 1610, script1610, EVENT_TEXT(5), NULL, NULL },

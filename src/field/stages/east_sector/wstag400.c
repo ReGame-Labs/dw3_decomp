@@ -78,8 +78,8 @@ void endEvents1507To1509(void) {
 extern FieldBattles stageBattles0[];
 extern FieldBattles stageBattles1[];
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
-#if VERSION_US
-#define STAGE_TEXT 0xF7
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF7)
 #define EVENT_TEXT_FILE 0x12E
 #define STAGE_FILE 0x3FA
 #elif VERSION_EU

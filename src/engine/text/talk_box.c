@@ -88,7 +88,7 @@ void drawTalkBoxFrame(TalkBoxFrame *task) {
     setPolyFT4(p);
     setRGB0(p, 0x80, 0x80, 0x80);
     p->tpage = 0x45;
-#if VERSION_US
+#if VERSION_US || VERSION_JP
     p->clut = 0x2E57;
 #elif VERSION_EU
     p->clut = 0x2C57;

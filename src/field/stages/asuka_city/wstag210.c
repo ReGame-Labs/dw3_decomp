@@ -9,8 +9,8 @@
 extern s32 listWindowFrames[];
 
 /* The text file of the menus, which the versions number differently */
-#if VERSION_US
-#define MENU_TEXT 0x10C
+#if VERSION_US || VERSION_JP
+#define MENU_TEXT TEXT_FILE(0x10C)
 #elif VERSION_EU
 #define MENU_TEXT 0x112
 #endif
@@ -420,8 +420,8 @@ void endEvent685(void) {
 /* the color the setup copies to FIELDSTG_state.spriteColor */
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0 };
 
-#if VERSION_US
-#define STAGE_TEXT 0xCD
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xCD)
 #define EVENT_TEXT_FILE 0x10B
 #define STAGE_FILE 0x18D
 #define STAGE_ARCHIVE 0x313

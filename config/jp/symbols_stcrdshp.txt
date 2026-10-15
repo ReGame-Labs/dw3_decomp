@@ -54,3 +54,9 @@ STCRDSHP_funcs = 0x8008C7D8;
 STCRDSHP_prices = 0x8008C978;
 STCRDSHP_stocks = 0x8008CA2C;
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+STCRDSHP_slotCards = 0x80088EE0; // size:0x1EC0
+STCRDSHP_slotCards123 = 0x8008ADA0; // size:0x4C
+STCRDSHP_slotCards124 = 0x8008ADE0; // size:0x1580
+STCRDSHP_shopCards = 0x8008C7F8; // size:0x180

@@ -136,8 +136,8 @@ void endEvent1080(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define EVENT_TEXT_FILE 0x14A
 #define STAGE_FILE 0x705
 #elif VERSION_EU

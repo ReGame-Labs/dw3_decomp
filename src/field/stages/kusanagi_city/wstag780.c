@@ -16,7 +16,7 @@ extern StageQuad drawByteAnimsQuads[];
 extern u8 *byteAnims[];
 
 /* The file of the stage's sprites, which the versions number differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define SPRITES 0x1B7
 #elif VERSION_EU
 #define SPRITES 0x1C5
@@ -620,15 +620,15 @@ void endEvent885(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x66), 1);
 }
 
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
 /* The end of event 1500, only in the European version: the story goes on to its extra chapter */
 void endEvent1500(void) {
     GAME.progress = FIELD_PROGRESS_EXTRA;
 }
 #endif
 
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x1B7
 #define STAGE_ARCHIVE 0x311
@@ -822,7 +822,7 @@ s16 script684[] = {
 #if VERSION_US
     SCRIPT_PLACE(0x10, 0x90, 0xC0),
     SCRIPT_POSE(0x10, 1, 1),
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     SCRIPT_PLACE(0x10, 0x12F, 0xC1),
     SCRIPT_POSE(0x10, 1, 7),
 #endif
@@ -838,7 +838,7 @@ s16 script684[] = {
     SCRIPT_PLACE(0x38, 0x70, 0xB0),
     SCRIPT_POSE(0x38, 1, 1),
     SCRIPT_COMMAND(0x320, 0x320, 2),
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     SCRIPT_PLACE(0x38, 0x150, 0xB0),
     SCRIPT_POSE(0x38, 1, 7),
     SCRIPT_COMMAND(0x320, 0x324, 2),
@@ -1156,7 +1156,7 @@ s16 script1500[] = {
     SCRIPT_WAIT(0x3C),
 #if VERSION_US
     SCRIPT_LEAVE(0xE0C, 0, 0, 0),
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     SCRIPT_LEAVE(0xE03, 0, 0, 1),
 #endif
     SCRIPT_END,
@@ -1294,31 +1294,31 @@ StageQuad drawByteAnimsQuads[] = {
     { 121, 77, 160, 58, 121, 116, 160, 97, 0 },
 #if VERSION_US
     { 0x111, 94, 0x130, 109, 0x111, 125, 0x130, 140, 81 },
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     { 0x110, 92, 0x131, 108, 0x110, 123, 0x131, 139, 81 },
 #endif
     { 0x115, 96, 0x130, 109, 0x115, 122, 0x130, 135, 0 },
 #if VERSION_US
     { 27, 56, 54, 69, 27, 83, 54, 96, 81 },
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     { 29, 53, 56, 66, 29, 81, 56, 94, 81 },
 #endif
     { 33, 59, 54, 69, 33, 81, 54, 91, 0 },
 #if VERSION_US
     { 58, 72, 85, 85, 58, 99, 85, 112, 81 },
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     { 60, 68, 87, 81, 60, 97, 87, 110, 81 },
 #endif
     { 64, 74, 85, 84, 64, 96, 85, 106, 0 },
 #if VERSION_US
     { 58, 103, 85, 116, 58, 130, 85, 143, 81 },
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     { 60, 99, 87, 112, 60, 128, 87, 141, 81 },
 #endif
     { 64, 105, 85, 115, 64, 127, 85, 137, 0 },
 #if VERSION_US
     { 27, 87, 54, 100, 27, 114, 54, 127, 81 },
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     { 29, 84, 56, 97, 29, 112, 56, 125, 81 },
 #endif
     { 33, 90, 54, 100, 33, 112, 54, 122, 0 },
@@ -1499,7 +1499,7 @@ FieldEvent stageEvents[] = {
     { 971, script971, EVENT_TEXT(0x23), NULL, NULL },
 #if VERSION_US
     { 1500, script1500, EVENT_TEXT(0x24), NULL, NULL },
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     { 1500, script1500, EVENT_TEXT(0x24), NULL, endEvent1500 },
 #endif
     { -1, NULL, 0, NULL, NULL },

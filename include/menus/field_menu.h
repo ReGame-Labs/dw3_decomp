@@ -13,7 +13,7 @@
 #define OVL_NAME(name) STSTATUS_##name
 
 /* The menu's sprite sheet; the next file is its texture archive */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FILE_STATUS_SPRITES 0x3F4
 #define FILE_STATUS_BG 0x78A /* +2 in the second half of the game */
 #elif VERSION_EU
@@ -337,7 +337,7 @@ typedef struct StatusMapScreen {
     /* 0x17C */ s32 speedY;
     /* 0x180 */ s32 hovering;
     /* 0x184 */ s32 spot; /* the area under the cursor */
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     /* 0x188 */ s32 hoverX; /* where the cursor was when it got there */
     /* 0x18C */ s32 hoverY;
 #endif

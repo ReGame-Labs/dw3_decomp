@@ -106,7 +106,7 @@ void STGMCARD_updateInfo(MemCardInfo *info) {
         info->nextState(info);
 #if VERSION_US
         STGMCARD_detailWindows[0].text = 0x21;
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
         STGMCARD_detailWindows[0].text = LANGUAGE != 0 ? 0x21 : 0x20;
 #endif
         windows = info->children;

@@ -150,8 +150,8 @@ void endEvent5(void) {
     GAME.progress = 2;
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xF0
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF0)
 #define EVENT_TEXT_FILE 0x10B
 #define STAGE_FILE 0x191
 #define STAGE_ARCHIVE 0x3BD

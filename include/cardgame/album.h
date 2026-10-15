@@ -16,7 +16,7 @@
 #define ALBUM_PAGE_CARDS 12
 
 /* The album's files: the discs number them differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define STCRDABM_FILE_SPRITES 0x5F5
 #define STCRDABM_FILE_IMAGES 0x5F6
 #define STCRDABM_FILE_DATA 0x7E7 /* the first of five */

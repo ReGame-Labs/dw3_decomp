@@ -18,7 +18,7 @@
 #define NAME_ENTRY_FILE_KEYBOARD STCRDDEK_FILE_KEYBOARD
 #include "shared/name_entry.h"
 
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define STCRDDEK_FILE_SPRITES 0x62E /* as the card shop's */
 #define STCRDDEK_FILE_IMAGES 0x632
 #define STCRDDEK_FILE_CARDS 0x7E7 /* the card images, the first of five */

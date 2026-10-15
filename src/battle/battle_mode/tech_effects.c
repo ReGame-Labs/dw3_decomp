@@ -112,7 +112,7 @@ void FIGHTSTG_rollMultiHit(void) {
 #if VERSION_US
     action->hitsLanded = 0;
     action->hitCount = 0;
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     action->hitsLanded = action->hits[0];
     action->hitCount = 1;
 #endif
@@ -121,7 +121,7 @@ void FIGHTSTG_rollMultiHit(void) {
     } else {
 #if VERSION_US
         for (i = 0; i < count; i++) {
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
         for (i = 1; i < count; i++) {
 #endif
             if (FIGHTSTG_battleFuncs.rollHit(FIGHTSTG_action.side, FIGHTSTG_action.tech) != 0) {
@@ -306,7 +306,7 @@ void FIGHTSTG_tryNoSwitch(void) {
 /* Starts a TECH_EFFECT_DOUBLE_MAGIC technique: two magic hits, each with the
    damage of technique 0x1B9 or 0x1BA */
 void FIGHTSTG_startDoubleMagic(void) {
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     s32 files[2] = { 0x1B9, 0x1BA };
 #endif
     s32 i;
@@ -316,7 +316,7 @@ void FIGHTSTG_startDoubleMagic(void) {
     for (i = 0; i < 2; i++) {
         if (FIGHTSTG_battleFuncs.rollMagicHit(FIGHTSTG_action.side, FIGHTSTG_action.tech)) {
             FIGHTSTG_action.hits[i] = 1;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             FIGHTSTG_action.hitDamage[i] = FIGHTSTG_battleFuncs.computeMagicDamage(FIGHTSTG_action.side, files[i]);
 #endif
             FIGHTSTG_action.hitsLanded++;

@@ -462,7 +462,7 @@ LabRecipe STGDGLAB_recipes7[] = {
     { 5, { 0x103, 0x0FE, 0x094, 0x167, 0x17D } },
     { 3, { 0x184, 0x187, 0x18A, 0, 0 } },
 };
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 LabRecipe STGDGLAB_recipes0[] = {
     { 3, { 0x182, 0x185, 0x188, 0, 0 } },
     { 4, { 0x005, 0x00C, 0x0D5, 0x096, 0 } },

@@ -9,7 +9,17 @@
 /* Defined below, after the code that uses them */
 extern Vec2 farSpriteSpots[];
 
-/* Draws the 36 sprites of file 0x919 at their places, scrolling at 1/8 of the layer */
+#if VERSION_EU
+#define STAGE_TEXT (LANGUAGE + 0x104)
+#define STAGE_FILE 0x919
+#define STAGE_FILE_8 0x1BE
+#elif VERSION_JP
+#define STAGE_TEXT 0x89B
+#define STAGE_FILE 0x8EC
+#define STAGE_FILE_8 0x1B0
+#endif
+
+/* Draws the 36 sprites of STAGE_FILE at their places, scrolling at 1/8 of the layer */
 void updateFarSprites(StageTask *task) {
     SpriteDrawer drawer;
     s32 pos[2];
@@ -32,7 +42,7 @@ void updateFarSprites(StageTask *task) {
         pos[0] = (scroll[0] - 0x2C0) >> 3;
         pos[1] = (scroll[1] - 0x280) >> 3;
         for (i = 0; i < 0x24; i++) {
-            drawer.draw(FILE_CACHE.getEntry(0x9190000), 0, farSpriteSpots[i].x + pos[0], farSpriteSpots[i].y + pos[1]);
+            drawer.draw(FILE_CACHE.getEntry(STAGE_FILE << 16), 0, farSpriteSpots[i].x + pos[0], farSpriteSpots[i].y + pos[1]);
         }
         break;
     case TASK_DONE:
@@ -64,12 +74,12 @@ void updateStage(StageTask *task, void **children) {
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 /* Sets the stage up: its map, actors, battles and events, playing PYRA_BGM */
 void setupStage(void) {
-    FIELDSTG_state.textFile = LANGUAGE + 0x104;
-    FIELDSTG_state.mapFile = 0x1BE;
-    FIELDSTG_state.sheetEntry = 0x9190000;
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE_8;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
     FIELDSTG_state.objects = stageObjects;
     FIELDSTG_state.slots = stageSlots;
-    FIELDSTG_state.imageFile = 0x918;
+    FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x1AF00, 0x3B400};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.soundBank = 0xB;
@@ -79,10 +89,10 @@ void setupStage(void) {
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x9190002);
-    FIELDSTG_map.setFile(FIELD_MAP_FLOOR1, 0x9190003);
-    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x9190004);
-    FIELDSTG_map.setFile(FIELD_MAP_AREAS, 0x9190001);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR1, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 4);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
 }
 

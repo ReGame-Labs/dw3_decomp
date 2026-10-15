@@ -11,8 +11,8 @@
 /* Defined below, after the code that uses them */
 extern StageSlot stageSlots0[];
 extern StageSlot stageSlots1[];
-#if VERSION_US
-#define STAGE_TEXT 0xF7
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF7)
 #define STAGE_FILE 0x26A
 #define STAGE_ARCHIVE 0x3CD
 #elif VERSION_EU

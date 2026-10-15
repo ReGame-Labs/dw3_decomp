@@ -183,7 +183,7 @@ typedef struct EffectModel {
 } EffectModel;
 
 /* The fighters' file, which FIGHTSTG_fighterCache.funcs reads */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FILE_FIGHTERS 0x1BE
 #elif VERSION_EU
 #define FILE_FIGHTERS 0x1CC

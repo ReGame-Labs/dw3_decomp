@@ -13,7 +13,7 @@
 #define OVL_NAME(name) STITSHOP_##name
 
 /* The shop's sprite sheet; the next file is its texture archive */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FILE_SHOP_SPRITES 0x3F2
 #elif VERSION_EU
 #define FILE_SHOP_SPRITES 0x402

@@ -486,14 +486,14 @@ static inline void STCRDDEK_showCardListCursor(DeckEditor *task, DeckEditorChild
    deck already has four of it (a message), triangle goes back to the grid */
 static inline void STCRDDEK_chooseListCard(DeckEditor *task, DeckEditorChildren *children) {
     s32 prev;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     s32 prevTop;
 #endif
     s32 id;
     s32 old;
 
     prev = task->listTop + task->listCursor;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     prevTop = task->listTop;
 #endif
     if (task->listCount >= 9) {
@@ -536,7 +536,7 @@ static inline void STCRDDEK_chooseListCard(DeckEditor *task, DeckEditorChildren 
             }
         }
     }
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     if (children->scrollBar != NULL && prevTop != task->listTop) {
         children->scrollBar->setPos(children->scrollBar, task->listTop);
     }

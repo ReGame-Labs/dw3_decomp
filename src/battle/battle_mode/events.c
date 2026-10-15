@@ -58,7 +58,7 @@ void FIGHTSTG_pushEventFirst(BattleEvent *event) {
     if (event->delay <= 0) {
         event->delay = 1;
     }
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     if (event->delay < 2) {
         event->delay = 2;
     }
@@ -70,7 +70,7 @@ void FIGHTSTG_pushEventFirst(BattleEvent *event) {
     }
 #if VERSION_US
     event->delay = 0;
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     event->delay = 1;
 #endif
     FIGHTSTG_pushEvent(event);
@@ -85,14 +85,14 @@ s32 FIGHTSTG_popEvent(void) {
     s32 best = -1;
     s32 i;
     s32 time;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     QueuedEvent *event;
 #endif
     s32 type;
 
     for (i = 0; i < 99; i++) {
         if (FIGHTSTG_events.events[i].type != 0) {
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             if (best != -1 && FIGHTSTG_events.events[i].time <= FIGHTSTG_events.events[best].time &&
                 (FIGHTSTG_events.events[best].type == EVENT_PLAYER_TURN || FIGHTSTG_events.events[best].type == EVENT_ENEMY_TURN)) {
                 best = i;
@@ -129,7 +129,7 @@ s32 FIGHTSTG_popEvent(void) {
         FIGHTSTG_events.events[best].type = 0;
         return type;
     }
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     event = &FIGHTSTG_events.events[best];
     time = event->time;
     for (i = 0; i < 99; i++) {

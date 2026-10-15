@@ -126,3 +126,7 @@ STDWTITL_movieEnded = 0x80088DCC;
 STDWTITL_movieFile = 0x80088DD0;
 STDWTITL_movieEndFrame = 0x80088DD4;
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+STDWTITL_movies = 0x8008781C; // size:0x9C
+STDWTITL_titleImages = 0x80087DB4; // size:0x38

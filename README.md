@@ -4,7 +4,7 @@
 |---|---|---|---|
 | 🇪🇺 Europe (`SLES_039.36`) | [![Code](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=code&version=SLES_039.36&label=Code)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLES_039.36) | [![Data](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=data&version=SLES_039.36&label=Data)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLES_039.36) | [![Functions](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=functions&version=SLES_039.36&label=Functions)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLES_039.36) |
 | 🇺🇸 USA (`SLUS_014.36`) | [![Code](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=code&version=SLUS_014.36&label=Code)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLUS_014.36) | [![Data](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=data&version=SLUS_014.36&label=Data)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLUS_014.36) | [![Functions](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=functions&version=SLUS_014.36&label=Functions)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLUS_014.36) |
-| 🇯🇵 Japan (`SLPS_034.46`) | assembly, not on decomp.dev yet | | |
+| 🇯🇵 Japan (`SLPS_034.46`) | the shared C, not on decomp.dev yet | | |
 
 [![Executable](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=code&version=SLES_039.36&category=game&label=Europe%20executable)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLES_039.36?category=game)
 [![Stages](https://decomp.dev/ReGame-Labs/dw3_decomp.svg?mode=shield&measure=code&version=SLES_039.36&category=stages&label=Europe%20stages)](https://decomp.dev/ReGame-Labs/dw3_decomp/SLES_039.36?category=stages)

@@ -257,14 +257,14 @@ void markCachedFiles(void) {
 }
 
 /*
- * Marks the files markCachedFiles saw as just used (the European version, 10 frames before), so
- * they stay cached
+ * Marks the files markCachedFiles saw as just used (the European and Japanese versions, 10 frames
+ * before), so they stay cached
  */
 void touchMarkedFiles(void) {
     FileSlot *slot = FILE_CACHE.slots;
 #if VERSION_US
     s32 now = GFX.funcs.getTime();
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     s32 now = GFX.funcs.getTime() - 10;
 #endif
     s32 i;

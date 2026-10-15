@@ -203,10 +203,10 @@ from `--defsym`.
   version, its `#if` blocks name only the versions that build it from C.
 - Each version lists the C files it builds in `mk/version/<version>.mk`
   (`C_SRC`), and the Makefile builds nothing else. `us` builds every C file
-  under `src/`; `eu` the ones it shares (all of them so far) and its own
-  stages'; `jp` none yet. The rest of `eu`'s executable and overlays, and
-  all of `jp`'s, is split into the USA files as asm segments with the same
-  names (`tools/split_version.py`).
+  under `src/`; `eu` and `jp` the ones they share (all of them so far) and
+  the extra stages'. Their executables and overlays are split into the USA
+  files with the same names (`tools/split_version.py`), as asm segments
+  until a file is C in that version.
 - To build a file for `eu` or `jp` too: add it to the version's `C_SRC`,
   make its segments in `config/<version>/` `c` (with `.rodata` and `.data`
   when those are C in `us`), then name what the C uses at the version's

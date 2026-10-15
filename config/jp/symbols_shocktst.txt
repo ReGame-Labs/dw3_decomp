@@ -22,3 +22,10 @@ SHOCKTST_createLoader = 0x8008474C; // type:func
 SHOCKTST_numberFormats = 0x800847D8;
 SHOCKTST_motorNames = 0x80084898;
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+D_80082A90 = 0x80082A90;
+D_80082A9C = 0x80082A9C;
+D_80082AD4 = 0x80082AD4;
+SHOCKTST_menuRows = 0x80084778; // size:0x60
+SHOCKTST_textPath = 0x800848A0; // size:0x4

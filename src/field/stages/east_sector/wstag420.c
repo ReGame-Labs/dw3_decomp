@@ -41,8 +41,8 @@ void endEvent71(void) {
     GAME.progress = 5;
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xD4
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xD4)
 #define EVENT_TEXT_FILE 0x12E
 #define STAGE_FILE 0x775
 #elif VERSION_EU
@@ -135,6 +135,8 @@ s16 script71[] = {
     /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
     0x882D,
+#elif VERSION_JP
+    0x0111,
 #endif
 };
 AreaBattle area0Battle0 = { 0, 0, MUSIC(1, 0) };

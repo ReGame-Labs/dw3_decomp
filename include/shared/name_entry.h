@@ -25,18 +25,19 @@
 
 /*
  * The Japanese keyboard (three pages) is for language 0 of the European
- * version; the USA version only has the one page.
+ * version, the Japanese version's only one; the USA version only has the
+ * one page.
  */
 #if VERSION_US
 #define NAME_ENTRY_JAPANESE 0
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 #define NAME_ENTRY_JAPANESE (LANGUAGE == 0)
 #endif
 
 /* A sprite of the keyboard drawn per language, one after the other (USA: the first) */
 #if VERSION_US
 #define NAME_ENTRY_TEXT_SPRITE(sprite) ((sprite) + 1)
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 #define NAME_ENTRY_TEXT_SPRITE(sprite) (LANGUAGE + (sprite))
 #endif
 

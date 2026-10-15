@@ -229,7 +229,7 @@ static inline void setTechPages(TechMenu *task) {
             FIGHTSTG_techCursor.count = task->count;
         }
     }
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     else {
         FIGHTSTG_techCursor.count = 1;
     }

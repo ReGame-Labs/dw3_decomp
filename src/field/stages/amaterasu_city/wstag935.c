@@ -12,20 +12,29 @@ extern s32 event1616WindowFrames[];
 extern s32 event1618WindowFrames[];
 
 /* The text file of the menus */
-#define MENU_TEXT 0x158
+#define MENU_TEXT EXTRA_TEXT
 
 #include "common/update_stage.inc.c"
 
 #include "common/start_stage.inc.c"
 
+#if VERSION_EU
+#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_FILE 0x8FD
+#define STAGE_FILE_8 0x1AE
+#elif VERSION_JP
+#define STAGE_TEXT 0x89A
+#define STAGE_FILE 0x8C2
+#define STAGE_FILE_8 0x1A0
+#endif
 /* Sets the stage up: its map, actors and events, playing SHOP2BGM */
 void setupStage(void) {
-    FIELDSTG_state.textFile = LANGUAGE + 0xFD;
-    FIELDSTG_state.mapFile = 0x1AE;
-    FIELDSTG_state.sheetEntry = 0x8FD0000;
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE_8;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
     FIELDSTG_state.objects = stageObjects;
     FIELDSTG_state.slots = stageSlots;
-    FIELDSTG_state.imageFile = 0x8FC;
+    FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x1A400, 0xC800};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.soundBank = 8;
@@ -33,8 +42,8 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8FD0001);
-    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x8FD0002);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -472,7 +481,7 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageFuncs stageFuncs = { setupStage, startTween, updateTween };
-#define EVENT_TEXT_FILE 0x158
+#define EVENT_TEXT_FILE EXTRA_TEXT
 FieldEvent stageEvents[] = {
     { 1616, NULL, EVENT_TEXT(8), startEvent1616, NULL },
     { 1618, NULL, EVENT_TEXT(9), startEvent1618, NULL },

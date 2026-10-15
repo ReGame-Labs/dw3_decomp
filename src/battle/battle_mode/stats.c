@@ -93,7 +93,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
         stats->level = totals.fields.level;
         values = totals.fields.battle;
         for (i = 0; i < 5; i++) {
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             if (values[i] > 0) {
                 stats->stats[i] = values[i];
             } else {
@@ -105,7 +105,7 @@ BattleStats *FIGHTSTG_computeStats(u8 side, s32 which, s32 index) {
         }
         values = totals.fields.resist;
         for (i = 0; i < 7; i++) {
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             if (values[i] > 0) {
                 stats->resist[i] = values[i];
             } else {

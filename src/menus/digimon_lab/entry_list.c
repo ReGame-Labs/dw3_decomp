@@ -196,7 +196,7 @@ void STGDGLAB_runEntryList(LabEntryList *panel, LabEntryListWindows *windows) {
                     }
                 }
             }
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             if (windows->scrollBar != NULL && scroll != panel->scroll) {
                 windows->scrollBar->setPos(windows->scrollBar, panel->scroll);
             }

@@ -18,8 +18,8 @@ extern AnimFrame updateTileAnimsFrames[];
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x6B8
 #elif VERSION_EU
@@ -69,6 +69,8 @@ s16 script1236[] = {
     /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
     0x350,
+#elif VERSION_JP
+    0x100,
 #endif
 };
 AnimFrame updateTileAnimsFrames[] = {

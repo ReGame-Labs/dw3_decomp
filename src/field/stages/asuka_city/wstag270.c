@@ -7,8 +7,8 @@
 #include "field/stage.h"
 
 /* The text file of the menus, which the versions number differently */
-#if VERSION_US
-#define MENU_TEXT 0x11A
+#if VERSION_US || VERSION_JP
+#define MENU_TEXT TEXT_FILE(0x11A)
 #elif VERSION_EU
 #define MENU_TEXT 0x120
 #endif
@@ -259,8 +259,8 @@ void endEvent1415(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xA1), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xCD
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xCD)
 #define EVENT_TEXT_FILE 0x119
 #define STAGE_FILE 0x1A1
 #define STAGE_ARCHIVE 0x3C2

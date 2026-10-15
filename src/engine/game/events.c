@@ -25,7 +25,7 @@ void setBit(u8 *bits, s32 index, s32 set) {
 }
 
 /* Special condition 0x00: the player has every item of a set (the European
-   version has a second set) */
+   and Japanese versions have a second set) */
 s32 checkItemSet(s32 op, s32 arg) {
     s32 ret = 0;
 
@@ -35,7 +35,7 @@ s32 checkItemSet(s32 op, s32 arg) {
         (GAME.items[0xA7] != 0 || GAME.equippedItems[0xA7] != 0)) {
         ret = 1;
     }
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     switch (op) {
     case 0:
         if ((GAME.items[7] != 0 || GAME.equippedItems[7] != 0) &&
@@ -60,14 +60,14 @@ s32 checkItemSet(s32 op, s32 arg) {
 
 /*
  * Special conditions 0x10: tests partners (unlocked, in the party, levels) or unlocks one; the
- * European version adds four
+ * European and Japanese versions add four
  */
 s32 checkPartner(u32 op, s32 arg) {
     s32 result = 0;
     s32 i;
     s32 total;
     s32 id;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     s32 partner;
 #endif
 
@@ -116,7 +116,7 @@ s32 checkPartner(u32 op, s32 arg) {
             result = 1;
         }
         break;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     case 7:
         result = 1;
         for (id = 0; id < PARTNER_COUNT; id++) {
@@ -225,7 +225,7 @@ s32 checkFlagCount(s32 unused, s32 mode) {
     }
     return ret;
 }
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 /* Special conditions 0x40: group 0 as in the USA version; group 1 whether four flags of group 0x10 are set */
 s32 checkFlagCount(s32 group, s32 mode) {
     s32 ret = 0;
@@ -404,7 +404,7 @@ s32 checkWarpArg(s32 id, s32 mode) {
             return 1;
         }
     }
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     /* mode zero: the opposite test, as checkProgress's */
     if (id < 30) {
         if (mode != 0) {
@@ -728,7 +728,7 @@ SpecialCondition SPECIAL_CONDITIONS[] = {
     { 0x24, 0x30, 0x1C }, { 0x3B, 0x30, 0x1D }, { 0x3C, 0x30, 0x1E }, { 0x3D, 0x30, 0x1F }, { 0x3E, 0x30, 0x20 },
     { 0x71, 0x40, 0x00 }, { 0x70, 0x40, 0x01 }, { 0x73, 0x40, 0x02 }, { 0x72, 0x40, 0x03 }, { 0x13, 0x50, 0x00 },
     { 0xFF },
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     { 0x3A, 0x00, 0x00 }, { 0x96, 0x01, 0x00 }, { 0x00, 0x10, 0x00 }, { 0x01, 0x10, 0x01 }, { 0x02, 0x10, 0x02 },
     { 0x10, 0x11, 0x00 }, { 0x12, 0x11, 0x01 }, { 0x11, 0x11, 0x02 }, { 0x0B, 0x11, 0x03 }, { 0x0D, 0x11, 0x04 },
     { 0x0C, 0x11, 0x05 }, { 0x0F, 0x11, 0x06 }, { 0x0E, 0x11, 0x07 }, { 0x42, 0x12, 0x00 }, { 0x44, 0x12, 0x01 },

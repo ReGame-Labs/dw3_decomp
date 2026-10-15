@@ -59,7 +59,7 @@ extern ItemScript FIGHTSTG_itemScripts[];
 extern u8 FIGHTSTG_statusTechFlags[];
 extern s32 FIGHTSTG_statusTechArgs[];
 extern s32 FIGHTSTG_statusTechLines[];
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
 extern s32 FIGHTSTG_clearIds[]; /* the six event types FIGHTSTG_reviveFighter clears */
 void FIGHTSTG_reviveFighter(s32 tech, s32 fighter);
 #endif

@@ -44,6 +44,7 @@ jobs:
     - run: |
         make VERSION=eu lint LINT_ARGS="--strict --base HEAD^"
         make VERSION=us lint LINT_ARGS="--strict --base HEAD^"
+        make VERSION=jp lint LINT_ARGS="--strict --base HEAD^"
 
   build:
     # The original executable and overlays live in a private repository that only this
@@ -71,9 +72,9 @@ jobs:
             exe: SLUS_014.36
             report: true
             shiftable: true
-          # still splat's assembly, whose addresses into the other binaries
-          # are numbers: not shiftable yet. decomp.dev doesn't show it yet,
-          # but its report is uploaded all the same.
+          # built from the shared C, but its symbol files still give the
+          # executable's data as numbers: not shiftable yet. decomp.dev
+          # doesn't show it yet, but its report is uploaded all the same.
           - version: jp
             exe: SLPS_034.46
             report: true

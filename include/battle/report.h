@@ -14,7 +14,7 @@
 #define OVL_NAME(name) STFGTREP_##name
 
 /* The sprite archive the overlay loads */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FILE_FGTREP_SPRITES 0x791
 #elif VERSION_EU
 #define FILE_FGTREP_SPRITES 0x7A0

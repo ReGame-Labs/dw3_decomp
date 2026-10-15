@@ -26,8 +26,19 @@ const char SAVE_FILE_NAMES[6][24] = {
     "BESLPS-99999DMW3-GER",
     "BESLPS-99999DMW3-SPN",
 };
+#elif VERSION_JP
+/* Only the first is read: the second is the USA release's name, the third
+   the placeholder the USA version keeps as SAVE_FILE_NAME_JP */
+const char SAVE_FILE_NAMES[3][24] = {
+    "BISLPS-03446DMW3-JPN",
+    "BASLUS-01436DMW3-USA",
+    "BISLPS-99999DMW3-JPN",
+};
+#endif
 
-/* The US release saves as BASLUS-01436DMW3-USA */
+#if VERSION_US || VERSION_JP
+/* The release saves as its own name, BASLUS-01436DMW3-USA in the US one
+   and BISLPS-03446DMW3-JPN in the Japanese one */
 void setSaveFileName(void) {
     MEMCARD.fileName = SAVE_FILE_NAMES[0];
 }

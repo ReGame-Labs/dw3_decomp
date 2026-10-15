@@ -50,12 +50,12 @@ segments:
     subalign: 4
     subsegments:
       # us's modules, each with its rodata, data and bss (tools/split_version.py)
-      - [0x0, rodata, menu]
-      - [0x20, asm, scene]
-      - [0x408, asm, info]
-      - [0xEE0, asm, panel]
-      - [0x1414, asm, menu]
-      - [0x1D50, asm, saves]
-      - [0x49FC, asm, screen]
-      - [0x525C, data, data/stgmcard]
+      - [0x0, .rodata, menu]
+      - [0x20, c, scene]
+      - [0x408, c, info]
+      - [0xEE0, c, panel]
+      - [0x1414, c, menu]
+      - [0x1D50, c, saves]
+      - [0x49FC, c, screen]
+      - [0x525C, .data, data/stgmcard]
   - [0x5B24]

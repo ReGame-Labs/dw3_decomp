@@ -660,7 +660,7 @@ void CARDGAME_drawMarkedCards(CardBattle *battle, CardScreen *screen, s32 side) 
     s32 j;
 
     battle->effectStep.vars[4] = battle->sides[side].pile.handCount;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     battle->effectStep.vars[1] = 0;
 #endif
     for (i = battle->sides[side].pile.deckTop; i < 40; i++) {
@@ -668,7 +668,7 @@ void CARDGAME_drawMarkedCards(CardBattle *battle, CardScreen *screen, s32 side) 
             card = battle->sides[side].pile.deck[i];
             battle->sides[side].pile.hand[battle->sides[side].pile.handCount] = card;
             battle->sides[side].pile.handCount++;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             battle->effectStep.vars[1] = 1;
 #endif
         }
@@ -798,7 +798,7 @@ s32 CARDGAME_drawNewCards(CardBattle *battle, CardScreen *screen, s32 side) {
         if (ready && battle->anim.current == CARD_ANIM_NONE) {
 #if VERSION_US
             battle->effectStep.state = 2;
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
             if (battle->effectStep.vars[1] == 0) {
                 screen->openMessage(screen, 0x35, 0, 0, side == 0 ? 2 : 0);
                 battle->effectStep.state = 5;

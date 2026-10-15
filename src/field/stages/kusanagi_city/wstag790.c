@@ -173,8 +173,8 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 0xC
 #include "common/start_stage.inc.c"
 
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x1BB
 #define STAGE_ARCHIVE 0x322
@@ -306,7 +306,7 @@ s16 script4[] = {
     SCRIPT_WAIT(0x12C),
 #if VERSION_US
     SCRIPT_LEAVE(0xE02, 0x170, 0x11F, 1),
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     SCRIPT_LEAVE(0xE03, 0x170, 0x11F, 1),
 #endif
     SCRIPT_END,

@@ -435,7 +435,7 @@ typedef union PartnerTotals {
 #if VERSION_US
 #define MODE_BATTLE_MOVIE 0xE09 /* STDWTITL's movie before each battle at GAME.progress 0x2B */
 #define MODE_ENDING 0xE0A /* STDWTITL's movie after the last battle */
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 #define MODE_OPENING_2 0xE02 /* STDWTITL's second opening movie: LANGUAGE 0
                                 alternates the two, the others play only it */
 #define MODE_BATTLE_MOVIE 0xE0A
@@ -499,7 +499,8 @@ typedef struct GameState {
     /*
      * flags02-flags40: the event flag groups 0x02-0x40 (checkCondition,
      * applyAction), bitsets packed one after the other, so most start at an
-     * odd byte
+     * odd byte. The Japanese version's state is the European one's: its
+     * newGame clears 0x26C4 bytes and its code reads the same offsets
      */
 #if VERSION_US
     /* 0x2644 */ u8 flags02[0xD];
@@ -529,7 +530,7 @@ typedef struct GameState {
     /* 0x26E8 */ s32 dark; /* the Dark Dungeon's darkness is on (WSTAG745, WSTAG746) */
     /* 0x26EC */ s32 flightZ; /* the flying player's height, kept while in the mode */
     /* 0x26F0 */ GameFuncs funcs;
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     /* 0x2644 */ u8 flags02[0x12];
     /* 0x2656 */ u8 flags04[0x2];
     /* 0x2658 */ u8 flags06[0x1];
@@ -565,7 +566,7 @@ typedef struct GameState {
    (stgmcard.h's GameSave) */
 #if VERSION_US
 #define GAME_SAVE_SIZE 0x26BC
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 #define GAME_SAVE_SIZE 0x26C4
 #endif
 

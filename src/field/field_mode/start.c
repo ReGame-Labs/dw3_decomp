@@ -14,7 +14,7 @@ void FIELDSTG_updateRoot(Task *task, Task **children) {
             if (GAME.lastFieldMode != mode) {
                 GAME.lastFieldMode = mode;
                 GAME.clearTempFlags = 1;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
                 GAME.randomGauges = 0x10;
 #endif
             } else {

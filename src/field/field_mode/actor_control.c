@@ -838,7 +838,7 @@ void FIELDSTG_setActorDir(Actor *actor, s32 dir) {
     actor->dir = dir;
 }
 
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define SET_FILE_0 0x01790070
 #define SET_FILE_8 0x03BB001E
 #define SET_FILE_16 0x03B9000B
@@ -1360,7 +1360,7 @@ static inline void runUse(Actor *actor) {
     switch (actor->step) {
     case 0:
     default:
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         FIELDSTG_state.acting = 1;
 #endif
         actor->control = NULL;
@@ -1371,7 +1371,7 @@ static inline void runUse(Actor *actor) {
     }
     if (actor->animDone != 0) {
         standAgain(actor);
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         FIELDSTG_state.acting = 0;
 #endif
     }
@@ -1389,7 +1389,7 @@ static inline void runUsed(Actor *actor) {
         }
         FIELDSTG_setActorAnim(actor, ACTOR_ANIM_USED);
         SOUND.playSound(SOUND_COMEX113);
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         setUsedFlag(actor->key1);
 #endif
         actor->nextStep(actor);
@@ -1472,7 +1472,7 @@ void FIELDSTG_runActorAction(Actor *actor, ActorChildren *children) {
             break;
         }
         actor->speed += 8;
-#if VERSION_EU
+#if PAL_VIDEO
         if (NTSC_MODE != 0) {
             if (actor->speed > FLIGHT_SPEED_MAX) {
                 actor->speed = FLIGHT_SPEED_MAX;

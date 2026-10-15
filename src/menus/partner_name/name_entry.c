@@ -30,7 +30,7 @@ NameEntry *STDGNAME_createNameEntry(char *name, s32 partner) {
     task->partner = partner;
 #if VERSION_US
     task->maxLength = 8;
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     /* a name of language 0 is shorter */
     if (LANGUAGE == 0) {
         task->maxLength = 5;

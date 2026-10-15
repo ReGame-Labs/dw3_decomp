@@ -100,16 +100,19 @@ s16 CARDGAME_otherCards[] = {
 /* the cards everyone has, after the two decks in the card list */
 s16 CARDGAME_commonCards[] = {
     0x050, 0x063, 0x08C, 0x0B8, 0x0E5, 0x0FB, 0x139, 0x13A, 0x13B,
+    /* the padding up to the next word, which each version fills with junk */
 #if VERSION_US
     0x2D2D,
 #elif VERSION_EU
     0x0A0D,
+#elif VERSION_JP
+    0x00E0,
 #endif
 };
 CardFileEntry CARDGAME_preloadFiles[] = {
     { 0x2B, 1 },
     { 0x0F, 1 },
-#if VERSION_US
+#if VERSION_US || VERSION_JP
     { 2023, 0 },
     { 2024, 0 },
     { 2025, 0 },

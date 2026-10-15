@@ -14,14 +14,14 @@ int main(void) {
     GsIMAGE tim;
     u_char param[8];
 
-#if VERSION_US
-    SetVideoMode(MODE_NTSC);
-#elif VERSION_EU
+#if PAL_VIDEO
     if (NTSC_MODE) {
         SetVideoMode(MODE_NTSC);
     } else {
         SetVideoMode(MODE_PAL);
     }
+#else
+    SetVideoMode(MODE_NTSC);
 #endif
     ResetCallback();
     VSync(0);

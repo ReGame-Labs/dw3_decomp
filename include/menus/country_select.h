@@ -21,7 +21,7 @@
 
 /* The screen's file, read with FILE_CACHE.getEntry: the discs number
    their files differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define CNTY_SEL_FILE 0x892
 #elif VERSION_EU
 #define CNTY_SEL_FILE 0x8A3

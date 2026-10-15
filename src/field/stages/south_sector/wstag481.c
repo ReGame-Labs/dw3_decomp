@@ -38,8 +38,8 @@ void updateStage(StageTask *task, void **children) {
 /* the color the setup copies to FIELDSTG_state.spriteColor */
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0 };
 
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define STAGE_FILE 0x5EB
 #elif VERSION_EU
 #define STAGE_TEXT (LANGUAGE + 0xF6)

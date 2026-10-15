@@ -41,14 +41,23 @@ void endEvent1600(void) {
     FLAGS_00.applyAction(SPECIAL(0x53), 1);
 }
 
+#if VERSION_EU
+#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_FILE 0x8E9
+#define STAGE_FILE_8 0x19E
+#elif VERSION_JP
+#define STAGE_TEXT 0x89A
+#define STAGE_FILE 0x8A4
+#define STAGE_FILE_8 0x190
+#endif
 /* Sets the stage up: its map, actors and events, playing the ambience ENV_0011 */
 void setupStage(void) {
-    FIELDSTG_state.textFile = LANGUAGE + 0xFD;
-    FIELDSTG_state.mapFile = 0x19E;
-    FIELDSTG_state.sheetEntry = 0x8E90000;
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE_8;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
     FIELDSTG_state.objects = stageObjects;
     FIELDSTG_state.slots = stageSlots;
-    FIELDSTG_state.imageFile = 0x8E8;
+    FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0xFD00, 0x17700};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.soundBank = 0x33;
@@ -56,8 +65,8 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8E90001);
-    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x8E90002);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -198,7 +207,7 @@ StageSlot stageSlots[] = {
 void (*stageFuncs[])(void) = {
     setupStage,
 };
-#define EVENT_TEXT_FILE 0x158
+#define EVENT_TEXT_FILE EXTRA_TEXT
 FieldEvent stageEvents[] = {
     { 1600, script1600, EVENT_TEXT(0), NULL, endEvent1600 },
     { -1, NULL, 0, NULL, NULL },

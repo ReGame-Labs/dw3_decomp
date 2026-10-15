@@ -48,8 +48,8 @@ void endEvent1292(void) {
 }
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x613
 #elif VERSION_EU
@@ -108,7 +108,7 @@ s16 script1291[] = {
     SCRIPT_WAIT(0x1E),
     SCRIPT_END,
     /* after the end, the original's padding up to a word, which isn't zeros */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
     0x6004,
 #elif VERSION_EU
     0x325,

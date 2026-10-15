@@ -11,14 +11,14 @@
 /* The images of a Digimon's change (FIGHTSTG_updateDigimonChange): entry 5 */
 #if VERSION_EU
 #define FILE_CHANGE 0x8A2
-#elif VERSION_US
+#elif VERSION_US || VERSION_JP
 #define FILE_CHANGE 0x891
 #endif
 
 /* What fighter 0x1D2's entrance (FIGHTSTG_updateEntrance) loads */
 #if VERSION_EU
 #define FILE_ENTRANCE_1D2 0x6E2
-#elif VERSION_US
+#elif VERSION_US || VERSION_JP
 #define FILE_ENTRANCE_1D2 0x6D3
 #endif
 

@@ -20,7 +20,7 @@ EffectLook WFIGHTMN_effectVisuals[] = {
     { 28, 41, 49 },
     { -1, 0, 0 },
 };
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 EffectLook WFIGHTMN_effectVisuals[] = {
     { TECH_EFFECT_POISON, 19, 26 },
     { TECH_EFFECT_PARALYSIS, 20, 26 },

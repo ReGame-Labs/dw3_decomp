@@ -31,7 +31,7 @@ void STSTATUS_showMapArea(StatusMapScreen *screen, TextWindow **windows) {
     if (wasHovering != screen->hovering) {
         if (screen->hovering) {
             SOUND.playSound(SOUND_MENU_CONFIRM);
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             screen->hoverX = screen->cursorX;
 #endif
             screen->hoverY = screen->cursorY;
@@ -176,7 +176,7 @@ void STSTATUS_runMapScreen(StatusMapScreen *screen, TextWindow **windows) {
 void STSTATUS_drawMapScreen(StatusMapScreen *screen) {
     SpriteDrawer sprite;
     s32 *towns;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     s32 x;
 #endif
     s32 frame;
@@ -217,7 +217,7 @@ void STSTATUS_drawMapScreen(StatusMapScreen *screen) {
                         screen->cursorX, screen->cursorY + screen->top);
         }
         sprite.setLayerId(screen->layer, screen->depth - 2);
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         if (screen->hovering) {
             x = screen->hoverX;
         } else {

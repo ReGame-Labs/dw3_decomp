@@ -195,13 +195,7 @@ s32 CARDGAME_moveSlotCard(CardBattle *battle, CardScreen *screen, s32 side) {
     if (side != 0) {
         index += 6;
     }
-#if VERSION_US
-    x = player->slotCount * 0x2900 + 0x1800;
-    y = 0x3200;
-    if (side == 0) {
-        y = 0x9000;
-    }
-#elif VERSION_EU
+#if PAL_VIDEO
     if (side == 0) {
         x = CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][0] + player->slotCount * 0x2900;
     } else {
@@ -211,6 +205,12 @@ s32 CARDGAME_moveSlotCard(CardBattle *battle, CardScreen *screen, s32 side) {
         y = CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][1];
     } else {
         y = CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][3];
+    }
+#else
+    x = player->slotCount * 0x2900 + 0x1800;
+    y = 0x3200;
+    if (side == 0) {
+        y = 0x9000;
     }
 #endif
     switch (battle->effectStep.state) {
@@ -300,13 +300,7 @@ s32 CARDGAME_flipSlotCard(CardBattle *battle, CardScreen *screen, s32 side) {
     if (side != 0) {
         index += 6;
     }
-#if VERSION_US
-    x = player->slotCount * 0x2900 + 0x1800;
-    y = 0x3200;
-    if (side == 0) {
-        y = 0x9000;
-    }
-#elif VERSION_EU
+#if PAL_VIDEO
     if (side == 0) {
         x = CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][0] + player->slotCount * 0x2900;
     } else {
@@ -316,6 +310,12 @@ s32 CARDGAME_flipSlotCard(CardBattle *battle, CardScreen *screen, s32 side) {
         y = CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][1];
     } else {
         y = CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][3];
+    }
+#else
+    x = player->slotCount * 0x2900 + 0x1800;
+    y = 0x3200;
+    if (side == 0) {
+        y = 0x9000;
     }
 #endif
     switch (battle->effectStep.state) {
@@ -381,7 +381,7 @@ void CARDGAME_startPlayCard(CardBattle *battle, CardScreen *screen, s32 side) {
             screen->startMove(screen, 15, 10, CARDGAME_recordCardPositions[battle->record.playCount][0], CARDGAME_recordCardPositions[battle->record.playCount][1]);
 #if VERSION_US
             battle->effectStep.state = 3;
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
             battle->effectStep.state = 5;
 #endif
             battle->effectStep.time = 0;
@@ -393,7 +393,7 @@ void CARDGAME_startPlayCard(CardBattle *battle, CardScreen *screen, s32 side) {
         screen->scaleSprite(screen, 15, 8, 0x1000, 0x1000);
         battle->effectStep.state = 2;
         battle->effectStep.time = 0;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         battle->effectStep.vars[0] = 0;
 #endif
     }
@@ -409,7 +409,7 @@ s32 CARDGAME_stepPlayCard(CardBattle *battle, CardScreen *screen) {
     s32 done = 0;
     s32 i;
     s32 j;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     s32 card;
 #endif
 
@@ -423,7 +423,7 @@ s32 CARDGAME_stepPlayCard(CardBattle *battle, CardScreen *screen) {
             battle->effectStep.time = 0;
         }
         break;
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     case 2:
         screen->windows[1].showCount = 0;
         screen->windows[1].value = 0;
@@ -553,10 +553,10 @@ void CARDGAME_dealHands(CardBattle *battle, CardScreen *screen) {
         }
     }
     for (i = 0; i < 6; i++) {
-#if VERSION_US
-        screen->addSprite(screen, i, 0x16000, 0x9000);
-#elif VERSION_EU
+#if PAL_VIDEO
         screen->addSprite(screen, i, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][0] + 0x14800, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][1]);
+#else
+        screen->addSprite(screen, i, 0x16000, 0x9000);
 #endif
         screen->setSpriteCard(screen, i, battle->sides[0].pile.hand[i]);
         screen->sprites[i].visible = 2;
@@ -564,10 +564,10 @@ void CARDGAME_dealHands(CardBattle *battle, CardScreen *screen) {
         screen->sprites[i].scaleX = 0;
     }
     for (i = 0; i < 6; i++) {
-#if VERSION_US
-        screen->addSprite(screen, i + 6, 0x16000, 0x3200);
-#elif VERSION_EU
+#if PAL_VIDEO
         screen->addSprite(screen, i + 6, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][2] + 0x14800, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][3]);
+#else
+        screen->addSprite(screen, i + 6, 0x16000, 0x3200);
 #endif
         screen->setSpriteCard(screen, i + 6, battle->sides[1].pile.hand[i]);
         screen->sprites[i + 6].visible = 2;
@@ -580,16 +580,16 @@ void CARDGAME_dealHands(CardBattle *battle, CardScreen *screen) {
    on the panels */
 static inline void dealNextCards(CardBattle *battle, CardScreen *screen) {
     if (battle->effectStep.vars[0] < 6) {
-#if VERSION_US
-        screen->startMove(screen, battle->effectStep.vars[0], 20, battle->effectStep.vars[0] * 0x2900 + 0x1800, 0x9000);
-#elif VERSION_EU
+#if PAL_VIDEO
         screen->startMove(screen, battle->effectStep.vars[0], 20, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][0] + battle->effectStep.vars[0] * 0x2900, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][1]);
+#else
+        screen->startMove(screen, battle->effectStep.vars[0], 20, battle->effectStep.vars[0] * 0x2900 + 0x1800, 0x9000);
 #endif
         screen->setSpriteScale(screen, battle->effectStep.vars[0], 0x1000, 0x1000);
-#if VERSION_US
-        screen->startMove(screen, battle->effectStep.vars[0] + 6, 20, battle->effectStep.vars[0] * 0x2900 + 0x1800, 0x3200);
-#elif VERSION_EU
+#if PAL_VIDEO
         screen->startMove(screen, battle->effectStep.vars[0] + 6, 20, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][2] + battle->effectStep.vars[0] * 0x2900, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][3]);
+#else
+        screen->startMove(screen, battle->effectStep.vars[0] + 6, 20, battle->effectStep.vars[0] * 0x2900 + 0x1800, 0x3200);
 #endif
         screen->setSpriteScale(screen, battle->effectStep.vars[0] + 6, 0x1000, 0x1000);
         battle->effectStep.vars[0]++;
@@ -806,7 +806,7 @@ s32 CARDGAME_stepAttack(CardBattle *battle, CardScreen *screen, s32 side) {
     s32 other = side ^ 1;
     s32 index;
     s32 value;
-#if VERSION_EU
+#if PAL_VIDEO
     s32 x;
 #endif
     s32 i;
@@ -818,15 +818,15 @@ s32 CARDGAME_stepAttack(CardBattle *battle, CardScreen *screen, s32 side) {
             if (side != 0) {
                 index += 6;
             }
-#if VERSION_US
-            screen->startFly(screen, index, 6, (battle->players[other].slotCount - 1) * 0x1480 + 0x1800, 0x6100);
-#elif VERSION_EU
+#if PAL_VIDEO
             x = CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][0] + (battle->players[other].slotCount - 1) * 0x1480;
             if (SHIFT_PAL_SCREEN) {
                 screen->startFly(screen, index, 6, x, side != 0 ? 0x6D00 : 0x5500);
             } else {
                 screen->startFly(screen, index, 6, x, 0x6100);
             }
+#else
+            screen->startFly(screen, index, 6, (battle->players[other].slotCount - 1) * 0x1480 + 0x1800, 0x6100);
 #endif
             battle->effectStep.vars[0]++;
             screen->sprites[index].moving = 1;
@@ -1101,10 +1101,10 @@ s32 CARDGAME_stepSlotTotal(CardBattle *battle, CardScreen *screen, s32 side) {
     case 3:
         if (screen->sprites[0x11].state == 1) {
             battle->effectStep.state = 4;
-#if VERSION_US
-            screen->openWindow(screen, 2, 1, battle->effectStep.vars[4], CARDGAME_cardWindowPositions[0][side][0], CARDGAME_cardWindowPositions[0][side][1]);
-#elif VERSION_EU
+#if PAL_VIDEO
             screen->openWindow(screen, 2, 1, battle->effectStep.vars[4], CARDGAME_cardWindowPositions[SHIFT_PAL_SCREEN][side][0], CARDGAME_cardWindowPositions[SHIFT_PAL_SCREEN][side][1]);
+#else
+            screen->openWindow(screen, 2, 1, battle->effectStep.vars[4], CARDGAME_cardWindowPositions[0][side][0], CARDGAME_cardWindowPositions[0][side][1]);
 #endif
         }
         break;

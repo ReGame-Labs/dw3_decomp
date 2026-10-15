@@ -63,3 +63,8 @@ STCRDDEK_keyArrowCluts = 0x8008B420;
 STCRDDEK_funcs = 0x8008B438;
 STCRDDEK_keyboard = 0x8008B450;
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+STCRDDEK_cursorCluts = 0x8008A08C; // size:0x18
+STCRDDEK_keyPagesJp = 0x8008AF70; // size:0x24
+STCRDDEK_keyCharsJp = 0x8008AF94; // size:0x278
