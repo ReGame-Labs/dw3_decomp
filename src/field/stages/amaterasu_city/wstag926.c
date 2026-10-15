@@ -10,14 +10,23 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+#if VERSION_EU
+#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_FILE 0x8EB
+#define STAGE_FILE_8 0x1A0
+#elif VERSION_JP
+#define STAGE_TEXT 0x89A
+#define STAGE_FILE 0x8A7
+#define STAGE_FILE_8 0x192
+#endif
 /* Sets the stage up: its map, actors and events, playing KANRIBGM */
 void setupStage(void) {
-    FIELDSTG_state.textFile = LANGUAGE + 0xFD;
-    FIELDSTG_state.mapFile = 0x1A0;
-    FIELDSTG_state.sheetEntry = 0x8EB0000;
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE_8;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
     FIELDSTG_state.objects = stageObjects;
     FIELDSTG_state.slots = stageSlots;
-    FIELDSTG_state.imageFile = 0x8EA;
+    FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0xDE00, 0xDE00};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.soundBank = 5;
@@ -25,8 +34,8 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8EB0001);
-    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x8EB0002);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -143,7 +152,7 @@ StageSlot stageSlots[] = {
 void (*stageFuncs[])(void) = {
     setupStage,
 };
-#define EVENT_TEXT_FILE 0x158
+#define EVENT_TEXT_FILE EXTRA_TEXT
 FieldEvent stageEvents[] = {
     { 1606, script1606, EVENT_TEXT(3), NULL, NULL },
     { -1, NULL, 0, NULL, NULL },

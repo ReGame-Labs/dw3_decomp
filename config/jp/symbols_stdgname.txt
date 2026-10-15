@@ -44,3 +44,7 @@ STDGNAME_menuAnims = 0x80087AE8;
 STDGNAME_funcs = 0x80087BC8;
 STDGNAME_keyboard = 0x80088AC4;
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+STDGNAME_keyPagesJp = 0x8008738C; // size:0x24
+STDGNAME_keyCharsJp = 0x800873B0; // size:0x276

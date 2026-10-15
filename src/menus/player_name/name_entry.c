@@ -54,7 +54,7 @@ NameEntry *STPLNMET_createNameEntry(char *name) {
     task->partner = -1;
 #if VERSION_US
     task->maxLength = 8;
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     /* five full-width characters in Japanese */
     if (LANGUAGE == 0) {
         task->maxLength = 5;

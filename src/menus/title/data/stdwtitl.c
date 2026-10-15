@@ -20,7 +20,12 @@ RECT STDWTITL_vramRect = {0, 0, 1024, 512};
 
 /* Each movie's file, the frame it ends on and the game mode after it */
 MovieInfo STDWTITL_movies[] = {
-#if VERSION_US
+#if VERSION_JP
+    /* the European version's first movie, the second opening (MOVIEOP2.STR),
+       then the USA version's movies */
+    {0x93A, 0x6F0, MODE_TITLE},
+#endif
+#if VERSION_US || VERSION_JP
     {0x7E5, 0x6F0, MODE_TITLE}, {0x7DB, 0x1D1, 0x207}, {0x7E3, 0x166, 0x26D},
     {0x7DC, 0x3C0, 0x216}, {0x7DD, 0x231, 0x272}, {0x7DE, 0x294, 0x288},
     {0x7DF, 0xE0, 0x288},  {0x7E0, 0x151, 0x2DE}, {0x7E1, 0x1B2, MODE_BATTLE},

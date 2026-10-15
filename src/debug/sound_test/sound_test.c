@@ -812,4 +812,6 @@ const char SOUNDTST_STR_CURSOR[4] =
     "\x81\x84\0\0";
 #elif VERSION_EU
     "\x81\x84\0\x2D";
+#elif VERSION_JP
+    "\x81\x84\0\x35";
 #endif

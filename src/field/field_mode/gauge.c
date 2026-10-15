@@ -57,7 +57,7 @@ void FIELDSTG_runGauge(GaugeGame *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         if (GAME.randomGauges > 0) {
             task->row = RANDOM.next() & (GAUGE_ROWS - 1);
             GAME.randomGauges--;
@@ -105,7 +105,7 @@ void FIELDSTG_runGauge(GaugeGame *task) {
                 }
                 break;
             case GAUGE_STOPPED:
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
                 index = task->cursor >> 10;
                 shift = (task->cursor >> 7) & 6;
                 cell = FIELDSTG_gaugeRows[task->row][index];

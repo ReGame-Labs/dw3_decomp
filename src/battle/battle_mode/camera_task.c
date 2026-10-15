@@ -7,7 +7,7 @@
 
 #if VERSION_US
 #include "camera_turn.h"
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 /* the lists of shots of the European version's own camera (FIGHTSTG_updateCameraShots) */
 CameraShot FIGHTSTG_euCameraShots[3][3] = {
     { { 64, 6 }, { 2, 3 }, { -1, 0 } },

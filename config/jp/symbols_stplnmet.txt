@@ -65,3 +65,7 @@ STPLNMET_tabX = 0x80089690;
 STPLNMET_funcs = 0x800897A0;
 STPLNMET_keyboard = 0x800897C0;
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+STPLNMET_keyPagesJp = 0x800891B0; // size:0x24
+STPLNMET_keyCharsJp = 0x800891D4; // size:0x276

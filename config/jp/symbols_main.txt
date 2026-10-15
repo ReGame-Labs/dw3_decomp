@@ -36,3 +36,9 @@ FIELDSTG_leaveField = 0x8008B4CC; // defined:True
 FIELDSTG_startListedEvent = 0x8008BD00; // defined:True
 FIELDSTG_openInn = 0x8008BD5C; // defined:True
 FIELDSTG_battleFuncs = 0x8009B3B8; // defined:True
+
+// the data's names, from its C (the build matches)
+ZERO_VECTOR = 0x8004D9CC; // size:0x10
+DOUBLE_WIDTH_MATRIX = 0x8004D9FC; // size:0x20
+DOUBLE_HEIGHT_MATRIX = 0x8004DA1C; // size:0x20
+DOUBLE_SIZE_MATRIX = 0x8004DA3C; // size:0x20

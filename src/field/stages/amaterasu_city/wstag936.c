@@ -11,14 +11,23 @@
 #include "common/start_stage.inc.c"
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
+#if VERSION_EU
+#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_FILE 0x8FF
+#define STAGE_FILE_8 0x1B0
+#elif VERSION_JP
+#define STAGE_TEXT 0x89A
+#define STAGE_FILE 0x8C5
+#define STAGE_FILE_8 0x1A2
+#endif
 /* Sets the stage up: its map and actors, playing the ambience ENV_0004 */
 void setupStage(void) {
-    FIELDSTG_state.textFile = LANGUAGE + 0xFD;
-    FIELDSTG_state.mapFile = 0x1B0;
-    FIELDSTG_state.sheetEntry = 0x8FF0000;
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE_8;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
     FIELDSTG_state.objects = stageObjects;
     FIELDSTG_state.slots = stageSlots;
-    FIELDSTG_state.imageFile = 0x8FE;
+    FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0xFD00, 0x1CD00};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.soundBank = 0x2C;
@@ -26,8 +35,8 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.spriteColor = stageColor;
-    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8FF0001);
-    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x8FF0002);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
 }
 

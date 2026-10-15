@@ -8,8 +8,8 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
-#if VERSION_US
-#define STAGE_TEXT 0xF0
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF0)
 #define EVENT_TEXT_FILE 0x10B
 #define STAGE_FILE 0x195
 #define STAGE_ARCHIVE 0x3BE
@@ -58,6 +58,10 @@ s16 script1200[] = {
     SCRIPT_WAIT(0x5A),
     SCRIPT_LEAVE(0xC01, 0, 0, 0),
     SCRIPT_END,
+    /* after the end, the original's padding up to a word, which isn't zeros */
+#if VERSION_JP
+    0x9082,
+#endif
 };
 ActorImage stageImages[] = {
     { 0x200, 0x100, 0x21C, 0x1A6, 0x70, 0xA6, 0x230, 0x1FE },

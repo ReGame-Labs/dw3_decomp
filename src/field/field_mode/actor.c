@@ -140,7 +140,7 @@ Actor *FIELDSTG_createActor(s32 key1, s32 kind, s32 image, FieldActorEntry *entr
     actor->image = &FIELDSTG_state.images.actors[image + 2];
     actor->fieldImage = FIELDSTG_state.images.field;
     FILE_CACHE.request(actor->animFile >> 16);
-#if VERSION_EU
+#if PAL_VIDEO
     if (NTSC_MODE) {
         actor->speed = 0x400;
     } else {

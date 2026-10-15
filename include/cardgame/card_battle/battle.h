@@ -9,7 +9,7 @@
 #include "cardgame/card_battle/screen.h"
 
 /* The opponents of the card battles (CardOpponent) */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FILE_CARDGAME_OPPONENTS 0x795
 #elif VERSION_EU
 #define FILE_CARDGAME_OPPONENTS 0x7A4
@@ -289,11 +289,11 @@ typedef struct CardBattleItems {
     /* 0x18 */ CardScreen *screen;
 } CardBattleItems;
 
-/* The steps CARDGAME_stepPlayCard has before its card goes off: the European version
-   shows the card's information first, and waits for a button */
+/* The steps CARDGAME_stepPlayCard has before its card goes off: the European and
+   Japanese versions show the card's information first, and wait for a button */
 #if VERSION_US
 #define CARD_INFO_STEPS 0
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 #define CARD_INFO_STEPS 2
 #endif
 
@@ -308,7 +308,7 @@ extern u16 CARDGAME_defaultDeck[];
 extern CardOffset CARDGAME_deckWindowPos[3]; /* the three deck windows */
 extern u8 CARDGAME_turnStates[]; /* the next record.turnState state, by step and side */
 extern CardBattleMessage CARDGAME_battleMessages[]; /* the step and nextPhase of CARDGAME_startBattleMessage, by prevPhase */
-#if VERSION_EU
+#if PAL_VIDEO
 extern s32 CARDGAME_slotRowPositions[2][4]; /* sprite positions, by SHIFT_PAL_SCREEN */
 extern CardOffset CARDGAME_panelIconPositions[2][2][2]; /* CARDGAME_drawPanelIcon's icon and label positions, by SHIFT_PAL_SCREEN and side (EU) */
 #endif

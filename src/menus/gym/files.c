@@ -362,7 +362,7 @@ TrainInfo STGTRAIN_trainings[] = {
     {42, 66, {91, 92, 93, 94}},
 };
 /* the discs number their files differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 TrainFile STGTRAIN_files[] = {
     {591, 82, 31, 0},
     {591, 82, 31, 0},

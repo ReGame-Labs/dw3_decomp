@@ -261,7 +261,7 @@ void STGDGLAB_drawRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *
     }
 }
 
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
 /* Moves the third screen's cursor by step slots, to the first column with
    an id; whether it moved */
 s32 STGDGLAB_moveRecipeCursor(LabRecipeScreen *screen, s32 step) {
@@ -405,7 +405,7 @@ static inline void pickRecipeId(LabRecipeScreen *screen) {
             }
         }
     }
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     if (screen->slots >= 2) {
         if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
             STGDGLAB_moveRecipeCursor(screen, -1);
@@ -441,7 +441,7 @@ static inline void pickRecipeId(LabRecipeScreen *screen) {
     if (oldCol != screen->col || oldSlot != screen->slot) {
         SOUND.playSound(SOUND_MENU_MOVE);
     }
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     else
 #endif
     if (PAD_PRESSED(PAD_CROSS)) {

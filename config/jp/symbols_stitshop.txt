@@ -77,3 +77,6 @@ STITSHOP_shopNames = 0x8008C784;
 STITSHOP_shops = 0x8008CCF8;
 STITSHOP_funcs = 0x8008CDF0;
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+STITSHOP_sellLists = 0x8008C6EC; // size:0x10

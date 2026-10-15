@@ -33,7 +33,7 @@ void FIGHTSTG_updateEffectModel(EffectModel *task, Model **children) {
 }
 
 /* the effect models, ended by an id of 0; the European version's differ */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 EffectModelEntry FIGHTSTG_effectModels[] = {
     { 39, 0x7FE001A, 0x7FE0000 },
     { 65, 0x7600004, 0x7600000 },

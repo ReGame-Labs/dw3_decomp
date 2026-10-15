@@ -126,8 +126,9 @@ void initCardDrawer(CardDrawer *obj) {
     obj->clutStride = 8;
 }
 
-/* The card images, 64 cards to a file (cardDrawerSetCard) */
-#if VERSION_US
+/* The card images, 64 cards to a file (cardDrawerSetCard), numbered in the
+   Japanese disc as in the USA one */
+#if VERSION_US || VERSION_JP
 s32 CARD_IMAGE_FILES[] = { 2023, 2024, 2025, 2026, 2027 };
 #elif VERSION_EU
 s32 CARD_IMAGE_FILES[] = { 2038, 2039, 2040, 2041, 2042 };

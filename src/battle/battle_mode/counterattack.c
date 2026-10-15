@@ -128,7 +128,7 @@ void FIGHTSTG_updateCounterattack(Counterattack *task, BattleChild *children) {
                 FIGHTSTG_events.events[index].type = 0;
 #if VERSION_US
             } else if (FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0])->counter != 0) {
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
             } else if (FIGHTSTG_battleFuncs.computeStats(SIDE_PLAYER, 1, FIGHTSTG_battle.state.active[0])->counter != 0
                        && FIGHTSTG_battleFuncs.rollCounter(0, task->received) != 0) {
 #endif
@@ -207,7 +207,7 @@ Counterattack *FIGHTSTG_startCounterattack(s32 side, s32 received, s32 noKnockOu
     return task;
 }
 
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
 /* Revives one of the player's fighters at full HP, clearing its status
    events, and raises its defense by tech's effectPower (FIGHTSTG_battleFuncs.changeBoost) */
 void FIGHTSTG_reviveFighter(s32 tech, s32 fighter) {

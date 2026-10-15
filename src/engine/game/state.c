@@ -4,7 +4,7 @@
 /* Clears the save data and sets up a new game */
 void newGame(void) {
     HEAP.zero(&GAME, GAME_SAVE_SIZE);
-#if VERSION_US
+#if VERSION_US || VERSION_JP
     GAME.mode = MODE_OPENING;
     GAME.nextMode = MODE_OPENING;
 #elif VERSION_EU

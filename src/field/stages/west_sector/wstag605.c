@@ -40,8 +40,8 @@ void endEvent510(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xF7
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF7)
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x475
 #elif VERSION_EU
@@ -119,7 +119,7 @@ s16 script511[] = {
     SCRIPT_LEAVE(0x24D, 1, 1, 7),
     SCRIPT_END,
     /* after the end, the original's padding up to a word, which isn't zeros */
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     0x6004,
 #endif
 };

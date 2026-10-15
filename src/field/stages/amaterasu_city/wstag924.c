@@ -12,20 +12,31 @@ extern s32 event1602WindowFrames[];
 extern s32 event1604WindowFrames[];
 
 /* The text file of the menus */
-#define MENU_TEXT 0x158
+#define MENU_TEXT EXTRA_TEXT
 
 #include "common/update_stage.inc.c"
 
 #include "common/start_stage.inc.c"
 
+#if VERSION_EU
+#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_FILE 0x8E7
+#define STAGE_FILE_8 0x19C
+#define STAGE_ARCHIVE 0x8E5
+#elif VERSION_JP
+#define STAGE_TEXT 0x89A
+#define STAGE_FILE 0x8A1
+#define STAGE_FILE_8 0x18E
+#define STAGE_ARCHIVE 0x8A0
+#endif
 /* Sets the stage up: its map, actors and events, playing the ambience ENV_0011 */
 void setupStage(void) {
-    FIELDSTG_state.textFile = LANGUAGE + 0xFD;
-    FIELDSTG_state.mapFile = 0x19C;
-    FIELDSTG_state.sheetEntry = 0x8E70000;
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE_8;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
     FIELDSTG_state.objects = stageObjects;
     FIELDSTG_state.slots = stageSlots;
-    FIELDSTG_state.imageFile = 0x8E5;
+    FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x10200, 0x15700};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.soundBank = 0x33;
@@ -34,8 +45,8 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
-    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8E70001);
-    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x8E70002);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -405,7 +416,7 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageFuncs stageFuncs = { setupStage, startTween, updateTween };
-#define EVENT_TEXT_FILE 0x158
+#define EVENT_TEXT_FILE EXTRA_TEXT
 FieldEvent stageEvents[] = {
     { 1602, NULL, EVENT_TEXT(1), startEvent1602, NULL },
     { 1604, NULL, EVENT_TEXT(2), startEvent1604, NULL },

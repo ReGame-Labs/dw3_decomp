@@ -5,7 +5,7 @@
 
 #include "common.h"
 #include "field/stage.h"
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define STAGE_FILE 0x6DD
 #elif VERSION_EU
 #define STAGE_FILE 0x6ED
@@ -239,8 +239,8 @@ void endEvent1035(void) {
     GAME.progress = 0x29;
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define EVENT_TEXT_FILE 0x14A
 #elif VERSION_EU
 #define STAGE_TEXT (LANGUAGE + 0xF6)

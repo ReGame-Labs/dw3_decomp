@@ -84,10 +84,10 @@ void CARDGAME_browseHand(CardBattle *battle, CardScreen *screen) {
 
 /* Shows the card being played (sprite 15) scaling in on the slot row */
 static inline void showPlayedCard(CardBattle *battle, CardScreen *screen) {
-#if VERSION_US
-    screen->addSprite(screen, 15, 0x1800, 0x9000);
-#elif VERSION_EU
+#if PAL_VIDEO
     screen->addSprite(screen, 15, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][0], CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][1]);
+#else
+    screen->addSprite(screen, 15, 0x1800, 0x9000);
 #endif
     screen->setSpriteCard(screen, 15, battle->record.plays[battle->record.playCount].card);
     screen->sprites[15].scaleX = 0;

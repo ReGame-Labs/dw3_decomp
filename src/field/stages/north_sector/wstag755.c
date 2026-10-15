@@ -44,8 +44,8 @@ void endEvent781(void) {
     FLAGS_00.applyAction(ITEM(0, 0xC), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xD4
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xD4)
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x6C3
 #elif VERSION_EU
@@ -139,6 +139,10 @@ s16 script781[] = {
     SCRIPT_WAIT(6),
     SCRIPT_LEAVE(0x26F, 0x78, 0x21C, 5),
     SCRIPT_END,
+    /* after the end, the original's padding up to a word, which isn't zeros */
+#if VERSION_JP
+    0x440,
+#endif
 };
 AreaBattle area0Battle0 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area0Battle1 = { 0, 0, MUSIC(1, 0) };

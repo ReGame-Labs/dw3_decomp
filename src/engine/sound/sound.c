@@ -1,8 +1,9 @@
 #include "engine/game.h"
 #include "libsnd.h"
 
-/* Each bank's files (SOUND_BANK_FILES[id]) */
-#if VERSION_US
+/* Each bank's files (SOUND_BANK_FILES[id]), numbered in the Japanese disc as
+   in the USA one */
+#if VERSION_US || VERSION_JP
 SoundFiles SOUND_FILES_01 = {370, 357, 0x1650000, 0x1720000, {0x1650001, 0x1650002, 0}};
 SoundFiles SOUND_FILES_02 = {361, 348, 0x15C0000, 0x1690000, {0x15C0001, 0}};
 SoundFiles SOUND_FILES_03 = {1122, 1120, 0x4600000, 0x4620000, {0x4600001, 0}};
@@ -292,11 +293,11 @@ void fadeOutSound(s32 packed) {
     s32 slot = findSoundBank(id);
 
     if (slot != -1 && !keyOn) {
-#if VERSION_US
-        SsSepSetDecrescendo(SOUND.banks[slot].seqs[seq], sep, 0x80, 0x3C);
-#elif VERSION_EU
+#if PAL_VIDEO
         /* one second, in frames */
         SsSepSetDecrescendo(SOUND.banks[slot].seqs[seq], sep, 0x80, NTSC_MODE ? 0x3C : 0x32);
+#else
+        SsSepSetDecrescendo(SOUND.banks[slot].seqs[seq], sep, 0x80, 0x3C);
 #endif
         if (SOUND.music == packed) {
             SOUND.music = 0;
@@ -421,14 +422,14 @@ void initSound(void) {
     s32 i;
 
     SsSetTableSize(SOUND.seqTable, 6, 16);
-#if VERSION_US
-    SsSetTickMode(SS_NOTICK);
-#elif VERSION_EU
+#if PAL_VIDEO
     if (NTSC_MODE) {
         SsSetTickMode(SS_NOTICK);
     } else {
         SsSetTickMode(SS_NOTICK | 50); /* 50 ticks a second */
     }
+#else
+    SsSetTickMode(SS_NOTICK);
 #endif
     SsStart2();
     SsSetMVol(SOUND_VOLUME_MAX, SOUND_VOLUME_MAX);

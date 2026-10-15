@@ -9,8 +9,8 @@
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-#if VERSION_US
-#define STAGE_TEXT 0xF0
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF0)
 #define EVENT_TEXT_FILE 0x10B
 #define STAGE_FILE 0x199
 #define STAGE_ARCHIVE 0x314

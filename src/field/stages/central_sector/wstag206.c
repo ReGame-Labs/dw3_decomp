@@ -52,8 +52,8 @@ void endEvent922(void) {
 }
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
-#if VERSION_US
-#define STAGE_TEXT 0xE2
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xE2)
 #define EVENT_TEXT_FILE 0x10B
 #define STAGE_FILE 0x49C
 #elif VERSION_EU
@@ -195,7 +195,7 @@ s16 script921[] = {
     SCRIPT_WAIT(0x1E),
 #if VERSION_US
     SCRIPT_LEAVE(0xE05, 0x2F0, 0x10E, 5),
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     SCRIPT_LEAVE(0xE06, 0x2F0, 0x10E, 5),
 #endif
     SCRIPT_END,

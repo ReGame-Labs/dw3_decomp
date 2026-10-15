@@ -11,7 +11,7 @@
 #define OVL_NAME(name) STGMCARD_##name
 
 /* The sprite archive of the screen */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FILE_GMCARD_SPRITES 0x28F
 #define FILE_GMCARD_SHEET 0x28E /* the sprite sheet of its images */
 #elif VERSION_EU
@@ -96,7 +96,7 @@ typedef struct MemCardFile {
    SAVE_CHECKED, and MEMCARD_SAVE_VERSION. */
 #if VERSION_US
 #define MEMCARD_SAVE_VERSION 3
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 #define MEMCARD_SAVE_VERSION 4
 #endif
 #define SAVE_CHECKED 4
@@ -105,7 +105,7 @@ typedef struct MemCardFile {
 #if VERSION_US
 #define MEMCARD_LOAD_FRAMES 1239
 #define MEMCARD_SAVE_FRAMES 1266
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 #define MEMCARD_LOAD_FRAMES 1240
 #define MEMCARD_SAVE_FRAMES 1267
 #endif

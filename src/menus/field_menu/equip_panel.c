@@ -420,7 +420,8 @@ static inline void STSTATUS_chooseEquipItem(EquipPanel *panel, EquipPanelWindows
         STSTATUS_showEquipList(panel, windows, 1);
         if (windows->scrollBar != NULL) {
 #if VERSION_US
-            /* the USA version's bar follows the chosen item, the European one the page */
+            /* the USA version's bar follows the chosen item, the European and
+               Japanese ones the page */
             windows->scrollBar->setPos(windows->scrollBar, panel->cursor + panel->scroll);
 #else
             windows->scrollBar->setPos(windows->scrollBar, panel->scroll);

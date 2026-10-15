@@ -188,8 +188,8 @@ void endEvent551(void) {
     GAME.progress = 0x15;
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xDB
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xDB)
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x479
 #elif VERSION_EU

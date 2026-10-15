@@ -131,7 +131,7 @@ void WSTAG805_handleCommand840(s32 task, s32 command, s32 arg);
 void WSTAG810_handleCommands842To844(s32 task, s32 command, s32 arg);
 s32 WSTAG820_createCommand853(s32 id);
 void WSTAG820_handleCommand845(s32 task, s32 command, s32 arg);
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
 s32 WSTAG925_createCommand855(s32 id);
 s32 WSTAG926_createCommand854(s32 id);
 #endif
@@ -375,7 +375,7 @@ struct Task *WSTAG880_startStage(void *owner);
 struct Task *WSTAG885_startStage(void *owner);
 struct Task *WSTAG890_startStage(void *owner);
 struct Task *WSTAG895_startStage(void *owner);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 struct Task *WSTAG200_startStage(void *owner);
 struct Task *WSTAG201_startStage(void *owner);
 struct Task *WSTAG202_startStage(void *owner);

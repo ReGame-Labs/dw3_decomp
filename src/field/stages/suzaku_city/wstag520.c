@@ -48,8 +48,8 @@ void endEvent695(void) {
     GAME.progress = 0x1A;
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xD4
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xD4)
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x23C
 #define STAGE_ARCHIVE 0x3CC
@@ -141,7 +141,7 @@ s16 script261[] = {
     /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
     0x1,
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     0x800A,
 #endif
 };

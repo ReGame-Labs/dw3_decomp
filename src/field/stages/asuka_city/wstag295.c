@@ -52,8 +52,8 @@ void endEvent892(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x59), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xF0
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF0)
 #define EVENT_TEXT_FILE 0x10B
 #define STAGE_FILE 0x5FF
 #elif VERSION_EU
@@ -322,7 +322,7 @@ s16 script891[] = {
     SCRIPT_WAIT(0x1E),
 #if VERSION_US
     SCRIPT_LEAVE(0xE04, 0x120, 0xB8, 3),
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     SCRIPT_LEAVE(0xE05, 0x120, 0xB8, 3),
 #endif
     SCRIPT_END,

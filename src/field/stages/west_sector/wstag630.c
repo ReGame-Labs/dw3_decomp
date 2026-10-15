@@ -19,8 +19,8 @@ extern AnimFrame updateTileAnimsFrames2[];
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-#if VERSION_US
-#define STAGE_TEXT 0xDB
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xDB)
 #define STAGE_FILE 0x484
 #elif VERSION_EU
 #define STAGE_TEXT (LANGUAGE + 0xD3)

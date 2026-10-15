@@ -37,7 +37,7 @@ static inline void announceEnemyTech(EnemyAttack *task, BattleChild *children, B
 static inline void damagePlayer(EnemyAttack *task, BattleChild *children) {
     BattleFighter *player;
 
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     player = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
     /* the European version's instant knockout */
     if (FIGHTSTG_action.effects[TECH_EFFECT_KNOCK_OUT]) {
@@ -158,7 +158,7 @@ void FIGHTSTG_updateEnemyAttack(EnemyAttack *task, BattleChild *children) {
         case 3:
             if (children[0].task == NULL) {
                 target = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
                 if (FIGHTSTG_action.effects[TECH_EFFECT_KNOCK_OUT]) {
                     target->hp = 0;
                     FIGHTSTG_queueKnockOut(0);

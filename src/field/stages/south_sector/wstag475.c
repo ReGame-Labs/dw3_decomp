@@ -48,8 +48,8 @@ void endEvent230(void) {
     FLAGS_00.applyAction(ITEM(0, 0xD), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xF7
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF7)
 #define EVENT_TEXT_FILE 0x12E
 #define STAGE_FILE 0x223
 #define STAGE_ARCHIVE 0x3CA

@@ -18,8 +18,8 @@ void endEvent720(void) {
     FLAGS_00.applyAction(ITEM(0, 0x18C), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xE9
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xE9)
 #define EVENT_TEXT_FILE 0x120
 #define STAGE_FILE 0x575
 #elif VERSION_EU

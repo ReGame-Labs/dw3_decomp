@@ -12,7 +12,7 @@ extern AnimFrame updateTileSetFrames3[];
 extern AnimFrame updateTileSetFrames0[];
 
 /* The file of the marks, which the versions number differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define MARKS 0x1B9
 #elif VERSION_EU
 #define MARKS 0x1C7
@@ -277,8 +277,8 @@ void endEvent1(void) {
 }
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x1B9
 #define STAGE_ARCHIVE 0x3D2

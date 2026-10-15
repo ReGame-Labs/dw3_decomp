@@ -8,7 +8,7 @@
 
 /* The fight stages, the battle's backgrounds: WFIGHTTS lists them as
    MFSTG001-027 */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FILE_FIGHT_STAGES 0x1BD
 #elif VERSION_EU
 #define FILE_FIGHT_STAGES 0x1CB

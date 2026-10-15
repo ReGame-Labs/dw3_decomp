@@ -11,8 +11,8 @@
 #include "common/start_stage.inc.c"
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
-#if VERSION_US
-#define STAGE_TEXT 0xCD
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xCD)
 #define EVENT_TEXT_FILE 0x10B
 #define STAGE_FILE 0x32A
 #elif VERSION_EU

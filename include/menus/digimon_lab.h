@@ -19,7 +19,7 @@
 #define OVL_NAME(name) STGDGLAB_##name
 
 /* The lab's sprite sheet; the next file is its texture archive */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FILE_LAB_SPRITES 0x2B6
 #elif VERSION_EU
 #define FILE_LAB_SPRITES 0x2C5

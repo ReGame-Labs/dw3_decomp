@@ -858,7 +858,7 @@ s32 STCRDSHP_slotCards123[19] = {
     215, 215, 226, 226, 226, 295, 295, 295,
     304, 304, 304,
 };
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 s32 STCRDSHP_slotCards123[16] = {
     86, 86, 170, 170, 170, 213, 213, 215,
     215, 226, 226, 226, 295, 295, 304, 304,

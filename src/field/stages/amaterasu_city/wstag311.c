@@ -496,8 +496,8 @@ void endEvent982(void) {
     GAME.progress = 0x28;
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xE2
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xE2)
 #define EVENT_TEXT_FILE 0x120
 #define STAGE_FILE 0x52D
 #elif VERSION_EU
@@ -792,7 +792,7 @@ s16 script933[] = {
     SCRIPT_WAIT(0x1E),
 #if VERSION_US
     SCRIPT_LEAVE(0xE06, 0x150, 0x190, 5),
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     SCRIPT_LEAVE(0xE07, 0x150, 0x190, 5),
 #endif
     SCRIPT_END,
@@ -920,7 +920,7 @@ s16 script981[] = {
     SCRIPT_WAIT(0x1E),
 #if VERSION_US
     SCRIPT_LEAVE(0xE07, 0xEA, 0x1C3, 5),
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     SCRIPT_LEAVE(0xE08, 0xEA, 0x1C3, 5),
 #endif
     SCRIPT_END,

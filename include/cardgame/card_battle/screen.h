@@ -9,7 +9,7 @@
 #include "cardgame/card_battle/types.h"
 
 /* CARDGAME's own pictures, a TIM archive */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FILE_CARDGAME_TIMS 0x24E
 #elif VERSION_EU
 #define FILE_CARDGAME_TIMS 0x25D

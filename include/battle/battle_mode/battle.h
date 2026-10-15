@@ -12,7 +12,7 @@
 
 /* A table of 0x46-byte entries that start with an s16 id, 0 after the
    last (FIGHTSTG_findBattleTableIndex) */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FILE_BATTLE_TABLE 0xBE
 #elif VERSION_EU
 #define FILE_BATTLE_TABLE 0x1CF
@@ -348,7 +348,7 @@ typedef struct BattleFuncs {
     /* 0xC4 */ s32 (*rollStatusRaise)(s32 actor, s32 id);
     /* 0xC8 */ s32 (*rollNoSwitch)(s32 actor, s32 id);
     /* 0xCC */ s32 (*rollNoDigivolve)(s32 actor, s32 id);
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     /* 0xD0 */ s32 (*rollCounter)(s32 arg0, s32 arg1);
 #endif
     /* the European version's offsets are 4 more from here */
@@ -475,7 +475,7 @@ s32 FIGHTSTG_rollStatusRaise(s32 actor, s32 id);
 s32 FIGHTSTG_rollNoSwitch(s32 actor, s32 id);
 s32 FIGHTSTG_rollNoDigivolve(s32 actor, s32 id);
 s32 FIGHTSTG_testRunAway(u8 side);
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
 s32 FIGHTSTG_rollCounter(s32 side, s32 damage);
 #endif
 s32 FIGHTSTG_testWakeUp(u8 side, s32 value);

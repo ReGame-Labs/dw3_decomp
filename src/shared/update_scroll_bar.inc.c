@@ -19,8 +19,8 @@ void OVL_NAME(updateScrollBar)(ScrollBar *bar) {
             range = (bar->bottom - bar->top) << 8;
             bar->size = range / pages;
             bar->posStep = range / bar->count;
-#elif VERSION_EU
-            /* the European version sizes the thumb for the visible items */
+#elif VERSION_EU || VERSION_JP
+            /* the European and Japanese versions size the thumb for the visible items */
             range = (bar->bottom - bar->top) << 8;
             bar->size = range / bar->count * bar->pageSize;
             bar->posStep = range / bar->count;

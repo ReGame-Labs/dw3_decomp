@@ -43,8 +43,8 @@ void endEvent531(void) {
 extern StageSlot stageSlots0[];
 extern StageSlot stageSlots1[];
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
-#if VERSION_US
-#define STAGE_TEXT 0xF7
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF7)
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x54D
 #elif VERSION_EU

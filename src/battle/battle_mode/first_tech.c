@@ -50,7 +50,7 @@ static inline void showFirstTechResult(FirstTech *task, BattleChild *children) {
         task->lines[2] = FIGHTSTG_action.hitsLanded;
         children[0].message->show(children[0].message, 0x10, task->lines);
         task->damage = FIGHTSTG_action.hitsLanded * FIGHTSTG_action.damage;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         if (task->damage >= 10000) {
             task->damage = 9999;
         }

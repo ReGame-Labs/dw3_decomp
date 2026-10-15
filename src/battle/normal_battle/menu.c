@@ -160,7 +160,7 @@ void WFIGHTMN_updateMenu(BattleMenu *task, BattleMenuChildren *children) {
             case 1:
                 setBattleKind();
                 addFighters(task, children);
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
                 GFX.frameTime = 1;
                 children->cameraMove.cameraShots = FIGHTSTG_startCameraShots();
 #else
@@ -169,7 +169,7 @@ void WFIGHTMN_updateMenu(BattleMenu *task, BattleMenuChildren *children) {
                 task->step++;
                 break;
             case 2:
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
                 GFX.frameTime = 1;
 #endif
                 children->loader = WFIGHTMN_createLoader();
@@ -398,7 +398,7 @@ void WFIGHTMN_tag(BattleMenu *task, BattleMenuChildren *children) {
                 task->args[2] = 0;
                 task->args[3] = FIGHTSTG_battle.state.active[0];
                 FIGHTSTG_events.funcs.pushFirst((BattleEvent *)task->args);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
                 FIGHTSTG_queueSpecialEnd();
 #endif
             }
@@ -471,7 +471,7 @@ void WFIGHTMN_endBattle(BattleMenu *task, BattleMenuChildren *children) {
     switch (task->step) {
     case 0:
     default:
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         if (children->cameraMove.task != NULL && children->cameraMove.task->state != TASK_DONE) {
             break;
         }
@@ -534,7 +534,7 @@ void WFIGHTMN_endBattle(BattleMenu *task, BattleMenuChildren *children) {
         if (children->task.task->state == TASK_DONE) {
             layer = GFX.funcs.getLayer(SCREEN_LAYER);
             layer->setBgColor(layer, 0, 0, 0);
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             if (children->cameraMove.task != NULL) {
                 children->cameraMove.task->setState(children->cameraMove.task, TASK_KILL);
             }
@@ -869,7 +869,7 @@ void WFIGHTMN_blast(BattleMenu *task, BattleMenuChildren *children) {
     s32 partner;
     s32 level;
     s32 tier;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     s32 index;
 #endif
 
@@ -912,7 +912,7 @@ void WFIGHTMN_blast(BattleMenu *task, BattleMenuChildren *children) {
         if (models->get(models, 0)->motion == 13) {
             BattleFighter *current = &FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]];
             current->hp = current->maxHp;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             if (current->flags & FIGHTER_CONFUSED) {
                 index = FIGHTSTG_events.funcs.find(EVENT_STATUS_END + 1, 0, FIGHTSTG_battle.state.active[0]);
                 if (index >= 0) {
@@ -974,7 +974,7 @@ static inline void announceKnockOut(BattleMenu *task, BattleMenuChildren *childr
             task->args[2] = 0;
             task->args[3] = FIGHTSTG_battle.state.active[0];
             FIGHTSTG_events.funcs.pushFirst((BattleEvent *)task->args);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
             FIGHTSTG_queueSpecialEnd();
 #endif
         }
@@ -1339,7 +1339,7 @@ void WFIGHTMN_runTurn(BattleMenu *task) {
         if (task->substate >= 3 && task->substate < 27) {
             WFIGHTMN_states[task->substate](task, children);
         } else {
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             task->setSubstate(task, 1);
 #endif
             task->step = FIGHTSTG_events.funcs.pop();
@@ -1356,7 +1356,7 @@ void WFIGHTMN_runTurn(BattleMenu *task) {
         }
         break;
     case 0:
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         task->setSubstate(task, 1);
         task->step = FIGHTSTG_events.funcs.pop();
 #else

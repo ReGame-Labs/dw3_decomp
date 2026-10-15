@@ -5,7 +5,7 @@
 
 #include "common.h"
 #include "field/stage.h"
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define TIMER_SHEET 0x6E6
 #elif VERSION_EU
 #define TIMER_SHEET 0x6F6
@@ -201,8 +201,8 @@ void endEvent840(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x63), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x6E6
 #define STAGE_FILE_8 0x711
@@ -259,6 +259,8 @@ s16 script830[] = {
     /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
     0x31A8,
+#elif VERSION_JP
+    0x240,
 #endif
 };
 s16 script840[] = {

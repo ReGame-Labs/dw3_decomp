@@ -356,10 +356,10 @@ void CARDGAME_layOutSlots(CardBattle *battle, CardBattleItems *items) {
         if (i >= battle->players[0].slotCount) {
             break;
         }
-#if VERSION_US
-        screen->addSprite(screen, i, 0x1800 + i * 0x2900, 0x9000);
-#elif VERSION_EU
+#if PAL_VIDEO
         screen->addSprite(screen, i, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][0] + i * 0x2900, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][1]);
+#else
+        screen->addSprite(screen, i, 0x1800 + i * 0x2900, 0x9000);
 #endif
         screen->setSpriteCard(screen, i, battle->players[0].slots[i].card);
         screen->sprites[i].ap = battle->players[0].slots[i].ap;
@@ -370,10 +370,10 @@ void CARDGAME_layOutSlots(CardBattle *battle, CardBattleItems *items) {
         if (i >= battle->players[1].slotCount) {
             break;
         }
-#if VERSION_US
-        screen->addSprite(screen, i + 6, 0x1800 + i * 0x2900, 0x3200);
-#elif VERSION_EU
+#if PAL_VIDEO
         screen->addSprite(screen, i + 6, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][2] + i * 0x2900, CARDGAME_slotRowPositions[SHIFT_PAL_SCREEN][3]);
+#else
+        screen->addSprite(screen, i + 6, 0x1800 + i * 0x2900, 0x3200);
 #endif
         screen->setSpriteCard(screen, i + 6, battle->players[1].slots[i].card);
         screen->sprites[i + 6].ap = battle->players[1].slots[i].ap;
@@ -1914,7 +1914,7 @@ void CARDGAME_startNextRound(CardBattle *battle, CardBattleItems *items) {
     battle->sides[1].pile.hpTotal = 0;
     CARDGAME_showPanelValues(battle, items);
     battle->round++;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     CARDGAME_findOpponentDeckLimits(battle, items);
 #endif
 }
@@ -2066,12 +2066,12 @@ s32 CARDGAME_showPlayedCard(CardBattle *battle, CardBattleItems *items) {
         battle->subState = 1;
         battle->subTime = 0;
         place = battle->record.plays[battle->record.playCount - 1].side;
-#if VERSION_US
-        items->screen->openWindow(items->screen, 2, 1, battle->cards[battle->record.plays[battle->record.playCount - 1].card] + 1,
-                              CARDGAME_playedCardPos[0][place].x, CARDGAME_playedCardPos[0][place].y);
-#elif VERSION_EU
+#if PAL_VIDEO
         items->screen->openWindow(items->screen, 2, 1, battle->cards[battle->record.plays[battle->record.playCount - 1].card] + 1,
                               CARDGAME_playedCardPos[SHIFT_PAL_SCREEN][place].x, CARDGAME_playedCardPos[SHIFT_PAL_SCREEN][place].y);
+#else
+        items->screen->openWindow(items->screen, 2, 1, battle->cards[battle->record.plays[battle->record.playCount - 1].card] + 1,
+                              CARDGAME_playedCardPos[0][place].x, CARDGAME_playedCardPos[0][place].y);
 #endif
         for (i = 0; i < 15; i++) {
             items->screen->sprites[i].moving = 0;

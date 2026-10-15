@@ -16,7 +16,7 @@
 #include "shared/name_entry.h"
 
 /* The screen's files: the discs number them differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define STDGNAME_FILE_SPRITES 0x279
 #define STDGNAME_FILE_IMAGES 0x27A
 #define STDGNAME_FILE_KEYBOARD 0x762

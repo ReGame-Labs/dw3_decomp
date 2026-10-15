@@ -39,7 +39,7 @@ SparkleFrame STPLNMET_sparkleFrames[] = {
     { 0, 0 },
 };
 /* The name font (STPLNMET_nameStyle): its glyphs and icons */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 Glyph STPLNMET_nameGlyphs[230] = {
     { 0x01, 96, 18, 48, 232, 8, 12, 4, 3, 6, 12 },
     { 0x01, 104, 18, 48, 232, 8, 12, 4, 3, 6, 12 },
@@ -506,7 +506,7 @@ Glyph STPLNMET_nameGlyphs[230] = {
     { 0x00, 96, 60, 48, 232, 12, 12, 4, 3, 9, 12 },
 };
 #endif
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 Glyph STPLNMET_nameIcons[114] = {
     { 0x00, 244, 20, 48, 232, 8, 12, 3, 3, 6, 12 },
     { 0x00, 244, 32, 48, 232, 8, 12, 3, 3, 7, 12 },

@@ -85,7 +85,7 @@ s32 FIGHTSTG_rollMagicCritical(u8 side, s32 id) {
         FIGHTSTG_computeStats(SIDE_PLAYER, 0, FIGHTSTG_battle.state.active[0]);
         FIGHTSTG_computeStats(SIDE_ENEMY, 1, FIGHTSTG_battle.state.active[1]);
     }
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     if (side == 0) {
         FIGHTSTG_computeStats(SIDE_ENEMY, 0, FIGHTSTG_battle.state.active[1]);
     } else {
@@ -374,7 +374,7 @@ s32 FIGHTSTG_rollDrain(u8 side, s32 id) {
     }
 #if VERSION_US
     stats = &FIGHTSTG_battleFuncs.stats[0];
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     stats = FIGHTSTG_computeStats(side, 1, FIGHTSTG_battle.state.active[side >> 4]);
 #endif
     entry = &TECHS[id - 1];
@@ -430,7 +430,7 @@ s32 FIGHTSTG_rollNoDigivolve(s32 actor, s32 id) {
     return rollTechChance(id);
 }
 
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
 /* FIGHTSTG_battleFuncs.rollCounter: a random test, likelier the bigger damage is next
    to the player's fighter's max HP; side is not used */
 s32 FIGHTSTG_rollCounter(s32 side, s32 damage) {
@@ -482,7 +482,7 @@ s32 FIGHTSTG_testRunAway(u8 side) {
         }
         chance += atk->runAwayBonus;
     } else {
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
         if (atk->flags & FIGHTER_ASLEEP) {
             return 0;
         }

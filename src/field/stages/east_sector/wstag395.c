@@ -48,8 +48,8 @@ void endEvent1305(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 8), 0);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xF7
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF7)
 #define EVENT_TEXT_FILE 0x120
 #define STAGE_FILE 0x20C
 #define STAGE_ARCHIVE 0x310
@@ -604,7 +604,7 @@ FieldTalk actor9Talks[] = {
 u16 actor0Conditions[] = {
 #if VERSION_US
     PROGRESS(5), 1, CODES_END,
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     PROGRESS(5), 1, FLAG(0x40, 0x11), 0, CODES_END,
 #endif
 };

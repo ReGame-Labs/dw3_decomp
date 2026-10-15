@@ -147,3 +147,15 @@ STSTATUS_equipKinds = 0x8009AF2C;
 STSTATUS_mapAreas = 0x8009AF30;
 STSTATUS_areaFuncs = 0x8009B020;
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+STSTATUS_statItems = 0x8009A210; // size:0x60
+STSTATUS_partnerAnims = 0x8009A2F4; // size:0xE0
+STSTATUS_layout = 0x8009A3D4; // size:0xC0
+STSTATUS_spots = 0x8009A494; // size:0x234
+STSTATUS_towns = 0x8009A6C8; // size:0xB8
+STSTATUS_townList0 = 0x8009A780; // size:0x1C
+STSTATUS_townList1 = 0x8009A79C; // size:0x30
+STSTATUS_townList2 = 0x8009A7CC; // size:0x48
+STSTATUS_townList3 = 0x8009A814; // size:0x5C
+STSTATUS_noTowns = 0x8009A870; // size:0x4

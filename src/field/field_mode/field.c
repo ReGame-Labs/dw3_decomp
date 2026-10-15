@@ -8,7 +8,7 @@
 
 /* Has the battle's files read while the transition plays */
 static inline void requestBattleFiles(void) {
-#if VERSION_US
+#if VERSION_US || VERSION_JP
     FILE_CACHE.request(0x1BD);
     FILE_CACHE.request(0x1BE);
     FILE_CACHE.request(0xBE);
@@ -735,7 +735,7 @@ static inline void pickOddFighterPrize(s32 mode) {
     case 0x24C: /* WSTAG575 */
         PICK_PRIZE(0x17A, 0x187);
         break;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     case 0x28C: /* WSTAG331 */
         if (GAME.progress != FIELD_PROGRESS_EXTRA) {
             PICK_PRIZE(0x17C, 0x187);
@@ -863,7 +863,7 @@ static inline void pickEvenFighterPrize(s32 mode) {
     case 0x24B: /* WSTAG570 */
         PICK_PRIZE(0x17B, 0x187);
         break;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     case 0x271: /* WSTAG203 */
         if (GAME.progress != FIELD_PROGRESS_EXTRA) {
             PICK_PRIZE(0x17D, 0x188);

@@ -31,7 +31,7 @@
 
 /* Entries of the files, read with FILE_CACHE.getEntry: the discs number
    their files differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define SPLASH_FILE 0x895
 #define STDWTITL_FILE_BACKGROUND 0x876
 #elif VERSION_EU
@@ -43,7 +43,7 @@
 #define STDWTITL_BACKGROUND(entry) (STDWTITL_FILE_BACKGROUND << 16 | (entry))
 
 /* The VRAM row of the title's sprites (SpriteDrawer.setTexture) */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define STDWTITL_TEXTURE_Y 0
 #elif VERSION_EU
 #define STDWTITL_TEXTURE_Y 0x100
@@ -57,7 +57,7 @@
    movies' */
 #if VERSION_US
 #define STDWTITL_SPLASH_MODE 12
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 #define STDWTITL_SPLASH_MODE 13
 #endif
 
@@ -226,7 +226,7 @@ typedef struct TitleBackgroundTask {
 
 typedef struct TitleChildren {
     /* 0x00 */ EdgeFadeTask *fade;
-#if VERSION_US
+#if VERSION_US || VERSION_JP
     /* 0x04 */ SlideTask *title0;
     /* 0x08 */ SlideTask *title1;
     /* 0x0C */ GlintTask *glint;

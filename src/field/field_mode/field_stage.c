@@ -35,7 +35,7 @@ END_CHOICE(15, 0x7087, 0x8B0F)
 /* The color the field's stage starts with (FieldState.spriteColor) */
 const CVECTOR FIELDSTG_startColor = {0x80, 0x80, 0x80, 0};
 
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FIELD_FILE 0x19F
 #elif VERSION_EU
 #define FIELD_FILE 0x1AD
@@ -48,14 +48,14 @@ const CVECTOR FIELDSTG_startColor = {0x80, 0x80, 0x80, 0};
  * start position being set with a constructor, (Vec2){x, y}.
  */
 void FIELDSTG_setupField(void) {
-#if VERSION_US
-    FIELDSTG_state.textFile = 0xF0;
+#if VERSION_US || VERSION_JP
+    FIELDSTG_state.textFile = TEXT_FILE(0xF0);
 #endif
     FIELDSTG_state.mapFile = FIELD_FILE - 1;
     FIELDSTG_state.sheetEntry = FIELD_FILE << 16;
     FIELDSTG_state.objects = FIELDSTG_mapObjects;
     FIELDSTG_state.slots = FIELDSTG_slots;
-#if VERSION_US
+#if VERSION_US || VERSION_JP
     FIELDSTG_state.imageFile = 0x31D;
 #elif VERSION_EU
     FIELDSTG_state.imageFile = 0x32C;

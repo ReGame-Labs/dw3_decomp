@@ -44,8 +44,8 @@ void endEvent901(void) {
     FLAGS_00.applyAction(ITEM(0, 0x18), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xE2
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xE2)
 #define EVENT_TEXT_FILE 0x13C
 #define STAGE_FILE 0x652
 #elif VERSION_EU
@@ -112,6 +112,8 @@ s16 script900[] = {
     0x2407,
 #elif VERSION_EU
     0x3,
+#elif VERSION_JP
+    0x178,
 #endif
 };
 s16 script901[] = {

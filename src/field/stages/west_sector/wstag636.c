@@ -10,8 +10,8 @@
 #include "common/update_stage_places.inc.c"
 #include "common/start_stage.inc.c"
 
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define STAGE_FILE 0x627
 #elif VERSION_EU
 #define STAGE_TEXT (LANGUAGE + 0xF6)

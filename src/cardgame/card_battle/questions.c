@@ -4,10 +4,10 @@
 
 /* A position of CARDGAME_stepWindowPositions */
 s16 CARDGAME_getStepWindowPos(s32 a, s32 b, s32 c) {
-#if VERSION_US
-    return CARDGAME_stepWindowPositions[0][a][b][c];
-#elif VERSION_EU
+#if PAL_VIDEO
     return CARDGAME_stepWindowPositions[SHIFT_PAL_SCREEN][a][b][c];
+#else
+    return CARDGAME_stepWindowPositions[0][a][b][c];
 #endif
 }
 
@@ -39,10 +39,10 @@ s32 CARDGAME_openStepWindows(CardBattle *battle, CardScreen *screen, s32 layout,
     return step;
 }
 
-/* Opens the panels and asks message value; the European version starts on the
-   second choice when none of the player's hand can be played */
+/* Opens the panels and asks message value; the European and Japanese versions
+   start on the second choice when none of the player's hand can be played */
 void CARDGAME_startQuestion(CardBattle *battle, CardScreen *screen, s32 value) {
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     s32 i;
     s32 found;
 #endif
@@ -59,7 +59,7 @@ void CARDGAME_startQuestion(CardBattle *battle, CardScreen *screen, s32 value) {
 #if VERSION_US
     screen->message.choice = 0;
     screen->message.place = 0;
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     screen->message.place = 0;
     found = 0;
     for (i = 0; i < battle->sides[0].pile.handCount; i++) {
@@ -94,7 +94,7 @@ static inline void readYesNoInput(CardBattle *battle, CardScreen *screen) {
         battle->effectStep.state = 7;
 #if VERSION_US
     } else if (PAD_PRESSED(PAD_UP) || PAD_PRESSED(PAD_DOWN)) {
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     } else if ((PAD_PRESSED(PAD_UP) || PAD_PRESSED(PAD_DOWN)) && battle->effectStep.vars[4] == 2) {
 #endif
         SOUND.playSound(SOUND_CURSOR);
@@ -137,7 +137,7 @@ static inline void showAfterMenu(CardBattle *battle, CardScreen *screen) {
         if (battle->anim.current == CARD_ANIM_NONE && screen->panels[0].state == 2) {
 #if VERSION_US
             screen->openMessage(screen, screen->message.message, 1, screen->message.choice, screen->message.place);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
             screen->openMessage(screen, screen->message.message, battle->effectStep.vars[4], screen->message.choice, screen->message.place);
 #endif
             battle->effectStep.time = 1;
@@ -163,7 +163,7 @@ s32 CARDGAME_stepYesNo(CardBattle *battle, CardScreen *screen) {
             battle->effectStep.state = 1;
             battle->effectStep.time = 0;
             screen->openMessage(screen, screen->message.message, 1, screen->message.choice, screen->message.place);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
             battle->effectStep.time = 0;
             if (battle->record.playCount != 0 && battle->effectStep.vars[4] == 3) {
                 battle->effectStep.state = 8;
@@ -182,7 +182,7 @@ s32 CARDGAME_stepYesNo(CardBattle *battle, CardScreen *screen) {
             screen->message.place ^= 2;
 #if VERSION_US
             screen->openMessage(screen, screen->message.message, 1, screen->message.choice, screen->message.place);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
             screen->openMessage(screen, screen->message.message, battle->effectStep.vars[4], screen->message.choice, screen->message.place);
 #endif
             battle->effectStep.state = 1;

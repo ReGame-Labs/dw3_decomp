@@ -30,8 +30,8 @@ void endEvent422(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xA2), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xF7
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF7)
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x471
 #elif VERSION_EU
@@ -131,6 +131,8 @@ s16 script422[] = {
     0x181,
 #elif VERSION_EU
     0x6004,
+#elif VERSION_JP
+    0x6008,
 #endif
 };
 AreaBattle area0Battle0 = { 149, 3, MUSIC(2, 0) };

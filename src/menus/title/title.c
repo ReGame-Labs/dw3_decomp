@@ -29,7 +29,7 @@ s32 STDWTITL_leaveTitle(TitleTask *task, TitleChildren *children) {
         case 3:
 #if VERSION_US
             GAME.funcs.requestMode(MODE_OPENING, 0);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
             if (LANGUAGE == 0) {
                 if (GAME.funcs.getPrevMode() == MODE_OPENING) {
                     GAME.funcs.requestMode(MODE_OPENING_2, 0);
@@ -106,7 +106,7 @@ s32 STDWTITL_stepTitle(TitleTask *task, TitleChildren *children) {
             task->nextSubstate(task);
             children->fade = STDWTITL_startEdgeFadeTask();
             if (task->choice == 1) {
-#if VERSION_US
+#if VERSION_US || VERSION_JP
                 FILE_CACHE.request(0x158);
 #elif VERSION_EU
                 FILE_CACHE.request(0x166);
@@ -140,7 +140,7 @@ void STDWTITL_tickTitle(TitleTask *task, TitleChildren *children) {
         children->glint = STDWTITL_startGlintTask(0);
         children->logo = STDWTITL_startLogoTask(0);
         children->menu = STDWTITL_startMenuTask(0);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
         if (LANGUAGE == 0) {
             children->title0 = STDWTITL_startTitle0AltTask(0);
             children->title1 = STDWTITL_startTitle1AltTask(0);
@@ -191,8 +191,8 @@ void STDWTITL_loadTitleImages(void) {
     loader.setClutPos(0, 0x1F0);
     loader.loadArchive(FILE_CACHE.getEntry(STDWTITL_titleImages[1].images));
     STDWTITL_spriteBank = STDWTITL_titleImages[1].sprites;
-#elif VERSION_EU
-    loader.setImagePos(0x280, 0x100);
+#elif VERSION_EU || VERSION_JP
+    loader.setImagePos(0x280, STDWTITL_TEXTURE_Y);
     loader.setClutPos(0, 0x1F0);
     loader.loadArchive(FILE_CACHE.getEntry(STDWTITL_titleImages[LANGUAGE].images));
     STDWTITL_spriteBank = STDWTITL_titleImages[LANGUAGE].sprites;

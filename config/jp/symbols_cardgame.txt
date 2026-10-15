@@ -1,5 +1,13 @@
 // CARDGAME.PRO's own symbols, which only its splat config reads
 
+// us's names that tools/match_versions.py can't pair with confidence: the
+// European version's functions, at the same place among their neighbours
+CARDGAME_startQuestion = 0x800860C8; // type:func
+CARDGAME_stepPlayCard = 0x8009225C; // type:func
+
+// a jump table that splat takes for data (the European version's jtbl_800834FC)
+jtbl_800832AC = 0x800832AC; // type:jtbl
+
 // names from us (tools/match_versions.py --seed): the same function or datum
 CARDGAME_getEffectField = 0x80083BE4; // type:func
 CARDGAME_jumpIfLastSide = 0x80083CF8; // type:func
@@ -352,6 +360,10 @@ CARDGAME_savedPanelScales = 0x800A5730;
 CARDGAME_selectionText = 0x800A5734;
 CARDGAME_slotMoves = 0x800A5738;
 CARDGAME_slotMoveCounts = 0x800A5750;
-CARDGAME_markedCounts = 0x800A5752;
+CARDGAME_markedCounts = 0x800A5752; // size:0x2 defined:True
 CARDGAME_savedScreenState = 0x800A5758;
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+CARDGAME_recordCardPositions = 0x800A52E0; // size:0x18
+CARDGAME_messageWindowPositions = 0x800A5360; // size:0x20

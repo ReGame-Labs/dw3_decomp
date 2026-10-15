@@ -40,7 +40,7 @@ s32 FIELDSTG_findTrigger(Triggers *task) {
    one that waits for a button and returns 1; returns 0 when its conditions
    don't hold */
 s32 FIELDSTG_offerTrigger(Triggers *task, TriggerChildren *children) {
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     s32 arg;
 #endif
 
@@ -102,7 +102,7 @@ s32 FIELDSTG_offerTrigger(Triggers *task, TriggerChildren *children) {
             }
             break;
     }
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     /* the European version restarts a running animation on the new row */
     switch (task->entry->type) {
         default:

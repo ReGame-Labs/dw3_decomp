@@ -107,8 +107,8 @@ void endEvent811(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x42), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xDB
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xDB)
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x6DE
 #define STAGE_FILE_8 0x700
@@ -174,6 +174,8 @@ s16 script810[] = {
     /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_EU
     0x4,
+#elif VERSION_JP
+    0x3E7,
 #endif
 };
 s16 script811[] = {

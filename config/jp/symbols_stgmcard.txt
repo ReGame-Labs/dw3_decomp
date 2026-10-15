@@ -46,12 +46,19 @@ STGMCARD_startFade = 0x80087B10; // type:func
 STGMCARD_updateFade = 0x80087BA4; // type:func
 STGMCARD_startLerp = 0x80087C10; // type:func
 STGMCARD_updateLerp = 0x80087C50; // type:func
-STGMCARD_partnerAnims = 0x80087E38;
-STGMCARD_partnerIcons = 0x80087F18;
-STGMCARD_slotIconX = 0x80087F38;
-STGMCARD_errorTexts = 0x80087F44;
-STGMCARD_places = 0x80087F70;
-STGMCARD_prevModes = 0x80087FD8;
-STGMCARD_funcs = 0x8008839C;
-STGMCARD_saveIcon = 0x80088574;
+STGMCARD_partnerAnims = 0x80087E38; // size:0xE0
+STGMCARD_partnerIcons = 0x80087F18; // size:0x20
+STGMCARD_slotIconX = 0x80087F38; // size:0xC
+STGMCARD_errorTexts = 0x80087F44; // size:0x2C
+STGMCARD_places = 0x80087F70; // size:0x68
+STGMCARD_prevModes = 0x80087FD8; // size:0x3C4
+STGMCARD_funcs = 0x8008839C; // size:0x38
+STGMCARD_saveIcon = 0x80088574; // size:0x10
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+STGMCARD_detailWindows = 0x80087CBC; // size:0x17C
+
+// the data's names, from its C (the build matches)
+STGMCARD_iconClut = 0x800883D4; // size:0x20
+STGMCARD_iconFrames = 0x800883F4; // size:0x180

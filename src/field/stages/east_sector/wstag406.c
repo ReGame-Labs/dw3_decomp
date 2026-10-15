@@ -53,8 +53,8 @@ void endEvent1286(void) {
     FLAGS_00.applyAction(ITEM(5, 0xF5), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xE9
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xE9)
 #define EVENT_TEXT_FILE 0x12E
 #define STAGE_FILE 0x734
 #elif VERSION_EU
@@ -114,7 +114,7 @@ s16 script1285[] = {
     /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
     0x800A,
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     0x2,
 #endif
 };

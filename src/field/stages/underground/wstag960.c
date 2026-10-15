@@ -12,14 +12,25 @@
 #include "common/start_stage.inc.c"
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x01 };
+#if VERSION_EU
+#define STAGE_TEXT (LANGUAGE + 0x104)
+#define STAGE_FILE 0x92F
+#define STAGE_FILE_8 0x69F
+#define STAGE_ARCHIVE 0x92E
+#elif VERSION_JP
+#define STAGE_TEXT 0x89B
+#define STAGE_FILE 0x90D
+#define STAGE_FILE_8 0x68F
+#define STAGE_ARCHIVE 0x90B
+#endif
 /* Sets the stage up: its map, actors and battles, playing BGM_0027 */
 void setupStage(void) {
-    FIELDSTG_state.textFile = LANGUAGE + 0x104;
-    FIELDSTG_state.mapFile = 0x69F;
-    FIELDSTG_state.sheetEntry = 0x92F0000;
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE_8;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
     FIELDSTG_state.objects = stageObjects;
     FIELDSTG_state.slots = stageSlots;
-    FIELDSTG_state.imageFile = 0x92E;
+    FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x9D00, 0x17F00};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.soundBank = 0x1D;
@@ -28,9 +39,9 @@ void setupStage(void) {
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.battles = FIELDSTG_state.findBattles(stageBattles, GAME.place);
-    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x92F0002);
-    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x92F0003);
-    FIELDSTG_map.setFile(FIELD_MAP_AREAS, 0x92F0001);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
 }
 

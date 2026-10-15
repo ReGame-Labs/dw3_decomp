@@ -54,14 +54,23 @@ StageTask *startStage(void *owner) {
 /* the color the setup copies to FIELDSTG_state.spriteColor */
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0 };
 
+#if VERSION_EU
+#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_FILE 0x8FB
+#define STAGE_FILE_8 0x1AC
+#elif VERSION_JP
+#define STAGE_TEXT 0x89A
+#define STAGE_FILE 0x8BF
+#define STAGE_FILE_8 0x19E
+#endif
 /* Sets the stage up: its map and actors, playing the ambience ENV_0204 */
 void setupStage(void) {
-    FIELDSTG_state.textFile = LANGUAGE + 0xFD;
-    FIELDSTG_state.mapFile = 0x1AC;
-    FIELDSTG_state.sheetEntry = 0x8FB0000;
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE_8;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
     FIELDSTG_state.objects = stageObjects;
     FIELDSTG_state.slots = stageSlots;
-    FIELDSTG_state.imageFile = 0x8FA;
+    FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x6700, 0x12300};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.soundBank = 0x42;
@@ -69,9 +78,9 @@ void setupStage(void) {
     FIELDSTG_state.music = MUSIC(0x42, 2);
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.spriteColor = stageColor;
-    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x8FB0001);
-    FIELDSTG_map.setFile(FIELD_MAP_FLOOR1, 0x8FB0002);
-    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x8FB0003);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR1, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
 }
 
@@ -80,7 +89,13 @@ void setupStage(void) {
 
 s16 tileLiftShake[] = {
     1, 2, 1, 0, -1, -2, -1, 0,
-    0x3E8, 5,
+    0x3E8,
+    /* after the end, the original's padding up to a word, which isn't zeros */
+#if VERSION_EU
+    5,
+#elif VERSION_JP
+    0x404,
+#endif
 };
 ActorImage stageImages[] = {
     { 0x200, 0x100, 0x21C, 0x1A6, 0x70, 0xA6, 0x230, 0x1FE },

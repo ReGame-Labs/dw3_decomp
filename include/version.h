@@ -28,4 +28,15 @@
 #define VERSION_JP 0
 #endif
 
+/*
+ * What the versions differ in, where the same difference recurs: each 0 or
+ * 1, tested with #if as the versions are, so that the code says what the
+ * difference is.
+ *
+ * PAL_VIDEO: the European release runs at 50 Hz (PAL), its clocks a step
+ * longer, unless NTSC_MODE is set, and moves its display down
+ * (SHIFT_PAL_SCREEN); the USA and Japanese ones are NTSC only.
+ */
+#define PAL_VIDEO VERSION_EU
+
 #endif /* VERSION_H */

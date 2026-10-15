@@ -9,7 +9,7 @@ s32 STCRDDEK_cursorCluts[] = {
 };
 /* The name's font: its glyphs (230 of TextStyle.glyphCount's 234) and icons,
    which differ in the European version */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 Glyph STCRDDEK_glyphs[] = {
     { 0x01, 0x60, 0x12, 0x30, 0xE8, 8, 12, 4, 3, 6, 12 },
     { 0x01, 0x68, 0x12, 0x30, 0xE8, 8, 12, 4, 3, 6, 12 },
@@ -476,7 +476,7 @@ Glyph STCRDDEK_glyphs[] = {
     { 0x00, 0x60, 0x3C, 0x30, 0xE8, 12, 12, 4, 3, 9, 12 },
 };
 #endif
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 Glyph STCRDDEK_icons[] = {
     { 0x00, 0xF4, 0x14, 0x30, 0xE8, 8, 12, 3, 3, 6, 12 },
     { 0x00, 0xF4, 0x20, 0x30, 0xE8, 8, 12, 3, 3, 7, 12 },

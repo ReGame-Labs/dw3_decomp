@@ -6,7 +6,7 @@
    group of languages) */
 void STDWTITL_drawSplash(SplashTask *task) {
     SpriteDrawer sprite;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     /* the screen has a frame per group of languages */
     s32 frame = 0;
 
@@ -35,7 +35,7 @@ void STDWTITL_drawSplash(SplashTask *task) {
     sprite.setClutRow(task->fade);
 #if VERSION_US
     sprite.draw(FILE_CACHE.getEntry(SPLASH_SPRITES), 0, 0, 0);
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     sprite.draw(FILE_CACHE.getEntry(SPLASH_SPRITES), frame, 0, 0);
 #endif
 }

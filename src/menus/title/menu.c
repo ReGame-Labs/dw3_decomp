@@ -3,7 +3,7 @@
 #include "menus/title.h"
 
 /* The menu's sprites: the European version has them for each language */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define MENU_SPRITE(i) (8 + (i))
 #elif VERSION_EU
 #define MENU_SPRITE(i) (STDWTITL_menuSprites[LANGUAGE][i])

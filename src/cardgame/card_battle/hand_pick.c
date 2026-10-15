@@ -937,7 +937,7 @@ s32 CARDGAME_drawFirstPlayer(CardBattle *battle, CardScreen *screen) {
     case 4:
         if (battle->effectStep.time == 20) {
             screen->startFlip(screen, battle->effectStep.cursor ^ 1);
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             screen->openWindow(screen, 5, 5, battle->effectStep.vars[3] == battle->effectStep.choice ? 0x44 : 0x43, 0, 0x42);
             SOUND.playSound(SOUND_MENU_OPEN);
 #endif
@@ -946,14 +946,14 @@ s32 CARDGAME_drawFirstPlayer(CardBattle *battle, CardScreen *screen) {
         if (battle->effectStep.time >= 31 && (PAD_PRESSED(PAD_CROSS) || PAD_PRESSED(PAD_TRIANGLE))) {
 #if VERSION_US
             battle->effectStep.time = 60;
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
             battle->effectStep.time = 90;
 #endif
         }
 #if VERSION_US
         battle->effectStep.time++;
         if (battle->effectStep.time >= 61) {
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
         battle->effectStep.time += GFX.funcs.getFrameTime();
         if (battle->effectStep.time >= 91) {
 #endif
@@ -961,7 +961,7 @@ s32 CARDGAME_drawFirstPlayer(CardBattle *battle, CardScreen *screen) {
             battle->effectStep.vars[1] = 0;
             battle->effectStep.vars[0] = 0;
             battle->effectStep.time = 0;
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             screen->closeWindow(screen, 5);
 #endif
         }

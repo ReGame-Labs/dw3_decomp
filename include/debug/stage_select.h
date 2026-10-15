@@ -51,7 +51,7 @@ void STAGSLCT_showBiosVersion(StageSelect *sel, StageSelectWindows *win);
 void STAGSLCT_zoomTitle(StageSelect *sel, StageSelectWindows *win);
 void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win);
 
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
 extern const char STAGSLCT_STR_CURSOR[]; /* "＞" with its padding */
 #endif
 

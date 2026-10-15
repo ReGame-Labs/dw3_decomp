@@ -8,7 +8,7 @@
 extern Vec2 farSpriteSpots[];
 
 /* The file of the sprites, which the versions number differently */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define SPRITES 0x1B1
 #elif VERSION_EU
 #define SPRITES 0x1BF
@@ -88,8 +88,8 @@ void endEvent1261(void) {
 extern FieldBattles stageBattles0[];
 extern FieldBattles stageBattles1[];
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
-#if VERSION_US
-#define STAGE_TEXT 0xF7
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF7)
 #define EVENT_TEXT_FILE 0x120
 #define STAGE_FILE 0x1B1
 #define STAGE_ARCHIVE 0x2C2
@@ -158,7 +158,7 @@ s16 script1260[] = {
     SCRIPT_WAIT(0x1E),
     SCRIPT_END,
     /* after the end, the original's padding up to a word, which isn't zeros */
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
     0x640,
 #endif
 };

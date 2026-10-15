@@ -594,7 +594,7 @@ void CNTY_SEL_tickMenu(CountryMenuTask *task, MenuChildren *children) {
             }
             break;
         case MENU_EXIT:
-#if VERSION_US
+#if VERSION_US || VERSION_JP
             GAME.funcs.requestMode(MODE_OPENING, 0);
 #elif VERSION_EU
             if (LANGUAGE == 0) {

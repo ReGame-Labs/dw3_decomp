@@ -7,8 +7,8 @@
 #include "field/stage.h"
 
 /* The text file of the menus, which the versions number differently */
-#if VERSION_US
-#define MENU_TEXT 0x10C
+#if VERSION_US || VERSION_JP
+#define MENU_TEXT TEXT_FILE(0x10C)
 #elif VERSION_EU
 #define MENU_TEXT 0x112
 #endif
@@ -365,8 +365,8 @@ void *startEvent1516(void) {
 /* the color the setup copies to FIELDSTG_state.spriteColor */
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0 };
 
-#if VERSION_US
-#define STAGE_TEXT 0xF0
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF0)
 #define EVENT_TEXT_FILE 0x10B
 #define STAGE_FILE 0x18F
 #define STAGE_ARCHIVE 0x2C7
@@ -441,6 +441,8 @@ s16 script53[] = {
     /* after the end, the original's padding up to a word, which isn't zeros */
 #if VERSION_US
     0x3E0,
+#elif VERSION_JP
+    0x8FB0,
 #endif
 };
 s16 script54[] = {

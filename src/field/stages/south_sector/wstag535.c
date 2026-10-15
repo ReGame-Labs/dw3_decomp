@@ -41,8 +41,8 @@ void endEvent1263(void) {
     FLAGS_00.applyAction(ITEM(3, 0x66), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xF7
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xF7)
 #define EVENT_TEXT_FILE 0x135
 #define STAGE_FILE 0x285
 #define STAGE_ARCHIVE 0x3CE
@@ -103,6 +103,10 @@ s16 script1262[] = {
     SCRIPT_WAIT_BOX,
     SCRIPT_WAIT(0x1E),
     SCRIPT_END,
+    /* after the end, the original's padding up to a word, which isn't zeros */
+#if VERSION_JP
+    0x800A,
+#endif
 };
 s16 script1263[] = {
     SCRIPT_FOLLOW(1, 2),

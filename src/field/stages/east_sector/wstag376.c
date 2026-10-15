@@ -48,8 +48,8 @@ void endEvent1284(void) {
 }
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
-#if VERSION_US
-#define STAGE_TEXT 0xE9
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xE9)
 #define EVENT_TEXT_FILE 0x120
 #define STAGE_FILE 0x579
 #elif VERSION_EU

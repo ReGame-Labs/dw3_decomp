@@ -341,7 +341,7 @@ BattleReward STFGTREP_rewards[] = {
     { 47, 235, 470 },
     { 47, 235, 470 },
 };
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
 BattleReward STFGTREP_rewards[] = {
     { 0, 0, 0 },
     { 12, 120, 240 },

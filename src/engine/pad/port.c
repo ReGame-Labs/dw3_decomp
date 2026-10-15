@@ -71,8 +71,9 @@ void readPadButtons(s32 port, PadData *data, PadData *record) {
         if (circle) {
             buttons |= 1 << PAD_CIRCLE;
         }
-#elif VERSION_EU
-        /* the Japanese language keeps the buttons as they are */
+#elif VERSION_EU || VERSION_JP
+        /* the Japanese language keeps the buttons as they are (the Japanese
+           version's only one, LANGUAGE 0) */
         buttons = ~data->buttons;
         if (LANGUAGE != 0) {
             b = buttons;

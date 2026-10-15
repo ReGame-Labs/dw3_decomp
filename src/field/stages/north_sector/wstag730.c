@@ -17,8 +17,8 @@ extern AnimFrame updateTileAnimsFrames[];
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-#if VERSION_US
-#define STAGE_TEXT 0xDB
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xDB)
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x66A
 #elif VERSION_EU
@@ -65,6 +65,10 @@ s16 script1235[] = {
     SCRIPT_WAIT(0x5A),
     SCRIPT_LEAVE(0xC07, 0, 0, 0),
     SCRIPT_END,
+    /* after the end, the original's padding up to a word, which isn't zeros */
+#if VERSION_JP
+    0x100,
+#endif
 };
 AnimFrame updateTileAnimsFrames[] = {
     { 53, 8 }, { 54, 8 }, { 55, 8 }, { 56, 4 },

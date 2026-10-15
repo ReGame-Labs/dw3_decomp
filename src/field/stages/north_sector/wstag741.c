@@ -147,8 +147,8 @@ void endEvent9015(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xC9), 1);
 }
 
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define EVENT_TEXT_FILE 0x143
 #define STAGE_FILE 0x741
 #elif VERSION_EU

@@ -26,7 +26,7 @@ typedef struct CardPack {
 
 /* The sprite sheet of the screen, the shop's textures and the card data
    (five files, as STCRDABM loads them) */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define FILE_CARDSHOP_SPRITES 0x62E
 #define FILE_CARDSHOP_IMAGES 0x632
 #define FILE_CARD_DATA 0x7E7

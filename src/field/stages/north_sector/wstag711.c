@@ -9,8 +9,8 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
-#if VERSION_US
-#define STAGE_TEXT 0xFE
+#if VERSION_US || VERSION_JP
+#define STAGE_TEXT TEXT_FILE(0xFE)
 #define STAGE_FILE 0x64E
 #elif VERSION_EU
 #define STAGE_TEXT (LANGUAGE + 0xF6)
@@ -115,7 +115,7 @@ u16 actor0Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor0Talk2Conditions[] = {
 #if VERSION_US
     ITEM(3, 0x8F), 0, FLAG(0, 0), 1, ITEM(2, 0x8B), 0, CODES_END,
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     ITEM(2, 0x8B), 0, ITEM(3, 0x8F), 0, FLAG(0, 0), 1, CODES_END,
 #endif
 };
@@ -123,7 +123,7 @@ u16 actor0Talk3Conditions[] = { ITEM(3, 0x8F), 0, FLAG(0, 0), 1, ITEM(2, 0x8B), 
 u16 actor0Talk3Actions[] = {
 #if VERSION_US
     ITEM(3, 0x8F), 1, ITEM(3, 0x8E), 0, ITEM(2, 0x8B), 0, SPECIAL(0x13), 1,
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     SPECIAL(0x13), 1, ITEM(3, 0x8F), 1, ITEM(3, 0x8E), 0, ITEM(2, 0x8B), 0,
 #endif
     CODES_END,
@@ -196,7 +196,7 @@ u16 actor3Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
 u16 actor4Conditions[] = {
 #if VERSION_US
     PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END,
-#elif VERSION_EU
+#elif VERSION_EU || VERSION_JP
     FLAG(0x1A, 0xA), 1, PROGRESS(0x26), 1, CODES_END,
 #endif
 };

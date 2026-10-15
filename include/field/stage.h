@@ -692,14 +692,31 @@ typedef struct StageListMenuChildren {
  * The menu sprite sheet, and an entry of a text file: the European version
  * numbers the disc's files differently, and has a copy of each text file per
  * language, one after the other, so it adds the language (LANGUAGE, which
- * CNTY_SEL sets) to the file.
+ * CNTY_SEL sets) to the file. The Japanese version numbers them as the USA
+ * one, and its text files are the Japanese copies (a stage's text defines
+ * are TEXT_FILE of the USA version's).
  */
-#if VERSION_US
+#if VERSION_US || VERSION_JP
 #define MENU_SPRITES 0x2770000
-#define TEXT_ENTRY(file, n) ((file) << 16 | (n))
 #elif VERSION_EU
 #define MENU_SPRITES 0x2860000
+#endif
+#if VERSION_US
+#define TEXT_ENTRY(file, n) ((file) << 16 | (n))
+#elif VERSION_EU || VERSION_JP
 #define TEXT_ENTRY(file, n) ((LANGUAGE << 16) + ((file) << 16 | (n)))
+#endif
+
+/*
+ * The text file of the extra chapter's (WSTAG920-974) menus and events, to
+ * which TEXT_ENTRY adds the language: the European version's copies of it, one
+ * per language, start with the Japanese one (COUNTRY/JPN/MSDMG900.BIN), which
+ * is the Japanese version's
+ */
+#if VERSION_EU
+#define EXTRA_TEXT 0x158
+#elif VERSION_JP
+#define EXTRA_TEXT 0x939
 #endif
 
 /*

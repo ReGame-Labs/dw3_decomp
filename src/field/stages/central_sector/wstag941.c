@@ -10,14 +10,23 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
+#if VERSION_EU
+#define STAGE_TEXT (LANGUAGE + 0x104)
+#define STAGE_FILE 0x909
+#define STAGE_FILE_8 0x1B6
+#elif VERSION_JP
+#define STAGE_TEXT 0x89B
+#define STAGE_FILE 0x8D4
+#define STAGE_FILE_8 0x1A8
+#endif
 /* Sets the stage up: its map, actors and battles, playing FIELDBGM */
 void setupStage(void) {
-    FIELDSTG_state.textFile = LANGUAGE + 0x104;
-    FIELDSTG_state.mapFile = 0x1B6;
-    FIELDSTG_state.sheetEntry = 0x9090000;
+    FIELDSTG_state.textFile = STAGE_TEXT;
+    FIELDSTG_state.mapFile = STAGE_FILE_8;
+    FIELDSTG_state.sheetEntry = STAGE_FILE << 16;
     FIELDSTG_state.objects = stageObjects;
     FIELDSTG_state.slots = stageSlots;
-    FIELDSTG_state.imageFile = 0x908;
+    FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x13800, 0x27100};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.soundBank = 9;
@@ -25,9 +34,9 @@ void setupStage(void) {
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
-    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, 0x9090002);
-    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, 0x9090003);
-    FIELDSTG_map.setFile(FIELD_MAP_AREAS, 0x9090001);
+    FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 2);
+    FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 3);
+    FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
 }
 

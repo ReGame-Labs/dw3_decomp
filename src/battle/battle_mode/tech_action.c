@@ -29,7 +29,7 @@ u8 FIGHTSTG_statusTechFlags[] = {
     FIGHTER_POISONED, FIGHTER_PARALYZED, FIGHTER_CONFUSED, 0x3F, /* all six */
 };
 /* the event types that the European version's FIGHTSTG_reviveFighter clears */
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
 s32 FIGHTSTG_clearIds[] = {
     EVENT_STATUS_DAMAGE, EVENT_STATUS_END, EVENT_STATUS_END + 1, EVENT_STATUS_END + 2,
     EVENT_RESTRICTION_END, EVENT_RESTRICTION_END + 1,
@@ -123,7 +123,7 @@ static inline void dealTechDamage(TechAction *task, BattleChild *children) {
             task->lines[1] = FIGHTSTG_action.damage;
             task->lines[2] = FIGHTSTG_action.hitsLanded;
             children[0].message->show(children[0].message, 0x10, task->lines);
-#if VERSION_EU
+#if VERSION_EU || VERSION_JP
             task->damage = FIGHTSTG_action.damage * FIGHTSTG_action.hitsLanded;
             if (task->damage >= 10000) {
                 task->damage = 9999;

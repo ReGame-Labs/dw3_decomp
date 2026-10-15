@@ -1,5 +1,17 @@
 // FIGHTSTG.PRO's own symbols, which only its splat config reads
 
+// the European version's functions, which the Japanese one has too
+FIGHTSTG_updateCameraShots = 0x800A1B40; // type:func version-only
+FIGHTSTG_rollCounter = 0x800A1108; // type:func version-only
+FIGHTSTG_startCameraShots = 0x800A1FCC; // type:func version-only
+FIGHTSTG_reviveFighter = 0x8008F384; // type:func version-only
+FIGHTSTG_clearIds = 0x800A2F98; // size:0x18 version-only
+FIGHTSTG_euCameraShots = 0x800A4208; // size:0x24 version-only
+
+// us's functions the seed didn't pair
+FIGHTSTG_findFighters = 0x80098AE4; // type:func size:0x360
+FIGHTSTG_rollDrain = 0x800A0E68; // type:func
+
 // names from us (tools/match_versions.py --seed): the same function or datum
 FIGHTSTG_stageTexPos = 0x80082A7C;
 FIGHTSTG_hitEffectPos = 0x80082AE0;
@@ -85,7 +97,7 @@ FIGHTSTG_getEyesFrame = 0x8008AEC8; // type:func
 FIGHTSTG_moveFacePart = 0x8008AF10; // type:func
 FIGHTSTG_updateFace = 0x8008AFB0; // type:func
 FIGHTSTG_createFace = 0x8008B2B8; // type:func
-FIGHTSTG_getScriptModel = 0x8008B3E0; // type:func size:0x3C
+FIGHTSTG_getScriptModel = 0x8008B3E0; // type:func size:0x6C
 FIGHTSTG_runScriptHits = 0x8008B44C; // type:func
 FIGHTSTG_runScriptModel = 0x8008B5A4; // type:func
 FIGHTSTG_runScriptEffect = 0x8008BA30; // type:func
@@ -314,7 +326,7 @@ FIGHTSTG_statusTechArgs = 0x800A2FB0;
 FIGHTSTG_statusTechLines = 0x800A2FC0;
 FIGHTSTG_commandCursor = 0x800A302C;
 FIGHTSTG_changeCursor = 0x800A304C;
-FIGHTSTG_statLines = 0x800A306C;
+FIGHTSTG_statLines = 0x800A306C; // size:0x27
 FIGHTSTG_itemCursor = 0x800A3094;
 FIGHTSTG_techCursor = 0x800A30B4;
 FIGHTSTG_switchCursor = 0x800A30D4;
@@ -327,17 +339,17 @@ FIGHTSTG_cursorBarRect = 0x800A31B4;
 FIGHTSTG_jumps = 0x800A31BC;
 FIGHTSTG_battleSounds = 0x800A31EC;
 FIGHTSTG_battleTableFunc = 0x800A335C;
-FIGHTSTG_eventPopModes = 0x800A3360;
-FIGHTSTG_events = 0x800A33C8;
-FIGHTSTG_eventDelays = 0x800A3EE4;
-FIGHTSTG_statusEvents = 0x800A3F34;
-FIGHTSTG_statusFlags = 0x800A3F3C;
-FIGHTSTG_boostEvents = 0x800A3F40;
+FIGHTSTG_eventPopModes = 0x800A3360; // size:0x68
+FIGHTSTG_events = 0x800A33C8; // size:0xB1C type:s32
+FIGHTSTG_eventDelays = 0x800A3EE4; // size:0x4E
+FIGHTSTG_statusEvents = 0x800A3F34; // size:0x8
+FIGHTSTG_statusFlags = 0x800A3F3C; // size:0x4
+FIGHTSTG_boostEvents = 0x800A3F40; // size:0xC
 FIGHTSTG_techEvents = 0x800A3F4C;
 FIGHTSTG_action = 0x800A3F54;
 FIGHTSTG_battle = 0x800A3FC0;
 FIGHTSTG_fighterCache = 0x800A40B8;
-FIGHTSTG_battleFuncs = 0x800A40E0;
+FIGHTSTG_battleFuncs = 0x800A40E0; // size:0xF0
 FIGHTSTG_boostStats = 0x800A41F4;
 FIGHTSTG_interp = 0x800A41FC;
 FIGHTSTG_partnerIdleMotion = 0x800A4230;
@@ -347,3 +359,26 @@ FIGHTSTG_cursorBarMoves = 0x800A4278;
 FIGHTSTG_cursorBarOt = 0x800A42D8;
 FIGHTSTG_newEvent = 0x800A42E0;
 // end of the names from us
+
+// names from the C of the modules this version builds (tools/version_symbols.py)
+FIGHTSTG_queueSpecialEnd = 0x8009CB18; // type:func
+WFIGHTMN_checkEquip = 0x800A6274; // type:func defined:True
+WFIGHTTS_start = 0x800A73F0; // type:func defined:True
+WFIGHTMN_start = 0x800A9944; // type:func defined:True
+WFIGHTMN_chargeGauge = 0x800A9A64; // type:func defined:True
+WFIGHTMN_startTech = 0x800A9B44; // type:func defined:True
+WFIGHTMN_setIdleMotion = 0x800AA344; // type:func defined:True
+WFIGHTMN_countHit = 0x800AA464; // type:func defined:True
+WFIGHTMN_endWeakness = 0x800AA4F4; // type:func defined:True
+WFIGHTMN_limitDamage = 0x800AA544; // type:func defined:True
+FIGHTSTG_stageMusic = 0x800A1FF8; // size:0x20
+FIGHTSTG_statusTechFlags = 0x800A2F94; // size:0x4
+FIGHTSTG_hpBars = 0x800A2FD0; // size:0x20
+FIGHTSTG_hpBarColors = 0x800A2FF0; // size:0x10
+FIGHTSTG_techGauge = 0x800A3000; // size:0x10
+FIGHTSTG_techGaugeColors = 0x800A3010; // size:0x10
+FIGHTSTG_iconX = 0x800A3020; // size:0xC
+FIGHTSTG_opposedElements = 0x800A41D0; // size:0x24
+FIGHTSTG_unused0 = 0x800A422C; // size:0x4
+FIGHTSTG_unused1 = 0x800A4234; // size:0x4
+FIGHTSTG_unused2 = 0x800A426C; // size:0x4
