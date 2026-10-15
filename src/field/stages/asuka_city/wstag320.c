@@ -37,13 +37,13 @@ void endEvent290(void) {
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
-#define EVENT_TEXT_FILE 0x120
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x295
 #define STAGE_ARCHIVE 0x317
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
-#define EVENT_TEXT_FILE 0x127
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x2A4
 #define STAGE_ARCHIVE 0x326
 #endif
@@ -60,8 +60,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x26F00, 0x1EF00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 6;
-    FIELDSTG_state.music = MUSIC(6, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SEWERS);
+    FIELDSTG_state.music = MUSIC_SEWERS;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -72,12 +72,12 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= STORY_BYAKKO_LEADER_FOUGHT && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
     if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -126,14 +126,14 @@ s16 script290[] = {
     SCRIPT_LEAVE(0x20B, 0x240, 0x140, 3),
     SCRIPT_END,
 };
-AreaBattle area0Battle0 = { 85, 7, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 85, 7, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 85, 7, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 85, 7, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 86, 7, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 86, 7, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 86, 7, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 86, 7, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 85, 7, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 85, 7, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 85, 7, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 85, 7, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 86, 7, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 86, 7, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 86, 7, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 86, 7, MUSIC_BATTLE };
 BattleList area0Battles = {
     4,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -195,9 +195,9 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1A4, 0x170, 0x190, 0x70, 0x140, 0x1F3 },
 };
 u16 actor0Talk0Actions[] = {
-    SPECIAL(0x8C), 1,
+    SPECIAL_GAIN_300_BIT, 1,
     FLAG_ASUKA_SEWERS_300_BIT_FOUND, 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor1Talk0Conditions[] = { FLAG_KAIL_ETEMON_SUIT_TALKED, 0, CODES_END };
@@ -206,13 +206,13 @@ u16 actor1Talk1Conditions[] = { ITEM(0, 0xF), 0, FLAG_KAIL_ETEMON_SUIT_TALKED, 1
 u16 actor1Talk1Actions[] = { START_EVENT(0x21), 1, CODES_END };
 u16 actor1Talk2Conditions[] = { ITEM(0, 0xF), 1, FLAG_KAIL_ETEMON_SUIT_TALKED, 1, CODES_END };
 u16 actor11Talk0Actions[] = {
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     FLAG_ASUKA_SEWERS_CRIMSON_BLADE_FOUND, 1,
     ITEM(2, 0x5E), 1,
     CODES_END,
 };
 u16 actor14Talk0Conditions[] = { ITEM(0, 0x15), 0, CODES_END };
-u16 actor14Talk0Actions[] = { ITEM(0, 0x15), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor14Talk0Actions[] = { ITEM(0, 0x15), 1, SPECIAL_SHOW_ITEM_GET_ICON, 1, CODES_END };
 u16 actor14Talk1Conditions[] = { ITEM(0, 0x15), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x453 },
@@ -289,11 +289,11 @@ u16 actor1Conditions[] = {
 };
 u16 actor2Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor4Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor7Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor8Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor7Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
+u16 actor8Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor9Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, CODES_END };
 u16 actor11Conditions[] = { FLAG_ASUKA_SEWERS_CRIMSON_BLADE_FOUND, 0, CODES_END };
@@ -304,7 +304,7 @@ u16 actor13Conditions[] = {
     CODES_END,
 };
 u16 actor14Conditions[] = { PROGRESS(STORY_AGUMON_SUITS), 1, FLAG(0x1A, 0x1B), 1, CODES_END };
-u16 actor15Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor15Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 465, 169, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x37, 5, 417, 209, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x37, 5, 417, 209, 7 };
@@ -473,12 +473,12 @@ StageTile stageObjects[] = {
 };
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x20B, 0x242, 0x13E, 3, 0, 0, 0 },
-    { { { SPECIAL(0x3F), 1 }, { CODES_END, 0 } }, SLOT_EXIT, 0x21A, 0x68, 0x304, 5, 0, 0, 0 },
+    { { { SPECIAL_STORY_CONTROL_ROOM_TO_GUNSLINGER, 1 }, { CODES_END, 0 } }, SLOT_EXIT, 0x21A, 0x68, 0x304, 5, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x21C, 0x88, 0x1B4, 5, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 2, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 2, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 4, 0x130, 0xF8, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 4, 0x120, 0x140, 0, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 2, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 2, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

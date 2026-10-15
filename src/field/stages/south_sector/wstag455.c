@@ -86,12 +86,12 @@ void endEvent360(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
-#define EVENT_TEXT_FILE 0x12E
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_400 - 1)
 #define STAGE_FILE 0x381
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
-#define EVENT_TEXT_FILE 0x135
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_400 - 1)
 #define STAGE_FILE 0x391
 #endif
 /* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0012 */
@@ -104,8 +104,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x1FA00, 0x21F00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x34;
-    FIELDSTG_state.music = MUSIC(0x34, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SWAMP);
+    FIELDSTG_state.music = MUSIC_SWAMP;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -163,14 +163,14 @@ AnimFrame updateTileTaskFrames[] = {
     { 23, 4 }, { 23, 4 }, { 24, 4 }, { 25, 4 },
     { 255, 0x3E7 },
 };
-AreaBattle area0Battle0 = { 54, 8, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 54, 8, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 66, 8, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 66, 8, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 66, 8, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 66, 8, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 66, 8, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 66, 8, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 54, 8, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 54, 8, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 66, 8, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 66, 8, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 66, 8, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 66, 8, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 66, 8, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 66, 8, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -205,11 +205,11 @@ BattleList area2Battles = {
 AreaBattle area3Battle0 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle3 = { 329, 8, MUSIC(2, 0) };
-AreaBattle area3Battle4 = { 328, 8, MUSIC(2, 0) };
+AreaBattle area3Battle3 = { 329, 8, MUSIC_BATTLE };
+AreaBattle area3Battle4 = { 328, 8, MUSIC_BATTLE };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle6 = { 147, 8, MUSIC(2, 0) };
-AreaBattle area3Battle7 = { 66, 8, MUSIC(2, 0) };
+AreaBattle area3Battle6 = { 147, 8, MUSIC_BATTLE };
+AreaBattle area3Battle7 = { 66, 8, MUSIC_BATTLE };
 BattleList area3Battles = {
     0,
     { &area3Battle0, &area3Battle1, &area3Battle2, &area3Battle3,

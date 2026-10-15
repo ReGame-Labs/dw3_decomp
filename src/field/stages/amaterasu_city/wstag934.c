@@ -55,7 +55,7 @@ StageTask *startStage(void *owner) {
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0 };
 
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_08)
 #define STAGE_FILE 0x8FB
 #define STAGE_FILE_8 0x1AC
 #elif VERSION_JP
@@ -73,9 +73,9 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x6700, 0x12300};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x42;
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CARGO_TOWER);
     FIELDSTG_state.startDir = 0;
-    FIELDSTG_state.music = MUSIC(0x42, 2);
+    FIELDSTG_state.music = MUSIC_CARGO_TOWER;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
@@ -110,7 +110,7 @@ ActorImage stageImages[] = {
 u16 actor1Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor1Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor1Talk1Conditions[] = { FLAG(0, 0), 1, ITEM(0, 0x192), 0, CODES_END };
-u16 actor1Talk1Actions[] = { ITEM(0, 0x192), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor1Talk1Actions[] = { ITEM(0, 0x192), 1, SPECIAL_SHOW_ITEM_GET_ICON, 1, CODES_END };
 u16 actor1Talk2Conditions[] = { FLAG(0, 0), 1, ITEM(0, 0x192), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x41 },

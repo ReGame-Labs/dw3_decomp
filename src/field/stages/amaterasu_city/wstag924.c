@@ -19,7 +19,7 @@ extern s32 event1604WindowFrames[];
 #include "common/start_stage.inc.c"
 
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_08)
 #define STAGE_FILE 0x8E7
 #define STAGE_FILE_8 0x19C
 #define STAGE_ARCHIVE 0x8E5
@@ -39,8 +39,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x10200, 0x15700};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x33;
-    FIELDSTG_state.music = MUSIC(0x33, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DIGIMON_LAB);
+    FIELDSTG_state.music = MUSIC_DIGIMON_LAB;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;

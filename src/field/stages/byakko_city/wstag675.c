@@ -46,12 +46,12 @@ void endEvent410(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xD4)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_01)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x4A0
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xCC)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_01)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x4B0
 #endif
 /*
@@ -68,8 +68,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x17000, 0x1E000};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x3D;
-    FIELDSTG_state.music = MUSIC(0x3D, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_BOOT_MOUNTAIN);
+    FIELDSTG_state.music = MUSIC_BOOT_MOUNTAIN;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -78,12 +78,12 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
     if (GAME.progress >= STORY_DE_SINCERITY && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -230,8 +230,8 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 5, 18, MUSIC(0x23, 0) };
-AreaBattle area3Battle1 = { 303, 18, MUSIC(0x23, 0) };
+AreaBattle area3Battle0 = { 5, 18, MUSIC_BOSS_1 };
+AreaBattle area3Battle1 = { 303, 18, MUSIC_BOSS_1 };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
@@ -275,7 +275,7 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x198, 0x178, 0x160, 0x78, 0x160, 0x1F9 },
 };
 u16 actor32Talk0Conditions[] = {
-    SPECIAL(0x20), 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_NETWORK_OFFLINE, 1,
     PROGRESS(STORY_REAL_WORLD), 0,
     PROGRESS(STORY_NETWORK_OFFLINE), 0,
     FLAG(0, 5), 0,
@@ -283,7 +283,7 @@ u16 actor32Talk0Conditions[] = {
 };
 u16 actor32Talk0Actions[] = { FLAG(0, 5), 1, CODES_END };
 u16 actor32Talk1Conditions[] = {
-    SPECIAL(0x20), 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_NETWORK_OFFLINE, 1,
     PROGRESS(STORY_REAL_WORLD), 0,
     PROGRESS(STORY_NETWORK_OFFLINE), 0,
     FLAG(0, 5), 1,
@@ -291,20 +291,30 @@ u16 actor32Talk1Conditions[] = {
 };
 u16 actor32Talk2Conditions[] = { PROGRESS(STORY_REAL_WORLD), 1, CODES_END };
 u16 actor32Talk3Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
-u16 actor32Talk4Conditions[] = { SPECIAL(0x19), 1, SPECIAL(0x20), 0, CODES_END };
-u16 actor39Talk0Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor32Talk4Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_NETWORK_OFFLINE, 0,
+    CODES_END,
+};
+u16 actor39Talk0Conditions[] = {
+    SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1,
+    CODES_END,
+};
 u16 actor39Talk0Actions[] = { 0x7A3F, 1, CODES_END };
-u16 actor39Talk1Conditions[] = { SPECIAL(0x20), 1, CODES_END };
+u16 actor39Talk1Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_NETWORK_OFFLINE, 1, CODES_END };
 u16 actor39Talk1Actions[] = { 0x7A40, 1, CODES_END };
 u16 actor39Talk2Conditions[] = {
-    SPECIAL(0x21), 1,
+    SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1,
     PROGRESS(STORY_PRESIDENT_ARRESTED), 0,
     CODES_END,
 };
 u16 actor39Talk2Actions[] = { 0x7A40, 1, CODES_END };
 u16 actor39Talk3Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor39Talk3Actions[] = { 0x7A41, 1, CODES_END };
-u16 actor39Talk4Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor39Talk4Conditions[] = {
+    SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1,
+    CODES_END,
+};
 u16 actor39Talk4Actions[] = { 0x7A41, 1, CODES_END };
 u16 actor39Talk5Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor39Talk5Actions[] = { 0x7A41, 1, CODES_END };
@@ -489,21 +499,21 @@ FieldTalk actor43Talks[] = {
     { NULL, NULL, 0x159 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor0Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor5Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor3Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
+u16 actor4Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
+u16 actor5Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor7Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor8Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor8Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor9Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor11Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor12Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor11Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
+u16 actor12Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor13Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor14Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor14Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor15Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor16Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor17Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
@@ -511,25 +521,33 @@ u16 actor18Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor19Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor20Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, FLAG(0x40, 0x1A), 0, CODES_END };
 u16 actor21Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, FLAG(0x40, 0x1A), 1, CODES_END };
-u16 actor22Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor22Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor23Conditions[] = { PROGRESS(STORY_JUNGLE_SOUND), 1, CODES_END };
 u16 actor24Conditions[] = { PROGRESS(STORY_BLUE_ID_PASS), 1, CODES_END };
 u16 actor25Conditions[] = { PROGRESS(STORY_BULBMON_BEATEN), 1, CODES_END };
 u16 actor26Conditions[] = { PROGRESS(STORY_DE_KNOWLEDGE), 1, CODES_END };
 u16 actor27Conditions[] = { PROGRESS(STORY_GENBU_BADGE), 1, CODES_END };
 u16 actor28Conditions[] = { PROGRESS(STORY_REAL_WORLD), 1, CODES_END };
-u16 actor29Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor29Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor30Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor31Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor32Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor32Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor33Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
-u16 actor34Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor35Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor36Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor37Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor38Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor39Conditions[] = { SPECIAL(8), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor40Conditions[] = { SPECIAL(8), 1, ITEM(0, 0x192), 0, CODES_END };
+u16 actor34Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor35Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor36Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor37Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor38Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor39Conditions[] = {
+    SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor40Conditions[] = {
+    SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1,
+    ITEM(0, 0x192), 0,
+    CODES_END,
+};
 u16 actor41Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor42Conditions[] = {
     PROGRESS(STORY_DE_SINCERITY), 1,

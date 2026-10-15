@@ -12,7 +12,7 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_08)
 #define STAGE_FILE 0x905
 #define STAGE_FILE_8 0x764
 #elif VERSION_JP
@@ -30,8 +30,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0xF500, 0x17A00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x2B;
-    FIELDSTG_state.music = MUSIC(0x2B, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CONTROL_ROOM);
+    FIELDSTG_state.music = MUSIC_CONTROL_ROOM;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
@@ -50,9 +50,17 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x170, 0x100, 0xC0, 0, 0x140, 0x1ED },
     { 0x140, 0x100, 0x178, 0x100, 0xE0, 0, 0x140, 0x1EC },
 };
-u16 actor2Talk0Conditions[] = { SPECIAL(0x54), 0, CODES_END };
-u16 actor2Talk1Conditions[] = { SPECIAL(0x54), 1, FLAG_KURT_ARENA_WIN_SEEN, 0, CODES_END };
-u16 actor2Talk2Conditions[] = { SPECIAL(0x54), 1, FLAG_KURT_ARENA_WIN_SEEN, 1, CODES_END };
+u16 actor2Talk0Conditions[] = { SPECIAL_FOUR_LEADERS_FOUGHT, 0, CODES_END };
+u16 actor2Talk1Conditions[] = {
+    SPECIAL_FOUR_LEADERS_FOUGHT, 1,
+    FLAG_KURT_ARENA_WIN_SEEN, 0,
+    CODES_END,
+};
+u16 actor2Talk2Conditions[] = {
+    SPECIAL_FOUR_LEADERS_FOUGHT, 1,
+    FLAG_KURT_ARENA_WIN_SEEN, 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x6D },
     { NULL, NULL, 0 },

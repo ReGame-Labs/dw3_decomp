@@ -11,10 +11,10 @@
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE9)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_04)
 #define STAGE_FILE 0x571
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE1)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_04)
 #define STAGE_FILE 0x581
 #endif
 /*
@@ -30,8 +30,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x1A200, 0xA000};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 9;
-    FIELDSTG_state.music = MUSIC(9, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_FIELD);
+    FIELDSTG_state.music = MUSIC_FIELD;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -41,19 +41,19 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
-AreaBattle area0Battle0 = { 106, 13, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 106, 13, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 106, 13, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 106, 13, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 151, 13, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 151, 13, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 151, 13, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 151, 13, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 106, 13, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 106, 13, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 106, 13, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 106, 13, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 151, 13, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 151, 13, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 151, 13, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 151, 13, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -88,11 +88,11 @@ BattleList area2Battles = {
 AreaBattle area3Battle0 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle3 = { 329, 13, MUSIC(2, 0) };
-AreaBattle area3Battle4 = { 330, 8, MUSIC(2, 0) };
+AreaBattle area3Battle3 = { 329, 13, MUSIC_BATTLE };
+AreaBattle area3Battle4 = { 330, 8, MUSIC_BATTLE };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle6 = { 99, 13, MUSIC(2, 0) };
-AreaBattle area3Battle7 = { 64, 8, MUSIC(2, 0) };
+AreaBattle area3Battle6 = { 99, 13, MUSIC_BATTLE };
+AreaBattle area3Battle7 = { 64, 8, MUSIC_BATTLE };
 BattleList area3Battles = {
     0,
     { &area3Battle0, &area3Battle1, &area3Battle2, &area3Battle3,
@@ -115,7 +115,7 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Actions[] = {
     FLAG_DIVERMON_LAKE_KNIGHT_SHIELD_FOUND, 1,
     ITEM(5, 0x116), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {
@@ -183,7 +183,7 @@ StageTile stageObjects[] = {
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x291, 0x32A, 0x334, 3, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x298, 0x9A, 0x74, 7, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 0x12, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 0x12, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 3, 0x1A1, 0x140, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 3, 0x1B0, 0x176, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x38, 0x58, 0, 0, 0, 0, 0 },

@@ -130,11 +130,11 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == STORY_LOGGED_IN && FLAGS_00.checkCondition(SPECIAL(0), 1)) {
+        if (GAME.progress == STORY_LOGGED_IN && FLAGS_00.checkCondition(SPECIAL_BALANCED_PACK_CHOSEN, 1)) {
             children[0] = FIELDSTG_startEvent(0xA);
-        } else if (GAME.progress == STORY_LOGGED_IN && FLAGS_00.checkCondition(SPECIAL(1), 1)) {
+        } else if (GAME.progress == STORY_LOGGED_IN && FLAGS_00.checkCondition(SPECIAL_POWERFUL_PACK_CHOSEN, 1)) {
             children[0] = FIELDSTG_startEvent(0xB);
-        } else if (GAME.progress == STORY_LOGGED_IN && FLAGS_00.checkCondition(SPECIAL(2), 1)) {
+        } else if (GAME.progress == STORY_LOGGED_IN && FLAGS_00.checkCondition(SPECIAL_MANIAC_PACK_CHOSEN, 1)) {
             children[0] = FIELDSTG_startEvent(0xC);
         } else if (GAME.progress == STORY_SUZAKU_BADGE && FLAGS_00.checkCondition(FLAG_DO_GUARD_BLOCK_SEEN, 0)) {
             children[0] = FIELDSTG_startEvent(0x10F);
@@ -189,12 +189,12 @@ void endEvent352(void) {
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
-#define EVENT_TEXT_FILE 0x10B
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x4BE
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
-#define EVENT_TEXT_FILE 0x112
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x4CE
 #endif
 /* Sets the stage up: its map, actors and events, playing the ambience ENV_0205 */
@@ -206,10 +206,10 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x17700, 0x13F00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x43;
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_MAIN_LOBBY_DEMO);
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
-    FIELDSTG_state.music = MUSIC(0x43, 3);
+    FIELDSTG_state.music = MUSIC_MAIN_LOBBY_DEMO;
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
@@ -1274,7 +1274,11 @@ u16 actor9Conditions[] = { PROGRESS(STORY_SUZAKU_BADGE), 1, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
 u16 actor11Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
 u16 actor12Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, SPECIAL(1), 1, CODES_END };
+u16 actor13Conditions[] = {
+    PROGRESS(STORY_LOGGED_IN), 1,
+    SPECIAL_POWERFUL_PACK_CHOSEN, 1,
+    CODES_END,
+};
 u16 actor14Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
 u16 actor15Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor16Conditions[] = { PROGRESS(STORY_SUZAKU_BADGE), 1, CODES_END };
@@ -1293,19 +1297,51 @@ u16 actor28Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor29Conditions[] = { PROGRESS(STORY_SUZAKU_BADGE), 1, CODES_END };
 u16 actor30Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor31Conditions[] = { PROGRESS(STORY_SUZAKU_BADGE), 1, CODES_END };
-u16 actor32Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, SPECIAL(2), 1, CODES_END };
-u16 actor33Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, SPECIAL(0), 1, CODES_END };
-u16 actor34Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, SPECIAL(1), 1, CODES_END };
+u16 actor32Conditions[] = {
+    PROGRESS(STORY_LOGGED_IN), 1,
+    SPECIAL_MANIAC_PACK_CHOSEN, 1,
+    CODES_END,
+};
+u16 actor33Conditions[] = {
+    PROGRESS(STORY_LOGGED_IN), 1,
+    SPECIAL_BALANCED_PACK_CHOSEN, 1,
+    CODES_END,
+};
+u16 actor34Conditions[] = {
+    PROGRESS(STORY_LOGGED_IN), 1,
+    SPECIAL_POWERFUL_PACK_CHOSEN, 1,
+    CODES_END,
+};
 u16 actor35Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
 u16 actor36Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
-u16 actor37Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, SPECIAL(0), 1, CODES_END };
-u16 actor38Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, SPECIAL(2), 1, CODES_END };
+u16 actor37Conditions[] = {
+    PROGRESS(STORY_LOGGED_IN), 1,
+    SPECIAL_BALANCED_PACK_CHOSEN, 1,
+    CODES_END,
+};
+u16 actor38Conditions[] = {
+    PROGRESS(STORY_LOGGED_IN), 1,
+    SPECIAL_MANIAC_PACK_CHOSEN, 1,
+    CODES_END,
+};
 u16 actor39Conditions[] = { PROGRESS(STORY_SUZAKU_BADGE), 1, CODES_END };
 u16 actor40Conditions[] = { PROGRESS(STORY_SUZAKU_BADGE), 1, CODES_END };
 u16 actor41Conditions[] = { PROGRESS(STORY_SUZAKU_BADGE), 1, CODES_END };
-u16 actor42Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, SPECIAL(2), 1, CODES_END };
-u16 actor43Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, SPECIAL(1), 1, CODES_END };
-u16 actor44Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, SPECIAL(0), 1, CODES_END };
+u16 actor42Conditions[] = {
+    PROGRESS(STORY_LOGGED_IN), 1,
+    SPECIAL_MANIAC_PACK_CHOSEN, 1,
+    CODES_END,
+};
+u16 actor43Conditions[] = {
+    PROGRESS(STORY_LOGGED_IN), 1,
+    SPECIAL_POWERFUL_PACK_CHOSEN, 1,
+    CODES_END,
+};
+u16 actor44Conditions[] = {
+    PROGRESS(STORY_LOGGED_IN), 1,
+    SPECIAL_BALANCED_PACK_CHOSEN, 1,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0xB, 5, 0, 0, 1 };

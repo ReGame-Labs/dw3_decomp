@@ -25,13 +25,13 @@ void endEvent380(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
-#define EVENT_TEXT_FILE 0x135
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x235
 #define STAGE_ARCHIVE 0x312
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x244
 #define STAGE_ARCHIVE 0x321
 #endif
@@ -45,8 +45,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x4D700, 0x4B700};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x38;
-    FIELDSTG_state.music = MUSIC(0x38, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DESERT);
+    FIELDSTG_state.music = MUSIC_DESERT;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -134,14 +134,14 @@ AnimFrame updateTileAnimsFrames2[] = {
     { 76, 8 }, { 77, 8 }, { 78, 8 }, { 79, 8 },
     { 80, 8 }, { 81, 8 }, { 82, 160 }, { 255, 0 },
 };
-AreaBattle area0Battle0 = { 148, 5, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 148, 5, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 148, 5, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 148, 5, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 154, 5, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 154, 5, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 154, 5, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 154, 5, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 148, 5, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 148, 5, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 148, 5, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 148, 5, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 154, 5, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 154, 5, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 154, 5, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 154, 5, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -236,8 +236,8 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x249, 0x7A, 0xEA, 5, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x247, 0xB0, 0x90, 7, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x257, 0x320, 0x88, 1, 0, 0, 0 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 0x1B, 1 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 1, 2 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 0x1B, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 1, 2 },
     { { { PROGRESS(STORY_DE_SINCERITY), 1 }, { FLAG(0x40, 0xC), 0 } }, SLOT_EVENT, 0x17C, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };

@@ -156,12 +156,12 @@ void endEvent552(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xDB)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x47C
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xD3)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x48C
 #endif
 /* Sets the stage up: its map, actors and events, playing BGM_0019 */
@@ -174,8 +174,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x20200, 0x17600};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x15;
-    FIELDSTG_state.music = MUSIC(0x15, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SECRET_ROOM);
+    FIELDSTG_state.music = MUSIC_SECRET_ROOM;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
@@ -394,14 +394,17 @@ FieldTalk actor10Talks[] = {
     { NULL, NULL, 0x303 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { SPECIAL(7), 1, CODES_END };
+u16 actor0Conditions[] = { SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_GAME_MASTER_CAUGHT, 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, CODES_END };
-u16 actor10Conditions[] = { SPECIAL(7), 1, CODES_END };
+u16 actor10Conditions[] = {
+    SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_GAME_MASTER_CAUGHT, 1,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0xB, 4, 472, 381, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x65, 5, 385, 416, 3 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x65, 5, 385, 416, 3 };

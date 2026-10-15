@@ -202,13 +202,13 @@ void endEvent840(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x6E6
 #define STAGE_FILE_8 0x711
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
-#define EVENT_TEXT_FILE 0x14A
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x6F6
 #define STAGE_FILE_8 0x721
 #endif
@@ -222,8 +222,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 4;
     FIELDSTG_state.start = (Vec2){0x4B200, 0x3AA00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0xD;
-    FIELDSTG_state.music = MUSIC(0xD, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_MAGASTA);
+    FIELDSTG_state.music = MUSIC_MAGASTA;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.startDir = 0;
@@ -345,14 +345,14 @@ AnimFrame *updateTilePairFrames[] = {
 s16 timerDigitX[] = {
     226, 253, 0x118, 0,
 };
-AreaBattle area0Battle0 = { 124, 16, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 124, 16, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 124, 16, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 125, 16, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 125, 16, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 125, 16, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 123, 16, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 123, 16, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 124, 16, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 124, 16, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 124, 16, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 125, 16, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 125, 16, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 125, 16, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 123, 16, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 123, 16, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,

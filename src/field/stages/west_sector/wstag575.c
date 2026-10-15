@@ -31,12 +31,12 @@ void endEvent422(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
-#define EVENT_TEXT_FILE 0x135
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x471
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x481
 #endif
 /* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0017 */
@@ -49,8 +49,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x15C00, 0xF800};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x39;
-    FIELDSTG_state.music = MUSIC(0x39, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DUM_DUM_FACTORY);
+    FIELDSTG_state.music = MUSIC_DUM_DUM_FACTORY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -135,14 +135,14 @@ s16 script422[] = {
     0x6008,
 #endif
 };
-AreaBattle area0Battle0 = { 149, 3, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 149, 3, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 149, 3, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 149, 3, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 70, 3, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 70, 3, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 70, 3, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 70, 3, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 149, 3, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 149, 3, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 149, 3, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 149, 3, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 70, 3, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 70, 3, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 70, 3, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 70, 3, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -177,10 +177,10 @@ BattleList area2Battles = {
 AreaBattle area3Battle0 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle3 = { 329, 3, MUSIC(2, 0) };
+AreaBattle area3Battle3 = { 329, 3, MUSIC_BATTLE };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle6 = { 156, 3, MUSIC(2, 0) };
+AreaBattle area3Battle6 = { 156, 3, MUSIC_BATTLE };
 AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area3Battles = {
     0,
@@ -255,7 +255,7 @@ StageTile stageObjects[] = {
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x24A, 0x5D8, 0x104, 1, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x24D, 0x88, 0x3F4, 5, 0, 0, 0 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 0x10, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 0x10, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 8, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };

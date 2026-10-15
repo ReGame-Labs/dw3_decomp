@@ -12,7 +12,7 @@
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0x104)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_09)
 #define STAGE_FILE 0x925
 #define STAGE_FILE_8 0x39C
 #elif VERSION_JP
@@ -30,8 +30,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x26F00, 0xA800};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0xE;
-    FIELDSTG_state.music = MUSIC(0xE, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_STATION);
+    FIELDSTG_state.music = MUSIC_STATION;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.spriteColor = stageColor;

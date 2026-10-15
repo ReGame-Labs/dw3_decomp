@@ -12,11 +12,11 @@
 
 /* The overlay's files: the discs number them differently */
 #if VERSION_US || VERSION_JP
-#define STGTRAIN_TEXT TEXT_FILE(0x105) /* its strings */
+#define STGTRAIN_TEXT TEXT_FILE(TEXT_TRAINING) /* its strings */
 #define STGTRAIN_FILE_SPRITES 0x27D
 #define STGTRAIN_FILE_IMAGES 0x27E /* a TIM archive */
 #elif VERSION_EU
-#define STGTRAIN_TEXT (LANGUAGE + 0x10B)
+#define STGTRAIN_TEXT TEXT_FILE(TEXT_TRAINING)
 #define STGTRAIN_FILE_SPRITES 0x28C
 #define STGTRAIN_FILE_IMAGES 0x28D
 #endif

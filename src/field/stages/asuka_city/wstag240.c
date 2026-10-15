@@ -9,11 +9,11 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
 #define STAGE_FILE 0x197
 #define STAGE_ARCHIVE 0x2B3
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
 #define STAGE_FILE 0x1A5
 #define STAGE_ARCHIVE 0x2C2
 #endif
@@ -27,8 +27,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0xB300, 0xFF00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 7;
-    FIELDSTG_state.music = MUSIC(7, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SHOP_1);
+    FIELDSTG_state.music = MUSIC_SHOP_1;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
@@ -117,18 +117,18 @@ FieldTalk actor14Talks[] = {
     { NULL, NULL, 0x434 },
     { NULL, NULL, 0 },
 };
-u16 actor3Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor3Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
+u16 actor4Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x15), 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF, 1, CODES_END };
 u16 actor7Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor8Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor9Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
-u16 actor10Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor10Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor11Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor12Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor13Conditions[] = { ITEM(0, 0x18F), 0, PROGRESS(STORY_FAKE_BLUE_CARD), 1, CODES_END };
-u16 actor14Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor14Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 FieldActorEntry actor0 = { NULL, actor0Talks, 0x28, 4, 135, 212, 7 };
 FieldActorEntry actor1 = { NULL, actor1Talks, 0x29, 5, 173, 155, 7 };
 FieldActorEntry actor2 = { NULL, actor2Talks, 0x2A, 6, 56, 193, 1 };

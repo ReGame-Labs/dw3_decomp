@@ -53,12 +53,12 @@ void endEvent892(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
-#define EVENT_TEXT_FILE 0x10B
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x5FF
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
-#define EVENT_TEXT_FILE 0x112
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x60F
 #endif
 /* Sets the stage up: its map, actors and events, playing BGM_0029 */
@@ -71,8 +71,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x18400, 0xE400};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x1F;
-    FIELDSTG_state.music = MUSIC(0x1F, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+    FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
@@ -405,15 +405,23 @@ u16 actor2Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, FLAG(0x1C, 0x1A), 1,
 u16 actor3Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor7Conditions[] = { SPECIAL(0x1E), 1, CODES_END };
-u16 actor8Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor9Conditions[] = { SPECIAL(0x1E), 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
+u16 actor7Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED, 1, CODES_END };
+u16 actor8Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
+u16 actor9Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED, 1, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
-u16 actor11Conditions[] = { SPECIAL(0x18), 1, PROGRESS(STORY_BULBMON_FOUND), 0, CODES_END };
+u16 actor11Conditions[] = {
+    SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1,
+    PROGRESS(STORY_BULBMON_FOUND), 0,
+    CODES_END,
+};
 u16 actor12Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
-u16 actor13Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor14Conditions[] = { SPECIAL(0x1E), 1, PROGRESS(STORY_NETWORK_OFFLINE), 0, CODES_END };
+u16 actor13Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
+u16 actor14Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED, 1,
+    PROGRESS(STORY_NETWORK_OFFLINE), 0,
+    CODES_END,
+};
 u16 actor15Conditions[] = {
     PROGRESS(STORY_NETWORK_OFFLINE), 1,
     FLAG_DESTROMON_REVEAL_SEEN, 0,
@@ -424,9 +432,9 @@ u16 actor16Conditions[] = {
     FLAG_DESTROMON_REVEAL_SEEN, 1,
     CODES_END,
 };
-u16 actor17Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor18Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor19Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor17Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor18Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor19Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor20Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, FLAG(0x1C, 0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 0xC, 4, 123, 110, 7 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0xC, 4, 0, 0, 1 };

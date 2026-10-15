@@ -10,10 +10,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
 #define STAGE_FILE 0x64E
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
 #define STAGE_FILE 0x65E
 #endif
 /* Sets the stage up: its map, actors and battles, playing the ambience ENV_0007 */
@@ -26,8 +26,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x42D00, 0x25F00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x2F;
-    FIELDSTG_state.music = MUSIC(0x2F, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_TYRANNO_VALLEY);
+    FIELDSTG_state.music = MUSIC_TYRANNO_VALLEY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -37,14 +37,14 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-AreaBattle area0Battle0 = { 163, 4, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 163, 4, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 163, 4, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 163, 4, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 137, 4, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 137, 4, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 137, 4, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 137, 4, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 163, 4, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 163, 4, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 163, 4, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 163, 4, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 137, 4, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 137, 4, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 137, 4, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 137, 4, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -79,10 +79,10 @@ BattleList area2Battles = {
 AreaBattle area3Battle0 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle3 = { 333, 4, MUSIC(2, 0) };
+AreaBattle area3Battle3 = { 333, 4, MUSIC_BATTLE };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle6 = { 175, 4, MUSIC(2, 0) };
+AreaBattle area3Battle6 = { 175, 4, MUSIC_BATTLE };
 AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area3Battles = {
     0,
@@ -122,9 +122,9 @@ u16 actor0Talk2Conditions[] = {
 u16 actor0Talk3Conditions[] = { ITEM(3, 0x8F), 0, FLAG(0, 0), 1, ITEM(2, 0x8B), 1, CODES_END };
 u16 actor0Talk3Actions[] = {
 #if VERSION_US
-    ITEM(3, 0x8F), 1, ITEM(3, 0x8E), 0, ITEM(2, 0x8B), 0, SPECIAL(0x13), 1,
+    ITEM(3, 0x8F), 1, ITEM(3, 0x8E), 0, ITEM(2, 0x8B), 0, SPECIAL_SHOW_ITEM_GET_ICON, 1,
 #elif VERSION_EU || VERSION_JP
-    SPECIAL(0x13), 1, ITEM(3, 0x8F), 1, ITEM(3, 0x8E), 0, ITEM(2, 0x8B), 0,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1, ITEM(3, 0x8F), 1, ITEM(3, 0x8E), 0, ITEM(2, 0x8B), 0,
 #endif
     CODES_END,
 };
@@ -184,8 +184,8 @@ FieldTalk actor12Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = {
-    SPECIAL(0x48), 1,
-    SPECIAL(0x50), 1,
+    SPECIAL_PATAMON_IN_PARTY, 1,
+    SPECIAL_PATAMON_LEVEL_45, 1,
     ITEM(3, 0x8E), 1,
     ITEM(3, 0x8F), 0,
     CODES_END,
@@ -209,12 +209,24 @@ u16 actor4Conditions[] = {
 #endif
 };
 u16 actor5Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor7Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor8Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor9Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor10Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor11Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor6Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor7Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor8Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor9Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor10Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor11Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor12Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x1F, 4, 255, 706, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x2D, 5, 1214, 517, 1 };
@@ -301,10 +313,10 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0x3E1, 0x32F, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0x150, 0x258, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0x15F, 0x2BE, 0, 0, 0, 0 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 5, 1 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 0xB, 1 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 3, 1 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 0x17, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 5, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 0xB, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 3, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 0x17, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

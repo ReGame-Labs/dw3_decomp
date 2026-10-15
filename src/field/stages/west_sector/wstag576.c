@@ -10,10 +10,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
 #define STAGE_FILE 0x5CE
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
 #define STAGE_FILE 0x5DE
 #endif
 /* Sets the stage up: its map, actors and battles, playing the ambience ENV_0017 */
@@ -26,8 +26,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x20000, 0xA600};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x39;
-    FIELDSTG_state.music = MUSIC(0x39, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DUM_DUM_FACTORY);
+    FIELDSTG_state.music = MUSIC_DUM_DUM_FACTORY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -37,14 +37,14 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-AreaBattle area0Battle0 = { 98, 3, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 98, 3, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 98, 3, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 130, 3, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 130, 3, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 131, 3, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 131, 3, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 131, 3, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 98, 3, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 98, 3, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 98, 3, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 130, 3, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 130, 3, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 131, 3, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 131, 3, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 131, 3, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -79,10 +79,10 @@ BattleList area2Battles = {
 AreaBattle area3Battle0 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle3 = { 333, 3, MUSIC(2, 0) };
+AreaBattle area3Battle3 = { 333, 3, MUSIC_BATTLE };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle6 = { 175, 3, MUSIC(2, 0) };
+AreaBattle area3Battle6 = { 175, 3, MUSIC_BATTLE };
 AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area3Battles = {
     0,
@@ -138,10 +138,18 @@ u16 actor1Conditions[] = {
     FLAG_OINKMON_CITIZENS_RESTORED, 1,
     CODES_END,
 };
-u16 actor2Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor5Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor2Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor3Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor4Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor5Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x2F, 4, 528, 801, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x34, 5, 608, 967, 5 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x9D, 6, 528, 801, 1 };
@@ -203,7 +211,7 @@ StageTile stageObjects[] = {
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2B4, 0x5D8, 0x104, 1, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2B7, 0x88, 0x3F4, 5, 0, 0, 0 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 0x19, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 0x19, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 8, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };

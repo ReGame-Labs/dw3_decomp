@@ -323,13 +323,13 @@ void endEvent711(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
-#define EVENT_TEXT_FILE 0x135
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x267
 #define STAGE_ARCHIVE 0x3CF
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x276
 #define STAGE_ARCHIVE 0x3DF
 #endif
@@ -343,8 +343,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x18800, 0x24600};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x13;
-    FIELDSTG_state.music = MUSIC(0x13, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_BUG_MAZE);
+    FIELDSTG_state.music = MUSIC_BUG_MAZE;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.startDir = 0;
@@ -465,14 +465,14 @@ StageTileAtSpot updateTileSwitchSpots[] = {
     { 0x307, 0x1C9, 6 },
     { 0x234, 0x171, 7 },
 };
-AreaBattle area0Battle0 = { 165, 10, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 165, 10, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 173, 10, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 173, 10, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 150, 10, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 150, 10, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 150, 10, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 92, 10, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 165, 10, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 165, 10, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 173, 10, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 173, 10, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 150, 10, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 150, 10, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 150, 10, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 92, 10, MUSIC_BATTLE };
 BattleList area0Battles = {
     4,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -504,8 +504,8 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 12, 10, MUSIC(0x22, 0) };
-AreaBattle area3Battle1 = { 315, 10, MUSIC(0x22, 0) };
+AreaBattle area3Battle0 = { 12, 10, MUSIC_BOSS };
+AreaBattle area3Battle1 = { 315, 10, MUSIC_BOSS };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
@@ -533,7 +533,7 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Actions[] = {
     FLAG_BUG_MAZE_PIT_DIGITAMA_MAIL_FOUND, 1,
     ITEM(5, 0x109), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {
@@ -558,8 +558,8 @@ FieldTalk actor4Talks[] = {
 };
 u16 actor0Conditions[] = { FLAG_BUG_MAZE_PIT_DIGITAMA_MAIL_FOUND, 0, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(STORY_BULBMON_FOUND), 1, CODES_END };
-u16 actor2Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor2Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor3Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 785, 697, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x45, 5, 559, 1145, 1 };

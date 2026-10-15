@@ -46,12 +46,12 @@ void endEvent1274(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
-#define EVENT_TEXT_FILE 0x135
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x3B3
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x3C3
 #endif
 /* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0015 */
@@ -64,8 +64,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x18600, 0x18600};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x37;
-    FIELDSTG_state.music = MUSIC(0x37, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_UG_LAKE);
+    FIELDSTG_state.music = MUSIC_UG_LAKE;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.startDir = 0;
@@ -228,14 +228,14 @@ s16 script1274[] = {
     SCRIPT_WAIT(0x3C),
     SCRIPT_END,
 };
-AreaBattle area0Battle0 = { 65, 27, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 65, 27, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 65, 27, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 65, 27, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 65, 27, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 65, 27, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 65, 27, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 65, 27, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 65, 27, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 65, 27, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 65, 27, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 65, 27, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 65, 27, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 65, 27, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 65, 27, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 65, 27, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -267,7 +267,7 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 268, 27, MUSIC(0x22, 0) };
+AreaBattle area3Battle0 = { 268, 27, MUSIC_BOSS };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
@@ -298,7 +298,7 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Actions[] = {
     FLAG_SUZAKU_LAKE_CROSSBOW_FOUND, 1,
     ITEM(4, 0xC0), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor3Talk0Conditions[] = { FLAG_KYUKIMON_DDNA_FOUGHT, 0, CODES_END };
@@ -408,7 +408,7 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 7, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 7, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 5, 0x22F, 0x3C8, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 5, 0x220, 0x372, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 5, 0x251, 0x2F7, 0, 0, 0, 0 },
@@ -416,7 +416,7 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 0xA, 0x1C0, 0x181, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 0xA, 0x1D0, 0xDA, 0, 0, 0, 0 },
     { { { FLAG_KEITH_NICK_SEARCH_STARTED, 1 }, { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1 } }, SLOT_EVENT, 0x226, 0, 0, 0, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 7, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 7, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

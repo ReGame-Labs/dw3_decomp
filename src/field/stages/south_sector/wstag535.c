@@ -42,13 +42,13 @@ void endEvent1263(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
-#define EVENT_TEXT_FILE 0x135
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x285
 #define STAGE_ARCHIVE 0x3CE
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x294
 #define STAGE_ARCHIVE 0x3DE
 #endif
@@ -62,8 +62,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x19E00, 0x11300};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x11;
-    FIELDSTG_state.music = MUSIC(0x11, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_JUNGLE_SHRINE);
+    FIELDSTG_state.music = MUSIC_JUNGLE_SHRINE;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -137,27 +137,27 @@ s16 script1263[] = {
     SCRIPT_WAIT(0x3C),
     SCRIPT_END,
 };
-AreaBattle area0Battle0 = { 91, 6, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 91, 6, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 91, 6, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 91, 6, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 91, 6, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 91, 6, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 91, 6, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 91, 6, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 91, 6, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 91, 6, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 91, 6, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 91, 6, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 91, 6, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 91, 6, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 91, 6, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 91, 6, MUSIC_BATTLE };
 BattleList area0Battles = {
     4,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
       &area0Battle4, &area0Battle5, &area0Battle6, &area0Battle7 },
 };
-AreaBattle area1Battle0 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle1 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle2 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle3 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle4 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle5 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle6 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle7 = { 0, 6, MUSIC(2, 0) };
+AreaBattle area1Battle0 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle1 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle2 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle3 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle4 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle5 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle6 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle7 = { 0, 6, MUSIC_BATTLE };
 BattleList area1Battles = {
     0,
     { &area1Battle0, &area1Battle1, &area1Battle2, &area1Battle3,
@@ -176,12 +176,12 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 11, 19, MUSIC(0x22, 0) };
+AreaBattle area3Battle0 = { 11, 19, MUSIC_BOSS };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle5 = { 91, 6, MUSIC(2, 0) };
+AreaBattle area3Battle5 = { 91, 6, MUSIC_BATTLE };
 AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area3Battles = {
@@ -287,8 +287,8 @@ u16 actor2Conditions[] = { PROGRESS(STORY_ZANBAMON_DRIVEN_OFF), 1, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(STORY_SOUTH_STATION_GHOST), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(STORY_CODE_PASSES_NEEDED), 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(STORY_KNIGHTMON_REPROGRAMMED), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x17), 1, CODES_END };
-u16 actor7Conditions[] = { SPECIAL(0x16), 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_CONTROL_ROOM, 1, CODES_END };
+u16 actor7Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
 u16 actor8Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor9Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x85, 4, 887, 133, 1 };

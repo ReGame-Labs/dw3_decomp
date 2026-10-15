@@ -156,12 +156,12 @@ void STPLNMET_updateScreen(PlayerNameScreen *screen, PlayerNameScreenChildren *c
         break;
     case TASK_DONE:
         if (SOUND.isLoading() == 0) {
-            SOUND.playSound(MUSIC(0x20, 0));
+            SOUND.playSound(MUSIC_MEMORY_CARD);
             screen->setState(screen, TASK_RUN);
         }
         break;
     case TASK_KILL:
-        SOUND.stopSound(MUSIC(0x20, 0));
+        SOUND.stopSound(MUSIC_MEMORY_CARD);
         GAME.funcs.requestMode(0x2D8, 0);
         break;
     }

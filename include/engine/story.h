@@ -161,7 +161,7 @@ enum StoryProgress {
    those stay numbers */
 
 /* set by updateModeFlags on the way back from a card battle: 1 if the
-   player won it (FLAGS_00.pendingFlag10, which the card battle sets), else
+   player won it (FLAGS_00.cardBattleWon, which the card battle sets), else
    0 */
 #define FLAG_CARD_BATTLE_WON FLAG(0, 0x10)
 /* set by updateModeFlags on the way back from a card battle; the talks that
@@ -1656,5 +1656,330 @@ enum StoryProgress {
 /* wstag741 event 9015: a Fire Dungeon trap (Amaterasu server) leaves the
    party at 1 HP; set at its end, tested 0 to start it */
 #define FLAG_AMATERASU_FIRE_TRAP_9015_SPRUNG FLAG(0x40, 0xC9)
+
+/*
+ * The SPECIAL conditions (SPECIAL(id), checkSpecialCondition), named after
+ * what the check function of their SPECIAL_CONDITIONS entry tests with its
+ * argument (src/engine/game/events.c). A condition list tests one against 1
+ * or 0; an action list runs it, and the ones that give or take something
+ * are only actions.
+ */
+
+/* checkItemSet: whether the player has a set of items */
+
+/* the player has a Red Snapper, a Spider Web and a Bamboo Spear (items 7, 0x59
+   and 0xA7, checkItemSet 0): what Tai Kong Wong asks for to make the Fishing
+   Pole (wstag340) */
+#define SPECIAL_HAS_FISHING_POLE_PARTS SPECIAL(0x3A)
+/* the European and Japanese versions: the player has the Muramasa, Super Nova,
+   Punishment, Eternally and Invincible (items 0x69, 0x77, 0x83, 0x90 and 0x9C,
+   checkItemSet 1), the "5 strongest Epic Items" the extra chapter's leaders
+   ask for (wstag949) */
+#define SPECIAL_HAS_FIVE_EPIC_ITEMS SPECIAL(0x96)
+
+/* checkPartner: the starter pack, the partners and the party; partner i
+   is DIGNAM's string i + 1 (Kotemon, Kumamon, Monmon, Agumon, Veemon,
+   Guilmon, Renamon, Patamon) */
+
+/* the player chose the Balanced Pack at registration (GAME.partySet 0,
+   STARTER_PARTIES[0]; NAMEET's string 10) */
+#define SPECIAL_BALANCED_PACK_CHOSEN SPECIAL(0)
+/* the player chose the Powerful Pack at registration (GAME.partySet 1,
+   STARTER_PARTIES[1]; NAMEET's string 11) */
+#define SPECIAL_POWERFUL_PACK_CHOSEN SPECIAL(1)
+/* the player chose the Maniac Pack at registration (GAME.partySet 2,
+   STARTER_PARTIES[2]; NAMEET's string 12) */
+#define SPECIAL_MANIAC_PACK_CHOSEN SPECIAL(2)
+/* Kotemon (partner 0) is unlocked */
+#define SPECIAL_KOTEMON_UNLOCKED SPECIAL(0x10)
+/* Kumamon (partner 1) is unlocked */
+#define SPECIAL_KUMAMON_UNLOCKED SPECIAL(0x12)
+/* Monmon (partner 2) is unlocked */
+#define SPECIAL_MONMON_UNLOCKED SPECIAL(0x11)
+/* Agumon (partner 3) is unlocked */
+#define SPECIAL_AGUMON_UNLOCKED SPECIAL(0xB)
+/* Veemon (partner 4) is unlocked */
+#define SPECIAL_VEEMON_UNLOCKED SPECIAL(0xD)
+/* Guilmon (partner 5) is unlocked */
+#define SPECIAL_GUILMON_UNLOCKED SPECIAL(0xC)
+/* Renamon (partner 6) is unlocked */
+#define SPECIAL_RENAMON_UNLOCKED SPECIAL(0xF)
+/* Patamon (partner 7) is unlocked */
+#define SPECIAL_PATAMON_UNLOCKED SPECIAL(0xE)
+/* Kotemon (partner 0) is in the party */
+#define SPECIAL_KOTEMON_IN_PARTY SPECIAL(0x42)
+/* Kumamon (partner 1) is in the party */
+#define SPECIAL_KUMAMON_IN_PARTY SPECIAL(0x44)
+/* Monmon (partner 2) is in the party */
+#define SPECIAL_MONMON_IN_PARTY SPECIAL(0x43)
+/* Agumon (partner 3) is in the party */
+#define SPECIAL_AGUMON_IN_PARTY SPECIAL(0x47)
+/* Veemon (partner 4) is in the party */
+#define SPECIAL_VEEMON_IN_PARTY SPECIAL(0x46)
+/* Guilmon (partner 5) is in the party */
+#define SPECIAL_GUILMON_IN_PARTY SPECIAL(0x45)
+/* Renamon (partner 6) is in the party */
+#define SPECIAL_RENAMON_IN_PARTY SPECIAL(0x49)
+/* Patamon (partner 7) is in the party */
+#define SPECIAL_PATAMON_IN_PARTY SPECIAL(0x48)
+/* an action: unlocks Kotemon (partner 0); the talks that take or give its DDNA
+   apply it */
+#define SPECIAL_UNLOCK_KOTEMON SPECIAL(0x37)
+/* an action: unlocks Kumamon (partner 1); the talks that take or give its DDNA
+   apply it */
+#define SPECIAL_UNLOCK_KUMAMON SPECIAL(0x39)
+/* an action: unlocks Monmon (partner 2); the talks that take or give its DDNA
+   apply it */
+#define SPECIAL_UNLOCK_MONMON SPECIAL(0x38)
+/* an action: unlocks Agumon (partner 3); the talks that take or give its DDNA
+   apply it */
+#define SPECIAL_UNLOCK_AGUMON SPECIAL(0x31)
+/* an action: unlocks Veemon (partner 4); the talks that take or give its DDNA
+   apply it */
+#define SPECIAL_UNLOCK_VEEMON SPECIAL(0x32)
+/* an action: unlocks Guilmon (partner 5); the talks that take or give its DDNA
+   apply it */
+#define SPECIAL_UNLOCK_GUILMON SPECIAL(0x33)
+/* an action: unlocks Renamon (partner 6); the talks that take or give its DDNA
+   apply it */
+#define SPECIAL_UNLOCK_RENAMON SPECIAL(0x35)
+/* an action: unlocks Patamon (partner 7); the talks that take or give its DDNA
+   apply it */
+#define SPECIAL_UNLOCK_PATAMON SPECIAL(0x34)
+/* Kotemon (partner 0) is unlocked and at level 45 or more */
+#define SPECIAL_KOTEMON_LEVEL_45 SPECIAL(0x4A)
+/* Kumamon (partner 1) is unlocked and at level 45 or more */
+#define SPECIAL_KUMAMON_LEVEL_45 SPECIAL(0x4C)
+/* Monmon (partner 2) is unlocked and at level 45 or more */
+#define SPECIAL_MONMON_LEVEL_45 SPECIAL(0x4B)
+/* Agumon (partner 3) is unlocked and at level 45 or more */
+#define SPECIAL_AGUMON_LEVEL_45 SPECIAL(0x4F)
+/* Veemon (partner 4) is unlocked and at level 45 or more */
+#define SPECIAL_VEEMON_LEVEL_45 SPECIAL(0x4E)
+/* Guilmon (partner 5) is unlocked and at level 45 or more */
+#define SPECIAL_GUILMON_LEVEL_45 SPECIAL(0x4D)
+/* Renamon (partner 6) is unlocked and at level 45 or more */
+#define SPECIAL_RENAMON_LEVEL_45 SPECIAL(0x51)
+/* Patamon (partner 7) is unlocked and at level 45 or more */
+#define SPECIAL_PATAMON_LEVEL_45 SPECIAL(0x50)
+/* the party's levels add up to 30 or more (0 * 15 + 30) */
+#define SPECIAL_PARTY_LEVEL_TOTAL_30 SPECIAL(0x25)
+/* the party's levels add up to 45 or more (1 * 15 + 30) */
+#define SPECIAL_PARTY_LEVEL_TOTAL_45 SPECIAL(0x26)
+/* the party's levels add up to 60 or more (2 * 15 + 30) */
+#define SPECIAL_PARTY_LEVEL_TOTAL_60 SPECIAL(0x27)
+/* the party's levels add up to 75 or more (3 * 15 + 30) */
+#define SPECIAL_PARTY_LEVEL_TOTAL_75 SPECIAL(0x28)
+/* the party's levels add up to 90 or more (4 * 15 + 30) */
+#define SPECIAL_PARTY_LEVEL_TOTAL_90 SPECIAL(0x29)
+/* Kotemon (partner 0) is still locked */
+#define SPECIAL_KOTEMON_LOCKED SPECIAL(0x2E)
+/* Kumamon (partner 1) is still locked */
+#define SPECIAL_KUMAMON_LOCKED SPECIAL(0x30)
+/* Monmon (partner 2) is still locked */
+#define SPECIAL_MONMON_LOCKED SPECIAL(0x2F)
+/* Agumon (partner 3) is still locked */
+#define SPECIAL_AGUMON_LOCKED SPECIAL(0x2A)
+/* Veemon (partner 4) is still locked */
+#define SPECIAL_VEEMON_LOCKED SPECIAL(0x2B)
+/* Guilmon (partner 5) is still locked */
+#define SPECIAL_GUILMON_LOCKED SPECIAL(0x2C)
+/* Renamon (partner 6) is still locked */
+#define SPECIAL_RENAMON_LOCKED SPECIAL(0x36)
+/* Patamon (partner 7) is still locked */
+#define SPECIAL_PATAMON_LOCKED SPECIAL(0x2D)
+/* the European and Japanese versions: every unlocked partner is at level 45 or
+   more */
+#define SPECIAL_ALL_PARTNERS_LEVEL_45 SPECIAL(0x95)
+/* the European and Japanese versions, an action: restores the party's HP and
+   MP */
+#define SPECIAL_HEAL_PARTY SPECIAL(0x53)
+/* the European and Japanese versions: all eight partners are unlocked */
+#define SPECIAL_ALL_PARTNERS_UNLOCKED SPECIAL(0x55)
+
+/* checkMoney: whether the player has an amount, or gives or takes one */
+
+/* the player has 800 BIT or more (MONEY_REQUIRED[0]) */
+#define SPECIAL_HAS_800_BIT SPECIAL(0x74)
+/* the player has 1600 BIT or more (MONEY_REQUIRED[1]) */
+#define SPECIAL_HAS_1600_BIT SPECIAL(0x75)
+/* the player has 2700 BIT or more (MONEY_REQUIRED[2]) */
+#define SPECIAL_HAS_2700_BIT SPECIAL(0x76)
+/* the player has 4000 BIT or more (MONEY_REQUIRED[3]) */
+#define SPECIAL_HAS_4000_BIT SPECIAL(0x77)
+/* the player has 6000 BIT or more (MONEY_REQUIRED[4]) */
+#define SPECIAL_HAS_6000_BIT SPECIAL(0x78)
+/* the player has 8700 BIT or more (MONEY_REQUIRED[5]) */
+#define SPECIAL_HAS_8700_BIT SPECIAL(0x79)
+/* the player has 11500 BIT or more (MONEY_REQUIRED[6]) */
+#define SPECIAL_HAS_11500_BIT SPECIAL(0x7A)
+/* the player has 17500 BIT or more (MONEY_REQUIRED[7]) */
+#define SPECIAL_HAS_17500_BIT SPECIAL(0x7B)
+/* the player has 24000 BIT or more (MONEY_REQUIRED[8]) */
+#define SPECIAL_HAS_24000_BIT SPECIAL(0x7C)
+/* the player has 32000 BIT or more (MONEY_REQUIRED[9]) */
+#define SPECIAL_HAS_32000_BIT SPECIAL(0x7D)
+/* an action: gives the player 100 BIT (MONEY_GAINS[0]) */
+#define SPECIAL_GAIN_100_BIT SPECIAL(0x8B)
+/* an action: gives the player 300 BIT (MONEY_GAINS[1]) */
+#define SPECIAL_GAIN_300_BIT SPECIAL(0x8C)
+/* an action: gives the player 600 BIT (MONEY_GAINS[2]) */
+#define SPECIAL_GAIN_600_BIT SPECIAL(0x8D)
+/* an action: gives the player 1000 BIT (MONEY_GAINS[3]) */
+#define SPECIAL_GAIN_1000_BIT SPECIAL(0x8E)
+/* an action: gives the player 1600 BIT (MONEY_GAINS[4]) */
+#define SPECIAL_GAIN_1600_BIT SPECIAL(0x8F)
+/* an action: gives the player 3000 BIT (MONEY_GAINS[5]) */
+#define SPECIAL_GAIN_3000_BIT SPECIAL(0x90)
+/* an action: gives the player 5000 BIT (MONEY_GAINS[6]) */
+#define SPECIAL_GAIN_5000_BIT SPECIAL(0x91)
+/* an action: gives the player 8500 BIT (MONEY_GAINS[7]) */
+#define SPECIAL_GAIN_8500_BIT SPECIAL(0x92)
+/* an action: takes 800 BIT (MONEY_LOSSES[0]) */
+#define SPECIAL_LOSE_800_BIT SPECIAL(0x7E)
+/* an action: takes 1600 BIT (MONEY_LOSSES[1]) */
+#define SPECIAL_LOSE_1600_BIT SPECIAL(0x7F)
+/* an action: takes 2700 BIT (MONEY_LOSSES[2]) */
+#define SPECIAL_LOSE_2700_BIT SPECIAL(0x80)
+/* an action: takes 4000 BIT (MONEY_LOSSES[3]) */
+#define SPECIAL_LOSE_4000_BIT SPECIAL(0x81)
+/* an action: takes 6000 BIT (MONEY_LOSSES[4]) */
+#define SPECIAL_LOSE_6000_BIT SPECIAL(0x82)
+/* an action: takes 8700 BIT (MONEY_LOSSES[5]) */
+#define SPECIAL_LOSE_8700_BIT SPECIAL(0x83)
+/* an action: takes 11500 BIT (MONEY_LOSSES[6]) */
+#define SPECIAL_LOSE_11500_BIT SPECIAL(0x84)
+/* an action: takes 17500 BIT (MONEY_LOSSES[7]) */
+#define SPECIAL_LOSE_17500_BIT SPECIAL(0x85)
+/* an action: takes 24000 BIT (MONEY_LOSSES[8]) */
+#define SPECIAL_LOSE_24000_BIT SPECIAL(0x86)
+/* an action: takes 32000 BIT (MONEY_LOSSES[9]) */
+#define SPECIAL_LOSE_32000_BIT SPECIAL(0x87)
+
+/* checkProgressRange: whether GAME.progress is within a range of
+   PROGRESS_RANGES */
+
+/* GAME.progress is from STORY_LOGGED_IN to STORY_LISA_SAVED
+   (PROGRESS_RANGES[0]) */
+#define SPECIAL_STORY_LOGGED_IN_TO_LISA_SAVED SPECIAL(6)
+/* GAME.progress is from STORY_GENJI_BEATEN to STORY_GAME_MASTER_CAUGHT
+   (PROGRESS_RANGES[1]) */
+#define SPECIAL_STORY_GENJI_BEATEN_TO_GAME_MASTER_CAUGHT SPECIAL(3)
+/* GAME.progress is from STORY_GENJI_BEATEN to 0x2C (PROGRESS_RANGES[2]);
+   nothing sets 0x2C, so to STORY_MOVIE_BATTLES */
+#define SPECIAL_STORY_GENJI_BEATEN_TO_MOVIE_BATTLES SPECIAL(0xA)
+/* GAME.progress is from STORY_BYAKKO_LEADER_FOUGHT to STORY_GAME_MASTER_CAUGHT
+   (PROGRESS_RANGES[3]) */
+#define SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_GAME_MASTER_CAUGHT SPECIAL(7)
+/* GAME.progress is from STORY_KNIGHTMON_REPROGRAMMED to STORY_AMATERASU_BRIDGE
+   (PROGRESS_RANGES[4]) */
+#define SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_AMATERASU_BRIDGE SPECIAL(4)
+/* GAME.progress is from STORY_ASUKA_HEADQUARTERS to 0x2A (PROGRESS_RANGES[5]);
+   nothing sets 0x2A, so to STORY_GUNSLINGER */
+#define SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_GUNSLINGER SPECIAL(5)
+/* GAME.progress is STORY_GENJI_BEATEN or later (PROGRESS_RANGES[6], to 0x63)
+   */
+#define SPECIAL_STORY_SINCE_GENJI_BEATEN SPECIAL(9)
+/* GAME.progress is STORY_SOUTH_STATION_GHOST or later (PROGRESS_RANGES[7], to
+   0x63) */
+#define SPECIAL_STORY_SINCE_SOUTH_STATION_GHOST SPECIAL(0x14)
+/* GAME.progress is STORY_KNIGHTMON_REPROGRAMMED or later (PROGRESS_RANGES[8],
+   to 0x63) */
+#define SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED SPECIAL(8)
+/* GAME.progress is from STORY_CONTROL_ROOM to 0x2A (PROGRESS_RANGES[9]);
+   nothing sets 0x2A, so to STORY_GUNSLINGER */
+#define SPECIAL_STORY_CONTROL_ROOM_TO_GUNSLINGER SPECIAL(0x3F)
+/* GAME.progress is STORY_LISA_SAVED or later (PROGRESS_RANGES[0xA], to 0x63)
+   */
+#define SPECIAL_STORY_SINCE_LISA_SAVED SPECIAL(0x40)
+/* GAME.progress is STORY_BYAKKO_LEADER_FOUGHT or later (PROGRESS_RANGES[0xB],
+   to 0x63) */
+#define SPECIAL_STORY_SINCE_BYAKKO_LEADER_FOUGHT SPECIAL(0x41)
+/* GAME.progress is STORY_DE_SINCERITY or later (PROGRESS_RANGES[0xC], to 0x63)
+   */
+#define SPECIAL_STORY_SINCE_DE_SINCERITY SPECIAL(0x93)
+/* GAME.progress is STORY_DE_KNOWLEDGE or later (PROGRESS_RANGES[0xD], to 0x63)
+   */
+#define SPECIAL_STORY_SINCE_DE_KNOWLEDGE SPECIAL(0x94)
+/* GAME.progress is from STORY_SEIRYU_BADGE to STORY_ZANBAMON_DRIVEN_OFF
+   (PROGRESS_RANGES[0xE]) */
+#define SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF SPECIAL(0x15)
+/* GAME.progress is from STORY_DE_SINCERITY to STORY_LISA_SAVED
+   (PROGRESS_RANGES[0xF]) */
+#define SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED SPECIAL(0x16)
+/* GAME.progress is from STORY_BYAKKO_LEADER_FOUGHT to STORY_CONTROL_ROOM
+   (PROGRESS_RANGES[0x10]) */
+#define SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_CONTROL_ROOM SPECIAL(0x17)
+/* GAME.progress is from STORY_KNIGHTMON_REPROGRAMMED to STORY_BULBMON_FOUND
+   (PROGRESS_RANGES[0x11]) */
+#define SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND SPECIAL(0x18)
+/* GAME.progress is from STORY_JUNGLE_SOUND to STORY_AMATERASU_BRIDGE
+   (PROGRESS_RANGES[0x12]) */
+#define SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE SPECIAL(0x19)
+/* GAME.progress is from STORY_ASUKA_HEADQUARTERS to STORY_OPERATION_SIGMA
+   (PROGRESS_RANGES[0x13]) */
+#define SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA SPECIAL(0x1A)
+/* GAME.progress is from STORY_AMATERASU_BRIDGE to STORY_PRESIDENT_ARRESTED
+   (PROGRESS_RANGES[0x14]) */
+#define SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED SPECIAL(0x1C)
+/* GAME.progress is from STORY_JUNGLE_SOUND to STORY_BLACK_ID_PASS
+   (PROGRESS_RANGES[0x15]) */
+#define SPECIAL_STORY_JUNGLE_SOUND_TO_BLACK_ID_PASS SPECIAL(0x1D)
+/* GAME.progress is from STORY_WAY_TO_AMATERASU to STORY_PRESIDENT_ARRESTED
+   (PROGRESS_RANGES[0x16]) */
+#define SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED SPECIAL(0x21)
+/* GAME.progress is from STORY_JUNGLE_SOUND to STORY_PRESIDENT_ARRESTED
+   (PROGRESS_RANGES[0x17]) */
+#define SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED SPECIAL(0x1E)
+/* GAME.progress is from STORY_BLUE_ID_PASS to STORY_AMATERASU_BRIDGE
+   (PROGRESS_RANGES[0x18]) */
+#define SPECIAL_STORY_BLUE_ID_PASS_TO_AMATERASU_BRIDGE SPECIAL(0x1F)
+/* GAME.progress is from STORY_JUNGLE_SOUND to STORY_NETWORK_OFFLINE
+   (PROGRESS_RANGES[0x19]) */
+#define SPECIAL_STORY_JUNGLE_SOUND_TO_NETWORK_OFFLINE SPECIAL(0x20)
+/* GAME.progress is from STORY_GENJI_BEATEN to STORY_PRESIDENT_ARRESTED
+   (PROGRESS_RANGES[0x1A]) */
+#define SPECIAL_STORY_GENJI_BEATEN_TO_PRESIDENT_ARRESTED SPECIAL(0x22)
+/* GAME.progress is from STORY_GENJI_BEATEN to STORY_STAFF_PASS
+   (PROGRESS_RANGES[0x1B]) */
+#define SPECIAL_STORY_GENJI_BEATEN_TO_STAFF_PASS SPECIAL(0x23)
+/* GAME.progress is from STORY_TEDDY_FOUND to STORY_PRESIDENT_ARRESTED
+   (PROGRESS_RANGES[0x1C]) */
+#define SPECIAL_STORY_TEDDY_FOUND_TO_PRESIDENT_ARRESTED SPECIAL(0x24)
+/* GAME.progress is from STORY_BYAKKO_BADGE to STORY_PRESIDENT_ARRESTED
+   (PROGRESS_RANGES[0x1D]) */
+#define SPECIAL_STORY_BYAKKO_BADGE_TO_PRESIDENT_ARRESTED SPECIAL(0x3B)
+/* GAME.progress is from STORY_ZANBAMON_DRIVEN_OFF to STORY_AGUMON_DISGUISE
+   (PROGRESS_RANGES[0x1E]) */
+#define SPECIAL_STORY_ZANBAMON_DRIVEN_OFF_TO_AGUMON_DISGUISE SPECIAL(0x3C)
+/* GAME.progress is from STORY_BULBMON_BEATEN to STORY_PRESIDENT_ARRESTED
+   (PROGRESS_RANGES[0x1F]) */
+#define SPECIAL_STORY_BULBMON_BEATEN_TO_PRESIDENT_ARRESTED SPECIAL(0x3D)
+/* GAME.progress is from STORY_LOOKING_FOR_TEDDY to STORY_CONTROL_ROOM
+   (PROGRESS_RANGES[0x20]) */
+#define SPECIAL_STORY_LOOKING_FOR_TEDDY_TO_CONTROL_ROOM SPECIAL(0x3E)
+
+/* checkFlagCount: the Master Room's sensors (wstag305), the letters M, O,
+   N, S, T, E and R (FLAG_MASTER_ROOM_SENSOR_M_TOUCHED to _R_, GAME.flags1C
+   0x27-0x2D), and the four leaders. Entry 0x72 (mode 3) is never true,
+   and nothing uses it */
+
+/* one of the Master Room's sensors or more is touched */
+#define SPECIAL_MASTER_ROOM_SENSOR_TOUCHED SPECIAL(0x71)
+/* two of the Master Room's sensors or more are still untouched */
+#define SPECIAL_MASTER_ROOM_SENSORS_LEFT SPECIAL(0x70)
+/* exactly one of the Master Room's sensors is untouched */
+#define SPECIAL_MASTER_ROOM_LAST_SENSOR_LEFT SPECIAL(0x73)
+/* the European and Japanese versions: FLAG_CHINRON_LEADER_FOUGHT,
+   FLAG_ZHU_QUE_LEADER_FOUGHT, FLAG_BAI_HU_LEADER_FOUGHT and
+   FLAG_XUAN_WU_LEADER_FOUGHT are all set, as the extra chapter's arena asks
+   (wstag926) */
+#define SPECIAL_FOUR_LEADERS_FOUGHT SPECIAL(0x54)
+
+/* showActorIcon */
+
+/* an action: the player's icon plays its animation 3 with SOUND_ITEM_GET
+   (FIELD_COMMAND_ICON3); the talks that give an item or a partner apply it */
+#define SPECIAL_SHOW_ITEM_GET_ICON SPECIAL(0x13)
 
 #endif

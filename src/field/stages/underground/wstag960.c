@@ -13,7 +13,7 @@
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x01 };
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0x104)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_09)
 #define STAGE_FILE 0x92F
 #define STAGE_FILE_8 0x69F
 #define STAGE_ARCHIVE 0x92E
@@ -33,8 +33,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x9D00, 0x17F00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x1D;
-    FIELDSTG_state.music = MUSIC(0x1D, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SEABED);
+    FIELDSTG_state.music = MUSIC_SEABED;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -100,14 +100,14 @@ StageSlot stageSlots[] = {
 void (*stageFuncs[])(void) = {
     setupStage,
 };
-AreaBattle place2Area0Battle0 = { 61, 11, MUSIC(2, 0) };
-AreaBattle place2Area0Battle1 = { 61, 11, MUSIC(2, 0) };
-AreaBattle place2Area0Battle2 = { 61, 11, MUSIC(2, 0) };
-AreaBattle place2Area0Battle3 = { 61, 11, MUSIC(2, 0) };
-AreaBattle place2Area0Battle4 = { 61, 11, MUSIC(2, 0) };
-AreaBattle place2Area0Battle5 = { 61, 11, MUSIC(2, 0) };
-AreaBattle place2Area0Battle6 = { 61, 11, MUSIC(2, 0) };
-AreaBattle place2Area0Battle7 = { 61, 11, MUSIC(2, 0) };
+AreaBattle place2Area0Battle0 = { 61, 11, MUSIC_BATTLE };
+AreaBattle place2Area0Battle1 = { 61, 11, MUSIC_BATTLE };
+AreaBattle place2Area0Battle2 = { 61, 11, MUSIC_BATTLE };
+AreaBattle place2Area0Battle3 = { 61, 11, MUSIC_BATTLE };
+AreaBattle place2Area0Battle4 = { 61, 11, MUSIC_BATTLE };
+AreaBattle place2Area0Battle5 = { 61, 11, MUSIC_BATTLE };
+AreaBattle place2Area0Battle6 = { 61, 11, MUSIC_BATTLE };
+AreaBattle place2Area0Battle7 = { 61, 11, MUSIC_BATTLE };
 BattleList place2Area0Battles = {
     3,
     { &place2Area0Battle0, &place2Area0Battle1, &place2Area0Battle2, &place2Area0Battle3,
@@ -152,14 +152,14 @@ BattleList place2Area3Battles = {
     { &place2Area3Battle0, &place2Area3Battle1, &place2Area3Battle2, &place2Area3Battle3,
       &place2Area3Battle4, &place2Area3Battle5, &place2Area3Battle6, &place2Area3Battle7 },
 };
-AreaBattle place3Area0Battle0 = { 64, 11, MUSIC(2, 0) };
-AreaBattle place3Area0Battle1 = { 64, 11, MUSIC(2, 0) };
-AreaBattle place3Area0Battle2 = { 64, 11, MUSIC(2, 0) };
-AreaBattle place3Area0Battle3 = { 64, 11, MUSIC(2, 0) };
-AreaBattle place3Area0Battle4 = { 64, 11, MUSIC(2, 0) };
-AreaBattle place3Area0Battle5 = { 64, 11, MUSIC(2, 0) };
-AreaBattle place3Area0Battle6 = { 64, 11, MUSIC(2, 0) };
-AreaBattle place3Area0Battle7 = { 64, 11, MUSIC(2, 0) };
+AreaBattle place3Area0Battle0 = { 64, 11, MUSIC_BATTLE };
+AreaBattle place3Area0Battle1 = { 64, 11, MUSIC_BATTLE };
+AreaBattle place3Area0Battle2 = { 64, 11, MUSIC_BATTLE };
+AreaBattle place3Area0Battle3 = { 64, 11, MUSIC_BATTLE };
+AreaBattle place3Area0Battle4 = { 64, 11, MUSIC_BATTLE };
+AreaBattle place3Area0Battle5 = { 64, 11, MUSIC_BATTLE };
+AreaBattle place3Area0Battle6 = { 64, 11, MUSIC_BATTLE };
+AreaBattle place3Area0Battle7 = { 64, 11, MUSIC_BATTLE };
 BattleList place3Area0Battles = {
     3,
     { &place3Area0Battle0, &place3Area0Battle1, &place3Area0Battle2, &place3Area0Battle3,
@@ -204,14 +204,14 @@ BattleList place3Area3Battles = {
     { &place3Area3Battle0, &place3Area3Battle1, &place3Area3Battle2, &place3Area3Battle3,
       &place3Area3Battle4, &place3Area3Battle5, &place3Area3Battle6, &place3Area3Battle7 },
 };
-AreaBattle place5Area0Battle0 = { 63, 11, MUSIC(2, 0) };
-AreaBattle place5Area0Battle1 = { 63, 11, MUSIC(2, 0) };
-AreaBattle place5Area0Battle2 = { 63, 11, MUSIC(2, 0) };
-AreaBattle place5Area0Battle3 = { 63, 11, MUSIC(2, 0) };
-AreaBattle place5Area0Battle4 = { 63, 11, MUSIC(2, 0) };
-AreaBattle place5Area0Battle5 = { 63, 11, MUSIC(2, 0) };
-AreaBattle place5Area0Battle6 = { 63, 11, MUSIC(2, 0) };
-AreaBattle place5Area0Battle7 = { 63, 11, MUSIC(2, 0) };
+AreaBattle place5Area0Battle0 = { 63, 11, MUSIC_BATTLE };
+AreaBattle place5Area0Battle1 = { 63, 11, MUSIC_BATTLE };
+AreaBattle place5Area0Battle2 = { 63, 11, MUSIC_BATTLE };
+AreaBattle place5Area0Battle3 = { 63, 11, MUSIC_BATTLE };
+AreaBattle place5Area0Battle4 = { 63, 11, MUSIC_BATTLE };
+AreaBattle place5Area0Battle5 = { 63, 11, MUSIC_BATTLE };
+AreaBattle place5Area0Battle6 = { 63, 11, MUSIC_BATTLE };
+AreaBattle place5Area0Battle7 = { 63, 11, MUSIC_BATTLE };
 BattleList place5Area0Battles = {
     4,
     { &place5Area0Battle0, &place5Area0Battle1, &place5Area0Battle2, &place5Area0Battle3,

@@ -10,10 +10,10 @@
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
 #define STAGE_FILE 0x414
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
 #define STAGE_FILE 0x424
 #endif
 /*
@@ -29,8 +29,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x29A00, 0xF400};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x14;
-    FIELDSTG_state.music = MUSIC(0x14, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_BADLAND);
+    FIELDSTG_state.music = MUSIC_BADLAND;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -40,19 +40,19 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
-AreaBattle area0Battle0 = { 69, 3, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 69, 3, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 69, 3, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 69, 3, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 68, 3, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 68, 3, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 68, 3, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 68, 3, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 69, 3, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 69, 3, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 69, 3, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 69, 3, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 68, 3, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 68, 3, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 68, 3, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 68, 3, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -88,10 +88,10 @@ AreaBattle area3Battle0 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle4 = { 330, 2, MUSIC(2, 0) };
+AreaBattle area3Battle4 = { 330, 2, MUSIC_BATTLE };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle7 = { 61, 2, MUSIC(2, 0) };
+AreaBattle area3Battle7 = { 61, 2, MUSIC_BATTLE };
 BattleList area3Battles = {
     0,
     { &area3Battle0, &area3Battle1, &area3Battle2, &area3Battle3,
@@ -111,9 +111,9 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1AC, 0x1B1, 0x1B0, 0xB1, 0x160, 0x1FF },
 };
 u16 actor0Talk0Actions[] = {
-    SPECIAL(0x8D), 1,
+    SPECIAL_GAIN_600_BIT, 1,
     FLAG_NORTH_BADLAND_E_600_BIT_FOUND, 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor1Talk0Conditions[] = { ITEM(0, 0x28), 1, ITEM(0, 0x29), 0, CODES_END };
@@ -219,14 +219,14 @@ StageTile stageObjects[] = {
 };
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x24A, 0x570, 0x3C0, 3, 0, 0, 0 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 0xA, 2 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 3, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 0xA, 2 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 3, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 7, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0x1C0, 0x272, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0x1CF, 0x2D8, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFE7, 0x46, 0, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x19, 0x46, 0, 0, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 3, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 3, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

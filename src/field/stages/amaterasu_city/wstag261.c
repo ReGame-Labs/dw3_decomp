@@ -60,12 +60,12 @@ void updateStage(StageTask *task, void **children) {
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0 };
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
-#define EVENT_TEXT_FILE 0x10B
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x517
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
-#define EVENT_TEXT_FILE 0x112
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x527
 #endif
 /* Sets the stage up: its map, actors and events, playing the ambience ENV_0204 */
@@ -78,10 +78,10 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x10300, 0x18500};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x42;
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CARGO_TOWER);
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
-    FIELDSTG_state.music = MUSIC(0x42, 2);
+    FIELDSTG_state.music = MUSIC_CARGO_TOWER;
     FIELDSTG_state.spriteColor = stageColor;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);

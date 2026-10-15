@@ -322,13 +322,13 @@ void endEvent871(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
-#define EVENT_TEXT_FILE 0x14A
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_800 - 1)
 #define STAGE_FILE 0x6EE
 #define STAGE_FILE_8 0x715
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
-#define EVENT_TEXT_FILE 0x151
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_800 - 1)
 #define STAGE_FILE 0x6FE
 #define STAGE_FILE_8 0x725
 #endif
@@ -342,8 +342,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 4;
     FIELDSTG_state.start = (Vec2){0x1E500, 0x38700};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0xD;
-    FIELDSTG_state.music = MUSIC(0xD, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_MAGASTA);
+    FIELDSTG_state.music = MUSIC_MAGASTA;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.startDir = 0;
@@ -582,14 +582,14 @@ AnimFrame effectFrames[] = {
     { 7, 4 }, { 4, 4 }, { 3, 4 }, { 2, 4 },
     { 1, 4 }, { 255, 0x3E7 },
 };
-AreaBattle area0Battle0 = { 123, 16, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 123, 16, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 123, 16, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 122, 16, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 122, 16, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 122, 16, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 102, 16, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 102, 16, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 123, 16, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 123, 16, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 123, 16, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 122, 16, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 122, 16, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 122, 16, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 102, 16, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 102, 16, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -621,7 +621,7 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 193, 16, MUSIC(2, 0) };
+AreaBattle area3Battle0 = { 193, 16, MUSIC_BATTLE };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };

@@ -11,10 +11,10 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x530
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x540
 #endif
 /* Sets the stage up: its map, actors and battles, playing BGM_0003 */
@@ -27,8 +27,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x31100, 0x22700};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 6;
-    FIELDSTG_state.music = MUSIC(6, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SEWERS);
+    FIELDSTG_state.music = MUSIC_SEWERS;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -39,14 +39,14 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-AreaBattle area0Battle0 = { 179, 7, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 179, 7, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 179, 7, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 179, 7, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 179, 7, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 179, 7, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 179, 7, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 179, 7, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 179, 7, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 179, 7, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 179, 7, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 179, 7, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 179, 7, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 179, 7, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 179, 7, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 179, 7, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -107,13 +107,13 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Actions[] = {
     FLAG_AMATERASU_SEWER_HIGH_SECURITY_FOUND, 1,
     ITEM(5, 0x122), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor1Talk0Actions[] = {
-    SPECIAL(0x91), 1,
+    SPECIAL_GAIN_5000_BIT, 1,
     FLAG_AMATERASU_SEWER_5000_BIT_FOUND, 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {
@@ -242,8 +242,8 @@ StageTile stageObjects[] = {
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x27A, 0x242, 0x13E, 3, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x28B, 0x88, 0x1B4, 5, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 0xC, 1 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 0xC, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 0xC, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 0xC, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 4, 0x130, 0xF8, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 4, 0x120, 0x140, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },

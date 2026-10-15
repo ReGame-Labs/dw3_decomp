@@ -13,7 +13,7 @@
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0x104)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_09)
 #define STAGE_FILE 0x91D
 #define STAGE_FILE_8 0x513
 #elif VERSION_JP
@@ -31,8 +31,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x3C500, 0x3D200};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0xA;
-    FIELDSTG_state.music = MUSIC(0xA, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DUEL_ISLAND);
+    FIELDSTG_state.music = MUSIC_DUEL_ISLAND;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -106,7 +106,7 @@ u16 actor5Talk4Actions[] = {
     FLAG(0, 0), 0,
     FLAG_CARD_KING_KEITH_BEATEN, 1,
     ITEM(0, 0x24), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor8Talk0Conditions[] = { FLAG_DUEL_ISLAND_ALICE_BEATEN, 1, CODES_END };

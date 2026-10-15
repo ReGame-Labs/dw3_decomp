@@ -9,11 +9,11 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
 #define STAGE_FILE 0x22B
 #define STAGE_ARCHIVE 0x3C7
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
 #define STAGE_FILE 0x23A
 #define STAGE_ARCHIVE 0x3D7
 #endif
@@ -27,8 +27,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0xB700, 0xD300};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x31;
-    FIELDSTG_state.music = MUSIC(0x31, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_FOREST_INN_BF);
+    FIELDSTG_state.music = MUSIC_FOREST_INN_BF;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 2);
@@ -48,7 +48,7 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x166, 0x14C, 0x98, 0x4C, 0x160, 0x1FE },
 };
 u16 actor10Talk0Conditions[] = { ITEM(0, 0x18E), 0, CODES_END };
-u16 actor10Talk0Actions[] = { ITEM(0, 0x18E), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor10Talk0Actions[] = { ITEM(0, 0x18E), 1, SPECIAL_SHOW_ITEM_GET_ICON, 1, CODES_END };
 u16 actor10Talk1Conditions[] = { ITEM(0, 0x18E), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x1D },
@@ -102,19 +102,19 @@ FieldTalk actor11Talks[] = {
 u16 actor0Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor3Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
+u16 actor4Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x15), 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF, 1, CODES_END };
 u16 actor7Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
-u16 actor8Conditions[] = { SPECIAL(0x17), 1, CODES_END };
-u16 actor9Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor8Conditions[] = { SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_CONTROL_ROOM, 1, CODES_END };
+u16 actor9Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor10Conditions[] = {
     PROGRESS(STORY_FAKE_BLUE_CARD), 1,
     FLAG_FAKE_BLUE_CARD_TALKED, 1,
     CODES_END,
 };
-u16 actor11Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor11Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x2D, 4, 241, 201, 5 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x2D, 4, 241, 201, 3 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x2D, 4, 241, 201, 5 };

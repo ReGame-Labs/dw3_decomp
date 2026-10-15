@@ -12,7 +12,7 @@
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_08)
 #define STAGE_FILE 0x903
 #define STAGE_FILE_8 0x2A3
 #elif VERSION_JP
@@ -30,8 +30,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x26F00, 0x1EF00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 6;
-    FIELDSTG_state.music = MUSIC(6, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SEWERS);
+    FIELDSTG_state.music = MUSIC_SEWERS;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -58,13 +58,13 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Actions[] = {
     FLAG_AMATERASU_SEWER_FIRE_CHIP_FOUND, 1,
     ITEM(1, 0x37), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor4Talk0Actions[] = {
     FLAG_AMATERASU_SEWER_WATER_CHIP_FOUND, 1,
     ITEM(1, 0x38), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {
@@ -244,14 +244,14 @@ StageSlot stageSlots[] = {
 void (*stageFuncs[])(void) = {
     setupStage,
 };
-AreaBattle area0Battle0 = { 88, 7, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 88, 7, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 88, 7, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 88, 7, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 90, 7, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 90, 7, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 90, 7, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 90, 7, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 88, 7, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 88, 7, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 88, 7, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 88, 7, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 90, 7, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 90, 7, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 90, 7, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 90, 7, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,

@@ -19,7 +19,7 @@ void endEvent1612(void) {
 }
 
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_08)
 #define STAGE_FILE 0x8EF
 #define STAGE_FILE_8 0x1A2
 #elif VERSION_JP
@@ -37,8 +37,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0xBC00, 0xB600};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 7;
-    FIELDSTG_state.music = MUSIC(7, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SHOP_1);
+    FIELDSTG_state.music = MUSIC_SHOP_1;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
@@ -111,9 +111,9 @@ u16 actor2Talk6Conditions[] = {
     CODES_END,
 };
 u16 actor2Talk6Actions[] = {
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     FLAG_AMATERASU_INN_BIT_FOUND, 1,
-    SPECIAL(0x92), 1,
+    SPECIAL_GAIN_8500_BIT, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {

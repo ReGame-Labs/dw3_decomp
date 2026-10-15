@@ -10,10 +10,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
 #define STAGE_FILE 0x60B
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
 #define STAGE_FILE 0x61B
 #endif
 /* Sets the stage up: its map, actors and battles, playing the ambience ENV_0018 */
@@ -26,8 +26,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0xBD00, 0x25800};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x3A;
-    FIELDSTG_state.music = MUSIC(0x3A, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_WEST_SEWERS);
+    FIELDSTG_state.music = MUSIC_WEST_SEWERS;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -37,14 +37,14 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-AreaBattle area0Battle0 = { 116, 12, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 116, 12, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 116, 12, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 116, 12, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 164, 12, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 164, 12, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 164, 12, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 164, 12, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 116, 12, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 116, 12, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 116, 12, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 116, 12, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 164, 12, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 164, 12, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 164, 12, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 164, 12, MUSIC_BATTLE };
 BattleList area0Battles = {
     2,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -138,10 +138,18 @@ u16 actor1Conditions[] = {
     FLAG_OINKMON_CITIZENS_RESTORED, 1,
     CODES_END,
 };
-u16 actor2Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor5Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor2Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor3Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor4Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor5Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x2D, 4, 625, 171, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x33, 5, 529, 567, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x9D, 6, 625, 171, 1 };

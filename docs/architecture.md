@@ -344,7 +344,10 @@ jumps or conditions.
 value)` pairs ending with `CODES_END`, built with the macros of
 [game_state.h](../include/engine/game_state.h): `FLAG(group, id)` (a story
 flag), `PROGRESS(n)` (`GAME.progress` is n), `SPECIAL(id)` (an entry of
-`SPECIAL_CONDITIONS`), and `PARTY_STAT`, `ITEM`, `CARD`, `WARP_ARG`.
+`SPECIAL_CONDITIONS`, named `SPECIAL_` in
+[story.h](../include/engine/story.h)), `PARTY_STAT`, `ITEM`, `CARD`, and
+`PLACE` and `PLACE_ARG` (the place the player's last exit set, as the
+stage's `StagePoints` number them).
 `FLAGS_00.checkConditions` holds when all hold; `FLAGS_00.applyActions`
 sets the flags and runs the actions, which can start a battle
 (`EVENT_BATTLE`), a card battle (`CARD_BATTLE`), another event

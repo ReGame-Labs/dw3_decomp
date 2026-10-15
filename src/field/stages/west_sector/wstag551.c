@@ -10,12 +10,12 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
-#define EVENT_TEXT_FILE 0x135
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x5C2
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x5D2
 #endif
 /*
@@ -31,8 +31,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0xCA00, 0x9800};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x14;
-    FIELDSTG_state.music = MUSIC(0x14, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_BADLAND);
+    FIELDSTG_state.music = MUSIC_BADLAND;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -42,8 +42,8 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -67,27 +67,27 @@ s16 script1226[] = {
     SCRIPT_LEAVE(0xC0E, 0, 0, 0),
     SCRIPT_END,
 };
-AreaBattle area0Battle0 = { 132, 3, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 132, 3, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 132, 3, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 132, 3, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 133, 3, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 133, 3, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 169, 3, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 169, 3, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 132, 3, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 132, 3, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 132, 3, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 132, 3, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 133, 3, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 133, 3, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 169, 3, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 169, 3, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
       &area0Battle4, &area0Battle5, &area0Battle6, &area0Battle7 },
 };
-AreaBattle area1Battle0 = { 0, 3, MUSIC(2, 0) };
-AreaBattle area1Battle1 = { 0, 3, MUSIC(2, 0) };
-AreaBattle area1Battle2 = { 0, 3, MUSIC(2, 0) };
-AreaBattle area1Battle3 = { 0, 3, MUSIC(2, 0) };
-AreaBattle area1Battle4 = { 0, 3, MUSIC(2, 0) };
-AreaBattle area1Battle5 = { 0, 3, MUSIC(2, 0) };
-AreaBattle area1Battle6 = { 0, 3, MUSIC(2, 0) };
-AreaBattle area1Battle7 = { 0, 3, MUSIC(2, 0) };
+AreaBattle area1Battle0 = { 0, 3, MUSIC_BATTLE };
+AreaBattle area1Battle1 = { 0, 3, MUSIC_BATTLE };
+AreaBattle area1Battle2 = { 0, 3, MUSIC_BATTLE };
+AreaBattle area1Battle3 = { 0, 3, MUSIC_BATTLE };
+AreaBattle area1Battle4 = { 0, 3, MUSIC_BATTLE };
+AreaBattle area1Battle5 = { 0, 3, MUSIC_BATTLE };
+AreaBattle area1Battle6 = { 0, 3, MUSIC_BATTLE };
+AreaBattle area1Battle7 = { 0, 3, MUSIC_BATTLE };
 BattleList area1Battles = {
     0,
     { &area1Battle0, &area1Battle1, &area1Battle2, &area1Battle3,
@@ -106,14 +106,14 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 234, 3, MUSIC(2, 0) };
-AreaBattle area3Battle1 = { 282, 3, MUSIC(3, 0) };
+AreaBattle area3Battle0 = { 234, 3, MUSIC_BATTLE };
+AreaBattle area3Battle1 = { 282, 3, MUSIC_BATTLE_1 };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle4 = { 334, 2, MUSIC(2, 0) };
-AreaBattle area3Battle5 = { 169, 3, MUSIC(2, 0) };
+AreaBattle area3Battle4 = { 334, 2, MUSIC_BATTLE };
+AreaBattle area3Battle5 = { 169, 3, MUSIC_BATTLE };
 AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle7 = { 180, 2, MUSIC(2, 0) };
+AreaBattle area3Battle7 = { 180, 2, MUSIC_BATTLE };
 BattleList area3Battles = {
     0,
     { &area3Battle0, &area3Battle1, &area3Battle2, &area3Battle3,
@@ -210,14 +210,14 @@ FieldTalk actor4Talks[] = {
 };
 u16 actor0Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor1Conditions[] = {
-    SPECIAL(0x19), 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
     FLAG_CARD_BATTLE_ENDED, 0,
     ITEM(0, 0x192), 1,
     ITEM(0, 0x14), 0,
     CODES_END,
 };
 u16 actor2Conditions[] = {
-    SPECIAL(0x19), 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
     FLAG_CARD_BATTLE_ENDED, 0,
     ITEM(0, 0x192), 1,
     ITEM(0, 0x14), 1,
@@ -225,11 +225,15 @@ u16 actor2Conditions[] = {
 };
 u16 actor3Conditions[] = {
     ITEM(0, 0x192), 1,
-    SPECIAL(0x19), 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
     FLAG_CARD_BATTLE_ENDED, 1,
     CODES_END,
 };
-u16 actor4Conditions[] = { SPECIAL(0x19), 1, ITEM(0, 0x192), 0, CODES_END };
+u16 actor4Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    ITEM(0, 0x192), 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x15, 4, 369, 209, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x45, 5, 752, 690, 5 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x45, 5, 752, 690, 5 };
@@ -264,19 +268,19 @@ StageTile stageObjects[] = {
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x2B2, 0x610, 0x540, 3, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 7, 0, 0, 0, 0, 0, 0 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 3, 5 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 6, 1 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 0xB, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 3, 5 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 6, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 0xB, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0x479, 0x2B0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0x469, 0x318, 0, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 0x13, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 0x13, 1 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFE0, 0x2C, 0, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x20, 0x30, 0, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xC, 0x30, 0, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFEC, 0x30, 0, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x30, 0xFFE8, 0, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0, 0xFFE0, 0, 0, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 0x13, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 0x13, 1 },
     { { { FLAG(0, FIELD_FLAG_ENCOUNTERED), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2328, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };

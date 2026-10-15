@@ -11,10 +11,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
 #define STAGE_FILE 0x627
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
 #define STAGE_FILE 0x637
 #endif
 /* Sets the stage up: its map, actors and battles, playing the ambience ENV_0016 */
@@ -27,8 +27,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x11F00, 0x2F100};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x38;
-    FIELDSTG_state.music = MUSIC(0x38, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DESERT);
+    FIELDSTG_state.music = MUSIC_DESERT;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -84,14 +84,14 @@ StagePoints *placePoints[] = {
     &placePoints1_5, &placePoints1_6, &placePoints1_7, &placePoints1_8,
     &placePoints0_0, NULL,
 };
-AreaBattle area0Battle0 = { 72, 5, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 72, 5, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 72, 5, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 72, 5, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 162, 5, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 162, 5, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 162, 5, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 162, 5, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 72, 5, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 72, 5, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 72, 5, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 72, 5, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 162, 5, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 162, 5, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 162, 5, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 162, 5, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -159,7 +159,7 @@ u16 actor1Talk3Actions[] = {
     ITEM(3, 0x82), 1,
     ITEM(3, 0x81), 0,
     ITEM(2, 0x7E), 0,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {
@@ -177,17 +177,17 @@ FieldTalk actor2Talks[] = {
     { NULL, NULL, 0x3CA },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { WARP_ARG(0), 1, WARP_ARG(0x1E), 1, CODES_END };
+u16 actor0Conditions[] = { PLACE(1), 1, PLACE_ARG(1), 1, CODES_END };
 u16 actor1Conditions[] = {
-    SPECIAL(0x43), 1,
-    SPECIAL(0x4B), 1,
+    SPECIAL_MONMON_IN_PARTY, 1,
+    SPECIAL_MONMON_LEVEL_45, 1,
     ITEM(3, 0x81), 1,
     ITEM(3, 0x82), 0,
-    WARP_ARG(0), 1,
-    WARP_ARG(0x1F), 1,
+    PLACE(1), 1,
+    PLACE_ARG(2), 1,
     CODES_END,
 };
-u16 actor2Conditions[] = { WARP_ARG(0), 1, WARP_ARG(0x23), 1, CODES_END };
+u16 actor2Conditions[] = { PLACE(1), 1, PLACE_ARG(6), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x40, 4, 408, 364, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0xA7, 5, 480, 696, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0xB5, 6, 480, 696, 7 };

@@ -11,7 +11,7 @@ static inline void loadEntranceExtras(Entrance *task, s32 is1D2) {
         if (is1D2) {
             FILE_CACHE.request(FILE_ENTRANCE_1D2);
         } else {
-            SOUND.fadeOut(MUSIC(0x24, 0));
+            SOUND.fadeOut(MUSIC_LAST_BOSS);
             SOUND.loadBank(0x26);
         }
         task->nextStep(task);
@@ -50,8 +50,8 @@ static inline void applyEntranceExtras(FightStage *stage, s32 is1D2, s32 is1D3) 
         stage->setStage(stage, 0x16, 1, 1);
     }
     if (is1D3) {
-        BATTLE_SETUP.music = MUSIC(0x26, 0);
-        SOUND.playSound(MUSIC(0x26, 0));
+        BATTLE_SETUP.music = MUSIC_LAST_BOSS_2;
+        SOUND.playSound(MUSIC_LAST_BOSS_2);
     }
 }
 

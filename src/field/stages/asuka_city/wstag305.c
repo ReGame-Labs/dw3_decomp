@@ -129,12 +129,12 @@ void endEvent960(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
-#define EVENT_TEXT_FILE 0x127
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_305 - 1)
 #define STAGE_FILE 0x33C
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
-#define EVENT_TEXT_FILE 0x12E
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_305 - 1)
 #define STAGE_FILE 0x34B
 #endif
 /* Sets the stage up: its map, actors and events, playing KANRIBGM */
@@ -147,8 +147,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x12C00, 0x12C00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 5;
-    FIELDSTG_state.music = MUSIC(5, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_ADMIN_CENTER);
+    FIELDSTG_state.music = MUSIC_ADMIN_CENTER;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
@@ -1228,7 +1228,7 @@ u16 actor8Talk0Conditions[] = { FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 1, CODES_END 
 u16 actor8Talk1Conditions[] = { FLAG(0, 0), 0, FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0, CODES_END };
 u16 actor8Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor8Talk2Conditions[] = {
-    SPECIAL(0x71), 0,
+    SPECIAL_MASTER_ROOM_SENSOR_TOUCHED, 0,
     FLAG(0, 0), 1,
     FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0,
     CODES_END,
@@ -1241,8 +1241,8 @@ u16 actor8Talk2Actions[] = {
 u16 actor8Talk3Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0,
     FLAG(0, 0), 1,
-    SPECIAL(0x71), 1,
-    SPECIAL(0x70), 0,
+    SPECIAL_MASTER_ROOM_SENSOR_TOUCHED, 1,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 0,
     CODES_END,
 };
 u16 actor8Talk3Actions[] = {
@@ -1264,10 +1264,10 @@ u16 actor8Talk3Actions[] = {
     CODES_END,
 };
 u16 actor8Talk4Conditions[] = {
-    SPECIAL(0x70), 1,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 1,
     FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0,
     FLAG(0, 0), 1,
-    SPECIAL(0x71), 1,
+    SPECIAL_MASTER_ROOM_SENSOR_TOUCHED, 1,
     CODES_END,
 };
 u16 actor8Talk4Actions[] = { FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 1, CODES_END };
@@ -1297,7 +1297,7 @@ u16 actor45Talk1Conditions[] = { FLAG(0, 1), 0, FLAG_MASTER_ROOM_SENSOR_O_TOUCHE
 u16 actor45Talk1Actions[] = { FLAG(0, 1), 1, CODES_END };
 u16 actor45Talk2Conditions[] = {
     FLAG(0, 1), 1,
-    SPECIAL(0x70), 0,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 0,
     FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0,
     CODES_END,
 };
@@ -1321,7 +1321,7 @@ u16 actor45Talk2Actions[] = {
 };
 u16 actor45Talk3Conditions[] = {
     FLAG(0, 1), 1,
-    SPECIAL(0x70), 1,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 1,
     FLAG_MASTER_ROOM_SENSOR_M_IN_ORDER, 0,
     FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0,
     CODES_END,
@@ -1329,7 +1329,7 @@ u16 actor45Talk3Conditions[] = {
 u16 actor45Talk3Actions[] = { FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 1, CODES_END };
 u16 actor45Talk4Conditions[] = {
     FLAG(0, 1), 1,
-    SPECIAL(0x70), 1,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 1,
     FLAG_MASTER_ROOM_SENSOR_M_IN_ORDER, 1,
     FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0,
     CODES_END,
@@ -1345,7 +1345,7 @@ u16 actor47Talk1Actions[] = { FLAG(0, 2), 1, CODES_END };
 u16 actor47Talk2Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0,
     FLAG(0, 2), 1,
-    SPECIAL(0x70), 0,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 0,
     CODES_END,
 };
 u16 actor47Talk2Actions[] = {
@@ -1369,7 +1369,7 @@ u16 actor47Talk2Actions[] = {
 u16 actor47Talk3Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0,
     FLAG(0, 2), 1,
-    SPECIAL(0x70), 1,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 1,
     FLAG_MASTER_ROOM_SENSOR_O_IN_ORDER, 0,
     CODES_END,
 };
@@ -1377,7 +1377,7 @@ u16 actor47Talk3Actions[] = { FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 1, CODES_END };
 u16 actor47Talk4Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0,
     FLAG(0, 2), 1,
-    SPECIAL(0x70), 1,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 1,
     FLAG_MASTER_ROOM_SENSOR_O_IN_ORDER, 1,
     CODES_END,
 };
@@ -1392,7 +1392,7 @@ u16 actor51Talk1Actions[] = { FLAG(0, 3), 1, CODES_END };
 u16 actor51Talk2Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0,
     FLAG(0, 3), 1,
-    SPECIAL(0x70), 0,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 0,
     CODES_END,
 };
 u16 actor51Talk2Actions[] = {
@@ -1416,7 +1416,7 @@ u16 actor51Talk2Actions[] = {
 u16 actor51Talk3Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0,
     FLAG(0, 3), 1,
-    SPECIAL(0x70), 1,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 1,
     FLAG_MASTER_ROOM_SENSOR_N_IN_ORDER, 0,
     CODES_END,
 };
@@ -1424,7 +1424,7 @@ u16 actor51Talk3Actions[] = { FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 1, CODES_END };
 u16 actor51Talk4Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0,
     FLAG(0, 3), 1,
-    SPECIAL(0x70), 1,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 1,
     FLAG_MASTER_ROOM_SENSOR_N_IN_ORDER, 1,
     CODES_END,
 };
@@ -1439,7 +1439,7 @@ u16 actor53Talk1Actions[] = { FLAG(0, 4), 1, CODES_END };
 u16 actor53Talk2Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0,
     FLAG(0, 4), 1,
-    SPECIAL(0x70), 0,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 0,
     CODES_END,
 };
 u16 actor53Talk2Actions[] = {
@@ -1463,7 +1463,7 @@ u16 actor53Talk2Actions[] = {
 u16 actor53Talk3Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0,
     FLAG(0, 4), 1,
-    SPECIAL(0x70), 1,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 1,
     FLAG_MASTER_ROOM_SENSOR_S_IN_ORDER, 0,
     CODES_END,
 };
@@ -1471,7 +1471,7 @@ u16 actor53Talk3Actions[] = { FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 1, CODES_END };
 u16 actor53Talk4Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0,
     FLAG(0, 4), 1,
-    SPECIAL(0x70), 1,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 1,
     FLAG_MASTER_ROOM_SENSOR_S_IN_ORDER, 1,
     CODES_END,
 };
@@ -1486,7 +1486,7 @@ u16 actor55Talk1Actions[] = { FLAG(0, 5), 1, CODES_END };
 u16 actor55Talk2Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0,
     FLAG(0, 5), 1,
-    SPECIAL(0x70), 0,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 0,
     CODES_END,
 };
 u16 actor55Talk2Actions[] = {
@@ -1510,7 +1510,7 @@ u16 actor55Talk2Actions[] = {
 u16 actor55Talk3Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0,
     FLAG(0, 5), 1,
-    SPECIAL(0x70), 1,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 1,
     FLAG_MASTER_ROOM_SENSOR_T_IN_ORDER, 0,
     CODES_END,
 };
@@ -1518,7 +1518,7 @@ u16 actor55Talk3Actions[] = { FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 1, CODES_END };
 u16 actor55Talk4Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0,
     FLAG(0, 5), 1,
-    SPECIAL(0x70), 1,
+    SPECIAL_MASTER_ROOM_SENSORS_LEFT, 1,
     FLAG_MASTER_ROOM_SENSOR_T_IN_ORDER, 1,
     CODES_END,
 };
@@ -1533,7 +1533,7 @@ u16 actor57Talk1Actions[] = { FLAG(0, 6), 1, CODES_END };
 u16 actor57Talk2Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0,
     FLAG(0, 6), 1,
-    SPECIAL(0x73), 0,
+    SPECIAL_MASTER_ROOM_LAST_SENSOR_LEFT, 0,
     CODES_END,
 };
 u16 actor57Talk2Actions[] = { FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 1, CODES_END };
@@ -1541,7 +1541,7 @@ u16 actor57Talk3Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_E_IN_ORDER, 0,
     FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0,
     FLAG(0, 6), 1,
-    SPECIAL(0x73), 1,
+    SPECIAL_MASTER_ROOM_LAST_SENSOR_LEFT, 1,
     CODES_END,
 };
 u16 actor57Talk3Actions[] = {
@@ -1565,7 +1565,7 @@ u16 actor57Talk3Actions[] = {
 u16 actor57Talk4Conditions[] = {
     FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0,
     FLAG(0, 6), 1,
-    SPECIAL(0x73), 1,
+    SPECIAL_MASTER_ROOM_LAST_SENSOR_LEFT, 1,
     FLAG_MASTER_ROOM_SENSOR_E_IN_ORDER, 1,
     CODES_END,
 };
@@ -1802,10 +1802,10 @@ u16 actor5Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor7Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor8Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
-u16 actor9Conditions[] = { SPECIAL(8), 1, CODES_END };
+u16 actor9Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor11Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
-u16 actor12Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor12Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor13Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
 u16 actor14Conditions[] = { PROGRESS(STORY_JUNGLE_SOUND), 1, CODES_END };
 u16 actor15Conditions[] = { PROGRESS(STORY_BLUE_ID_PASS), 1, CODES_END };
@@ -1835,8 +1835,8 @@ u16 actor30Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor31Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor32Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor33Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor34Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor35Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor34Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor35Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor36Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
 u16 actor37Conditions[] = { PROGRESS(STORY_JUNGLE_SOUND), 1, CODES_END };
 u16 actor38Conditions[] = { PROGRESS(STORY_BLUE_ID_PASS), 1, CODES_END };
@@ -1847,21 +1847,21 @@ u16 actor42Conditions[] = { PROGRESS(STORY_REAL_WORLD), 1, CODES_END };
 u16 actor43Conditions[] = { PROGRESS(STORY_WAY_TO_AMATERASU), 1, CODES_END };
 u16 actor44Conditions[] = { PROGRESS(STORY_WHITE_ID_PASS), 1, CODES_END };
 u16 actor45Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
-u16 actor46Conditions[] = { SPECIAL(8), 1, CODES_END };
+u16 actor46Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
 u16 actor47Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
-u16 actor48Conditions[] = { SPECIAL(8), 1, CODES_END };
+u16 actor48Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
 u16 actor49Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor50Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor50Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor51Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
-u16 actor52Conditions[] = { SPECIAL(8), 1, CODES_END };
+u16 actor52Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
 u16 actor53Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
-u16 actor54Conditions[] = { SPECIAL(8), 1, CODES_END };
+u16 actor54Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
 u16 actor55Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
-u16 actor56Conditions[] = { SPECIAL(8), 1, CODES_END };
+u16 actor56Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
 u16 actor57Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
-u16 actor58Conditions[] = { SPECIAL(8), 1, CODES_END };
+u16 actor58Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
 u16 actor59Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor60Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor60Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor61Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
 u16 actor62Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
 u16 actor63Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
@@ -2013,7 +2013,7 @@ StageTile stageObjects[] = {
 };
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x217, 0x398, 0xCC, 1, 0, 0, 0 },
-    { { { SPECIAL(0x94), 1 }, { SPECIAL(0x19), 0 } }, SLOT_EVENT, 0x3C5, 0, 0, 0, 0, 0, 0 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 0 } }, SLOT_EVENT, 0x3C5, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

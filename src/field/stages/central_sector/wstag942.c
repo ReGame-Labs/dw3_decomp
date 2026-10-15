@@ -12,7 +12,7 @@
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0x104)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_09)
 #define STAGE_FILE 0x90B
 #define STAGE_FILE_8 0x3A1
 #elif VERSION_JP
@@ -30,8 +30,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x30700, 0x9A00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x36;
-    FIELDSTG_state.music = MUSIC(0x36, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_COAST);
+    FIELDSTG_state.music = MUSIC_COAST;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -71,7 +71,7 @@ u16 actor3Talk0Conditions[] = { FLAG(0, 5), 0, CODES_END };
 u16 actor3Talk0Actions[] = { FLAG(0, 5), 1, CODES_END };
 u16 actor3Talk1Conditions[] = { FLAG(0, 5), 1, ITEM(0, 0x192), 0, CODES_END };
 u16 actor3Talk2Conditions[] = { FLAG(0, 5), 1, ITEM(0, 5), 0, ITEM(0, 0x192), 1, CODES_END };
-u16 actor3Talk2Actions[] = { ITEM(0, 5), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor3Talk2Actions[] = { ITEM(0, 5), 1, SPECIAL_SHOW_ITEM_GET_ICON, 1, CODES_END };
 u16 actor3Talk3Conditions[] = { FLAG(0, 5), 1, ITEM(0, 5), 1, ITEM(0, 0x192), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x21 },
@@ -172,27 +172,27 @@ StageSlot stageSlots[] = {
 void (*stageFuncs[])(void) = {
     setupStage,
 };
-AreaBattle area0Battle0 = { 42, 1, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 42, 1, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 42, 1, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 42, 1, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 43, 1, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 43, 1, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 43, 1, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 43, 1, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 42, 1, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 42, 1, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 42, 1, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 42, 1, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 43, 1, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 43, 1, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 43, 1, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 43, 1, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
       &area0Battle4, &area0Battle5, &area0Battle6, &area0Battle7 },
 };
-AreaBattle area1Battle0 = { 36, 2, MUSIC(2, 0) };
-AreaBattle area1Battle1 = { 36, 2, MUSIC(2, 0) };
-AreaBattle area1Battle2 = { 36, 2, MUSIC(2, 0) };
-AreaBattle area1Battle3 = { 36, 2, MUSIC(2, 0) };
-AreaBattle area1Battle4 = { 37, 2, MUSIC(2, 0) };
-AreaBattle area1Battle5 = { 37, 2, MUSIC(2, 0) };
-AreaBattle area1Battle6 = { 37, 2, MUSIC(2, 0) };
-AreaBattle area1Battle7 = { 37, 2, MUSIC(2, 0) };
+AreaBattle area1Battle0 = { 36, 2, MUSIC_BATTLE };
+AreaBattle area1Battle1 = { 36, 2, MUSIC_BATTLE };
+AreaBattle area1Battle2 = { 36, 2, MUSIC_BATTLE };
+AreaBattle area1Battle3 = { 36, 2, MUSIC_BATTLE };
+AreaBattle area1Battle4 = { 37, 2, MUSIC_BATTLE };
+AreaBattle area1Battle5 = { 37, 2, MUSIC_BATTLE };
+AreaBattle area1Battle6 = { 37, 2, MUSIC_BATTLE };
+AreaBattle area1Battle7 = { 37, 2, MUSIC_BATTLE };
 BattleList area1Battles = {
     3,
     { &area1Battle0, &area1Battle1, &area1Battle2, &area1Battle3,
@@ -214,11 +214,11 @@ BattleList area2Battles = {
 AreaBattle area3Battle0 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle3 = { 327, 13, MUSIC(2, 0) };
-AreaBattle area3Battle4 = { 328, 2, MUSIC(2, 0) };
+AreaBattle area3Battle3 = { 327, 13, MUSIC_BATTLE };
+AreaBattle area3Battle4 = { 328, 2, MUSIC_BATTLE };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle6 = { 48, 13, MUSIC(2, 0) };
-AreaBattle area3Battle7 = { 59, 2, MUSIC(2, 0) };
+AreaBattle area3Battle6 = { 48, 13, MUSIC_BATTLE };
+AreaBattle area3Battle7 = { 59, 2, MUSIC_BATTLE };
 BattleList area3Battles = {
     0,
     { &area3Battle0, &area3Battle1, &area3Battle2, &area3Battle3,

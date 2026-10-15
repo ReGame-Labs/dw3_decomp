@@ -628,13 +628,13 @@ void endEvent1500(void) {
 #endif
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x1B7
 #define STAGE_ARCHIVE 0x311
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
-#define EVENT_TEXT_FILE 0x14A
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x1C5
 #define STAGE_ARCHIVE 0x320
 #endif
@@ -651,24 +651,24 @@ void setupStage(void) {
     FIELDSTG_state.start = (Vec2){0x1C700, 0x12C00};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.startDir = 0;
-    FIELDSTG_state.soundBank = 0x29;
-    FIELDSTG_state.music = MUSIC(0x29, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_STREET_CORNER);
+    FIELDSTG_state.music = MUSIC_STREET_CORNER;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
     switch (GAME.progress) {
     case STORY_JUNGLE_SOUND:
-        FIELDSTG_state.soundBank = 0x29;
-        FIELDSTG_state.music = MUSIC(0x29, 1);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_STREET_CORNER_1);
+        FIELDSTG_state.music = MUSIC_STREET_CORNER_1;
         break;
     case STORY_REAL_WORLD:
-        FIELDSTG_state.soundBank = 0x29;
-        FIELDSTG_state.music = MUSIC(0x29, 2);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_STREET_CORNER_2);
+        FIELDSTG_state.music = MUSIC_STREET_CORNER_2;
         break;
     case STORY_ASUKA_HEADQUARTERS:
-        FIELDSTG_state.soundBank = 0x29;
-        FIELDSTG_state.music = MUSIC(0x29, 3);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_STREET_CORNER_3);
+        FIELDSTG_state.music = MUSIC_STREET_CORNER_3;
         break;
     }
 }

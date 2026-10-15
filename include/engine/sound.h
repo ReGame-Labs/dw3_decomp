@@ -65,9 +65,87 @@
  * (SEP) n of the first sequence of a sound bank, exclusive (bit 30) and with
  * bit 29, which playSound doesn't read but every one of SOUNDTST's tunes
  * has, and its loops (BT_LOOP0, EX_AT_LP), not its jingles. A stage's music
- * is usually of the bank it loads (FieldState.soundBank).
+ * is of the bank it loads (FieldState.soundBank, MUSIC_BANK).
  */
 #define MUSIC(bank, n) (0x60000000 | (bank) << 18 | (n))
+
+/* The music by where the game plays it (FieldState.music, AreaBattle.music, the
+   screens'), each with SOUNDTST's name for it */
+#define MUSIC_CONFUSION MUSIC(1, 0) /* COM_CNFS: in a battle while a partner is confused (WFIGHTMN switchConfusionMusic) */
+#define MUSIC_GAME_OVER MUSIC(1, 8) /* GAMEOVER: a battle lost (WFIGHTMN endBattleOnKnockOut) */
+#define MUSIC_BATTLE MUSIC(2, 0) /* BATL0000: the maps' random battles (AreaBattle, nearly all of them) */
+#define MUSIC_BATTLE_1 MUSIC(3, 0) /* BATL1000: the Digimon Arena's battles and some event battles (AreaBattle) */
+#define MUSIC_ASUKA_CITY MUSIC(4, 0) /* ASKA_BGM: the Central Sector's streets and bridges, the Underground Path */
+#define MUSIC_ADMIN_CENTER MUSIC(5, 0) /* KANRIBGM: the cities' Main Lobby, Admin Center, Digimon Arena, Master Room */
+#define MUSIC_SEWERS MUSIC(6, 0) /* BGM_0003: the Admin Center's basement and the cities' sewers */
+#define MUSIC_SHOP_1 MUSIC(7, 0) /* SHOP1BGM: the inns, shops and towers */
+#define MUSIC_SHOP_2 MUSIC(8, 0) /* SHOP2BGM: Lamb Chop, the Yellow Cruiser and El Dorado */
+#define MUSIC_FIELD MUSIC(9, 0) /* FIELDBGM: Central Park, the Wire Forest Entrance, Shell Beach, Plug Cape */
+#define MUSIC_DUEL_ISLAND MUSIC(0xA, 0) /* BGM_0008: Duel Island */
+#define MUSIC_PROTOCOL_RUINS MUSIC(0xB, 0) /* PYRA_BGM: the Protocol Ruins */
+#define MUSIC_SEIRYU_CITY MUSIC(0xC, 0) /* SEIR_BGM: Seiryu City */
+#define MUSIC_MAGASTA MUSIC(0xD, 0) /* BGM_0011: the Undersea Base (Magasta), and the Deeper Crevice's gondola */
+#define MUSIC_STATION MUSIC(0xE, 0) /* BGM_0012: the East and South Stations */
+#define MUSIC_SHAMAN_HOUSE MUSIC(0xF, 0) /* BGM_0013: the Shaman House */
+#define MUSIC_RELIABILITY_SPOT MUSIC(0x10, 0) /* BGM_0014: the Reliability Spot */
+#define MUSIC_JUNGLE_SHRINE MUSIC(0x11, 0) /* BGM_0015: the Jungle Grave, the Jungle Shrine and the Catacomb */
+#define MUSIC_SUZAKU_CITY MUSIC(0x12, 0) /* BGM_0016: Suzaku City and its Hall */
+#define MUSIC_BUG_MAZE MUSIC(0x13, 0) /* BGM_0017: the Bug Maze (Network Break) */
+#define MUSIC_BADLAND MUSIC(0x14, 0) /* BGM_0018: the Badlands */
+#define MUSIC_SECRET_ROOM MUSIC(0x15, 0) /* BGM_0019: the Secret Room, the rebels' hideout */
+#define MUSIC_MIRAGE_HALL MUSIC(0x16, 0) /* BGM_0020: the Mirage Hall and Mirage Room */
+#define MUSIC_BYAKKO_CITY MUSIC(0x17, 0) /* BGM_0021: Byakko City and the Bai Hu Dome */
+#define MUSIC_LEGENDARY_GYM MUSIC(0x18, 0) /* BGM_0022: the Legendary Gym */
+#define MUSIC_DUNGEON MUSIC(0x19, 0) /* BGM_0023: the Ice, Fire and Dark Dungeons */
+#define MUSIC_GENBU_CITY MUSIC(0x1A, 0) /* BGM_0024: Genbu City */
+#define MUSIC_ONLINE_CENTER MUSIC(0x1B, 0) /* ON_CNBGM: MAGAMI's Online Center */
+#define MUSIC_GUNSLINGER MUSIC(0x1C, 0) /* BGM_0026: the Gunslinger (the Spy Satellite) */
+#define MUSIC_SEABED MUSIC(0x1D, 0) /* BGM_0027: the Seabed tunnels */
+#define MUSIC_CIRCUIT_BOARD MUSIC(0x1E, 0) /* BGM_0028: the Circuit Board tunnels */
+#define MUSIC_CITY_CRISIS MUSIC(0x1F, 0) /* BGM_0029: the cities and their streets instead of their music while the story is at a crisis (Knightmon reprogrammed, the A.o.A's headquarters, the Amaterasu server's Oinkmon) */
+#define MUSIC_MEMORY_CARD MUSIC(0x20, 0) /* BGM_0030: the memory card screen and the player's name entry */
+#define MUSIC_TRAINING MUSIC(0x21, 2) /* TRAINING: the gym's training */
+#define MUSIC_BOSS MUSIC(0x22, 0) /* BOSS_000: the sectors' boss battles */
+#define MUSIC_BOSS_1 MUSIC(0x23, 0) /* BOSS_001: the Digimon Arena's, the cities', the dungeons' and the A.o.A's boss battles */
+#define MUSIC_LAST_BOSS MUSIC(0x24, 0) /* LASTBOSS: Lord Megadeath's battle (WSTAG820) */
+#define MUSIC_LAST_BOSS_1 MUSIC(0x25, 0) /* LASTB_01: the extra chapter's last battle (WSTAG927, the Digimon Arena) */
+#define MUSIC_LAST_BOSS_2 MUSIC(0x26, 0) /* LASTB_02: Lord Megadeath's second form (WSTAG820, fighter 0x1D3's entrance) */
+#define MUSIC_CARD_BATTLE MUSIC(0x27, 4) /* CBTLMAIN: the card battles */
+#define MUSIC_STREET_CORNER MUSIC(0x29, 0) /* BGM00000: the Street Corner (Kusanagi City) */
+#define MUSIC_STREET_CORNER_1 MUSIC(0x29, 1) /* BGM00001: the Street Corner at STORY_JUNGLE_SOUND */
+#define MUSIC_STREET_CORNER_2 MUSIC(0x29, 2) /* BGM00002: the Street Corner at STORY_REAL_WORLD */
+#define MUSIC_STREET_CORNER_3 MUSIC(0x29, 3) /* BGM00003: the Street Corner at STORY_ASUKA_HEADQUARTERS */
+#define MUSIC_AOA_HEADQUARTERS MUSIC(0x2A, 0) /* ENV_0002: the A.o.A Headquarters */
+#define MUSIC_CONTROL_ROOM MUSIC(0x2B, 0) /* ENV_0003: the cities' Control Room */
+#define MUSIC_WATER_TUNNEL MUSIC(0x2C, 0) /* ENV_0004: the Water Tunnel */
+#define MUSIC_WIRE_FOREST MUSIC(0x2D, 0) /* ENV05_00: the Wire Forests and the Kicking Forest */
+#define MUSIC_WIND_PRAIRIE MUSIC(0x2E, 0) /* ENV_0006: the Wind Prairie */
+#define MUSIC_TYRANNO_VALLEY MUSIC(0x2F, 0) /* ENV_0007: Tyranno Valley, Snow Mountain, Kulon Mine and the Battle Gate */
+#define MUSIC_GALE_TOWER MUSIC(0x30, 0) /* ENV_0008: the Gale Tower */
+#define MUSIC_FOREST_INN_BF MUSIC(0x31, 0) /* ENV_0009: the Forest Inn's basement */
+#define MUSIC_PROTOCOL_FOREST MUSIC(0x32, 0) /* ENV10_00: the Protocol Forest */
+#define MUSIC_DIGIMON_LAB MUSIC(0x33, 0) /* ENV_0011: Asuka's Digimon Lab and Login Room */
+#define MUSIC_SWAMP MUSIC(0x34, 0) /* ENV_0012: the South Sector's swamps and Bulk Bridge */
+#define MUSIC_ETHER_JUNGLE MUSIC(0x35, 0) /* ENV_0013: the Ether Jungle */
+#define MUSIC_COAST MUSIC(0x36, 0) /* ENV_0014: Shell Beach, Plug Cape, Phoenix Bay and South Cape */
+#define MUSIC_UG_LAKE MUSIC(0x37, 0) /* ENV_0015: the UG Lake */
+#define MUSIC_DESERT MUSIC(0x38, 0) /* ENV_0016: the West Sector's deserts and the Mirage Tower */
+#define MUSIC_DUM_DUM_FACTORY MUSIC(0x39, 0) /* ENV_0017: Bullet Valley, the Dum Dum Factory, its Duct Rooms and Operation Room */
+#define MUSIC_WEST_SEWERS MUSIC(0x3A, 0) /* ENV_0018: the West Sector's Sewers and Secret Stairs */
+#define MUSIC_STORAGE_ROOM MUSIC(0x3B, 0) /* ENV_0019: Byakko City's Storage Room */
+#define MUSIC_UNDERGROUND_CAVE MUSIC(0x3C, 0) /* ENV_0020: the Underground Cave */
+#define MUSIC_BOOT_MOUNTAIN MUSIC(0x3D, 0) /* ENV_0021: Boot Mountain, and the Byakko Dome */
+#define MUSIC_FREEZE_MOUNTAIN MUSIC(0x3E, 0) /* ENV_0022: Freeze Mountain and the Lake of Ice */
+#define MUSIC_KULON_PIT MUSIC(0x3F, 0) /* ENV_0023: the Kulon Pit */
+#define MUSIC_CHAMBER_ROOM MUSIC(0x40, 1) /* ENV_0024: the Chamber Rooms */
+#define MUSIC_PELCHE_OASIS MUSIC(0x41, 0) /* ENV_0025: the Pelche Oasis */
+#define MUSIC_EAUCTION MUSIC(0x42, 0) /* EAUCTION: the Cargo Tower at some points of the story (FIELDSTG_setupField) */
+#define MUSIC_CARGO_TOWER MUSIC(0x42, 2) /* ENV_0204: the Cargo Tower */
+#define MUSIC_MAIN_LOBBY_DEMO MUSIC(0x43, 3) /* ENV_0205: the story events' copy of Asuka's Main Lobby (WSTAG212) */
+#define MUSIC_SATELLITE_CONTROL_ROOM MUSIC(0x44, 1) /* ENV_0206: the Spy Satellite's Control Room */
+
+/* The sound bank of a music, which a stage loads for it (FieldState.soundBank) */
+#define MUSIC_BANK(music) ((music) >> 18 & 0x7F)
 
 /* One of the SOUND_SLOT_COUNT loaded sound banks: a VAB and its SEP sequences */
 typedef struct SoundBank {

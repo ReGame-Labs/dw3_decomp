@@ -20,10 +20,10 @@ extern AnimFrame updateTileAnimsFrames2[];
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xDB)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
 #define STAGE_FILE 0x484
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xD3)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
 #define STAGE_FILE 0x494
 #endif
 /* Sets the stage up: its map, actors and battles, playing the ambience ENV_0016 */
@@ -36,8 +36,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x1AF00, 0x11800};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x38;
-    FIELDSTG_state.music = MUSIC(0x38, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DESERT);
+    FIELDSTG_state.music = MUSIC_DESERT;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -64,14 +64,14 @@ AnimFrame updateTileAnimsFrames2[] = {
     { 76, 8 }, { 77, 8 }, { 78, 8 }, { 79, 8 },
     { 80, 8 }, { 81, 8 }, { 82, 160 }, { 255, 0 },
 };
-AreaBattle area0Battle0 = { 156, 5, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 156, 5, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 156, 5, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 156, 5, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 156, 5, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 156, 5, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 156, 5, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 156, 5, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 156, 5, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 156, 5, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 156, 5, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 156, 5, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 156, 5, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 156, 5, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 156, 5, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 156, 5, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -238,29 +238,33 @@ FieldTalk actor17Talks[] = {
 };
 u16 actor0Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1, CODES_END };
-u16 actor2Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor2Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor5Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x17), 1, PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 0, CODES_END };
+u16 actor4Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
+u16 actor5Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
+u16 actor6Conditions[] = {
+    SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_CONTROL_ROOM, 1,
+    PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 0,
+    CODES_END,
+};
 u16 actor7Conditions[] = { PROGRESS(STORY_NUMEMON_FOUND), 1, CODES_END };
 u16 actor8Conditions[] = {
-    SPECIAL(0x16), 1,
+    SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1,
     PROGRESS(STORY_NUMEMON_FOUND), 0,
     PROGRESS(STORY_DE_SINCERITY), 0,
     CODES_END,
 };
 u16 actor9Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor11Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor11Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor12Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor13Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor14Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor15Conditions[] = { SPECIAL(0x17), 1, CODES_END };
+u16 actor13Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
+u16 actor14Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
+u16 actor15Conditions[] = { SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_CONTROL_ROOM, 1, CODES_END };
 u16 actor16Conditions[] = {
     PROGRESS(STORY_DE_SINCERITY), 0,
     PROGRESS(STORY_NUMEMON_FOUND), 0,
-    SPECIAL(0x16), 1,
+    SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1,
     CODES_END,
 };
 u16 actor17Conditions[] = { PROGRESS(STORY_NUMEMON_FOUND), 1, CODES_END };

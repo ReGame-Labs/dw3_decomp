@@ -114,12 +114,12 @@ void endEvent1282(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
-#define EVENT_TEXT_FILE 0x120
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x52A
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
-#define EVENT_TEXT_FILE 0x127
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x53A
 #endif
 /* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0003 */
@@ -132,8 +132,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0xF300, 0x17A00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x2B;
-    FIELDSTG_state.music = MUSIC(0x2B, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CONTROL_ROOM);
+    FIELDSTG_state.music = MUSIC_CONTROL_ROOM;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -243,8 +243,8 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 31, 19, MUSIC(0x22, 0) };
-AreaBattle area3Battle1 = { 321, 19, MUSIC(0x22, 0) };
+AreaBattle area3Battle0 = { 31, 19, MUSIC_BOSS };
+AreaBattle area3Battle1 = { 321, 19, MUSIC_BOSS };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
@@ -313,8 +313,8 @@ FieldTalk actor2Talks[] = {
     { actor2Talk1Conditions, NULL, 0xB4 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { SPECIAL(0x1C), 1, CODES_END };
-u16 actor1Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor0Conditions[] = { SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1, CODES_END };
+u16 actor1Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x105, 4, 425, 256, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x105, 4, 425, 256, 1 };

@@ -9,10 +9,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
 #define STAGE_FILE 0x6E9
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
 #define STAGE_FILE 0x6F9
 #endif
 /* Sets the stage up: its map, actors and battles, playing BGM_0017 */
@@ -25,8 +25,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x15200, 0x1C000};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x13;
-    FIELDSTG_state.music = MUSIC(0x13, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_BUG_MAZE);
+    FIELDSTG_state.music = MUSIC_BUG_MAZE;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -37,14 +37,14 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-AreaBattle area0Battle0 = { 165, 10, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 165, 10, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 173, 10, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 173, 10, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 150, 10, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 150, 10, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 150, 10, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 92, 10, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 165, 10, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 165, 10, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 173, 10, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 173, 10, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 150, 10, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 150, 10, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 150, 10, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 92, 10, MUSIC_BATTLE };
 BattleList area0Battles = {
     4,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -106,19 +106,19 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Actions[] = {
     FLAG_BUG_MAZE_RUBBER_SUIT_FOUND, 1,
     ITEM(5, 0xFC), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor1Talk0Actions[] = {
     FLAG_BUG_MAZE_POWER_CHARGE_FOUND, 1,
     ITEM(1, 0x2B), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor2Talk0Actions[] = {
-    SPECIAL(0x8F), 1,
+    SPECIAL_GAIN_1600_BIT, 1,
     FLAG_BUG_MAZE_1600_BIT_FOUND, 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {

@@ -10,10 +10,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x592
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x5A2
 #endif
 /* Sets the stage up: its map and actors, playing SHOP1BGM */
@@ -26,8 +26,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x1BA00, 0x17F00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 7;
-    FIELDSTG_state.music = MUSIC(7, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SHOP_1);
+    FIELDSTG_state.music = MUSIC_SHOP_1;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
@@ -51,17 +51,17 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Actions[] = { 0x7A2A, 1, CODES_END };
 u16 actor1Talk0Actions[] = { 0x7A15, 1, CODES_END };
 u16 actor2Talk0Actions[] = { 0x7A14, 1, CODES_END };
-u16 actor3Talk0Conditions[] = { SPECIAL(0x20), 1, CODES_END };
+u16 actor3Talk0Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_NETWORK_OFFLINE, 1, CODES_END };
 u16 actor3Talk0Actions[] = { 0x7A46, 1, CODES_END };
 u16 actor3Talk1Conditions[] = {
-    SPECIAL(0x21), 1,
+    SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1,
     PROGRESS(STORY_PRESIDENT_ARRESTED), 0,
     CODES_END,
 };
 u16 actor3Talk1Actions[] = { 0x7A46, 1, CODES_END };
 u16 actor3Talk2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor3Talk2Actions[] = { 0x7A47, 1, CODES_END };
-u16 actor3Talk3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor3Talk3Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor3Talk3Actions[] = { 0x7A47, 1, CODES_END };
 u16 actor3Talk4Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor3Talk4Actions[] = { 0x7A47, 1, CODES_END };

@@ -10,10 +10,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x4A4
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x4B4
 #endif
 /*
@@ -29,16 +29,16 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0xDB00, 0xDF00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 5;
-    FIELDSTG_state.music = MUSIC(5, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_ADMIN_CENTER);
+    FIELDSTG_state.music = MUSIC_ADMIN_CENTER;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -111,9 +111,21 @@ u16 actor4Conditions[] = {
 u16 actor5Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor7Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor8Conditions[] = { FLAG_OINKMON_CITIZENS_RESTORED, 0, SPECIAL(0xA), 1, CODES_END };
-u16 actor9Conditions[] = { SPECIAL(0xA), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor10Conditions[] = { SPECIAL(0xA), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
+u16 actor8Conditions[] = {
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    SPECIAL_STORY_GENJI_BEATEN_TO_MOVIE_BATTLES, 1,
+    CODES_END,
+};
+u16 actor9Conditions[] = {
+    SPECIAL_STORY_GENJI_BEATEN_TO_MOVIE_BATTLES, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor10Conditions[] = {
+    SPECIAL_STORY_GENJI_BEATEN_TO_MOVIE_BATTLES, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x20, 4, 272, 344, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x20, 4, 272, 344, 7 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0x24, 5, 240, 329, 3 };

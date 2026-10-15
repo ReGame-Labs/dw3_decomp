@@ -10,10 +10,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
 #define STAGE_FILE 0x76B
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
 #define STAGE_FILE 0x77A
 #endif
 /* Sets the stage up: its map, actors and battles, playing the ambience ENV_0017 */
@@ -26,8 +26,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x10400, 0x3AD00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x39;
-    FIELDSTG_state.music = MUSIC(0x39, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DUM_DUM_FACTORY);
+    FIELDSTG_state.music = MUSIC_DUM_DUM_FACTORY;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
@@ -36,14 +36,14 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-AreaBattle area0Battle0 = { 87, 12, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 87, 12, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 87, 12, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 139, 12, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 139, 12, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 164, 12, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 164, 12, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 164, 12, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 87, 12, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 87, 12, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 87, 12, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 139, 12, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 139, 12, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 164, 12, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 164, 12, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 164, 12, MUSIC_BATTLE };
 BattleList area0Battles = {
     2,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,

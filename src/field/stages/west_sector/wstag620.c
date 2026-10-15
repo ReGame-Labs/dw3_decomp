@@ -189,12 +189,12 @@ void endEvent551(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xDB)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x479
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xD3)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x489
 #endif
 /* Sets the stage up: its map, actors, battles and events, playing BGM_0019 */
@@ -207,8 +207,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x20200, 0x17800};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x15;
-    FIELDSTG_state.music = MUSIC(0x15, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SECRET_ROOM);
+    FIELDSTG_state.music = MUSIC_SECRET_ROOM;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -915,7 +915,7 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 188, 18, MUSIC(2, 0) };
+AreaBattle area3Battle0 = { 188, 18, MUSIC_BATTLE };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
@@ -990,7 +990,7 @@ FieldTalk actor19Talks[] = {
 };
 u16 actor0Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
-u16 actor2Conditions[] = { SPECIAL(7), 1, CODES_END };
+u16 actor2Conditions[] = { SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_GAME_MASTER_CAUGHT, 1, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1, CODES_END };
@@ -1004,7 +1004,10 @@ u16 actor12Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
 u16 actor13Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
 u16 actor17Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
 u16 actor18Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
-u16 actor19Conditions[] = { SPECIAL(7), 1, CODES_END };
+u16 actor19Conditions[] = {
+    SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_GAME_MASTER_CAUGHT, 1,
+    CODES_END,
+};
 u16 actor20Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
 u16 actor21Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 0 };
