@@ -5,7 +5,7 @@
 /* Draws the fader over RECT, in layer 0x100 */
 void CARDGAME_drawFader(CardFader *fader, RECT rect) {
     Layer *layer = GFX.funcs.getLayer(0x100);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, 0);
+    u_long *ot = layer->getOtEntry(layer, 0);
     POLY_F4 *poly = GFX.funcs.getPrim();
     DR_TPAGE *mode;
 

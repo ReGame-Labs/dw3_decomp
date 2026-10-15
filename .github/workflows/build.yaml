@@ -150,6 +150,11 @@ jobs:
     - if: matrix.report
       run: make report
 
+    # the README's status table and docs/binaries.md's overlay table give
+    # this report's figures (tools/status_tables.py writes them)
+    - if: matrix.report
+      run: python3 tools/status_tables.py --check "$VERSION"
+
     - if: matrix.report
       uses: actions/upload-artifact@v6
       with:

@@ -41,7 +41,8 @@ void FIGHTSTG_runScriptHits(BattleScript *script, BattleScriptChildren *children
         children->script->enemy = script->enemy == 0;
         children->script->index = script->hits[3] + 1;
         break;
-    /* the match depends on these cases, which do nothing */
+    /* these cases do nothing, but the match depends on them: they shape the
+       tree of tests the switch is compiled to */
     case 1:
     case 2:
     case 3:
@@ -601,7 +602,8 @@ void FIGHTSTG_updateBattleScript(BattleScript *script, BattleScriptChildren *chi
             case 7:
                 FIGHTSTG_runScriptFade(script, &children->fade);
                 break;
-            /* the match depends on these cases, which do nothing, and on 2 and 3 */
+            /* these cases do nothing, but the match depends on them, as it does on
+               the outer switch's 2 and 3: they shape its tests */
             case 8:
             case 9:
                 break;

@@ -26,7 +26,7 @@ prefix (`CNTY_SEL_`, `STDWTITL_`...):
 | `STCRDDEK` | `0x80082448` | 55 / 55 | the decks, which it names with the on-screen keyboard (`include/shared/name_entry.h`) |
 | `STCRDSHP` | `0x80082448` | 45 / 45 | the card packs (mode 0x1300): opening a pack uses it up and draws six cards, one from each slot's list in `STCRDSHP_packs` |
 | `STDGNAME` | `0x80082448` | 32 / 32 | a name entry screen, a keyboard of character pages |
-| `STDWTITL` | `0x80082448` | 91 / 91 | the title screen, the opening movies and a notice screen |
+| `STDWTITL` | `0x80082448` | 74 / 74 | the title screen, the opening movies and a notice screen |
 | `STFGTREP` | `0x80082448` | 36 / 36 | the report after a battle (mode 0x1400), which `WFIGHTMN` requests: the partners that went up a level |
 | `STGDGLAB` | `0x80082448` | 70 / 70 | the partners' digivolutions, it seems: a menu of three screens that checks the recipes of `STGDGLAB_data` against a partner's entries and sets its three slots |
 | `STGMCARD` | `0x80082448` | 45 / 45 | the memory card screen (mode 0xC00): the saves of a card, their details, and saving and loading |

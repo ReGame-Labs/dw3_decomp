@@ -489,7 +489,9 @@ breaks a function or datum in either version.
   (address, old name, new name).
 - Before opening one, run `make compare` for both versions; both must print
   only `OK`. Run `tools/hacks.py --check README.md docs/status.md` and
-  `tools/check_names.py` too, which the CI runs first. The CI builds and compares `eu` and `us`, and uploads both
+  `tools/check_names.py` too, which the CI runs first, and after `make
+  report`, `tools/status_tables.py` if a figure of the status tables
+  changed. The CI builds and compares `eu` and `us`, and uploads both
   reports that decomp.dev reads.
 - Pull requests are squash-merged, titled "Title (#N)": "Build the overlays
   and decompile CNTY_SEL (#12)". The title says what the pull request does,

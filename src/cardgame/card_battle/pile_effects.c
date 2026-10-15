@@ -302,7 +302,7 @@ s32 CARDGAME_discardPickedCard(CardBattle *battle, CardScreen *screen, s32 side,
                     }
                     battle->sides[side].pile.deckTop++;
                     battle->sides[side].pile.deckCount--;
-                    for (j = 39; j >= 0; j--) {
+                    for (j = 0; j < 40; j++) {
                         battle->opponentDraws[j].order = j;
                     }
                 }
@@ -418,7 +418,7 @@ static inline void takeChosenCard(CardBattle *battle, s32 side) {
                 battle->reserveStart++;
             }
         }
-        for (k = 39; k >= 0; k--) {
+        for (k = 0; k < 40; k++) {
             battle->opponentDraws[k].order = k;
         }
     }
@@ -589,7 +589,7 @@ s32 CARDGAME_returnUsedCards(CardBattle *battle, CardScreen *screen, s32 side) {
                 deck[39] = used[i];
                 battle->opponentDraws[39].group = 7;
             }
-            for (i = 39; i >= 0; i--) {
+            for (i = 0; i < 40; i++) {
                 battle->opponentDraws[i].order = i;
             }
             pile->discardCount = 0;
@@ -763,7 +763,7 @@ static inline void takeMarkedCard(CardBattle *battle, s32 side) {
                     battle->reserveStart++;
                 }
             }
-            for (n = 39; n >= 0; n--) {
+            for (n = 0; n < 40; n++) {
                 battle->opponentDraws[n].order = n;
             }
         }

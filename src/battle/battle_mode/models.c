@@ -155,7 +155,7 @@ Models *FIGHTSTG_createModels(void) {
     Models *task = createTaskWithId(FIGHTSTG_updateModels, sizeof(Models), sizeof(ModelsChildren), BATTLE_TASK_MODELS);
     s32 i;
 
-    for (i = 3; i >= 0; i--) {
+    for (i = 0; i < 4; i++) {
         task->controls[i].active = 0;
     }
     task->add = FIGHTSTG_addFighterModel;

@@ -160,7 +160,7 @@ s32 FIGHTSTG_findEventFrom(s32 start) {
     s32 type = FIGHTSTG_events.findType;
     s32 i;
 
-    if ((u32)(type - 1) >= 24) {
+    if (type < 1 || type > 24) {
         return -1;
     }
     for (i = start; i < 99; i++) {

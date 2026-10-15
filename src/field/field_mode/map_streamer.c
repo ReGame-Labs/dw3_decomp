@@ -69,7 +69,7 @@ void FIELDSTG_drawCoverBlock(Layer *layer, s32 x, s32 y, s32 level) {
     s32 i;
     s32 shade;
 
-    ot = (u_long *)layer->getOtEntry(layer, 0);
+    ot = layer->getOtEntry(layer, 0);
     shade = level >> 8;
     layer->getScroll(layer, &scroll);
     prim.any = GFX.funcs.getPrim();

@@ -768,7 +768,7 @@ void FIELDSTG_drawActor(void *data, void *drawLayer) {
     s32 x;
 
     if (actor->state == TASK_RUN) {
-        ot = (u_long *)layer->getOtEntry(layer, actor->depth);
+        ot = layer->getOtEntry(layer, actor->depth);
         pos = actor->tile;
         layer->getScroll(layer, &scroll);
         pos.x -= scroll.x;
@@ -812,7 +812,7 @@ void FIELDSTG_drawActor(void *data, void *drawLayer) {
         pos.y += actor->z >> 8;
         prim.ft4++;
         if (actor->hasShadow != 0) {
-            ot = (u_long *)layer->getOtEntry(layer, actor->depth + 1);
+            ot = layer->getOtEntry(layer, actor->depth + 1);
             shadow = actor->fieldImage;
             setSprt(prim.sprt);
             setRGB0(prim.sprt, 0x80, 0x80, 0x80);

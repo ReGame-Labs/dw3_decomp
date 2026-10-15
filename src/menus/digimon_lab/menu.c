@@ -31,7 +31,7 @@ void STGDGLAB_closeMenu(LabMenu *menu) {
     if (windows->name != NULL) {
         windows->name->setVisible(windows->name, 0);
     }
-    for (i = 4; i >= 0; i--) {
+    for (i = 0; i < 5; i++) {
         menu->frames[i] = 0;
     }
 }

@@ -13,7 +13,5 @@ include/engine/file.h: (file scope): [redundant-decls] redundant redeclaration o
 include/engine/menu.h: (file scope): [redundant-decls] redundant redeclaration of 'FIELD_MENU_CHOICE'
 src/battle/battle_mode/item.c: FIGHTSTG_updateItem: [unused-variable] unused variable 'unused'
 src/debug/battle_test/battle_test.c: WFIGHTTS_battleTest: [unused-variable] unused variable 'unused'
-src/debug/battle_test/battle_test.c: WFIGHTTS_effectList: [unused-variable] unused variable 'x'
-src/debug/battle_test/battle_test.c: WFIGHTTS_motionList: [unused-variable] unused variable 'x'
 src/engine/text/talk_box.c: drawTalkBoxArrow: [unused-variable] unused variable 'unused'
 src/menus/field_menu/status_screen.c: STSTATUS_runStatusChoice: [unused-variable] unused variable 'unused'

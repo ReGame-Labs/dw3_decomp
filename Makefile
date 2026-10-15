@@ -453,7 +453,7 @@ objdiff: expected
 	$(PYTHON) tools/objdiff_generate.py
 
 report: objdiff
-	$(OBJDIFF) report generate -o $(BUILDDIR)/report.json
+	$(OBJDIFF) report generate -p $(BUILDDIR) -o $(BUILDDIR)/report.json
 else
 $(MATCHING_ONLY):
 	$(error make $@ works on the matching build, TOOLCHAIN=$(MATCHING_TOOLCHAIN))

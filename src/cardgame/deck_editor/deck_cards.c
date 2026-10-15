@@ -23,10 +23,8 @@ void STCRDDEK_drawDeckCards(DeckCards *task) {
     card.setLayer(task->layer, task->depth);
     for (i = 0; i < task->count; i++) {
         card.setCard(GAME.decks[task->editor->deck].cards[i]);
-        /* the match depends on col holding the row first */
-        col = i / 9;
-        row = col;
-        col = i - row * 9;
+        col = i % 9;
+        row = i / 9;
         sheet = FILE_CACHE.getEntry(STCRDDEK_SPRITES);
         x = col * 32 + 0x10;
         y = row * 32 + 0x3A;

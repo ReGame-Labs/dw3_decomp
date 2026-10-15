@@ -234,7 +234,8 @@ void STSTATUS_showDigivolveStats(DigivolvePanel *panel, DigivolvePanelWindows *w
 void STSTATUS_scrollTechList(DigivolvePanel *panel, DigivolvePanelWindows *windows) {
     s32 i;
 
-    /* the match depends on the (s16) casts in the loops */
+    /* the match depends on the (s16) casts in the loops: without them, the
+       0x7C and 0x88 go into i * 14's induction variable */
     windows->entryName->setPos(windows->entryName, 0x4F, panel->scroll.value + 0x68);
     windows->skillLabel->setPos(windows->skillLabel, 0xEB, panel->scroll.value + 0x68);
     windows->skillLevel->setPos(windows->skillLevel, 0x12F, panel->scroll.value + 0x68);
@@ -868,7 +869,8 @@ void STSTATUS_runDigivolvePanel(DigivolvePanel *panel, DigivolvePanelWindows *wi
                 }
             }
             if (panel->techCount != 0) {
-                /* the match depends on this order of the terms */
+                /* the match depends on this order of the terms, here and in case
+                   0x2C: the scroll first, or the row last, gives other adds */
                 windows->listCursor->setPos(windows->listCursor, 0xA9, panel->tech * 0xE + 0x88 + panel->scroll.value);
                 windows->listCursor->setVisible(windows->listCursor, 1);
                 STSTATUS_showTechCost(panel, windows, 1);

@@ -46,7 +46,8 @@ one unit per C file, and tracked on
 [decomp.dev](https://decomp.dev/ReGame-Labs/dw3_decomp).
 
 ```
-# Write objdiff.json and the target objects in expected/<version>/
+# Write objdiff's project (objdiff.json, build/<version>/objdiff.json) and
+# the target objects in expected/<version>/
 make VERSION=eu objdiff
 
 # Write build/<version>/report.json
@@ -65,9 +66,11 @@ version being reported doesn't build from C, but has split at the same path
 (`asm/<version>/<binary>/<file>.s`), is its unit with no base object, from
 that code and the module's rodata, data and bss segments, so the report
 counts all of it as still to do; a binary with no such file is one unit of
-splat's code and data. Both versions build every file from C today, so
-neither has such a unit. `objdiff.json` is for the version it was last
-written for.
+splat's code and data. The three versions build every file from C today, so
+none has such a unit. Each version's project is
+`build/<version>/objdiff.json`, which `make report` reads; `objdiff.json`,
+which the GUI opens, has the units of every version `make objdiff` was run
+for, under the version's name (`eu/main/menu/inn`, `us/main/menu/inn`).
 
 Code and data that the build still takes from asm never count as
 progress: a function behind `INCLUDE_ASM` keeps splat's `.NON_MATCHING`
@@ -89,7 +92,9 @@ The CI (`.github/workflows/build.yaml`) first runs `tools/check_names.py`
 and `tools/hacks.py`, which only read the source and the configs, and
 `make lint` for both versions. It then builds both versions on every push,
 runs `make compare`, the shift checks (`tools/shiftcheck.py --strict`,
-`make padcheck`) and `make report`, and uploads each
+`make padcheck`) and `make report`, checks that the README's status table
+and `docs/binaries.md`'s overlay table give the report's figures
+(`tools/status_tables.py --check`, which writes them), and uploads each
 `build/<version>/report.json` as the `SLES_039.36_report` and
 `SLUS_014.36_report` artifacts, which decomp.dev reads; its default version
 is the European one. The original files come from a private repository, so
@@ -109,8 +114,8 @@ README's badge counts them: fake matches, then the other kinds together.
 |---|---|---|
 | Fake matches | 0 | a comment that starts with `/* fake match:` and says what is forced and why |
 | BEC forms | 1 | a comment that starts with `/* BEC form:` and names the Digimon World 2 function with the same form |
-| Unused frame locals | 6 | `/* unused, but it is in the original stack frame */` |
-| Form-dependent matches | 176 | a comment that says the `match depends on` the form |
+| Unused frame locals | 4 | `/* unused, but it is in the original stack frame */` |
+| Form-dependent matches | 162 | a comment that says the `match depends on` the form |
 | Functions still in assembly | 0 | `INCLUDE_ASM` |
 
 - A fake match is the last resort: a form forced only for the code it makes,

@@ -14,7 +14,7 @@
 [![Platform](https://img.shields.io/badge/platform-PlayStation-003791)](docs/binaries.md#the-games-binaries)
 [![Versions](https://img.shields.io/badge/versions-USA%20%7C%20Europe%20%7C%20Japan-blue)](docs/binaries.md#how-the-versions-are-organised)
 [![Compiler](https://img.shields.io/badge/compiler-GCC%202.8.1-orange)](docs/toolchain.md#toolchain)
-[![Fake matches | hacks](https://img.shields.io/badge/fake%20matches%20%7C%20hacks-0%20%7C%20183-yellow)](docs/status.md#fake-matches-and-hacks)
+[![Fake matches | hacks](https://img.shields.io/badge/fake%20matches%20%7C%20hacks-0%20%7C%20167-yellow)](docs/status.md#fake-matches-and-hacks)
 [![License](https://img.shields.io/github/license/ReGame-Labs/dw3_decomp)](LICENSE)
 
 A work in progress matching decompilation of **Digimon World 3** for the
@@ -37,19 +37,23 @@ Click it for the details on decomp.dev.</sub>
 
 ## Status
 
-Measured with `make report` on the European and USA versions; the badges
-above are always current:
+Measured with `make report` on each version, and written by
+`tools/status_tables.py`; the badges above are always current:
 
 | Part | Version | Functions in C | Code | Data |
 |---|---|---|---|---|
 | Executable, game code | Europe | 346 / 346 | 100.00 % | 100.00 % |
 | | USA | 346 / 346 | 100.00 % | 100.00 % |
+| | Japan | 346 / 346 | 100.00 % | 100.00 % |
 | The 21 overlays | Europe | 1,670 / 1,670 | 100.00 % | 100.00 % |
 | | USA | 1,665 / 1,665 | 100.00 % | 100.00 % |
-| The stages (293 and 238) | Europe | 1,590 / 1,590 | 100.00 % | 100.00 % |
+| | Japan | 1,670 / 1,670 | 100.00 % | 100.00 % |
+| The stages (293, 238 and 293) | Europe | 1,590 / 1,590 | 100.00 % | 100.00 % |
 | | USA | 1,369 / 1,369 | 100.00 % | 100.00 % |
+| | Japan | 1,590 / 1,590 | 100.00 % | 100.00 % |
 | **Total** | **Europe** | **3,606 / 3,606** | **100.00 %** | **100.00 %** |
 | | **USA** | **3,380 / 3,380** | **100.00 %** | **100.00 %** |
+| | **Japan** | **3,606 / 3,606** | **100.00 %** | **100.00 %** |
 
 - The game's code and data are all C in the three versions: the executable,
   the 21 overlays and all the stages.
@@ -184,7 +188,6 @@ python3 tools/check_names.py  # every version uses the USA version's names
   that keep it (`shiftcheck`, `padcheck`, `inputcheck`).
 - [CONTRIBUTING.md](CONTRIBUTING.md): the matching workflow and the rules on
   matching, versions, code style, names and pull requests.
-- [TODO.md](TODO.md): what is left to do.
 
 ## Contributing
 

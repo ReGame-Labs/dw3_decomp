@@ -299,27 +299,7 @@ void STSTATUS_drawItemScreen(ItemScreen *screen) {
         }
     }
     sprite.setTexture(0x140, 0);
-    for (i = 0; i < screen->count; i++) {
-        if (screen->pageFades[i].level != 0) {
-            /* both branches draw the frame's last part: the match depends on it */
-            if (screen->pageFades[i].level != ONE) {
-                sprite.setScale(screen->pageFades[i].level, ONE, ONE);
-                sprite.setPivot(0, i * 0x2E + 0x25);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 0x2E + 0x11);
-                sprite.setScale(screen->pageFades[i].level, screen->pageFades[i].level, ONE);
-                sprite.setPivot(0x7C, i * 0x2E + 0x27);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x16, 0x67, i * 0x2E + 0x13);
-                sprite.setScale(screen->pageFades[i].level, ONE, ONE);
-                sprite.setPivot(0, i * 0x2E + 0x25);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 0x2E + 0x11);
-            } else {
-                sprite.setScale(ONE, ONE, ONE);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 0x2E + 0x11);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x16, 0x67, i * 0x2E + 0x13);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 0x2E + 0x11);
-            }
-        }
-    }
+    DRAW_PAGE_PANELS(sprite, screen, i);
     if (screen->fades[0].level != 0) {
         if (screen->fades[0].level != ONE) {
             sprite.setScale(screen->fades[0].level, ONE, ONE);
@@ -1050,7 +1030,6 @@ void STSTATUS_runItemScreen(ItemScreen *screen, ItemScreenWindows *windows) {
 /* The first screen's task: counts the party, sets the fades and creates the
    windows, then runs and draws the screen */
 void STSTATUS_updateItemScreen(ItemScreen *screen, ItemScreenWindows *windows) {
-    s32 duration;
     s32 i;
 
     switch (screen->state) {
@@ -1065,9 +1044,8 @@ void STSTATUS_updateItemScreen(ItemScreen *screen, ItemScreenWindows *windows) {
         for (i = 0; i < screen->count; i++) {
             screen->pageFades[i].duration = 10;
         }
-        duration = 10; /* the match depends on this temporary */
-        for (i = 1; i >= 0; i--) {
-            screen->fades[i].duration = duration;
+        for (i = 0; i < 2; i++) {
+            screen->fades[i].duration = 10;
         }
         screen->fades2[0].duration = 10;
         screen->fades2[1].duration = 10;

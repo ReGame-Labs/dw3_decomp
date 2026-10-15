@@ -106,7 +106,9 @@ s32 FIGHTSTG_computeDamage(u8 side, s32 id) {
     if (side == 0) {
         value = tech->power * user->stats[BATTLE_STAT_ATTACK] / target->stats[BATTLE_STAT_DEFENSE];
     } else {
-        enemy = FIGHTSTG_battle.state.active[1]; /* the match depends on reading it first */
+        /* the match depends on reading it first: indexed in place, the lui of
+           BATTLE_SETUP moves ahead of its load */
+        enemy = FIGHTSTG_battle.state.active[1];
         value = tech->power * BATTLE_SETUP.enemies[enemy].strength / 16 * user->stats[BATTLE_STAT_ATTACK] /
                 target->stats[BATTLE_STAT_DEFENSE];
     }
@@ -140,7 +142,9 @@ s32 FIGHTSTG_computeMagicDamage(u8 side, s32 id) {
     if (side == 0) {
         base = tech->power;
     } else {
-        enemy = FIGHTSTG_battle.state.active[1]; /* the match depends on reading it first */
+        /* the match depends on reading it first: indexed in place, the lui of
+           BATTLE_SETUP moves ahead of its load */
+        enemy = FIGHTSTG_battle.state.active[1];
         base = tech->power * BATTLE_SETUP.enemies[enemy].strength / 16;
     }
     power = base * (user->stats[BATTLE_STAT_SPIRIT] * 50 / target->stats[BATTLE_STAT_SPIRIT] + 50) / 100;
@@ -191,7 +195,9 @@ s32 FIGHTSTG_computeMagicDamage(u8 side, s32 id) {
  * half the max HP. The match depends on the fighter pointer. */
 s32 FIGHTSTG_getDamage(s32 *args) {
     u8 side;
-    u8 team; /* the match depends on a u8 */
+    /* the match depends on a u8: side != 0 is computed into v0 and copied,
+       which keeps FIGHTSTG_battle's address until after it */
+    u8 team;
     s32 index;
     s32 damage;
     BattleStats *stats;

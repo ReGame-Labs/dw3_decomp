@@ -623,7 +623,7 @@ void STGTRAIN_updateScreen(TrainScreen *screen, TrainScreenWindows *win) {
                         screen->partyCount++;
                     }
                 }
-                for (i = 2; i >= 0; i--) {
+                for (i = 0; i < 3; i++) {
                     screen->panels[i].duration = 10;
                 }
                 screen->panels[3].duration = 10;

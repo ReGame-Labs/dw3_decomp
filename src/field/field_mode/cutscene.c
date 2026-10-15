@@ -4,8 +4,7 @@
 
 /* A cutscene's animation over the field (FIELDSTG_createCutsceneAnim): kind 0 plays once,
    kind 1 loops two animations until 160 ticks of frame time pass. The match
-   depends on the if/else around the file calls (not a ?: in their argument)
-   and on case 0 next to default. */
+   depends on the if/else around the file calls (not a ?: in their argument). */
 void FIELDSTG_playCutsceneAnim(CutsceneAnim *task) {
     TimLoader loader;
     SpriteDrawer drawer;

@@ -30,7 +30,7 @@ void OVL_NAME(updateScrollBar)(ScrollBar *bar) {
         break;
     case TASK_RUN:
         layer = GFX.funcs.getLayer(bar->layer);
-        ot = (u_long *)layer->getOtEntry(layer, bar->depth);
+        ot = layer->getOtEntry(layer, bar->depth);
         poly = GFX.funcs.getPrim();
         if (bar->pos < bar->count - 1) {
             bar->y = bar->top + ((bar->pos * bar->posStep) >> 8);

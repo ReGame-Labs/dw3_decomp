@@ -294,7 +294,7 @@ void FIGHTSTG_updateSwitchInMenu(SwitchInMenu *task, SwitchInMenuWindows *w) {
             case 0:
             default:
                 findPairTech(task);
-                /* the match depends on the ?: */
+                /* the match depends on the ?: (an if/else gives 23 diffs) */
                 FIGHTSTG_pairCursors[1].count = task->tech != 0 ? 2 : 1;
                 w->techCursor = FIGHTSTG_createCursor(&FIGHTSTG_pairCursors[1]);
                 if (w->cursor != NULL) {

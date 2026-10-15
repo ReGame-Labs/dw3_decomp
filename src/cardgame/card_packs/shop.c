@@ -16,15 +16,14 @@ void STCRDSHP_createShopWindows(CardShop *shop, CardShopWindows *win) {
     for (i = 0; i < 3; i++) {
         win->options[i] = createTextWindow(shop->layer, 1, 0xA7, i * 14 + 0x35);
     }
-    j = 0; /* the match depends on setting it here and on the loop's form */
     win->cursor = createCursor(shop->layer, shop->depth - 2, 0xA7, shop->cursor * 14 + 0x35);
     win->cursor->setVisible(win->cursor, 0);
     win->message = createTextWindow(shop->layer, 1, 0x9A, 0x71);
     windows = shop->children;
-    while (j < shop->childCount - 3) {
-        j++;
+    /* the match depends on this loop having a counter of its own: sharing i
+       swaps the registers of the options loop's counter and y */
+    for (j = 0; j < shop->childCount - 3; j++, windows++) {
         (*windows)->setDepth(*windows, shop->depth - 2);
-        windows++;
     }
 }
 

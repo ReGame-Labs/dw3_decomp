@@ -526,14 +526,14 @@ void STCRDSHP_runPackOpen(CardPackOpen *open, CardPackOpenWindows *win) {
         break;
     case 52:
         if (STCRDSHP_funcs.updateFade(&open->fades[3]) || win->grid == NULL) {
-            /* The match depends on the page's rows: the last as
-               (page + 1) * 8 - 1, as STCRDSHP_choosePack writes it, which
-               shifts the page twice, and the first in a variable of its
-               own. */
+            /* The match depends on the page's rows: the first in a variable
+               of its own, and the last as (page + 1) * 8 - 1, as
+               STCRDSHP_choosePack writes it, which shifts the page twice
+               (top + 7 doesn't). */
             open->substate = 0;
+            top = open->page * 8;
             end = (open->page + 1) * 8 - 1;
             i = open->packs[open->cursor];
-            top = open->page * 8;
             STCRDSHP_listPacks(open);
             if (end > open->packCount - 1) {
                 end = open->packCount - 1;

@@ -75,7 +75,7 @@ void computeStats(s32 partner, PartnerTotals *out) {
     GameState *save = &GAME;
     PartnerStats *d;
 
-    *(StatBlock *)out = *(StatBlock *)save->partners[partner].info.stats;
+    out->block = *(StatBlock *)save->partners[partner].info.stats;
     d = &GAME.partners[partner].info;
     equip = d->equip;
     for (i = 0; i < 6; i++) {

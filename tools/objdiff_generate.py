@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
-"""Write objdiff.json with one unit per C file under src/, for the version
-being built (VERSION, as for make; eu by default).
+"""Write objdiff's project, with one unit per C file under src/, for the
+version being built (VERSION, as for make; eu by default):
+build/<version>/objdiff.json, which make report reads, and objdiff.json,
+which the objdiff GUI opens, with the units of every version generated so
+far (eu/main/menu/inn, us/main/menu/inn...).
 
 Target objects are splat's full disassembly of each C segment
 (expected/<version>/asm/<segment>/<file>.s.o); base objects are the files
@@ -101,6 +104,8 @@ import version
 
 ROOT = version.ROOT
 V = version.VERSION
+# every version, as the Makefile's VERSIONS
+VERSIONS = ("eu", "us", "jp")
 ASM = version.ASM_DIR
 
 # The executable's game code and one category per overlay (src/<group>/<overlay>/,
@@ -626,6 +631,56 @@ def asm_units(names: list) -> list:
     return units
 
 
+def version_project(v):
+    return ROOT / "build" / v / "objdiff.json"
+
+
+def relative_to_build(config, prefix):
+    """config with prefix put in front of every unit's paths."""
+    config = json.loads(json.dumps(config))
+    for unit in config["units"]:
+        for key in ("target_path", "base_path"):
+            if key in unit:
+                unit[key] = prefix + unit[key]
+    return config
+
+
+def all_versions(config):
+    """objdiff.json for the GUI: the units of every version that has a
+    project in build/, each named and categorized under its version
+    (eu/main/menu/inn, category eu.game). The make arguments are the last
+    version generated's."""
+    merged = dict(config, units=[], progress_categories=[])
+    for v in VERSIONS:
+        if v == V:
+            project = config
+        elif version_project(v).exists():
+            with open(version_project(v)) as f:
+                project = json.load(f)
+            for unit in project["units"]:
+                for key in ("target_path", "base_path"):
+                    if key in unit:
+                        unit[key] = unit[key].removeprefix("../../")
+        else:
+            continue
+        for unit in project["units"]:
+            unit = dict(unit, name=f"{v}/{unit['name']}")
+            unit["metadata"] = dict(unit["metadata"], progress_categories=[
+                f"{v}.{c}" for c in unit["metadata"].get("progress_categories", [])])
+            merged["units"].append(unit)
+        merged["progress_categories"] += [
+            {"id": f"{v}.{c['id']}", "name": f"{v}: {c['name']}"}
+            for c in project["progress_categories"]]
+    return merged
+
+
+def write_json(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2)
+        f.write("\n")
+
+
 def main() -> None:
     # units are named by the C file's path under its binary (main/menu/inn
     # for src/engine/menu/inn.c), as splat's asm is
@@ -742,9 +797,11 @@ def main() -> None:
         "progress_categories": categories,
     }
 
-    with open(ROOT / "objdiff.json", "w") as f:
-        json.dump(config, f, indent=2)
-        f.write("\n")
+    # the version's own project, which make report reads: in its build
+    # directory, so its paths go up to the repository
+    write_json(version_project(V), relative_to_build(config, "../../"))
+    # and the one the objdiff GUI opens: every version generated so far
+    write_json(ROOT / "objdiff.json", all_versions(config))
 
     if wrong_sizes:
         print("functions splat sizes differently from their C: give them their"

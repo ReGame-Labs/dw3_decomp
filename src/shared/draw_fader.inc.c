@@ -2,7 +2,7 @@
    blending (tpage 0xE1000245) */
 void OVL_NAME(drawFader)(ScreenFade *task) {
     Layer *layer = GFX.funcs.getLayer(task->layerId);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, task->depth);
+    u_long *ot = layer->getOtEntry(layer, task->depth);
     POLY_F4 *poly = GFX.funcs.getPrim();
     DR_TPAGE *mode;
 

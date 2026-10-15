@@ -128,7 +128,7 @@ static inline void setItemScript(BattleItem *task, BattleChild *children) {
     if (task->item >= 0x2B && task->item < 0x2F) {
         WFIGHTMN_setIdleMotion(0, -ITEM_FUNCS.get(task->item)->data.effect->amount);
     } else if (task->item == 0x47) {
-        WFIGHTMN_setIdleMotion(0, -((FIGHTSTG_battle.state.fighters[0] + FIGHTSTG_battle.state.active[0])->maxHp >> 1));
+        WFIGHTMN_setIdleMotion(0, -(ACTIVE_FIGHTER(0)->maxHp >> 1));
     }
 }
 
@@ -487,7 +487,7 @@ static inline void boostDefense(BattleItem *task, BattleChild *children) {
 /* Item 0x4B: puts the partner in its special state, which doubles its
    effects */
 static inline void startSpecial(BattleItem *task, BattleChild *children) {
-    (FIGHTSTG_battle.state.fighters[0] + FIGHTSTG_battle.state.active[0])->special = 1;
+    ACTIVE_FIGHTER(0)->special = 1;
 #if VERSION_US
     FIGHTSTG_queueSpecialEnd();
 #endif
@@ -753,9 +753,9 @@ static inline void damageEnemy(BattleItem *task, BattleChild *children) {
    (item 0x55 attacks again in BATTLE_KIND_FINAL_LAST). The match depends on
    each case's variables being its own, on item 0x47's halves being declared in
    its `if`, on its MP test being written `maxMp <= mp + halfMp`, on item
-   0x57's cap being read after the boosts change, on the pointer sum of item
-   0x4B and on the cases that say the item does nothing ending on their own
-   (item 0x2B's, 0x57's and 0x59's). */
+   0x57's cap being read after the boosts change and on the cases that say
+   the item does nothing ending on their own (item 0x2B's, 0x57's and
+   0x59's). */
 void FIGHTSTG_updateItem(BattleItem *task, BattleChild *children) {
     s8 unused[0x90]; /* unused, but it is in the original stack frame */
 

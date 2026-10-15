@@ -60,8 +60,7 @@ static inline void startChange(DigimonChange *task, DigimonChangeChildren *child
     task->clip1.h = 0;
     control = models->get(models, 0);
     camera->getFighterView(camera, 0, 9);
-    z = control->homePos.z;
-    z = -z;
+    z = -control->homePos.z;
     FIGHTSTG_fighterView.vpz += z;
     FIGHTSTG_fighterView.vrz += z;
     camera->set(camera, &FIGHTSTG_fighterView);
@@ -124,8 +123,7 @@ static inline void swapInNewDigimon(DigimonChange *task, Models *models, BattleC
     control->layers[1].layerId = BATTLE_LAYER_WIREFRAME;
     models->face(models, 0);
     camera->getFighterView(camera, 0, 9);
-    z = control->homePos.z;
-    z = -z;
+    z = -control->homePos.z;
     FIGHTSTG_fighterView.vpz += z;
     FIGHTSTG_fighterView.vrz += z;
     camera->set(camera, &FIGHTSTG_fighterView);
@@ -192,9 +190,9 @@ static inline void returnToBattle(DigimonChange *task, Models *models, BattleCam
    clips of BATTLE_LAYER_MODELS and BATTLE_LAYER_WIREFRAME (startChange,
    wipeToWireframe, swapInNewDigimon, wipeFromWireframe), and a fade back to
    the battle (returnToBattle). The match depends on substate 2's control
-   kept in startChange, on z read and then negated, on the if/else of the
-   motion, on clip1.h written before clip1.y in wipeToWireframe and on the
-   layers kept in setChangeClips */
+   kept in startChange, on the if/else of the motion, on clip1.h written
+   before clip1.y in wipeToWireframe and on the layers kept in
+   setChangeClips */
 void FIGHTSTG_updateDigimonChange(DigimonChange *task, DigimonChangeChildren *children) {
     Models *models = task->models;
     BattleCamera *camera = task->camera;

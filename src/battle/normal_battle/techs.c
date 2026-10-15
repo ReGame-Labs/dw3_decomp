@@ -49,7 +49,6 @@ void WFIGHTMN_chargeGauge(u8 side, s32 damage) {
    an action effect or a weapon of the enemy's family, else its own one */
 static inline void choosePartnerScript(BattleScript *task, TechData *info, BattleStats *own, BattleStats *other) {
     s32 i;
-    s32 j;
 
     if (info->script == 5) {
         if (own->tripleHit != 0) {
@@ -60,13 +59,8 @@ static inline void choosePartnerScript(BattleScript *task, TechData *info, Battl
             for (i = 2; i < 13; i++) {
                 if (FIGHTSTG_action.effects[i] != 0) {
                     task->index = 6;
-                    {
-                        ScriptLook *table = WFIGHTMN_actionEffects; /* match depends on the pointer */
-
-                        j = i - 2;
-                        task->effect = table[j].effect;
-                        task->sound = table[j].sound;
-                    }
+                    task->effect = WFIGHTMN_actionEffects[i - 2].effect;
+                    task->sound = WFIGHTMN_actionEffects[i - 2].sound;
                     break;
                 }
             }
@@ -334,10 +328,10 @@ s32 WFIGHTMN_limitDamage(u8 side, s32 damage, s32 hits) {
     case BATTLE_KIND_ESCAPE:
     case BATTLE_KIND_UNK2:
         if (side == 0) {
-            /* the s16 cast and total: the match depends on them, which
-               narrow the limit and multiply before the branches */
-            limit = (s16)(unit->maxHp / 11);
+            limit = unit->maxHp / 11;
             if (hits != 0) {
+                /* the match depends on total, which multiplies before the
+                   branches */
                 total = damage * hits;
                 if (unit->hp > limit) {
                     if (unit->hp - total < limit) {

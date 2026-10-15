@@ -11,7 +11,7 @@ build/<version>/gcc, whose files may be smaller) into a copy of the original
 disc image (tools/patch_disc.py), boots that in DuckStation under xvfb-run,
 with no window, and reads GAME.mode through DuckStation's GDB server until
 the game waits in the first screen that needs a button: the title screen
-(USA) or the language menu (Europe). Then it watches the game for HOLD
+(USA, Japan) or the language menu (Europe). Then it watches the game for HOLD
 seconds: it passes if the game takes no exception that the kernel leaves
 unresolved (all but interrupts and system calls), never jumps to 0, runs
 only known code (the BIOS, the kernel, the build's binaries), keeps drawing
@@ -42,10 +42,10 @@ from patch_disc import patch
 from version import BUILD_DIR, EXE_NAME, VERSION
 
 # GAME.mode (include/engine/game_state.h), and the mode in which the game waits
-# for a button on its first screen: STDWTITL's title screen, or the
-# European language menu (CNTY_SEL), which comes before it
-MODE_OFFSET = {"us": 0x26BC, "eu": 0x26C4}[VERSION]
-FIRST_MENU = {"us": 0xE01, "eu": 0x1600}[VERSION]
+# for a button on its first screen: STDWTITL's title screen (MODE_OPENING), or
+# the European language menu (CNTY_SEL), which comes before it
+MODE_OFFSET = {"us": 0x26BC, "eu": 0x26C4, "jp": 0x26C4}[VERSION]
+FIRST_MENU = {"us": 0xE01, "eu": 0x1600, "jp": 0xE01}[VERSION]
 
 # GFX.frameCount (include/engine/graphics.h): the frames that drawFrame ended
 FRAME_COUNT_OFFSET = 0x08

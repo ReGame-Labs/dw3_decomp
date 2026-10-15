@@ -129,28 +129,7 @@ void STSTATUS_drawDemoScreen(PartyScreen *screen) {
         }
     }
     sprite.setTexture(0x140, 0);
-    for (i = 0; i < screen->count; i++) {
-        level = screen->pageFades[i].level;
-        if (level != 0) {
-            /* both branches draw the frame's last part: the match depends on it */
-            if (level != ONE) {
-                sprite.setScale(level, ONE, ONE);
-                sprite.setPivot(0, i * 46 + 0x25);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 46 + 0x11);
-                sprite.setScale(screen->pageFades[i].level, screen->pageFades[i].level, ONE);
-                sprite.setPivot(0x7C, i * 46 + 0x27);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x16, 0x67, i * 46 + 0x13);
-                sprite.setScale(screen->pageFades[i].level, ONE, ONE);
-                sprite.setPivot(0, i * 46 + 0x25);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 46 + 0x11);
-            } else {
-                sprite.setScale(ONE, ONE, ONE);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 46 + 0x11);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x16, 0x67, i * 46 + 0x13);
-                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 46 + 0x11);
-            }
-        }
-    }
+    DRAW_PAGE_PANELS(sprite, screen, i);
     level = screen->fades[1].level;
     if (level != 0) {
         if (level != ONE) {

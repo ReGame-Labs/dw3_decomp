@@ -98,9 +98,8 @@ static inline void showCounterResult(Counterattack *task, BattleChild *children)
    HP (showCounterResult), 2 hands received to WFIGHTMN_chargeGauge. The
    match depends on playCounterTech's technique and side being declared in
    it, on the event index and the stats being variables of their own, on the
-   stage being written element * 3 + 0x21 and one more, on the enemy's
-   fighter being found as a pointer sum and on one row variable for both of
-   playCounterTech's rows. */
+   stage being written element * 3 + 0x21 and one more and on one row
+   variable for both of playCounterTech's rows. */
 void FIGHTSTG_updateCounterattack(Counterattack *task, BattleChild *children) {
     BattleFighter *fighter;
     BattleTableEntry *entry;
@@ -150,7 +149,7 @@ void FIGHTSTG_updateCounterattack(Counterattack *task, BattleChild *children) {
             }
             task->tech = FIGHTSTG_getEnemyAction(entry->counter.target);
             if (task->tech == 1) {
-                task->tech = FIGHTSTG_battleTableFunc((FIGHTSTG_battle.state.fighters[1] + FIGHTSTG_battle.state.active[1])->id)->techs[0];
+                task->tech = FIGHTSTG_battleTableFunc(ACTIVE_FIGHTER(1)->id)->techs[0];
                 task->substate = 1;
             }
         }

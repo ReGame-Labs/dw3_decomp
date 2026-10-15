@@ -413,9 +413,8 @@ void FIGHTSTG_startAction(u8 side, s32 tech) {
     } else if (entry->effect == TECH_EFFECT_END_BATTLE) {
         FIGHTSTG_startEndBattle();
     } else {
-        /* the match depends on the fighter's pointer sum */
         if (entry->effect == TECH_EFFECT_ENEMY_ONLY &&
-            (side == 0 || FIGHTSTG_battleTableFunc((FIGHTSTG_battle.state.fighters[1] + FIGHTSTG_battle.state.active[1])->id)->techs[0] != tech)) {
+            (side == 0 || FIGHTSTG_battleTableFunc(ACTIVE_FIGHTER(1)->id)->techs[0] != tech)) {
             FIGHTSTG_markEnemyOnly();
             return;
         }

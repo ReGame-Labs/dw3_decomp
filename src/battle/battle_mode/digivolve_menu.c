@@ -13,7 +13,8 @@ void FIGHTSTG_showDigivolveNames(DigivolveMenu *task) {
     s32 current;
     s32 i;
 
-    /* the match depends on setting index in the loop's init */
+    /* the match depends on setting index in the loop's init: set before the
+       loop, its -1 is scheduled two instructions earlier */
     for (i = 0, index = -1; i < 3; i++) {
         if (task->partner == GAME.funcs.getPartyMember(i)) {
             index = i;
