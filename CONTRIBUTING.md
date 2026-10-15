@@ -4,6 +4,8 @@ The conventions follow the [Digimon World decomp](https://github.com/jype0/dw_de
 and the [Digimon Digital Card Battle decomp](https://github.com/ReGame-Labs/dcb_decomp),
 so that the Digimon decomps read the same way. The README explains how to
 set up and build the project; this file is about the work itself.
+[docs/architecture.md](docs/architecture.md) explains how the game works
+and where each part's code is.
 
 ## Decompiling a function
 

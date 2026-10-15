@@ -177,6 +177,9 @@ python3 tools/check_names.py  # every version uses the USA version's names
 - [The API documentation](https://regame-labs.github.io/dw3_decomp/): the European version's functions,
   types, globals and macros, with their source and graphs, and these pages
   (`make docs` builds it locally).
+- [docs/architecture.md](docs/architecture.md): how the game works as a
+  program (the main loop, the overlays, the tasks, the engine's modules,
+  the field's scripts, the battle) and where each part's code is.
 - [docs/status.md](docs/status.md): the status of each part, how the
   progress is measured, and the fake matches and hacks.
 - [docs/binaries.md](docs/binaries.md): the game's executable, overlays and

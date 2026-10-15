@@ -8,7 +8,7 @@ in the report. `include/` has the same folders.
 
 | Folder | On the disc | What it is |
 |---|---|---|
-| `engine/` | SLES_039.36, SLUS_014.36 | the executable: one folder per module |
+| `engine/` | SLES_039.36, SLUS_014.36, SLPS_034.46 | the executable: one folder per module |
 | `field/field_mode/` | FIELDSTG.PRO | the field mode, where the player walks around the map |
 | `field/stages/` | WSTAG###.PRO | the stage overlays, in the folders of their areas ([the list](field/stages/README.md)) |
 | `battle/battle_mode/` | FIGHTSTG.PRO | the battle |
@@ -32,6 +32,10 @@ in the report. `include/` has the same folders.
 | `debug/vibration_test/` | SHOCKTST.PRO | the vibration test |
 | `debug/sound_test/` | SOUNDTST.PRO | the sound test |
 | `shared/` | | the code several overlays have, each its own copy, which their files include as `"shared/<file>.inc.c"` |
+
+[docs/architecture.md](../docs/architecture.md) explains how these parts
+work together: the main loop, the modes and their overlays, the tasks, and
+each part of the game.
 
 An overlay's `scene.c` is its root task (and the screen fade); `data/` holds
 data that is the original's own object (`data/wfightmn_2.c`, the second
