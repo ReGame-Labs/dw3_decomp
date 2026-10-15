@@ -53,9 +53,9 @@ ActorImage stageImages[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0 },
     { 0, 0, 0, 0, 0, 0, 0, 0 },
 };
-u16 actor13Talk0Conditions[] = { FLAG(0x1C, 0x44), 0, CODES_END };
-u16 actor13Talk0Actions[] = { FLAG(0x1C, 0x44), 1, CODES_END };
-u16 actor13Talk1Conditions[] = { FLAG(0x1C, 0x44), 1, CODES_END };
+u16 actor13Talk0Conditions[] = { FLAG_ASUKA_INN_GUILMON_TALKED, 0, CODES_END };
+u16 actor13Talk0Actions[] = { FLAG_ASUKA_INN_GUILMON_TALKED, 1, CODES_END };
+u16 actor13Talk1Conditions[] = { FLAG_ASUKA_INN_GUILMON_TALKED, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x20 },
     { NULL, NULL, 0 },
@@ -119,15 +119,15 @@ FieldTalk actor14Talks[] = {
 };
 u16 actor3Conditions[] = { SPECIAL(0x16), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0xC), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0xE), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0x16), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(4), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor13Conditions[] = { ITEM(0, 0x18F), 0, PROGRESS(6), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor13Conditions[] = { ITEM(0, 0x18F), 0, PROGRESS(STORY_FAKE_BLUE_CARD), 1, CODES_END };
 u16 actor14Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { NULL, actor0Talks, 0x28, 4, 135, 212, 7 };
 FieldActorEntry actor1 = { NULL, actor1Talks, 0x29, 5, 173, 155, 7 };

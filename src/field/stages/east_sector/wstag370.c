@@ -22,7 +22,7 @@ extern FieldBattles stageBattles1[];
 #endif
 /*
  * Sets the stage up: its map, actors and battles, playing the ambience
- * ENV10_00; battle list 0 before story step 0xE, 1 from then on
+ * ENV10_00; battle list 0 before STORY_TEDDY_FOUND, 1 from then on
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -41,7 +41,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress < 0xE) {
+    if (GAME.progress < STORY_TEDDY_FOUND) {
         FIELDSTG_state.battles = stageBattles0;
     } else {
         FIELDSTG_state.battles = stageBattles1;
@@ -179,9 +179,9 @@ FieldTalk actor2Talks[] = {
     { NULL, NULL, 0x330 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(5), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(6), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(7), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_SEIRYU_BADGE), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_FAKE_BLUE_CARD), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_SOUTH_STATION_GHOST), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0xB2, 4, 320, 736, 3 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0xB2, 4, 320, 736, 3 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0xB2, 4, 320, 736, 3 };

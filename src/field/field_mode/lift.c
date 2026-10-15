@@ -141,7 +141,7 @@ void FIELDSTG_moveLift(Lift *task, s32 command) {
 Lift *FIELDSTG_createLift(s32 id) {
     Lift *task = createTaskWithId(FIELDSTG_updateLift, sizeof(Lift), 0, id);
 
-    if (FLAGS_00.checkCondition(FLAG(0x1C, 0x3D), 1)) {
+    if (FLAGS_00.checkCondition(FLAG_LIFT_RAISED, 1)) {
         task->raised = 1;
     } else {
         task->raised = 0;

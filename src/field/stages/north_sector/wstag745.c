@@ -69,7 +69,7 @@ void updateStage(StageTask *task, void **children) {
                 children[i] = createStageEffect(updateStageSpots[i].x, updateStageSpots[i].y, updateStageSpots[i].frame);
             }
         }
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x41), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x42), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_DARK_KNIGHT_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_GENBU_LEADER_CHALLENGE_SEEN, 0)) {
             children[21] = FIELDSTG_startEvent(0x32B);
         }
         task->nextState(task);
@@ -94,7 +94,7 @@ void updateStage(StageTask *task, void **children) {
  * keeps it from playing again
  */
 void endEvent810(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x41), 1);
+    FLAGS_00.applyAction(FLAG_DARK_KNIGHT_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -104,7 +104,7 @@ void endEvent810(void) {
  */
 void endEvent811(void) {
     FLAGS_00.applyAction(ITEM(4, 0xA3), 1);
-    FLAGS_00.applyAction(FLAG(0x40, 0x42), 1);
+    FLAGS_00.applyAction(FLAG_GENBU_LEADER_CHALLENGE_SEEN, 1);
 }
 
 #if VERSION_US || VERSION_JP
@@ -309,7 +309,12 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x170, 0x180, 0xC0, 0x80, 0x150, 0x1FA },
     { 0x140, 0x100, 0x140, 0x160, 0, 0x60, 0x160, 0x1FA },
 };
-u16 actor0Talk0Actions[] = { SPECIAL(0x91), 1, FLAG(2, 0x38), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    SPECIAL(0x91), 1,
+    FLAG_DARK_DUNGEON_5000_BIT_FOUND, 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x26F },
     { NULL, NULL, 0 },
@@ -334,12 +339,12 @@ FieldTalk actor5Talks[] = {
     { NULL, NULL, 0x20A },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x38), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_DARK_DUNGEON_5000_BIT_FOUND, 0, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor4Conditions[] = { FLAG(0x40, 0x42), 0, SPECIAL(0x19), 1, CODES_END };
-u16 actor5Conditions[] = { FLAG(0x40, 0x42), 1, SPECIAL(0x19), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor4Conditions[] = { FLAG_GENBU_LEADER_CHALLENGE_SEEN, 0, SPECIAL(0x19), 1, CODES_END };
+u16 actor5Conditions[] = { FLAG_GENBU_LEADER_CHALLENGE_SEEN, 1, SPECIAL(0x19), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 785, 233, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x9D, 5, 271, 193, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0xCA, 6, 271, 193, 1 };
@@ -375,7 +380,7 @@ StageTile stageObjects[] = {
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x26B, 0xD0, 0x33C, 5, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x26D, 0x1E8, 0x254, 3, 0, 0, 0 },
-    { { { ITEM(0, 0x11), 1 }, { FLAG(0x40, 0x41), 0 } }, SLOT_EVENT, 0x32A, 0, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 0x11), 1 }, { FLAG_DARK_KNIGHT_WIN_SEEN, 0 } }, SLOT_EVENT, 0x32A, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x1F40, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x1F41, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x1F42, 0, 0, 0, 0, 0, 0 },

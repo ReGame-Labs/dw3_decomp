@@ -1,7 +1,7 @@
 /*
  * WSTAG963: Seabed, Underground: below Shell Beach, Plug Cape, South Cape and
  * the Lake of Ice, in the extra chapter. The European version's: in its extra
- * chapter (FIELD_PROGRESS_EXTRA), mode 739 starts it instead of WSTAG840.
+ * chapter (STORY_EXTRA), mode 739 starts it instead of WSTAG840.
  */
 
 #include "common.h"

@@ -103,9 +103,21 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x18C, 0x100, 0x130, 0, 0x150, 0x1F1 },
     { 0x180, 0x100, 0x194, 0x100, 0x150, 0, 0x170, 0x1F1 },
 };
-u16 actor0Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 8), 1, CODES_END };
-u16 actor1Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 9), 1, CODES_END };
-u16 actor2Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0xA), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_ASUKA_BASEMENT_STAIRS_TROOPER_A_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor1Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_ASUKA_BASEMENT_STAIRS_TROOPER_B_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor2Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_ASUKA_BASEMENT_STAIRS_TROOPER_C_FOUGHT, 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0xA9 },
     { NULL, NULL, 0 },
@@ -118,9 +130,21 @@ FieldTalk actor2Talks[] = {
     { NULL, actor2Talk0Actions, 0xA9 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 8), 0, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 9), 0, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0xA), 0, CODES_END };
+u16 actor0Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_BASEMENT_STAIRS_TROOPER_A_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor1Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_BASEMENT_STAIRS_TROOPER_B_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor2Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_BASEMENT_STAIRS_TROOPER_C_FOUGHT, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x132, 4, 209, 353, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x133, 5, 419, 250, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x134, 6, 544, 249, 7 };

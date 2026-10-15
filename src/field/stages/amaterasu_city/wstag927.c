@@ -1,7 +1,7 @@
 /*
  * WSTAG927: Digimon Arena, Amaterasu City, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 632 starts it
- * instead of WSTAG233.
+ * version's: in its extra chapter (STORY_EXTRA), mode 632 starts it instead of
+ * WSTAG233.
  */
 
 #include "common.h"
@@ -22,10 +22,10 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         children[0] = createTileAnims();
-        if (FLAGS_00.checkCondition(FLAG(0x10, 0xC), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_KURT_ARENA_WIN_SEEN, 0)) {
             children[1] = FIELDSTG_startEvent(0x648);
         }
-        if (FLAGS_00.checkCondition(FLAG(0x10, 0xC), 1)) {
+        if (FLAGS_00.checkCondition(FLAG_KURT_ARENA_WIN_SEEN, 1)) {
             children[1] = FIELDSTG_startEvent(0x64A);
         }
         task->nextState(task);
@@ -42,7 +42,7 @@ void updateStage(StageTask *task, void **children) {
 
 /* After event 1608, with Kurt: starts the stage's event battle 0 and keeps it from playing again */
 void endEvent1608(void) {
-    FLAGS_00.applyAction(FLAG(0x10, 0xC), 1);
+    FLAGS_00.applyAction(FLAG_KURT_ARENA_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 

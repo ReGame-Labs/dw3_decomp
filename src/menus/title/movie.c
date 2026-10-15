@@ -238,7 +238,7 @@ void STDWTITL_tickMovie(MovieTask *task, MoviePlayerTask **player) {
         }
         if (task->movie != 11) {
             task->nextMode = STDWTITL_movies[task->movie].nextMode;
-            if (task->movie == 2 && GAME.progress == 0x2D) {
+            if (task->movie == 2 && GAME.progress == STORY_EXTRA) {
                 task->nextMode = 0x276;
             }
         } else {

@@ -12,11 +12,11 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         do {
-            if (GAME.progress == 0x24 && FLAGS_00.checkCondition(FLAG(0x40, 0xCA), 0)) {
+            if (GAME.progress == STORY_BLACK_ID_PASS && FLAGS_00.checkCondition(FLAG(0x40, 0xCA), 0)) {
                 children[0] = FIELDSTG_startEvent(0x399);
                 break;
             }
-            if (GAME.progress == 0x24 && FLAGS_00.checkCondition(FLAG(0x40, 0xCA), 1)) {
+            if (GAME.progress == STORY_BLACK_ID_PASS && FLAGS_00.checkCondition(FLAG(0x40, 0xCA), 1)) {
                 children[0] = FIELDSTG_startEvent(0x39A);
                 break;
             }
@@ -46,9 +46,9 @@ void endEvent921(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xCA), 1);
 }
 
-/* After event 922, with Teddy and Nick: moves the story on to its step 0x25 */
+/* After event 922, with Teddy and Nick: moves the story on to STORY_AMATERASU_BRIDGE */
 void endEvent922(void) {
-    GAME.progress = 0x25;
+    GAME.progress = STORY_AMATERASU_BRIDGE;
 }
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
@@ -63,7 +63,7 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #endif
 /*
  * Sets the stage up: its map, actors, battles and events, playing ASKA_BGM;
- * BGM_0029 instead except at story step 0x26 once flag 0x1A0A is set
+ * BGM_0029 instead except at STORY_PRESIDENT_ARRESTED once flag 0x1A0A is set
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -84,7 +84,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress != 0x26 || FLAGS_00.checkCondition(FLAG(0x1A, 0xA), 0) != 0) {
+    if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -370,11 +370,16 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x188, 0x138, 0x120, 0x38, 0x150, 0x1FB },
     { 0x180, 0x100, 0x190, 0x138, 0x140, 0x38, 0x160, 0x1FB },
 };
-u16 actor0Talk0Actions[] = { SPECIAL(0x8B), 1, FLAG(2, 0x5E), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor14Talk0Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor14Talk1Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor18Talk0Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor18Talk1Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    SPECIAL(0x8B), 1,
+    FLAG_AMATERASU_BRIDGE_100_BIT_FOUND, 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor14Talk0Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor14Talk1Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor18Talk0Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor18Talk1Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x16C },
     { NULL, NULL, 0 },
@@ -413,33 +418,33 @@ FieldTalk actor20Talks[] = {
     { NULL, NULL, 0xEC },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x5E), 0, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x24), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x24), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x24), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x24), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0x24), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x24), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(0x24), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(0x24), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(0x24), 1, CODES_END };
+u16 actor0Conditions[] = { FLAG_AMATERASU_BRIDGE_100_BIT_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor13Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
 u16 actor14Conditions[] = { SPECIAL(0x1C), 1, CODES_END };
-u16 actor15Conditions[] = { PROGRESS(0x24), 0, SPECIAL(0x1D), 1, CODES_END };
+u16 actor15Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 0, SPECIAL(0x1D), 1, CODES_END };
 u16 actor16Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor17Conditions[] = { PROGRESS(0x24), 1, CODES_END };
+u16 actor17Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
 u16 actor18Conditions[] = { SPECIAL(0x1C), 1, CODES_END };
-u16 actor19Conditions[] = { PROGRESS(0x24), 0, SPECIAL(0x1D), 1, CODES_END };
+u16 actor19Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 0, SPECIAL(0x1D), 1, CODES_END };
 u16 actor20Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor21Conditions[] = { PROGRESS(0x24), 1, CODES_END };
-u16 actor22Conditions[] = { PROGRESS(0x24), 0, SPECIAL(0x1D), 1, CODES_END };
-u16 actor23Conditions[] = { PROGRESS(0x24), 0, SPECIAL(0x1D), 1, CODES_END };
-u16 actor24Conditions[] = { SPECIAL(0x1D), 1, PROGRESS(0x24), 0, CODES_END };
-u16 actor25Conditions[] = { PROGRESS(0x24), 1, CODES_END };
-u16 actor26Conditions[] = { PROGRESS(0x24), 1, CODES_END };
+u16 actor21Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
+u16 actor22Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 0, SPECIAL(0x1D), 1, CODES_END };
+u16 actor23Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 0, SPECIAL(0x1D), 1, CODES_END };
+u16 actor24Conditions[] = { SPECIAL(0x1D), 1, PROGRESS(STORY_BLACK_ID_PASS), 0, CODES_END };
+u16 actor25Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
+u16 actor26Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 304, 160, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x25, 5, 736, 184, 1 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0x25, 5, 0, 0, 1 };

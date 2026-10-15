@@ -380,11 +380,11 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         do {
-            if (GAME.progress == 0xD && FLAGS_00.checkCondition(FLAG(0x1C, 0xB), 0)) {
+            if (GAME.progress == STORY_AGUMON_DISGUISE && FLAGS_00.checkCondition(FLAG(0x1C, 0xB), 0)) {
                 children[0] = FIELDSTG_startEvent(0x136);
                 break;
             }
-            if (GAME.progress == 0x17 && FLAGS_00.checkCondition(FLAG(0x40, 0x50), 1)) {
+            if (GAME.progress == STORY_GAME_MASTER_CAUGHT && FLAGS_00.checkCondition(FLAG(0x40, 0x50), 1)) {
                 children[0] = FIELDSTG_startEvent(0x2AD);
                 break;
             }
@@ -408,13 +408,13 @@ void endEvent310(void) {
 }
 
 /*
- * After event 685, with Teddy: moves the story on to its step 0x18 and
+ * After event 685, with Teddy: moves the story on to STORY_KNIGHTMON_REPROGRAMMED and
  * clears flag 0x1C26 (which decides whether actors 17, 19, 21 and 23 in
  * WSTAG660 appear)
  */
 void endEvent685(void) {
     FLAGS_00.applyAction(FLAG(0x1C, 0x26), 0);
-    GAME.progress = 0x18;
+    GAME.progress = STORY_KNIGHTMON_REPROGRAMMED;
 }
 
 /* the color the setup copies to FIELDSTG_state.spriteColor */
@@ -454,11 +454,11 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x14 && GAME.progress < 0x18) {
+    if (GAME.progress >= STORY_BYAKKO_LEADER_FOUGHT && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -896,23 +896,23 @@ ActorImage stageImages[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0 },
     { 0x140, 0x100, 0x168, 0x139, 0xA0, 0x39, 0x150, 0x1F2 },
 };
-u16 actor0Talk0Conditions[] = { FLAG(0x1A, 0), 0, CODES_END };
-u16 actor0Talk0Actions[] = { FLAG(0x1A, 0), 1, CODES_END };
-u16 actor0Talk1Conditions[] = { FLAG(0x1A, 0), 1, CODES_END };
+u16 actor0Talk0Conditions[] = { FLAG_HELP_COUNTER_TALKED, 0, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_HELP_COUNTER_TALKED, 1, CODES_END };
+u16 actor0Talk1Conditions[] = { FLAG_HELP_COUNTER_TALKED, 1, CODES_END };
 u16 actor0Talk1Actions[] = { START_EVENT(4), 1, CODES_END };
 u16 actor1Talk0Actions[] = { START_EVENT(0x1A), 1, CODES_END };
 u16 actor2Talk0Actions[] = { START_EVENT(0x1A), 1, CODES_END };
 u16 actor3Talk0Actions[] = { START_EVENT(0x1A), 1, CODES_END };
-u16 actor4Talk0Conditions[] = { FLAG(0x1A, 0), 0, CODES_END };
-u16 actor4Talk0Actions[] = { FLAG(0x1A, 0), 1, CODES_END };
-u16 actor4Talk1Conditions[] = { FLAG(0x1A, 0), 1, CODES_END };
+u16 actor4Talk0Conditions[] = { FLAG_HELP_COUNTER_TALKED, 0, CODES_END };
+u16 actor4Talk0Actions[] = { FLAG_HELP_COUNTER_TALKED, 1, CODES_END };
+u16 actor4Talk1Conditions[] = { FLAG_HELP_COUNTER_TALKED, 1, CODES_END };
 u16 actor4Talk1Actions[] = { START_EVENT(3), 1, CODES_END };
 u16 actor5Talk0Actions[] = { START_EVENT(3), 1, CODES_END };
 u16 actor6Talk0Actions[] = { START_EVENT(3), 1, CODES_END };
 u16 actor7Talk0Actions[] = { START_EVENT(3), 0, CODES_END };
-u16 actor78Talk0Conditions[] = { FLAG(0x1A, 0x16), 0, CODES_END };
-u16 actor78Talk0Actions[] = { FLAG(0x1A, 0x16), 1, CODES_END };
-u16 actor78Talk1Conditions[] = { FLAG(0x1A, 0x16), 1, CODES_END };
+u16 actor78Talk0Conditions[] = { FLAG_KAIL_ETEMON_SUIT_TALKED, 0, CODES_END };
+u16 actor78Talk0Actions[] = { FLAG_KAIL_ETEMON_SUIT_TALKED, 1, CODES_END };
+u16 actor78Talk1Conditions[] = { FLAG_KAIL_ETEMON_SUIT_TALKED, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, actor0Talk0Actions, 0x67 },
     { actor0Talk1Conditions, actor0Talk1Actions, 0x486 },
@@ -1240,102 +1240,119 @@ FieldTalk actor94Talks[] = {
     { NULL, NULL, 0x40 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(2), 1, CODES_END };
-u16 actor1Conditions[] = { SPECIAL(0x22), 1, PROGRESS(0x16), 0, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(2), 1, CODES_END };
-u16 actor5Conditions[] = { SPECIAL(0x22), 1, PROGRESS(0x16), 0, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(2), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(4), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
+u16 actor1Conditions[] = { SPECIAL(0x22), 1, PROGRESS(STORY_CONTROL_ROOM), 0, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
+u16 actor5Conditions[] = { SPECIAL(0x22), 1, PROGRESS(STORY_CONTROL_ROOM), 0, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0xC), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
+u16 actor13Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor14Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor15Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor16Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor15Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor16Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor17Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor18Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor19Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor20Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor21Conditions[] = { PROGRESS(2), 1, CODES_END };
-u16 actor22Conditions[] = { PROGRESS(4), 1, CODES_END };
+u16 actor19Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor20Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor21Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
+u16 actor22Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor23Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor24Conditions[] = { PROGRESS(2), 1, ITEM(0, 0), 0, CODES_END };
-u16 actor25Conditions[] = { PROGRESS(4), 1, CODES_END };
+u16 actor24Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, ITEM(0, 0), 0, CODES_END };
+u16 actor25Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor26Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor27Conditions[] = { PROGRESS(2), 1, CODES_END };
-u16 actor28Conditions[] = { PROGRESS(4), 1, CODES_END };
+u16 actor27Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
+u16 actor28Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor29Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor30Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor31Conditions[] = { PROGRESS(0xC), 1, CODES_END };
-u16 actor32Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor30Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor31Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
+u16 actor32Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor33Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor34Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor35Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor34Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor35Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor36Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor37Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor38Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor39Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor40Conditions[] = { PROGRESS(2), 1, CODES_END };
-u16 actor41Conditions[] = { PROGRESS(4), 1, CODES_END };
+u16 actor38Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor39Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor40Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
+u16 actor41Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor42Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor43Conditions[] = { PROGRESS(2), 1, CODES_END };
-u16 actor44Conditions[] = { PROGRESS(4), 1, CODES_END };
+u16 actor43Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
+u16 actor44Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor45Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor46Conditions[] = { PROGRESS(0xC), 1, CODES_END };
-u16 actor47Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor46Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
+u16 actor47Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor48Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor49Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor50Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor51Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor49Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor50Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor51Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor52Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor53Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor54Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor55Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor56Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor54Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor55Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor56Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor57Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor58Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor59Conditions[] = { PROGRESS(0xC), 1, CODES_END };
-u16 actor60Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor61Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor58Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor59Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
+u16 actor60Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor61Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor62Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor63Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor64Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor65Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor66Conditions[] = { PROGRESS(0xD), 1, FLAG(0x1C, 0xD), 0, CODES_END };
-u16 actor67Conditions[] = { PROGRESS(0xD), 1, FLAG(0x1C, 0xD), 0, CODES_END };
+u16 actor64Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor65Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor66Conditions[] = {
+    PROGRESS(STORY_AGUMON_DISGUISE), 1,
+    FLAG_GAME_MASTER_MEETING_SEEN, 0,
+    CODES_END,
+};
+u16 actor67Conditions[] = {
+    PROGRESS(STORY_AGUMON_DISGUISE), 1,
+    FLAG_GAME_MASTER_MEETING_SEEN, 0,
+    CODES_END,
+};
 u16 actor68Conditions[] = { SPECIAL(9), 1, SPECIAL(0x1A), 0, CODES_END };
-u16 actor69Conditions[] = { PROGRESS(2), 1, CODES_END };
+u16 actor69Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
 u16 actor70Conditions[] = { SPECIAL(9), 1, SPECIAL(0x1A), 0, CODES_END };
-u16 actor71Conditions[] = { PROGRESS(2), 1, CODES_END };
+u16 actor71Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
 u16 actor72Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor73Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor74Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor75Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor76Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor77Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor78Conditions[] = { FLAG(0x1A, 0x15), 1, PROGRESS(0xC), 1, ITEM(0, 0xF), 0, CODES_END };
-u16 actor79Conditions[] = { PROGRESS(0xD), 1, FLAG(0x1C, 0xD), 1, CODES_END };
-u16 actor80Conditions[] = { PROGRESS(4), 1, CODES_END };
-u16 actor81Conditions[] = { PROGRESS(4), 1, CODES_END };
-u16 actor82Conditions[] = { PROGRESS(0x17), 1, CODES_END };
+u16 actor78Conditions[] = {
+    FLAG_MISCHIEVOUS_MAT_TALKED, 1,
+    PROGRESS(STORY_LOOKING_FOR_TEDDY), 1,
+    ITEM(0, 0xF), 0,
+    CODES_END,
+};
+u16 actor79Conditions[] = {
+    PROGRESS(STORY_AGUMON_DISGUISE), 1,
+    FLAG_GAME_MASTER_MEETING_SEEN, 1,
+    CODES_END,
+};
+u16 actor80Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
+u16 actor81Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
+u16 actor82Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
 u16 actor83Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor84Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor85Conditions[] = { PROGRESS(0xC), 1, CODES_END };
-u16 actor86Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor85Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
+u16 actor86Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor87Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor88Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor89Conditions[] = { PROGRESS(0x16), 1, CODES_END };
+u16 actor88Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor89Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor90Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor91Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor91Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor92Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor93Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor93Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor94Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor95Conditions[] = { PROGRESS(0x17), 1, CODES_END };
+u16 actor95Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x20, 4, 384, 255, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x20, 4, 384, 255, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x20, 4, 384, 255, 1 };
@@ -1645,10 +1662,10 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x208, 0x69, 0x134, 5, 0x65, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x214, 0x1F8, 0x2BC, 5, 0x66, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x217, 0x1D8, 0x1D4, 3, 0, 0, 0 },
-    { { { PROGRESS(2), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x14, 0, 0, 0, 0, 0, 0 },
-    { { { PROGRESS(2), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x1E, 0, 0, 0, 0, 0, 0 },
-    { { { PROGRESS(0xD), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x140, 0, 0, 0, 0, 0, 0 },
-    { { { PROGRESS(0xD), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x14A, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_LOGGED_IN), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x14, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_LOGGED_IN), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x1E, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_AGUMON_DISGUISE), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x140, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_AGUMON_DISGUISE), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x14A, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageFuncs stageFuncs = { setupStage, startTween, updateTween };

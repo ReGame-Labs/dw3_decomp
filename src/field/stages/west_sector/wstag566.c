@@ -18,7 +18,7 @@
 #endif
 /*
  * Sets the stage up: its map, actors and battles, playing BGM_0018; BGM_0029
- * instead except at story step 0x26 once flag 0x1A0A is set
+ * instead except at STORY_PRESIDENT_ARRESTED once flag 0x1A0A is set
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -38,7 +38,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress != 0x26 || FLAGS_00.checkCondition(FLAG(0x1A, 0xA), 0) != 0) {
+    if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -110,7 +110,12 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x176, 0x100, 0xD8, 0, 0x160, 0x1FF },
     { 0x140, 0x100, 0x16C, 0x146, 0xB0, 0x46, 0x170, 0x1FF },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x4A), 1, ITEM(1, 0x2C), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_NORTH_BADLAND_W_SUPER_CHARGE_FOUND, 1,
+    ITEM(1, 0x2C), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 u16 actor1Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor1Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor1Talk1Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(7), 0, CODES_END };
@@ -120,15 +125,19 @@ u16 actor1Talk3Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(7), 1,
     PARTY_STAT(9), 1,
-    FLAG(0xE, 0x27), 0,
+    FLAG_NORTH_BADLAND_WEST_TROOPER_FOUGHT, 0,
     CODES_END,
 };
-u16 actor1Talk3Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xE, 0x27), 1, CODES_END };
+u16 actor1Talk3Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_NORTH_BADLAND_WEST_TROOPER_FOUGHT, 1,
+    CODES_END,
+};
 u16 actor1Talk4Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(7), 1,
     PARTY_STAT(9), 1,
-    FLAG(0xE, 0x27), 1,
+    FLAG_NORTH_BADLAND_WEST_TROOPER_FOUGHT, 1,
     CODES_END,
 };
 u16 actor2Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
@@ -151,12 +160,17 @@ u16 actor2Talk4Conditions[] = {
     CODES_END,
 };
 u16 actor2Talk4Actions[] = { CARD_BATTLE(0x34, 1), 1, CODES_END };
-u16 actor3Talk0Conditions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor3Talk1Conditions[] = { FLAG(0, 0x10), 0, CODES_END };
-u16 actor3Talk1Actions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor3Talk2Conditions[] = { FLAG(0, 0x10), 1, CODES_END };
-u16 actor3Talk2Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, CODES_END };
-u16 actor5Talk0Actions[] = { FLAG(2, 0x4B), 1, ITEM(1, 0x46), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor3Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor3Talk1Conditions[] = { FLAG_CARD_BATTLE_WON, 0, CODES_END };
+u16 actor3Talk1Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor3Talk2Conditions[] = { FLAG_CARD_BATTLE_WON, 1, CODES_END };
+u16 actor3Talk2Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG_CARD_BATTLE_WON, 0, CODES_END };
+u16 actor5Talk0Actions[] = {
+    FLAG_NORTH_BADLAND_W_LIFE_DISK_FOUND, 1,
+    ITEM(1, 0x46), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x17D },
     { NULL, NULL, 0 },
@@ -191,24 +205,29 @@ FieldTalk actor5Talks[] = {
     { NULL, actor5Talk0Actions, 0x183 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x4A), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_NORTH_BADLAND_W_SUPER_CHARGE_FOUND, 0, CODES_END };
 u16 actor1Conditions[] = {
     SPECIAL(0x19), 1,
     ITEM(0, 0x192), 1,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     ITEM(0, 0x14), 0,
     CODES_END,
 };
 u16 actor2Conditions[] = {
     ITEM(0, 0x192), 1,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     SPECIAL(0x19), 1,
     ITEM(0, 0x14), 1,
     CODES_END,
 };
-u16 actor3Conditions[] = { SPECIAL(0x19), 1, ITEM(0, 0x192), 1, FLAG(0, 0x11), 1, CODES_END };
+u16 actor3Conditions[] = {
+    SPECIAL(0x19), 1,
+    ITEM(0, 0x192), 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    CODES_END,
+};
 u16 actor4Conditions[] = { ITEM(0, 0x192), 0, SPECIAL(0x19), 1, CODES_END };
-u16 actor5Conditions[] = { FLAG(2, 0x4B), 0, CODES_END };
+u16 actor5Conditions[] = { FLAG_NORTH_BADLAND_W_LIFE_DISK_FOUND, 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 1057, 961, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x45, 5, 784, 393, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x45, 5, 784, 393, 7 };

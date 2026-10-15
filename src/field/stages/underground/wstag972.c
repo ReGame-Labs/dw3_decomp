@@ -1,7 +1,7 @@
 /*
  * WSTAG972: Circuit Board, Underground: a deep tunnel with Black Kingz and
  * Numemon, in the extra chapter. The European version's: in its extra chapter
- * (FIELD_PROGRESS_EXTRA), mode 748 starts it instead of WSTAG885.
+ * (STORY_EXTRA), mode 748 starts it instead of WSTAG885.
  */
 
 #include "common.h"
@@ -173,432 +173,551 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x168, 0x100, 0xA0, 0, 0x150, 0x1FD },
     { 0x140, 0x100, 0x140, 0x140, 0, 0x40, 0x160, 0x1FD },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x78), 1, ITEM(2, 0x72), 1, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(2, 0x7B), 1, ITEM(3, 0x66), 1, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(2, 0x7C), 1, ITEM(3, 0x8D), 1, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_CIRCUIT_BOARD_TEMPEST_ARM_FOUND, 1, ITEM(2, 0x72), 1, CODES_END };
+u16 actor1Talk0Actions[] = {
+    FLAG_CIRCUIT_BOARD_RUSTY_KATANA_FOUND, 1,
+    ITEM(3, 0x66), 1,
+    CODES_END,
+};
+u16 actor2Talk0Actions[] = { FLAG_CIRCUIT_BOARD_OLD_WAND_FOUND, 1, ITEM(3, 0x8D), 1, CODES_END };
 u16 actor3Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor3Talk1Conditions[] = { FLAG(0, 0), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor3Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor3Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor3Talk2Actions[] = { CARD_BATTLE(0x17, 1), 1, CODES_END };
-u16 actor3Talk3Conditions[] = {
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 1,
+u16 actor3Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor3Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor3Talk2Actions[] = { CARD_BATTLE(0x17, 1), 1, CODES_END };
+u16 actor3Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 0), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor3Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor3Talk4Conditions[] = {
     CARD(0x13), 0,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor3Talk4Actions[] = {
     CARD(0x13), 1,
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 0,
     CODES_END,
 };
 u16 actor3Talk5Conditions[] = {
     CARD(0x13), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor3Talk5Actions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor3Talk5Actions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
 u16 actor4Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor4Talk1Conditions[] = { ITEM(0, 0x192), 1, FLAG(0, 1), 0, CODES_END };
 u16 actor4Talk1Actions[] = { FLAG(0, 1), 1, CODES_END };
-u16 actor4Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 1), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor4Talk2Actions[] = { CARD_BATTLE(0x1A, 1), 1, CODES_END };
-u16 actor4Talk3Conditions[] = {
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 1,
+u16 actor4Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 1), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor4Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 1), 0, CODES_END };
+u16 actor4Talk2Actions[] = { CARD_BATTLE(0x1A, 1), 1, CODES_END };
+u16 actor4Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 1), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor4Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 1), 0, CODES_END };
 u16 actor4Talk4Conditions[] = {
     CARD(1), 0,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 1), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor4Talk4Actions[] = {
     CARD(1), 1,
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 1), 0,
     CODES_END,
 };
 u16 actor4Talk5Conditions[] = {
     CARD(1), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 1), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor4Talk5Actions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 0, FLAG(0, 1), 0, CODES_END };
+u16 actor4Talk5Actions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG(0, 1), 0,
+    CODES_END,
+};
 u16 actor5Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor5Talk1Conditions[] = { FLAG(0, 0), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor5Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor5Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor5Talk2Actions[] = { CARD_BATTLE(6, 1), 1, CODES_END };
-u16 actor5Talk3Conditions[] = {
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 1,
+u16 actor5Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor5Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor5Talk2Actions[] = { CARD_BATTLE(6, 1), 1, CODES_END };
+u16 actor5Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 0), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor5Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor5Talk4Conditions[] = {
     CARD(0xD), 0,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor5Talk4Actions[] = {
     CARD(0xD), 1,
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 0,
     CODES_END,
 };
 u16 actor5Talk5Conditions[] = {
     CARD(0xD), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor5Talk5Actions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor5Talk5Actions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
 u16 actor6Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor6Talk1Conditions[] = { FLAG(0, 0), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor6Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor6Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor6Talk2Actions[] = { CARD_BATTLE(0x21, 1), 1, CODES_END };
-u16 actor6Talk3Conditions[] = {
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 1,
+u16 actor6Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor6Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor6Talk2Actions[] = { CARD_BATTLE(0x21, 1), 1, CODES_END };
+u16 actor6Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 0), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor6Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor6Talk4Conditions[] = {
     CARD(0x19), 0,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor6Talk4Actions[] = {
     CARD(0x19), 1,
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 0,
     CODES_END,
 };
 u16 actor6Talk5Conditions[] = {
     CARD(0x19), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor6Talk5Actions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor6Talk5Actions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
 u16 actor7Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor7Talk1Conditions[] = { FLAG(0, 0), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor7Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor7Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor7Talk2Actions[] = { CARD_BATTLE(0x11, 1), 1, CODES_END };
-u16 actor7Talk3Conditions[] = {
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 1,
+u16 actor7Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor7Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor7Talk2Actions[] = { CARD_BATTLE(0x11, 1), 1, CODES_END };
+u16 actor7Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 0), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor7Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor7Talk4Conditions[] = {
     CARD(7), 0,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor7Talk4Actions[] = {
     CARD(7), 1,
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 0,
     CODES_END,
 };
 u16 actor7Talk5Conditions[] = {
     CARD(7), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor7Talk5Actions[] = { FLAG(0, 0), 0, FLAG(0, 0x10), 0, FLAG(0, 0x11), 0, CODES_END };
+u16 actor7Talk5Actions[] = {
+    FLAG(0, 0), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    CODES_END,
+};
 u16 actor12Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor12Talk1Conditions[] = { FLAG(0, 0), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor12Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor12Talk2Conditions[] = { FLAG(0, 0), 1, FLAG(0, 0x11), 0, ITEM(0, 0x192), 1, CODES_END };
-u16 actor12Talk2Actions[] = { CARD_BATTLE(0x4A, 0), 1, CODES_END };
-u16 actor12Talk3Conditions[] = {
+u16 actor12Talk2Conditions[] = {
     FLAG(0, 0), 1,
-    FLAG(0, 0x11), 1,
-    FLAG(0, 0x10), 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor12Talk3Actions[] = { FLAG(0, 0), 0, FLAG(0, 0x11), 0, CODES_END };
+u16 actor12Talk2Actions[] = { CARD_BATTLE(0x4A, 0), 1, CODES_END };
+u16 actor12Talk3Conditions[] = {
+    FLAG(0, 0), 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG_CARD_BATTLE_WON, 0,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor12Talk3Actions[] = { FLAG(0, 0), 0, FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
 u16 actor12Talk4Conditions[] = {
     FLAG(0, 0), 1,
-    FLAG(0, 0x11), 1,
-    FLAG(0, 0x10), 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG_CARD_BATTLE_WON, 1,
     CARD(0x21), 0,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor12Talk4Actions[] = {
     FLAG(0, 0), 0,
-    FLAG(0, 0x11), 0,
-    FLAG(0, 0x10), 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG_CARD_BATTLE_WON, 0,
     CARD(0x21), 1,
     CODES_END,
 };
 u16 actor12Talk5Conditions[] = {
     FLAG(0, 0), 1,
-    FLAG(0, 0x11), 1,
-    FLAG(0, 0x10), 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG_CARD_BATTLE_WON, 1,
     CARD(0x21), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor12Talk5Actions[] = { FLAG(0, 0), 0, FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, CODES_END };
+u16 actor12Talk5Actions[] = {
+    FLAG(0, 0), 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    CODES_END,
+};
 u16 actor13Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor13Talk1Conditions[] = { FLAG(0, 0), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor13Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor13Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor13Talk2Actions[] = { CARD_BATTLE(0x48, 0), 1, CODES_END };
-u16 actor13Talk3Conditions[] = {
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 1,
+u16 actor13Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor13Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor13Talk2Actions[] = { CARD_BATTLE(0x48, 0), 1, CODES_END };
+u16 actor13Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 0), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor13Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor13Talk4Conditions[] = {
     CARD(0x22), 0,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor13Talk4Actions[] = {
     CARD(0x22), 1,
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 0,
     CODES_END,
 };
 u16 actor13Talk5Conditions[] = {
     CARD(0x22), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor13Talk5Actions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor13Talk5Actions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
 u16 actor14Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor14Talk1Conditions[] = { FLAG(0, 0), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor14Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor14Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor14Talk2Actions[] = { CARD_BATTLE(0x49, 0), 1, CODES_END };
-u16 actor14Talk3Conditions[] = {
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 1,
+u16 actor14Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor14Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor14Talk2Actions[] = { CARD_BATTLE(0x49, 0), 1, CODES_END };
+u16 actor14Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 0), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor14Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor14Talk4Conditions[] = {
     CARD(0x23), 0,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor14Talk4Actions[] = {
     CARD(0x23), 1,
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 0,
     CODES_END,
 };
 u16 actor14Talk5Conditions[] = {
     CARD(0x23), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor14Talk5Actions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor14Talk5Actions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
 u16 actor15Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor15Talk1Conditions[] = { FLAG(0, 0), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor15Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor15Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor15Talk2Actions[] = { CARD_BATTLE(0x4B, 0), 1, CODES_END };
-u16 actor15Talk3Conditions[] = {
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 1,
+u16 actor15Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor15Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor15Talk2Actions[] = { CARD_BATTLE(0x4B, 0), 1, CODES_END };
+u16 actor15Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 0), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor15Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor15Talk4Conditions[] = {
     CARD(0x1F), 0,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor15Talk4Actions[] = {
     CARD(0x1F), 1,
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 0,
     CODES_END,
 };
 u16 actor15Talk5Conditions[] = {
     CARD(0x1F), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor15Talk5Actions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor15Talk5Actions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
 u16 actor16Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor16Talk1Conditions[] = { FLAG(0, 0), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor16Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor16Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor16Talk2Actions[] = { CARD_BATTLE(0x47, 0), 1, CODES_END };
-u16 actor16Talk3Conditions[] = {
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 1,
+u16 actor16Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor16Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor16Talk2Actions[] = { CARD_BATTLE(0x47, 0), 1, CODES_END };
+u16 actor16Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 0), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor16Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor16Talk4Conditions[] = {
     CARD(0x20), 0,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor16Talk4Actions[] = {
     CARD(0x20), 1,
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 0,
     CODES_END,
 };
 u16 actor16Talk5Conditions[] = {
     CARD(0x20), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor16Talk5Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, FLAG(0, 0x10), 0, CODES_END };
+u16 actor16Talk5Actions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG(0, 0), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    CODES_END,
+};
 u16 actor17Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor17Talk1Conditions[] = { FLAG(0, 1), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor17Talk1Actions[] = { FLAG(0, 1), 1, CODES_END };
-u16 actor17Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 1), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor17Talk2Actions[] = { CARD_BATTLE(0x4F, 0), 1, CODES_END };
-u16 actor17Talk3Conditions[] = {
-    FLAG(0, 0x11), 1,
+u16 actor17Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 1), 1,
     ITEM(0, 0x192), 1,
-    FLAG(0, 0x10), 0,
     CODES_END,
 };
-u16 actor17Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 1), 0, CODES_END };
+u16 actor17Talk2Actions[] = { CARD_BATTLE(0x4F, 0), 1, CODES_END };
+u16 actor17Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 1), 1,
+    ITEM(0, 0x192), 1,
+    FLAG_CARD_BATTLE_WON, 0,
+    CODES_END,
+};
+u16 actor17Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 1), 0, CODES_END };
 u16 actor17Talk4Conditions[] = {
     CARD(0xF1), 0,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 1), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor17Talk4Actions[] = {
     CARD(0xF1), 1,
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 1), 0,
     CODES_END,
 };
 u16 actor17Talk5Conditions[] = {
     CARD(0xF1), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 1), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor17Talk5Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 1), 0, FLAG(0, 0x10), 0, CODES_END };
+u16 actor17Talk5Actions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG(0, 1), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    CODES_END,
+};
 u16 actor18Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor18Talk1Conditions[] = { FLAG(0, 0), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor18Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor18Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor18Talk2Actions[] = { CARD_BATTLE(0x4E, 0), 1, CODES_END };
-u16 actor18Talk3Conditions[] = {
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 1,
+u16 actor18Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor18Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor18Talk2Actions[] = { CARD_BATTLE(0x4E, 0), 1, CODES_END };
+u16 actor18Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 0), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor18Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor18Talk4Conditions[] = {
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CARD(0x45), 0,
@@ -606,139 +725,174 @@ u16 actor18Talk4Conditions[] = {
 };
 u16 actor18Talk4Actions[] = {
     CARD(0x45), 1,
-    FLAG(0, 0x11), 0,
-    FLAG(0, 0x10), 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG_CARD_BATTLE_WON, 0,
     FLAG(0, 0), 0,
     CODES_END,
 };
 u16 actor18Talk5Conditions[] = {
     CARD(0x45), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor18Talk5Actions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor18Talk5Actions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
 u16 actor19Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor19Talk1Conditions[] = { FLAG(0, 0), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor19Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor19Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor19Talk2Actions[] = { CARD_BATTLE(0x4D, 0), 1, CODES_END };
-u16 actor19Talk3Conditions[] = {
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 1,
+u16 actor19Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor19Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor19Talk2Actions[] = { CARD_BATTLE(0x4D, 0), 1, CODES_END };
+u16 actor19Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 0), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor19Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor19Talk4Conditions[] = {
     CARD(0x9B), 0,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor19Talk4Actions[] = {
     CARD(0x9B), 1,
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 0,
     CODES_END,
 };
 u16 actor19Talk5Conditions[] = {
     CARD(0x9B), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor19Talk5Actions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor19Talk5Actions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
 u16 actor20Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor20Talk1Conditions[] = { FLAG(0, 0), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor20Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor20Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor20Talk2Actions[] = { CARD_BATTLE(0x4C, 0), 1, CODES_END };
-u16 actor20Talk3Conditions[] = {
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 1,
+u16 actor20Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor20Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor20Talk2Actions[] = { CARD_BATTLE(0x4C, 0), 1, CODES_END };
+u16 actor20Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 0), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor20Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor20Talk4Conditions[] = {
     CARD(0xC6), 0,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor20Talk4Actions[] = {
     CARD(0xC6), 1,
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 0,
     CODES_END,
 };
 u16 actor20Talk5Conditions[] = {
     CARD(0xC6), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor20Talk5Actions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor20Talk5Actions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
 u16 actor21Talk0Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor21Talk1Conditions[] = { FLAG(0, 0), 0, ITEM(0, 0x192), 1, CODES_END };
 u16 actor21Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor21Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor21Talk2Actions[] = { CARD_BATTLE(0x50, 0), 1, CODES_END };
-u16 actor21Talk3Conditions[] = {
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 1,
+u16 actor21Talk2Conditions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor21Talk3Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor21Talk2Actions[] = { CARD_BATTLE(0x50, 0), 1, CODES_END };
+u16 actor21Talk3Conditions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    FLAG(0, 0), 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
+u16 actor21Talk3Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor21Talk4Conditions[] = {
     CARD(0x70), 0,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
 u16 actor21Talk4Actions[] = {
     CARD(0x70), 1,
-    FLAG(0, 0x10), 0,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     FLAG(0, 0), 0,
     CODES_END,
 };
 u16 actor21Talk5Conditions[] = {
     CARD(0x70), 1,
-    FLAG(0, 0x10), 1,
-    FLAG(0, 0x11), 1,
+    FLAG_CARD_BATTLE_WON, 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
     FLAG(0, 0), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor21Talk5Actions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor21Talk5Actions[] = {
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
 u16 actor26Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor26Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor26Talk1Conditions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor26Talk1Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xA, 0x10), 1, CODES_END };
+u16 actor26Talk1Actions[] = { EVENT_BATTLE(0), 1, FLAG_B_SERAPHIMON_FOUGHT, 1, CODES_END };
 u16 actor27Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor27Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor27Talk1Conditions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor27Talk1Actions[] = { FLAG(0xA, 0x13), 1, EVENT_BATTLE(1), 1, CODES_END };
+u16 actor27Talk1Actions[] = { FLAG_B_KING_NUMEMON_FOUGHT, 1, EVENT_BATTLE(1), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x10 },
     { NULL, NULL, 0 },
@@ -896,11 +1050,16 @@ FieldTalk actor27Talks[] = {
     { actor27Talk1Conditions, actor27Talk1Actions, 0xFC },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { WARP_ARG(0), 1, WARP_ARG(0x25), 1, FLAG(2, 0x78), 0, CODES_END };
+u16 actor0Conditions[] = {
+    WARP_ARG(0), 1,
+    WARP_ARG(0x25), 1,
+    FLAG_CIRCUIT_BOARD_TEMPEST_ARM_FOUND, 0,
+    CODES_END,
+};
 u16 actor1Conditions[] = {
     WARP_ARG(0), 1,
     WARP_ARG(0x25), 1,
-    FLAG(2, 0x7B), 0,
+    FLAG_CIRCUIT_BOARD_RUSTY_KATANA_FOUND, 0,
     ITEM(3, 0x66), 0,
     ITEM(3, 0x67), 0,
     ITEM(3, 0x68), 0,
@@ -910,7 +1069,7 @@ u16 actor1Conditions[] = {
 u16 actor2Conditions[] = {
     WARP_ARG(0), 1,
     WARP_ARG(0x25), 1,
-    FLAG(2, 0x7C), 0,
+    FLAG_CIRCUIT_BOARD_OLD_WAND_FOUND, 0,
     ITEM(3, 0x8D), 0,
     ITEM(3, 0x8E), 0,
     ITEM(3, 0x8F), 0,
@@ -939,8 +1098,18 @@ u16 actor22Conditions[] = { WARP_ARG(0), 0, WARP_ARG(0x1E), 1, FLAG(0, 9), 0, CO
 u16 actor23Conditions[] = { WARP_ARG(0), 0, WARP_ARG(0x1F), 1, FLAG(0, 9), 0, CODES_END };
 u16 actor24Conditions[] = { WARP_ARG(0), 0, WARP_ARG(0x20), 1, FLAG(0, 9), 0, CODES_END };
 u16 actor25Conditions[] = { WARP_ARG(0), 0, WARP_ARG(0x21), 1, FLAG(0, 9), 0, CODES_END };
-u16 actor26Conditions[] = { WARP_ARG(0), 1, WARP_ARG(0x21), 1, FLAG(0xA, 0x10), 0, CODES_END };
-u16 actor27Conditions[] = { WARP_ARG(0), 1, WARP_ARG(0x25), 1, FLAG(0xA, 0x13), 0, CODES_END };
+u16 actor26Conditions[] = {
+    WARP_ARG(0), 1,
+    WARP_ARG(0x21), 1,
+    FLAG_B_SERAPHIMON_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor27Conditions[] = {
+    WARP_ARG(0), 1,
+    WARP_ARG(0x25), 1,
+    FLAG_B_KING_NUMEMON_FOUGHT, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 800, 344, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x4D, 5, 704, 352, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x4E, 6, 616, 272, 1 };

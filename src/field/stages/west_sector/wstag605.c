@@ -11,7 +11,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (GAME.progress == 0x11 && FLAGS_00.checkCondition(FLAG(0x40, 0xA6), 1)) {
+        if (GAME.progress == STORY_BYAKKO_BADGE && FLAGS_00.checkCondition(FLAG_HIANDROMON_WIN_SEEN, 1)) {
             children[0] = FIELDSTG_startEvent(0x1FF);
         }
         break;
@@ -27,16 +27,16 @@ void updateStage(StageTask *task, void **children) {
 
 /*
  * After event 511, with HiAndromon: gives the player the Rusty Rifle and
- * moves the story on to its step 0x12
+ * moves the story on to STORY_LISA_SAVED
  */
 void endEvent511(void) {
     FLAGS_00.applyAction(ITEM(3, 0x80), 1);
-    GAME.progress = 0x12;
+    GAME.progress = STORY_LISA_SAVED;
 }
 
 /* After event 510, with HiAndromon: lets event 511 start and starts the stage's event battle 0 */
 void endEvent510(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xA6), 1);
+    FLAGS_00.applyAction(FLAG_HIANDROMON_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -188,9 +188,9 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x16A, 0x100, 0xA8, 0, 0x150, 0x1F9 },
 };
 u16 actor8Talk0Conditions[] = { FLAG(0x1C, 0x25), 0, CODES_END };
-u16 actor8Talk1Conditions[] = { FLAG(0x1C, 0x25), 1, FLAG(0xA, 4), 0, CODES_END };
-u16 actor8Talk1Actions[] = { START_EVENT(0x5E), 1, FLAG(0xA, 4), 1, CODES_END };
-u16 actor8Talk2Conditions[] = { FLAG(0x1C, 0x25), 1, FLAG(0xA, 4), 1, CODES_END };
+u16 actor8Talk1Conditions[] = { FLAG(0x1C, 0x25), 1, FLAG_HIANDROMON_BEATEN, 0, CODES_END };
+u16 actor8Talk1Actions[] = { START_EVENT(0x5E), 1, FLAG_HIANDROMON_BEATEN, 1, CODES_END };
+u16 actor8Talk2Conditions[] = { FLAG(0x1C, 0x25), 1, FLAG_HIANDROMON_BEATEN, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x14C },
     { NULL, NULL, 0 },
@@ -233,16 +233,16 @@ FieldTalk actor9Talks[] = {
     { NULL, NULL, 0x2FC },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0xF), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x17), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0x10), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x11), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0x12), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_NUMEMON_FOUND), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_BYAKKO_BADGE), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_LISA_SAVED), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x96, 4, 657, 185, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x96, 4, 657, 185, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x96, 4, 657, 185, 1 };

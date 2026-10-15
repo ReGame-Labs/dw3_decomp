@@ -18,7 +18,7 @@
 #endif
 /*
  * Sets the stage up: its map, actors and battles, playing FIELDBGM; BGM_0029
- * instead except at story step 0x26 once flag 0x1A0A is set
+ * instead except at STORY_PRESIDENT_ARRESTED once flag 0x1A0A is set
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -38,7 +38,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress != 0x26 || FLAGS_00.checkCondition(FLAG(0x1A, 0xA), 0) != 0) {
+    if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -168,18 +168,34 @@ FieldTalk actor12Talks[] = {
     { NULL, NULL, 0x7A },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor2Conditions[] = { FLAG(0x1A, 0xA), 1, PROGRESS(0x26), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor5Conditions[] = { SPECIAL(0x1E), 1, FLAG(0x1A, 0xA), 0, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x27), 1, CODES_END };
-u16 actor7Conditions[] = { SPECIAL(0x1E), 1, FLAG(0x1A, 0xA), 0, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x27), 1, CODES_END };
-u16 actor9Conditions[] = { SPECIAL(0x1E), 1, FLAG(0x1A, 0xA), 0, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(0x27), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(0x27), 1, CODES_END };
-u16 actor12Conditions[] = { SPECIAL(0x1E), 1, FLAG(0x1A, 0xA), 0, CODES_END };
+u16 actor0Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor1Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor2Conditions[] = {
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    CODES_END,
+};
+u16 actor3Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor5Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_ASUKA_HEADQUARTERS), 1, CODES_END };
+u16 actor7Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_ASUKA_HEADQUARTERS), 1, CODES_END };
+u16 actor9Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_ASUKA_HEADQUARTERS), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_ASUKA_HEADQUARTERS), 1, CODES_END };
+u16 actor12Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x2F, 4, 319, 313, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x30, 5, 361, 749, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x39, 6, 768, 664, 1 };

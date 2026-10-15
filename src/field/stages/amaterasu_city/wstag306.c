@@ -34,14 +34,14 @@ void updateStage(StageTask *task, void **children) {
     default:
         task->nextState(task);
         switch (GAME.progress) {
-        case 0x25:
+        case STORY_AMATERASU_BRIDGE:
             children[1] = FIELDSTG_startEvent(0x3A2);
             break;
-        case 0x27:
+        case STORY_ASUKA_HEADQUARTERS:
             children[1] = FIELDSTG_startEvent(0x3D4);
             break;
         }
-        if (GAME.progress < 0x27) {
+        if (GAME.progress < STORY_ASUKA_HEADQUARTERS) {
             children[0] = createSoundTile(0x353);
         }
         break;
@@ -66,7 +66,7 @@ void updateStage(StageTask *task, void **children) {
 #endif
 /*
  * Sets the stage up: its map, actors and events, playing KANRIBGM; BGM_0029
- * instead except at story step 0x26 once flag 0x1A0A is set
+ * instead except at STORY_PRESIDENT_ARRESTED once flag 0x1A0A is set
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -85,7 +85,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress != 0x26 || FLAGS_00.checkCondition(FLAG(0x1A, 0xA), 0) != 0) {
+    if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -332,8 +332,8 @@ FieldTalk actor12Talks[] = {
     { NULL, NULL, 5 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x27), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_ASUKA_HEADQUARTERS), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x94), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x1A), 1, CODES_END };

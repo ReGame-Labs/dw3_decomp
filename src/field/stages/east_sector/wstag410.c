@@ -8,9 +8,9 @@
 #include "common/update_stage.inc.c"
 #include "common/start_stage.inc.c"
 
-/* After event 90, with the player: moves the story on to its step 6 */
+/* After event 90, with the player: moves the story on to STORY_FAKE_BLUE_CARD */
 void endEvent90(void) {
-    GAME.progress = 6;
+    GAME.progress = STORY_FAKE_BLUE_CARD;
 }
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
@@ -46,7 +46,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -243,16 +243,16 @@ u16 actor0Talk3Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(1), 1,
     PARTY_STAT(3), 1,
-    FLAG(0xE, 8), 0,
+    FLAG_TOMOMI_FOUGHT, 0,
     CODES_END,
 };
-u16 actor0Talk3Actions[] = { FLAG(0xE, 8), 1, EVENT_BATTLE(0), 1, CODES_END };
+u16 actor0Talk3Actions[] = { FLAG_TOMOMI_FOUGHT, 1, EVENT_BATTLE(0), 1, CODES_END };
 u16 actor0Talk4Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(1), 1,
     PARTY_STAT(3), 1,
     ITEM(0, 0x12), 0,
-    FLAG(0xE, 8), 1,
+    FLAG_TOMOMI_FOUGHT, 1,
     CODES_END,
 };
 u16 actor0Talk5Conditions[] = {
@@ -261,24 +261,24 @@ u16 actor0Talk5Conditions[] = {
     PARTY_STAT(3), 1,
     ITEM(0, 0x12), 1,
     PARTY_STAT(5), 0,
-    FLAG(0xE, 8), 1,
+    FLAG_TOMOMI_FOUGHT, 1,
     CODES_END,
 };
 u16 actor0Talk6Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(1), 1,
     PARTY_STAT(3), 1,
-    FLAG(0xE, 8), 1,
+    FLAG_TOMOMI_FOUGHT, 1,
     ITEM(0, 0x12), 1,
     PARTY_STAT(5), 1,
     CODES_END,
 };
 u16 actor0Talk6Actions[] = { CARD_BATTLE(0x12, 1), 1, CODES_END };
-u16 actor1Talk0Conditions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor1Talk1Conditions[] = { FLAG(0, 0x10), 0, FLAG(0, 0x11), 1, CODES_END };
-u16 actor1Talk1Actions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor1Talk2Conditions[] = { FLAG(0, 0x10), 1, FLAG(0, 0x11), 1, CODES_END };
-u16 actor1Talk2Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, CODES_END };
+u16 actor1Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor1Talk1Conditions[] = { FLAG_CARD_BATTLE_WON, 0, FLAG_CARD_BATTLE_ENDED, 1, CODES_END };
+u16 actor1Talk1Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor1Talk2Conditions[] = { FLAG_CARD_BATTLE_WON, 1, FLAG_CARD_BATTLE_ENDED, 1, CODES_END };
+u16 actor1Talk2Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG_CARD_BATTLE_WON, 0, CODES_END };
 u16 actor2Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor2Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor2Talk1Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(1), 0, CODES_END };
@@ -288,23 +288,23 @@ u16 actor2Talk3Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(1), 1,
     PARTY_STAT(3), 1,
-    FLAG(0xE, 8), 0,
+    FLAG_TOMOMI_FOUGHT, 0,
     CODES_END,
 };
-u16 actor2Talk3Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xE, 8), 1, CODES_END };
+u16 actor2Talk3Actions[] = { EVENT_BATTLE(0), 1, FLAG_TOMOMI_FOUGHT, 1, CODES_END };
 u16 actor2Talk4Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(1), 1,
     PARTY_STAT(3), 1,
     ITEM(0, 0x12), 0,
-    FLAG(0xE, 8), 1,
+    FLAG_TOMOMI_FOUGHT, 1,
     CODES_END,
 };
 u16 actor2Talk5Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(1), 1,
     PARTY_STAT(3), 1,
-    FLAG(0xE, 8), 1,
+    FLAG_TOMOMI_FOUGHT, 1,
     ITEM(0, 0x12), 1,
     PARTY_STAT(5), 0,
     CODES_END,
@@ -313,7 +313,7 @@ u16 actor2Talk6Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(1), 1,
     PARTY_STAT(3), 1,
-    FLAG(0xE, 8), 1,
+    FLAG_TOMOMI_FOUGHT, 1,
     ITEM(0, 0x12), 1,
     PARTY_STAT(5), 1,
     CODES_END,
@@ -328,20 +328,20 @@ u16 actor3Talk3Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(1), 1,
     PARTY_STAT(3), 1,
-    FLAG(0xE, 8), 0,
+    FLAG_TOMOMI_FOUGHT, 0,
     CODES_END,
 };
-u16 actor3Talk3Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xE, 8), 1, CODES_END };
+u16 actor3Talk3Actions[] = { EVENT_BATTLE(0), 1, FLAG_TOMOMI_FOUGHT, 1, CODES_END };
 u16 actor3Talk4Conditions[] = {
     ITEM(0, 0x12), 0,
     FLAG(0, 0), 1,
     PARTY_STAT(1), 1,
     PARTY_STAT(3), 1,
-    FLAG(0xE, 8), 1,
+    FLAG_TOMOMI_FOUGHT, 1,
     CODES_END,
 };
 u16 actor3Talk5Conditions[] = {
-    FLAG(0xE, 8), 1,
+    FLAG_TOMOMI_FOUGHT, 1,
     ITEM(0, 0x12), 1,
     PARTY_STAT(5), 0,
     FLAG(0, 0), 1,
@@ -352,7 +352,7 @@ u16 actor3Talk5Conditions[] = {
 u16 actor3Talk6Conditions[] = {
     ITEM(0, 0x12), 1,
     PARTY_STAT(5), 1,
-    FLAG(0xE, 8), 1,
+    FLAG_TOMOMI_FOUGHT, 1,
     FLAG(0, 0), 1,
     PARTY_STAT(1), 1,
     PARTY_STAT(3), 1,
@@ -365,19 +365,19 @@ u16 actor5Talk1Conditions[] = { ITEM(0, 0x18E), 0, ITEM(0, 0x18F), 0, CODES_END 
 u16 actor5Talk2Conditions[] = {
     ITEM(0, 0x18E), 0,
     ITEM(0, 0x18F), 1,
-    FLAG(0x1C, 0x50), 0,
+    FLAG_FAKE_BLUE_CARD_TRIED, 0,
     CODES_END,
 };
 u16 actor5Talk2Actions[] = {
     FLAG(0x1C, 0x46), 1,
     START_EVENT(9), 1,
-    FLAG(0x1C, 0x50), 1,
+    FLAG_FAKE_BLUE_CARD_TRIED, 1,
     CODES_END,
 };
 u16 actor5Talk3Conditions[] = {
     ITEM(0, 0x18F), 1,
     ITEM(0, 0x18E), 0,
-    FLAG(0x1C, 0x50), 1,
+    FLAG_FAKE_BLUE_CARD_TRIED, 1,
     CODES_END,
 };
 u16 actor6Talk0Actions[] = { START_EVENT(0x5F), 1, CODES_END };
@@ -389,15 +389,15 @@ u16 actor7Talk3Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(1), 1,
     PARTY_STAT(3), 1,
-    FLAG(0xE, 8), 0,
+    FLAG_TOMOMI_FOUGHT, 0,
     CODES_END,
 };
-u16 actor7Talk3Actions[] = { FLAG(0xE, 8), 1, CODES_END };
+u16 actor7Talk3Actions[] = { FLAG_TOMOMI_FOUGHT, 1, CODES_END };
 u16 actor7Talk4Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(1), 1,
     PARTY_STAT(3), 1,
-    FLAG(0xE, 8), 1,
+    FLAG_TOMOMI_FOUGHT, 1,
     ITEM(0, 0x12), 0,
     CODES_END,
 };
@@ -406,7 +406,7 @@ u16 actor7Talk5Conditions[] = {
     PARTY_STAT(3), 1,
     ITEM(0, 0x12), 1,
     PARTY_STAT(1), 1,
-    FLAG(0xE, 8), 1,
+    FLAG_TOMOMI_FOUGHT, 1,
     PARTY_STAT(5), 0,
     CODES_END,
 };
@@ -414,7 +414,7 @@ u16 actor7Talk6Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(1), 1,
     PARTY_STAT(3), 1,
-    FLAG(0xE, 8), 1,
+    FLAG_TOMOMI_FOUGHT, 1,
     ITEM(0, 0x12), 1,
     PARTY_STAT(5), 1,
     CODES_END,
@@ -481,12 +481,17 @@ FieldTalk actor7Talks[] = {
     { actor7Talk6Conditions, actor7Talk6Actions, 0x61 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { SPECIAL(3), 1, FLAG(0, 0x11), 0, ITEM(0, 0x192), 1, CODES_END };
-u16 actor1Conditions[] = { SPECIAL(9), 1, FLAG(0, 0x11), 1, ITEM(0, 0x192), 1, CODES_END };
-u16 actor2Conditions[] = { SPECIAL(4), 1, FLAG(0, 0x11), 0, ITEM(0, 0x192), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x26), 1, FLAG(0, 0x11), 0, ITEM(0, 0x192), 1, CODES_END };
+u16 actor0Conditions[] = { SPECIAL(3), 1, FLAG_CARD_BATTLE_ENDED, 0, ITEM(0, 0x192), 1, CODES_END };
+u16 actor1Conditions[] = { SPECIAL(9), 1, FLAG_CARD_BATTLE_ENDED, 1, ITEM(0, 0x192), 1, CODES_END };
+u16 actor2Conditions[] = { SPECIAL(4), 1, FLAG_CARD_BATTLE_ENDED, 0, ITEM(0, 0x192), 1, CODES_END };
+u16 actor3Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
 u16 actor4Conditions[] = { ITEM(0, 0x192), 0, SPECIAL(9), 1, SPECIAL(0x1A), 0, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(6), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_FAKE_BLUE_CARD), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x14), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x30, 4, 624, 152, 7 };
@@ -518,7 +523,7 @@ StageTile stageObjects[] = {
 };
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x22A, 0xD0, 0x2FC, 7, 0, 0, 0 },
-    { { { PROGRESS(5), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x5A, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_SEIRYU_BADGE), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x5A, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

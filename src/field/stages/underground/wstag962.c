@@ -1,7 +1,7 @@
 /*
  * WSTAG962: Seabed, Underground: below Divermon's Lake and South and West
  * Sector, in the extra chapter. The European version's: in its extra chapter
- * (FIELD_PROGRESS_EXTRA), mode 738 starts it instead of WSTAG835.
+ * (STORY_EXTRA), mode 738 starts it instead of WSTAG835.
  */
 
 #include "common.h"

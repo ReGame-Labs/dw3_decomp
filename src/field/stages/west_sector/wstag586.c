@@ -108,7 +108,12 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x148, 0x120, 0x20, 0x20, 0x150, 0x1FD },
     { 0x140, 0x100, 0x150, 0x120, 0x40, 0x20, 0x160, 0x1FD },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x4C), 1, ITEM(1, 0x32), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_DUCT_ROOM_01_ARMOR_CHIP_FOUND, 1,
+    ITEM(1, 0x32), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 u16 actor1Talk0Actions[] = {
     ITEM(1, 0x59), 1,
     ITEM(1, 0x5A), 1,
@@ -181,14 +186,18 @@ FieldTalk actor7Talks[] = {
     { NULL, actor7Talk0Actions, 0x39E },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x4C), 0, PROGRESS(0), 0, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0), 1, CODES_END };
+u16 actor0Conditions[] = {
+    FLAG_DUCT_ROOM_01_ARMOR_CHIP_FOUND, 0,
+    PROGRESS(STORY_START), 0,
+    CODES_END,
+};
+u16 actor1Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_START), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 379, 318, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x45, 5, 209, 329, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x46, 6, 240, 313, 7 };

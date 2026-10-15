@@ -11,7 +11,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x29), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x2A), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_TAOMON_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_KYUKIMON_DDNA_REQUEST_SEEN, 0)) {
             children[0] = FIELDSTG_startEvent(0x4F8);
         }
         break;
@@ -27,7 +27,7 @@ void updateStage(StageTask *task, void **children) {
 
 /* After event 1271, with Taomon: lets event 1272 start and starts the stage's event battle 0 */
 void endEvent1271(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x29), 1);
+    FLAGS_00.applyAction(FLAG_TAOMON_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -36,7 +36,7 @@ void endEvent1271(void) {
  * it from playing again
  */
 void endEvent1272(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x2A), 1);
+    FLAGS_00.applyAction(FLAG_KYUKIMON_DDNA_REQUEST_SEEN, 1);
     FLAGS_00.applyAction(ITEM(0, 0x26), 1);
 }
 
@@ -72,7 +72,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -194,12 +194,27 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x16E, 0x172, 0xB8, 0x72, 0x170, 0x1FF },
     { 0x140, 0x100, 0x162, 0x172, 0x88, 0x72, 0x150, 0x1FE },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 9), 1, ITEM(1, 0x2B), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(2, 0xA), 1, SPECIAL(0x8B), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(2, 0xB), 1, ITEM(1, 0x45), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor3Talk0Conditions[] = { FLAG(0x1C, 0x15), 0, CODES_END };
-u16 actor3Talk0Actions[] = { START_EVENT(0x28), 1, FLAG(0x1C, 0x15), 1, CODES_END };
-u16 actor3Talk1Conditions[] = { FLAG(0x1C, 0x15), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_NORTH_BADLAND_W_POWER_CHARGE_FOUND, 1,
+    ITEM(1, 0x2B), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor1Talk0Actions[] = {
+    FLAG_NORTH_BADLAND_W_100_BIT_FOUND, 1,
+    SPECIAL(0x8B), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor2Talk0Actions[] = {
+    FLAG_NORTH_BADLAND_W_ENERGY_DISK_FOUND, 1,
+    ITEM(1, 0x45), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor3Talk0Conditions[] = { FLAG_TAOMON_DDNA_FOUGHT, 0, CODES_END };
+u16 actor3Talk0Actions[] = { START_EVENT(0x28), 1, FLAG_TAOMON_DDNA_FOUGHT, 1, CODES_END };
+u16 actor3Talk1Conditions[] = { FLAG_TAOMON_DDNA_FOUGHT, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x16D },
     { NULL, NULL, 0 },
@@ -217,10 +232,10 @@ FieldTalk actor3Talks[] = {
     { actor3Talk1Conditions, NULL, 0x2C4 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 9), 0, CODES_END };
-u16 actor1Conditions[] = { FLAG(2, 0xA), 0, CODES_END };
-u16 actor2Conditions[] = { FLAG(2, 0xB), 0, CODES_END };
-u16 actor3Conditions[] = { FLAG(6, 3), 1, ITEM(0, 0x26), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_NORTH_BADLAND_W_POWER_CHARGE_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { FLAG_NORTH_BADLAND_W_100_BIT_FOUND, 0, CODES_END };
+u16 actor2Conditions[] = { FLAG_NORTH_BADLAND_W_ENERGY_DISK_FOUND, 0, CODES_END };
+u16 actor3Conditions[] = { FLAG_RENAMON_DDNA_REQUESTED, 1, ITEM(0, 0x26), 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 256, 561, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x4D, 5, 784, 393, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x4E, 6, 593, 793, 1 };

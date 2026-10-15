@@ -21,7 +21,7 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 /*
  * Sets the stage up: its map, actors, battles and events, playing the
  * ambience ENV_0014; BGM_0029 instead at story steps 0x27 to 0x28; battle
- * list 0 before story step 0xB, 1 from then on
+ * list 0 before STORY_SUZAKU_BADGE, 1 from then on
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -43,11 +43,11 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
-    if (GAME.progress < 0xB) {
+    if (GAME.progress < STORY_SUZAKU_BADGE) {
         FIELDSTG_state.battles = &stageBattles[0];
     } else {
         FIELDSTG_state.battles = &stageBattles[1];
@@ -199,18 +199,18 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x172, 0x181, 0xC8, 0x81, 0x150, 0x1FF },
     { 0x140, 0x100, 0x172, 0x1A1, 0xC8, 0xA1, 0x160, 0x1FF },
 };
-u16 actor2Talk0Conditions[] = { FLAG(0x1A, 0x36), 0, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(0x1A, 0x36), 1, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0x1A, 0x36), 1, ITEM(0, 0x192), 0, CODES_END };
+u16 actor2Talk0Conditions[] = { FLAG_TAI_KONG_WANG_TALKED, 0, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_TAI_KONG_WANG_TALKED, 1, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_TAI_KONG_WANG_TALKED, 1, ITEM(0, 0x192), 0, CODES_END };
 u16 actor2Talk2Conditions[] = {
-    FLAG(0x1A, 0x36), 1,
+    FLAG_TAI_KONG_WANG_TALKED, 1,
     SPECIAL(0x3A), 0,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor2Talk2Actions[] = { FLAG(0x1A, 0x21), 1, CODES_END };
+u16 actor2Talk2Actions[] = { FLAG_TAI_KONG_WANG_POLE_TALKED, 1, CODES_END };
 u16 actor2Talk3Conditions[] = {
-    FLAG(0x1A, 0x36), 1,
+    FLAG_TAI_KONG_WANG_TALKED, 1,
     SPECIAL(0x3A), 1,
     ITEM(0, 5), 0,
     ITEM(0, 0x192), 1,
@@ -218,32 +218,32 @@ u16 actor2Talk3Conditions[] = {
 };
 u16 actor2Talk3Actions[] = { ITEM(0, 5), 1, START_EVENT(0x47), 1, CODES_END };
 u16 actor2Talk4Conditions[] = {
-    FLAG(0x1A, 0x36), 1,
+    FLAG_TAI_KONG_WANG_TALKED, 1,
     SPECIAL(0x3A), 1,
     ITEM(0, 5), 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor3Talk0Conditions[] = { FLAG(0x1A, 0x36), 0, CODES_END };
-u16 actor3Talk0Actions[] = { FLAG(0x1A, 0x36), 1, CODES_END };
-u16 actor3Talk1Conditions[] = { ITEM(0, 0x192), 0, FLAG(0x1A, 0x36), 1, CODES_END };
+u16 actor3Talk0Conditions[] = { FLAG_TAI_KONG_WANG_TALKED, 0, CODES_END };
+u16 actor3Talk0Actions[] = { FLAG_TAI_KONG_WANG_TALKED, 1, CODES_END };
+u16 actor3Talk1Conditions[] = { ITEM(0, 0x192), 0, FLAG_TAI_KONG_WANG_TALKED, 1, CODES_END };
 u16 actor3Talk2Conditions[] = {
-    FLAG(0x1A, 0x36), 1,
+    FLAG_TAI_KONG_WANG_TALKED, 1,
     ITEM(0, 0x192), 1,
     SPECIAL(0x3A), 0,
     CODES_END,
 };
-u16 actor3Talk2Actions[] = { FLAG(0x1A, 0x21), 1, CODES_END };
+u16 actor3Talk2Actions[] = { FLAG_TAI_KONG_WANG_POLE_TALKED, 1, CODES_END };
 u16 actor3Talk3Conditions[] = {
     ITEM(0, 0x192), 1,
     SPECIAL(0x3A), 1,
     ITEM(0, 5), 0,
-    FLAG(0x1A, 0x36), 1,
+    FLAG_TAI_KONG_WANG_TALKED, 1,
     CODES_END,
 };
 u16 actor3Talk3Actions[] = { ITEM(0, 5), 1, START_EVENT(0x47), 1, CODES_END };
 u16 actor3Talk4Conditions[] = {
-    FLAG(0x1A, 0x36), 1,
+    FLAG_TAI_KONG_WANG_TALKED, 1,
     ITEM(0, 0x192), 1,
     SPECIAL(0x3A), 1,
     ITEM(0, 5), 1,
@@ -280,8 +280,8 @@ FieldTalk actor4Talks[] = {
 u16 actor0Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x22), 1, ITEM(0, 5), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x22), 1, ITEM(0, 5), 0, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 5), 0, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 5), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, ITEM(0, 5), 0, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, ITEM(0, 5), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x9D, 4, 412, 642, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x11A, 5, 412, 642, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x11A, 5, 412, 642, 1 };

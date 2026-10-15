@@ -1,7 +1,7 @@
 /*
  * WSTAG954: Tyranno Valley, East Sector, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 666 starts it
- * instead of WSTAG406.
+ * version's: in its extra chapter (STORY_EXTRA), mode 666 starts it instead of
+ * WSTAG406.
  */
 
 #include "common.h"
@@ -85,18 +85,23 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1AA, 0x120, 0x1A8, 0x20, 0x150, 0x1FE },
     { 0x180, 0x100, 0x1B2, 0x120, 0x1C8, 0x20, 0x160, 0x1FE },
 };
-u16 actor2Talk0Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 0, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 1, CODES_END };
-u16 actor2Talk1Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, FLAG(0, 0), 0, CODES_END };
-u16 actor2Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor2Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 0, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 1, CODES_END };
+u16 actor2Talk1Actions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
+u16 actor2Talk2Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor2Talk2Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor2Talk3Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, CODES_END };
+u16 actor2Talk3Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 1, CODES_END };
 u16 actor2Talk3Actions[] = { CARD_BATTLE(0x2F, 1), 1, CODES_END };
 u16 actor3Talk0Conditions[] = { SPECIAL(0x96), 0, CODES_END };
-u16 actor3Talk1Conditions[] = { SPECIAL(0x96), 1, FLAG(0x10, 0x10), 0, CODES_END };
-u16 actor3Talk1Actions[] = { FLAG(0x10, 0x10), 1, EVENT_BATTLE(0), 1, CODES_END };
-u16 actor3Talk2Conditions[] = { SPECIAL(0x96), 1, FLAG(0x10, 0x10), 1, CODES_END };
+u16 actor3Talk1Conditions[] = { SPECIAL(0x96), 1, FLAG_XUAN_WU_LEADER_FOUGHT, 0, CODES_END };
+u16 actor3Talk1Actions[] = { FLAG_XUAN_WU_LEADER_FOUGHT, 1, EVENT_BATTLE(0), 1, CODES_END };
+u16 actor3Talk2Conditions[] = { SPECIAL(0x96), 1, FLAG_XUAN_WU_LEADER_FOUGHT, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x92 },
     { NULL, NULL, 0 },

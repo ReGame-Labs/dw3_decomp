@@ -130,7 +130,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == 1) {
+        if (GAME.progress == STORY_ACCOUNT_REGISTERED) {
             children[0] = FIELDSTG_startEvent(5);
         }
         task->nextState(task);
@@ -145,9 +145,9 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-/* After event 5, with Account Clerk: moves the story on to its step 2 */
+/* After event 5, with Account Clerk: moves the story on to STORY_LOGGED_IN */
 void endEvent5(void) {
-    GAME.progress = 2;
+    GAME.progress = STORY_LOGGED_IN;
 }
 
 #if VERSION_US || VERSION_JP
@@ -182,11 +182,11 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x14 && GAME.progress < 0x18) {
+    if (GAME.progress >= STORY_BYAKKO_LEADER_FOUGHT && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -338,21 +338,21 @@ FieldTalk actor15Talks[] = {
     { NULL, NULL, 0x1B0 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(1), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(1), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(2), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(4), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_ACCOUNT_REGISTERED), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_ACCOUNT_REGISTERED), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0xD), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0xC), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor14Conditions[] = { PROGRESS(0xD), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor13Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor14Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor15Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0xD, 5, 0, 0, 3 };

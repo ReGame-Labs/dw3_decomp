@@ -11,7 +11,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == 0x1C && FLAGS_00.checkCondition(FLAG(0x40, 0x52), 1)) {
+        if (GAME.progress == STORY_BLUE_ID_PASS && FLAGS_00.checkCondition(FLAG_KNOWLEDGE_EGG_FOUND, 1)) {
             children[0] = FIELDSTG_startEvent(0x2EF);
         }
         task->nextState(task);
@@ -31,16 +31,16 @@ void updateStage(StageTask *task, void **children) {
  * stage's event battle 0
  */
 void endEvent750(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x52), 1);
+    FLAGS_00.applyAction(FLAG_KNOWLEDGE_EGG_FOUND, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
 /*
- * After event 751, with the player: moves the story on to its step 0x1D and
+ * After event 751, with the player: moves the story on to STORY_BULBMON_BEATEN and
  * gives the player the Red ID Pass
  */
 void endEvent751(void) {
-    GAME.progress = 0x1D;
+    GAME.progress = STORY_BULBMON_BEATEN;
     FLAGS_00.applyAction(ITEM(0, 0x17), 1);
 }
 
@@ -55,7 +55,7 @@ void endEvent751(void) {
 #endif
 /*
  * Sets the stage up: its map, actors, battles and events, playing BGM_0016;
- * BGM_0029 instead except at story step 0x26 once flag 0x1A0A is set
+ * BGM_0029 instead except at STORY_PRESIDENT_ARRESTED once flag 0x1A0A is set
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -75,7 +75,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress != 0x26 || FLAGS_00.checkCondition(FLAG(0x1A, 0xA), 0) != 0) {
+    if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -292,22 +292,34 @@ FieldTalk actor17Talks[] = {
     { NULL, NULL, 0x200 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor10Conditions[] = { SPECIAL(0x1E), 1, FLAG(0x1A, 0xA), 0, CODES_END };
+u16 actor0Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor1Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor2Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor10Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor12Conditions[] = { SPECIAL(0x1E), 1, FLAG(0x1A, 0xA), 0, CODES_END };
+u16 actor12Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
 u16 actor13Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor14Conditions[] = { SPECIAL(0x3D), 1, FLAG(0x1A, 0xA), 0, CODES_END };
+u16 actor14Conditions[] = { SPECIAL(0x3D), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
 u16 actor15Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor16Conditions[] = { FLAG(0x40, 0x52), 0, CODES_END };
-u16 actor17Conditions[] = { PROGRESS(0x1C), 1, CODES_END };
-u16 actor18Conditions[] = { PROGRESS(0x1C), 1, CODES_END };
+u16 actor16Conditions[] = { FLAG_KNOWLEDGE_EGG_FOUND, 0, CODES_END };
+u16 actor17Conditions[] = { PROGRESS(STORY_BLUE_ID_PASS), 1, CODES_END };
+u16 actor18Conditions[] = { PROGRESS(STORY_BLUE_ID_PASS), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x2E, 4, 517, 289, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x31, 5, 321, 193, 3 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x39, 6, 241, 217, 3 };

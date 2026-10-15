@@ -139,13 +139,13 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == 0x13 && FLAGS_00.checkCondition(FLAG(0x40, 0x3B), 0)) {
+        if (GAME.progress == STORY_LUCKY_MOUSE && FLAGS_00.checkCondition(FLAG(0x40, 0x3B), 0)) {
             children[0] = FIELDSTG_startEvent(0x214);
-        } else if (GAME.progress == 0x13 && FLAGS_00.checkCondition(FLAG(0x40, 0x3B), 1)) {
+        } else if (GAME.progress == STORY_LUCKY_MOUSE && FLAGS_00.checkCondition(FLAG(0x40, 0x3B), 1)) {
             children[0] = FIELDSTG_startEvent(0x216);
-        } else if (FLAGS_00.checkCondition(FLAG(0x40, 0x3A), 0) && FLAGS_00.checkCondition(FLAG(0x1C, 0x1B), 1)) {
+        } else if (FLAGS_00.checkCondition(FLAG_PASS_CODE_SEARCH_SEEN, 0) && FLAGS_00.checkCondition(FLAG_DATAMON_STAFF_PASS_TALKED, 1)) {
             children[0] = FIELDSTG_startEvent(0x21C);
-        } else if (GAME.progress == 0x14 && FLAGS_00.checkCondition(FLAG(0x40, 3), 1)) {
+        } else if (GAME.progress == STORY_BYAKKO_LEADER_FOUGHT && FLAGS_00.checkCondition(FLAG_SECURITY_HOLE_SEEN, 1)) {
             children[0] = FIELDSTG_startEvent(0x227);
         }
         task->nextState(task);
@@ -169,9 +169,9 @@ void endEvent532(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-/* After event 534, with Attacker, Lisa, Kail and Kurt: moves the story on to its step 0x14 */
+/* After event 534, with Attacker, Lisa, Kail and Kurt: moves the story on to STORY_BYAKKO_LEADER_FOUGHT */
 void endEvent534(void) {
-    GAME.progress = 0x14;
+    GAME.progress = STORY_BYAKKO_LEADER_FOUGHT;
 }
 
 /*
@@ -179,13 +179,13 @@ void endEvent534(void) {
  * start and keeps it from playing again
  */
 void endEvent540(void) {
-    FLAGS_00.applyAction(FLAG(0x1C, 0x1C), 1);
-    FLAGS_00.applyAction(FLAG(0x40, 0x3A), 1);
+    FLAGS_00.applyAction(FLAG_KEITH_NICK_SEARCH_STARTED, 1);
+    FLAGS_00.applyAction(FLAG_PASS_CODE_SEARCH_SEEN, 1);
 }
 
-/* After event 551, with Lisa, Keith, Nick and Kail: moves the story on to its step 0x15 */
+/* After event 551, with Lisa, Keith, Nick and Kail: moves the story on to STORY_STAFF_PASS */
 void endEvent551(void) {
-    GAME.progress = 0x15;
+    GAME.progress = STORY_STAFF_PASS;
 }
 
 #if VERSION_US || VERSION_JP
@@ -955,12 +955,12 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x146, 0x1E0, 0x18, 0xE0, 0x160, 0x1F1 },
     { 0x140, 0x100, 0x15C, 0x150, 0x70, 0x50, 0x170, 0x1F1 },
 };
-u16 actor2Talk0Conditions[] = { FLAG(0x1C, 0x1C), 0, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0x1C, 0x1C), 1, CODES_END };
-u16 actor5Talk0Conditions[] = { FLAG(0x1C, 0x1C), 0, CODES_END };
-u16 actor5Talk1Conditions[] = { FLAG(0x1C, 0x1C), 1, CODES_END };
-u16 actor19Talk0Conditions[] = { FLAG(0x1C, 0x1C), 0, CODES_END };
-u16 actor19Talk1Conditions[] = { FLAG(0x1C, 0x1C), 1, CODES_END };
+u16 actor2Talk0Conditions[] = { FLAG_KEITH_NICK_SEARCH_STARTED, 0, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_KEITH_NICK_SEARCH_STARTED, 1, CODES_END };
+u16 actor5Talk0Conditions[] = { FLAG_KEITH_NICK_SEARCH_STARTED, 0, CODES_END };
+u16 actor5Talk1Conditions[] = { FLAG_KEITH_NICK_SEARCH_STARTED, 1, CODES_END };
+u16 actor19Talk0Conditions[] = { FLAG_KEITH_NICK_SEARCH_STARTED, 0, CODES_END };
+u16 actor19Talk1Conditions[] = { FLAG_KEITH_NICK_SEARCH_STARTED, 1, CODES_END };
 FieldTalk actor2Talks[] = {
     { actor2Talk0Conditions, NULL, 0x2FE },
     { actor2Talk1Conditions, NULL, 0x301 },
@@ -988,25 +988,25 @@ FieldTalk actor19Talks[] = {
     { actor19Talk1Conditions, NULL, 0x302 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x13), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x13), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(7), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x13), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x13), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x14), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x15), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0x15), 1, FLAG(0x40, 0x3D), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x14), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0x15), 1, FLAG(0x40, 0x3D), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(0x14), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(0x13), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x13), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(0x13), 1, CODES_END };
-u16 actor17Conditions[] = { PROGRESS(0x13), 1, CODES_END };
-u16 actor18Conditions[] = { PROGRESS(0x13), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, FLAG(0x40, 0x3D), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, FLAG(0x40, 0x3D), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
+u16 actor13Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
+u16 actor17Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
+u16 actor18Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
 u16 actor19Conditions[] = { SPECIAL(7), 1, CODES_END };
-u16 actor20Conditions[] = { PROGRESS(0x13), 1, CODES_END };
-u16 actor21Conditions[] = { PROGRESS(0x13), 1, CODES_END };
+u16 actor20Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
+u16 actor21Conditions[] = { PROGRESS(STORY_LUCKY_MOUSE), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 0 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0xB, 5, 0, 0, 0 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0xB, 5, 472, 381, 1 };

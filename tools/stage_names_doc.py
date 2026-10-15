@@ -240,10 +240,10 @@ STAGES = {
     530: ("Jungle Shrine, South Sector", ""),
     531: ("Jungle Shrine, South Sector",
           "On the Amaterasu server; its Asuka server twin is WSTAG530."),
-    535: ("Catacomb, South Sector: before story point 0x1A",
+    535: ("Catacomb, South Sector: before STORY_BULBMON_FOUND",
           "The Jungle Shrine (WSTAG530) leads here (mode 579) until GAME.progress "
           "reaches 0x1A."),
-    537: ("Catacomb, South Sector: from story point 0x1A",
+    537: ("Catacomb, South Sector: from STORY_BULBMON_FOUND",
           "The Jungle Shrine (WSTAG530) leads here (mode 580) from GAME.progress "
           "0x1A on; it has the way to the Bug Maze (540)."),
     538: ("Catacomb, South Sector, on the Amaterasu server",
@@ -457,184 +457,184 @@ STAGES = {
           "to both servers' exits."),
     920: ("Amaterasu City, Central Sector: the streets by the bridge, in the "
           "extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 624 starts it instead of WSTAG201."),
     921: ("Amaterasu City, Central Sector: the streets by the Cargo Tower, in "
           "the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 625 starts it instead of WSTAG203."),
     922: ("Amaterasu Bridge, Central Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 626 starts it instead of WSTAG206."),
     923: ("Main Lobby, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 627 starts it instead of WSTAG211."),
     924: ("Digimon Lab, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 629 starts it instead of WSTAG221."),
     925: ("Login Room, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 630 starts it instead of WSTAG226."),
     926: ("Arena Front Desk, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 631 starts it instead of WSTAG231."),
     927: ("Digimon Arena, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 632 starts it instead of WSTAG233."),
     928: ("Amaterasu Inn 1F, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 633 starts it instead of WSTAG236."),
     929: ("Underground Path, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 634 starts it instead of WSTAG238."),
     930: ("Amaterasu Inn 2F, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 635 starts it instead of WSTAG241."),
     931: ("Wedge's Shop, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 636 starts it instead of WSTAG246."),
     932: ("Junk Shop, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 637 starts it instead of WSTAG251."),
     933: ("Lamb Chop, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 638 starts it instead of WSTAG256."),
     934: ("Cargo Tower, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 639 starts it instead of WSTAG261."),
     935: ("Yellow Cruiser, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 640 starts it instead of WSTAG271."),
     936: ("Water Tunnel, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 641 starts it instead of WSTAG276."),
     937: ("El Dorado, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 642 starts it instead of WSTAG281."),
     938: ("Amaterasu Sewer, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 650 starts it instead of WSTAG321."),
     939: ("Control Room, Amaterasu City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 651 starts it instead of WSTAG326."),
     940: ("Central Park, Central Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 652 starts it instead of WSTAG331."),
     941: ("Wire Forest Entrance, Central Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 653 starts it instead of WSTAG336."),
     942: ("Shell Beach, Central Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 654 starts it instead of WSTAG341."),
     943: ("Plug Cape, Central Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 655 starts it instead of WSTAG346."),
     944: ("West Wire Forest, East Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 656 starts it instead of WSTAG351."),
     945: ("East Wire Forest, East Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 657 starts it instead of WSTAG356."),
     946: ("Forest Inn, East Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 658 starts it instead of WSTAG361."),
     947: ("Forest Inn BF, East Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 659 starts it instead of WSTAG366."),
     948: ("Protocol Forest, East Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 660 starts it instead of WSTAG371."),
     949: ("Protocol Ruins, East Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 661 starts it instead of WSTAG376."),
     950: ("Divermon's Lake, East Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 662 starts it instead of WSTAG381."),
     951: ("Duel Island, East Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 663 starts it instead of WSTAG386."),
     952: ("Wind Prairie, East Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 664 starts it instead of WSTAG396."),
     953: ("Kicking Forest, East Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 665 starts it instead of WSTAG401."),
     954: ("Tyranno Valley, East Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 666 starts it instead of WSTAG406."),
     955: ("East Station, East Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 667 starts it instead of WSTAG411."),
     956: ("Qing Long City, East Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 668 starts it instead of WSTAG421."),
     957: ("Zephyr Tower, Qing Long City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 669 starts it instead of WSTAG426."),
     958: ("Qing Long Tower, Qing Long City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 670 starts it instead of WSTAG431."),
     959: ("Gale Tower, Qing Long City, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 671 starts it instead of WSTAG436."),
     960: ("Seabed, Underground: below the Sewers, Duel Island, Kicking Forest "
           "and the UG Lake, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 736 starts it instead of WSTAG825."),
     961: ("Seabed, Underground: below the bridges, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 737 starts it instead of WSTAG830."),
     962: ("Seabed, Underground: below Divermon's Lake and South and West "
           "Sector, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 738 starts it instead of WSTAG835."),
     963: ("Seabed, Underground: below Shell Beach, Plug Cape, South Cape and "
           "the Lake of Ice, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 739 starts it instead of WSTAG840."),
     964: ("Seabed, Underground: Seehomon and Depthmon's forge, in the extra "
           "chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 740 starts it instead of WSTAG845."),
     965: ("Seabed, Underground: below Central Park, Bulk Bridge and Phoenix "
           "Bay, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 741 starts it instead of WSTAG850."),
     966: ("Seabed, Underground: the junction of the Seabed tunnels, in the "
           "extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 742 starts it instead of WSTAG855."),
     967: ("Seabed, Underground: a dead end off WSTAG845 and 850, in the extra "
           "chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 743 starts it instead of WSTAG860."),
     968: ("Circuit Board, Underground: entered from the sectors' maps, in the "
           "extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 744 starts it instead of WSTAG865."),
     969: ("Circuit Board, Underground: entered from the sectors' maps, in the "
           "extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 745 starts it instead of WSTAG870."),
     970: ("Circuit Board, Underground: the Black Kingz' den, in the extra "
           "chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 746 starts it instead of WSTAG875."),
     971: ("Circuit Board, Underground: reached only from the other tunnels, "
           "in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 747 starts it instead of WSTAG880."),
     972: ("Circuit Board, Underground: a deep tunnel with Black Kingz and "
           "Numemon, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 748 starts it instead of WSTAG885."),
     973: ("Circuit Board, Underground: a deep tunnel with guides to both "
           "servers, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 749 starts it instead of WSTAG890."),
     974: ("Circuit Board, Underground: a deep tunnel with guides to both "
           "servers, in the extra chapter",
-          "The European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), "
+          "The European version's: in its extra chapter (STORY_EXTRA), "
           "mode 750 starts it instead of WSTAG895."),
 }
 

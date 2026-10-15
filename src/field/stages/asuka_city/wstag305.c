@@ -29,46 +29,46 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         do {
-            if (GAME.progress == 0xD && FLAGS_00.checkCondition(FLAG(0x1C, 0xD), 0)) {
+            if (GAME.progress == STORY_AGUMON_DISGUISE && FLAGS_00.checkCondition(FLAG_GAME_MASTER_MEETING_SEEN, 0)) {
                 children[0] = FIELDSTG_startEvent(0x15E);
                 break;
             }
-            if (GAME.progress == 0xD && FLAGS_00.checkCondition(FLAG(0x1C, 0xD), 1)) {
+            if (GAME.progress == STORY_AGUMON_DISGUISE && FLAGS_00.checkCondition(FLAG_GAME_MASTER_MEETING_SEEN, 1)) {
                 children[0] = FIELDSTG_startEvent(0x15F);
                 break;
             }
-            if (GAME.progress == 0x16 && FLAGS_00.checkCondition(FLAG(0x1C, 0x36), 1)) {
+            if (GAME.progress == STORY_CONTROL_ROOM && FLAGS_00.checkCondition(FLAG_MASTER_ROOM_SENSORS_ALL_TOUCHED, 1)) {
                 children[0] = FIELDSTG_startEvent(0x294);
                 break;
             }
-            if (GAME.progress == 0x16 && FLAGS_00.checkCondition(FLAG(0x1C, 0x37), 1)) {
+            if (GAME.progress == STORY_CONTROL_ROOM && FLAGS_00.checkCondition(FLAG(0x1C, 0x37), 1)) {
                 children[0] = FIELDSTG_startEvent(0x295);
                 break;
             }
-            if (GAME.progress == 0x17 && FLAGS_00.checkCondition(FLAG(0x40, 0x50), 1)) {
+            if (GAME.progress == STORY_GAME_MASTER_CAUGHT && FLAGS_00.checkCondition(FLAG(0x40, 0x50), 1)) {
                 children[0] = FIELDSTG_startEvent(0x2AB);
                 break;
             }
-            if (GAME.progress == 0x21 && FLAGS_00.checkCondition(FLAG(0x1C, 0x39), 0) && FLAGS_00.checkCondition(FLAG(0x40, 0x57), 0)) {
+            if (GAME.progress == STORY_NETWORK_OFFLINE && FLAGS_00.checkCondition(FLAG_LISA_RESISTANCE_REPORT_SEEN, 0) && FLAGS_00.checkCondition(FLAG_AMATERASU_PLAN_SEEN, 0)) {
                 children[0] = FIELDSTG_startEvent(0x37A);
                 break;
             }
-            if (GAME.progress == 0x21 && FLAGS_00.checkCondition(FLAG(0x40, 0x59), 1) && FLAGS_00.checkCondition(FLAG(0x1C, 0x39), 0) &&
-                FLAGS_00.checkCondition(FLAG(0x1A, 0x34), 1)) {
+            if (GAME.progress == STORY_NETWORK_OFFLINE && FLAGS_00.checkCondition(FLAG(0x40, 0x59), 1) && FLAGS_00.checkCondition(FLAG_LISA_RESISTANCE_REPORT_SEEN, 0) &&
+                FLAGS_00.checkCondition(FLAG_RESISTANCE_CHUCK_MET, 1)) {
                 children[0] = FIELDSTG_startEvent(0x37D);
                 break;
             }
-            if (GAME.progress == 0x21 && FLAGS_00.checkCondition(FLAG(0x40, 0x59), 1) && FLAGS_00.checkCondition(FLAG(0x1C, 0x39), 0) &&
-                FLAGS_00.checkCondition(FLAG(0x1A, 0x34), 0)) {
+            if (GAME.progress == STORY_NETWORK_OFFLINE && FLAGS_00.checkCondition(FLAG(0x40, 0x59), 1) && FLAGS_00.checkCondition(FLAG_LISA_RESISTANCE_REPORT_SEEN, 0) &&
+                FLAGS_00.checkCondition(FLAG_RESISTANCE_CHUCK_MET, 0)) {
                 children[0] = FIELDSTG_startEvent(0x37E);
                 break;
             }
-            if (GAME.progress == 0x26 && FLAGS_00.checkCondition(FLAG(0x40, 0x69), 0)) {
+            if (GAME.progress == STORY_PRESIDENT_ARRESTED && FLAGS_00.checkCondition(FLAG(0x40, 0x69), 0)) {
                 children[0] = FIELDSTG_startEvent(0x3C0);
                 break;
             }
         } while (0);
-        if (GAME.progress < 0x26) {
+        if (GAME.progress < STORY_PRESIDENT_ARRESTED) {
             children[1] = createSoundTile(0x352);
         }
         task->nextState(task);
@@ -85,7 +85,7 @@ void updateStage(StageTask *task, void **children) {
 
 /* After event 350, with Kail, Game Master and DO Guard: keeps it from playing again */
 void endEvent350(void) {
-    FLAGS_00.applyAction(FLAG(0x1C, 0xD), 1);
+    FLAGS_00.applyAction(FLAG_GAME_MASTER_MEETING_SEEN, 1);
 }
 
 /* After event 351, with Game Master and Kail: sets flag 0x1C0E */
@@ -95,32 +95,32 @@ void endEvent351(void) {
 
 /* After event 660, with the player: clears flag 0x1C36 */
 void endEvent660(void) {
-    FLAGS_00.applyAction(FLAG(0x1C, 0x36), 0);
+    FLAGS_00.applyAction(FLAG_MASTER_ROOM_SENSORS_ALL_TOUCHED, 0);
 }
 
-/* After event 661, with the player: moves the story on to its step 0x17 */
+/* After event 661, with the player: moves the story on to STORY_GAME_MASTER_CAUGHT */
 void endEvent661(void) {
-    GAME.progress = 0x17;
+    GAME.progress = STORY_GAME_MASTER_CAUGHT;
 }
 
 /* After event 890, with Lisa, Teddy, Keith and Nick: keeps it from playing again */
 void endEvent890(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x57), 1);
+    FLAGS_00.applyAction(FLAG_AMATERASU_PLAN_SEEN, 1);
 }
 
-/* After event 893, with Lisa, Nick, Keith and Teddy: moves the story on to its step 0x22 */
+/* After event 893, with Lisa, Nick, Keith and Teddy: moves the story on to STORY_WAY_TO_AMATERASU */
 void endEvent893(void) {
-    GAME.progress = 0x22;
+    GAME.progress = STORY_WAY_TO_AMATERASU;
 }
 
 /* After event 894, with Lisa, Nick and Keith: keeps it from playing again */
 void endEvent894(void) {
-    FLAGS_00.applyAction(FLAG(0x1C, 0x39), 1);
+    FLAGS_00.applyAction(FLAG_LISA_RESISTANCE_REPORT_SEEN, 1);
 }
 
-/* After event 895, with Lisa, Keith, Nick and Teddy: moves the story on to its step 0x22 */
+/* After event 895, with Lisa, Keith, Nick and Teddy: moves the story on to STORY_WAY_TO_AMATERASU */
 void endEvent895(void) {
-    GAME.progress = 0x22;
+    GAME.progress = STORY_WAY_TO_AMATERASU;
 }
 
 /* After event 960, with Oinkmon: keeps it from playing again */
@@ -1224,46 +1224,55 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1A0, 0x100, 0x180, 0, 0x140, 0x1F5 },
     { 0x180, 0x100, 0x1A8, 0x100, 0x1A0, 0, 0x150, 0x1F5 },
 };
-u16 actor8Talk0Conditions[] = { FLAG(0x1C, 0x27), 1, CODES_END };
-u16 actor8Talk1Conditions[] = { FLAG(0, 0), 0, FLAG(0x1C, 0x27), 0, CODES_END };
+u16 actor8Talk0Conditions[] = { FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 1, CODES_END };
+u16 actor8Talk1Conditions[] = { FLAG(0, 0), 0, FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0, CODES_END };
 u16 actor8Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor8Talk2Conditions[] = { SPECIAL(0x71), 0, FLAG(0, 0), 1, FLAG(0x1C, 0x27), 0, CODES_END };
-u16 actor8Talk2Actions[] = { FLAG(0x1C, 0x2E), 1, FLAG(0x1C, 0x27), 1, CODES_END };
+u16 actor8Talk2Conditions[] = {
+    SPECIAL(0x71), 0,
+    FLAG(0, 0), 1,
+    FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0,
+    CODES_END,
+};
+u16 actor8Talk2Actions[] = {
+    FLAG_MASTER_ROOM_SENSOR_M_IN_ORDER, 1,
+    FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 1,
+    CODES_END,
+};
 u16 actor8Talk3Conditions[] = {
-    FLAG(0x1C, 0x27), 0,
+    FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0,
     FLAG(0, 0), 1,
     SPECIAL(0x71), 1,
     SPECIAL(0x70), 0,
     CODES_END,
 };
 u16 actor8Talk3Actions[] = {
-    FLAG(0x1C, 0x28), 0,
-    FLAG(0x1C, 0x29), 0,
-    FLAG(0x1C, 0x2A), 0,
-    FLAG(0x1C, 0x2B), 0,
-    FLAG(0x1C, 0x2C), 0,
-    FLAG(0x1C, 0x2D), 0,
-    FLAG(0x1C, 0x2E), 0,
-    FLAG(0x1C, 0x2F), 0,
-    FLAG(0x1C, 0x30), 0,
-    FLAG(0x1C, 0x31), 0,
-    FLAG(0x1C, 0x32), 0,
-    FLAG(0x1C, 0x33), 0,
-    FLAG(0x1C, 0x36), 1,
+    FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_M_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSORS_ALL_TOUCHED, 1,
     START_EVENT(0x61), 1,
-    FLAG(0x1C, 0x27), 0,
+    FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0,
     CODES_END,
 };
 u16 actor8Talk4Conditions[] = {
     SPECIAL(0x70), 1,
-    FLAG(0x1C, 0x27), 0,
+    FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0,
     FLAG(0, 0), 1,
     SPECIAL(0x71), 1,
     CODES_END,
 };
-u16 actor8Talk4Actions[] = { FLAG(0x1C, 0x27), 1, CODES_END };
-u16 actor13Talk0Conditions[] = { FLAG(0x1A, 0x34), 0, CODES_END };
-u16 actor13Talk1Conditions[] = { FLAG(0x1A, 0x34), 1, CODES_END };
+u16 actor8Talk4Actions[] = { FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 1, CODES_END };
+u16 actor13Talk0Conditions[] = { FLAG_RESISTANCE_CHUCK_MET, 0, CODES_END };
+u16 actor13Talk1Conditions[] = { FLAG_RESISTANCE_CHUCK_MET, 1, CODES_END };
 u16 actor13Talk1Actions[] = { START_EVENT(0x4B), 1, CODES_END };
 u16 actor35Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor35Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
@@ -1283,231 +1292,281 @@ u16 actor40Talk1Conditions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor41Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor41Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor41Talk1Conditions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor45Talk0Conditions[] = { FLAG(0x1C, 0x28), 1, CODES_END };
-u16 actor45Talk1Conditions[] = { FLAG(0, 1), 0, FLAG(0x1C, 0x28), 0, CODES_END };
+u16 actor45Talk0Conditions[] = { FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 1, CODES_END };
+u16 actor45Talk1Conditions[] = { FLAG(0, 1), 0, FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0, CODES_END };
 u16 actor45Talk1Actions[] = { FLAG(0, 1), 1, CODES_END };
-u16 actor45Talk2Conditions[] = { FLAG(0, 1), 1, SPECIAL(0x70), 0, FLAG(0x1C, 0x28), 0, CODES_END };
+u16 actor45Talk2Conditions[] = {
+    FLAG(0, 1), 1,
+    SPECIAL(0x70), 0,
+    FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0,
+    CODES_END,
+};
 u16 actor45Talk2Actions[] = {
     START_EVENT(0x61), 1,
-    FLAG(0x1C, 0x36), 1,
-    FLAG(0x1C, 0x27), 0,
-    FLAG(0x1C, 0x28), 0,
-    FLAG(0x1C, 0x29), 0,
-    FLAG(0x1C, 0x2A), 0,
-    FLAG(0x1C, 0x2B), 0,
-    FLAG(0x1C, 0x2C), 0,
-    FLAG(0x1C, 0x2D), 0,
-    FLAG(0x1C, 0x2E), 0,
-    FLAG(0x1C, 0x2F), 0,
-    FLAG(0x1C, 0x30), 0,
-    FLAG(0x1C, 0x31), 0,
-    FLAG(0x1C, 0x32), 0,
-    FLAG(0x1C, 0x33), 0,
+    FLAG_MASTER_ROOM_SENSORS_ALL_TOUCHED, 1,
+    FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_M_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_IN_ORDER, 0,
     CODES_END,
 };
 u16 actor45Talk3Conditions[] = {
     FLAG(0, 1), 1,
     SPECIAL(0x70), 1,
-    FLAG(0x1C, 0x2E), 0,
-    FLAG(0x1C, 0x28), 0,
+    FLAG_MASTER_ROOM_SENSOR_M_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0,
     CODES_END,
 };
-u16 actor45Talk3Actions[] = { FLAG(0x1C, 0x28), 1, CODES_END };
+u16 actor45Talk3Actions[] = { FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 1, CODES_END };
 u16 actor45Talk4Conditions[] = {
     FLAG(0, 1), 1,
     SPECIAL(0x70), 1,
-    FLAG(0x1C, 0x2E), 1,
-    FLAG(0x1C, 0x28), 0,
+    FLAG_MASTER_ROOM_SENSOR_M_IN_ORDER, 1,
+    FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0,
     CODES_END,
 };
-u16 actor45Talk4Actions[] = { FLAG(0x1C, 0x28), 1, FLAG(0x1C, 0x2F), 1, CODES_END };
-u16 actor47Talk0Conditions[] = { FLAG(0x1C, 0x29), 1, CODES_END };
-u16 actor47Talk1Conditions[] = { FLAG(0x1C, 0x29), 0, FLAG(0, 2), 0, CODES_END };
+u16 actor45Talk4Actions[] = {
+    FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 1,
+    FLAG_MASTER_ROOM_SENSOR_O_IN_ORDER, 1,
+    CODES_END,
+};
+u16 actor47Talk0Conditions[] = { FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 1, CODES_END };
+u16 actor47Talk1Conditions[] = { FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0, FLAG(0, 2), 0, CODES_END };
 u16 actor47Talk1Actions[] = { FLAG(0, 2), 1, CODES_END };
-u16 actor47Talk2Conditions[] = { FLAG(0x1C, 0x29), 0, FLAG(0, 2), 1, SPECIAL(0x70), 0, CODES_END };
+u16 actor47Talk2Conditions[] = {
+    FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0,
+    FLAG(0, 2), 1,
+    SPECIAL(0x70), 0,
+    CODES_END,
+};
 u16 actor47Talk2Actions[] = {
     START_EVENT(0x61), 1,
-    FLAG(0x1C, 0x36), 1,
-    FLAG(0x1C, 0x27), 0,
-    FLAG(0x1C, 0x28), 0,
-    FLAG(0x1C, 0x29), 0,
-    FLAG(0x1C, 0x2A), 0,
-    FLAG(0x1C, 0x2B), 0,
-    FLAG(0x1C, 0x2C), 0,
-    FLAG(0x1C, 0x2D), 0,
-    FLAG(0x1C, 0x2E), 0,
-    FLAG(0x1C, 0x2F), 0,
-    FLAG(0x1C, 0x30), 0,
-    FLAG(0x1C, 0x31), 0,
-    FLAG(0x1C, 0x32), 0,
-    FLAG(0x1C, 0x33), 0,
+    FLAG_MASTER_ROOM_SENSORS_ALL_TOUCHED, 1,
+    FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_M_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_IN_ORDER, 0,
     CODES_END,
 };
 u16 actor47Talk3Conditions[] = {
-    FLAG(0x1C, 0x29), 0,
+    FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0,
     FLAG(0, 2), 1,
     SPECIAL(0x70), 1,
-    FLAG(0x1C, 0x2F), 0,
+    FLAG_MASTER_ROOM_SENSOR_O_IN_ORDER, 0,
     CODES_END,
 };
-u16 actor47Talk3Actions[] = { FLAG(0x1C, 0x29), 1, CODES_END };
+u16 actor47Talk3Actions[] = { FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 1, CODES_END };
 u16 actor47Talk4Conditions[] = {
-    FLAG(0x1C, 0x29), 0,
+    FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0,
     FLAG(0, 2), 1,
     SPECIAL(0x70), 1,
-    FLAG(0x1C, 0x2F), 1,
+    FLAG_MASTER_ROOM_SENSOR_O_IN_ORDER, 1,
     CODES_END,
 };
-u16 actor47Talk4Actions[] = { FLAG(0x1C, 0x29), 1, FLAG(0x1C, 0x30), 1, CODES_END };
-u16 actor51Talk0Conditions[] = { FLAG(0x1C, 0x2A), 1, CODES_END };
-u16 actor51Talk1Conditions[] = { FLAG(0, 3), 0, FLAG(0x1C, 0x2A), 0, CODES_END };
+u16 actor47Talk4Actions[] = {
+    FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 1,
+    FLAG_MASTER_ROOM_SENSOR_N_IN_ORDER, 1,
+    CODES_END,
+};
+u16 actor51Talk0Conditions[] = { FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 1, CODES_END };
+u16 actor51Talk1Conditions[] = { FLAG(0, 3), 0, FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0, CODES_END };
 u16 actor51Talk1Actions[] = { FLAG(0, 3), 1, CODES_END };
-u16 actor51Talk2Conditions[] = { FLAG(0x1C, 0x2A), 0, FLAG(0, 3), 1, SPECIAL(0x70), 0, CODES_END };
+u16 actor51Talk2Conditions[] = {
+    FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0,
+    FLAG(0, 3), 1,
+    SPECIAL(0x70), 0,
+    CODES_END,
+};
 u16 actor51Talk2Actions[] = {
     START_EVENT(0x61), 1,
-    FLAG(0x1C, 0x36), 1,
-    FLAG(0x1C, 0x27), 0,
-    FLAG(0x1C, 0x28), 0,
-    FLAG(0x1C, 0x29), 0,
-    FLAG(0x1C, 0x2A), 0,
-    FLAG(0x1C, 0x2B), 0,
-    FLAG(0x1C, 0x2C), 0,
-    FLAG(0x1C, 0x2D), 0,
-    FLAG(0x1C, 0x2E), 0,
-    FLAG(0x1C, 0x2F), 0,
-    FLAG(0x1C, 0x30), 0,
-    FLAG(0x1C, 0x31), 0,
-    FLAG(0x1C, 0x32), 0,
-    FLAG(0x1C, 0x33), 0,
+    FLAG_MASTER_ROOM_SENSORS_ALL_TOUCHED, 1,
+    FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_M_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_IN_ORDER, 0,
     CODES_END,
 };
 u16 actor51Talk3Conditions[] = {
-    FLAG(0x1C, 0x2A), 0,
+    FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0,
     FLAG(0, 3), 1,
     SPECIAL(0x70), 1,
-    FLAG(0x1C, 0x30), 0,
+    FLAG_MASTER_ROOM_SENSOR_N_IN_ORDER, 0,
     CODES_END,
 };
-u16 actor51Talk3Actions[] = { FLAG(0x1C, 0x2A), 1, CODES_END };
+u16 actor51Talk3Actions[] = { FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 1, CODES_END };
 u16 actor51Talk4Conditions[] = {
-    FLAG(0x1C, 0x2A), 0,
+    FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0,
     FLAG(0, 3), 1,
     SPECIAL(0x70), 1,
-    FLAG(0x1C, 0x30), 1,
+    FLAG_MASTER_ROOM_SENSOR_N_IN_ORDER, 1,
     CODES_END,
 };
-u16 actor51Talk4Actions[] = { FLAG(0x1C, 0x2A), 1, FLAG(0x1C, 0x31), 1, CODES_END };
-u16 actor53Talk0Conditions[] = { FLAG(0x1C, 0x2B), 1, CODES_END };
-u16 actor53Talk1Conditions[] = { FLAG(0x1C, 0x2B), 0, FLAG(0, 4), 0, CODES_END };
+u16 actor51Talk4Actions[] = {
+    FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 1,
+    FLAG_MASTER_ROOM_SENSOR_S_IN_ORDER, 1,
+    CODES_END,
+};
+u16 actor53Talk0Conditions[] = { FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 1, CODES_END };
+u16 actor53Talk1Conditions[] = { FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0, FLAG(0, 4), 0, CODES_END };
 u16 actor53Talk1Actions[] = { FLAG(0, 4), 1, CODES_END };
-u16 actor53Talk2Conditions[] = { FLAG(0x1C, 0x2B), 0, FLAG(0, 4), 1, SPECIAL(0x70), 0, CODES_END };
+u16 actor53Talk2Conditions[] = {
+    FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0,
+    FLAG(0, 4), 1,
+    SPECIAL(0x70), 0,
+    CODES_END,
+};
 u16 actor53Talk2Actions[] = {
     START_EVENT(0x61), 1,
-    FLAG(0x1C, 0x36), 1,
-    FLAG(0x1C, 0x27), 0,
-    FLAG(0x1C, 0x28), 0,
-    FLAG(0x1C, 0x29), 0,
-    FLAG(0x1C, 0x2A), 0,
-    FLAG(0x1C, 0x2B), 0,
-    FLAG(0x1C, 0x2C), 0,
-    FLAG(0x1C, 0x2D), 0,
-    FLAG(0x1C, 0x2E), 0,
-    FLAG(0x1C, 0x2F), 0,
-    FLAG(0x1C, 0x30), 0,
-    FLAG(0x1C, 0x31), 0,
-    FLAG(0x1C, 0x32), 0,
-    FLAG(0x1C, 0x33), 0,
+    FLAG_MASTER_ROOM_SENSORS_ALL_TOUCHED, 1,
+    FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_M_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_IN_ORDER, 0,
     CODES_END,
 };
 u16 actor53Talk3Conditions[] = {
-    FLAG(0x1C, 0x2B), 0,
+    FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0,
     FLAG(0, 4), 1,
     SPECIAL(0x70), 1,
-    FLAG(0x1C, 0x31), 0,
+    FLAG_MASTER_ROOM_SENSOR_S_IN_ORDER, 0,
     CODES_END,
 };
-u16 actor53Talk3Actions[] = { FLAG(0x1C, 0x2B), 1, CODES_END };
+u16 actor53Talk3Actions[] = { FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 1, CODES_END };
 u16 actor53Talk4Conditions[] = {
-    FLAG(0x1C, 0x2B), 0,
+    FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0,
     FLAG(0, 4), 1,
     SPECIAL(0x70), 1,
-    FLAG(0x1C, 0x31), 1,
+    FLAG_MASTER_ROOM_SENSOR_S_IN_ORDER, 1,
     CODES_END,
 };
-u16 actor53Talk4Actions[] = { FLAG(0x1C, 0x2B), 1, FLAG(0x1C, 0x32), 1, CODES_END };
-u16 actor55Talk0Conditions[] = { FLAG(0x1C, 0x2C), 1, CODES_END };
-u16 actor55Talk1Conditions[] = { FLAG(0x1C, 0x2C), 0, FLAG(0, 5), 0, CODES_END };
+u16 actor53Talk4Actions[] = {
+    FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 1,
+    FLAG_MASTER_ROOM_SENSOR_T_IN_ORDER, 1,
+    CODES_END,
+};
+u16 actor55Talk0Conditions[] = { FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 1, CODES_END };
+u16 actor55Talk1Conditions[] = { FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0, FLAG(0, 5), 0, CODES_END };
 u16 actor55Talk1Actions[] = { FLAG(0, 5), 1, CODES_END };
-u16 actor55Talk2Conditions[] = { FLAG(0x1C, 0x2C), 0, FLAG(0, 5), 1, SPECIAL(0x70), 0, CODES_END };
+u16 actor55Talk2Conditions[] = {
+    FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0,
+    FLAG(0, 5), 1,
+    SPECIAL(0x70), 0,
+    CODES_END,
+};
 u16 actor55Talk2Actions[] = {
     START_EVENT(0x61), 1,
-    FLAG(0x1C, 0x36), 1,
-    FLAG(0x1C, 0x27), 0,
-    FLAG(0x1C, 0x28), 0,
-    FLAG(0x1C, 0x29), 0,
-    FLAG(0x1C, 0x2A), 0,
-    FLAG(0x1C, 0x2B), 0,
-    FLAG(0x1C, 0x2C), 0,
-    FLAG(0x1C, 0x2D), 0,
-    FLAG(0x1C, 0x2E), 0,
-    FLAG(0x1C, 0x2F), 0,
-    FLAG(0x1C, 0x30), 0,
-    FLAG(0x1C, 0x31), 0,
-    FLAG(0x1C, 0x32), 0,
-    FLAG(0x1C, 0x33), 0,
+    FLAG_MASTER_ROOM_SENSORS_ALL_TOUCHED, 1,
+    FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_M_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_IN_ORDER, 0,
     CODES_END,
 };
 u16 actor55Talk3Conditions[] = {
-    FLAG(0x1C, 0x2C), 0,
+    FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0,
     FLAG(0, 5), 1,
     SPECIAL(0x70), 1,
-    FLAG(0x1C, 0x32), 0,
+    FLAG_MASTER_ROOM_SENSOR_T_IN_ORDER, 0,
     CODES_END,
 };
-u16 actor55Talk3Actions[] = { FLAG(0x1C, 0x2C), 1, CODES_END };
+u16 actor55Talk3Actions[] = { FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 1, CODES_END };
 u16 actor55Talk4Conditions[] = {
-    FLAG(0x1C, 0x2C), 0,
+    FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0,
     FLAG(0, 5), 1,
     SPECIAL(0x70), 1,
-    FLAG(0x1C, 0x32), 1,
+    FLAG_MASTER_ROOM_SENSOR_T_IN_ORDER, 1,
     CODES_END,
 };
-u16 actor55Talk4Actions[] = { FLAG(0x1C, 0x2C), 1, FLAG(0x1C, 0x33), 1, CODES_END };
-u16 actor57Talk0Conditions[] = { FLAG(0x1C, 0x2D), 1, CODES_END };
-u16 actor57Talk1Conditions[] = { FLAG(0x1C, 0x2D), 0, FLAG(0, 6), 0, CODES_END };
+u16 actor55Talk4Actions[] = {
+    FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 1,
+    FLAG_MASTER_ROOM_SENSOR_E_IN_ORDER, 1,
+    CODES_END,
+};
+u16 actor57Talk0Conditions[] = { FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 1, CODES_END };
+u16 actor57Talk1Conditions[] = { FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0, FLAG(0, 6), 0, CODES_END };
 u16 actor57Talk1Actions[] = { FLAG(0, 6), 1, CODES_END };
-u16 actor57Talk2Conditions[] = { FLAG(0x1C, 0x2D), 0, FLAG(0, 6), 1, SPECIAL(0x73), 0, CODES_END };
-u16 actor57Talk2Actions[] = { FLAG(0x1C, 0x2D), 1, CODES_END };
+u16 actor57Talk2Conditions[] = {
+    FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0,
+    FLAG(0, 6), 1,
+    SPECIAL(0x73), 0,
+    CODES_END,
+};
+u16 actor57Talk2Actions[] = { FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 1, CODES_END };
 u16 actor57Talk3Conditions[] = {
-    FLAG(0x1C, 0x33), 0,
-    FLAG(0x1C, 0x2D), 0,
+    FLAG_MASTER_ROOM_SENSOR_E_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0,
     FLAG(0, 6), 1,
     SPECIAL(0x73), 1,
     CODES_END,
 };
 u16 actor57Talk3Actions[] = {
     START_EVENT(0x61), 1,
-    FLAG(0x1C, 0x36), 1,
-    FLAG(0x1C, 0x27), 0,
-    FLAG(0x1C, 0x28), 0,
-    FLAG(0x1C, 0x29), 0,
-    FLAG(0x1C, 0x2A), 0,
-    FLAG(0x1C, 0x2B), 0,
-    FLAG(0x1C, 0x2C), 0,
-    FLAG(0x1C, 0x2D), 0,
-    FLAG(0x1C, 0x2E), 0,
-    FLAG(0x1C, 0x2F), 0,
-    FLAG(0x1C, 0x30), 0,
-    FLAG(0x1C, 0x31), 0,
-    FLAG(0x1C, 0x32), 0,
-    FLAG(0x1C, 0x33), 0,
+    FLAG_MASTER_ROOM_SENSORS_ALL_TOUCHED, 1,
+    FLAG_MASTER_ROOM_SENSOR_M_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0,
+    FLAG_MASTER_ROOM_SENSOR_M_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_O_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_N_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_S_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_T_IN_ORDER, 0,
+    FLAG_MASTER_ROOM_SENSOR_E_IN_ORDER, 0,
     CODES_END,
 };
 u16 actor57Talk4Conditions[] = {
-    FLAG(0x1C, 0x2D), 0,
+    FLAG_MASTER_ROOM_SENSOR_R_TOUCHED, 0,
     FLAG(0, 6), 1,
     SPECIAL(0x73), 1,
-    FLAG(0x1C, 0x33), 1,
+    FLAG_MASTER_ROOM_SENSOR_E_IN_ORDER, 1,
     CODES_END,
 };
 u16 actor57Talk4Actions[] = { START_EVENT(0x61), 1, FLAG(0x1C, 0x37), 1, CODES_END };
@@ -1726,71 +1785,87 @@ FieldTalk actor64Talks[] = {
     { NULL, NULL, 0xB2 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0xD), 1, FLAG(0x1C, 0xD), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0xD), 1, FLAG(0x1C, 0xD), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x16), 1, CODES_END };
+u16 actor0Conditions[] = {
+    PROGRESS(STORY_AGUMON_DISGUISE), 1,
+    FLAG_GAME_MASTER_MEETING_SEEN, 1,
+    CODES_END,
+};
+u16 actor1Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor2Conditions[] = {
+    PROGRESS(STORY_AGUMON_DISGUISE), 1,
+    FLAG_GAME_MASTER_MEETING_SEEN, 1,
+    CODES_END,
+};
+u16 actor3Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor9Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(0xD), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor12Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(0x21), 1, CODES_END };
-u16 actor14Conditions[] = { PROGRESS(0x1B), 1, CODES_END };
-u16 actor15Conditions[] = { PROGRESS(0x1C), 1, CODES_END };
-u16 actor16Conditions[] = { PROGRESS(0x1D), 1, CODES_END };
-u16 actor17Conditions[] = { PROGRESS(0x1E), 1, CODES_END };
-u16 actor18Conditions[] = { PROGRESS(0x1F), 1, CODES_END };
-u16 actor19Conditions[] = { PROGRESS(0x20), 1, CODES_END };
-u16 actor20Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor21Conditions[] = { PROGRESS(0x21), 1, CODES_END };
-u16 actor22Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor23Conditions[] = { PROGRESS(0x21), 1, CODES_END };
-u16 actor24Conditions[] = { PROGRESS(0x22), 1, CODES_END };
-u16 actor25Conditions[] = { PROGRESS(0x23), 1, CODES_END };
-u16 actor26Conditions[] = { PROGRESS(0xD), 1, FLAG(0x1C, 0xD), 0, CODES_END };
-u16 actor27Conditions[] = { PROGRESS(0xD), 1, FLAG(0x1C, 0xD), 0, CODES_END };
-u16 actor28Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor29Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor30Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor31Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor32Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor33Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor13Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
+u16 actor14Conditions[] = { PROGRESS(STORY_JUNGLE_SOUND), 1, CODES_END };
+u16 actor15Conditions[] = { PROGRESS(STORY_BLUE_ID_PASS), 1, CODES_END };
+u16 actor16Conditions[] = { PROGRESS(STORY_BULBMON_BEATEN), 1, CODES_END };
+u16 actor17Conditions[] = { PROGRESS(STORY_DE_KNOWLEDGE), 1, CODES_END };
+u16 actor18Conditions[] = { PROGRESS(STORY_GENBU_BADGE), 1, CODES_END };
+u16 actor19Conditions[] = { PROGRESS(STORY_REAL_WORLD), 1, CODES_END };
+u16 actor20Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor21Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
+u16 actor22Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor23Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
+u16 actor24Conditions[] = { PROGRESS(STORY_WAY_TO_AMATERASU), 1, CODES_END };
+u16 actor25Conditions[] = { PROGRESS(STORY_WHITE_ID_PASS), 1, CODES_END };
+u16 actor26Conditions[] = {
+    PROGRESS(STORY_AGUMON_DISGUISE), 1,
+    FLAG_GAME_MASTER_MEETING_SEEN, 0,
+    CODES_END,
+};
+u16 actor27Conditions[] = {
+    PROGRESS(STORY_AGUMON_DISGUISE), 1,
+    FLAG_GAME_MASTER_MEETING_SEEN, 0,
+    CODES_END,
+};
+u16 actor28Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor29Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor30Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor31Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor32Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor33Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor34Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor35Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor36Conditions[] = { PROGRESS(0x21), 1, CODES_END };
-u16 actor37Conditions[] = { PROGRESS(0x1B), 1, CODES_END };
-u16 actor38Conditions[] = { PROGRESS(0x1C), 1, CODES_END };
-u16 actor39Conditions[] = { PROGRESS(0x1D), 1, CODES_END };
-u16 actor40Conditions[] = { PROGRESS(0x1E), 1, CODES_END };
-u16 actor41Conditions[] = { PROGRESS(0x1F), 1, CODES_END };
-u16 actor42Conditions[] = { PROGRESS(0x20), 1, CODES_END };
-u16 actor43Conditions[] = { PROGRESS(0x22), 1, CODES_END };
-u16 actor44Conditions[] = { PROGRESS(0x23), 1, CODES_END };
-u16 actor45Conditions[] = { PROGRESS(0x16), 1, CODES_END };
+u16 actor36Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
+u16 actor37Conditions[] = { PROGRESS(STORY_JUNGLE_SOUND), 1, CODES_END };
+u16 actor38Conditions[] = { PROGRESS(STORY_BLUE_ID_PASS), 1, CODES_END };
+u16 actor39Conditions[] = { PROGRESS(STORY_BULBMON_BEATEN), 1, CODES_END };
+u16 actor40Conditions[] = { PROGRESS(STORY_DE_KNOWLEDGE), 1, CODES_END };
+u16 actor41Conditions[] = { PROGRESS(STORY_GENBU_BADGE), 1, CODES_END };
+u16 actor42Conditions[] = { PROGRESS(STORY_REAL_WORLD), 1, CODES_END };
+u16 actor43Conditions[] = { PROGRESS(STORY_WAY_TO_AMATERASU), 1, CODES_END };
+u16 actor44Conditions[] = { PROGRESS(STORY_WHITE_ID_PASS), 1, CODES_END };
+u16 actor45Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor46Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor47Conditions[] = { PROGRESS(0x16), 1, CODES_END };
+u16 actor47Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor48Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor49Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor49Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor50Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor51Conditions[] = { PROGRESS(0x16), 1, CODES_END };
+u16 actor51Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor52Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor53Conditions[] = { PROGRESS(0x16), 1, CODES_END };
+u16 actor53Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor54Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor55Conditions[] = { PROGRESS(0x16), 1, CODES_END };
+u16 actor55Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor56Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor57Conditions[] = { PROGRESS(0x16), 1, CODES_END };
+u16 actor57Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor58Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor59Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor59Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor60Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor61Conditions[] = { PROGRESS(0x17), 1, CODES_END };
-u16 actor62Conditions[] = { PROGRESS(0x21), 1, CODES_END };
-u16 actor63Conditions[] = { PROGRESS(0x21), 1, CODES_END };
-u16 actor64Conditions[] = { PROGRESS(0x21), 1, CODES_END };
+u16 actor61Conditions[] = { PROGRESS(STORY_GAME_MASTER_CAUGHT), 1, CODES_END };
+u16 actor62Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
+u16 actor63Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
+u16 actor64Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0xB, 5, 0, 0, 1 };

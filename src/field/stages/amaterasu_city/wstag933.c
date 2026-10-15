@@ -1,7 +1,7 @@
 /*
  * WSTAG933: Lamb Chop, Amaterasu City, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 638 starts it
- * instead of WSTAG256.
+ * version's: in its extra chapter (STORY_EXTRA), mode 638 starts it instead of
+ * WSTAG256.
  */
 
 #include "common.h"

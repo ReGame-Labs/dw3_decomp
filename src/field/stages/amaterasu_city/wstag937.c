@@ -1,7 +1,7 @@
 /*
  * WSTAG937: El Dorado, Amaterasu City, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 642 starts it
- * instead of WSTAG281.
+ * version's: in its extra chapter (STORY_EXTRA), mode 642 starts it instead of
+ * WSTAG281.
  */
 
 #include "common.h"

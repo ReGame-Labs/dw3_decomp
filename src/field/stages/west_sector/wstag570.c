@@ -39,7 +39,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -110,7 +110,12 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1B8, 0x100, 0x1E0, 0, 0x150, 0x1FF },
     { 0x180, 0x100, 0x1AC, 0x1B1, 0x1B0, 0xB1, 0x160, 0x1FF },
 };
-u16 actor0Talk0Actions[] = { SPECIAL(0x8D), 1, FLAG(2, 0xC), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    SPECIAL(0x8D), 1,
+    FLAG_NORTH_BADLAND_E_600_BIT_FOUND, 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 u16 actor1Talk0Conditions[] = { ITEM(0, 0x28), 1, ITEM(0, 0x29), 0, CODES_END };
 u16 actor1Talk0Actions[] = { 0x9403, 1, CODES_END };
 u16 actor1Talk1Conditions[] = { ITEM(0, 0x28), 1, ITEM(0, 0x29), 1, CODES_END };
@@ -129,7 +134,7 @@ FieldTalk actor2Talks[] = {
     { NULL, actor2Talk0Actions, 0x24 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0xC), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_NORTH_BADLAND_E_600_BIT_FOUND, 0, CODES_END };
 u16 actor1Conditions[] = { ITEM(0, 0x2A), 0, CODES_END };
 u16 actor2Conditions[] = { ITEM(0, 0x2A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 335, 718, 1 };

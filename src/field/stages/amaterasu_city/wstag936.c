@@ -1,7 +1,7 @@
 /*
  * WSTAG936: Water Tunnel, Amaterasu City, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 641 starts it
- * instead of WSTAG276.
+ * version's: in its extra chapter (STORY_EXTRA), mode 641 starts it instead of
+ * WSTAG276.
  */
 
 #include "common.h"
@@ -49,13 +49,18 @@ ActorImage stageImages[] = {
     { 0x200, 0x100, 0x200, 0x1BC, 0, 0xBC, 0x230, 0x1FD },
     { 0, 0, 0, 0, 0, 0, 0, 0 },
 };
-u16 actor0Talk0Conditions[] = { FLAG(0x18, 6), 1, CODES_END };
-u16 actor0Talk1Conditions[] = { FLAG(0x18, 6), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor0Talk0Conditions[] = { FLAG_PLATINUM_CARD_FOUND, 1, CODES_END };
+u16 actor0Talk1Conditions[] = { FLAG_PLATINUM_CARD_FOUND, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor0Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor0Talk2Conditions[] = { FLAG(0x18, 6), 0, FLAG(0, 0), 1, FLAG(0, 1), 0, CODES_END };
+u16 actor0Talk2Conditions[] = {
+    FLAG_PLATINUM_CARD_FOUND, 0,
+    FLAG(0, 0), 1,
+    FLAG(0, 1), 0,
+    CODES_END,
+};
 u16 actor0Talk2Actions[] = { FLAG(0, 1), 1, CODES_END };
 u16 actor0Talk3Conditions[] = {
-    FLAG(0x18, 6), 0,
+    FLAG_PLATINUM_CARD_FOUND, 0,
     FLAG(0, 0), 1,
     FLAG(0, 1), 1,
     FLAG(0, 2), 0,
@@ -63,7 +68,7 @@ u16 actor0Talk3Conditions[] = {
 };
 u16 actor0Talk3Actions[] = { FLAG(0, 2), 1, CODES_END };
 u16 actor0Talk4Conditions[] = {
-    FLAG(0x18, 6), 0,
+    FLAG_PLATINUM_CARD_FOUND, 0,
     FLAG(0, 0), 1,
     FLAG(0, 1), 1,
     FLAG(0, 2), 1,
@@ -72,7 +77,7 @@ u16 actor0Talk4Conditions[] = {
 };
 u16 actor0Talk4Actions[] = { FLAG(0, 3), 1, CODES_END };
 u16 actor0Talk5Conditions[] = {
-    FLAG(0x18, 6), 0,
+    FLAG_PLATINUM_CARD_FOUND, 0,
     FLAG(0, 0), 1,
     FLAG(0, 1), 1,
     FLAG(0, 2), 1,
@@ -82,7 +87,7 @@ u16 actor0Talk5Conditions[] = {
 };
 u16 actor0Talk5Actions[] = { FLAG(0, 4), 1, CODES_END };
 u16 actor0Talk6Conditions[] = {
-    FLAG(0x18, 6), 0,
+    FLAG_PLATINUM_CARD_FOUND, 0,
     FLAG(0, 0), 1,
     FLAG(0, 1), 1,
     FLAG(0, 2), 1,
@@ -90,7 +95,12 @@ u16 actor0Talk6Conditions[] = {
     FLAG(0, 4), 1,
     CODES_END,
 };
-u16 actor0Talk6Actions[] = { FLAG(0x18, 6), 1, ITEM(0, 0x25), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk6Actions[] = {
+    FLAG_PLATINUM_CARD_FOUND, 1,
+    ITEM(0, 0x25), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, NULL, 0x58 },
     { actor0Talk1Conditions, actor0Talk1Actions, 0x55 },

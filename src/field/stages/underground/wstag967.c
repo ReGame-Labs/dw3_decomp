@@ -1,7 +1,7 @@
 /*
  * WSTAG967: Seabed, Underground: a dead end off WSTAG845 and 850, in the extra
- * chapter. The European version's: in its extra chapter
- * (FIELD_PROGRESS_EXTRA), mode 743 starts it instead of WSTAG860.
+ * chapter. The European version's: in its extra chapter (STORY_EXTRA), mode
+ * 743 starts it instead of WSTAG860.
  */
 
 #include "common.h"
@@ -62,9 +62,9 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x16E, 0x15F, 0xB8, 0x5F, 0x150, 0x1FF },
     { 0x140, 0x100, 0x160, 0x160, 0x80, 0x60, 0x160, 0x1FF },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x6E), 1, ITEM(2, 0x96), 1, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(2, 0x72), 1, ITEM(2, 0x71), 1, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(2, 0x71), 1, ITEM(2, 0x63), 1, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_SEABED_SABER_FANG_FOUND, 1, ITEM(2, 0x96), 1, CODES_END };
+u16 actor1Talk0Actions[] = { FLAG_SEABED_KAISER_FIST_FOUND, 1, ITEM(2, 0x71), 1, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_SEABED_ONIMARU_FOUND, 1, ITEM(2, 0x63), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 6 },
     { NULL, NULL, 0 },
@@ -77,9 +77,24 @@ FieldTalk actor2Talks[] = {
     { NULL, actor2Talk0Actions, 9 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { WARP_ARG(2), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x6E), 0, CODES_END };
-u16 actor1Conditions[] = { WARP_ARG(3), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x72), 0, CODES_END };
-u16 actor2Conditions[] = { WARP_ARG(4), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x71), 0, CODES_END };
+u16 actor0Conditions[] = {
+    WARP_ARG(2), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_SEABED_SABER_FANG_FOUND, 0,
+    CODES_END,
+};
+u16 actor1Conditions[] = {
+    WARP_ARG(3), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_SEABED_KAISER_FIST_FOUND, 0,
+    CODES_END,
+};
+u16 actor2Conditions[] = {
+    WARP_ARG(4), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_SEABED_ONIMARU_FOUND, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 192, 280, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x21, 4, 192, 280, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x21, 4, 192, 280, 1 };

@@ -1,7 +1,7 @@
 /*
  * WSTAG930: Amaterasu Inn 2F, Amaterasu City, in the extra chapter. The
- * European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 635
- * starts it instead of WSTAG241.
+ * European version's: in its extra chapter (STORY_EXTRA), mode 635 starts it
+ * instead of WSTAG241.
  */
 
 #include "common.h"

@@ -1,7 +1,7 @@
 /*
  * WSTAG946: Forest Inn, East Sector, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 658 starts it
- * instead of WSTAG361.
+ * version's: in its extra chapter (STORY_EXTRA), mode 658 starts it instead of
+ * WSTAG361.
  */
 
 #include "common.h"

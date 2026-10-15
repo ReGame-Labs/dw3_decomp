@@ -40,11 +40,11 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
-    if (GAME.progress >= 0xF && GAME.progress < 0x18) {
+    if (GAME.progress >= STORY_DE_SINCERITY && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -267,26 +267,26 @@ u16 actor2Conditions[] = { SPECIAL(8), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(8), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(8), 1, CODES_END };
 u16 actor5Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor9Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor13Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor14Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor14Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor15Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor16Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor16Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor17Conditions[] = { FLAG(0x1C, 0x26), 1, CODES_END };
-u16 actor18Conditions[] = { PROGRESS(0xF), 1, CODES_END };
+u16 actor18Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor19Conditions[] = { FLAG(0x1C, 0x26), 1, CODES_END };
-u16 actor20Conditions[] = { PROGRESS(0xF), 1, CODES_END };
+u16 actor20Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor21Conditions[] = { FLAG(0x1C, 0x26), 1, CODES_END };
-u16 actor22Conditions[] = { PROGRESS(0xF), 1, CODES_END };
+u16 actor22Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor23Conditions[] = { FLAG(0x1C, 0x26), 1, CODES_END };
-u16 actor24Conditions[] = { PROGRESS(0xF), 1, CODES_END };
-u16 actor25Conditions[] = { PROGRESS(0xF), 1, CODES_END };
+u16 actor24Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
+u16 actor25Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor26Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor27Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor28Conditions[] = { SPECIAL(0x1A), 1, CODES_END };

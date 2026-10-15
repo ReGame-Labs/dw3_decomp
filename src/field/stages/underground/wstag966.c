@@ -1,7 +1,7 @@
 /*
  * WSTAG966: Seabed, Underground: the junction of the Seabed tunnels, in the
- * extra chapter. The European version's: in its extra chapter
- * (FIELD_PROGRESS_EXTRA), mode 742 starts it instead of WSTAG855.
+ * extra chapter. The European version's: in its extra chapter (STORY_EXTRA),
+ * mode 742 starts it instead of WSTAG855.
  */
 
 #include "common.h"

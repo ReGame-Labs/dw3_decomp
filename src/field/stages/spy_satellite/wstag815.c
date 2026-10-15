@@ -113,7 +113,7 @@ StageTask *startStage(void *owner) {
  * and keeps it from playing again
  */
 void endEvent1020(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x70), 1);
+    FLAGS_00.applyAction(FLAG_GUNSLINGER_2F_SOLDIER_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -122,7 +122,7 @@ void endEvent1020(void) {
  * and keeps it from playing again
  */
 void endEvent1030(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x71), 1);
+    FLAGS_00.applyAction(FLAG_MEGADEATH_TAUNT_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -141,7 +141,7 @@ void endEvent1041(void) {
  * keeps it from playing again
  */
 void endEvent1050(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x73), 1);
+    FLAGS_00.applyAction(FLAG_MEGADEATH_MEETING_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
@@ -405,8 +405,16 @@ ActorImage stageImages[] = {
     { 0x1C0, 0x100, 0x1CD, 0x182, 0x234, 0x82, 0x160, 0x1FC },
     { 0x1C0, 0x100, 0x1CD, 0x15A, 0x234, 0x5A, 0x170, 0x1FC },
 };
-u16 actor0Conditions[] = { FLAG(0x40, 0x70), 0, PROGRESS(0x28), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x28), 1, FLAG(0x40, 0x71), 0, CODES_END };
+u16 actor0Conditions[] = {
+    FLAG_GUNSLINGER_2F_SOLDIER_SEEN, 0,
+    PROGRESS(STORY_OPERATION_SIGMA), 1,
+    CODES_END,
+};
+u16 actor1Conditions[] = {
+    PROGRESS(STORY_OPERATION_SIGMA), 1,
+    FLAG_MEGADEATH_TAUNT_SEEN, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, NULL, 0xD0, 4, 302, 691, 7 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0xD1, 5, 927, 235, 7 };
 FieldActorEntry *stageActors[] = {
@@ -432,10 +440,10 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH_OUT, 0x2DD, 0x344, 0xF6, 5, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH_OUT, 0x2DD, 0x29C, 0x1AA, 1, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH_OUT, 0x2DD, 0x3E4, 0x146, 5, 0, 0, 0 },
-    { { { FLAG(0x40, 0x70), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x3FC, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0x71), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x406, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_GUNSLINGER_2F_SOLDIER_SEEN, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x3FC, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_MEGADEATH_TAUNT_SEEN, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x406, 0, 0, 0, 0, 0, 0 },
     { { { FLAG(0x40, 0x72), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x410, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0x73), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x41A, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_MEGADEATH_MEETING_SEEN, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x41A, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

@@ -82,19 +82,19 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x150, 0x16D, 0x40, 0x6D, 0x160, 0x1FA },
     { 0, 0, 0, 0, 0, 0, 0, 0 },
 };
-u16 actor0Talk0Conditions[] = { FLAG(0x1A, 8), 0, CODES_END };
-u16 actor0Talk0Actions[] = { FLAG(0x1A, 8), 1, CODES_END };
-u16 actor0Talk1Conditions[] = { FLAG(0x1A, 8), 1, CODES_END };
+u16 actor0Talk0Conditions[] = { FLAG_INN_GATOMON_TALKED, 0, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_INN_GATOMON_TALKED, 1, CODES_END };
+u16 actor0Talk1Conditions[] = { FLAG_INN_GATOMON_TALKED, 1, CODES_END };
 u16 actor0Talk1Actions[] = { 0x7A1F, 1, CODES_END };
-u16 actor1Talk0Conditions[] = { FLAG(0x1A, 9), 0, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(0x1A, 9), 1, CODES_END };
-u16 actor1Talk1Conditions[] = { FLAG(0x1A, 9), 1, CODES_END };
+u16 actor1Talk0Conditions[] = { FLAG_SAVE_GUARDROMON_TALKED, 0, CODES_END };
+u16 actor1Talk0Actions[] = { FLAG_SAVE_GUARDROMON_TALKED, 1, CODES_END };
+u16 actor1Talk1Conditions[] = { FLAG_SAVE_GUARDROMON_TALKED, 1, CODES_END };
 u16 actor1Talk1Actions[] = { START_EVENT(0x11), 1, CODES_END };
-u16 actor3Talk0Conditions[] = { FLAG(0x1C, 0x1C), 0, CODES_END };
-u16 actor3Talk1Conditions[] = { FLAG(0x1C, 0x1C), 1, CODES_END };
-u16 actor12Talk0Conditions[] = { FLAG(0x1C, 0x45), 0, CODES_END };
-u16 actor12Talk0Actions[] = { FLAG(0x1C, 0x45), 1, CODES_END };
-u16 actor12Talk1Conditions[] = { FLAG(0x1C, 0x45), 1, CODES_END };
+u16 actor3Talk0Conditions[] = { FLAG_KEITH_NICK_SEARCH_STARTED, 0, CODES_END };
+u16 actor3Talk1Conditions[] = { FLAG_KEITH_NICK_SEARCH_STARTED, 1, CODES_END };
+u16 actor12Talk0Conditions[] = { FLAG_FOREST_INN_GUILMON_TALKED, 0, CODES_END };
+u16 actor12Talk0Actions[] = { FLAG_FOREST_INN_GUILMON_TALKED, 1, CODES_END };
+u16 actor12Talk1Conditions[] = { FLAG_FOREST_INN_GUILMON_TALKED, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, actor0Talk0Actions, 0x16A },
     { actor0Talk1Conditions, actor0Talk1Actions, 0x16B },
@@ -155,17 +155,22 @@ FieldTalk actor14Talks[] = {
     { NULL, NULL, 0x243 },
     { NULL, NULL, 0 },
 };
-u16 actor2Conditions[] = { PROGRESS(4), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x14), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor5Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor7Conditions[] = { SPECIAL(0x17), 1, PROGRESS(0x14), 0, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0xE), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0xC), 1, CODES_END };
-u16 actor10Conditions[] = { SPECIAL(0x15), 1, PROGRESS(6), 0, CODES_END };
+u16 actor7Conditions[] = { SPECIAL(0x17), 1, PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 0, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
+u16 actor10Conditions[] = { SPECIAL(0x15), 1, PROGRESS(STORY_FAKE_BLUE_CARD), 0, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor12Conditions[] = { ITEM(0, 0x18F), 0, FLAG(0x1C, 0x44), 1, PROGRESS(6), 1, CODES_END };
+u16 actor12Conditions[] = {
+    ITEM(0, 0x18F), 0,
+    FLAG_ASUKA_INN_GUILMON_TALKED, 1,
+    PROGRESS(STORY_FAKE_BLUE_CARD), 1,
+    CODES_END,
+};
 u16 actor14Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { NULL, actor0Talks, 0x14, 4, 345, 308, 7 };
 FieldActorEntry actor1 = { NULL, actor1Talks, 0x15, 5, 121, 165, 7 };

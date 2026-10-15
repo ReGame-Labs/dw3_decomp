@@ -1,7 +1,7 @@
 /*
  * WSTAG969: Circuit Board, Underground: entered from the sectors' maps, in the
- * extra chapter. The European version's: in its extra chapter
- * (FIELD_PROGRESS_EXTRA), mode 745 starts it instead of WSTAG870.
+ * extra chapter. The European version's: in its extra chapter (STORY_EXTRA),
+ * mode 745 starts it instead of WSTAG870.
  */
 
 #include "common.h"

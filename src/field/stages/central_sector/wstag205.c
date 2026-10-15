@@ -86,7 +86,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == 6 && FLAGS_00.checkCondition(FLAG(0x40, 6), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x16), 0)) {
+        if (GAME.progress == STORY_FAKE_BLUE_CARD && FLAGS_00.checkCondition(FLAG_KEITH_BRIDGE_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_ETEMON_MASK_QUESTION_SEEN, 0)) {
             children[0] = FIELDSTG_startEvent(0x65);
         }
         task->nextState(task);
@@ -106,13 +106,13 @@ void updateStage(StageTask *task, void **children) {
  * battle 0 and keeps it from playing again
  */
 void endEvent100(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 6), 1);
+    FLAGS_00.applyAction(FLAG_KEITH_BRIDGE_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
 /* After event 101, with Keith: keeps it from playing again */
 void endEvent101(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x16), 1);
+    FLAGS_00.applyAction(FLAG_ETEMON_MASK_QUESTION_SEEN, 1);
 }
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
@@ -150,11 +150,11 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x14 && GAME.progress < 0x18) {
+    if (GAME.progress >= STORY_BYAKKO_LEADER_FOUGHT && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -506,8 +506,13 @@ ActorImage stageImages[] = {
     { 0x1C0, 0x100, 0x1EA, 0x118, 0x2A8, 0x18, 0x160, 0x1FE },
     { 0x1C0, 0x100, 0x1F2, 0x118, 0x2C8, 0x18, 0x170, 0x1FE },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 6), 1, ITEM(2, 0x6C), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor20Talk0Actions[] = { FLAG(0x1A, 0x19), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_ASUKA_BRIDGE_IRON_GLOVE_FOUND, 1,
+    ITEM(2, 0x6C), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor20Talk0Actions[] = { FLAG_BRIDGE_SEPIKMON_TALKED, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x44C },
     { NULL, NULL, 0 },
@@ -596,27 +601,36 @@ FieldTalk actor22Talks[] = {
     { NULL, NULL, 0x2ED },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 6), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_ASUKA_BRIDGE_IRON_GLOVE_FOUND, 0, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0xC), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(4), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(4), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0xC), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
+u16 actor13Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor14Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor15Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor15Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor16Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor17Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor18Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor19Conditions[] = { PROGRESS(6), 1, FLAG(0x40, 0x16), 0, CODES_END };
-u16 actor20Conditions[] = { PROGRESS(8), 1, FLAG(0x1A, 0x18), 1, FLAG(0x1A, 0x19), 0, CODES_END };
+u16 actor18Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor19Conditions[] = {
+    PROGRESS(STORY_FAKE_BLUE_CARD), 1,
+    FLAG_ETEMON_MASK_QUESTION_SEEN, 0,
+    CODES_END,
+};
+u16 actor20Conditions[] = {
+    PROGRESS(STORY_SEPIKMON_MASK_LOST), 1,
+    FLAG_BARONMON_SEPIKMON_TALKED, 1,
+    FLAG_BRIDGE_SEPIKMON_TALKED, 0,
+    CODES_END,
+};
 u16 actor21Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor22Conditions[] = { SPECIAL(5), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 304, 160, 1 };
@@ -780,7 +794,7 @@ StageSlot stageSlots[] = {
     { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E1, 0xE0, 0x110, 7, 0, 2, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 3, 0x110, 0x100, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 3, 0x120, 0xC8, 0, 0, 0, 0 },
-    { { { PROGRESS(6), 1 }, { FLAG(0x40, 6), 0 } }, SLOT_EVENT, 0x64, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_FAKE_BLUE_CARD), 1 }, { FLAG_KEITH_BRIDGE_WIN_SEEN, 0 } }, SLOT_EVENT, 0x64, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

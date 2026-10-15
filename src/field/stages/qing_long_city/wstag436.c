@@ -52,8 +52,12 @@ FieldTalk actor1Talks[] = {
     { NULL, NULL, 0x102 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor1Conditions[] = { SPECIAL(0x1A), 1, FLAG(0x1A, 0xA), 1, CODES_END };
+u16 actor0Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor1Conditions[] = { SPECIAL(0x1A), 1, FLAG_OINKMON_CITIZENS_RESTORED, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x3E, 4, 256, 455, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x3E, 4, 256, 455, 1 };
 FieldActorEntry *stageActors[] = {

@@ -248,11 +248,6 @@ typedef struct Lift {
     /* 0x68 */ s16 homeY[2]; /* the objects' place on the map */
 } Lift;
 
-/* Points of the story (GAME.progress) where the field and the stages act differently */
-#define FIELD_PROGRESS_MOVIE_BATTLES 0x2B /* each encounter plays MODE_BATTLE_MOVIE first */
-#define FIELD_PROGRESS_EXTRA 0x2D /* the European version's extra chapter, whose stages are
-                                     FIELDSTG_extraStages (WSTAG920 to WSTAG974) */
-
 /* The kinds of StageSlot (type). SLOT_DEPTH, SLOT_MAP, SLOT_EVENT, the slides
    and SLOT_LAUNCH act as the player steps on them; the others show a balloon
    and wait for cross, and those up to SLOT_GAUGE only while the player faces

@@ -559,7 +559,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (GAME.progress < 0x1E) {
+        if (GAME.progress < STORY_DE_KNOWLEDGE) {
             children[0] = createCommand829(0x33D);
         }
         break;
@@ -574,11 +574,11 @@ void updateStage(StageTask *task, void **children) {
 #include "common/start_stage.inc.c"
 
 /*
- * After event 760, with the player: moves the story on to its step 0x1E and
+ * After event 760, with the player: moves the story on to STORY_DE_KNOWLEDGE and
  * gives the player the DE Knowledge
  */
 void endEvent760(void) {
-    GAME.progress = 0x1E;
+    GAME.progress = STORY_DE_KNOWLEDGE;
     FLAGS_00.applyAction(ITEM(0, 0x11), 1);
 }
 
@@ -785,7 +785,12 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x180, 0x138, 0x100, 0x38, 0x140, 0x1F4 },
     { 0x140, 0x100, 0x175, 0x120, 0xD4, 0x20, 0x150, 0x1F4 },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x1F), 1, ITEM(2, 0x94), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_ZHU_QUE_LAKE_EVIL_FANG_FOUND, 1,
+    ITEM(2, 0x94), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 u16 actor2Talk0Conditions[] = { ITEM(3, 0x81), 1, CODES_END };
 u16 actor2Talk1Conditions[] = { ITEM(3, 0x81), 0, FLAG(0, 0), 0, CODES_END };
 u16 actor2Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
@@ -809,8 +814,8 @@ FieldTalk actor2Talks[] = {
     { actor2Talk3Conditions, actor2Talk3Actions, 0x2E5 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x1F), 0, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x1D), 1, CODES_END };
+u16 actor0Conditions[] = { FLAG_ZHU_QUE_LAKE_EVIL_FANG_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_BULBMON_BEATEN), 1, CODES_END };
 u16 actor2Conditions[] = {
     SPECIAL(0x43), 1,
     SPECIAL(0x4B), 1,
@@ -866,7 +871,7 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 5, 0x260, 0x2A1, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 0xA, 0x1C0, 0x181, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 0xA, 0x1D0, 0xDA, 0, 0, 0, 0 },
-    { { { PROGRESS(0x1D), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2F8, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_BULBMON_BEATEN), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2F8, 0, 0, 0, 0, 0, 0 },
     { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 0x11, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };

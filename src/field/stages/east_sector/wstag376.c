@@ -15,7 +15,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x78), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x79), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_BK_MEGAGARGOMON_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x79), 0)) {
             children[0] = FIELDSTG_startEvent(0x504);
         }
         break;
@@ -34,7 +34,7 @@ void updateStage(StageTask *task, void **children) {
  * the stage's event battle 1
  */
 void endEvent1283(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x78), 1);
+    FLAGS_00.applyAction(FLAG_BK_MEGAGARGOMON_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
@@ -215,21 +215,21 @@ u16 actor0Talk3Actions[] = {
     SPECIAL(0x13), 1,
     CODES_END,
 };
-u16 actor1Talk0Conditions[] = { FLAG(0xA, 7), 0, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(0xA, 7), 1, START_EVENT(0x39), 1, CODES_END };
-u16 actor1Talk1Conditions[] = { FLAG(0xA, 7), 1, CODES_END };
-u16 actor2Talk0Conditions[] = { FLAG(0xA, 7), 0, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(0xA, 7), 1, START_EVENT(0x39), 1, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0xA, 7), 1, CODES_END };
-u16 actor3Talk0Conditions[] = { FLAG(0xA, 7), 0, CODES_END };
-u16 actor3Talk0Actions[] = { FLAG(0xA, 7), 1, START_EVENT(0x39), 1, CODES_END };
-u16 actor3Talk1Conditions[] = { FLAG(0xA, 7), 1, CODES_END };
-u16 actor4Talk0Conditions[] = { FLAG(0xA, 7), 0, CODES_END };
-u16 actor4Talk0Actions[] = { FLAG(0xA, 7), 1, START_EVENT(0x39), 1, CODES_END };
-u16 actor4Talk1Conditions[] = { FLAG(0xA, 7), 1, CODES_END };
-u16 actor5Talk0Conditions[] = { FLAG(0xA, 7), 0, CODES_END };
-u16 actor5Talk0Actions[] = { FLAG(0xA, 7), 1, START_EVENT(0x39), 1, CODES_END };
-u16 actor5Talk1Conditions[] = { FLAG(0xA, 7), 1, CODES_END };
+u16 actor1Talk0Conditions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 0, CODES_END };
+u16 actor1Talk0Actions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 1, START_EVENT(0x39), 1, CODES_END };
+u16 actor1Talk1Conditions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 1, CODES_END };
+u16 actor2Talk0Conditions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 0, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 1, START_EVENT(0x39), 1, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 1, CODES_END };
+u16 actor3Talk0Conditions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 0, CODES_END };
+u16 actor3Talk0Actions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 1, START_EVENT(0x39), 1, CODES_END };
+u16 actor3Talk1Conditions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 1, CODES_END };
+u16 actor4Talk0Conditions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 0, CODES_END };
+u16 actor4Talk0Actions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 1, START_EVENT(0x39), 1, CODES_END };
+u16 actor4Talk1Conditions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 1, CODES_END };
+u16 actor5Talk0Conditions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 0, CODES_END };
+u16 actor5Talk0Actions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 1, START_EVENT(0x39), 1, CODES_END };
+u16 actor5Talk1Conditions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, NULL, 0x2F6 },
     { actor0Talk1Conditions, actor0Talk1Actions, 0x2F7 },
@@ -271,9 +271,9 @@ u16 actor0Conditions[] = {
 };
 u16 actor1Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x25), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x1C, 4, 97, 242, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x106, 5, 1073, 145, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x106, 5, 1073, 145, 1 };

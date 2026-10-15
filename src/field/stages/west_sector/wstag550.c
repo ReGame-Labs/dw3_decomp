@@ -14,7 +14,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x27), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x28), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_MAGNAANGEMON_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_TAOMON_DDNA_REQUEST_SEEN, 0)) {
             children[0] = FIELDSTG_startEvent(0x4F6);
         }
         break;
@@ -33,7 +33,7 @@ void updateStage(StageTask *task, void **children) {
  * stage's event battle 0
  */
 void endEvent1269(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x27), 1);
+    FLAGS_00.applyAction(FLAG_MAGNAANGEMON_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -42,7 +42,7 @@ void endEvent1269(void) {
  * keeps it from playing again
  */
 void endEvent1270(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x28), 1);
+    FLAGS_00.applyAction(FLAG_TAOMON_DDNA_REQUEST_SEEN, 1);
     FLAGS_00.applyAction(ITEM(0, 0x27), 1);
 }
 
@@ -80,7 +80,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -228,9 +228,9 @@ ActorImage stageImages[] = {
     { 0x1C0, 0x100, 0x1C0, 0x100, 0x200, 0, 0x160, 0x1FE },
 };
 u16 actor0Talk0Actions[] = { START_EVENT(0x11), 1, CODES_END };
-u16 actor2Talk0Conditions[] = { FLAG(0x1C, 0x14), 0, CODES_END };
-u16 actor2Talk0Actions[] = { START_EVENT(0x27), 1, FLAG(0x1C, 0x14), 1, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0x1C, 0x14), 1, CODES_END };
+u16 actor2Talk0Conditions[] = { FLAG_MAGNAANGEMON_DDNA_FOUGHT, 0, CODES_END };
+u16 actor2Talk0Actions[] = { START_EVENT(0x27), 1, FLAG_MAGNAANGEMON_DDNA_FOUGHT, 1, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_MAGNAANGEMON_DDNA_FOUGHT, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x168 },
     { NULL, NULL, 0 },
@@ -244,9 +244,9 @@ FieldTalk actor2Talks[] = {
     { actor2Talk1Conditions, NULL, 0x2C2 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor2Conditions[] = { FLAG(6, 2), 1, ITEM(0, 0x27), 0, CODES_END };
+u16 actor2Conditions[] = { FLAG_PATAMON_DDNA_REQUESTED, 1, ITEM(0, 0x27), 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x15, 4, 369, 209, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x67, 5, 352, 720, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x7C, 6, 1153, 858, 7 };

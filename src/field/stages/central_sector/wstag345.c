@@ -27,7 +27,7 @@ const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 /*
  * Sets the stage up: its map, actors, battles and events, playing the
  * ambience ENV_0014; BGM_0029 instead at story steps 0x27 to 0x28; battle
- * list 0 before story step 0xB, 1 from then on
+ * list 0 before STORY_SUZAKU_BADGE, 1 from then on
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -49,11 +49,11 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
-    if (GAME.progress < 0xB) {
+    if (GAME.progress < STORY_SUZAKU_BADGE) {
         FIELDSTG_state.battles = &stageBattles[0];
     } else {
         FIELDSTG_state.battles = &stageBattles[1];
@@ -265,58 +265,58 @@ ActorImage stageImages[] = {
 u16 actor2Talk0Conditions[] = { FLAG(0x1A, 0x22), 0, CODES_END };
 u16 actor2Talk1Conditions[] = {
     FLAG(0x1A, 0x22), 1,
-    FLAG(0x1A, 0x23), 0,
+    FLAG_HIDE_GABUMON_CARD_FOUND, 0,
     FLAG(0, 0), 0,
     CODES_END,
 };
 u16 actor2Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor2Talk2Conditions[] = {
     FLAG(0x1A, 0x22), 1,
-    FLAG(0x1A, 0x23), 0,
+    FLAG_HIDE_GABUMON_CARD_FOUND, 0,
     FLAG(0, 0), 1,
     CODES_END,
 };
 u16 actor2Talk3Conditions[] = {
     FLAG(0x1A, 0x22), 1,
-    FLAG(0x1A, 0x23), 1,
-    FLAG(0x1A, 0x24), 0,
+    FLAG_HIDE_GABUMON_CARD_FOUND, 1,
+    FLAG_HIDE_GABUMON_CARD_GIVEN, 0,
     CODES_END,
 };
-u16 actor2Talk3Actions[] = { FLAG(0x1A, 0x24), 1, FLAG(0x1C, 8), 1, CODES_END };
+u16 actor2Talk3Actions[] = { FLAG_HIDE_GABUMON_CARD_GIVEN, 1, FLAG(0x1C, 8), 1, CODES_END };
 u16 actor2Talk4Conditions[] = {
     FLAG(0x1A, 0x22), 1,
-    FLAG(0x1A, 0x23), 1,
-    FLAG(0x1A, 0x24), 1,
+    FLAG_HIDE_GABUMON_CARD_FOUND, 1,
+    FLAG_HIDE_GABUMON_CARD_GIVEN, 1,
     ITEM(0, 4), 0,
     CODES_END,
 };
 u16 actor2Talk5Conditions[] = {
     FLAG(0x1A, 0x22), 1,
-    FLAG(0x1A, 0x23), 1,
-    FLAG(0x1A, 0x24), 1,
+    FLAG_HIDE_GABUMON_CARD_FOUND, 1,
+    FLAG_HIDE_GABUMON_CARD_GIVEN, 1,
     ITEM(0, 4), 1,
     CODES_END,
 };
 u16 actor4Talk0Conditions[] = { FLAG(0x1A, 0x22), 0, CODES_END };
-u16 actor4Talk1Conditions[] = { FLAG(0x1A, 0x22), 1, FLAG(0x1A, 0x23), 0, CODES_END };
+u16 actor4Talk1Conditions[] = { FLAG(0x1A, 0x22), 1, FLAG_HIDE_GABUMON_CARD_FOUND, 0, CODES_END };
 u16 actor4Talk2Conditions[] = {
     FLAG(0x1A, 0x22), 1,
-    FLAG(0x1A, 0x23), 1,
-    FLAG(0x1A, 0x24), 0,
+    FLAG_HIDE_GABUMON_CARD_FOUND, 1,
+    FLAG_HIDE_GABUMON_CARD_GIVEN, 0,
     CODES_END,
 };
-u16 actor4Talk2Actions[] = { FLAG(0x1A, 0x24), 1, FLAG(0x1C, 8), 1, CODES_END };
+u16 actor4Talk2Actions[] = { FLAG_HIDE_GABUMON_CARD_GIVEN, 1, FLAG(0x1C, 8), 1, CODES_END };
 u16 actor4Talk3Conditions[] = {
     FLAG(0x1A, 0x22), 1,
-    FLAG(0x1A, 0x23), 1,
-    FLAG(0x1A, 0x24), 1,
+    FLAG_HIDE_GABUMON_CARD_FOUND, 1,
+    FLAG_HIDE_GABUMON_CARD_GIVEN, 1,
     ITEM(0, 4), 0,
     CODES_END,
 };
 u16 actor4Talk4Conditions[] = {
     FLAG(0x1A, 0x22), 1,
-    FLAG(0x1A, 0x23), 1,
-    FLAG(0x1A, 0x24), 1,
+    FLAG_HIDE_GABUMON_CARD_FOUND, 1,
+    FLAG_HIDE_GABUMON_CARD_GIVEN, 1,
     ITEM(0, 4), 1,
     CODES_END,
 };
@@ -361,8 +361,8 @@ u16 actor0Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x22), 1, ITEM(0, 4), 0, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x22), 1, ITEM(0, 4), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 4), 0, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 4), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, ITEM(0, 4), 0, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, ITEM(0, 4), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x9D, 4, 885, 951, 5 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x119, 5, 865, 941, 5 };

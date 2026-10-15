@@ -120,22 +120,22 @@ u16 actor4Talk3Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(7), 1,
     PARTY_STAT(9), 1,
-    FLAG(0xE, 0x26), 0,
+    FLAG_NOISE_DESERT_TROOPER_FOUGHT, 0,
     CODES_END,
 };
-u16 actor4Talk3Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xE, 0x26), 1, CODES_END };
+u16 actor4Talk3Actions[] = { EVENT_BATTLE(0), 1, FLAG_NOISE_DESERT_TROOPER_FOUGHT, 1, CODES_END };
 u16 actor4Talk4Conditions[] = {
     FLAG(0, 0), 1,
     PARTY_STAT(7), 1,
     PARTY_STAT(9), 1,
-    FLAG(0xE, 0x26), 1,
+    FLAG_NOISE_DESERT_TROOPER_FOUGHT, 1,
     CODES_END,
 };
-u16 actor5Talk0Conditions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor5Talk1Conditions[] = { FLAG(0, 0x10), 0, CODES_END };
-u16 actor5Talk1Actions[] = { FLAG(0, 0x11), 0, CODES_END };
-u16 actor5Talk2Conditions[] = { FLAG(0, 0x10), 1, CODES_END };
-u16 actor5Talk2Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, CODES_END };
+u16 actor5Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor5Talk1Conditions[] = { FLAG_CARD_BATTLE_WON, 0, CODES_END };
+u16 actor5Talk1Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor5Talk2Conditions[] = { FLAG_CARD_BATTLE_WON, 1, CODES_END };
+u16 actor5Talk2Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG_CARD_BATTLE_WON, 0, CODES_END };
 u16 actor7Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor7Talk0Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor7Talk1Conditions[] = { FLAG(0, 0), 1, PARTY_STAT(0xA), 0, CODES_END };
@@ -238,33 +238,54 @@ FieldTalk actor17Talks[] = {
     { NULL, NULL, 0x329 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
+u16 actor0Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor1Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor2Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor3Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
 u16 actor4Conditions[] = {
     SPECIAL(0x19), 1,
     ITEM(0, 0x192), 1,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     ITEM(0, 0x14), 0,
     CODES_END,
 };
-u16 actor5Conditions[] = { SPECIAL(0x19), 1, FLAG(0, 0x11), 1, ITEM(0, 0x192), 1, CODES_END };
+u16 actor5Conditions[] = {
+    SPECIAL(0x19), 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
 u16 actor6Conditions[] = { SPECIAL(0x19), 1, ITEM(0, 0x192), 0, CODES_END };
 u16 actor7Conditions[] = {
     ITEM(0, 0x14), 1,
     ITEM(0, 0x192), 1,
-    FLAG(0, 0x11), 0,
+    FLAG_CARD_BATTLE_ENDED, 0,
     SPECIAL(0x19), 1,
     CODES_END,
 };
-u16 actor8Conditions[] = { SPECIAL(0x1E), 1, FLAG(0x1A, 0xA), 0, CODES_END };
+u16 actor8Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
 u16 actor9Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor10Conditions[] = { FLAG(0x1A, 0xA), 0, SPECIAL(0x1E), 1, CODES_END };
+u16 actor10Conditions[] = { FLAG_OINKMON_CITIZENS_RESTORED, 0, SPECIAL(0x1E), 1, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor12Conditions[] = { SPECIAL(0x1E), 1, FLAG(0x1A, 0xA), 0, CODES_END };
+u16 actor12Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
 u16 actor13Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor14Conditions[] = { SPECIAL(0x1E), 1, FLAG(0x1A, 0xA), 0, CODES_END };
+u16 actor14Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
 u16 actor15Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor16Conditions[] = { SPECIAL(0x20), 1, CODES_END };
 u16 actor17Conditions[] = { SPECIAL(0x20), 1, CODES_END };

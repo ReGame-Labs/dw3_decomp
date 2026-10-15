@@ -12,7 +12,7 @@ void updateStage(StageTask *task) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress >= 0x16) {
+        if (GAME.progress >= STORY_CONTROL_ROOM) {
             for (tile = FIELDSTG_state.objects; tile->margin != 0; tile++) {
                 if (tile->anim == 10) {
                     tile->visible = 0;
@@ -71,11 +71,11 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x14 && GAME.progress < 0x18) {
+    if (GAME.progress >= STORY_BYAKKO_LEADER_FOUGHT && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -194,13 +194,23 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x19C, 0x150, 0x170, 0x50, 0x170, 0x1F4 },
     { 0x180, 0x100, 0x1A4, 0x170, 0x190, 0x70, 0x140, 0x1F3 },
 };
-u16 actor0Talk0Actions[] = { SPECIAL(0x8C), 1, FLAG(2, 0), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor1Talk0Conditions[] = { FLAG(0x1A, 0x16), 0, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(0x1A, 0x15), 1, CODES_END };
-u16 actor1Talk1Conditions[] = { ITEM(0, 0xF), 0, FLAG(0x1A, 0x16), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    SPECIAL(0x8C), 1,
+    FLAG_ASUKA_SEWERS_300_BIT_FOUND, 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor1Talk0Conditions[] = { FLAG_KAIL_ETEMON_SUIT_TALKED, 0, CODES_END };
+u16 actor1Talk0Actions[] = { FLAG_MISCHIEVOUS_MAT_TALKED, 1, CODES_END };
+u16 actor1Talk1Conditions[] = { ITEM(0, 0xF), 0, FLAG_KAIL_ETEMON_SUIT_TALKED, 1, CODES_END };
 u16 actor1Talk1Actions[] = { START_EVENT(0x21), 1, CODES_END };
-u16 actor1Talk2Conditions[] = { ITEM(0, 0xF), 1, FLAG(0x1A, 0x16), 1, CODES_END };
-u16 actor11Talk0Actions[] = { SPECIAL(0x13), 1, FLAG(2, 7), 1, ITEM(2, 0x5E), 1, CODES_END };
+u16 actor1Talk2Conditions[] = { ITEM(0, 0xF), 1, FLAG_KAIL_ETEMON_SUIT_TALKED, 1, CODES_END };
+u16 actor11Talk0Actions[] = {
+    SPECIAL(0x13), 1,
+    FLAG_ASUKA_SEWERS_CRIMSON_BLADE_FOUND, 1,
+    ITEM(2, 0x5E), 1,
+    CODES_END,
+};
 u16 actor14Talk0Conditions[] = { ITEM(0, 0x15), 0, CODES_END };
 u16 actor14Talk0Actions[] = { ITEM(0, 0x15), 1, SPECIAL(0x13), 1, CODES_END };
 u16 actor14Talk1Conditions[] = { ITEM(0, 0x15), 1, CODES_END };
@@ -271,21 +281,29 @@ FieldTalk actor15Talks[] = {
     { NULL, NULL, 0x45C },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0), 0, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0xC), 1, FLAG(0x1A, 0x14), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0xE), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x14), 1, CODES_END };
+u16 actor0Conditions[] = { FLAG_ASUKA_SEWERS_300_BIT_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = {
+    PROGRESS(STORY_LOOKING_FOR_TEDDY), 1,
+    FLAG_SUIT_COUPLE_TALKED, 1,
+    CODES_END,
+};
+u16 actor2Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x16), 1, CODES_END };
 u16 actor8Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(0x15), 1, CODES_END };
-u16 actor11Conditions[] = { FLAG(2, 7), 0, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0xA), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(0xC), 1, FLAG(0x1A, 0x14), 0, CODES_END };
-u16 actor14Conditions[] = { PROGRESS(9), 1, FLAG(0x1A, 0x1B), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, CODES_END };
+u16 actor11Conditions[] = { FLAG_ASUKA_SEWERS_CRIMSON_BLADE_FOUND, 0, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_ZANBAMON_DRIVEN_OFF), 1, CODES_END };
+u16 actor13Conditions[] = {
+    PROGRESS(STORY_LOOKING_FOR_TEDDY), 1,
+    FLAG_SUIT_COUPLE_TALKED, 0,
+    CODES_END,
+};
+u16 actor14Conditions[] = { PROGRESS(STORY_AGUMON_SUITS), 1, FLAG(0x1A, 0x1B), 1, CODES_END };
 u16 actor15Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 465, 169, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x37, 5, 417, 209, 7 };

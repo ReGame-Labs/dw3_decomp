@@ -107,15 +107,54 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x172, 0x1CD, 0xC8, 0xCD, 0x150, 0x1FA },
     { 0x180, 0x100, 0x1A0, 0x100, 0x180, 0, 0x160, 0x1FA },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x11), 1, ITEM(1, 0x2B), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor1Talk0Actions[] = { SPECIAL(0x8B), 1, FLAG(2, 0x12), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(2, 0x13), 1, ITEM(1, 0x46), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor3Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0x14), 1, CODES_END };
-u16 actor4Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0x15), 1, CODES_END };
-u16 actor5Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0x16), 1, CODES_END };
-u16 actor6Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0x15), 1, CODES_END };
-u16 actor7Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0x17), 1, CODES_END };
-u16 actor8Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0x18), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_ASUKA_ADMIN_B1F_POWER_CHARGE_FOUND, 1,
+    ITEM(1, 0x2B), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor1Talk0Actions[] = {
+    SPECIAL(0x8B), 1,
+    FLAG_ASUKA_ADMIN_B1F_100_BIT_FOUND, 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor2Talk0Actions[] = {
+    FLAG_ASUKA_ADMIN_B1F_LIFE_DISK_FOUND, 1,
+    ITEM(1, 0x46), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor3Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_ASUKA_ADMIN_B1F_TROOPER_A_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor4Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_ASUKA_ADMIN_B1F_TROOPER_B_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor5Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_ASUKA_ADMIN_B1F_TROOPER_C_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor6Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_ASUKA_ADMIN_B1F_TROOPER_B_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor7Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_ASUKA_ADMIN_B1F_TROOPER_D_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor8Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_ASUKA_ADMIN_B1F_TROOPER_E_FOUGHT, 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x2B6 },
     { NULL, NULL, 0 },
@@ -152,15 +191,39 @@ FieldTalk actor8Talks[] = {
     { NULL, actor8Talk0Actions, 0xA9 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x11), 0, CODES_END };
-u16 actor1Conditions[] = { FLAG(2, 0x12), 0, CODES_END };
-u16 actor2Conditions[] = { FLAG(2, 0x13), 0, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0x14), 0, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0x15), 0, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0x16), 0, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0x15), 0, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0x17), 0, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0x18), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_ASUKA_ADMIN_B1F_POWER_CHARGE_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { FLAG_ASUKA_ADMIN_B1F_100_BIT_FOUND, 0, CODES_END };
+u16 actor2Conditions[] = { FLAG_ASUKA_ADMIN_B1F_LIFE_DISK_FOUND, 0, CODES_END };
+u16 actor3Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_ADMIN_B1F_TROOPER_A_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor4Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_ADMIN_B1F_TROOPER_B_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor5Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_ADMIN_B1F_TROOPER_C_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor6Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_ADMIN_B1F_TROOPER_B_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor7Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_ADMIN_B1F_TROOPER_D_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor8Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_ADMIN_B1F_TROOPER_E_FOUGHT, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 144, 647, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x4D, 5, 209, 201, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x4E, 6, 768, 490, 1 };

@@ -176,7 +176,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == 0xF) {
+        if (GAME.progress == STORY_DE_SINCERITY) {
             children[0] = FIELDSTG_startEvent(0x19C);
         }
         task->nextState(task);
@@ -340,7 +340,7 @@ ActorImage stageImages[] = {
     { 0x200, 0x100, 0x200, 0x1BC, 0, 0xBC, 0x230, 0x1FD },
     { 0x140, 0x100, 0x176, 0x164, 0xD8, 0x64, 0x150, 0x1FF },
 };
-u16 actor0Conditions[] = { PROGRESS(0xF), 1, FLAG(0x40, 0x1C), 0, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, FLAG(0x40, 0x1C), 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 0 };
 FieldActorEntry *stageActors[] = {
     &actor0,

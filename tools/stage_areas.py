@@ -133,6 +133,16 @@ The cities have two copies of their stages, one for each server (Asuka and
 Amaterasu, Seiryu and Qing Long, Suzaku and Zhu Que, Byakko and Bai Hu),
 and the European version adds stages of its own (920 and up) to the areas.
 
+The scripts test the point of the story, GAME.progress, with the STORY_
+names of `include/engine/story.h`: the stage events that move the story on
+set them (endEventN), and conditions test them as PROGRESS(STORY_...) codes,
+through PROGRESS_RANGES, or in the code. The event flags that story.h names
+(FLAG_, after what sets them: an event seen, a chest taken, a battle fought)
+are written by name too. FLAGS_00's temporary bits, FLAG(0, n), are each
+stage's own and stay numbers, but for the two a card battle leaves
+(FLAG_CARD_BATTLE_WON and FLAG_CARD_BATTLE_ENDED); so do the flags whose
+meaning isn't clear.
+
 Each stage's file starts with a comment that says which map or event it is
 (`tools/stage_names_doc.py` writes them, and the names below).
 

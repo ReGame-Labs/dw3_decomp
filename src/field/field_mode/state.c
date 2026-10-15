@@ -23,7 +23,7 @@ void FIELDSTG_pickStage(void) {
 #if VERSION_US
     entry = FIELDSTG_stages;
 #elif VERSION_EU || VERSION_JP
-    if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+    if (GAME.progress != STORY_EXTRA) {
         entry = FIELDSTG_stages;
     } else {
         entry = FIELDSTG_extraStages;

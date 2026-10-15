@@ -225,20 +225,28 @@ FieldTalk actor14Talks[] = {
     { actor14Talk1Conditions, NULL, 0x326 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1A, 0xA), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x1C), 0, SPECIAL(0x1F), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x1C), 1, FLAG(0x1A, 0x35), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0x1B), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor1Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor3Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor5Conditions[] = { PROGRESS(STORY_BLUE_ID_PASS), 0, SPECIAL(0x1F), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_BLUE_ID_PASS), 1, FLAG(0x1A, 0x35), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_JUNGLE_SOUND), 1, CODES_END };
 u16 actor8Conditions[] = { SPECIAL(0x1F), 1, CODES_END };
-u16 actor9Conditions[] = { SPECIAL(0x1E), 1, FLAG(0x1A, 0xA), 0, CODES_END };
+u16 actor9Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor11Conditions[] = { SPECIAL(0x1E), 1, FLAG(0x1A, 0xA), 0, CODES_END };
+u16 actor11Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
 u16 actor12Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(0x1B), 1, CODES_END };
-u16 actor14Conditions[] = { FLAG(0x1A, 0x35), 0, PROGRESS(0x1C), 1, CODES_END };
+u16 actor13Conditions[] = { PROGRESS(STORY_JUNGLE_SOUND), 1, CODES_END };
+u16 actor14Conditions[] = { FLAG(0x1A, 0x35), 0, PROGRESS(STORY_BLUE_ID_PASS), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x2D, 4, 944, 185, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x31, 5, 1394, 778, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x33, 6, 1394, 778, 7 };

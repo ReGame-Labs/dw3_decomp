@@ -415,7 +415,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (GAME.progress < 0xF) {
+        if (GAME.progress < STORY_DE_SINCERITY) {
             children[0] = createCommand830(0x33E);
         }
         break;
@@ -430,11 +430,11 @@ void updateStage(StageTask *task, void **children) {
 #include "common/start_stage.inc.c"
 
 /*
- * After event 370, with the player: moves the story on to its step 0xF and
+ * After event 370, with the player: moves the story on to STORY_DE_SINCERITY and
  * gives the player the DE Sincerity
  */
 void endEvent370(void) {
-    GAME.progress = 0xF;
+    GAME.progress = STORY_DE_SINCERITY;
     FLAGS_00.applyAction(ITEM(0, 0x10), 1);
 }
 
@@ -582,7 +582,7 @@ FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x33A },
     { NULL, NULL, 0 },
 };
-u16 actor1Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 FieldActorEntry actor0 = { NULL, actor0Talks, 0x3F, 4, 250, 109, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0x82, 5, 96, 367, 7 };
 FieldActorEntry *stageActors[] = {
@@ -609,7 +609,7 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { PROGRESS(0xE), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x172, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_TEDDY_FOUND), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x172, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 0xE, 0xEF, 0xA8, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 0xE, 0xDF, 0x190, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },

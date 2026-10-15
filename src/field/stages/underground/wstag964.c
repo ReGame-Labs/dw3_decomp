@@ -1,7 +1,7 @@
 /*
  * WSTAG964: Seabed, Underground: Seehomon and Depthmon's forge, in the extra
- * chapter. The European version's: in its extra chapter
- * (FIELD_PROGRESS_EXTRA), mode 740 starts it instead of WSTAG845.
+ * chapter. The European version's: in its extra chapter (STORY_EXTRA), mode
+ * 740 starts it instead of WSTAG845.
  */
 
 #include "common.h"
@@ -87,9 +87,9 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x170, 0x1D0, 0xC0, 0xD0, 0x170, 0x1FF },
     { 0x180, 0x100, 0x1A0, 0x100, 0x180, 0, 0x140, 0x1FE },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x73), 1, ITEM(1, 0x34), 1, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(2, 0x6F), 1, ITEM(2, 0x7D), 1, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(2, 0x70), 1, ITEM(2, 0x8A), 1, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_SEABED_WISDOM_CHIP_FOUND, 1, ITEM(1, 0x34), 1, CODES_END };
+u16 actor1Talk0Actions[] = { FLAG_SEABED_CLUSTER_CANNON_FOUND, 1, ITEM(2, 0x7D), 1, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_SEABED_KHAKKHARA_FOUND, 1, ITEM(2, 0x8A), 1, CODES_END };
 u16 actor3Talk0Conditions[] = { ITEM(3, 0x76), 1, CODES_END };
 u16 actor3Talk1Conditions[] = { ITEM(3, 0x76), 0, FLAG(0, 0), 0, CODES_END };
 u16 actor3Talk1Actions[] = { FLAG(0, 0), 1, CODES_END };
@@ -128,9 +128,24 @@ FieldTalk actor4Talks[] = {
     { actor4Talk3Conditions, actor4Talk3Actions, 0xB8 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { WARP_ARG(1), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x73), 0, CODES_END };
-u16 actor1Conditions[] = { WARP_ARG(1), 1, WARP_ARG(0x21), 1, FLAG(2, 0x6F), 0, CODES_END };
-u16 actor2Conditions[] = { WARP_ARG(4), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x70), 0, CODES_END };
+u16 actor0Conditions[] = {
+    WARP_ARG(1), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_SEABED_WISDOM_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor1Conditions[] = {
+    WARP_ARG(1), 1,
+    WARP_ARG(0x21), 1,
+    FLAG_SEABED_CLUSTER_CANNON_FOUND, 0,
+    CODES_END,
+};
+u16 actor2Conditions[] = {
+    WARP_ARG(4), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_SEABED_KHAKKHARA_FOUND, 0,
+    CODES_END,
+};
 u16 actor3Conditions[] = {
     WARP_ARG(1), 1,
     WARP_ARG(0x1F), 1,

@@ -23,7 +23,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x3F), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x40), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_FIRE_KNIGHT_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_DARK_KNIGHT_CHALLENGE_SEEN, 0)) {
             children[0] = FIELDSTG_startEvent(0x321);
         }
         break;
@@ -50,7 +50,7 @@ void updateStage(StageTask *task, void **children) {
  * keeps it from playing again
  */
 void endEvent800(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x3F), 1);
+    FLAGS_00.applyAction(FLAG_FIRE_KNIGHT_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -60,87 +60,87 @@ void endEvent800(void) {
  */
 void endEvent801(void) {
     FLAGS_00.applyAction(ITEM(2, 0x88), 1);
-    FLAGS_00.applyAction(FLAG(0x40, 0x40), 1);
+    FLAGS_00.applyAction(FLAG_DARK_KNIGHT_CHALLENGE_SEEN, 1);
 }
 
 /* After the trap of event 9000 goes off: keeps it from going off again */
 void endEvent9000(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xAA), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9000_SPRUNG, 1);
 }
 
 /* After the trap of event 9001 goes off: keeps it from going off again */
 void endEvent9001(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xAB), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9001_SPRUNG, 1);
 }
 
 /* After the trap of event 9002 goes off: keeps it from going off again */
 void endEvent9002(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xAC), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9002_SPRUNG, 1);
 }
 
 /* After the trap of event 9003 goes off: keeps it from going off again */
 void endEvent9003(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xAD), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9003_SPRUNG, 1);
 }
 
 /* After the trap of event 9004 goes off: keeps it from going off again */
 void endEvent9004(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xAE), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9004_SPRUNG, 1);
 }
 
 /* After the trap of event 9005 goes off: keeps it from going off again */
 void endEvent9005(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xAF), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9005_SPRUNG, 1);
 }
 
 /* After the trap of event 9006 goes off: keeps it from going off again */
 void endEvent9006(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xB0), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9006_SPRUNG, 1);
 }
 
 /* After the trap of event 9007 goes off: keeps it from going off again */
 void endEvent9007(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xB1), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9007_SPRUNG, 1);
 }
 
 /* After the trap of event 9008 goes off: keeps it from going off again */
 void endEvent9008(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xB2), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9008_SPRUNG, 1);
 }
 
 /* After the trap of event 9009 goes off: keeps it from going off again */
 void endEvent9009(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xB3), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9009_SPRUNG, 1);
 }
 
 /* After the trap of event 9010 goes off: keeps it from going off again */
 void endEvent9010(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xB4), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9010_SPRUNG, 1);
 }
 
 /* After the trap of event 9011 goes off: keeps it from going off again */
 void endEvent9011(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xB5), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9011_SPRUNG, 1);
 }
 
 /* After the trap of event 9012 goes off: keeps it from going off again */
 void endEvent9012(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xB6), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9012_SPRUNG, 1);
 }
 
 /* After the trap of event 9013 goes off: keeps it from going off again */
 void endEvent9013(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xB7), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9013_SPRUNG, 1);
 }
 
 /* After the trap of event 9014 goes off: keeps it from going off again */
 void endEvent9014(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xB8), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9014_SPRUNG, 1);
 }
 
 /* After the trap of event 9015 goes off: keeps it from going off again */
 void endEvent9015(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xB9), 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_FIRE_TRAP_9015_SPRUNG, 1);
 }
 
 #if VERSION_US || VERSION_JP
@@ -333,10 +333,10 @@ FieldTalk actor4Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor3Conditions[] = { FLAG(0x40, 0x40), 0, SPECIAL(0x19), 1, CODES_END };
-u16 actor4Conditions[] = { FLAG(0x40, 0x40), 1, SPECIAL(0x19), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor3Conditions[] = { FLAG_DARK_KNIGHT_CHALLENGE_SEEN, 0, SPECIAL(0x19), 1, CODES_END };
+u16 actor4Conditions[] = { FLAG_DARK_KNIGHT_CHALLENGE_SEEN, 1, SPECIAL(0x19), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x9D, 4, 464, 648, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0xC9, 5, 464, 648, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0xC9, 5, 464, 648, 7 };
@@ -372,23 +372,23 @@ StageTile stageObjects[] = {
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x26A, 0x70, 0x2EC, 5, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x26C, 0x448, 0x288, 1, 0, 0, 0 },
-    { { { FLAG(0x40, 0xAA), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2328, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xAB), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2329, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xAC), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232A, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xAD), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232B, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xAE), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232C, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xAF), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232D, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xB0), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232E, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xB1), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232F, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xB2), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2330, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xB3), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2331, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xB4), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2332, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xB5), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2333, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xB6), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2334, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xB7), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2335, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xB8), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2336, 0, 0, 0, 0, 0, 0 },
-    { { { FLAG(0x40, 0xB9), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2337, 0, 0, 0, 0, 0, 0 },
-    { { { ITEM(0, 0x11), 1 }, { FLAG(0x40, 0x3F), 0 } }, SLOT_EVENT, 0x320, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9000_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2328, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9001_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2329, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9002_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232A, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9003_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232B, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9004_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232C, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9005_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232D, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9006_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232E, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9007_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x232F, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9008_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2330, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9009_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2331, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9010_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2332, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9011_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2333, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9012_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2334, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9013_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2335, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9014_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2336, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_ASUKA_FIRE_TRAP_9015_SPRUNG, 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2337, 0, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 0x11), 1 }, { FLAG_FIRE_KNIGHT_WIN_SEEN, 0 } }, SLOT_EVENT, 0x320, 0, 0, 0, 0, 0, 0 },
     { { { FLAG(0, FIELD_FLAG_ENCOUNTERED), 0 }, { CODES_END, 0 } }, SLOT_EVENT, 0x2338, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };

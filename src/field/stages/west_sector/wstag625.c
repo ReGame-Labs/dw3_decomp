@@ -132,7 +132,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (GAME.progress == 0x15 && FLAGS_00.checkCondition(FLAG(0x40, 0x3D), 0)) {
+        if (GAME.progress == STORY_STAFF_PASS && FLAGS_00.checkCondition(FLAG(0x40, 0x3D), 0)) {
             children[1] = FIELDSTG_startEvent(0x228);
         }
         break;
@@ -395,12 +395,12 @@ FieldTalk actor10Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { SPECIAL(7), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x15), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x15), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x15), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(7), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0xB, 4, 472, 381, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x65, 5, 385, 416, 3 };

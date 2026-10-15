@@ -23,22 +23,22 @@ void FIELDSTG_runStoryEvents(StoryEvents *task, StoryEventsChildren *children) {
             }
         }
         switch (GAME.progress) {
-        case 5:
-        case 8:
-        case 12:
-        case 14:
-        case 16:
-        case 22:
-        case 24:
-        case 26:
-        case 28:
-        case 30:
-        case 31:
-        case 34:
-        case 36:
-        case 37:
-        case 38:
-        case 39:
+        case STORY_SEIRYU_BADGE:
+        case STORY_SEPIKMON_MASK_LOST:
+        case STORY_LOOKING_FOR_TEDDY:
+        case STORY_TEDDY_FOUND:
+        case STORY_NUMEMON_FOUND:
+        case STORY_CONTROL_ROOM:
+        case STORY_KNIGHTMON_REPROGRAMMED:
+        case STORY_BULBMON_FOUND:
+        case STORY_BLUE_ID_PASS:
+        case STORY_DE_KNOWLEDGE:
+        case STORY_GENBU_BADGE:
+        case STORY_WAY_TO_AMATERASU:
+        case STORY_BLACK_ID_PASS:
+        case STORY_AMATERASU_BRIDGE:
+        case STORY_PRESIDENT_ARRESTED:
+        case STORY_ASUKA_HEADQUARTERS:
             object->visible = 1;
             break;
         default:

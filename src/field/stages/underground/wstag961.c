@@ -1,7 +1,7 @@
 /*
  * WSTAG961: Seabed, Underground: below the bridges, in the extra chapter. The
- * European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 737
- * starts it instead of WSTAG830.
+ * European version's: in its extra chapter (STORY_EXTRA), mode 737 starts it
+ * instead of WSTAG830.
  */
 
 #include "common.h"

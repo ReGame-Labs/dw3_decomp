@@ -11,7 +11,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x2B), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x2C), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_KYUKIMON_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_BK_SERAPHIMON_CHALLENGE_SEEN, 0)) {
             children[0] = FIELDSTG_startEvent(0x4FA);
         }
         break;
@@ -27,12 +27,12 @@ void updateStage(StageTask *task, void **children) {
 
 /* After event 550, with Nick and Keith: lets event 551 of WSTAG620 start */
 void endEvent550(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 3), 1);
+    FLAGS_00.applyAction(FLAG_SECURITY_HOLE_SEEN, 1);
 }
 
 /* After event 1273, with Kyukimon: lets event 1274 start and starts the stage's event battle 0 */
 void endEvent1273(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x2B), 1);
+    FLAGS_00.applyAction(FLAG_KYUKIMON_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -41,7 +41,7 @@ void endEvent1273(void) {
  * keeps it from playing again
  */
 void endEvent1274(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x2C), 1);
+    FLAGS_00.applyAction(FLAG_BK_SERAPHIMON_CHALLENGE_SEEN, 1);
     FLAGS_00.applyAction(ITEM(0, 0x13), 1);
 }
 
@@ -295,10 +295,15 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x174, 0x1C0, 0xD0, 0xC0, 0x170, 0x1FC },
     { 0x140, 0x100, 0x154, 0x1C0, 0x50, 0xC0, 0x170, 0x1FB },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 8), 1, ITEM(4, 0xC0), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor3Talk0Conditions[] = { FLAG(0x1C, 0x16), 0, CODES_END };
-u16 actor3Talk0Actions[] = { START_EVENT(0x29), 1, FLAG(0x1C, 0x16), 1, CODES_END };
-u16 actor3Talk1Conditions[] = { FLAG(0x1C, 0x16), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_SUZAKU_LAKE_CROSSBOW_FOUND, 1,
+    ITEM(4, 0xC0), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor3Talk0Conditions[] = { FLAG_KYUKIMON_DDNA_FOUGHT, 0, CODES_END };
+u16 actor3Talk0Actions[] = { START_EVENT(0x29), 1, FLAG_KYUKIMON_DDNA_FOUGHT, 1, CODES_END };
+u16 actor3Talk1Conditions[] = { FLAG_KYUKIMON_DDNA_FOUGHT, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x251 },
     { NULL, NULL, 0 },
@@ -308,10 +313,18 @@ FieldTalk actor3Talks[] = {
     { actor3Talk1Conditions, NULL, 0x2C6 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 8), 0, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x14), 1, FLAG(0x1C, 0x1C), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x14), 1, FLAG(0x1C, 0x1C), 1, CODES_END };
-u16 actor3Conditions[] = { FLAG(6, 4), 1, ITEM(0, 0x13), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_SUZAKU_LAKE_CROSSBOW_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = {
+    PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1,
+    FLAG_KEITH_NICK_SEARCH_STARTED, 1,
+    CODES_END,
+};
+u16 actor2Conditions[] = {
+    PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1,
+    FLAG_KEITH_NICK_SEARCH_STARTED, 1,
+    CODES_END,
+};
+u16 actor3Conditions[] = { FLAG_KOTEMON_DDNA_REQUESTED, 1, ITEM(0, 0x13), 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 545, 177, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0x66, 5, 113, 729, 5 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0x67, 6, 145, 713, 1 };
@@ -402,7 +415,7 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 5, 0x260, 0x2A1, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 0xA, 0x1C0, 0x181, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 0xA, 0x1D0, 0xDA, 0, 0, 0, 0 },
-    { { { FLAG(0x1C, 0x1C), 1 }, { PROGRESS(0x14), 1 } }, SLOT_EVENT, 0x226, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG_KEITH_NICK_SEARCH_STARTED, 1 }, { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1 } }, SLOT_EVENT, 0x226, 0, 0, 0, 0, 0, 0 },
     { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 7, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };

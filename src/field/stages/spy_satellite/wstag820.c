@@ -70,11 +70,11 @@ void updateStage(StageTask *task, void **children) {
             }
         }
         do {
-            if (GAME.progress == 0x29 && FLAGS_00.checkCondition(FLAG(0x40, 0x74), 0)) {
+            if (GAME.progress == STORY_GUNSLINGER && FLAGS_00.checkCondition(FLAG_MEGADEATH_WIN_SEEN, 0)) {
                 children[0] = FIELDSTG_startEvent(0x424);
                 break;
             }
-            if (GAME.progress == 0x29 && FLAGS_00.checkCondition(FLAG(0x40, 0x74), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x75), 0)) {
+            if (GAME.progress == STORY_GUNSLINGER && FLAGS_00.checkCondition(FLAG_MEGADEATH_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_SNATCHMON_APPEARS_SEEN, 0)) {
                 children[0] = FIELDSTG_startEvent(0x42E);
                 break;
             }
@@ -118,21 +118,21 @@ void handleCommand845(Task *task, s32 id) {
  * keeps it from playing again
  */
 void endEvent1060(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x74), 1);
+    FLAGS_00.applyAction(FLAG_MEGADEATH_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
 /* After event 1070, with the player: keeps it from playing again */
 void endEvent1070(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x75), 1);
+    FLAGS_00.applyAction(FLAG_SNATCHMON_APPEARS_SEEN, 1);
 }
 
 /*
  * After event 1080, with Snatchmon: moves the story on to
- * FIELD_PROGRESS_MOVIE_BATTLES and starts the stage's event battle 1
+ * STORY_MOVIE_BATTLES and starts the stage's event battle 1
  */
 void endEvent1080(void) {
-    GAME.progress = FIELD_PROGRESS_MOVIE_BATTLES;
+    GAME.progress = STORY_MOVIE_BATTLES;
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
@@ -574,14 +574,18 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x16A, 0x1C0, 0xA8, 0xC0, 0x140, 0x1FA },
     { 0x140, 0x100, 0x162, 0x100, 0x88, 0, 0x150, 0x1F9 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x29), 1, FLAG(0x40, 0x74), 0, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x29), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x29), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x29), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x29), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x29), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0x29), 1, CODES_END };
-u16 actor7Conditions[] = { FLAG(0x40, 0x75), 0, PROGRESS(0x29), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_GUNSLINGER), 1, FLAG_MEGADEATH_WIN_SEEN, 0, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_GUNSLINGER), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_GUNSLINGER), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_GUNSLINGER), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_GUNSLINGER), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_GUNSLINGER), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_GUNSLINGER), 1, CODES_END };
+u16 actor7Conditions[] = {
+    FLAG_SNATCHMON_APPEARS_SEEN, 0,
+    PROGRESS(STORY_GUNSLINGER), 1,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 0xD5, 5, 336, 232, 3 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0xD6, 6, 0, 0, 1 };

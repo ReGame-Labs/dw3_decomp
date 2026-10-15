@@ -406,7 +406,7 @@ static inline void createParty(FieldChildren *children) {
             break;
         }
         children->actors[0] = FIELDSTG_createActor(FIELD_CHARACTER_PLAYER, 0, 0, NULL);
-        if (GAME.progress >= 3) {
+        if (GAME.progress >= STORY_PARTNERS_RECEIVED) {
             if (GAME.funcs.getPartyPartner(0) >= 0) {
                 children->actors[1] = FIELDSTG_createActor(GAME.funcs.getPartyPartner(0) + FIELD_CHARACTER_PARTNERS, 2, 1, NULL);
             }
@@ -463,13 +463,13 @@ static inline void warpAway(FieldTask *task, FieldChildren *children) {
 }
 
 /*
- * From the story point 4 on, START opens the field menu (STSTATUS) while
+ * From the STORY_GENJI_BEATEN on, START opens the field menu (STSTATUS) while
  * the field is idle; the player's place is kept to come back to
  */
 static inline void openFieldMenu(FieldTask *task, FieldChildren *children) {
     if (FIELDSTG_state.menuOpen != 1 && FIELDSTG_state.busy == 0 && FIELDSTG_state.acting == 0) {
         do {
-            if (GAME.progress < 4 || !(PAD.getPressed(0) & (1 << PAD_START))) {
+            if (GAME.progress < STORY_GENJI_BEATEN || !(PAD.getPressed(0) & (1 << PAD_START))) {
                 break;
             }
             FIELDSTG_state.menuOpen = 1;
@@ -737,63 +737,63 @@ static inline void pickOddFighterPrize(s32 mode) {
         break;
 #if VERSION_EU || VERSION_JP
     case 0x28C: /* WSTAG331 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17C, 0x187);
         } else { /* WSTAG940 */
             PICK_PRIZE(0x17F, 0x188);
         }
         break;
     case 0x28D: /* WSTAG336 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17C, 0x187);
         } else { /* WSTAG941 */
             PICK_PRIZE(0x179, 0x186);
         }
         break;
     case 0x28E: /* WSTAG341 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17C, 0x187);
         } else { /* WSTAG942 */
             PICK_PRIZE(0x178, 0x186);
         }
         break;
     case 0x28F: /* WSTAG346 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17C, 0x187);
         } else { /* WSTAG943 */
             PICK_PRIZE(0x17E, 0x188);
         }
         break;
     case 0x290: /* WSTAG351 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17C, 0x187);
         } else { /* WSTAG944 */
             PICK_PRIZE(0x180, 0x189);
         }
         break;
     case 0x291: /* WSTAG356 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17C, 0x187);
         } else { /* WSTAG945 */
             PICK_PRIZE(0x181, 0x189);
         }
         break;
     case 0x296: /* WSTAG381 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17C, 0x187);
         } else { /* WSTAG950 */
             PICK_PRIZE(0x182, 0x189);
         }
         break;
     case 0x298: /* WSTAG396 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17C, 0x187);
         } else { /* WSTAG952 */
             PICK_PRIZE(0x183, 0x18A);
         }
         break;
     case 0x299: /* WSTAG401 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17F, 0x188);
         } else { /* WSTAG953 */
             PICK_PRIZE(0x185, 0x18A);
@@ -865,56 +865,56 @@ static inline void pickEvenFighterPrize(s32 mode) {
         break;
 #if VERSION_EU || VERSION_JP
     case 0x271: /* WSTAG203 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17D, 0x188);
         } else { /* WSTAG921 */
             PICK_PRIZE(0x177, 0x186);
         }
         break;
     case 0x28C: /* WSTAG331 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17D, 0x188);
         } else { /* WSTAG940 */
             PICK_PRIZE(0x17A, 0x187);
         }
         break;
     case 0x28D: /* WSTAG336 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17D, 0x188);
         } else { /* WSTAG941 */
             PICK_PRIZE(0x179, 0x186);
         }
         break;
     case 0x28E: /* WSTAG341 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17D, 0x188);
         } else { /* WSTAG942 */
             PICK_PRIZE(0x178, 0x186);
         }
         break;
     case 0x28F: /* WSTAG346 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17D, 0x188);
         } else { /* WSTAG943 */
             PICK_PRIZE(0x17B, 0x187);
         }
         break;
     case 0x290: /* WSTAG351 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17D, 0x188);
         } else { /* WSTAG944 */
             PICK_PRIZE(0x184, 0x18A);
         }
         break;
     case 0x296: /* WSTAG381 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17D, 0x188);
         } else { /* WSTAG950 */
             PICK_PRIZE(0x17C, 0x187);
         }
         break;
     case 0x299: /* WSTAG401 */
-        if (GAME.progress != FIELD_PROGRESS_EXTRA) {
+        if (GAME.progress != STORY_EXTRA) {
             PICK_PRIZE(0x17D, 0x188);
         } else { /* WSTAG953 */
             PICK_PRIZE(0x17D, 0x188);
@@ -958,7 +958,7 @@ static inline void pickEvenFighterPrize(s32 mode) {
 /*
  * Starts encounter FIELDSTG_encounters[encounter]: the field task
  * (FIELD_TASK_FIELD) leaves for the battle (MODE_BATTLE, after a movie in the chapter
- * FIELD_PROGRESS_MOVIE_BATTLES), and BATTLE_SETUP takes the encounter's
+ * STORY_MOVIE_BATTLES), and BATTLE_SETUP takes the encounter's
  * enemies and bytes. A battle led by one of the prize fighters always gives
  * an item, which the field's stage (named in each case by the stage its mode
  * loads, FIELDSTG_stages) and a roll pick: the rare item comes 1 in 32
@@ -975,7 +975,7 @@ void FIELDSTG_startEncounter(s32 encounter) {
         FIELDSTG_state.busy = 1;
         FIELDSTG_state.battleStarting = 1;
         next = MODE_BATTLE_MOVIE;
-        if (GAME.progress != FIELD_PROGRESS_MOVIE_BATTLES) {
+        if (GAME.progress != STORY_MOVIE_BATTLES) {
             next = MODE_BATTLE;
         }
         task->nextMode = next;

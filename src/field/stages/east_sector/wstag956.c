@@ -1,7 +1,7 @@
 /*
  * WSTAG956: Qing Long City, East Sector, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 668 starts it
- * instead of WSTAG421.
+ * version's: in its extra chapter (STORY_EXTRA), mode 668 starts it instead of
+ * WSTAG421.
  */
 
 #include "common.h"
@@ -55,25 +55,35 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1A4, 0x140, 0x190, 0x40, 0x150, 0x1FE },
     { 0x1C0, 0x100, 0x1F4, 0x100, 0x2D0, 0, 0x160, 0x1FE },
 };
-u16 actor1Talk0Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 0, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 1), 0, CODES_END };
-u16 actor1Talk1Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 1, CODES_END };
-u16 actor1Talk1Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, FLAG(0, 1), 0, CODES_END };
-u16 actor1Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 1), 0, CODES_END };
+u16 actor1Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 0, CODES_END };
+u16 actor1Talk0Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 1), 0, CODES_END };
+u16 actor1Talk1Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 1, CODES_END };
+u16 actor1Talk1Actions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG(0, 1), 0,
+    CODES_END,
+};
+u16 actor1Talk2Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 1), 0, CODES_END };
 u16 actor1Talk2Actions[] = { FLAG(0, 1), 1, CODES_END };
-u16 actor1Talk3Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 1), 1, CODES_END };
+u16 actor1Talk3Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 1), 1, CODES_END };
 u16 actor1Talk3Actions[] = { CARD_BATTLE(0x45, 1), 1, CODES_END };
 u16 actor5Talk0Conditions[] = { SPECIAL(0x96), 0, CODES_END };
-u16 actor5Talk1Conditions[] = { SPECIAL(0x96), 1, FLAG(0x10, 0xD), 0, CODES_END };
-u16 actor5Talk1Actions[] = { FLAG(0x10, 0xD), 1, EVENT_BATTLE(0), 1, CODES_END };
-u16 actor5Talk2Conditions[] = { SPECIAL(0x96), 1, FLAG(0x10, 0xD), 1, CODES_END };
-u16 actor7Talk0Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 0, CODES_END };
-u16 actor7Talk0Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
-u16 actor7Talk1Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 1, CODES_END };
-u16 actor7Talk1Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, FLAG(0, 0), 0, CODES_END };
-u16 actor7Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor5Talk1Conditions[] = { SPECIAL(0x96), 1, FLAG_CHINRON_LEADER_FOUGHT, 0, CODES_END };
+u16 actor5Talk1Actions[] = { FLAG_CHINRON_LEADER_FOUGHT, 1, EVENT_BATTLE(0), 1, CODES_END };
+u16 actor5Talk2Conditions[] = { SPECIAL(0x96), 1, FLAG_CHINRON_LEADER_FOUGHT, 1, CODES_END };
+u16 actor7Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 0, CODES_END };
+u16 actor7Talk0Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
+u16 actor7Talk1Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 1, CODES_END };
+u16 actor7Talk1Actions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
+u16 actor7Talk2Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor7Talk2Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor7Talk3Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, CODES_END };
+u16 actor7Talk3Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 1, CODES_END };
 u16 actor7Talk3Actions[] = { CARD_BATTLE(0x4B, 1), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x5E },

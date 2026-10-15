@@ -10,7 +10,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == 0x10 && FLAGS_00.checkCondition(FLAG(0x40, 0x3E), 1)) {
+        if (GAME.progress == STORY_NUMEMON_FOUND && FLAGS_00.checkCondition(FLAG_BYAKKO_LEADER_APOLOGY_SEEN, 1)) {
             children[0] = FIELDSTG_startEvent(0x1AF);
         }
         task->nextState(task);
@@ -30,16 +30,16 @@ void updateStage(StageTask *task, void **children) {
  * stage's event battle 0
  */
 void endEvent430(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x3E), 1);
+    FLAGS_00.applyAction(FLAG_BYAKKO_LEADER_APOLOGY_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
 /*
- * After event 431, with Byakko Leader: moves the story on to its step 0x11
+ * After event 431, with Byakko Leader: moves the story on to STORY_BYAKKO_BADGE
  * and gives the player the Byakko Badge
  */
 void endEvent431(void) {
-    GAME.progress = 0x11;
+    GAME.progress = STORY_BYAKKO_BADGE;
     FLAGS_00.applyAction(ITEM(0, 0xB), 1);
 }
 
@@ -74,7 +74,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -269,11 +269,11 @@ FieldTalk actor4Talks[] = {
     { NULL, NULL, 0x162 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0xF), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x11), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_BYAKKO_BADGE), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x17), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x10), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x12), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_NUMEMON_FOUND), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_LISA_SAVED), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x7A, 4, 419, 103, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x7A, 4, 419, 103, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x7A, 4, 419, 103, 1 };

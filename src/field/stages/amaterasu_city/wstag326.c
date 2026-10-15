@@ -81,7 +81,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x76), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x77), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_BK_WARGREYMON_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_BK_MEGAGARGOMON_CHALLENGE_SEEN, 0)) {
             children[1] = FIELDSTG_startEvent(0x502);
         }
         break;
@@ -100,7 +100,7 @@ void updateStage(StageTask *task, void **children) {
  * stage's event battle 0
  */
 void endEvent1281(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x76), 1);
+    FLAGS_00.applyAction(FLAG_BK_WARGREYMON_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -109,7 +109,7 @@ void endEvent1281(void) {
  * keeps it from playing again
  */
 void endEvent1282(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x77), 1);
+    FLAGS_00.applyAction(FLAG_BK_MEGAGARGOMON_CHALLENGE_SEEN, 1);
     FLAGS_00.applyAction(ITEM(0, 0x2A), 1);
 }
 
@@ -268,18 +268,34 @@ ActorImage stageImages[] = {
     { 0x200, 0x100, 0x200, 0x1BC, 0, 0xBC, 0x230, 0x1FD },
     { 0x140, 0x100, 0x140, 0x100, 0, 0, 0x140, 0x1FB },
 };
-u16 actor0Talk0Conditions[] = { PROGRESS(0x25), 1, FLAG(0xA, 0xD), 0, CODES_END };
-u16 actor0Talk0Actions[] = { FLAG(0xA, 0xD), 1, START_EVENT(0x38), 1, CODES_END };
-u16 actor0Talk1Conditions[] = { FLAG(0xA, 0xD), 1, PROGRESS(0x25), 1, CODES_END };
-u16 actor0Talk2Conditions[] = { PROGRESS(0x26), 1, FLAG(0xA, 0xD), 0, CODES_END };
-u16 actor0Talk2Actions[] = { FLAG(0xA, 0xD), 1, START_EVENT(0x38), 1, CODES_END };
-u16 actor0Talk3Conditions[] = { FLAG(0xA, 0xD), 1, PROGRESS(0x26), 1, CODES_END };
-u16 actor1Talk0Conditions[] = { FLAG(0xA, 0xD), 0, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(0xA, 0xD), 1, START_EVENT(0x38), 1, CODES_END };
-u16 actor1Talk1Conditions[] = { FLAG(0xA, 0xD), 1, CODES_END };
-u16 actor2Talk0Conditions[] = { FLAG(0xA, 0xD), 0, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(0xA, 0xD), 1, START_EVENT(0x38), 1, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0xA, 0xD), 1, CODES_END };
+u16 actor0Talk0Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_BK_WARGREYMON_BEATEN, 0,
+    CODES_END,
+};
+u16 actor0Talk0Actions[] = { FLAG_BK_WARGREYMON_BEATEN, 1, START_EVENT(0x38), 1, CODES_END };
+u16 actor0Talk1Conditions[] = {
+    FLAG_BK_WARGREYMON_BEATEN, 1,
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    CODES_END,
+};
+u16 actor0Talk2Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_BK_WARGREYMON_BEATEN, 0,
+    CODES_END,
+};
+u16 actor0Talk2Actions[] = { FLAG_BK_WARGREYMON_BEATEN, 1, START_EVENT(0x38), 1, CODES_END };
+u16 actor0Talk3Conditions[] = {
+    FLAG_BK_WARGREYMON_BEATEN, 1,
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    CODES_END,
+};
+u16 actor1Talk0Conditions[] = { FLAG_BK_WARGREYMON_BEATEN, 0, CODES_END };
+u16 actor1Talk0Actions[] = { FLAG_BK_WARGREYMON_BEATEN, 1, START_EVENT(0x38), 1, CODES_END };
+u16 actor1Talk1Conditions[] = { FLAG_BK_WARGREYMON_BEATEN, 1, CODES_END };
+u16 actor2Talk0Conditions[] = { FLAG_BK_WARGREYMON_BEATEN, 0, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_BK_WARGREYMON_BEATEN, 1, START_EVENT(0x38), 1, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_BK_WARGREYMON_BEATEN, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, actor0Talk0Actions, 0x1AB },
     { actor0Talk1Conditions, NULL, 0xB1 },
@@ -299,7 +315,7 @@ FieldTalk actor2Talks[] = {
 };
 u16 actor0Conditions[] = { SPECIAL(0x1C), 1, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x105, 4, 425, 256, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x105, 4, 425, 256, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x105, 4, 425, 256, 1 };

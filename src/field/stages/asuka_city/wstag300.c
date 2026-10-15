@@ -11,9 +11,9 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (GAME.progress == 0x16 && FLAGS_00.checkCondition(FLAG(0x40, 0x4A), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x4B), 0)) {
+        if (GAME.progress == STORY_CONTROL_ROOM && FLAGS_00.checkCondition(FLAG_STRANGE_DIGIMON_SEEN, 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x4B), 0)) {
             children[0] = FIELDSTG_startEvent(0x23B);
-        } else if (GAME.progress == 0x16 && FLAGS_00.checkCondition(FLAG(0x40, 0x4B), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x4C), 0)) {
+        } else if (GAME.progress == STORY_CONTROL_ROOM && FLAGS_00.checkCondition(FLAG(0x40, 0x4B), 1) && FLAGS_00.checkCondition(FLAG_GAME_MASTER_GUARDS_SEEN, 0)) {
             children[0] = FIELDSTG_startEvent(0x23C);
         }
         break;
@@ -33,8 +33,8 @@ void updateStage(StageTask *task, void **children) {
  * playing again
  */
 void endEvent570(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x4A), 1);
-    FLAGS_00.applyAction(FLAG(0xC, 0x11), 1);
+    FLAGS_00.applyAction(FLAG_STRANGE_DIGIMON_SEEN, 1);
+    FLAGS_00.applyAction(FLAG_ASUKA_ADMIN_2F_SOLDIER_C_FOUGHT, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(1), 1);
 }
 
@@ -49,7 +49,7 @@ void endEvent571(void) {
 
 /* After event 572, with the player: keeps it from playing again */
 void endEvent572(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x4C), 1);
+    FLAGS_00.applyAction(FLAG_GAME_MASTER_GUARDS_SEEN, 1);
 }
 
 #if VERSION_US || VERSION_JP
@@ -83,11 +83,11 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress >= 0x14 && GAME.progress < 0x18) {
+    if (GAME.progress >= STORY_BYAKKO_LEADER_FOUGHT && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
-    if (GAME.progress >= 0x27 && GAME.progress < 0x29) {
+    if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
         FIELDSTG_state.soundBank = 0x1F;
         FIELDSTG_state.music = MUSIC(0x1F, 0);
     }
@@ -340,14 +340,47 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1B0, 0x160, 0x1C0, 0x60, 0x160, 0x1F2 },
     { 0x180, 0x100, 0x1A0, 0x167, 0x180, 0x67, 0x170, 0x1F2 },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x14), 1, ITEM(1, 0x2B), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor13Talk0Actions[] = { EVENT_BATTLE(1), 1, FLAG(0xC, 0xF), 1, CODES_END };
-u16 actor14Talk0Actions[] = { FLAG(0xC, 0x10), 1, EVENT_BATTLE(1), 1, CODES_END };
-u16 actor15Talk0Actions[] = { EVENT_BATTLE(1), 1, FLAG(0xC, 0x11), 1, CODES_END };
-u16 actor16Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0xB), 1, CODES_END };
-u16 actor17Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0xC), 1, CODES_END };
-u16 actor18Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0xD), 1, CODES_END };
-u16 actor19Talk0Actions[] = { EVENT_BATTLE(0), 1, FLAG(0xC, 0xE), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_ASUKA_ADMIN_2F_POWER_CHARGE_FOUND, 1,
+    ITEM(1, 0x2B), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor13Talk0Actions[] = {
+    EVENT_BATTLE(1), 1,
+    FLAG_ASUKA_ADMIN_2F_SOLDIER_A_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor14Talk0Actions[] = {
+    FLAG_ASUKA_ADMIN_2F_SOLDIER_B_FOUGHT, 1,
+    EVENT_BATTLE(1), 1,
+    CODES_END,
+};
+u16 actor15Talk0Actions[] = {
+    EVENT_BATTLE(1), 1,
+    FLAG_ASUKA_ADMIN_2F_SOLDIER_C_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor16Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_ASUKA_ADMIN_2F_TROOPER_A_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor17Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_ASUKA_ADMIN_2F_TROOPER_B_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor18Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_ASUKA_ADMIN_2F_TROOPER_C_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor19Talk0Actions[] = {
+    EVENT_BATTLE(0), 1,
+    FLAG_ASUKA_ADMIN_2F_TROOPER_D_FOUGHT, 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x2B6 },
     { NULL, NULL, 0 },
@@ -436,31 +469,59 @@ FieldTalk actor24Talks[] = {
     { NULL, NULL, 0xA7 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x14), 0, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x21), 1, CODES_END };
-u16 actor2Conditions[] = { SPECIAL(0x21), 1, PROGRESS(0x26), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_ASUKA_ADMIN_2F_POWER_CHARGE_FOUND, 0, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
+u16 actor2Conditions[] = { SPECIAL(0x21), 1, PROGRESS(STORY_PRESIDENT_ARRESTED), 0, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(0x20), 1, PROGRESS(0x21), 0, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x21), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x21), 1, PROGRESS(0x26), 0, CODES_END };
+u16 actor4Conditions[] = { SPECIAL(0x20), 1, PROGRESS(STORY_NETWORK_OFFLINE), 0, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL(0x21), 1, PROGRESS(STORY_PRESIDENT_ARRESTED), 0, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor8Conditions[] = { SPECIAL(0x20), 1, PROGRESS(0x21), 0, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0x21), 1, CODES_END };
-u16 actor10Conditions[] = { SPECIAL(0x21), 1, PROGRESS(0x26), 0, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x16), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0xF), 0, CODES_END };
-u16 actor14Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0x10), 0, CODES_END };
-u16 actor15Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0x11), 0, CODES_END };
-u16 actor16Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0xB), 0, CODES_END };
-u16 actor17Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0xC), 0, CODES_END };
-u16 actor18Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0xD), 0, CODES_END };
-u16 actor19Conditions[] = { PROGRESS(0x16), 1, FLAG(0xC, 0xE), 0, CODES_END };
-u16 actor20Conditions[] = { PROGRESS(0xD), 1, CODES_END };
-u16 actor21Conditions[] = { PROGRESS(0xD), 1, CODES_END };
+u16 actor8Conditions[] = { SPECIAL(0x20), 1, PROGRESS(STORY_NETWORK_OFFLINE), 0, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
+u16 actor10Conditions[] = { SPECIAL(0x21), 1, PROGRESS(STORY_PRESIDENT_ARRESTED), 0, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
+u16 actor13Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_ADMIN_2F_SOLDIER_A_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor14Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_ADMIN_2F_SOLDIER_B_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor15Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_ADMIN_2F_SOLDIER_C_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor16Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_ADMIN_2F_TROOPER_A_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor17Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_ADMIN_2F_TROOPER_B_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor18Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_ADMIN_2F_TROOPER_C_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor19Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_ASUKA_ADMIN_2F_TROOPER_D_FOUGHT, 0,
+    CODES_END,
+};
+u16 actor20Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
+u16 actor21Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 u16 actor22Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor23Conditions[] = { SPECIAL(0x20), 1, PROGRESS(0x21), 0, CODES_END };
-u16 actor24Conditions[] = { PROGRESS(0xD), 1, CODES_END };
+u16 actor23Conditions[] = { SPECIAL(0x20), 1, PROGRESS(STORY_NETWORK_OFFLINE), 0, CODES_END };
+u16 actor24Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 700, 283, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x25, 5, 880, 225, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x25, 5, 880, 225, 1 };
@@ -546,8 +607,8 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x203, 0xC8, 0x9C, 7, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x214, 0x177, 0xBD, 1, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x205, 0x372, 0x132, 7, 0, 0, 0 },
-    { { { PROGRESS(0x16), 1 }, { FLAG(0x40, 0x4A), 0 } }, SLOT_EVENT, 0x23A, 0, 0, 0, 0, 0, 0 },
-    { { { PROGRESS(0xD), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x15D, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_CONTROL_ROOM), 1 }, { FLAG_STRANGE_DIGIMON_SEEN, 0 } }, SLOT_EVENT, 0x23A, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_AGUMON_DISGUISE), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x15D, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

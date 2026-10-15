@@ -145,9 +145,9 @@ ActorImage stageImages[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0 },
     { 0x140, 0x100, 0x174, 0x1CC, 0xD0, 0xCC, 0x160, 0x1FD },
 };
-u16 actor0Talk0Conditions[] = { FLAG(0x1C, 0x1C), 0, CODES_END };
-u16 actor0Talk1Conditions[] = { FLAG(0x1C, 0x1C), 1, CODES_END };
-u16 actor4Talk0Actions[] = { FLAG(0x1A, 2), 1, CODES_END };
+u16 actor0Talk0Conditions[] = { FLAG_KEITH_NICK_SEARCH_STARTED, 0, CODES_END };
+u16 actor0Talk1Conditions[] = { FLAG_KEITH_NICK_SEARCH_STARTED, 1, CODES_END };
+u16 actor4Talk0Actions[] = { FLAG_NAMI_SWAMP_CREST_TALKED, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, NULL, 0x13C },
     { actor0Talk1Conditions, NULL, 0x3E },
@@ -193,15 +193,15 @@ FieldTalk actor10Talks[] = {
     { NULL, NULL, 0x141 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0x14), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor2Conditions[] = { SPECIAL(0x17), 1, PROGRESS(0x14), 0, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(0x19), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor2Conditions[] = { SPECIAL(0x17), 1, PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 0, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_CODE_PASSES_NEEDED), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor5Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(0xF), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0x18), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x1A), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_KNIGHTMON_REPROGRAMMED), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_BULBMON_FOUND), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x32, 4, 1201, 505, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x32, 4, 1201, 505, 1 };
@@ -442,7 +442,7 @@ StageSlot stageSlots[] = {
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x20, 0x20, 0, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x30, 0x30, 0, 0, 0, 0, 0 },
     { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E5, 0x240, 0x120, 1, 0, 4, 1 },
-    { { { PROGRESS(0x19), 1 }, { FLAG(0x1C, 0x51), 0 } }, SLOT_EVENT, 0x5FA, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_CODE_PASSES_NEEDED), 1 }, { FLAG(0x1C, 0x51), 0 } }, SLOT_EVENT, 0x5FA, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

@@ -135,7 +135,12 @@ ActorImage stageImages[] = {
 };
 u16 actor0Talk0Actions[] = { 0x7A45, 1, CODES_END };
 u16 actor1Talk0Actions[] = { START_EVENT(0x69), 1, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(2, 0x54), 1, ITEM(1, 0x36), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor2Talk0Actions[] = {
+    FLAG_AMATERASU_PELCHE_OASIS_CHARISMA_CHIP_FOUND, 1,
+    ITEM(1, 0x36), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x2D7 },
     { NULL, NULL, 0 },
@@ -148,7 +153,7 @@ FieldTalk actor2Talks[] = {
     { NULL, actor2Talk0Actions, 0x187 },
     { NULL, NULL, 0 },
 };
-u16 actor2Conditions[] = { FLAG(2, 0x54), 0, CODES_END };
+u16 actor2Conditions[] = { FLAG_AMATERASU_PELCHE_OASIS_CHARISMA_CHIP_FOUND, 0, CODES_END };
 FieldActorEntry actor0 = { NULL, actor0Talks, 0x14, 4, 450, 368, 1 };
 FieldActorEntry actor1 = { NULL, actor1Talks, 0x15, 5, 247, 291, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x21, 6, 502, 546, 1 };

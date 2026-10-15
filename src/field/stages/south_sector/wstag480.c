@@ -19,7 +19,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         children[1] = createTileCursors();
-        if (GAME.progress == 7 && FLAGS_00.checkCondition(FLAG(0x40, 0), 1)) {
+        if (GAME.progress == STORY_SOUTH_STATION_GHOST && FLAGS_00.checkCondition(FLAG(0x40, 0), 1)) {
             children[0] = FIELDSTG_startEvent(0xAB);
         }
         task->nextState(task);
@@ -40,9 +40,9 @@ void endEvent170(void) {
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
-/* After event 171, with Zanbamon: moves the story on to its step 8 */
+/* After event 171, with Zanbamon: moves the story on to STORY_SEPIKMON_MASK_LOST */
 void endEvent171(void) {
-    GAME.progress = 8;
+    GAME.progress = STORY_SEPIKMON_MASK_LOST;
 }
 
 /* the color the setup copies to FIELDSTG_state.spriteColor */
@@ -61,7 +61,7 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0 };
 #endif
 /*
  * Sets the stage up: its map, actors, battles and events, playing BGM_0015;
- * battle list 0 before story step 0xA, 1 before story step 0x18, 2 from then
+ * battle list 0 before STORY_ZANBAMON_DRIVEN_OFF, 1 before STORY_KNIGHTMON_REPROGRAMMED, 2 from then
  * on
  */
 void setupStage(void) {
@@ -85,9 +85,9 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 4);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress < 0xA) {
+    if (GAME.progress < STORY_ZANBAMON_DRIVEN_OFF) {
         FIELDSTG_state.battles = &stageBattles[0];
-    } else if (GAME.progress < 0x18) {
+    } else if (GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
         FIELDSTG_state.battles = &stageBattles[1];
     } else {
         FIELDSTG_state.battles = &stageBattles[2];
@@ -424,10 +424,10 @@ ActorImage stageImages[] = {
     { 0x200, 0x100, 0x200, 0x1BC, 0, 0xBC, 0x230, 0x1FD },
     { 0x140, 0x100, 0x170, 0x100, 0xC0, 0, 0x160, 0x1FA },
 };
-u16 actor0Talk0Conditions[] = { PROGRESS(7), 1, CODES_END };
-u16 actor0Talk1Conditions[] = { PROGRESS(8), 1, CODES_END };
-u16 actor0Talk2Conditions[] = { PROGRESS(9), 1, CODES_END };
-u16 actor0Talk3Conditions[] = { PROGRESS(0xA), 1, CODES_END };
+u16 actor0Talk0Conditions[] = { PROGRESS(STORY_SOUTH_STATION_GHOST), 1, CODES_END };
+u16 actor0Talk1Conditions[] = { PROGRESS(STORY_SEPIKMON_MASK_LOST), 1, CODES_END };
+u16 actor0Talk2Conditions[] = { PROGRESS(STORY_AGUMON_SUITS), 1, CODES_END };
+u16 actor0Talk3Conditions[] = { PROGRESS(STORY_ZANBAMON_DRIVEN_OFF), 1, CODES_END };
 u16 actor0Talk3Actions[] = { FLAG(0x1C, 9), 1, START_EVENT(0x1F), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, NULL, 0x245 },
@@ -693,7 +693,7 @@ StageSlot stageSlots[] = {
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0, 0xFFD8, 0, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFD0, 0x28, 0, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x30, 0x28, 0, 0, 0, 0, 0 },
-    { { { PROGRESS(7), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0xAA, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_SOUTH_STATION_GHOST), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0xAA, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_MAP, 0, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_MAP, 1, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },

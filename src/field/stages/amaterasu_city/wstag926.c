@@ -1,7 +1,7 @@
 /*
  * WSTAG926: Arena Front Desk, Amaterasu City, in the extra chapter. The
- * European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 631
- * starts it instead of WSTAG231.
+ * European version's: in its extra chapter (STORY_EXTRA), mode 631 starts it
+ * instead of WSTAG231.
  */
 
 #include "common.h"
@@ -97,9 +97,9 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x16C, 0x161, 0xB0, 0x61, 0x170, 0x1FE },
 };
 u16 actor0Talk0Conditions[] = { SPECIAL(0x54), 0, CODES_END };
-u16 actor0Talk1Conditions[] = { SPECIAL(0x54), 1, FLAG(0x10, 0xC), 0, CODES_END };
+u16 actor0Talk1Conditions[] = { SPECIAL(0x54), 1, FLAG_KURT_ARENA_WIN_SEEN, 0, CODES_END };
 u16 actor0Talk1Actions[] = { START_EVENT(0x6F), 1, CODES_END };
-u16 actor0Talk2Conditions[] = { SPECIAL(0x54), 1, FLAG(0x10, 0xC), 1, CODES_END };
+u16 actor0Talk2Conditions[] = { SPECIAL(0x54), 1, FLAG_KURT_ARENA_WIN_SEEN, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, NULL, 0x27 },
     { actor0Talk1Conditions, actor0Talk1Actions, 0x28 },

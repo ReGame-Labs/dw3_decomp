@@ -107,166 +107,166 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x178, 0x120, 0xE0, 0x20, 0x170, 0x1FD },
     { 0x1C0, 0x100, 0x1DE, 0x1A9, 0x278, 0xA9, 0x140, 0x1FC },
 };
-u16 actor0Talk0Conditions[] = { FLAG(0x1A, 0xF), 0, CODES_END };
-u16 actor0Talk0Actions[] = { FLAG(0x1A, 0xF), 1, CODES_END };
-u16 actor0Talk1Conditions[] = { FLAG(0x1A, 0xF), 1, CODES_END };
+u16 actor0Talk0Conditions[] = { FLAG_ITEM_SHOP_WIZARDMON_TALKED, 0, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_ITEM_SHOP_WIZARDMON_TALKED, 1, CODES_END };
+u16 actor0Talk1Conditions[] = { FLAG_ITEM_SHOP_WIZARDMON_TALKED, 1, CODES_END };
 u16 actor0Talk1Actions[] = { 0x7A02, 1, CODES_END };
-u16 actor1Talk0Conditions[] = { FLAG(0x1A, 0xE), 0, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(0x1A, 0xE), 1, CODES_END };
-u16 actor1Talk1Conditions[] = { FLAG(0x1A, 0xE), 1, CODES_END };
+u16 actor1Talk0Conditions[] = { FLAG_ARMORY_GARGOMON_TALKED, 0, CODES_END };
+u16 actor1Talk0Actions[] = { FLAG_ARMORY_GARGOMON_TALKED, 1, CODES_END };
+u16 actor1Talk1Conditions[] = { FLAG_ARMORY_GARGOMON_TALKED, 1, CODES_END };
 u16 actor1Talk1Actions[] = { 0x7A00, 1, CODES_END };
-u16 actor2Talk0Conditions[] = { FLAG(0x1A, 0x11), 0, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(0x1A, 0x11), 1, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0x1A, 0x11), 1, ITEM(0, 8), 0, CODES_END };
+u16 actor2Talk0Conditions[] = { FLAG_MR_SMITH_TALKED, 0, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG_MR_SMITH_TALKED, 1, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_MR_SMITH_TALKED, 1, ITEM(0, 8), 0, CODES_END };
 u16 actor2Talk2Conditions[] = {
-    FLAG(0x1A, 0x11), 1,
+    FLAG_MR_SMITH_TALKED, 1,
     ITEM(0, 8), 1,
-    FLAG(0x1C, 0x1E), 0,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
     CODES_END,
 };
-u16 actor2Talk2Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor2Talk2Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor2Talk3Conditions[] = {
-    FLAG(0x1A, 0x11), 1,
+    FLAG_MR_SMITH_TALKED, 1,
     ITEM(0, 8), 1,
-    FLAG(0x1C, 0x1E), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
     CODES_END,
 };
 u16 actor3Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor3Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor3Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor3Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor4Talk0Conditions[] = { FLAG(0x1A, 0x11), 0, CODES_END };
-u16 actor4Talk0Actions[] = { FLAG(0x1A, 0x11), 1, CODES_END };
-u16 actor4Talk1Conditions[] = { ITEM(0, 8), 0, FLAG(0x1A, 0x11), 1, CODES_END };
+u16 actor3Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor3Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor3Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor4Talk0Conditions[] = { FLAG_MR_SMITH_TALKED, 0, CODES_END };
+u16 actor4Talk0Actions[] = { FLAG_MR_SMITH_TALKED, 1, CODES_END };
+u16 actor4Talk1Conditions[] = { ITEM(0, 8), 0, FLAG_MR_SMITH_TALKED, 1, CODES_END };
 u16 actor4Talk2Conditions[] = {
     ITEM(0, 8), 1,
-    FLAG(0x1A, 0x11), 1,
-    FLAG(0x1C, 0x1E), 0,
+    FLAG_MR_SMITH_TALKED, 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
     CODES_END,
 };
-u16 actor4Talk2Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor4Talk2Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor4Talk3Conditions[] = {
-    FLAG(0x1A, 0x11), 1,
+    FLAG_MR_SMITH_TALKED, 1,
     ITEM(0, 8), 1,
-    FLAG(0x1C, 0x1E), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
     CODES_END,
 };
 u16 actor5Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor5Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor5Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor5Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor5Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor5Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor5Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor6Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor6Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor6Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor6Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor6Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor6Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor6Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor7Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor7Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor7Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor7Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor7Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor7Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor7Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor8Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor8Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor8Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor8Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor8Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor8Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor8Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor9Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor9Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor9Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor9Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor9Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor9Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor9Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor10Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor10Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor10Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor10Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor10Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor10Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor10Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor11Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor11Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor11Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor11Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor11Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor11Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor11Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor12Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor12Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor12Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor12Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor12Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor12Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor12Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor13Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor13Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor13Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor13Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor13Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor13Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor13Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor14Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor14Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor14Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor14Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor14Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor14Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor14Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor15Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor15Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor15Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor15Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor15Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor15Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor15Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor16Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor16Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor16Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor16Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor16Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor16Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor16Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor32Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor32Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor32Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor32Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor76Talk0Conditions[] = { FLAG(0x1A, 0x10), 0, CODES_END };
-u16 actor76Talk0Actions[] = { FLAG(0x1A, 0x10), 1, CODES_END };
-u16 actor76Talk1Conditions[] = { FLAG(0x1A, 0x10), 1, CODES_END };
+u16 actor32Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor32Talk1Actions[] = { START_EVENT(0x1D), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor32Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor76Talk0Conditions[] = { FLAG_PAWN_SHOP_GOMAMON_TALKED, 0, CODES_END };
+u16 actor76Talk0Actions[] = { FLAG_PAWN_SHOP_GOMAMON_TALKED, 1, CODES_END };
+u16 actor76Talk1Conditions[] = { FLAG_PAWN_SHOP_GOMAMON_TALKED, 1, CODES_END };
 u16 actor76Talk1Actions[] = { 0x7A01, 1, CODES_END };
 u16 actor78Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor78Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor78Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor78Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor78Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor78Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor78Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor79Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor79Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor79Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor79Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor79Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor79Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor79Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor80Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor80Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor80Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor80Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor80Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor80Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor80Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor81Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor81Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor81Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor81Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor81Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor81Talk2Conditions[] = { ITEM(0, 8), 1, CODES_END };
 u16 actor82Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor82Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor82Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor82Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor82Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor82Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor82Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor83Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor83Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor83Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor83Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor83Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor83Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor83Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor84Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor84Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor84Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor84Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor84Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor84Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor84Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor85Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor85Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor85Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor85Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor85Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor85Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor85Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor86Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor86Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor86Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor86Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor86Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor86Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor86Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor87Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor87Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor87Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor87Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor87Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor87Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor87Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor88Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor88Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor88Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor88Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor88Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor88Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor88Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor89Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor89Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor89Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor89Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor89Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor89Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor89Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor90Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor90Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor90Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor90Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor90Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor90Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor90Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor91Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor91Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor91Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor91Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor91Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor91Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor91Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 u16 actor92Talk0Conditions[] = { ITEM(0, 8), 0, CODES_END };
-u16 actor92Talk1Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor92Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor92Talk2Conditions[] = { ITEM(0, 8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor92Talk1Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 0, CODES_END };
+u16 actor92Talk1Actions[] = { START_EVENT(0x1E), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
+u16 actor92Talk2Conditions[] = { ITEM(0, 8), 1, FLAG_SMITH_EL_DORADO_ID_SHOWN, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { actor0Talk0Conditions, actor0Talk0Actions, 0x42 },
     { actor0Talk1Conditions, actor0Talk1Actions, 0x26 },
@@ -706,105 +706,345 @@ FieldTalk actor93Talks[] = {
     { NULL, NULL, 0x24 },
     { NULL, NULL, 0 },
 };
-u16 actor2Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(4), 1, CODES_END };
+u16 actor2Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_GENJI_BEATEN), 1,
+    CODES_END,
+};
 u16 actor3Conditions[] = {
-    FLAG(0x1C, 0x1E), 0,
-    PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_MOVIE_BATTLES), 1,
     CODES_END,
 };
-u16 actor4Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(6), 1, CODES_END };
-u16 actor5Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(7), 1, CODES_END };
-u16 actor6Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(9), 1, CODES_END };
-u16 actor7Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0xA), 1, CODES_END };
-u16 actor8Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0xF), 1, CODES_END };
-u16 actor9Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x11), 1, CODES_END };
-u16 actor10Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x12), 1, CODES_END };
-u16 actor11Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x14), 1, CODES_END };
-u16 actor12Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x15), 1, CODES_END };
-u16 actor13Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x19), 1, CODES_END };
-u16 actor14Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x1B), 1, CODES_END };
-u16 actor15Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x1D), 1, CODES_END };
-u16 actor16Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x21), 1, CODES_END };
-u16 actor17Conditions[] = { PROGRESS(6), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
+u16 actor4Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_FAKE_BLUE_CARD), 1,
+    CODES_END,
+};
+u16 actor5Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_SOUTH_STATION_GHOST), 1,
+    CODES_END,
+};
+u16 actor6Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_AGUMON_SUITS), 1,
+    CODES_END,
+};
+u16 actor7Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_ZANBAMON_DRIVEN_OFF), 1,
+    CODES_END,
+};
+u16 actor8Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_DE_SINCERITY), 1,
+    CODES_END,
+};
+u16 actor9Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_BYAKKO_BADGE), 1,
+    CODES_END,
+};
+u16 actor10Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_LISA_SAVED), 1,
+    CODES_END,
+};
+u16 actor11Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1,
+    CODES_END,
+};
+u16 actor12Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_STAFF_PASS), 1,
+    CODES_END,
+};
+u16 actor13Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_CODE_PASSES_NEEDED), 1,
+    CODES_END,
+};
+u16 actor14Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_JUNGLE_SOUND), 1,
+    CODES_END,
+};
+u16 actor15Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_BULBMON_BEATEN), 1,
+    CODES_END,
+};
+u16 actor16Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_NETWORK_OFFLINE), 1,
+    CODES_END,
+};
+u16 actor17Conditions[] = {
+    PROGRESS(STORY_FAKE_BLUE_CARD), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
 u16 actor18Conditions[] = {
-    PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1,
-    FLAG(0x1C, 0x1E), 1,
+    PROGRESS(STORY_MOVIE_BATTLES), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
     CODES_END,
 };
-u16 actor19Conditions[] = { PROGRESS(4), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor20Conditions[] = { PROGRESS(7), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor21Conditions[] = { PROGRESS(9), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor22Conditions[] = { PROGRESS(0xA), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor23Conditions[] = { PROGRESS(0xF), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor24Conditions[] = { PROGRESS(0x11), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor25Conditions[] = { PROGRESS(0x12), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor26Conditions[] = { PROGRESS(0x14), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor27Conditions[] = { PROGRESS(0x15), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor28Conditions[] = { PROGRESS(0x19), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor29Conditions[] = { PROGRESS(0x1B), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor30Conditions[] = { PROGRESS(0x1D), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor31Conditions[] = { PROGRESS(0x21), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor32Conditions[] = { PROGRESS(0x23), 1, FLAG(0x1C, 0x1E), 0, CODES_END };
-u16 actor33Conditions[] = { PROGRESS(0x23), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor34Conditions[] = { PROGRESS(4), 1, CODES_END };
-u16 actor35Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor36Conditions[] = { PROGRESS(6), 1, CODES_END };
-u16 actor37Conditions[] = { PROGRESS(7), 1, CODES_END };
-u16 actor38Conditions[] = { PROGRESS(9), 1, CODES_END };
-u16 actor39Conditions[] = { PROGRESS(0xA), 1, CODES_END };
-u16 actor40Conditions[] = { PROGRESS(0xF), 1, CODES_END };
-u16 actor41Conditions[] = { PROGRESS(0x11), 1, CODES_END };
-u16 actor42Conditions[] = { PROGRESS(0x19), 1, CODES_END };
-u16 actor43Conditions[] = { PROGRESS(0x14), 1, CODES_END };
-u16 actor44Conditions[] = { PROGRESS(0x12), 1, CODES_END };
-u16 actor45Conditions[] = { PROGRESS(0x21), 1, CODES_END };
-u16 actor46Conditions[] = { PROGRESS(0x1D), 1, CODES_END };
-u16 actor47Conditions[] = { PROGRESS(0x1B), 1, CODES_END };
-u16 actor48Conditions[] = { PROGRESS(0x15), 1, CODES_END };
-u16 actor49Conditions[] = { PROGRESS(5), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor50Conditions[] = { PROGRESS(0x26), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor51Conditions[] = { PROGRESS(8), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor52Conditions[] = { FLAG(0x1C, 0x1E), 1, PROGRESS(0xC), 1, CODES_END };
-u16 actor53Conditions[] = { PROGRESS(0xE), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor54Conditions[] = { PROGRESS(0x10), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor55Conditions[] = { PROGRESS(0x16), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor56Conditions[] = { PROGRESS(0x1A), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor57Conditions[] = { PROGRESS(0x1C), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor58Conditions[] = { PROGRESS(0x1E), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor59Conditions[] = { PROGRESS(0x1F), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor60Conditions[] = { PROGRESS(0x22), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor61Conditions[] = { PROGRESS(0x24), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor62Conditions[] = { PROGRESS(0x25), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor63Conditions[] = { PROGRESS(0x18), 1, FLAG(0x1C, 0x1E), 1, CODES_END };
-u16 actor64Conditions[] = { PROGRESS(0x23), 1, CODES_END };
-u16 actor65Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor19Conditions[] = {
+    PROGRESS(STORY_GENJI_BEATEN), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor20Conditions[] = {
+    PROGRESS(STORY_SOUTH_STATION_GHOST), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor21Conditions[] = {
+    PROGRESS(STORY_AGUMON_SUITS), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor22Conditions[] = {
+    PROGRESS(STORY_ZANBAMON_DRIVEN_OFF), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor23Conditions[] = {
+    PROGRESS(STORY_DE_SINCERITY), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor24Conditions[] = {
+    PROGRESS(STORY_BYAKKO_BADGE), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor25Conditions[] = {
+    PROGRESS(STORY_LISA_SAVED), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor26Conditions[] = {
+    PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor27Conditions[] = {
+    PROGRESS(STORY_STAFF_PASS), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor28Conditions[] = {
+    PROGRESS(STORY_CODE_PASSES_NEEDED), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor29Conditions[] = {
+    PROGRESS(STORY_JUNGLE_SOUND), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor30Conditions[] = {
+    PROGRESS(STORY_BULBMON_BEATEN), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor31Conditions[] = {
+    PROGRESS(STORY_NETWORK_OFFLINE), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor32Conditions[] = {
+    PROGRESS(STORY_WHITE_ID_PASS), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    CODES_END,
+};
+u16 actor33Conditions[] = {
+    PROGRESS(STORY_WHITE_ID_PASS), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor34Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
+u16 actor35Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor36Conditions[] = { PROGRESS(STORY_FAKE_BLUE_CARD), 1, CODES_END };
+u16 actor37Conditions[] = { PROGRESS(STORY_SOUTH_STATION_GHOST), 1, CODES_END };
+u16 actor38Conditions[] = { PROGRESS(STORY_AGUMON_SUITS), 1, CODES_END };
+u16 actor39Conditions[] = { PROGRESS(STORY_ZANBAMON_DRIVEN_OFF), 1, CODES_END };
+u16 actor40Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
+u16 actor41Conditions[] = { PROGRESS(STORY_BYAKKO_BADGE), 1, CODES_END };
+u16 actor42Conditions[] = { PROGRESS(STORY_CODE_PASSES_NEEDED), 1, CODES_END };
+u16 actor43Conditions[] = { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1, CODES_END };
+u16 actor44Conditions[] = { PROGRESS(STORY_LISA_SAVED), 1, CODES_END };
+u16 actor45Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
+u16 actor46Conditions[] = { PROGRESS(STORY_BULBMON_BEATEN), 1, CODES_END };
+u16 actor47Conditions[] = { PROGRESS(STORY_JUNGLE_SOUND), 1, CODES_END };
+u16 actor48Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, CODES_END };
+u16 actor49Conditions[] = {
+    PROGRESS(STORY_SEIRYU_BADGE), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor50Conditions[] = {
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor51Conditions[] = {
+    PROGRESS(STORY_SEPIKMON_MASK_LOST), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor52Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    PROGRESS(STORY_LOOKING_FOR_TEDDY), 1,
+    CODES_END,
+};
+u16 actor53Conditions[] = {
+    PROGRESS(STORY_TEDDY_FOUND), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor54Conditions[] = {
+    PROGRESS(STORY_NUMEMON_FOUND), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor55Conditions[] = {
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor56Conditions[] = {
+    PROGRESS(STORY_BULBMON_FOUND), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor57Conditions[] = {
+    PROGRESS(STORY_BLUE_ID_PASS), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor58Conditions[] = {
+    PROGRESS(STORY_DE_KNOWLEDGE), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor59Conditions[] = {
+    PROGRESS(STORY_GENBU_BADGE), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor60Conditions[] = {
+    PROGRESS(STORY_WAY_TO_AMATERASU), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor61Conditions[] = {
+    PROGRESS(STORY_BLACK_ID_PASS), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor62Conditions[] = {
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor63Conditions[] = {
+    PROGRESS(STORY_KNIGHTMON_REPROGRAMMED), 1,
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 1,
+    CODES_END,
+};
+u16 actor64Conditions[] = { PROGRESS(STORY_WHITE_ID_PASS), 1, CODES_END };
+u16 actor65Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor66Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor67Conditions[] = { PROGRESS(0xC), 1, CODES_END };
-u16 actor68Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor67Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
+u16 actor68Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor69Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor70Conditions[] = { PROGRESS(0x16), 1, CODES_END };
+u16 actor70Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor71Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor72Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor73Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor73Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor74Conditions[] = { SPECIAL(0x1A), 1, ITEM(0, 8), 1, CODES_END };
 u16 actor75Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor77Conditions[] = { SPECIAL(0x1A), 1, ITEM(0, 8), 0, CODES_END };
-u16 actor78Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0xE), 1, CODES_END };
-u16 actor79Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x16), 1, CODES_END };
-u16 actor80Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x18), 1, CODES_END };
-u16 actor81Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x1A), 1, CODES_END };
-u16 actor82Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x10), 1, CODES_END };
-u16 actor83Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x1C), 1, CODES_END };
-u16 actor84Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x1E), 1, CODES_END };
-u16 actor85Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(8), 1, CODES_END };
-u16 actor86Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x25), 1, CODES_END };
-u16 actor87Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x1F), 1, CODES_END };
-u16 actor88Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(5), 1, CODES_END };
-u16 actor89Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0xC), 1, CODES_END };
-u16 actor90Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x22), 1, CODES_END };
-u16 actor91Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x24), 1, CODES_END };
-u16 actor92Conditions[] = { FLAG(0x1C, 0x1E), 0, PROGRESS(0x26), 1, CODES_END };
-u16 actor93Conditions[] = { PROGRESS(4), 1, CODES_END };
+u16 actor78Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_TEDDY_FOUND), 1,
+    CODES_END,
+};
+u16 actor79Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_CONTROL_ROOM), 1,
+    CODES_END,
+};
+u16 actor80Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_KNIGHTMON_REPROGRAMMED), 1,
+    CODES_END,
+};
+u16 actor81Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_BULBMON_FOUND), 1,
+    CODES_END,
+};
+u16 actor82Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_NUMEMON_FOUND), 1,
+    CODES_END,
+};
+u16 actor83Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_BLUE_ID_PASS), 1,
+    CODES_END,
+};
+u16 actor84Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_DE_KNOWLEDGE), 1,
+    CODES_END,
+};
+u16 actor85Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_SEPIKMON_MASK_LOST), 1,
+    CODES_END,
+};
+u16 actor86Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_AMATERASU_BRIDGE), 1,
+    CODES_END,
+};
+u16 actor87Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_GENBU_BADGE), 1,
+    CODES_END,
+};
+u16 actor88Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_SEIRYU_BADGE), 1,
+    CODES_END,
+};
+u16 actor89Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_LOOKING_FOR_TEDDY), 1,
+    CODES_END,
+};
+u16 actor90Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_WAY_TO_AMATERASU), 1,
+    CODES_END,
+};
+u16 actor91Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_BLACK_ID_PASS), 1,
+    CODES_END,
+};
+u16 actor92Conditions[] = {
+    FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
+    PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
+    CODES_END,
+};
+u16 actor93Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 FieldActorEntry actor0 = { NULL, actor0Talks, 0x16, 4, 449, 281, 7 };
 FieldActorEntry actor1 = { NULL, actor1Talks, 0x17, 5, 304, 369, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x1E, 6, 152, 397, 7 };

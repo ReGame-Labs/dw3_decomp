@@ -12,7 +12,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        if (GAME.progress == 0x1E && FLAGS_00.checkCondition(FLAG(0x40, 1), 1)) {
+        if (GAME.progress == STORY_DE_KNOWLEDGE && FLAGS_00.checkCondition(FLAG_GENBU_LEADER_WIN_SEEN, 1)) {
             children[0] = FIELDSTG_startEvent(0x30D);
         }
         break;
@@ -31,16 +31,16 @@ void updateStage(StageTask *task, void **children) {
  * keeps it from playing again
  */
 void endEvent780(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 1), 1);
+    FLAGS_00.applyAction(FLAG_GENBU_LEADER_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
 /*
- * After event 781, with Genbu Leader: moves the story on to its step 0x1F
+ * After event 781, with Genbu Leader: moves the story on to STORY_GENBU_BADGE
  * and gives the player the Genbu Badge
  */
 void endEvent781(void) {
-    GAME.progress = 0x1F;
+    GAME.progress = STORY_GENBU_BADGE;
     FLAGS_00.applyAction(ITEM(0, 0xC), 1);
 }
 
@@ -211,11 +211,21 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x174, 0x120, 0xD0, 0x20, 0x150, 0x1FE },
     { 0x180, 0x100, 0x1B0, 0x193, 0x1C0, 0x93, 0x160, 0x1FE },
 };
-u16 actor11Talk0Conditions[] = { PROGRESS(0x20), 0, PROGRESS(0x21), 0, FLAG(0, 5), 0, CODES_END };
+u16 actor11Talk0Conditions[] = {
+    PROGRESS(STORY_REAL_WORLD), 0,
+    PROGRESS(STORY_NETWORK_OFFLINE), 0,
+    FLAG(0, 5), 0,
+    CODES_END,
+};
 u16 actor11Talk0Actions[] = { FLAG(0, 5), 1, CODES_END };
-u16 actor11Talk1Conditions[] = { PROGRESS(0x20), 0, PROGRESS(0x21), 0, FLAG(0, 5), 1, CODES_END };
-u16 actor11Talk2Conditions[] = { PROGRESS(0x20), 1, CODES_END };
-u16 actor11Talk3Conditions[] = { PROGRESS(0x21), 1, CODES_END };
+u16 actor11Talk1Conditions[] = {
+    PROGRESS(STORY_REAL_WORLD), 0,
+    PROGRESS(STORY_NETWORK_OFFLINE), 0,
+    FLAG(0, 5), 1,
+    CODES_END,
+};
+u16 actor11Talk2Conditions[] = { PROGRESS(STORY_REAL_WORLD), 1, CODES_END };
+u16 actor11Talk3Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x169 },
     { NULL, NULL, 0 },
@@ -271,16 +281,16 @@ FieldTalk actor12Talks[] = {
     { NULL, NULL, 0x160 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x19), 1, SPECIAL(0x20), 0, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x20), 1, CODES_END };
 u16 actor12Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
@@ -346,7 +356,7 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 7, 0x318, 0x180, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 7, 0x3D8, 0xC0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 7, 0x3C8, 0x138, 0, 0, 0, 0 },
-    { { { PROGRESS(0x1E), 1 }, { FLAG(0x40, 1), 0 } }, SLOT_EVENT, 0x30C, 0, 0, 0, 0, 0, 0 },
+    { { { PROGRESS(STORY_DE_KNOWLEDGE), 1 }, { FLAG_GENBU_LEADER_WIN_SEEN, 0 } }, SLOT_EVENT, 0x30C, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

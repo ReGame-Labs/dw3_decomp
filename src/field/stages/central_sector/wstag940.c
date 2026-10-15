@@ -1,7 +1,7 @@
 /*
  * WSTAG940: Central Park, Central Sector, in the extra chapter. The European
- * version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 652 starts it
- * instead of WSTAG331.
+ * version's: in its extra chapter (STORY_EXTRA), mode 652 starts it instead of
+ * WSTAG331.
  */
 
 #include "common.h"
@@ -57,22 +57,37 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x180, 0x11F, 0x100, 0x1F, 0x150, 0x1FE },
     { 0x180, 0x100, 0x188, 0x11F, 0x120, 0x1F, 0x160, 0x1FE },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x69), 1, ITEM(1, 0x32), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor2Talk0Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 0, CODES_END };
-u16 actor2Talk0Actions[] = { FLAG(0, 1), 0, FLAG(0, 0x11), 0, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 1, CODES_END };
-u16 actor2Talk1Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, FLAG(0, 1), 0, CODES_END };
-u16 actor2Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 1), 0, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_CENTRAL_PARK_ARMOR_CHIP_FOUND, 1,
+    ITEM(1, 0x32), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor2Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 0, CODES_END };
+u16 actor2Talk0Actions[] = { FLAG(0, 1), 0, FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 1, CODES_END };
+u16 actor2Talk1Actions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG(0, 1), 0,
+    CODES_END,
+};
+u16 actor2Talk2Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 1), 0, CODES_END };
 u16 actor2Talk2Actions[] = { FLAG(0, 1), 1, CODES_END };
-u16 actor2Talk3Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 1), 1, CODES_END };
+u16 actor2Talk3Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 1), 1, CODES_END };
 u16 actor2Talk3Actions[] = { CARD_BATTLE(0x22, 1), 1, CODES_END };
-u16 actor5Talk0Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 0, CODES_END };
-u16 actor5Talk0Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
-u16 actor5Talk1Conditions[] = { FLAG(0, 0x11), 1, FLAG(0, 0x10), 1, CODES_END };
-u16 actor5Talk1Actions[] = { FLAG(0, 0x11), 0, FLAG(0, 0x10), 0, FLAG(0, 0), 0, CODES_END };
-u16 actor5Talk2Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 0, CODES_END };
+u16 actor5Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 0, CODES_END };
+u16 actor5Talk0Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
+u16 actor5Talk1Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 1, CODES_END };
+u16 actor5Talk1Actions[] = {
+    FLAG_CARD_BATTLE_ENDED, 0,
+    FLAG_CARD_BATTLE_WON, 0,
+    FLAG(0, 0), 0,
+    CODES_END,
+};
+u16 actor5Talk2Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor5Talk2Actions[] = { FLAG(0, 0), 1, CODES_END };
-u16 actor5Talk3Conditions[] = { FLAG(0, 0x11), 0, FLAG(0, 0), 1, CODES_END };
+u16 actor5Talk3Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 1, CODES_END };
 u16 actor5Talk3Actions[] = { CARD_BATTLE(0x4D, 1), 1, CODES_END };
 u16 actor7Talk0Conditions[] = { ITEM(0, 0x29), 0, CODES_END };
 u16 actor7Talk0Actions[] = { 0x9407, 1, CODES_END };
@@ -122,7 +137,7 @@ FieldTalk actor8Talks[] = {
     { NULL, actor8Talk0Actions, 0x6F },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x69), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_CENTRAL_PARK_ARMOR_CHIP_FOUND, 0, CODES_END };
 u16 actor1Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 u16 actor2Conditions[] = { ITEM(0, 0x192), 1, CODES_END };
 u16 actor4Conditions[] = { ITEM(0, 0x192), 0, CODES_END };

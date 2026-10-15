@@ -10,7 +10,7 @@ void updateStage(StageTask *task, void **children) {
     switch (task->state) {
     case TASK_INIT:
     default:
-        if (GAME.progress == 0xF) {
+        if (GAME.progress == STORY_DE_SINCERITY) {
             children[0] = FIELDSTG_startEvent(0x19D);
         }
         task->nextState(task);
@@ -25,9 +25,9 @@ void updateStage(StageTask *task, void **children) {
 #define STAGE_CHILDREN_SIZE 4
 #include "common/start_stage.inc.c"
 
-/* After event 413, with the player: moves the story on to its step 0x10 */
+/* After event 413, with the player: moves the story on to STORY_NUMEMON_FOUND */
 void endEvent413(void) {
-    GAME.progress = 0x10;
+    GAME.progress = STORY_NUMEMON_FOUND;
 }
 
 /* After event 421, with Numemon: sets flag 0x4020 */
@@ -35,9 +35,9 @@ void endEvent421(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0x20), 1);
 }
 
-/* After event 690, with General: moves the story on to its step 0x19 */
+/* After event 690, with General: moves the story on to STORY_CODE_PASSES_NEEDED */
 void endEvent690(void) {
-    GAME.progress = 0x19;
+    GAME.progress = STORY_CODE_PASSES_NEEDED;
 }
 
 #if VERSION_US || VERSION_JP
@@ -230,14 +230,22 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x158, 0x1C8, 0x60, 0xC8, 0x160, 0x1FB },
     { 0x140, 0x100, 0x160, 0x1D0, 0x80, 0xD0, 0x170, 0x1FB },
 };
-u16 actor5Talk0Conditions[] = { PROGRESS(0x10), 1, CODES_END };
+u16 actor5Talk0Conditions[] = { PROGRESS(STORY_NUMEMON_FOUND), 1, CODES_END };
 u16 actor5Talk1Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor6Talk0Conditions[] = { PROGRESS(0x18), 1, CODES_END };
-u16 actor6Talk1Conditions[] = { PROGRESS(0x18), 0, SPECIAL(0x18), 1, CODES_END };
-u16 actor9Talk0Conditions[] = { PROGRESS(0x18), 1, CODES_END };
-u16 actor9Talk1Conditions[] = { SPECIAL(0x18), 1, PROGRESS(0x18), 0, CODES_END };
-u16 actor13Talk0Conditions[] = { PROGRESS(0x18), 0, CODES_END };
-u16 actor13Talk1Conditions[] = { PROGRESS(0x18), 1, CODES_END };
+u16 actor6Talk0Conditions[] = { PROGRESS(STORY_KNIGHTMON_REPROGRAMMED), 1, CODES_END };
+u16 actor6Talk1Conditions[] = {
+    PROGRESS(STORY_KNIGHTMON_REPROGRAMMED), 0,
+    SPECIAL(0x18), 1,
+    CODES_END,
+};
+u16 actor9Talk0Conditions[] = { PROGRESS(STORY_KNIGHTMON_REPROGRAMMED), 1, CODES_END };
+u16 actor9Talk1Conditions[] = {
+    SPECIAL(0x18), 1,
+    PROGRESS(STORY_KNIGHTMON_REPROGRAMMED), 0,
+    CODES_END,
+};
+u16 actor13Talk0Conditions[] = { PROGRESS(STORY_KNIGHTMON_REPROGRAMMED), 0, CODES_END };
+u16 actor13Talk1Conditions[] = { PROGRESS(STORY_KNIGHTMON_REPROGRAMMED), 1, CODES_END };
 u16 actor13Talk1Actions[] = { START_EVENT(0x43), 1, CODES_END };
 u16 actor22Talk0Actions[] = { FLAG(0x1A, 3), 1, CODES_END };
 u16 actor23Talk0Actions[] = { FLAG(0x1A, 3), 1, CODES_END };
@@ -341,32 +349,32 @@ FieldTalk actor26Talks[] = {
     { NULL, NULL, 0x139 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(0xF), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor1Conditions[] = { SPECIAL(4), 1, CODES_END };
-u16 actor2Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor3Conditions[] = { SPECIAL(4), 1, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor9Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor11Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor12Conditions[] = { PROGRESS(0x10), 1, CODES_END };
+u16 actor11Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor12Conditions[] = { PROGRESS(STORY_NUMEMON_FOUND), 1, CODES_END };
 u16 actor13Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor14Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor15Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor15Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor16Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor17Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor18Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor19Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor20Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor21Conditions[] = { PROGRESS(0xF), 1, CODES_END };
-u16 actor22Conditions[] = { PROGRESS(0x10), 1, CODES_END };
-u16 actor23Conditions[] = { PROGRESS(0x10), 1, CODES_END };
-u16 actor24Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor25Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor26Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor21Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
+u16 actor22Conditions[] = { PROGRESS(STORY_NUMEMON_FOUND), 1, CODES_END };
+u16 actor23Conditions[] = { PROGRESS(STORY_NUMEMON_FOUND), 1, CODES_END };
+u16 actor24Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor25Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor26Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x25, 5, 386, 129, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x25, 5, 386, 129, 1 };
@@ -442,7 +450,7 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 8, 0x1D5, 0x12C, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 4, 0x1BF, 0x150, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 4, 0x1AF, 0x198, 0, 0, 0, 0 },
-    { { { FLAG(0x1A, 3), 1 }, { PROGRESS(0x10), 1 } }, SLOT_EVENT, 0x1A5, 0, 0, 0, 0, 0, 0 },
+    { { { FLAG(0x1A, 3), 1 }, { PROGRESS(STORY_NUMEMON_FOUND), 1 } }, SLOT_EVENT, 0x1A5, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

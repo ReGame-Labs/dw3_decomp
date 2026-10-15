@@ -278,8 +278,8 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x16E, 0x17F, 0xB8, 0x7F, 0x160, 0x1FF },
     { 0x140, 0x100, 0x160, 0x160, 0x80, 0x60, 0x170, 0x1FF },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x2C), 1, ITEM(1, 0x36), 1, CODES_END };
-u16 actor1Talk0Actions[] = { FLAG(2, 0x55), 1, ITEM(1, 0x40), 1, CODES_END };
+u16 actor0Talk0Actions[] = { FLAG_SEABED_CHARISMA_CHIP_FOUND, 1, ITEM(1, 0x36), 1, CODES_END };
+u16 actor1Talk0Actions[] = { FLAG_SEABED_TRAIN_CHIP_3_FOUND, 1, ITEM(1, 0x40), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x34E },
     { NULL, NULL, 0 },
@@ -288,8 +288,18 @@ FieldTalk actor1Talks[] = {
     { NULL, actor1Talk0Actions, 0x34F },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { WARP_ARG(5), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x2C), 0, CODES_END };
-u16 actor1Conditions[] = { WARP_ARG(0xF), 1, WARP_ARG(0x1E), 1, FLAG(2, 0x55), 0, CODES_END };
+u16 actor0Conditions[] = {
+    WARP_ARG(5), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_SEABED_CHARISMA_CHIP_FOUND, 0,
+    CODES_END,
+};
+u16 actor1Conditions[] = {
+    WARP_ARG(0xF), 1,
+    WARP_ARG(0x1E), 1,
+    FLAG_SEABED_TRAIN_CHIP_3_FOUND, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 192, 280, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x4D, 5, 192, 280, 1 };
 FieldActorEntry actor2 = { NULL, NULL, 0x147, 6, 0, 0, 0 };

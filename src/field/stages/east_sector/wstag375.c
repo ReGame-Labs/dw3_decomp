@@ -54,7 +54,7 @@ void updateStage(StageTask *task, void **children) {
     case TASK_INIT:
     default:
         children[0] = createFarSprites();
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0x53), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x54), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_PHARAOHMON_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x54), 0)) {
             children[1] = FIELDSTG_startEvent(0x4ED);
         }
         task->nextState(task);
@@ -71,7 +71,7 @@ void updateStage(StageTask *task, void **children) {
 
 /* After event 1260, with Pharaohmon: lets event 1261 start and starts the stage's event battle 0 */
 void endEvent1260(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0x53), 1);
+    FLAGS_00.applyAction(FLAG_PHARAOHMON_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -101,7 +101,7 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #endif
 /*
  * Sets the stage up: its map, actors, battles and events, playing PYRA_BGM;
- * battle list 0 before story step 0xE, 1 from then on
+ * battle list 0 before STORY_TEDDY_FOUND, 1 from then on
  */
 void setupStage(void) {
     FIELDSTG_state.textFile = STAGE_TEXT;
@@ -123,7 +123,7 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFile(FIELD_MAP_AREAS, STAGE_FILE << 16 | 3);
     FIELDSTG_map.setFirstMap(0);
-    if (GAME.progress < 0xE) {
+    if (GAME.progress < STORY_TEDDY_FOUND) {
         FIELDSTG_state.battles = stageBattles0;
     } else {
         FIELDSTG_state.battles = stageBattles1;
@@ -331,18 +331,18 @@ ActorImage stageImages[] = {
 u16 actor2Talk0Conditions[] = { SPECIAL(0xD), 0, CODES_END };
 u16 actor2Talk0Actions[] = { SPECIAL(0x13), 1, SPECIAL(0x32), 1, CODES_END };
 u16 actor2Talk1Conditions[] = { SPECIAL(0xD), 1, CODES_END };
-u16 actor3Talk0Conditions[] = { FLAG(0x1A, 0x29), 0, CODES_END };
-u16 actor3Talk0Actions[] = { FLAG(0x1A, 0x29), 1, CODES_END };
-u16 actor3Talk1Conditions[] = { FLAG(0x1A, 0x29), 1, SPECIAL(0x2B), 0, CODES_END };
+u16 actor3Talk0Conditions[] = { FLAG_DRI_BOB_TALKED, 0, CODES_END };
+u16 actor3Talk0Actions[] = { FLAG_DRI_BOB_TALKED, 1, CODES_END };
+u16 actor3Talk1Conditions[] = { FLAG_DRI_BOB_TALKED, 1, SPECIAL(0x2B), 0, CODES_END };
 u16 actor3Talk2Conditions[] = {
-    FLAG(0x1A, 0x29), 1,
+    FLAG_DRI_BOB_TALKED, 1,
     SPECIAL(0x2B), 1,
     SPECIAL(0x25), 0,
     CODES_END,
 };
 u16 actor3Talk2Actions[] = { FLAG(6, 7), 1, CODES_END };
 u16 actor3Talk3Conditions[] = {
-    FLAG(0x1A, 0x29), 1,
+    FLAG_DRI_BOB_TALKED, 1,
     SPECIAL(0x2B), 1,
     SPECIAL(0x25), 1,
     CODES_END,
@@ -350,83 +350,91 @@ u16 actor3Talk3Conditions[] = {
 u16 actor4Talk0Conditions[] = { SPECIAL(0xD), 0, CODES_END };
 u16 actor4Talk0Actions[] = { SPECIAL(0x13), 1, SPECIAL(0x32), 1, CODES_END };
 u16 actor4Talk1Conditions[] = { SPECIAL(0xD), 1, CODES_END };
-u16 actor5Talk0Conditions[] = { FLAG(0x1A, 0x29), 0, CODES_END };
-u16 actor5Talk0Actions[] = { FLAG(0x1A, 0x29), 1, CODES_END };
-u16 actor5Talk1Conditions[] = { FLAG(0x1A, 0x29), 1, SPECIAL(0x2B), 0, CODES_END };
+u16 actor5Talk0Conditions[] = { FLAG_DRI_BOB_TALKED, 0, CODES_END };
+u16 actor5Talk0Actions[] = { FLAG_DRI_BOB_TALKED, 1, CODES_END };
+u16 actor5Talk1Conditions[] = { FLAG_DRI_BOB_TALKED, 1, SPECIAL(0x2B), 0, CODES_END };
 u16 actor5Talk2Conditions[] = {
-    FLAG(0x1A, 0x29), 1,
+    FLAG_DRI_BOB_TALKED, 1,
     SPECIAL(0x2B), 1,
     SPECIAL(0x25), 0,
     CODES_END,
 };
 u16 actor5Talk2Actions[] = { FLAG(6, 7), 1, CODES_END };
 u16 actor5Talk3Conditions[] = {
-    FLAG(0x1A, 0x29), 1,
+    FLAG_DRI_BOB_TALKED, 1,
     SPECIAL(0x2B), 1,
     SPECIAL(0x25), 1,
     CODES_END,
 };
-u16 actor6Talk0Conditions[] = { FLAG(0xA, 0), 0, CODES_END };
-u16 actor6Talk0Actions[] = { FLAG(0xA, 0), 1, START_EVENT(0x35), 1, CODES_END };
-u16 actor6Talk1Conditions[] = { FLAG(0xA, 0), 1, CODES_END };
-u16 actor7Talk0Conditions[] = { FLAG(0xA, 0), 0, CODES_END };
-u16 actor7Talk0Actions[] = { FLAG(0xA, 0), 1, START_EVENT(0x35), 1, CODES_END };
-u16 actor7Talk1Conditions[] = { FLAG(0xA, 0), 1, CODES_END };
-u16 actor8Talk0Conditions[] = { FLAG(0xA, 0), 0, CODES_END };
-u16 actor8Talk0Actions[] = { FLAG(0xA, 0), 1, START_EVENT(0x35), 1, CODES_END };
-u16 actor8Talk1Conditions[] = { FLAG(0xA, 0), 1, CODES_END };
-u16 actor9Talk0Conditions[] = { FLAG(0xA, 0), 0, CODES_END };
-u16 actor9Talk0Actions[] = { FLAG(0xA, 0), 1, START_EVENT(0x35), 1, CODES_END };
-u16 actor9Talk1Conditions[] = { FLAG(0xA, 0), 1, CODES_END };
-u16 actor10Talk0Conditions[] = { FLAG(0xA, 0), 0, CODES_END };
-u16 actor10Talk0Actions[] = { FLAG(0xA, 0), 1, START_EVENT(0x35), 1, CODES_END };
-u16 actor10Talk1Conditions[] = { FLAG(0xA, 0), 1, CODES_END };
-u16 actor11Talk0Conditions[] = { FLAG(0xA, 0), 0, CODES_END };
-u16 actor11Talk0Actions[] = { FLAG(0xA, 0), 1, START_EVENT(0x35), 1, CODES_END };
-u16 actor11Talk1Conditions[] = { FLAG(0xA, 0), 1, CODES_END };
-u16 actor12Talk0Conditions[] = { FLAG(0xA, 0), 0, CODES_END };
-u16 actor12Talk0Actions[] = { FLAG(0xA, 0), 1, START_EVENT(0x35), 1, CODES_END };
-u16 actor12Talk1Conditions[] = { FLAG(0xA, 0), 1, CODES_END };
-u16 actor13Talk0Conditions[] = { FLAG(0xA, 0), 0, CODES_END };
-u16 actor13Talk0Actions[] = { FLAG(0xA, 0), 1, START_EVENT(0x35), 1, CODES_END };
-u16 actor13Talk1Conditions[] = { FLAG(0xA, 0), 1, CODES_END };
-u16 actor14Talk0Conditions[] = { FLAG(0xA, 0), 0, CODES_END };
-u16 actor14Talk0Actions[] = { FLAG(0xA, 0), 1, START_EVENT(0x35), 1, CODES_END };
-u16 actor14Talk1Conditions[] = { FLAG(0xA, 0), 1, CODES_END };
-u16 actor15Talk0Conditions[] = { FLAG(0xA, 0), 0, CODES_END };
-u16 actor15Talk0Actions[] = { FLAG(0xA, 0), 1, START_EVENT(0x35), 1, CODES_END };
-u16 actor15Talk1Conditions[] = { FLAG(0xA, 0), 1, CODES_END };
-u16 actor16Talk0Conditions[] = { FLAG(0xA, 0), 0, CODES_END };
-u16 actor16Talk0Actions[] = { START_EVENT(0x35), 1, FLAG(0xA, 0), 1, CODES_END };
-u16 actor16Talk1Conditions[] = { FLAG(0xA, 0), 1, CODES_END };
-u16 actor17Talk0Conditions[] = { FLAG(0x1C, 0xF), 0, CODES_END };
-u16 actor17Talk1Conditions[] = { FLAG(0x1C, 0xF), 1, FLAG(0, 5), 0, CODES_END };
-u16 actor17Talk1Actions[] = { FLAG(0x1C, 0x10), 1, FLAG(0, 5), 1, CODES_END };
-u16 actor17Talk2Conditions[] = { FLAG(0x1C, 0xF), 1, FLAG(0, 5), 1, CODES_END };
-u16 actor18Talk0Conditions[] = { FLAG(0x1A, 0x17), 0, CODES_END };
-u16 actor18Talk1Conditions[] = { FLAG(0x1A, 0x17), 1, FLAG(0x1A, 0x18), 0, CODES_END };
-u16 actor18Talk1Actions[] = { FLAG(0x1A, 0x18), 1, CODES_END };
-u16 actor18Talk2Conditions[] = { FLAG(0x1A, 0x17), 1, FLAG(0x1A, 0x18), 1, CODES_END };
-u16 actor21Talk0Conditions[] = { ITEM(0, 0xE), 0, FLAG(0x1A, 0x2B), 0, CODES_END };
-u16 actor21Talk1Conditions[] = {
-    ITEM(0, 0xE), 0,
-    FLAG(0x1A, 0x2B), 1,
-    FLAG(0x1C, 0x4F), 0,
+u16 actor6Talk0Conditions[] = { FLAG_PHARAOHMON_BEATEN, 0, CODES_END };
+u16 actor6Talk0Actions[] = { FLAG_PHARAOHMON_BEATEN, 1, START_EVENT(0x35), 1, CODES_END };
+u16 actor6Talk1Conditions[] = { FLAG_PHARAOHMON_BEATEN, 1, CODES_END };
+u16 actor7Talk0Conditions[] = { FLAG_PHARAOHMON_BEATEN, 0, CODES_END };
+u16 actor7Talk0Actions[] = { FLAG_PHARAOHMON_BEATEN, 1, START_EVENT(0x35), 1, CODES_END };
+u16 actor7Talk1Conditions[] = { FLAG_PHARAOHMON_BEATEN, 1, CODES_END };
+u16 actor8Talk0Conditions[] = { FLAG_PHARAOHMON_BEATEN, 0, CODES_END };
+u16 actor8Talk0Actions[] = { FLAG_PHARAOHMON_BEATEN, 1, START_EVENT(0x35), 1, CODES_END };
+u16 actor8Talk1Conditions[] = { FLAG_PHARAOHMON_BEATEN, 1, CODES_END };
+u16 actor9Talk0Conditions[] = { FLAG_PHARAOHMON_BEATEN, 0, CODES_END };
+u16 actor9Talk0Actions[] = { FLAG_PHARAOHMON_BEATEN, 1, START_EVENT(0x35), 1, CODES_END };
+u16 actor9Talk1Conditions[] = { FLAG_PHARAOHMON_BEATEN, 1, CODES_END };
+u16 actor10Talk0Conditions[] = { FLAG_PHARAOHMON_BEATEN, 0, CODES_END };
+u16 actor10Talk0Actions[] = { FLAG_PHARAOHMON_BEATEN, 1, START_EVENT(0x35), 1, CODES_END };
+u16 actor10Talk1Conditions[] = { FLAG_PHARAOHMON_BEATEN, 1, CODES_END };
+u16 actor11Talk0Conditions[] = { FLAG_PHARAOHMON_BEATEN, 0, CODES_END };
+u16 actor11Talk0Actions[] = { FLAG_PHARAOHMON_BEATEN, 1, START_EVENT(0x35), 1, CODES_END };
+u16 actor11Talk1Conditions[] = { FLAG_PHARAOHMON_BEATEN, 1, CODES_END };
+u16 actor12Talk0Conditions[] = { FLAG_PHARAOHMON_BEATEN, 0, CODES_END };
+u16 actor12Talk0Actions[] = { FLAG_PHARAOHMON_BEATEN, 1, START_EVENT(0x35), 1, CODES_END };
+u16 actor12Talk1Conditions[] = { FLAG_PHARAOHMON_BEATEN, 1, CODES_END };
+u16 actor13Talk0Conditions[] = { FLAG_PHARAOHMON_BEATEN, 0, CODES_END };
+u16 actor13Talk0Actions[] = { FLAG_PHARAOHMON_BEATEN, 1, START_EVENT(0x35), 1, CODES_END };
+u16 actor13Talk1Conditions[] = { FLAG_PHARAOHMON_BEATEN, 1, CODES_END };
+u16 actor14Talk0Conditions[] = { FLAG_PHARAOHMON_BEATEN, 0, CODES_END };
+u16 actor14Talk0Actions[] = { FLAG_PHARAOHMON_BEATEN, 1, START_EVENT(0x35), 1, CODES_END };
+u16 actor14Talk1Conditions[] = { FLAG_PHARAOHMON_BEATEN, 1, CODES_END };
+u16 actor15Talk0Conditions[] = { FLAG_PHARAOHMON_BEATEN, 0, CODES_END };
+u16 actor15Talk0Actions[] = { FLAG_PHARAOHMON_BEATEN, 1, START_EVENT(0x35), 1, CODES_END };
+u16 actor15Talk1Conditions[] = { FLAG_PHARAOHMON_BEATEN, 1, CODES_END };
+u16 actor16Talk0Conditions[] = { FLAG_PHARAOHMON_BEATEN, 0, CODES_END };
+u16 actor16Talk0Actions[] = { START_EVENT(0x35), 1, FLAG_PHARAOHMON_BEATEN, 1, CODES_END };
+u16 actor16Talk1Conditions[] = { FLAG_PHARAOHMON_BEATEN, 1, CODES_END };
+u16 actor17Talk0Conditions[] = { FLAG_TOM_SEIRYU_LEADER_TALKED, 0, CODES_END };
+u16 actor17Talk1Conditions[] = { FLAG_TOM_SEIRYU_LEADER_TALKED, 1, FLAG(0, 5), 0, CODES_END };
+u16 actor17Talk1Actions[] = { FLAG_SEIRYU_LEADER_REFUSED, 1, FLAG(0, 5), 1, CODES_END };
+u16 actor17Talk2Conditions[] = { FLAG_TOM_SEIRYU_LEADER_TALKED, 1, FLAG(0, 5), 1, CODES_END };
+u16 actor18Talk0Conditions[] = { FLAG_SEPIKMON_LOST_MASK_SEEN, 0, CODES_END };
+u16 actor18Talk1Conditions[] = {
+    FLAG_SEPIKMON_LOST_MASK_SEEN, 1,
+    FLAG_BARONMON_SEPIKMON_TALKED, 0,
     CODES_END,
 };
-u16 actor21Talk1Actions[] = { FLAG(0x1C, 0x4F), 1, CODES_END };
+u16 actor18Talk1Actions[] = { FLAG_BARONMON_SEPIKMON_TALKED, 1, CODES_END };
+u16 actor18Talk2Conditions[] = {
+    FLAG_SEPIKMON_LOST_MASK_SEEN, 1,
+    FLAG_BARONMON_SEPIKMON_TALKED, 1,
+    CODES_END,
+};
+u16 actor21Talk0Conditions[] = { ITEM(0, 0xE), 0, FLAG_SEPIKMON_BOMB_HINT_TALKED, 0, CODES_END };
+u16 actor21Talk1Conditions[] = {
+    ITEM(0, 0xE), 0,
+    FLAG_SEPIKMON_BOMB_HINT_TALKED, 1,
+    FLAG_BARONMON_TNT_BALL_TALKED, 0,
+    CODES_END,
+};
+u16 actor21Talk1Actions[] = { FLAG_BARONMON_TNT_BALL_TALKED, 1, CODES_END };
 u16 actor21Talk2Conditions[] = {
     ITEM(1, 0x5A), 0,
     ITEM(0, 0xE), 0,
-    FLAG(0x1A, 0x2B), 1,
-    FLAG(0x1C, 0x4F), 1,
+    FLAG_SEPIKMON_BOMB_HINT_TALKED, 1,
+    FLAG_BARONMON_TNT_BALL_TALKED, 1,
     CODES_END,
 };
 u16 actor21Talk3Conditions[] = {
     ITEM(0, 0xE), 0,
-    FLAG(0x1A, 0x2B), 1,
+    FLAG_SEPIKMON_BOMB_HINT_TALKED, 1,
     ITEM(1, 0x5A), 1,
-    FLAG(0x1C, 0x4F), 1,
+    FLAG_BARONMON_TNT_BALL_TALKED, 1,
     CODES_END,
 };
 u16 actor21Talk3Actions[] = { SPECIAL(0x13), 1, ITEM(0, 0xE), 1, CODES_END };
@@ -554,29 +562,29 @@ FieldTalk actor23Talks[] = {
     { NULL, NULL, 0x2A6 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(0x1C, 0x11), 0, PROGRESS(4), 1, CODES_END };
-u16 actor1Conditions[] = { FLAG(0x1C, 0x11), 0, PROGRESS(4), 1, CODES_END };
+u16 actor0Conditions[] = { FLAG(0x1C, 0x11), 0, PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
+u16 actor1Conditions[] = { FLAG(0x1C, 0x11), 0, PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x3B), 1, ITEM(0, 0x23), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 0x23), 0, CODES_END };
-u16 actor4Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, ITEM(0, 0x23), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, ITEM(0, 0x23), 0, CODES_END };
+u16 actor4Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, ITEM(0, 0x23), 1, CODES_END };
 u16 actor5Conditions[] = { ITEM(0, 0x23), 0, SPECIAL(0x3B), 1, CODES_END };
-u16 actor6Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor7Conditions[] = { PROGRESS(0xC), 1, CODES_END };
-u16 actor8Conditions[] = { PROGRESS(0xE), 1, CODES_END };
+u16 actor6Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor7Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
+u16 actor8Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
 u16 actor9Conditions[] = { SPECIAL(0x16), 1, CODES_END };
 u16 actor10Conditions[] = { SPECIAL(0x17), 1, CODES_END };
 u16 actor11Conditions[] = { SPECIAL(0x18), 1, CODES_END };
 u16 actor12Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor13Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor13Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor14Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor15Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor16Conditions[] = { PROGRESS(4), 1, CODES_END };
-u16 actor17Conditions[] = { FLAG(0x1C, 0x11), 0, PROGRESS(4), 1, CODES_END };
-u16 actor18Conditions[] = { PROGRESS(8), 1, CODES_END };
-u16 actor19Conditions[] = { PROGRESS(9), 1, CODES_END };
+u16 actor16Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
+u16 actor17Conditions[] = { FLAG(0x1C, 0x11), 0, PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
+u16 actor18Conditions[] = { PROGRESS(STORY_SEPIKMON_MASK_LOST), 1, CODES_END };
+u16 actor19Conditions[] = { PROGRESS(STORY_AGUMON_SUITS), 1, CODES_END };
 u16 actor20Conditions[] = { SPECIAL(0x3C), 1, CODES_END };
-u16 actor21Conditions[] = { PROGRESS(0xE), 1, CODES_END };
-u16 actor22Conditions[] = { FLAG(0x1C, 0x11), 0, PROGRESS(4), 1, CODES_END };
+u16 actor21Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
+u16 actor22Conditions[] = { FLAG(0x1C, 0x11), 0, PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor23Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x22, 4, 505, 213, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x23, 5, 480, 225, 7 };

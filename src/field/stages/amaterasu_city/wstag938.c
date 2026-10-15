@@ -1,7 +1,7 @@
 /*
  * WSTAG938: Amaterasu Sewer, Amaterasu City, in the extra chapter. The
- * European version's: in its extra chapter (FIELD_PROGRESS_EXTRA), mode 650
- * starts it instead of WSTAG321.
+ * European version's: in its extra chapter (STORY_EXTRA), mode 650 starts it
+ * instead of WSTAG321.
  */
 
 #include "common.h"
@@ -55,8 +55,18 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1A6, 0x158, 0x198, 0x58, 0x170, 0x1F4 },
     { 0x180, 0x100, 0x19E, 0x130, 0x178, 0x30, 0x140, 0x1F3 },
 };
-u16 actor0Talk0Actions[] = { FLAG(2, 0x67), 1, ITEM(1, 0x37), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor4Talk0Actions[] = { FLAG(2, 0x68), 1, ITEM(1, 0x38), 1, SPECIAL(0x13), 1, CODES_END };
+u16 actor0Talk0Actions[] = {
+    FLAG_AMATERASU_SEWER_FIRE_CHIP_FOUND, 1,
+    ITEM(1, 0x37), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
+u16 actor4Talk0Actions[] = {
+    FLAG_AMATERASU_SEWER_WATER_CHIP_FOUND, 1,
+    ITEM(1, 0x38), 1,
+    SPECIAL(0x13), 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 2 },
     { NULL, NULL, 0 },
@@ -77,8 +87,8 @@ FieldTalk actor4Talks[] = {
     { NULL, actor4Talk0Actions, 3 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { FLAG(2, 0x67), 0, CODES_END };
-u16 actor4Conditions[] = { FLAG(2, 0x68), 0, CODES_END };
+u16 actor0Conditions[] = { FLAG_AMATERASU_SEWER_FIRE_CHIP_FOUND, 0, CODES_END };
+u16 actor4Conditions[] = { FLAG_AMATERASU_SEWER_WATER_CHIP_FOUND, 0, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 465, 169, 1 };
 FieldActorEntry actor1 = { NULL, actor1Talks, 0x25, 5, 336, 640, 1 };
 FieldActorEntry actor2 = { NULL, actor2Talks, 0x26, 6, 839, 533, 1 };

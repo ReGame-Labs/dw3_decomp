@@ -19,7 +19,7 @@ void updateStage(StageTask *task, void **children) {
                 children[i] = createStageEffect(updateStageSpots[i].x, updateStageSpots[i].y, updateStageSpots[i].frame);
             }
         }
-        if (FLAGS_00.checkCondition(FLAG(0x40, 0xE), 1) && FLAGS_00.checkCondition(FLAG(0x40, 0x19), 0)) {
+        if (FLAGS_00.checkCondition(FLAG_ICE_WITCH_WIN_SEEN, 1) && FLAGS_00.checkCondition(FLAG_FIRE_KNIGHT_BATTLE_SEEN, 0)) {
             children[10] = FIELDSTG_startEvent(0x317);
         }
         task->nextState(task);
@@ -44,7 +44,7 @@ void updateStage(StageTask *task, void **children) {
  * keeps it from playing again
  */
 void endEvent790(void) {
-    FLAGS_00.applyAction(FLAG(0x40, 0xE), 1);
+    FLAGS_00.applyAction(FLAG_ICE_WITCH_WIN_SEEN, 1);
     FLAGS_00.applyAction(EVENT_BATTLE(0), 1);
 }
 
@@ -54,7 +54,7 @@ void endEvent790(void) {
  */
 void endEvent791(void) {
     FLAGS_00.applyAction(ITEM(5, 0xDD), 1);
-    FLAGS_00.applyAction(FLAG(0x40, 0x19), 1);
+    FLAGS_00.applyAction(FLAG_FIRE_KNIGHT_BATTLE_SEEN, 1);
 }
 
 #if VERSION_US || VERSION_JP
@@ -301,19 +301,19 @@ FieldTalk actor12Talks[] = {
     { NULL, NULL, 0x202 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor1Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor0Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor1Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor2Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor3Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
+u16 actor3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor4Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor5Conditions[] = { PROGRESS(0x26), 1, CODES_END };
+u16 actor5Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor6Conditions[] = { SPECIAL(0x19), 1, CODES_END };
 u16 actor7Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
 u16 actor8Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor9Conditions[] = { PROGRESS(FIELD_PROGRESS_MOVIE_BATTLES), 1, CODES_END };
-u16 actor10Conditions[] = { PROGRESS(0x26), 1, CODES_END };
-u16 actor11Conditions[] = { FLAG(0x40, 0x19), 0, SPECIAL(0x19), 1, CODES_END };
-u16 actor12Conditions[] = { SPECIAL(0x19), 1, FLAG(0x40, 0x19), 1, CODES_END };
+u16 actor9Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
+u16 actor10Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
+u16 actor11Conditions[] = { FLAG_FIRE_KNIGHT_BATTLE_SEEN, 0, SPECIAL(0x19), 1, CODES_END };
+u16 actor12Conditions[] = { SPECIAL(0x19), 1, FLAG_FIRE_KNIGHT_BATTLE_SEEN, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x2E, 4, 1041, 105, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x2E, 4, 944, 233, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x2E, 4, 944, 233, 1 };
@@ -405,7 +405,7 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_DROP, 7, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26A, 0x140, 0x260, 3, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_LAUNCH, 0x26A, 0x3C0, 0x50, 7, 0, 0, 0 },
-    { { { ITEM(0, 0x11), 1 }, { FLAG(0x40, 0xE), 0 } }, SLOT_EVENT, 0x316, 0, 0, 0, 0, 0, 0 },
+    { { { ITEM(0, 0x11), 1 }, { FLAG_ICE_WITCH_WIN_SEEN, 0 } }, SLOT_EVENT, 0x316, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_SLIDE, 0, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_STOP_SLIDE, 0, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
