@@ -445,6 +445,35 @@ typedef struct StatusData {
     /* 0x668 */ StatusFuncs funcs;
 } StatusData;
 
+/*
+ * Draws the panels of the party's pages (parts 0x15 to 0x17 of the menu's
+ * sprites), each stretched across by its page's fade while it opens or
+ * closes; five screens draw them with this loop. The match depends on both
+ * branches drawing the panel's last part: drawn once after the if, the saved
+ * registers change.
+ */
+#define DRAW_PAGE_PANELS(sprite, screen, i)                                                           \
+    for (i = 0; i < (screen)->count; i++) {                                                          \
+        if ((screen)->pageFades[i].level != 0) {                                                     \
+            if ((screen)->pageFades[i].level != ONE) {                                               \
+                (sprite).setScale((screen)->pageFades[i].level, ONE, ONE);                           \
+                (sprite).setPivot(0, i * 0x2E + 0x25);                                               \
+                (sprite).draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 0x2E + 0x11);    \
+                (sprite).setScale((screen)->pageFades[i].level, (screen)->pageFades[i].level, ONE);  \
+                (sprite).setPivot(0x7C, i * 0x2E + 0x27);                                            \
+                (sprite).draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x16, 0x67, i * 0x2E + 0x13); \
+                (sprite).setScale((screen)->pageFades[i].level, ONE, ONE);                           \
+                (sprite).setPivot(0, i * 0x2E + 0x25);                                               \
+                (sprite).draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 0x2E + 0x11);    \
+            } else {                                                                                 \
+                (sprite).setScale(ONE, ONE, ONE);                                                    \
+                (sprite).draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, i * 0x2E + 0x11);    \
+                (sprite).draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x16, 0x67, i * 0x2E + 0x13); \
+                (sprite).draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, i * 0x2E + 0x11);    \
+            }                                                                                        \
+        }                                                                                            \
+    }
+
 /* card_screen.c */
 void STSTATUS_updateScene(Task *task, FieldMenuScreen **child);
 void STSTATUS_createCardWindows(PartyScreen *screen, PartyScreenWindows *windows);

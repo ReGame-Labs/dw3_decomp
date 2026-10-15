@@ -104,7 +104,7 @@ void FIELDSTG_playBattleTransition(FieldTask *task, FieldChildren *fieldChildren
     Layer *layer;
     u_long *ot;
     s32 speed;
-    POLY_FT4 *poly;
+    PrimPtr prim;
     s32 i;
     s32 j;
     s32 k;
@@ -138,54 +138,54 @@ void FIELDSTG_playBattleTransition(FieldTask *task, FieldChildren *fieldChildren
     case 1:
         waitToRequestBattleFiles();
         layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
-        ot = (u_long *)layer->getOtEntry(layer, 0);
+        ot = layer->getOtEntry(layer, 0);
         speed = GFX.funcs.getFrameTime() * TRANSITION_SPEED;
         moveTransitionTile(task, speed);
         if (task->step != TRANSITION_DONE) {
-            poly = GFX.funcs.getPrim();
-            setRGB0((POLY_F4 *)poly, 0x10, 0x10, 0x10);
-            setPolyF4((POLY_F4 *)poly);
-            setSemiTrans((POLY_F4 *)poly, 1);
-            ((POLY_F4 *)poly)->x0 = 0;
-            ((POLY_F4 *)poly)->x1 = SCREEN_WIDTH;
-            ((POLY_F4 *)poly)->x2 = 0;
-            ((POLY_F4 *)poly)->x3 = SCREEN_WIDTH;
-            ((POLY_F4 *)poly)->y0 = 0;
-            ((POLY_F4 *)poly)->y1 = 0;
-            ((POLY_F4 *)poly)->y2 = SCREEN_HEIGHT;
-            ((POLY_F4 *)poly)->y3 = SCREEN_HEIGHT;
-            addPrim(ot, poly);
-            poly = (POLY_FT4 *)((POLY_F4 *)poly + 1);
-            setDrawTPage((DR_TPAGE *)poly, 0, 1, getTPage(0, 2, 320, 0));
-            addPrim(ot, poly);
-            poly = (POLY_FT4 *)((DR_TPAGE *)poly + 1);
+            prim.any = GFX.funcs.getPrim();
+            setRGB0(prim.f4, 0x10, 0x10, 0x10);
+            setPolyF4(prim.f4);
+            setSemiTrans(prim.f4, 1);
+            prim.f4->x0 = 0;
+            prim.f4->x1 = SCREEN_WIDTH;
+            prim.f4->x2 = 0;
+            prim.f4->x3 = SCREEN_WIDTH;
+            prim.f4->y0 = 0;
+            prim.f4->y1 = 0;
+            prim.f4->y2 = SCREEN_HEIGHT;
+            prim.f4->y3 = SCREEN_HEIGHT;
+            addPrim(ot, prim.f4);
+            prim.f4++;
+            setDrawTPage(prim.tpage, 0, 1, getTPage(0, 2, 320, 0));
+            addPrim(ot, prim.tpage);
+            prim.tpage++;
             for (i = 0; i < TRANSITION_ROWS; i++) {
                 for (j = 0; j < TRANSITION_COLUMNS; j++) {
                     if (FIELDSTG_tiles[j][i].x != TRANSITION_GONE && FIELDSTG_tiles[j][i].y != TRANSITION_GONE) {
-                        setPolyFT4(poly);
-                        setSemiTrans(poly, 1);
-                        setRGB0(poly, 0x80, 0x80, 0x80);
+                        setPolyFT4(prim.ft4);
+                        setSemiTrans(prim.ft4, 1);
+                        setRGB0(prim.ft4, 0x80, 0x80, 0x80);
                         x = FIELDSTG_tiles[j][i].x;
-                        poly->x0 = poly->x2 = x;
-                        poly->x1 = poly->x3 = x + TRANSITION_TILE_WIDTH;
+                        prim.ft4->x0 = prim.ft4->x2 = x;
+                        prim.ft4->x1 = prim.ft4->x3 = x + TRANSITION_TILE_WIDTH;
                         y = FIELDSTG_tiles[j][i].y;
-                        poly->u0 = 0;
-                        poly->u1 = TRANSITION_TILE_WIDTH;
-                        poly->u2 = 0;
-                        poly->u3 = TRANSITION_TILE_WIDTH;
-                        poly->v0 = i * TRANSITION_TILE_HEIGHT;
-                        poly->v1 = i * TRANSITION_TILE_HEIGHT;
-                        poly->v2 = i * TRANSITION_TILE_HEIGHT + TRANSITION_TILE_HEIGHT;
-                        poly->v3 = i * TRANSITION_TILE_HEIGHT + TRANSITION_TILE_HEIGHT;
-                        poly->y0 = poly->y1 = y;
-                        poly->y2 = poly->y3 = y + TRANSITION_TILE_HEIGHT;
-                        poly->tpage = getTPage(2, 0, TRANSITION_IMAGE_X + j * TRANSITION_TILE_WIDTH, 0);
-                        addPrim(ot, poly);
-                        poly++;
+                        prim.ft4->u0 = 0;
+                        prim.ft4->u1 = TRANSITION_TILE_WIDTH;
+                        prim.ft4->u2 = 0;
+                        prim.ft4->u3 = TRANSITION_TILE_WIDTH;
+                        prim.ft4->v0 = i * TRANSITION_TILE_HEIGHT;
+                        prim.ft4->v1 = i * TRANSITION_TILE_HEIGHT;
+                        prim.ft4->v2 = i * TRANSITION_TILE_HEIGHT + TRANSITION_TILE_HEIGHT;
+                        prim.ft4->v3 = i * TRANSITION_TILE_HEIGHT + TRANSITION_TILE_HEIGHT;
+                        prim.ft4->y0 = prim.ft4->y1 = y;
+                        prim.ft4->y2 = prim.ft4->y3 = y + TRANSITION_TILE_HEIGHT;
+                        prim.ft4->tpage = getTPage(2, 0, TRANSITION_IMAGE_X + j * TRANSITION_TILE_WIDTH, 0);
+                        addPrim(ot, prim.ft4);
+                        prim.ft4++;
                     }
                 }
             }
-            GFX.funcs.setPrim(poly);
+            GFX.funcs.setPrim(prim.ft4);
         } else {
             task->nextSubstate(task);
         }
@@ -991,7 +991,8 @@ void FIELDSTG_startEncounter(s32 encounter) {
             BATTLE_SETUP.enemies[i] = *FIELDSTG_encounters[encounter].enemies[i];
         }
         BATTLE_SETUP.hasPrize = 0;
-        if ((u32)(BATTLE_SETUP.enemies[0].fighter - FIELD_PRIZE_FIGHTERS) < FIELD_PRIZE_FIGHTER_COUNT) {
+        if (BATTLE_SETUP.enemies[0].fighter >= FIELD_PRIZE_FIGHTERS
+            && BATTLE_SETUP.enemies[0].fighter < FIELD_PRIZE_FIGHTERS + FIELD_PRIZE_FIGHTER_COUNT) {
             BATTLE_SETUP.hasPrize = 1;
             mode = GAME.funcs.getMode();
             if (BATTLE_SETUP.enemies[0].fighter & 1) {

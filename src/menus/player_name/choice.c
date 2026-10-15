@@ -118,7 +118,7 @@ void STPLNMET_runChoice(PartnerChoice *task, PartnerChoiceWindows *windows) {
     if (old != task->choice) {
         SOUND.playSound(SOUND_MENU_MOVE);
         STPLNMET_showChoiceWindows(task, windows, 1);
-        for (i = 2; i >= 0; i--) {
+        for (i = 0; i < 3; i++) {
             task->frames[i] = 0;
         }
     }

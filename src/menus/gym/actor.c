@@ -5,17 +5,13 @@
 /* Makes the Digimon's sprite from its loaded image set, and the effect's from
    set 8, when the file has one */
 static inline void STGTRAIN_setUpActor(TrainActor *actor, TrainActorSprites *sprites) {
-    s32 *pos;
     s32 filePos;
     s32 x;
     s32 y;
 
     filePos = STGTRAIN_state.getFilePos(actor->file);
     STGTRAIN_state.readSet(actor->set);
-    /* the match depends on pos set here, after the two calls: set
-       before them it lives too long, and x takes its register */
-    pos = actor->pos;
-    STGTRAIN_state.loadSet(actor->set, pos);
+    STGTRAIN_state.loadSet(actor->set, actor->pos);
     if (sprites->sprite == NULL) {
         sprites->sprite = STGTRAIN_createSprite();
     }
@@ -31,7 +27,7 @@ static inline void STGTRAIN_setUpActor(TrainActor *actor, TrainActorSprites *spr
     if (STGTRAIN_state.readSet(8) != 0) {
         actor->savedX = actor->pos[0];
         actor->pos[0] = actor->pos[0] + 0x80;
-        STGTRAIN_state.loadSet(8, pos);
+        STGTRAIN_state.loadSet(8, actor->pos);
         actor->pos[0] = actor->savedX;
         if (sprites->effect == NULL) {
             sprites->effect = STGTRAIN_createSprite();

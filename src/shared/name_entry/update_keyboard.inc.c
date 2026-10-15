@@ -6,7 +6,7 @@ void OVL_NAME(updateKeyboard)(NameEntry *task, NameEntryWindows *windows) {
     s32 key;
     s32 j;
     u16 c;
-    u32 glyph; /* the match depends on this u32 copy of c, which orders the loads of the key's glyph */
+    u16 glyph;
 
     switch (task->substate) {
     case 0:

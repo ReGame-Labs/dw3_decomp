@@ -71,7 +71,7 @@ void FIGHTSTG_drawCursorSprites(MenuCursor *task) {
             }
         }
         row = task->blink[i] >> 2;
-        if ((u32)row < 5) {
+        if (row >= 0 && row < 5) {
             drawer.setClutRow(row);
         } else {
             drawer.setClutRow(0);

@@ -322,6 +322,7 @@ typedef struct TimLoader {
 typedef union PrimPtr {
     void *any;
     SPRT *sprt;
+    POLY_F4 *f4;
     POLY_FT4 *ft4;
     DR_TPAGE *tpage;
 } PrimPtr;

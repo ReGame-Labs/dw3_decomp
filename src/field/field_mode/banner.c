@@ -226,7 +226,7 @@ void FIELDSTG_updateBanner(AreaBanner *task, AreaNameWindows *windows) {
     if (task->state >= 1 && task->state <= 2 && task->key1 != 0) {
         Layer *top = GFX.funcs.getLayer(FIELD_LAYER_BANNER);
 
-        ot = (u_long *)top->getOtEntry(top, 1);
+        ot = top->getOtEntry(top, 1);
         for (i = 0; i < 10; i++) {
             if (task->boxes[i].visible) {
                 FIELDSTG_stretchBannerBox(task, &task->boxes[i]);

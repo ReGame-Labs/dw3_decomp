@@ -186,7 +186,7 @@ static inline void listSlotTechs(TechMenu *task, BattleFighter *fighter, s32 mem
         }
     }
     /* the techniques the other entries can pass on */
-    for (j = 9; j >= 0; j--) {
+    for (j = 0; j < 10; j++) {
         extra[j] = 0;
     }
     count = 0;

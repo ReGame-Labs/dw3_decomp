@@ -157,7 +157,7 @@ void STDGNAME_updateMenu(PartnerMenuTask *task, TextWindow **windows) {
     case TASK_INIT:
     default:
         task->nextState(task);
-        for (i = 5; i >= 0; i--) {
+        for (i = 0; i < 6; i++) {
             task->tweens[i].duration = 10;
         }
         for (i = 0; i < 3; i++) {

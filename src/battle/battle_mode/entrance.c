@@ -57,8 +57,7 @@ static inline void applyEntranceExtras(FightStage *stage, s32 is1D2, s32 is1D3) 
 
 /* A fighter's entrance: loads its model and adds it, then shows it behind a fade
    (FIGHTSTG_startWhiteFlash) and turns the camera to it; fighter 0x1D2 changes the fight
-   stage and 0x1D3 the music. The match depends on substate 7's own ModelControl
-   pointer. */
+   stage and 0x1D3 the music. */
 void FIGHTSTG_updateEntrance(Entrance *task, WhiteFlash **children) {
     Models *models = task->models;
     BattleCamera *camera = task->camera;

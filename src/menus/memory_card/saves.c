@@ -665,7 +665,7 @@ static inline void STGMCARD_answerError(MemCardSaves *saves, MemCardSavesWindows
     s32 prev;
     s32 status;
 
-    if (saves->screen->loading == 0 && (u32)(saves->result - CARD_ERR_UNFORMATTED) < 2) {
+    if (saves->screen->loading == 0 && (saves->result == CARD_ERR_UNFORMATTED || saves->result == CARD_ERR_NO_FILE)) {
         prev = saves->choice;
         if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
             saves->choice = 0;
@@ -788,7 +788,7 @@ static inline void STGMCARD_writeHeader(MemCardSaves *saves, MemCardSavesWindows
     status = saves->result = MEMCARD_SYSTEM.funcs.write(saves->port, &MEMCARD.header, sizeof(CardHeader), SAVE_SECTION_HEADER);
     if (status != 0) {
         if (status == 1) {
-            if ((u32)(MEMCARD.iconCount - 1) >= SAVE_MAX_ICONS) {
+            if (MEMCARD.iconCount < 1 || MEMCARD.iconCount > SAVE_MAX_ICONS) {
                 saves->result = 3;
                 STGMCARD_showError(saves, win);
             } else {

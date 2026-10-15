@@ -126,7 +126,7 @@ void STSTATUS_showSlotItem(EquipPanel *panel, EquipPanelWindows *windows, s32 sh
 
     if (show) {
         stats = GAME.funcs.getPartnerStats(panel->partner);
-        item = *(stats->equip + panel->slot); /* the match depends on this form */
+        item = *(stats->equip + panel->slot); /* the match depends on this form: equip[slot] adds the base to the index */
         windows->slotTitle->setString(windows->slotTitle, FILE_CACHE.load(TEXT_FILE(TEXT_STATUS)), 0x20);
         if (item > 0) {
             windows->slotItem->setString(windows->slotItem, FILE_CACHE.load(TEXT_FILE(TEXT_ITEM_NAMES)), item);
@@ -232,7 +232,7 @@ void STSTATUS_drawEquipPanel(EquipPanel *panel) {
         } else {
             sprite.setScale(ONE, ONE, ONE);
             if (panel->showSlot) {
-                item = *(stats->equip + panel->slot); /* the match depends on this form */
+                item = *(stats->equip + panel->slot); /* the match depends on this form: equip[slot] adds the base to the index */
                 if (item > 0) {
                     sprite.setTexture(0x140, 0);
                     sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), ITEM_FUNCS.getCategory(item), 0xB2, 0x23);

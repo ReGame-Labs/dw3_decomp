@@ -38,7 +38,7 @@ void FIELDSTG_drawStream(StreamTask *task, Layer *layer, s32 x, s32 y) {
     layer->getScroll(layer, &scroll);
     prim.any = GFX.funcs.getPrim();
     for (i = 0; i < 3; i++) {
-        ot = (u_long *)layer->getOtEntry(layer, FIELDSTG_spriteDepths[i]);
+        ot = layer->getOtEntry(layer, FIELDSTG_spriteDepths[i]);
         for (j = 0; j < 5; j++) {
             if (task->sprites[i][j].visible) {
                 SetSprt(prim.sprt);

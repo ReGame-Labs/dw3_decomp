@@ -265,7 +265,8 @@ and publishes it to GitHub Pages: <https://regame-labs.github.io/dw3_decomp/>.
 | `tools/try_match.py` | compiles a draft and compares each of its functions with the original |
 | `tools/permuter_import.py` | sets up a [decomp-permuter](https://github.com/simonlindholm/decomp-permuter) directory for one function |
 | `tools/data_to_c.py` | turns a splat data file into C definitions that reproduce its bytes |
-| `tools/objdiff_generate.py` | writes `objdiff.json` (`make objdiff`) |
+| `tools/objdiff_generate.py` | writes objdiff's projects, `build/<version>/objdiff.json` and `objdiff.json` (`make objdiff`) |
+| `tools/status_tables.py` | writes the figures of the README's status table and of `docs/binaries.md`'s overlay table from each version's `make report` (`--check` in the CI) |
 | `tools/data_sizes.py` | gives compiled data symbols their ELF size, for objdiff (part of the build) |
 | `tools/comm_align.py` | gives common symbols larger than a word a word's alignment, as their definitions have (part of the build) |
 | `tools/hacks.py` | counts the fake matches and hacks (`--list`, `--check README.md docs/status.md`) and fails on `NON_MATCHING` code, `#if 0` and inline asm in place of C |

@@ -128,7 +128,7 @@ Face *FIGHTSTG_createFace(Model *model, s32 fighter) {
     task->model = model;
     task->texPos = model->texPos;
     rects = FIGHTSTG_fighterCache.getFace(fighter);
-    for (i = 15; i >= 0; i--) {
+    for (i = 0; i < 16; i++) {
         task->parts[i].used = 0;
     }
     for (i = 0; i < 16; i++) {

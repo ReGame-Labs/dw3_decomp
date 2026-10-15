@@ -100,16 +100,160 @@ void STGDGLAB_showSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windows
     }
 }
 
+/* Draws the panel, its skills' icons once it is open, and the yes/no box */
+static inline void STGDGLAB_drawSkillPanel(LabSkillPanel *panel) {
+    SpriteDrawer sprite;
+    s32 id;
+    s32 i;
+
+    initSpriteDrawer(&sprite);
+    sprite.setLayerId(panel->layer, panel->depth);
+    if (panel->fade.level != ONE) {
+        sprite.setScale(panel->fade.level, ONE, ONE);
+        sprite.setPivot(0x140, 0x7D);
+    } else {
+        sprite.setTexture(0x140, 0);
+        for (i = 0; i < 6; i++) {
+            if (panel->entry.skills[i] != 0) {
+                id = panel->entry.skills[i] & SKILL_ID;
+                sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), TECHS[id - 1].icon + 0x37, 0x5D,
+                            i * 0x11 + 0x58);
+            }
+        }
+    }
+    sprite.setTexture(0x280, 0x100);
+    sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x28, 0x46, 0x41);
+    if (panel->fade.level != ONE) {
+        sprite.setPivot(0, 0xD0);
+    }
+    sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x2B, 0, 0xBF);
+    if (panel->fade.level != ONE) {
+        sprite.setPivot(0x140, 0x1F);
+    }
+    sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x24, 0x92, 0x13);
+    if (panel->confirm.level != 0) {
+        if (panel->confirm.level != ONE) {
+            sprite.setScale(panel->confirm.level, ONE, ONE);
+            sprite.setPivot(0x140, 0x46);
+        } else {
+            sprite.setScale(ONE, ONE, ONE);
+        }
+        sprite.setLayerId(panel->layer, 1);
+        sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x23, 0xAE, 0x32);
+    }
+}
+
+/* Asks whether to unmark (message 7) or mark (8) the skill, yes first */
+static inline void STGDGLAB_askMark(LabSkillPanel *panel, LabSkillPanelWindows *windows, s32 message) {
+    windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), message);
+    windows->yes->setString(windows->yes, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xC);
+    windows->no->setString(windows->no, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xD);
+    panel->choice = 0;
+    windows->optionCursor->setVisible(windows->optionCursor, 1);
+    windows->optionCursor->setPos(windows->optionCursor, 0xB8, panel->choice * 0x10 + 0x38);
+    panel->substate++;
+}
+
+/* The yes/no answer: yes marks the skill (or unmarks it), and either closes
+   the question */
+static inline void STGDGLAB_answerMark(LabSkillPanel *panel, LabSkillPanelWindows *windows, s32 mark) {
+    s32 old;
+
+    old = panel->choice;
+    if (PAD_PRESSED(PAD_UP)) {
+        panel->choice = 0;
+    } else if (PAD_PRESSED(PAD_DOWN)) {
+        panel->choice = 1;
+    }
+    if (old != panel->choice) {
+        SOUND.playSound(SOUND_CURSOR);
+        windows->optionCursor->setPos(windows->optionCursor, 0xB8, panel->choice * 0x10 + 0x38);
+    }
+    if (PAD_PRESSED(PAD_CROSS)) {
+        SOUND.playSound(SOUND_SELECT);
+        if (panel->choice == 0) {
+            if (mark) {
+                panel->entry.skills[panel->cursor] |= SKILL_MARKED;
+            } else {
+                panel->entry.skills[panel->cursor] &= ~SKILL_MARKED;
+            }
+        }
+        windows->yes->setVisible(windows->yes, 0);
+        windows->no->setVisible(windows->no, 0);
+        windows->cursor->setStill(windows->cursor, 0);
+        panel->setSubstate(panel, 7);
+        panel->step = 0;
+    } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+        SOUND.playSound(SOUND_MENU_CANCEL);
+        windows->yes->setVisible(windows->yes, 0);
+        windows->no->setVisible(windows->no, 0);
+        windows->cursor->setStill(windows->cursor, 0);
+        panel->setSubstate(panel, 7);
+        panel->step = 0;
+    }
+}
+
+/* The skill list: up and down move the cursor; cross marks the skill or
+   unmarks it, after a yes/no, or says why it can't; triangle closes the panel */
+static inline void STGDGLAB_pickSkill(LabSkillPanel *panel, LabSkillPanelWindows *windows) {
+    s32 skill;
+    s32 old;
+
+        old = panel->cursor;
+    if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
+        panel->cursor--;
+        if (panel->cursor < 0) {
+            panel->cursor = 0;
+        }
+    } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
+        panel->cursor++;
+        if (panel->cursor > panel->skillCount - 1) {
+            panel->cursor = panel->skillCount - 1;
+        }
+    }
+    if (old != panel->cursor) {
+        SOUND.playSound(SOUND_CURSOR);
+        STGDGLAB_showSkillPanel(panel, windows, 1);
+        windows->cursor->setPos(windows->cursor, 0x4C, panel->cursor * 0x11 + 0x58);
+    } else {
+        skill = panel->entry.skills[old];
+        if (PAD_PRESSED(PAD_CROSS)) {
+            SOUND.playSound(SOUND_SELECT);
+            if (skill != 0) {
+                if (skill & SKILL_MARKED) {
+                    panel->substate = 5;
+                    panel->step = 10;
+                } else if (skill & SKILL_LAST) {
+                    windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xB);
+                    panel->substate = 30;
+                } else if (!(skill & SKILL_KNOWN)) {
+                    windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xA);
+                    panel->substate = 30;
+                } else if (panel->learned >= 3) {
+                    windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 9);
+                    panel->substate = 30;
+                } else {
+                    panel->substate = 5;
+                    panel->step = 20;
+                }
+                windows->cursor->setPalette(windows->cursor, PALETTE_GREY);
+                windows->cursor->setStill(windows->cursor, 1);
+            }
+        } else if (PAD_PRESSED(PAD_TRIANGLE)) {
+            SOUND.playSound(SOUND_MENU_CANCEL);
+            panel->setSubstate(panel, 40);
+            STGDGLAB_data.funcs.startFade(&panel->fade, 0);
+            windows->optionCursor->setVisible(windows->optionCursor, 0);
+            windows->cursor->setVisible(windows->cursor, 0);
+            STGDGLAB_showSkillPanel(panel, windows, 0);
+        }
+    }
+}
+
 /* The panel of a partner's Digimon's skills: up and down pick one, cross
    marks it to pass on or unmarks it, after a yes/no, or says why it can't be
    marked, and triangle saves the entry and closes the panel */
 void STGDGLAB_updateSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windows) {
-    SpriteDrawer sprite;
-    s32 skill;
-    s32 id;
-    s32 old;
-    s32 i;
-
     switch (panel->state) {
     case TASK_INIT:
     default:
@@ -144,55 +288,7 @@ void STGDGLAB_updateSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windo
             }
             break;
         case 1:
-            old = panel->cursor;
-            if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
-                panel->cursor--;
-                if (panel->cursor < 0) {
-                    panel->cursor = 0;
-                }
-            } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
-                panel->cursor++;
-                if (panel->cursor > panel->skillCount - 1) {
-                    panel->cursor = panel->skillCount - 1;
-                }
-            }
-            if (old != panel->cursor) {
-                SOUND.playSound(SOUND_CURSOR);
-                STGDGLAB_showSkillPanel(panel, windows, 1);
-                windows->cursor->setPos(windows->cursor, 0x4C, panel->cursor * 0x11 + 0x58);
-            } else {
-                skill = panel->entry.skills[old];
-                if (PAD_PRESSED(PAD_CROSS)) {
-                    SOUND.playSound(SOUND_SELECT);
-                    if (skill != 0) {
-                        if (skill & SKILL_MARKED) {
-                            panel->substate = 5;
-                            panel->step = 10;
-                        } else if (skill & SKILL_LAST) {
-                            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xB);
-                            panel->substate = 30;
-                        } else if (!(skill & SKILL_KNOWN)) {
-                            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xA);
-                            panel->substate = 30;
-                        } else if (panel->learned >= 3) {
-                            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 9);
-                            panel->substate = 30;
-                        } else {
-                            panel->substate = 5;
-                            panel->step = 20;
-                        }
-                        windows->cursor->setPalette(windows->cursor, PALETTE_GREY);
-                        windows->cursor->setStill(windows->cursor, 1);
-                    }
-                } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-                    SOUND.playSound(SOUND_MENU_CANCEL);
-                    panel->setSubstate(panel, 40);
-                    STGDGLAB_data.funcs.startFade(&panel->fade, 0);
-                    windows->optionCursor->setVisible(windows->optionCursor, 0);
-                    windows->cursor->setVisible(windows->cursor, 0);
-                    STGDGLAB_showSkillPanel(panel, windows, 0);
-                }
-            }
+            STGDGLAB_pickSkill(panel, windows);
             break;
         case 5:
             STGDGLAB_data.funcs.startFade(&panel->confirm, 1);
@@ -210,82 +306,16 @@ void STGDGLAB_updateSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windo
             panel->substate = 6;
             break;
         case 10:
-            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 7);
-            windows->yes->setString(windows->yes, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xC);
-            windows->no->setString(windows->no, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xD);
-            panel->choice = 0;
-            windows->optionCursor->setVisible(windows->optionCursor, 1);
-            windows->optionCursor->setPos(windows->optionCursor, 0xB8, panel->choice * 0x10 + 0x38);
-            panel->substate++;
+            STGDGLAB_askMark(panel, windows, 7);
             break;
         case 11:
-            old = panel->choice;
-            if (PAD_PRESSED(PAD_UP)) {
-                panel->choice = 0;
-            } else if (PAD_PRESSED(PAD_DOWN)) {
-                panel->choice = 1;
-            }
-            if (old != panel->choice) {
-                SOUND.playSound(SOUND_CURSOR);
-                windows->optionCursor->setPos(windows->optionCursor, 0xB8, panel->choice * 0x10 + 0x38);
-            }
-            if (PAD_PRESSED(PAD_CROSS)) {
-                SOUND.playSound(SOUND_SELECT);
-                if (panel->choice == 0) {
-                    panel->entry.skills[panel->cursor] &= ~SKILL_MARKED;
-                }
-                windows->yes->setVisible(windows->yes, 0);
-                windows->no->setVisible(windows->no, 0);
-                windows->cursor->setStill(windows->cursor, 0);
-                panel->setSubstate(panel, 7);
-                panel->step = 0;
-            } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-                SOUND.playSound(SOUND_MENU_CANCEL);
-                windows->yes->setVisible(windows->yes, 0);
-                windows->no->setVisible(windows->no, 0);
-                windows->cursor->setStill(windows->cursor, 0);
-                panel->setSubstate(panel, 7);
-                panel->step = 0;
-            }
+            STGDGLAB_answerMark(panel, windows, 0);
             break;
         case 20:
-            windows->message->setString(windows->message, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 8);
-            windows->yes->setString(windows->yes, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xC);
-            windows->no->setString(windows->no, FILE_CACHE.load(TEXT_FILE(TEXT_DIGI_LAB)), 0xD);
-            panel->choice = 0;
-            windows->optionCursor->setVisible(windows->optionCursor, 1);
-            windows->optionCursor->setPos(windows->optionCursor, 0xB8, panel->choice * 0x10 + 0x38);
-            panel->substate++;
+            STGDGLAB_askMark(panel, windows, 8);
             break;
         case 21:
-            old = panel->choice;
-            if (PAD_PRESSED(PAD_UP)) {
-                panel->choice = 0;
-            } else if (PAD_PRESSED(PAD_DOWN)) {
-                panel->choice = 1;
-            }
-            if (old != panel->choice) {
-                SOUND.playSound(SOUND_CURSOR);
-                windows->optionCursor->setPos(windows->optionCursor, 0xB8, panel->choice * 0x10 + 0x38);
-            }
-            if (PAD_PRESSED(PAD_CROSS)) {
-                SOUND.playSound(SOUND_SELECT);
-                if (panel->choice == 0) {
-                    panel->entry.skills[panel->cursor] |= SKILL_MARKED;
-                }
-                windows->yes->setVisible(windows->yes, 0);
-                windows->no->setVisible(windows->no, 0);
-                windows->cursor->setStill(windows->cursor, 0);
-                panel->setSubstate(panel, 7);
-                panel->step = 0;
-            } else if (PAD_PRESSED(PAD_TRIANGLE)) {
-                SOUND.playSound(SOUND_MENU_CANCEL);
-                windows->yes->setVisible(windows->yes, 0);
-                windows->no->setVisible(windows->no, 0);
-                windows->cursor->setStill(windows->cursor, 0);
-                panel->setSubstate(panel, 7);
-                panel->step = 0;
-            }
+            STGDGLAB_answerMark(panel, windows, 1);
             break;
         case 30:
             if (PAD_PRESSED(PAD_CROSS)) {
@@ -301,41 +331,7 @@ void STGDGLAB_updateSkillPanel(LabSkillPanel *panel, LabSkillPanelWindows *windo
             }
             break;
         }
-        initSpriteDrawer(&sprite);
-        sprite.setLayerId(panel->layer, panel->depth);
-        if (panel->fade.level != ONE) {
-            sprite.setScale(panel->fade.level, ONE, ONE);
-            sprite.setPivot(0x140, 0x7D);
-        } else {
-            sprite.setTexture(0x140, 0);
-            for (i = 0; i < 6; i++) {
-                if (panel->entry.skills[i] != 0) {
-                    id = panel->entry.skills[i] & SKILL_ID;
-                    sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), TECHS[id - 1].icon + 0x37, 0x5D,
-                                i * 0x11 + 0x58);
-                }
-            }
-        }
-        sprite.setTexture(0x280, 0x100);
-        sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x28, 0x46, 0x41);
-        if (panel->fade.level != ONE) {
-            sprite.setPivot(0, 0xD0);
-        }
-        sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x2B, 0, 0xBF);
-        if (panel->fade.level != ONE) {
-            sprite.setPivot(0x140, 0x1F);
-        }
-        sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x24, 0x92, 0x13);
-        if (panel->confirm.level != 0) {
-            if (panel->confirm.level != ONE) {
-                sprite.setScale(panel->confirm.level, ONE, ONE);
-                sprite.setPivot(0x140, 0x46);
-            } else {
-                sprite.setScale(ONE, ONE, ONE);
-            }
-            sprite.setLayerId(panel->layer, 1);
-            sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x23, 0xAE, 0x32);
-        }
+        STGDGLAB_drawSkillPanel(panel);
         break;
     case TASK_DONE:
     case TASK_KILL:

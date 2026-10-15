@@ -247,7 +247,7 @@ void STPLNMET_hideConfirm(NameConfirm *task, s32 hide) {
     } else {
         task->state = TASK_RUN;
         task->substate = 0;
-        for (i = 2; i >= 0; i--) {
+        for (i = 0; i < 3; i++) {
             task->frames[i] = 0;
         }
         task->cursor = 0;

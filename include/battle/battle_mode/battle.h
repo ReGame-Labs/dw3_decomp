@@ -485,6 +485,13 @@ void FIGHTSTG_changeBoost(u8 side, s32 index, s32 stat, s32 percent);
 s32 FIGHTSTG_getGaugeGain(s32 damage);
 s32 FIGHTSTG_getTechCost(u8 side, s32 id);
 
+/* SIDE's active fighter as its row plus the index, which GCC adds with the
+   row's address first. The battle code reaches the active fighter in three
+   ways that compile to different instructions: this one,
+   &fighters[side][active[side]] (most of it) and FIGHTSTG_getActiveFighter's
+   below; the match depends on which one each place uses. */
+#define ACTIVE_FIGHTER(side) (FIGHTSTG_battle.state.fighters[side] + FIGHTSTG_battle.state.active[side])
+
 /* Row's active fighter (FIGHTSTG_battle.state.fighters[row][active[row]]), as the
    row's offset in bytes added to the slot's fighter in row 0 */
 static inline BattleFighter *FIGHTSTG_getActiveFighter(s32 row) {

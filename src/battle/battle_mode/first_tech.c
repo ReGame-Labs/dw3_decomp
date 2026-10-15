@@ -14,7 +14,7 @@ static inline void announceFirstTech(FirstTech *task, BattleChild *children) {
     } else {
         task->tech = FIGHTSTG_battleTableFunc(FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]].id)->techs[0];
     }
-    fighter = (FIGHTSTG_battle.state.fighters[1] + FIGHTSTG_battle.state.active[1]);
+    fighter = ACTIVE_FIGHTER(1);
     tech = &TECHS[task->tech - 1];
     if (task->side != 0 && tech->mp > fighter->mp) {
         children[0].message = FIGHTSTG_createMessage();
@@ -62,7 +62,7 @@ static inline void showFirstTechResult(FirstTech *task, BattleChild *children) {
         FIGHTSTG_queueKnockOut(other << 4);
         children[0].task->state = 3;
     } else if (FIGHTSTG_action.effects[TECH_EFFECT_END_BATTLE]) {
-        task->damage = (FIGHTSTG_battle.state.fighters[0] + FIGHTSTG_battle.state.active[0])->hp * 7 / 10;
+        task->damage = ACTIVE_FIGHTER(0)->hp * 7 / 10;
         task->lines[0] = 0;
         task->lines[1] = task->damage;
         children[0].message->show(children[0].message, 4, task->lines);
@@ -125,9 +125,8 @@ static inline void wakeCounteredUp(FirstTech *task, BattleChild *children, Battl
    slot in the first row, each in a variable of its own in a block of its own (as an
    index, gcc folds the row into (other * 3 + active) * 32); on the blocks
    of their own of substate 0's row and of the event that wakeCounteredUp finds;
-   on announceFirstTech's MP test being written tech->mp > fighter->mp; on
-   TECH_EFFECT_END_BATTLE's damage being stored before lines[0] and on the pointer sum
-   of its HP. */
+   on announceFirstTech's MP test being written tech->mp > fighter->mp and on
+   TECH_EFFECT_END_BATTLE's damage being stored before lines[0]. */
 void FIGHTSTG_updateFirstTech(FirstTech *task, BattleChild *children) {
     BattleFighter *countered;
     s32 index;
@@ -188,7 +187,7 @@ void FIGHTSTG_updateFirstTech(FirstTech *task, BattleChild *children) {
             break;
         case 4:
             index = task->side == 0;
-            countered = (FIGHTSTG_battle.state.fighters[index] + FIGHTSTG_battle.state.active[index]);
+            countered = ACTIVE_FIGHTER(index);
             if (countered->flags & FIGHTER_ASLEEP) {
                 if (task->asleep != 0 && FIGHTSTG_battleFuncs.testWakeUp(SIDE_ENEMY - task->side, task->damage) != 0) {
                     wakeCounteredUp(task, children, countered, index);

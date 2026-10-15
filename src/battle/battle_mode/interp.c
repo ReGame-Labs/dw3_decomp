@@ -27,9 +27,7 @@ void FIGHTSTG_lerpVector(SVECTOR *from, SVECTOR *to, s32 t, SVECTOR *out) {
 }
 
 /* Returns value scaled by the sine of t (4096 is 1.0) on the given curve: 0 a
- * quarter of t, 1 the same as a cosine, 2 half of t. The match depends on a
- * return in each case; one shared return after the switch schedules the
- * epilogue differently. */
+ * quarter of t, 1 the same as a cosine, 2 half of t. */
 s32 FIGHTSTG_ease(s32 curve, s32 t, s32 value) {
     switch (curve) {
     case 0:

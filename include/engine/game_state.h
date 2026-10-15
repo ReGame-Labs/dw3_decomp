@@ -417,6 +417,7 @@ typedef union PartnerTotals {
         /* 0x26 */ s16 lowered[3]; /* taken from battle[0], [1] and [4] */
         /* 0x2C */ s32 spare; /* not filled: STGTRAIN's result keeps its yes/no answer here, 0 yes */
     } fields;
+    StatBlock block; /* the first 0x2C bytes, which computeStats copies whole */
 } PartnerTotals;
 
 /* Game modes (GameState: mode >> 8 is the overlay) that more than their own

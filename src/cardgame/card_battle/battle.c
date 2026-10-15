@@ -147,7 +147,7 @@ void CARDGAME_returnOpponentHand(CardBattle *battle, CardBattleItems *items) {
         pile->deck[battle->reserveStart - 1] = card;
         battle->opponentDraws[battle->reserveStart - 1].group = 7;
     }
-    for (i = 39; i >= 0; i--) {
+    for (i = 0; i < 40; i++) {
         battle->opponentDraws[i].order = i;
     }
 }

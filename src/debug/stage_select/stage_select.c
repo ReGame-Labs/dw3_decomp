@@ -985,6 +985,48 @@ static inline void editBattleDebug(StageSelectWindows *win) {
     }
 }
 
+/* Sets up the screen and the list's windows, at the entry the stage select
+   was left on */
+static inline void STAGSLCT_startStageSelect(StageSelect *sel, StageSelectWindows *win) {
+    Layer *layer;
+    s32 i;
+
+    GFX.funcs.reset();
+    GFX.funcs.allocPrimBuffers(0x5000);
+    GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
+    layer = GFX.funcs.createLayer(&STAGSLCT_screenRect, 1, SCREEN_LAYER);
+    layer->setBgColor(layer, 0x1F, 0x1F, 0x1F);
+    i = 0;
+    while (STAGSLCT_entries[i].scene != -1) {
+        i++;
+    }
+    if (i < 14) {
+        sel->lines = i;
+    } else {
+        sel->lines = 14;
+    }
+    sel->count = i;
+    sel->top = GAME.stageSelectTop;
+    sel->cursor = GAME.stageSelectCursor;
+    win->title = createTextWindow(SCREEN_LAYER, 1, 0x10, 0x20);
+    win->cursor = createTextWindow(SCREEN_LAYER, 1, 0x10, 0x2C);
+    win->cursor->setPos(win->cursor, 0xE, sel->cursor * 12 + 0x2D);
+    for (i = 0; i < sel->lines; i++) {
+        win->names[i] = createTextWindow(SCREEN_LAYER, 1, 0x18, i * 12 + 0x2D);
+        win->titles[i] = createTextWindow(SCREEN_LAYER, 1, 0x98, i * 12 + 0x2D);
+        win->names[i]->setText(win->names[i], STAGSLCT_entries[sel->top + i].name);
+        win->titles[i]->setText(win->titles[i], STAGSLCT_entries[sel->top + i].title);
+    }
+    win->region = createTextWindow(SCREEN_LAYER, 1, 0x90, 0x20);
+    win->progress = createTextWindow(SCREEN_LAYER, 1, 0xC0, 0x20);
+    win->charisma = createTextWindow(SCREEN_LAYER, 1, 0xD0, 0xDC);
+    win->level = createTextWindow(SCREEN_LAYER, 1, 0x100, 0xDC);
+    win->randomBattles = createTextWindow(SCREEN_LAYER, 1, 0x10, 0xDC);
+    win->randomBattles->setNumber(win->randomBattles, 0, BATTLE_SETUP.randomBattles);
+    win->debugUpDown = createTextWindow(SCREEN_LAYER, 1, 0x30, 0xDC);
+    win->debugLeftRight = createTextWindow(SCREEN_LAYER, 1, 0x50, 0xDC);
+}
+
 /*
  * The stage select. Pad 1 moves the cursor (up/down), turns pages (L1/R1),
  * toggles BATTLE_SETUP.randomBattles (Select), starts the entry (Cross: scene 0x300
@@ -1002,42 +1044,7 @@ void STAGSLCT_updateStageSelect(Task *task, StageSelectWindows *win) {
     switch (sel->state) {
     case TASK_INIT:
     default:
-        i = 0;
-        GFX.funcs.reset();
-        GFX.funcs.allocPrimBuffers(0x5000);
-        GFX.funcs.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
-        {
-            Layer *layer = GFX.funcs.createLayer(&STAGSLCT_screenRect, 1, SCREEN_LAYER);
-            layer->setBgColor(layer, 0x1F, 0x1F, 0x1F);
-        }
-        while (STAGSLCT_entries[i].scene != -1) {
-            i++;
-        }
-        if (i < 14) {
-            sel->lines = i;
-        } else {
-            sel->lines = 14;
-        }
-        sel->count = i;
-        sel->top = GAME.stageSelectTop;
-        sel->cursor = GAME.stageSelectCursor;
-        win->title = createTextWindow(SCREEN_LAYER, 1, 0x10, 0x20);
-        win->cursor = createTextWindow(SCREEN_LAYER, 1, 0x10, 0x2C);
-        win->cursor->setPos(win->cursor, 0xE, sel->cursor * 12 + 0x2D);
-        for (i = 0; i < sel->lines; i++) {
-            win->names[i] = createTextWindow(SCREEN_LAYER, 1, 0x18, i * 12 + 0x2D);
-            win->titles[i] = createTextWindow(SCREEN_LAYER, 1, 0x98, i * 12 + 0x2D);
-            win->names[i]->setText(win->names[i], STAGSLCT_entries[sel->top + i].name);
-            win->titles[i]->setText(win->titles[i], STAGSLCT_entries[sel->top + i].title);
-        }
-        win->region = createTextWindow(SCREEN_LAYER, 1, 0x90, 0x20);
-        win->progress = createTextWindow(SCREEN_LAYER, 1, 0xC0, 0x20);
-        win->charisma = createTextWindow(SCREEN_LAYER, 1, 0xD0, 0xDC);
-        win->level = createTextWindow(SCREEN_LAYER, 1, 0x100, 0xDC);
-        win->randomBattles = createTextWindow(SCREEN_LAYER, 1, 0x10, 0xDC);
-        win->randomBattles->setNumber(win->randomBattles, 0, BATTLE_SETUP.randomBattles);
-        win->debugUpDown = createTextWindow(SCREEN_LAYER, 1, 0x30, 0xDC);
-        win->debugLeftRight = createTextWindow(SCREEN_LAYER, 1, 0x50, 0xDC);
+        STAGSLCT_startStageSelect(sel, win);
         task->nextState(task);
         break;
     case TASK_RUN:

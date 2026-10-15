@@ -333,9 +333,7 @@ void WFIGHTMN_digivolve(BattleMenu *task, BattleMenuChildren *children) {
         break;
     case 1:
         if (children->task.task == NULL) {
-            /* a pointer sum, not units[0][...]: the match depends on it,
-               which adds the base first */
-            digimon = GET_DIGIMON((FIGHTSTG_battle.state.fighters[0] + FIGHTSTG_battle.state.active[0])->id);
+            digimon = GET_DIGIMON(ACTIVE_FIGHTER(0)->id);
             children->task.message = FIGHTSTG_createMessage();
             task->args[0] = 0;
             task->args[1] = digimon->nameId;
@@ -367,7 +365,8 @@ void WFIGHTMN_tag(BattleMenu *task, BattleMenuChildren *children) {
         break;
     case 1:
         if (children->task.task == NULL) {
-            /* the match depends on setting i here, before the call */
+            /* the match depends on setting i here, before the call, which
+               gives i and slot their registers */
             i = 0;
             slot = -1;
             member = GAME.funcs.getPartyMember(children->commands->arg);
@@ -388,7 +387,7 @@ void WFIGHTMN_tag(BattleMenu *task, BattleMenuChildren *children) {
     case 2:
         if (children->task.entrance->done != 0) {
             newSlot = task->args[0];
-            unit = FIGHTSTG_battle.state.fighters[0] + FIGHTSTG_battle.state.active[0];
+            unit = ACTIVE_FIGHTER(0);
             if (unit->special != 0) {
                 unit->special = 0;
 #if VERSION_US
@@ -578,7 +577,8 @@ void WFIGHTMN_runAway(BattleMenu *task, BattleMenuChildren *children) {
             task->counter = 1;
             action->type = 0;
             children->task.message = FIGHTSTG_createMessage();
-            /* the match depends on args[1] being set in both branches */
+            /* the match depends on args[1] being set in both branches: set once
+               after them, task swaps saved registers with a global's address */
             if (action->args[0] == 0) {
                 task->args[0] = 0x43;
                 task->args[1] = action->args[0];
@@ -963,7 +963,7 @@ static inline void announceKnockOut(BattleMenu *task, BattleMenuChildren *childr
     /* the key is the event's first two args: args[0]'s low byte and args[1] */
     FIGHTSTG_events.funcs.remove((EventKey *)&action->args[0]);
     side = action->args[0] >> 4;
-    fighter = FIGHTSTG_battle.state.fighters[side] + FIGHTSTG_battle.state.active[side];
+    fighter = ACTIVE_FIGHTER(side);
     if (side == 0) {
         if (fighter->special != 0) {
             fighter->special = 0;
@@ -1252,10 +1252,9 @@ void WFIGHTMN_bringLastEnemy(BattleMenu *task, BattleMenuChildren *children) {
         break;
     case 2:
         if (children->task.task == NULL) {
-            /* dst[3] and not TECHS[442]: the match depends on it */
             dst = &TECHS[439];
             id = FIGHTSTG_battle.state.tech;
-            *dst = dst[3];
+            *dst = TECHS[442];
             if (id != 0) {
                 tech = &TECHS[id - 1];
                 if (tech->script != 5 && tech->script != 12) {
@@ -1382,7 +1381,7 @@ void WFIGHTMN_runTurn(BattleMenu *task) {
                 children->task.enemyAttack = FIGHTSTG_startEnemyAttack(0, 0);
                 task->setSubstate(task, 2);
             } else {
-                (FIGHTSTG_battle.state.fighters[1] + FIGHTSTG_battle.state.active[1])->turns++;
+                ACTIVE_FIGHTER(1)->turns++;
                 children->task.enemyTurn = FIGHTSTG_startEnemyTurn(&FIGHTSTG_battle);
                 task->setSubstate(task, 2);
             }

@@ -246,7 +246,8 @@ static inline void runMotionList(BattleTest *task, BattleTestChildren *children)
             children->motions->setState(children->motions, 3);
             task->setSubstate(task, 3);
         } else if (children->motions == NULL) {
-            /* match depends on the call in each branch */
+            /* the match depends on the call in each branch: one call after the
+               if loses a move of task into a0 */
             if (task->side == -1) {
                 task->setSubstate(task, 0);
             } else {
@@ -696,7 +697,6 @@ void WFIGHTTS_motionList(BattleTestMotions *task, BattleTestWindows *windows) {
     s32 pressed;
     s32 steps;
     s32 fighter;
-    s32 x; /* unused, but it is in the original stack frame */
     s32 n;
     s32 i;
     s32 side;
@@ -888,7 +888,6 @@ static inline void drawEffectNames(BattleTestEffects *task, BattleTestWindows *w
 void WFIGHTTS_effectList(BattleTestEffects *task, BattleTestWindows *windows) {
     s32 pressed;
     s32 steps;
-    s32 x; /* unused, but it is in the original stack frame */
     s32 k;
 
     switch (task->state) {

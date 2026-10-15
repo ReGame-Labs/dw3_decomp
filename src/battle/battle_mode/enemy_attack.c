@@ -27,7 +27,7 @@ static inline void announceEnemyTech(EnemyAttack *task, BattleChild *children, B
         children[0].message->show(children[0].message, 3, task->lines);
         task->tech = entry->techs[0];
     }
-    if ((FIGHTSTG_battle.state.fighters[0] + FIGHTSTG_battle.state.active[0])->flags & FIGHTER_ASLEEP) {
+    if (ACTIVE_FIGHTER(0)->flags & FIGHTER_ASLEEP) {
         task->asleep = 1;
     }
 }
@@ -110,9 +110,8 @@ static inline void showOtherAttackResult(EnemyAttack *task, BattleChild *childre
 
 /* An attack on the player's active fighter (FIGHTSTG_startEnemyAttack): state 1 is the
    enemy's technique, 2 another attack, each with its messages, motion and
-   damage. The match depends on each case advancing substate itself, on a
-   fighter variable of its own in each case and on the pointer sum of
-   announceEnemyTech's FIGHTER_ASLEEP test. */
+   damage. The match depends on each case advancing substate itself and on
+   a fighter variable of its own in each case. */
 void FIGHTSTG_updateEnemyAttack(EnemyAttack *task, BattleChild *children) {
     BattleTableEntry *entry = FIGHTSTG_battleTableFunc(FIGHTSTG_battle.state.fighters[1][FIGHTSTG_battle.state.active[1]].id);
     BattleFighter *fighter;

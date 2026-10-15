@@ -97,8 +97,9 @@ s32 FIELDSTG_getMapCell(s32 index, Vec2 *pos) {
 }
 
 /* Whether nothing stands at pos: no character's box (gathered once a frame)
-   and no object. The match depends on the boxes' variables being local to
-   their blocks. */
+   and no object. The match depends on the two widths, the gathered box's and
+   the tested one's, being variables of their own: one width for both blocks
+   gives GCC 2.8.1 other registers. */
 s32 FIELDSTG_isTileFree(Vec2 *pos) {
     s32 frame = GFX.funcs.getFrameCount();
     Actor *actor;

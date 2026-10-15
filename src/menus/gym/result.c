@@ -11,7 +11,7 @@ s32 STGTRAIN_raiseStat(TrainResult *result, s32 stat) {
     s16 *value;
     s32 gained;
 
-    if ((u32)(stat - 1) >= 5) {
+    if (stat < 1 || stat > 5) {
         return 0;
     }
     value = &stats->stats[stat + 5];
@@ -38,7 +38,7 @@ s32 STGTRAIN_lowerStat(TrainResult *result, s32 stat) {
     s32 lost;
     s32 column;
 
-    if ((u32)(stat - 1) >= 5 || (RANDOM.next() & 1)) {
+    if (stat < 1 || stat > 5 || (RANDOM.next() & 1)) {
         return 0;
     }
     value = &stats->stats[stat + 5];
@@ -68,7 +68,7 @@ s32 STGTRAIN_raiseResistance(TrainResult *result, s32 stat) {
     s32 gained;
     s32 resist = stat - 8;
 
-    if ((u32)resist >= 7) {
+    if (resist < 0 || resist >= 7) {
         return 0;
     }
     stats = GAME.funcs.getPartnerStats(result->partner);
@@ -116,7 +116,7 @@ s32 STGTRAIN_raiseMaxHpMp(TrainResult *result, s32 stat) {
     s32 column;
     s32 gained;
 
-    if ((u32)(stat - 15) >= 2) {
+    if (stat < 15 || stat > 16) {
         return 0;
     }
     stats = GAME.funcs.getPartnerStats(result->partner);
@@ -171,13 +171,13 @@ void STGTRAIN_applyTry(TrainResult *result, s32 i) {
         s16 stat = entry->stat;
 
         if (stat != 0) {
-            if ((u16)stat - 1 < 5u) {
+            if (stat >= 1 && stat <= 5) {
                 result->gains[i] = STGTRAIN_raiseStat(result, stat);
             } else {
                 result->gains[i] = STGTRAIN_raiseResistance(result, stat);
                 stat = entry->other;
                 if (stat != 0) {
-                    if ((u16)stat - 1 < 5u) {
+                    if (stat >= 1 && stat <= 5) {
                         result->losses[i] = STGTRAIN_lowerStat(result, stat);
                     } else {
                         result->losses[i] = STGTRAIN_raiseMaxHpMp(result, stat);
@@ -187,7 +187,7 @@ void STGTRAIN_applyTry(TrainResult *result, s32 i) {
         }
     }
     if (result->trained[i] != 0) {
-        if ((u16)entry->stat - 1 < 5u) {
+        if (entry->stat >= 1 && entry->stat <= 5) {
             win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), 0x5C);
             win->message[0]->setSubString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), entry->stat + 0x46, 1);
             win->message[0]->setNumber(win->message[0], 2, result->gains[i]);
@@ -202,7 +202,7 @@ void STGTRAIN_applyTry(TrainResult *result, s32 i) {
             win->message[0]->setPalette(win->message[0], PALETTE_BLUE);
             other = entry->other;
             if (other != 0) {
-                if ((u16)other - 1 < 5u) {
+                if (other >= 1 && other <= 5) {
                     if (result->losses[i] != 0) {
                         win->message[1]->setString(win->message[1], FILE_CACHE.load(STGTRAIN_TEXT), 0x5D);
                         win->message[1]->setSubString(win->message[1], FILE_CACHE.load(STGTRAIN_TEXT), entry->other + 0x46, 1);
@@ -393,7 +393,7 @@ static inline void STGTRAIN_showGains(TrainResult *result, TrainResultWindows *w
         for (i = 0; i < 5; i++) {
             sums[0] += result->gains[i];
         }
-        if ((u16)entry->stat - 8 < 7u) {
+        if (entry->stat >= 8 && entry->stat <= 14) {
             if (entry->other != 0) {
                 sums[1] = 0;
                 for (i = 0; i < 5; i++) {
@@ -412,7 +412,7 @@ static inline void STGTRAIN_showGains(TrainResult *result, TrainResultWindows *w
             shown[i] = sums[i];
         }
         if (sums[0] != 0) {
-            if ((u16)entry->stat - 1 < 5u) {
+            if (entry->stat >= 1 && entry->stat <= 5) {
                 if (getStat(&result->before, entry->stat) + sums[0] >= 1000) {
                     shown[0] = 999 - getStat(&result->before, entry->stat);
                 } else {
@@ -428,13 +428,13 @@ static inline void STGTRAIN_showGains(TrainResult *result, TrainResultWindows *w
         }
         if (sums[1] != 0) {
             other = entry->other;
-            if ((u16)other - 1 < 5u) {
+            if (other >= 1 && other <= 5) {
                 if (getStat(&result->before, other) - sums[1] < 0) {
                     shown[1] = getStat(&result->before, other);
                 } else {
                     shown[1] = sums[1];
                 }
-            } else if ((u16)(other - 8) < 7) {
+            } else if (other >= 8 && other <= 14) {
                 if (getResistance(&result->before, other) + sums[1] >= 1000) {
                     shown[1] = 999 - getResistance(&result->before, other);
                 } else {
@@ -455,7 +455,7 @@ static inline void STGTRAIN_showGains(TrainResult *result, TrainResultWindows *w
             }
         }
 #endif
-        if ((u16)entry->stat - 1 < 5u) {
+        if (entry->stat >= 1 && entry->stat <= 5) {
             win->message[0]->setString(win->message[0], FILE_CACHE.load(STGTRAIN_TEXT), entry->stat + 0x5D);
 #if VERSION_US
             win->message[0]->setNumber(win->message[0], 1, sums[0]);
@@ -687,7 +687,7 @@ void STGTRAIN_runTraining(TrainResult *result, TrainResultWindows *win) {
     }
 }
 
-/* The training result's task. The match depends on the -1 being in a variable. */
+/* The training result's task */
 void STGTRAIN_updateResult(TrainResult *result, TrainResultWindows *win) {
     s32 i;
 
@@ -700,11 +700,8 @@ void STGTRAIN_updateResult(TrainResult *result, TrainResultWindows *win) {
         result->panels[1].duration = 10;
         result->panels[2].duration = 10;
         result->panels[3].duration = 10;
-        {
-            s32 none = -1;
-            for (i = 4; i >= 0; i--) {
-                result->trained[i] = none;
-            }
+        for (i = 0; i < 5; i++) {
+            result->trained[i] = -1;
         }
         win->actor = STGTRAIN_createActor(result->partner, result->training, result->layerId, result->depth - 3);
         win->actor->setPos(win->actor, 0x300, 0);
