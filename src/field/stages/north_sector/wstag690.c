@@ -9,10 +9,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xDB)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
 #define STAGE_FILE 0x631
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xD3)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
 #define STAGE_FILE 0x641
 #endif
 /* Sets the stage up: its map, actors and battles, playing the ambience ENV_0021 */
@@ -25,8 +25,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x4BE00, 0x2DA00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x3D;
-    FIELDSTG_state.music = MUSIC(0x3D, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_BOOT_MOUNTAIN);
+    FIELDSTG_state.music = MUSIC_BOOT_MOUNTAIN;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -36,14 +36,14 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-AreaBattle area0Battle0 = { 153, 4, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 153, 4, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 153, 4, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 111, 4, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 111, 4, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 111, 4, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 112, 4, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 112, 4, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 153, 4, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 153, 4, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 153, 4, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 111, 4, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 111, 4, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 111, 4, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 112, 4, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 112, 4, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -75,13 +75,13 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 217, 4, MUSIC(3, 0) };
+AreaBattle area3Battle0 = { 217, 4, MUSIC_BATTLE_1 };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle3 = { 333, 4, MUSIC(2, 0) };
+AreaBattle area3Battle3 = { 333, 4, MUSIC_BATTLE };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle6 = { 168, 4, MUSIC(2, 0) };
+AreaBattle area3Battle6 = { 168, 4, MUSIC_BATTLE };
 AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area3Battles = {
     0,
@@ -106,7 +106,7 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Actions[] = {
     FLAG_BOOT_MOUNTAIN_NEEDLE_GLOVE_FOUND, 1,
     ITEM(2, 0x6D), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor1Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
@@ -197,7 +197,7 @@ u16 actor4Talk2Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG_CARD_BATTLE_WON, 0,
 u16 actor5Talk0Actions[] = {
     FLAG_BOOT_MOUNTAIN_POWER_CHARGE_FOUND, 1,
     ITEM(1, 0x2B), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor6Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
@@ -288,17 +288,32 @@ FieldTalk actor6Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { FLAG_BOOT_MOUNTAIN_NEEDLE_GLOVE_FOUND, 0, CODES_END };
-u16 actor1Conditions[] = { ITEM(0, 0x192), 1, FLAG_CARD_BATTLE_ENDED, 0, SPECIAL(4), 1, CODES_END };
-u16 actor2Conditions[] = { ITEM(0, 0x192), 0, SPECIAL(9), 1, SPECIAL(0x1A), 0, CODES_END };
+u16 actor1Conditions[] = {
+    ITEM(0, 0x192), 1,
+    FLAG_CARD_BATTLE_ENDED, 0,
+    SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_AMATERASU_BRIDGE, 1,
+    CODES_END,
+};
+u16 actor2Conditions[] = {
+    ITEM(0, 0x192), 0,
+    SPECIAL_STORY_SINCE_GENJI_BEATEN, 1,
+    SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 0,
+    CODES_END,
+};
 u16 actor3Conditions[] = {
     ITEM(0, 0x192), 1,
     FLAG_CARD_BATTLE_ENDED, 0,
     PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
     CODES_END,
 };
-u16 actor4Conditions[] = { ITEM(0, 0x192), 1, FLAG_CARD_BATTLE_ENDED, 1, SPECIAL(9), 1, CODES_END };
+u16 actor4Conditions[] = {
+    ITEM(0, 0x192), 1,
+    FLAG_CARD_BATTLE_ENDED, 1,
+    SPECIAL_STORY_SINCE_GENJI_BEATEN, 1,
+    CODES_END,
+};
 u16 actor5Conditions[] = { FLAG_BOOT_MOUNTAIN_POWER_CHARGE_FOUND, 0, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 1281, 353, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x32, 5, 617, 589, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x32, 5, 617, 589, 7 };
@@ -349,10 +364,10 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x265, 0x4F0, 0x2B8, 3, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x262, 0xA0, 0x1D0, 7, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x262, 0xA0, 0x240, 7, 0, 0, 0 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 0x16, 2 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 2, 1 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 5, 2 },
-    { { { SPECIAL(0x94), 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 0xC, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 0x16, 2 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 2, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E9, 0xB0, 0xF8, 7, 0, 5, 2 },
+    { { { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1 }, { CODES_END, 0 } }, SLOT_WARP1, 0x2E8, 0x240, 0xD0, 1, 0, 0xC, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0x27F, 0x280, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0x26E, 0x2E8, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0x4C0, 0x1A0, 0, 0, 0, 0 },

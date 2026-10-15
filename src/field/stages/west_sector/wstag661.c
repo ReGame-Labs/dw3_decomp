@@ -11,12 +11,12 @@
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x656
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x666
 #endif
 /*
@@ -32,8 +32,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x1FA00, 0x2DE00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x17;
-    FIELDSTG_state.music = MUSIC(0x17, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_BYAKKO_CITY);
+    FIELDSTG_state.music = MUSIC_BYAKKO_CITY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -42,8 +42,8 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -94,7 +94,7 @@ u16 actor1Talk0Actions[] = { START_EVENT(0x13), 1, CODES_END };
 u16 actor2Talk0Actions[] = { 0x7A1B, 1, CODES_END };
 u16 actor3Talk0Actions[] = { 0x7A1A, 1, CODES_END };
 u16 actor4Talk0Actions[] = { 0x7C00, 1, CODES_END };
-u16 actor12Talk0Conditions[] = { SPECIAL(0x1F), 1, CODES_END };
+u16 actor12Talk0Conditions[] = { SPECIAL_STORY_BLUE_ID_PASS_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor12Talk1Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, actor0Talk0Actions, 0x1A3 },
@@ -168,12 +168,20 @@ u16 actor7Conditions[] = {
     FLAG_OINKMON_CITIZENS_RESTORED, 1,
     CODES_END,
 };
-u16 actor8Conditions[] = { SPECIAL(0x21), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor9Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor10Conditions[] = { SPECIAL(0x21), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor11Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor12Conditions[] = { SPECIAL(0x21), 1, CODES_END };
-u16 actor13Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor8Conditions[] = {
+    SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor9Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor10Conditions[] = {
+    SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor11Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor12Conditions[] = { SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1, CODES_END };
+u16 actor13Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor14Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 FieldActorEntry actor0 = { NULL, actor0Talks, 0x14, 4, 908, 596, 7 };
 FieldActorEntry actor1 = { NULL, actor1Talks, 0x15, 5, 1119, 502, 1 };

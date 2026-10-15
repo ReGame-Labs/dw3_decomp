@@ -12,7 +12,7 @@
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_08)
 #define STAGE_FILE 0x8FF
 #define STAGE_FILE_8 0x1B0
 #elif VERSION_JP
@@ -30,8 +30,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0xFD00, 0x1CD00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x2C;
-    FIELDSTG_state.music = MUSIC(0x2C, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_WATER_TUNNEL);
+    FIELDSTG_state.music = MUSIC_WATER_TUNNEL;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.spriteColor = stageColor;
@@ -98,7 +98,7 @@ u16 actor0Talk6Conditions[] = {
 u16 actor0Talk6Actions[] = {
     FLAG_PLATINUM_CARD_FOUND, 1,
     ITEM(0, 0x25), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {

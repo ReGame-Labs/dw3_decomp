@@ -11,7 +11,7 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_08)
 #define STAGE_FILE 0x914
 #define STAGE_FILE_8 0x239
 #define STAGE_ARCHIVE 0x915
@@ -31,8 +31,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0xB700, 0xD300};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x31;
-    FIELDSTG_state.music = MUSIC(0x31, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_FOREST_INN_BF);
+    FIELDSTG_state.music = MUSIC_FOREST_INN_BF;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);

@@ -150,12 +150,12 @@ void endEvent935(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
-#define EVENT_TEXT_FILE 0x10B
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x4A8
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
-#define EVENT_TEXT_FILE 0x112
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x4B8
 #endif
 /*
@@ -171,8 +171,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x10100, 0x16D00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 5;
-    FIELDSTG_state.music = MUSIC(5, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_ADMIN_CENTER);
+    FIELDSTG_state.music = MUSIC_ADMIN_CENTER;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
@@ -180,8 +180,8 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -434,8 +434,12 @@ u16 actor6Conditions[] = {
     FLAG_OINKMON_CITIZENS_RESTORED, 1,
     CODES_END,
 };
-u16 actor7Conditions[] = { FLAG_OINKMON_CITIZENS_RESTORED, 0, SPECIAL(0x1C), 1, CODES_END };
-u16 actor8Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor7Conditions[] = {
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    CODES_END,
+};
+u16 actor8Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor9Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor10Conditions[] = {
     PROGRESS(STORY_PRESIDENT_ARRESTED), 1,

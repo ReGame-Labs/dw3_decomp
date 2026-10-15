@@ -11,10 +11,10 @@ const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x51F
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x52F
 #endif
 /* Sets the stage up: its map and actors, playing the ambience ENV_0004 */
@@ -27,8 +27,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x10100, 0x1C800};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x2C;
-    FIELDSTG_state.music = MUSIC(0x2C, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_WATER_TUNNEL);
+    FIELDSTG_state.music = MUSIC_WATER_TUNNEL;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.spriteColor = stageColor;
@@ -64,8 +64,12 @@ u16 actor0Conditions[] = {
     FLAG_OINKMON_CITIZENS_RESTORED, 1,
     CODES_END,
 };
-u16 actor1Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor2Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor1Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor2Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x33, 4, 256, 443, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x9D, 5, 256, 443, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x9D, 5, 256, 443, 7 };

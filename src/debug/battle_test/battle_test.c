@@ -45,8 +45,8 @@ static inline void setUpBattle(BattleTest *task, BattleTestChildren *children) {
             /* fallthrough */
         case 1:
             if (SOUND.isLoading() == 0) {
-                SOUND.playSound(MUSIC(2, 0));
-                BATTLE_SETUP.music = MUSIC(2, 0);
+                SOUND.playSound(MUSIC_BATTLE);
+                BATTLE_SETUP.music = MUSIC_BATTLE;
                 task->nextSubstate(task);
             }
             break;

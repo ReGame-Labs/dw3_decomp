@@ -12,11 +12,11 @@
 extern StageSlot stageSlots0[];
 extern StageSlot stageSlots1[];
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
 #define STAGE_FILE 0x26A
 #define STAGE_ARCHIVE 0x3CD
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
 #define STAGE_FILE 0x279
 #define STAGE_ARCHIVE 0x3DD
 #endif
@@ -32,8 +32,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x10800, 0xED00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x11;
-    FIELDSTG_state.music = MUSIC(0x11, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_JUNGLE_SHRINE);
+    FIELDSTG_state.music = MUSIC_JUNGLE_SHRINE;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -49,27 +49,27 @@ void setupStage(void) {
     }
 }
 
-AreaBattle area0Battle0 = { 165, 6, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 165, 6, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 165, 6, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 165, 6, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 165, 6, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 165, 6, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 165, 6, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 165, 6, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 165, 6, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 165, 6, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 165, 6, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 165, 6, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 165, 6, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 165, 6, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 165, 6, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 165, 6, MUSIC_BATTLE };
 BattleList area0Battles = {
     5,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
       &area0Battle4, &area0Battle5, &area0Battle6, &area0Battle7 },
 };
-AreaBattle area1Battle0 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle1 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle2 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle3 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle4 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle5 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle6 = { 0, 6, MUSIC(2, 0) };
-AreaBattle area1Battle7 = { 0, 6, MUSIC(2, 0) };
+AreaBattle area1Battle0 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle1 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle2 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle3 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle4 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle5 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle6 = { 0, 6, MUSIC_BATTLE };
+AreaBattle area1Battle7 = { 0, 6, MUSIC_BATTLE };
 BattleList area1Battles = {
     0,
     { &area1Battle0, &area1Battle1, &area1Battle2, &area1Battle3,
@@ -93,7 +93,7 @@ AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle5 = { 165, 6, MUSIC(2, 0) };
+AreaBattle area3Battle5 = { 165, 6, MUSIC_BATTLE };
 AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area3Battles = {
@@ -116,7 +116,7 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Actions[] = {
     FLAG_JUNGLE_SHRINE_POWER_CHARGE_FOUND, 1,
     ITEM(1, 0x2B), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {

@@ -19,7 +19,7 @@ void STGMCARD_updateScreen(MemCardScreen *screen, MemCardScreenTasks *tasks) {
             break;
         case 1:
             if (STGMCARD_funcs.filesLoading() == 0 && SOUND.isLoading() == 0) {
-                SOUND.playSound(MUSIC(0x20, 0));
+                SOUND.playSound(MUSIC_MEMORY_CARD);
                 screen->nextState(screen);
             }
             break;
@@ -63,7 +63,7 @@ void STGMCARD_updateScreen(MemCardScreen *screen, MemCardScreenTasks *tasks) {
     case TASK_DONE:
         break;
     case TASK_KILL:
-        SOUND.stopSound(MUSIC(0x20, 0));
+        SOUND.stopSound(MUSIC_MEMORY_CARD);
         if (screen->step != 0) {
             if (screen->loading == 0) {
                 GAME.funcs.requestMode(GAME.funcs.getPrevMode(), 0);

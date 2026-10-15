@@ -19,10 +19,10 @@ extern AnimFrame updateTileAnimsFrames1[];
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
 #define STAGE_FILE 0x338
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
 #define STAGE_FILE 0x347
 #endif
 /*
@@ -37,19 +37,19 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x11D00, 0x12800};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 5;
-    FIELDSTG_state.music = MUSIC(5, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_ADMIN_CENTER);
+    FIELDSTG_state.music = MUSIC_ADMIN_CENTER;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= STORY_BYAKKO_LEADER_FOUGHT && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
     if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -106,11 +106,11 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 253, 20, MUSIC(3, 0) };
-AreaBattle area3Battle1 = { 254, 20, MUSIC(3, 0) };
-AreaBattle area3Battle2 = { 255, 20, MUSIC(3, 0) };
-AreaBattle area3Battle3 = { 256, 20, MUSIC(3, 0) };
-AreaBattle area3Battle4 = { 257, 20, MUSIC(0x23, 0) };
+AreaBattle area3Battle0 = { 253, 20, MUSIC_BATTLE_1 };
+AreaBattle area3Battle1 = { 254, 20, MUSIC_BATTLE_1 };
+AreaBattle area3Battle2 = { 255, 20, MUSIC_BATTLE_1 };
+AreaBattle area3Battle3 = { 256, 20, MUSIC_BATTLE_1 };
+AreaBattle area3Battle4 = { 257, 20, MUSIC_BOSS_1 };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };

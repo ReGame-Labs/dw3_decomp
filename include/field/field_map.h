@@ -402,7 +402,8 @@ typedef struct Actor {
 typedef struct AreaBattle {
     /* 0x0 */ s32 encounter; /* of FIELDSTG_encounters */
     /* 0x4 */ s32 stage; /* the fight stage, for BATTLE_SETUP.stage */
-    /* 0x8 */ s32 music; /* for BATTLE_SETUP.music */
+    /* 0x8 */ s32 music; /* for BATTLE_SETUP.music (MUSIC_); the empty slots,
+                            { 0, 0, MUSIC(1, 0) }, keep the bare MUSIC(1, 0) */
 } AreaBattle;
 
 /* The battles of an area of the map (its cells' value at FieldMap.files[4]),

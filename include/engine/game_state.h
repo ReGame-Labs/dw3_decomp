@@ -47,7 +47,7 @@ typedef struct GameFuncs {
  */
 typedef struct GameFlags {
     /* 0x00 */ u8 bits[4];
-    /* 0x04 */ s32 pendingFlag10; /* PENDING_FLAG_10 */
+    /* 0x04 */ s32 cardBattleWon; /* 1 when the player won the card battle; updateModeFlags copies it to FLAG_CARD_BATTLE_WON */
     /* 0x08 */ s32 (*checkConditions)(u16 *list);
     /* 0x0C */ void (*applyAction)(s32 code, s32 value);
     /* 0x10 */ s32 (*checkCondition)(u16 code, u16 value);
@@ -71,7 +71,10 @@ typedef struct GameFlags {
 #define PARTY_STAT(id) (0x7200 | (id)) /* checkPartyStat */
 #define EVENT_BATTLE(id) (0x7400 | (id)) /* action: FIELDSTG_battleFuncs.startEventBattle */
 #define CARD_BATTLE(opponent, kind) ((0x7600 + (kind) * 0x200) | (opponent)) /* action: startCardBattle */
-#define WARP_ARG(id) (0x7E00 | (id)) /* checkWarpArg */
+/* the place and its argument the last exit or warp set (checkWarpArg): the
+   numbers of the stage's StagePoints, place 1-30 */
+#define PLACE(n) (0x7E00 | ((n) - 1)) /* GAME.place is n */
+#define PLACE_ARG(n) (0x7E00 | ((n) + 29)) /* GAME.placeArg is n */
 /* an item, in the bag or equipped; kind (bits 9-11) isn't read, and the
    scripts set it after the item's kind loosely */
 #define ITEM(kind, id) (0x8000 | (kind) << 9 | (id))

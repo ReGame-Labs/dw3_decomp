@@ -85,7 +85,7 @@ static inline void queueFirstTurns(BattleMenu *task, BattleMenuChildren *childre
     }
 }
 
-/* Plays sound 0x60040000 once a partner is confused, and the battle's music
+/* Plays MUSIC_CONFUSION once a partner is confused, and the battle's music
    again once none is */
 static inline void switchConfusionMusic(BattleMenu *task) {
     BattleFighter *units;
@@ -96,7 +96,7 @@ static inline void switchConfusionMusic(BattleMenu *task) {
     if (task->confusionSound == 0) {
         for (i = 0; i < 3; i++) {
             if (units[i].flags & FIGHTER_CONFUSED) {
-                SOUND.playSound(0x60040000);
+                SOUND.playSound(MUSIC_CONFUSION);
                 task->confusionSound = 1;
                 break;
             }
@@ -118,7 +118,7 @@ static inline void switchConfusionMusic(BattleMenu *task) {
 
 /* The battle menu's task: sets up the battle (its music, FIGHTSTG's tasks,
    setBattleKind, the fighters' models in addFighters and queueFirstTurns),
-   then runs the menu (WFIGHTMN_runTurn), playing sound 0x60040000 once a
+   then runs the menu (WFIGHTMN_runTurn), playing MUSIC_CONFUSION once a
    partner is confused and the battle's music again after
    (switchConfusionMusic) */
 void WFIGHTMN_updateMenu(BattleMenu *task, BattleMenuChildren *children) {
@@ -1001,7 +1001,7 @@ static inline void endBattleOnKnockOut(BattleMenu *task, BattleMenuChildren *chi
     children->task.message = FIGHTSTG_createMessage();
     if (event->args[0] == 0) {
         FIGHTSTG_endBattle(BATTLE_LOST);
-        SOUND.playSound(0x60040008);
+        SOUND.playSound(MUSIC_GAME_OVER);
         task->args[0] = 0x53;
         task->setSubstate(task, 2);
         children->cameraMove.cameraTurn = FIGHTSTG_startCameraTurn();

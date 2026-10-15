@@ -687,12 +687,12 @@ void updateModeFlags(void) {
     if (GAME.funcs.getPrevMode() == MODE_CARD_GAME) {
         applyAction(FLAG_CARD_BATTLE_ENDED, 1);
         applyAction(0x12, 1);
-        if (FLAGS_00.pendingFlag10 != 0) {
+        if (FLAGS_00.cardBattleWon != 0) {
             applyAction(FLAG_CARD_BATTLE_WON, 1);
         } else {
             applyAction(FLAG_CARD_BATTLE_WON, 0);
         }
-        FLAGS_00.pendingFlag10 = 0;
+        FLAGS_00.cardBattleWon = 0;
     }
 }
 

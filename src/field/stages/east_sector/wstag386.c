@@ -10,12 +10,12 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE9)
-#define EVENT_TEXT_FILE 0x120
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_04)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x57D
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE1)
-#define EVENT_TEXT_FILE 0x127
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_04)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x58D
 #endif
 /* Sets the stage up: its map, actors and events, playing BGM_0008 */
@@ -28,8 +28,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x32500, 0x36900};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0xA;
-    FIELDSTG_state.music = MUSIC(0xA, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DUEL_ISLAND);
+    FIELDSTG_state.music = MUSIC_DUEL_ISLAND;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
@@ -678,14 +678,14 @@ FieldTalk actor22Talks[] = {
     { NULL, NULL, 0x34C },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor1Conditions[] = { SPECIAL(8), 1, CODES_END };
+u16 actor0Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
+u16 actor1Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
 u16 actor2Conditions[] = { FLAG(0x1A, 0x3F), 1, CODES_END };
 u16 actor3Conditions[] = { FLAG(0x1A, 0x3E), 1, CODES_END };
 u16 actor4Conditions[] = { FLAG(0x1A, 0x3D), 1, CODES_END };
 u16 actor5Conditions[] = { FLAG(0x1A, 0x3C), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor7Conditions[] = { SPECIAL(8), 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
+u16 actor7Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
 u16 actor8Conditions[] = { ITEM(0, 0x14), 0, CODES_END };
 u16 actor9Conditions[] = { ITEM(0, 0x14), 1, CODES_END };
 u16 actor10Conditions[] = { FLAG_DUEL_ISLAND_METALETEMON_BEATEN, 1, CODES_END };
@@ -839,8 +839,8 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 4, 0x33F, 0x12E, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 4, 0x2DE, 0x141, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 4, 0x2CE, 0x186, 0, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 0x12, 1 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 0x12, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 0x12, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 0x12, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

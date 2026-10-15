@@ -10,10 +10,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
 #define STAGE_FILE 0x60F
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
 #define STAGE_FILE 0x61F
 #endif
 /* Sets the stage up: its map, actors and battles, playing the ambience ENV_0016 */
@@ -26,8 +26,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x16000, 0x23100};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x38;
-    FIELDSTG_state.music = MUSIC(0x38, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DESERT);
+    FIELDSTG_state.music = MUSIC_DESERT;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -37,14 +37,14 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-AreaBattle area0Battle0 = { 72, 5, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 72, 5, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 72, 5, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 72, 5, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 72, 5, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 72, 5, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 72, 5, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 72, 5, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 72, 5, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 72, 5, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 72, 5, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 72, 5, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 72, 5, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 72, 5, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 72, 5, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 72, 5, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -76,8 +76,8 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 238, 5, MUSIC(2, 0) };
-AreaBattle area3Battle1 = { 286, 5, MUSIC(3, 0) };
+AreaBattle area3Battle0 = { 238, 5, MUSIC_BATTLE };
+AreaBattle area3Battle1 = { 286, 5, MUSIC_BATTLE_1 };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
@@ -220,11 +220,11 @@ u16 actor1Conditions[] = {
     ITEM(0, 0x192), 1,
     FLAG_CARD_BATTLE_ENDED, 0,
     ITEM(0, 0x14), 0,
-    SPECIAL(0x19), 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
     CODES_END,
 };
 u16 actor2Conditions[] = {
-    SPECIAL(0x19), 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
     FLAG_CARD_BATTLE_ENDED, 0,
     ITEM(0, 0x192), 1,
     ITEM(0, 0x14), 1,
@@ -233,62 +233,70 @@ u16 actor2Conditions[] = {
 u16 actor3Conditions[] = {
     ITEM(0, 0x192), 1,
     FLAG_CARD_BATTLE_ENDED, 1,
-    SPECIAL(0x19), 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
     CODES_END,
 };
-u16 actor4Conditions[] = { ITEM(0, 0x192), 0, SPECIAL(0x19), 1, CODES_END };
+u16 actor4Conditions[] = {
+    ITEM(0, 0x192), 0,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    CODES_END,
+};
 u16 actor5Conditions[] = {
-    SPECIAL(0x21), 1,
+    SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1,
     PROGRESS(STORY_AMATERASU_BRIDGE), 0,
     PROGRESS(STORY_PRESIDENT_ARRESTED), 0,
     CODES_END,
 };
 u16 actor6Conditions[] = {
-    SPECIAL(0x21), 1,
+    SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1,
     PROGRESS(STORY_AMATERASU_BRIDGE), 0,
     PROGRESS(STORY_PRESIDENT_ARRESTED), 0,
     CODES_END,
 };
 u16 actor7Conditions[] = {
-    SPECIAL(0x21), 1,
+    SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1,
     PROGRESS(STORY_AMATERASU_BRIDGE), 0,
     PROGRESS(STORY_PRESIDENT_ARRESTED), 0,
     CODES_END,
 };
 u16 actor8Conditions[] = {
-    SPECIAL(0x21), 1,
+    SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1,
     PROGRESS(STORY_AMATERASU_BRIDGE), 0,
     PROGRESS(STORY_PRESIDENT_ARRESTED), 0,
     CODES_END,
 };
 u16 actor9Conditions[] = {
-    SPECIAL(0x21), 1,
+    SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1,
     PROGRESS(STORY_AMATERASU_BRIDGE), 0,
     PROGRESS(STORY_PRESIDENT_ARRESTED), 0,
     CODES_END,
 };
-u16 actor10Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor11Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor10Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor11Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor12Conditions[] = {
-    SPECIAL(0x21), 1,
+    SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1,
     PROGRESS(STORY_AMATERASU_BRIDGE), 0,
     PROGRESS(STORY_PRESIDENT_ARRESTED), 0,
     CODES_END,
 };
 u16 actor13Conditions[] = {
-    SPECIAL(0x21), 1,
+    SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1,
     PROGRESS(STORY_AMATERASU_BRIDGE), 0,
     PROGRESS(STORY_PRESIDENT_ARRESTED), 0,
     CODES_END,
 };
 u16 actor14Conditions[] = {
-    SPECIAL(0x21), 1,
+    SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1,
     PROGRESS(STORY_AMATERASU_BRIDGE), 0,
     PROGRESS(STORY_PRESIDENT_ARRESTED), 0,
     CODES_END,
 };
 u16 actor15Conditions[] = {
-    SPECIAL(0x21), 1,
+    SPECIAL_STORY_WAY_TO_AMATERASU_TO_PRESIDENT_ARRESTED, 1,
     PROGRESS(STORY_AMATERASU_BRIDGE), 0,
     PROGRESS(STORY_PRESIDENT_ARRESTED), 0,
     CODES_END,

@@ -108,13 +108,13 @@ void endEvent811(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xDB)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x6DE
 #define STAGE_FILE_8 0x700
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xD3)
-#define EVENT_TEXT_FILE 0x14A
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x6EE
 #define STAGE_FILE_8 0x710
 #endif
@@ -131,8 +131,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 4;
     FIELDSTG_state.start = (Vec2){0x40000, 0x2C800};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x19;
-    FIELDSTG_state.music = MUSIC(0x19, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DUNGEON);
+    FIELDSTG_state.music = MUSIC_DUNGEON;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -243,14 +243,14 @@ AnimFrame effectFrames[] = {
     { 7, 4 }, { 4, 4 }, { 3, 4 }, { 2, 4 },
     { 1, 4 }, { 255, 0x3E7 },
 };
-AreaBattle area0Battle0 = { 120, 26, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 120, 26, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 121, 26, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 121, 26, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 171, 26, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 171, 26, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 171, 26, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 171, 26, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 120, 26, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 120, 26, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 121, 26, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 121, 26, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 171, 26, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 171, 26, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 171, 26, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 171, 26, MUSIC_BATTLE };
 BattleList area0Battles = {
     2,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -282,7 +282,7 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 21, 26, MUSIC(0x23, 0) };
+AreaBattle area3Battle0 = { 21, 26, MUSIC_BOSS_1 };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
@@ -310,9 +310,9 @@ ActorImage stageImages[] = {
     { 0x140, 0x100, 0x140, 0x160, 0, 0x60, 0x160, 0x1FA },
 };
 u16 actor0Talk0Actions[] = {
-    SPECIAL(0x91), 1,
+    SPECIAL_GAIN_5000_BIT, 1,
     FLAG_DARK_DUNGEON_5000_BIT_FOUND, 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {
@@ -340,11 +340,19 @@ FieldTalk actor5Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { FLAG_DARK_DUNGEON_5000_BIT_FOUND, 0, CODES_END };
-u16 actor1Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor1Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor4Conditions[] = { FLAG_GENBU_LEADER_CHALLENGE_SEEN, 0, SPECIAL(0x19), 1, CODES_END };
-u16 actor5Conditions[] = { FLAG_GENBU_LEADER_CHALLENGE_SEEN, 1, SPECIAL(0x19), 1, CODES_END };
+u16 actor4Conditions[] = {
+    FLAG_GENBU_LEADER_CHALLENGE_SEEN, 0,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    CODES_END,
+};
+u16 actor5Conditions[] = {
+    FLAG_GENBU_LEADER_CHALLENGE_SEEN, 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 785, 233, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x9D, 5, 271, 193, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0xCA, 6, 271, 193, 1 };

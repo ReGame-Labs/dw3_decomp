@@ -9,11 +9,11 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
 #define STAGE_FILE 0x19D
 #define STAGE_ARCHIVE 0x3C0
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
 #define STAGE_FILE 0x1AB
 #define STAGE_ARCHIVE 0x3D0
 #endif
@@ -27,8 +27,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x10B00, 0x12C00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 8;
-    FIELDSTG_state.music = MUSIC(8, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SHOP_2);
+    FIELDSTG_state.music = MUSIC_SHOP_2;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 2);
@@ -216,50 +216,70 @@ FieldTalk actor38Talks[] = {
 u16 actor0Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(0x16), 1, CODES_END };
+u16 actor3Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(STORY_SEPIKMON_MASK_LOST), 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
-u16 actor7Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor7Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor8Conditions[] = {
-    SPECIAL(0x15), 1,
+    SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF, 1,
     PROGRESS(STORY_SEPIKMON_MASK_LOST), 0,
     PROGRESS(STORY_AGUMON_SUITS), 0,
     CODES_END,
 };
-u16 actor9Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor9Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(STORY_AGUMON_SUITS), 1, CODES_END };
 u16 actor11Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, FLAG(0x1C, 8), 0, CODES_END };
-u16 actor12Conditions[] = { SPECIAL(0x15), 1, FLAG(0x1C, 8), 0, CODES_END };
+u16 actor12Conditions[] = {
+    SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF, 1,
+    FLAG(0x1C, 8), 0,
+    CODES_END,
+};
 u16 actor13Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, FLAG(0x1C, 8), 1, CODES_END };
-u16 actor14Conditions[] = { SPECIAL(0x18), 1, FLAG(0x1C, 8), 0, CODES_END };
+u16 actor14Conditions[] = {
+    SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1,
+    FLAG(0x1C, 8), 0,
+    CODES_END,
+};
 u16 actor15Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, FLAG(0x1C, 8), 0, CODES_END };
-u16 actor16Conditions[] = { SPECIAL(0x22), 1, FLAG(0x1C, 8), 1, CODES_END };
-u16 actor17Conditions[] = { SPECIAL(0x19), 1, FLAG(0x1C, 8), 0, CODES_END };
+u16 actor16Conditions[] = {
+    SPECIAL_STORY_GENJI_BEATEN_TO_PRESIDENT_ARRESTED, 1,
+    FLAG(0x1C, 8), 1,
+    CODES_END,
+};
+u16 actor17Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    FLAG(0x1C, 8), 0,
+    CODES_END,
+};
 u16 actor18Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, FLAG(0x1C, 8), 0, CODES_END };
 u16 actor19Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, FLAG(0x1C, 8), 0, CODES_END };
 u16 actor20Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, FLAG(0x1C, 8), 0, CODES_END };
-u16 actor21Conditions[] = { SPECIAL(0x16), 1, FLAG(0x1C, 8), 0, CODES_END };
+u16 actor21Conditions[] = {
+    SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1,
+    FLAG(0x1C, 8), 0,
+    CODES_END,
+};
 u16 actor22Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, FLAG(0x1C, 8), 0, CODES_END };
 u16 actor23Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
 u16 actor24Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor25Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor26Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor27Conditions[] = { SPECIAL(0x15), 1, CODES_END };
-u16 actor28Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor29Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor27Conditions[] = { SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF, 1, CODES_END };
+u16 actor28Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
+u16 actor29Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor30Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor31Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
-u16 actor32Conditions[] = { SPECIAL(0x16), 1, CODES_END };
+u16 actor32Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
 u16 actor33Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor34Conditions[] = { SPECIAL(0x22), 1, CODES_END };
-u16 actor35Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor36Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor37Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor38Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor34Conditions[] = { SPECIAL_STORY_GENJI_BEATEN_TO_PRESIDENT_ARRESTED, 1, CODES_END };
+u16 actor35Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor36Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor37Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor38Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor39Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor40Conditions[] = { SPECIAL(0x22), 1, CODES_END };
-u16 actor41Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor40Conditions[] = { SPECIAL_STORY_GENJI_BEATEN_TO_PRESIDENT_ARRESTED, 1, CODES_END };
+u16 actor41Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x19, 4, 275, 255, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x19, 4, 275, 255, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x19, 4, 275, 255, 1 };

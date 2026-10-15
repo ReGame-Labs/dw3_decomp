@@ -10,12 +10,12 @@
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xD4)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_01)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x4B7
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xCC)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_01)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x4C7
 #endif
 /*
@@ -31,8 +31,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x1F800, 0x2E200};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x17;
-    FIELDSTG_state.music = MUSIC(0x17, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_BYAKKO_CITY);
+    FIELDSTG_state.music = MUSIC_BYAKKO_CITY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -41,12 +41,12 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
     if (GAME.progress >= STORY_DE_SINCERITY && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -261,22 +261,22 @@ FieldTalk actor28Talks[] = {
     { NULL, NULL, 0x153 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor1Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor2Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(8), 1, CODES_END };
-u16 actor5Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor0Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
+u16 actor1Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
+u16 actor2Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
+u16 actor3Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
+u16 actor4Conditions[] = { SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1, CODES_END };
+u16 actor5Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor7Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor7Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor8Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor9Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor9Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor11Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor11Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor12Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor13Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor13Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor14Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor15Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor15Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor16Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor17Conditions[] = { FLAG(0x1C, 0x26), 1, CODES_END };
 u16 actor18Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
@@ -287,9 +287,9 @@ u16 actor22Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor23Conditions[] = { FLAG(0x1C, 0x26), 1, CODES_END };
 u16 actor24Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor25Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
-u16 actor26Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor27Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor28Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor26Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor27Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor28Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x14, 4, 908, 596, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x15, 5, 1119, 502, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x16, 6, 834, 470, 7 };

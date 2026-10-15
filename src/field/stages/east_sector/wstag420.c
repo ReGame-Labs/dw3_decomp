@@ -42,12 +42,12 @@ void endEvent71(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xD4)
-#define EVENT_TEXT_FILE 0x12E
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_01)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_400 - 1)
 #define STAGE_FILE 0x775
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xCC)
-#define EVENT_TEXT_FILE 0x135
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_01)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_400 - 1)
 #define STAGE_FILE 0x784
 #endif
 /*
@@ -63,8 +63,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x1D100, 0x1F600};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0xC;
-    FIELDSTG_state.music = MUSIC(0xC, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SEIRYU_CITY);
+    FIELDSTG_state.music = MUSIC_SEIRYU_CITY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -73,8 +73,8 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -178,9 +178,9 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 209, 20, MUSIC(3, 0) };
-AreaBattle area3Battle1 = { 3, 18, MUSIC(0x23, 0) };
-AreaBattle area3Battle2 = { 301, 18, MUSIC(0x23, 0) };
+AreaBattle area3Battle0 = { 209, 20, MUSIC_BATTLE_1 };
+AreaBattle area3Battle1 = { 3, 18, MUSIC_BOSS_1 };
+AreaBattle area3Battle2 = { 301, 18, MUSIC_BOSS_1 };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
@@ -217,58 +217,58 @@ ActorImage stageImages[] = {
 };
 u16 actor0Talk0Conditions[] = { FLAG_DRI_JIMMY_TALKED, 0, CODES_END };
 u16 actor0Talk0Actions[] = { FLAG_DRI_JIMMY_TALKED, 1, CODES_END };
-u16 actor0Talk1Conditions[] = { FLAG_DRI_JIMMY_TALKED, 1, SPECIAL(0x2C), 0, CODES_END };
+u16 actor0Talk1Conditions[] = { FLAG_DRI_JIMMY_TALKED, 1, SPECIAL_GUILMON_LOCKED, 0, CODES_END };
 u16 actor0Talk2Conditions[] = {
     FLAG_DRI_JIMMY_TALKED, 1,
-    SPECIAL(0x2C), 1,
-    SPECIAL(0x25), 0,
+    SPECIAL_GUILMON_LOCKED, 1,
+    SPECIAL_PARTY_LEVEL_TOTAL_30, 0,
     CODES_END,
 };
 u16 actor0Talk3Conditions[] = {
     FLAG_DRI_JIMMY_TALKED, 1,
-    SPECIAL(0x2C), 1,
-    SPECIAL(0x25), 1,
-    SPECIAL(0x27), 0,
+    SPECIAL_GUILMON_LOCKED, 1,
+    SPECIAL_PARTY_LEVEL_TOTAL_30, 1,
+    SPECIAL_PARTY_LEVEL_TOTAL_60, 0,
     CODES_END,
 };
 u16 actor0Talk3Actions[] = { FLAG_GUILMON_DDNA_REQUESTED, 1, CODES_END };
 u16 actor0Talk4Conditions[] = {
     FLAG_DRI_JIMMY_TALKED, 1,
-    SPECIAL(0x2C), 1,
-    SPECIAL(0x25), 1,
-    SPECIAL(0x27), 1,
+    SPECIAL_GUILMON_LOCKED, 1,
+    SPECIAL_PARTY_LEVEL_TOTAL_30, 1,
+    SPECIAL_PARTY_LEVEL_TOTAL_60, 1,
     CODES_END,
 };
-u16 actor1Talk0Conditions[] = { SPECIAL(0xC), 0, CODES_END };
-u16 actor1Talk0Actions[] = { SPECIAL(0x33), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor1Talk1Conditions[] = { SPECIAL(0xC), 1, CODES_END };
+u16 actor1Talk0Conditions[] = { SPECIAL_GUILMON_UNLOCKED, 0, CODES_END };
+u16 actor1Talk0Actions[] = { SPECIAL_UNLOCK_GUILMON, 1, SPECIAL_SHOW_ITEM_GET_ICON, 1, CODES_END };
+u16 actor1Talk1Conditions[] = { SPECIAL_GUILMON_UNLOCKED, 1, CODES_END };
 u16 actor2Talk0Conditions[] = { FLAG_DRI_JIMMY_TALKED, 0, CODES_END };
 u16 actor2Talk0Actions[] = { FLAG_DRI_JIMMY_TALKED, 1, CODES_END };
-u16 actor2Talk1Conditions[] = { FLAG_DRI_JIMMY_TALKED, 1, SPECIAL(0x2C), 0, CODES_END };
+u16 actor2Talk1Conditions[] = { FLAG_DRI_JIMMY_TALKED, 1, SPECIAL_GUILMON_LOCKED, 0, CODES_END };
 u16 actor2Talk2Conditions[] = {
     FLAG_DRI_JIMMY_TALKED, 1,
-    SPECIAL(0x2C), 1,
-    SPECIAL(0x25), 0,
+    SPECIAL_GUILMON_LOCKED, 1,
+    SPECIAL_PARTY_LEVEL_TOTAL_30, 0,
     CODES_END,
 };
 u16 actor2Talk3Conditions[] = {
     FLAG_DRI_JIMMY_TALKED, 1,
-    SPECIAL(0x2C), 1,
-    SPECIAL(0x25), 1,
-    SPECIAL(0x27), 0,
+    SPECIAL_GUILMON_LOCKED, 1,
+    SPECIAL_PARTY_LEVEL_TOTAL_30, 1,
+    SPECIAL_PARTY_LEVEL_TOTAL_60, 0,
     CODES_END,
 };
 u16 actor2Talk3Actions[] = { FLAG_GUILMON_DDNA_REQUESTED, 1, CODES_END };
 u16 actor2Talk4Conditions[] = {
     FLAG_DRI_JIMMY_TALKED, 1,
-    SPECIAL(0x2C), 1,
-    SPECIAL(0x25), 1,
-    SPECIAL(0x27), 1,
+    SPECIAL_GUILMON_LOCKED, 1,
+    SPECIAL_PARTY_LEVEL_TOTAL_30, 1,
+    SPECIAL_PARTY_LEVEL_TOTAL_60, 1,
     CODES_END,
 };
-u16 actor3Talk0Conditions[] = { SPECIAL(0xC), 0, CODES_END };
-u16 actor3Talk0Actions[] = { SPECIAL(0x33), 1, SPECIAL(0x13), 1, CODES_END };
-u16 actor3Talk1Conditions[] = { SPECIAL(0xC), 1, CODES_END };
+u16 actor3Talk0Conditions[] = { SPECIAL_GUILMON_UNLOCKED, 0, CODES_END };
+u16 actor3Talk0Actions[] = { SPECIAL_UNLOCK_GUILMON, 1, SPECIAL_SHOW_ITEM_GET_ICON, 1, CODES_END };
+u16 actor3Talk1Conditions[] = { SPECIAL_GUILMON_UNLOCKED, 1, CODES_END };
 u16 actor14Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
 u16 actor14Talk1Conditions[] = { FLAG_CARD_BATTLE_WON, 0, FLAG_CARD_BATTLE_ENDED, 1, CODES_END };
 u16 actor14Talk1Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, CODES_END };
@@ -395,7 +395,7 @@ u16 actor18Talk6Conditions[] = {
 };
 u16 actor18Talk6Actions[] = { CARD_BATTLE(0x13, 1), 1, CODES_END };
 u16 actor31Talk0Conditions[] = {
-    SPECIAL(0x20), 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_NETWORK_OFFLINE, 1,
     PROGRESS(STORY_REAL_WORLD), 0,
     PROGRESS(STORY_NETWORK_OFFLINE), 0,
     FLAG(0, 5), 0,
@@ -404,14 +404,18 @@ u16 actor31Talk0Conditions[] = {
 u16 actor31Talk0Actions[] = { FLAG(0, 5), 1, CODES_END };
 u16 actor31Talk1Conditions[] = {
     FLAG(0, 5), 1,
-    SPECIAL(0x20), 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_NETWORK_OFFLINE, 1,
     PROGRESS(STORY_REAL_WORLD), 0,
     PROGRESS(STORY_NETWORK_OFFLINE), 0,
     CODES_END,
 };
 u16 actor31Talk2Conditions[] = { PROGRESS(STORY_REAL_WORLD), 1, CODES_END };
 u16 actor31Talk3Conditions[] = { PROGRESS(STORY_NETWORK_OFFLINE), 1, CODES_END };
-u16 actor31Talk4Conditions[] = { SPECIAL(0x19), 1, SPECIAL(0x20), 0, CODES_END };
+u16 actor31Talk4Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_NETWORK_OFFLINE, 0,
+    CODES_END,
+};
 u16 actor38Talk0Actions[] = { START_EVENT(0x2E), 1, CODES_END };
 u16 actor41Talk0Conditions[] = { FLAG(0, 0), 0, CODES_END };
 u16 actor41Talk1Conditions[] = { PARTY_STAT(1), 0, FLAG(0, 0), 1, CODES_END };
@@ -774,38 +778,38 @@ FieldTalk actor69Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = {
-    SPECIAL(0x22), 1,
+    SPECIAL_STORY_GENJI_BEATEN_TO_PRESIDENT_ARRESTED, 1,
     PROGRESS(STORY_GENJI_BEATEN), 0,
     ITEM(0, 0x22), 0,
     CODES_END,
 };
 u16 actor1Conditions[] = {
-    SPECIAL(0x22), 1,
+    SPECIAL_STORY_GENJI_BEATEN_TO_PRESIDENT_ARRESTED, 1,
     PROGRESS(STORY_GENJI_BEATEN), 0,
     ITEM(0, 0x22), 1,
     CODES_END,
 };
 u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, ITEM(0, 0x22), 0, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, ITEM(0, 0x22), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor4Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x15), 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF, 1, CODES_END };
 u16 actor7Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor8Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor9Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor9Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor11Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
-u16 actor12Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor13Conditions[] = { SPECIAL(0x17), 1, CODES_END };
+u16 actor12Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
+u16 actor13Conditions[] = { SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_CONTROL_ROOM, 1, CODES_END };
 u16 actor14Conditions[] = {
     ITEM(0, 0x192), 1,
-    SPECIAL(9), 1,
+    SPECIAL_STORY_SINCE_GENJI_BEATEN, 1,
     FLAG_CARD_BATTLE_ENDED, 1,
     CODES_END,
 };
 u16 actor15Conditions[] = {
     ITEM(0, 0x192), 1,
-    SPECIAL(4), 1,
+    SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_AMATERASU_BRIDGE, 1,
     FLAG_CARD_BATTLE_ENDED, 0,
     CODES_END,
 };
@@ -815,50 +819,63 @@ u16 actor16Conditions[] = {
     FLAG_CARD_BATTLE_ENDED, 0,
     CODES_END,
 };
-u16 actor17Conditions[] = { ITEM(0, 0x192), 0, SPECIAL(9), 1, SPECIAL(0x1A), 0, CODES_END };
+u16 actor17Conditions[] = {
+    ITEM(0, 0x192), 0,
+    SPECIAL_STORY_SINCE_GENJI_BEATEN, 1,
+    SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 0,
+    CODES_END,
+};
 u16 actor18Conditions[] = {
     FLAG_CARD_BATTLE_ENDED, 0,
-    SPECIAL(3), 1,
+    SPECIAL_STORY_GENJI_BEATEN_TO_GAME_MASTER_CAUGHT, 1,
     ITEM(0, 0x192), 1,
     CODES_END,
 };
-u16 actor19Conditions[] = { SPECIAL(0x15), 1, CODES_END };
+u16 actor19Conditions[] = { SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF, 1, CODES_END };
 u16 actor20Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor21Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor22Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor22Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor23Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
-u16 actor24Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor24Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor25Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor26Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
-u16 actor27Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor28Conditions[] = { SPECIAL(0x17), 1, CODES_END };
-u16 actor29Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor27Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
+u16 actor28Conditions[] = { SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_CONTROL_ROOM, 1, CODES_END };
+u16 actor29Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor30Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor31Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor32Conditions[] = { SPECIAL(0x15), 1, CODES_END };
+u16 actor31Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
+u16 actor32Conditions[] = { SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF, 1, CODES_END };
 u16 actor33Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor34Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
-u16 actor35Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor36Conditions[] = { SPECIAL(0x17), 1, CODES_END };
+u16 actor35Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
+u16 actor36Conditions[] = { SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_CONTROL_ROOM, 1, CODES_END };
 u16 actor37Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor38Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, FLAG(0x1C, 0x11), 1, CODES_END };
 u16 actor39Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
-u16 actor40Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor41Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor42Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor43Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor44Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor40Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor41Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor42Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor43Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor44Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor45Conditions[] = { PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 1, CODES_END };
 u16 actor46Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, FLAG(0x1C, 0x11), 1, CODES_END };
-u16 actor47Conditions[] = { SPECIAL(0x15), 1, PROGRESS(STORY_SEPIKMON_MASK_LOST), 0, CODES_END };
-u16 actor48Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor47Conditions[] = {
+    SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF, 1,
+    PROGRESS(STORY_SEPIKMON_MASK_LOST), 0,
+    CODES_END,
+};
+u16 actor48Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor49Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor50Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor51Conditions[] = { SPECIAL(0x18), 1, CODES_END };
+u16 actor50Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
+u16 actor51Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
 u16 actor52Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor53Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
-u16 actor54Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor55Conditions[] = { SPECIAL(0x17), 1, PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 0, CODES_END };
+u16 actor54Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
+u16 actor55Conditions[] = {
+    SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_CONTROL_ROOM, 1,
+    PROGRESS(STORY_BYAKKO_LEADER_FOUGHT), 0,
+    CODES_END,
+};
 u16 actor56Conditions[] = {
     PROGRESS(STORY_SEPIKMON_MASK_LOST), 1,
     FLAG_SEPIKMON_LOST_MASK_SEEN, 0,
@@ -873,19 +890,19 @@ u16 actor58Conditions[] = { FLAG(0x1C, 0x46), 1, PROGRESS(STORY_FAKE_BLUE_CARD),
 u16 actor59Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, FLAG(0x1C, 0x11), 1, CODES_END };
 u16 actor60Conditions[] = {
     PROGRESS(STORY_FAKE_BLUE_CARD), 0,
-    SPECIAL(0x15), 1,
+    SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF, 1,
     PROGRESS(STORY_SEPIKMON_MASK_LOST), 0,
     CODES_END,
 };
 u16 actor61Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor62Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor62Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor63Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor64Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor64Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor65Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor66Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
-u16 actor67Conditions[] = { SPECIAL(0x16), 1, CODES_END };
-u16 actor68Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor69Conditions[] = { SPECIAL(0x17), 1, CODES_END };
+u16 actor67Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
+u16 actor68Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
+u16 actor69Conditions[] = { SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_CONTROL_ROOM, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x2B, 4, 1089, 402, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x2B, 4, 1089, 402, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x2B, 4, 1089, 402, 1 };

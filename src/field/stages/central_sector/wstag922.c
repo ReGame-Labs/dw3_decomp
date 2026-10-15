@@ -13,7 +13,7 @@
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_08)
 #define STAGE_FILE 0x8E6
 #define STAGE_FILE_8 0x198
 #elif VERSION_JP
@@ -31,8 +31,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x2DC00, 0xF200};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 4;
-    FIELDSTG_state.music = MUSIC(4, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_ASUKA_CITY);
+    FIELDSTG_state.music = MUSIC_ASUKA_CITY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -56,7 +56,7 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Actions[] = {
     FLAG_AMATERASU_BRIDGE_BOOST_CHIP_FOUND, 1,
     ITEM(1, 0x35), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {

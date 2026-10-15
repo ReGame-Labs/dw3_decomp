@@ -9,10 +9,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x4C2
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x4D2
 #endif
 /* Sets the stage up: its map and actors, playing BGM_0029 */
@@ -26,8 +26,8 @@ void setupStage(void) {
     FIELDSTG_state.start = (Vec2){0xED00, 0xE900};
     FIELDSTG_state.images.actors = stageImages;
     FIELDSTG_state.startDir = 0;
-    FIELDSTG_state.soundBank = 0x1F;
-    FIELDSTG_state.music = MUSIC(0x1F, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+    FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);

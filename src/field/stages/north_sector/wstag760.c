@@ -9,12 +9,12 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xD4)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_01)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x709
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xCC)
-#define EVENT_TEXT_FILE 0x14A
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_01)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x719
 #endif
 /*
@@ -30,8 +30,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x27100, 0x2F000};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x1A;
-    FIELDSTG_state.music = MUSIC(0x1A, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_GENBU_CITY);
+    FIELDSTG_state.music = MUSIC_GENBU_CITY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
@@ -39,8 +39,8 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -95,7 +95,7 @@ u16 actor4Talk0Actions[] = { 0x7C00, 1, CODES_END };
 u16 actor5Talk0Actions[] = {
     ITEM(1, 0x46), 1,
     FLAG_GENBU_CITY_LIFE_DISK_FOUND, 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor46Talk0Actions[] = { 0x7A42, 1, CODES_END };
@@ -328,10 +328,10 @@ u16 actor38Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
 u16 actor39Conditions[] = { PROGRESS(STORY_GENBU_BADGE), 1, CODES_END };
 u16 actor40Conditions[] = { PROGRESS(STORY_WAY_TO_AMATERASU), 1, CODES_END };
 u16 actor41Conditions[] = { PROGRESS(STORY_BLACK_ID_PASS), 1, CODES_END };
-u16 actor42Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor43Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor44Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor45Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor42Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor43Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor44Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor45Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor46Conditions[] = { ITEM(0, 0x192), 1, CODES_END };
 u16 actor47Conditions[] = { ITEM(0, 0x192), 0, CODES_END };
 FieldActorEntry actor0 = { NULL, actor0Talks, 0x14, 4, 1073, 798, 1 };

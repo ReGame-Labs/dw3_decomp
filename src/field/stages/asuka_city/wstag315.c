@@ -9,10 +9,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
 #define STAGE_FILE 0x738
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
 #define STAGE_FILE 0x748
 #endif
 /* Sets the stage up: its map, actors and battles, playing BGM_0003 */
@@ -25,8 +25,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x13B00, 0x1B900};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 6;
-    FIELDSTG_state.music = MUSIC(6, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SEWERS);
+    FIELDSTG_state.music = MUSIC_SEWERS;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -74,7 +74,7 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 192, 12, MUSIC(2, 0) };
+AreaBattle area3Battle0 = { 192, 12, MUSIC_BATTLE };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
@@ -110,19 +110,19 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Actions[] = {
     FLAG_ASUKA_ADMIN_B1F_POWER_CHARGE_FOUND, 1,
     ITEM(1, 0x2B), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor1Talk0Actions[] = {
-    SPECIAL(0x8B), 1,
+    SPECIAL_GAIN_100_BIT, 1,
     FLAG_ASUKA_ADMIN_B1F_100_BIT_FOUND, 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor2Talk0Actions[] = {
     FLAG_ASUKA_ADMIN_B1F_LIFE_DISK_FOUND, 1,
     ITEM(1, 0x46), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor3Talk0Actions[] = {
@@ -275,7 +275,7 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { SPECIAL(0x3F), 1 }, { CODES_END, 0 } }, SLOT_EXIT, 0x21B, 0x338, 0x21C, 1, 0, 0, 0 },
+    { { { SPECIAL_STORY_CONTROL_ROOM_TO_GUNSLINGER, 1 }, { CODES_END, 0 } }, SLOT_EXIT, 0x21B, 0x338, 0x21C, 1, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x215, 0x78, 0x124, 7, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 8, 0x19E, 0x1C0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 8, 0x1AE, 0x248, 0, 0, 0, 0 },

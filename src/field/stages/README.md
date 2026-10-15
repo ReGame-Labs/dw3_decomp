@@ -25,6 +25,12 @@ stage's own and stay numbers, but for the two a card battle leaves
 (FLAG_CARD_BATTLE_WON and FLAG_CARD_BATTLE_ENDED); so do the flags whose
 meaning isn't clear.
 
+The SPECIAL conditions have names in story.h as well (SPECIAL_), after what
+their entry of SPECIAL_CONDITIONS checks: a range of the story
+(SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF), a partner
+(SPECIAL_AGUMON_UNLOCKED, SPECIAL_UNLOCK_AGUMON), an amount of BIT, a set of
+items, the Master Room's sensors, or the player's item-get icon.
+
 Each stage's file starts with a comment that says which map or event it is
 (`tools/stage_names_doc.py` writes them, and the names below).
 

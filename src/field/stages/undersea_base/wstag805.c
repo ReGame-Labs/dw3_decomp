@@ -369,12 +369,12 @@ void endEvent882(void) {
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
-#define EVENT_TEXT_FILE 0x14A
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_800 - 1)
 #define STAGE_FILE 0x662
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
-#define EVENT_TEXT_FILE 0x151
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_800 - 1)
 #define STAGE_FILE 0x672
 #endif
 /* Sets the stage up: its map, actors, battles and events, playing BGM_0011 */
@@ -386,8 +386,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x2A000, 0x18C00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0xD;
-    FIELDSTG_state.music = MUSIC(0xD, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_MAGASTA);
+    FIELDSTG_state.music = MUSIC_MAGASTA;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -716,7 +716,7 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 22, 18, MUSIC(0x23, 0) };
+AreaBattle area3Battle0 = { 22, 18, MUSIC_BOSS_1 };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };

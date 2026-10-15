@@ -13,7 +13,7 @@
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x01 };
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0x104)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_09)
 #define STAGE_FILE 0x931
 #define STAGE_FILE_8 0x700
 #elif VERSION_JP
@@ -31,8 +31,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0xDB00, 0x12300};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x1D;
-    FIELDSTG_state.music = MUSIC(0x1D, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SEABED);
+    FIELDSTG_state.music = MUSIC_SEABED;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -97,14 +97,14 @@ StageSlot stageSlots[] = {
 void (*stageFuncs[])(void) = {
     setupStage,
 };
-AreaBattle area0Battle0 = { 62, 11, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 62, 11, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 62, 11, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 62, 11, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 62, 11, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 62, 11, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 103, 11, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 103, 11, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 62, 11, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 62, 11, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 62, 11, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 62, 11, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 62, 11, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 62, 11, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 103, 11, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 103, 11, MUSIC_BATTLE };
 BattleList area0Battles = {
     5,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,

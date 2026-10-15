@@ -49,12 +49,12 @@ void endEvent1284(void) {
 
 const CVECTOR stageColor = { 0x80, 0x80, 0x80, 0x00 };
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE9)
-#define EVENT_TEXT_FILE 0x120
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_04)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x579
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE1)
-#define EVENT_TEXT_FILE 0x127
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_04)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x589
 #endif
 /* Sets the stage up: its map, actors, battles and events, playing PYRA_BGM */
@@ -67,8 +67,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x11A00, 0x3AD00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0xB;
-    FIELDSTG_state.music = MUSIC(0xB, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_PROTOCOL_RUINS);
+    FIELDSTG_state.music = MUSIC_PROTOCOL_RUINS;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -138,27 +138,27 @@ s16 script1284[] = {
     SCRIPT_WAIT(0x3C),
     SCRIPT_END,
 };
-AreaBattle area0Battle0 = { 96, 7, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 96, 7, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 96, 7, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 96, 7, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 97, 7, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 97, 7, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 97, 7, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 97, 7, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 96, 7, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 96, 7, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 96, 7, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 96, 7, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 97, 7, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 97, 7, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 97, 7, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 97, 7, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
       &area0Battle4, &area0Battle5, &area0Battle6, &area0Battle7 },
 };
-AreaBattle area1Battle0 = { 0, 7, MUSIC(2, 0) };
-AreaBattle area1Battle1 = { 0, 7, MUSIC(2, 0) };
-AreaBattle area1Battle2 = { 0, 7, MUSIC(2, 0) };
-AreaBattle area1Battle3 = { 0, 7, MUSIC(2, 0) };
-AreaBattle area1Battle4 = { 0, 7, MUSIC(2, 0) };
-AreaBattle area1Battle5 = { 0, 7, MUSIC(2, 0) };
-AreaBattle area1Battle6 = { 0, 7, MUSIC(2, 0) };
-AreaBattle area1Battle7 = { 0, 7, MUSIC(2, 0) };
+AreaBattle area1Battle0 = { 0, 7, MUSIC_BATTLE };
+AreaBattle area1Battle1 = { 0, 7, MUSIC_BATTLE };
+AreaBattle area1Battle2 = { 0, 7, MUSIC_BATTLE };
+AreaBattle area1Battle3 = { 0, 7, MUSIC_BATTLE };
+AreaBattle area1Battle4 = { 0, 7, MUSIC_BATTLE };
+AreaBattle area1Battle5 = { 0, 7, MUSIC_BATTLE };
+AreaBattle area1Battle6 = { 0, 7, MUSIC_BATTLE };
+AreaBattle area1Battle7 = { 0, 7, MUSIC_BATTLE };
 BattleList area1Battles = {
     0,
     { &area1Battle0, &area1Battle1, &area1Battle2, &area1Battle3,
@@ -177,12 +177,12 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 13, 19, MUSIC(0x22, 0) };
-AreaBattle area3Battle1 = { 316, 19, MUSIC(0x22, 0) };
+AreaBattle area3Battle0 = { 13, 19, MUSIC_BOSS };
+AreaBattle area3Battle1 = { 316, 19, MUSIC_BOSS };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle5 = { 97, 7, MUSIC(2, 0) };
+AreaBattle area3Battle5 = { 97, 7, MUSIC_BATTLE };
 AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area3Battles = {
@@ -212,7 +212,7 @@ u16 actor0Talk3Actions[] = {
     ITEM(3, 0x8E), 1,
     ITEM(3, 0x8D), 0,
     ITEM(2, 0x8A), 0,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor1Talk0Conditions[] = { FLAG_BK_MAGNAGARGOMON_BEATEN, 0, CODES_END };
@@ -263,14 +263,14 @@ FieldTalk actor5Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = {
-    SPECIAL(0x48), 1,
-    SPECIAL(0x50), 1,
+    SPECIAL_PATAMON_IN_PARTY, 1,
+    SPECIAL_PATAMON_LEVEL_45, 1,
     ITEM(3, 0x8D), 1,
     ITEM(3, 0x8E), 0,
     CODES_END,
 };
-u16 actor1Conditions[] = { SPECIAL(0x1D), 1, CODES_END };
-u16 actor2Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor1Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_BLACK_ID_PASS, 1, CODES_END };
+u16 actor2Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };

@@ -19,10 +19,10 @@ extern AnimFrame updateTileAnimsFrames1[];
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x4CC
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x4DC
 #endif
 /*
@@ -37,15 +37,15 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x11100, 0x12D00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 5;
-    FIELDSTG_state.music = MUSIC(5, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_ADMIN_CENTER);
+    FIELDSTG_state.music = MUSIC_ADMIN_CENTER;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -102,11 +102,11 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 258, 20, MUSIC(3, 0) };
-AreaBattle area3Battle1 = { 259, 20, MUSIC(3, 0) };
-AreaBattle area3Battle2 = { 260, 20, MUSIC(3, 0) };
-AreaBattle area3Battle3 = { 261, 20, MUSIC(3, 0) };
-AreaBattle area3Battle4 = { 262, 20, MUSIC(0x23, 0) };
+AreaBattle area3Battle0 = { 258, 20, MUSIC_BATTLE_1 };
+AreaBattle area3Battle1 = { 259, 20, MUSIC_BATTLE_1 };
+AreaBattle area3Battle2 = { 260, 20, MUSIC_BATTLE_1 };
+AreaBattle area3Battle3 = { 261, 20, MUSIC_BATTLE_1 };
+AreaBattle area3Battle4 = { 262, 20, MUSIC_BOSS_1 };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };

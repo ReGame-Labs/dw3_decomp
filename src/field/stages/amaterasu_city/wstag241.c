@@ -10,10 +10,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x4DA
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x4EA
 #endif
 /* Sets the stage up: its map and actors, playing SHOP1BGM */
@@ -26,8 +26,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0xB700, 0x10900};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 7;
-    FIELDSTG_state.music = MUSIC(7, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SHOP_1);
+    FIELDSTG_state.music = MUSIC_SHOP_1;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
@@ -83,8 +83,12 @@ u16 actor3Conditions[] = {
     FLAG_OINKMON_CITIZENS_RESTORED, 1,
     CODES_END,
 };
-u16 actor4Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor5Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor4Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor5Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor7Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor8Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };

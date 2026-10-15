@@ -225,6 +225,61 @@ extern s32 LANGUAGE; /* 2-5 */
 #define TEXT_STATUS 0xB1 /* STATUS: the field menu's and STSTATUS's */
 #define TEXT_STAGE_NAMES 0xB8 /* STNAME */
 
+/*
+ * The stages' text files, by their USA disc names too: TALKnn hold the
+ * stages' talks (a stage's STAGE_TEXT, the file shared by a set of stages),
+ * DMGnnn the events of the stages from WSTAGnnn on (EVENT_TEXT_FILE, which
+ * counts from TEXT_FILE(1), so is the file - 1), but for DMG260, DMG270 and
+ * DMG305, of one stage each. The European disc numbers the TALK files 7
+ * lower and has its extra chapter's two after them, so the others 7 higher;
+ * the Japanese version has the extra chapter's (MSTALK08, MSTALK09,
+ * MSDMG900) after its stages' files, and reads them by number.
+ */
+#if VERSION_US || VERSION_JP
+#define TEXT_TALKS_00 0xCD /* TALK00 */
+#define TEXT_TALKS_01 0xD4 /* TALK01 */
+#define TEXT_TALKS_02 0xDB /* TALK02 */
+#define TEXT_TALKS_03 0xE2 /* TALK03 */
+#define TEXT_TALKS_04 0xE9 /* TALK04 */
+#define TEXT_TALKS_05 0xF0 /* TALK05 */
+#define TEXT_TALKS_06 0xF7 /* TALK06 */
+#define TEXT_TALKS_07 0xFE /* TALK07 */
+#define TEXT_TRAINING 0x105 /* TRAINI: STGTRAIN's */
+#define TEXT_EVENTS_200 0x10C /* DMG200 */
+#define TEXT_EVENTS_260 0x113 /* DMG260: the story events' (WSTAG260, FIELDSTG_setupField) */
+#define TEXT_EVENTS_270 0x11A /* DMG270: the Yellow Cruiser's (WSTAG270) */
+#define TEXT_EVENTS_300 0x121 /* DMG300 */
+#define TEXT_EVENTS_305 0x128 /* DMG305: the Master Room's (WSTAG305) */
+#define TEXT_EVENTS_400 0x12F /* DMG400 */
+#define TEXT_EVENTS_500 0x136 /* DMG500 */
+#define TEXT_EVENTS_600 0x13D /* DMG600 */
+#define TEXT_EVENTS_700 0x144 /* DMG700 */
+#define TEXT_EVENTS_800 0x14B /* DMG800 */
+#elif VERSION_EU
+#define TEXT_TALKS_00 0xC6
+#define TEXT_TALKS_01 0xCD
+#define TEXT_TALKS_02 0xD4
+#define TEXT_TALKS_03 0xDB
+#define TEXT_TALKS_04 0xE2
+#define TEXT_TALKS_05 0xE9
+#define TEXT_TALKS_06 0xF0
+#define TEXT_TALKS_07 0xF7
+#define TEXT_TALKS_08 0xFE /* TALK08: the extra chapter's */
+#define TEXT_TALKS_09 0x105 /* TALK09: the extra chapter's */
+#define TEXT_TRAINING 0x10C
+#define TEXT_EVENTS_200 0x113
+#define TEXT_EVENTS_260 0x11A
+#define TEXT_EVENTS_270 0x121
+#define TEXT_EVENTS_300 0x128
+#define TEXT_EVENTS_305 0x12F
+#define TEXT_EVENTS_400 0x136
+#define TEXT_EVENTS_500 0x13D
+#define TEXT_EVENTS_600 0x144
+#define TEXT_EVENTS_700 0x14B
+#define TEXT_EVENTS_800 0x152
+#define TEXT_EVENTS_900 0x159 /* DMG900: the extra chapter's (EXTRA_TEXT) */
+#endif
+
 /* The battle menu's files (WFIGHTMN, WFIGHTTS): FILE_BATTLE_IMAGES is an
    archive whose entries go through FILE_CACHE.getEntry, the four after it
    are archives of images for VRAM */

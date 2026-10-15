@@ -89,12 +89,12 @@ void endEvent520(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
-#define EVENT_TEXT_FILE 0x135
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x771
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x780
 #endif
 /* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0017 */
@@ -107,8 +107,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0xF600, 0x3B200};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x39;
-    FIELDSTG_state.music = MUSIC(0x39, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DUM_DUM_FACTORY);
+    FIELDSTG_state.music = MUSIC_DUM_DUM_FACTORY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -407,14 +407,14 @@ s16 script520[] = {
     SCRIPT_WAIT(0x1E),
     SCRIPT_END,
 };
-AreaBattle area0Battle0 = { 80, 12, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 80, 12, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 79, 12, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 79, 12, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 78, 12, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 78, 12, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 77, 12, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 77, 12, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 80, 12, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 80, 12, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 79, 12, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 79, 12, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 78, 12, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 78, 12, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 77, 12, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 77, 12, MUSIC_BATTLE };
 BattleList area0Battles = {
     2,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -595,7 +595,7 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x252, 0x258, 0x24C, 5, 0x6A, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x251, 0x108, 0x174, 5, 0x66, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x252, 0x68, 0x20C, 3, 0x64, 0, 0 },
-    { { { SPECIAL(0x40), 1 }, { CODES_END, 0 } }, SLOT_EXIT, 0x253, 0x278, 0xD4, 3, 0x68, 0, 0 },
+    { { { SPECIAL_STORY_SINCE_LISA_SAVED, 1 }, { CODES_END, 0 } }, SLOT_EXIT, 0x253, 0x278, 0xD4, 3, 0x68, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 6, 0x160, 0x80, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 6, 0x170, 0xE8, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 0xC, 0xDF, 0x142, 0, 0, 0, 0 },

@@ -10,7 +10,7 @@
 extern Vec2 farSpriteSpots[];
 
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0x104)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_09)
 #define STAGE_FILE 0x919
 #define STAGE_FILE_8 0x1BE
 #elif VERSION_JP
@@ -82,8 +82,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x1AF00, 0x3B400};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0xB;
-    FIELDSTG_state.music = MUSIC(0xB, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_PROTOCOL_RUINS);
+    FIELDSTG_state.music = MUSIC_PROTOCOL_RUINS;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -133,14 +133,30 @@ u16 actor1Talk2Actions[] = { FLAG(0, 0), 1, CODES_END };
 u16 actor1Talk3Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 1, CODES_END };
 u16 actor1Talk3Actions[] = { CARD_BATTLE(0x42, 1), 1, CODES_END };
 u16 actor2Talk0Actions[] = { 0x7C01, 1, CODES_END };
-u16 actor3Talk0Conditions[] = { SPECIAL(0x96), 0, CODES_END };
-u16 actor3Talk1Conditions[] = { SPECIAL(0x96), 1, FLAG_ZHU_QUE_LEADER_FOUGHT, 0, CODES_END };
+u16 actor3Talk0Conditions[] = { SPECIAL_HAS_FIVE_EPIC_ITEMS, 0, CODES_END };
+u16 actor3Talk1Conditions[] = {
+    SPECIAL_HAS_FIVE_EPIC_ITEMS, 1,
+    FLAG_ZHU_QUE_LEADER_FOUGHT, 0,
+    CODES_END,
+};
 u16 actor3Talk1Actions[] = { EVENT_BATTLE(0), 1, FLAG_ZHU_QUE_LEADER_FOUGHT, 1, CODES_END };
-u16 actor3Talk2Conditions[] = { SPECIAL(0x96), 1, FLAG_ZHU_QUE_LEADER_FOUGHT, 1, CODES_END };
-u16 actor4Talk0Conditions[] = { SPECIAL(0x96), 0, CODES_END };
-u16 actor4Talk1Conditions[] = { SPECIAL(0x96), 1, FLAG_BAI_HU_LEADER_FOUGHT, 0, CODES_END };
+u16 actor3Talk2Conditions[] = {
+    SPECIAL_HAS_FIVE_EPIC_ITEMS, 1,
+    FLAG_ZHU_QUE_LEADER_FOUGHT, 1,
+    CODES_END,
+};
+u16 actor4Talk0Conditions[] = { SPECIAL_HAS_FIVE_EPIC_ITEMS, 0, CODES_END };
+u16 actor4Talk1Conditions[] = {
+    SPECIAL_HAS_FIVE_EPIC_ITEMS, 1,
+    FLAG_BAI_HU_LEADER_FOUGHT, 0,
+    CODES_END,
+};
 u16 actor4Talk1Actions[] = { FLAG_BAI_HU_LEADER_FOUGHT, 1, EVENT_BATTLE(1), 1, CODES_END };
-u16 actor4Talk2Conditions[] = { SPECIAL(0x96), 1, FLAG_BAI_HU_LEADER_FOUGHT, 1, CODES_END };
+u16 actor4Talk2Conditions[] = {
+    SPECIAL_HAS_FIVE_EPIC_ITEMS, 1,
+    FLAG_BAI_HU_LEADER_FOUGHT, 1,
+    CODES_END,
+};
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x39 },
     { NULL, NULL, 0 },
@@ -205,14 +221,14 @@ FieldEvent stageEvents[] = {
     { 9000, NULL, 0, FIELDSTG_startEventBattle5, NULL },
     { -1, NULL, 0, NULL, NULL },
 };
-AreaBattle area0Battle0 = { 46, 7, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 46, 7, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 150, 7, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 150, 7, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 96, 7, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 96, 7, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 97, 7, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 97, 7, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 46, 7, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 46, 7, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 150, 7, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 150, 7, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 96, 7, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 96, 7, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 97, 7, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 97, 7, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -244,8 +260,8 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 306, 18, MUSIC(0x23, 0) };
-AreaBattle area3Battle1 = { 307, 18, MUSIC(0x23, 0) };
+AreaBattle area3Battle0 = { 306, 18, MUSIC_BOSS_1 };
+AreaBattle area3Battle1 = { 307, 18, MUSIC_BOSS_1 };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };

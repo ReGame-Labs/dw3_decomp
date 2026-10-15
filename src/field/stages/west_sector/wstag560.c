@@ -18,13 +18,13 @@ void endEvent1459(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
-#define EVENT_TEXT_FILE 0x135
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x2A1
 #define STAGE_ARCHIVE 0x315
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_500 - 1)
 #define STAGE_FILE 0x2B0
 #define STAGE_ARCHIVE 0x324
 #endif
@@ -38,8 +38,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x25900, 0x1AB00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x41;
-    FIELDSTG_state.music = MUSIC(0x41, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_PELCHE_OASIS);
+    FIELDSTG_state.music = MUSIC_PELCHE_OASIS;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -78,27 +78,27 @@ s16 script1459[] = {
     0xAFBF,
 #endif
 };
-AreaBattle area0Battle0 = { 148, 3, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 148, 3, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 148, 3, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 148, 3, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 154, 3, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 154, 3, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 154, 3, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 154, 3, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 148, 3, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 148, 3, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 148, 3, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 148, 3, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 154, 3, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 154, 3, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 154, 3, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 154, 3, MUSIC_BATTLE };
 BattleList area0Battles = {
     3,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
       &area0Battle4, &area0Battle5, &area0Battle6, &area0Battle7 },
 };
-AreaBattle area1Battle0 = { 148, 8, MUSIC(2, 0) };
-AreaBattle area1Battle1 = { 148, 8, MUSIC(2, 0) };
-AreaBattle area1Battle2 = { 148, 8, MUSIC(2, 0) };
-AreaBattle area1Battle3 = { 148, 8, MUSIC(2, 0) };
-AreaBattle area1Battle4 = { 154, 8, MUSIC(2, 0) };
-AreaBattle area1Battle5 = { 154, 8, MUSIC(2, 0) };
-AreaBattle area1Battle6 = { 154, 8, MUSIC(2, 0) };
-AreaBattle area1Battle7 = { 154, 8, MUSIC(2, 0) };
+AreaBattle area1Battle0 = { 148, 8, MUSIC_BATTLE };
+AreaBattle area1Battle1 = { 148, 8, MUSIC_BATTLE };
+AreaBattle area1Battle2 = { 148, 8, MUSIC_BATTLE };
+AreaBattle area1Battle3 = { 148, 8, MUSIC_BATTLE };
+AreaBattle area1Battle4 = { 154, 8, MUSIC_BATTLE };
+AreaBattle area1Battle5 = { 154, 8, MUSIC_BATTLE };
+AreaBattle area1Battle6 = { 154, 8, MUSIC_BATTLE };
+AreaBattle area1Battle7 = { 154, 8, MUSIC_BATTLE };
 BattleList area1Battles = {
     3,
     { &area1Battle0, &area1Battle1, &area1Battle2, &area1Battle3,
@@ -121,10 +121,10 @@ AreaBattle area3Battle0 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle4 = { 330, 8, MUSIC(2, 0) };
+AreaBattle area3Battle4 = { 330, 8, MUSIC_BATTLE };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle7 = { 61, 8, MUSIC(2, 0) };
+AreaBattle area3Battle7 = { 61, 8, MUSIC_BATTLE };
 BattleList area3Battles = {
     0,
     { &area3Battle0, &area3Battle1, &area3Battle2, &area3Battle3,
@@ -150,7 +150,7 @@ u16 actor1Talk0Actions[] = { START_EVENT(0x65), 1, CODES_END };
 u16 actor2Talk0Actions[] = {
     FLAG_PELCHE_OASIS_CHARISMA_CHIP_FOUND, 1,
     ITEM(1, 0x36), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {
@@ -170,7 +170,11 @@ FieldTalk actor3Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor2Conditions[] = { FLAG_PELCHE_OASIS_CHARISMA_CHIP_FOUND, 0, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(0x16), 1, PROGRESS(STORY_LISA_SAVED), 0, CODES_END };
+u16 actor3Conditions[] = {
+    SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1,
+    PROGRESS(STORY_LISA_SAVED), 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { NULL, actor0Talks, 0x14, 4, 450, 368, 1 };
 FieldActorEntry actor1 = { NULL, actor1Talks, 0x15, 5, 247, 291, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x21, 6, 502, 546, 1 };
@@ -215,11 +219,11 @@ StageTile stageObjects[] = {
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x248, 0x610, 0x240, 1, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x24A, 0x80, 0x178, 7, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 5, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 5, 1 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFC8, 0x3C, 0, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0xFFD0, 0xFFF8, 0, 0, 0, 0, 0 },
     { { { ITEM(0, 5), 1 }, { CODES_END, 0 } }, SLOT_GAUGE, 0x40, 0xFFF0, 0, 0, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 5, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E2, 0xB0, 0x148, 7, 0, 5, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

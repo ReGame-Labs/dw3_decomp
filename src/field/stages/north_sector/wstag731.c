@@ -19,12 +19,12 @@ extern AnimFrame updateTileAnimsFrames[];
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x6B8
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
-#define EVENT_TEXT_FILE 0x14A
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x6C7
 #endif
 /* Sets the stage up: its map, actors and events, playing SHOP2BGM */
@@ -37,8 +37,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0xCE00, 0xDD00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 8;
-    FIELDSTG_state.music = MUSIC(8, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SHOP_2);
+    FIELDSTG_state.music = MUSIC_SHOP_2;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
@@ -97,7 +97,7 @@ u16 actor2Talk3Actions[] = {
     ITEM(3, 0x9C), 1,
     ITEM(3, 0x9B), 0,
     ITEM(2, 0x98), 0,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor4Talk0Conditions[] = { ITEM(3, 0x90), 1, CODES_END };
@@ -109,7 +109,7 @@ u16 actor4Talk3Actions[] = {
     ITEM(3, 0x90), 1,
     ITEM(3, 0x8F), 0,
     ITEM(2, 0x8C), 0,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor6Talk0Conditions[] = { ITEM(3, 0x77), 1, CODES_END };
@@ -121,7 +121,7 @@ u16 actor6Talk3Actions[] = {
     ITEM(3, 0x77), 1,
     ITEM(3, 0x76), 0,
     ITEM(2, 0x73), 0,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor8Talk0Conditions[] = { ITEM(3, 0x83), 1, CODES_END };
@@ -133,7 +133,7 @@ u16 actor8Talk3Actions[] = {
     ITEM(3, 0x83), 1,
     ITEM(3, 0x82), 0,
     ITEM(2, 0x7F), 0,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor10Talk0Conditions[] = { ITEM(3, 0x69), 1, CODES_END };
@@ -145,7 +145,7 @@ u16 actor10Talk3Actions[] = {
     ITEM(3, 0x69), 1,
     ITEM(3, 0x68), 0,
     ITEM(2, 0x65), 0,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {

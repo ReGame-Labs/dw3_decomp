@@ -10,12 +10,12 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x6C9
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
-#define EVENT_TEXT_FILE 0x14A
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x6D8
 #endif
 /*
@@ -31,8 +31,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x25D00, 0x2F900};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x1A;
-    FIELDSTG_state.music = MUSIC(0x1A, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_GENBU_CITY);
+    FIELDSTG_state.music = MUSIC_GENBU_CITY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -41,8 +41,8 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -106,10 +106,10 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 251, 18, MUSIC(2, 0) };
-AreaBattle area3Battle1 = { 252, 18, MUSIC(2, 0) };
-AreaBattle area3Battle2 = { 299, 18, MUSIC(3, 0) };
-AreaBattle area3Battle3 = { 300, 18, MUSIC(3, 0) };
+AreaBattle area3Battle0 = { 251, 18, MUSIC_BATTLE };
+AreaBattle area3Battle1 = { 252, 18, MUSIC_BATTLE };
+AreaBattle area3Battle2 = { 299, 18, MUSIC_BATTLE_1 };
+AreaBattle area3Battle3 = { 300, 18, MUSIC_BATTLE_1 };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
@@ -151,7 +151,7 @@ u16 actor4Talk0Actions[] = { 0x7C00, 1, CODES_END };
 u16 actor5Talk0Actions[] = {
     FLAG_XUAN_WU_CITY_KULON_SHIELD_FOUND, 1,
     ITEM(5, 0x118), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor8Talk0Conditions[] = { FLAG_CARD_BATTLE_WON, 1, FLAG_CARD_BATTLE_ENDED, 1, CODES_END };
@@ -449,18 +449,42 @@ u16 actor7Conditions[] = {
     FLAG_OINKMON_CITIZENS_RESTORED, 1,
     CODES_END,
 };
-u16 actor8Conditions[] = { ITEM(0, 0x192), 1, SPECIAL(0x19), 1, CODES_END };
+u16 actor8Conditions[] = {
+    ITEM(0, 0x192), 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    CODES_END,
+};
 u16 actor9Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor11Conditions[] = { ITEM(0, 0x192), 0, SPECIAL(0x19), 1, CODES_END };
-u16 actor12Conditions[] = { ITEM(0, 0x192), 1, SPECIAL(0x19), 1, CODES_END };
+u16 actor11Conditions[] = {
+    ITEM(0, 0x192), 0,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    CODES_END,
+};
+u16 actor12Conditions[] = {
+    ITEM(0, 0x192), 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    CODES_END,
+};
 u16 actor13Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor14Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor15Conditions[] = { ITEM(0, 0x192), 0, SPECIAL(0x19), 1, CODES_END };
-u16 actor16Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor17Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor18Conditions[] = { SPECIAL(0x1E), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor19Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor15Conditions[] = {
+    ITEM(0, 0x192), 0,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    CODES_END,
+};
+u16 actor16Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor17Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor18Conditions[] = {
+    SPECIAL_STORY_JUNGLE_SOUND_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor19Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 FieldActorEntry actor0 = { NULL, actor0Talks, 0x14, 4, 1073, 798, 1 };
 FieldActorEntry actor1 = { NULL, actor1Talks, 0x15, 5, 1233, 881, 1 };
 FieldActorEntry actor2 = { NULL, actor2Talks, 0x16, 6, 705, 597, 1 };

@@ -3,7 +3,8 @@
 #include "field/field_mode.h"
 
 /* The ends of the events of question n's answers (FIELDSTG_events): both set
-   event flag 0x400 + n, and the first answer's also applies actions a and b */
+   event flag 0x400 + n, and the first answer's also applies a, the auction's
+   price (SPECIAL_LOSE_*_BIT), and b */
 #define END_CHOICE(n, a, b)                     \
     void FIELDSTG_endChoice##n##Answer0(void) { \
         FLAGS_00.applyAction(a, 1);             \
@@ -15,22 +16,22 @@
         FLAGS_00.applyAction(0x400 + n, 1);     \
     }
 
-END_CHOICE(0, 0x707E, 0x8B19)
-END_CHOICE(1, 0x707E, 0x8B1F)
-END_CHOICE(2, 0x707F, 0x8B1A)
-END_CHOICE(3, 0x707F, 0x8B20)
-END_CHOICE(4, 0x7080, 0x8489)
-END_CHOICE(5, 0x7080, 0x8495)
-END_CHOICE(6, 0x7081, 0x847C)
-END_CHOICE(7, 0x7081, 0x8462)
-END_CHOICE(8, 0x7082, 0x8ADE)
-END_CHOICE(9, 0x7082, 0x8AE8)
-END_CHOICE(10, 0x7083, 0x8AF4)
-END_CHOICE(11, 0x7083, 0x8AF3)
-END_CHOICE(12, 0x7084, 0x8B01)
-END_CHOICE(13, 0x7085, 0x8B0D)
-END_CHOICE(14, 0x7086, 0x8B02)
-END_CHOICE(15, 0x7087, 0x8B0F)
+END_CHOICE(0, SPECIAL_LOSE_800_BIT, 0x8B19)
+END_CHOICE(1, SPECIAL_LOSE_800_BIT, 0x8B1F)
+END_CHOICE(2, SPECIAL_LOSE_1600_BIT, 0x8B1A)
+END_CHOICE(3, SPECIAL_LOSE_1600_BIT, 0x8B20)
+END_CHOICE(4, SPECIAL_LOSE_2700_BIT, 0x8489)
+END_CHOICE(5, SPECIAL_LOSE_2700_BIT, 0x8495)
+END_CHOICE(6, SPECIAL_LOSE_4000_BIT, 0x847C)
+END_CHOICE(7, SPECIAL_LOSE_4000_BIT, 0x8462)
+END_CHOICE(8, SPECIAL_LOSE_6000_BIT, 0x8ADE)
+END_CHOICE(9, SPECIAL_LOSE_6000_BIT, 0x8AE8)
+END_CHOICE(10, SPECIAL_LOSE_8700_BIT, 0x8AF4)
+END_CHOICE(11, SPECIAL_LOSE_8700_BIT, 0x8AF3)
+END_CHOICE(12, SPECIAL_LOSE_11500_BIT, 0x8B01)
+END_CHOICE(13, SPECIAL_LOSE_17500_BIT, 0x8B0D)
+END_CHOICE(14, SPECIAL_LOSE_24000_BIT, 0x8B02)
+END_CHOICE(15, SPECIAL_LOSE_32000_BIT, 0x8B0F)
 
 /* The color the field's stage starts with (FieldState.spriteColor) */
 const CVECTOR FIELDSTG_startColor = {0x80, 0x80, 0x80, 0};
@@ -49,7 +50,7 @@ const CVECTOR FIELDSTG_startColor = {0x80, 0x80, 0x80, 0};
  */
 void FIELDSTG_setupField(void) {
 #if VERSION_US || VERSION_JP
-    FIELDSTG_state.textFile = TEXT_FILE(0xF0);
+    FIELDSTG_state.textFile = TEXT_FILE(TEXT_TALKS_05);
 #endif
     FIELDSTG_state.mapFile = FIELD_FILE - 1;
     FIELDSTG_state.sheetEntry = FIELD_FILE << 16;
@@ -59,14 +60,14 @@ void FIELDSTG_setupField(void) {
     FIELDSTG_state.imageFile = 0x31D;
 #elif VERSION_EU
     FIELDSTG_state.imageFile = 0x32C;
-    FIELDSTG_state.textFile = LANGUAGE + 0xE8;
+    FIELDSTG_state.textFile = TEXT_FILE(TEXT_TALKS_05);
 #endif
     FIELDSTG_state.start = (Vec2){0x6700, 0x12300};
     FIELDSTG_state.images.field = &FIELDSTG_images.field;
-    FIELDSTG_state.soundBank = 0x42;
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CARGO_TOWER);
     FIELDSTG_state.actors = FIELDSTG_actorList;
     FIELDSTG_state.startDir = 0;
-    FIELDSTG_state.music = MUSIC(0x42, 2);
+    FIELDSTG_state.music = MUSIC_CARGO_TOWER;
     FIELDSTG_state.spriteColor = FIELDSTG_startColor;
     FIELDSTG_state.events = FIELDSTG_events;
     FIELDSTG_map.setFile(0, FIELD_FILE << 16 | 2);
@@ -90,8 +91,8 @@ void FIELDSTG_setupField(void) {
     case STORY_AMATERASU_BRIDGE:
     case STORY_PRESIDENT_ARRESTED:
     case STORY_ASUKA_HEADQUARTERS:
-        FIELDSTG_state.soundBank = 0x42;
-        FIELDSTG_state.music = MUSIC(0x42, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_EAUCTION);
+        FIELDSTG_state.music = MUSIC_EAUCTION;
         break;
     }
 }

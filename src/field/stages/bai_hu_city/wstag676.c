@@ -45,12 +45,12 @@ void endEvent901(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x652
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x662
 #endif
 /*
@@ -66,8 +66,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x14E00, 0x1E900};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x17;
-    FIELDSTG_state.music = MUSIC(0x17, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_BYAKKO_CITY);
+    FIELDSTG_state.music = MUSIC_BYAKKO_CITY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -76,8 +76,8 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -179,8 +179,8 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 25, 18, MUSIC(0x23, 0) };
-AreaBattle area3Battle1 = { 307, 18, MUSIC(0x23, 0) };
+AreaBattle area3Battle0 = { 25, 18, MUSIC_BOSS_1 };
+AreaBattle area3Battle1 = { 307, 18, MUSIC_BOSS_1 };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
@@ -278,13 +278,13 @@ FieldTalk actor10Talks[] = {
 u16 actor0Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor5Conditions[] = { SPECIAL(0x19), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor3Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
+u16 actor4Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
+u16 actor5Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor7Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor8Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor9Conditions[] = { SPECIAL(0x94), 1, CODES_END };
+u16 actor9Conditions[] = { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1, CODES_END };
 u16 actor10Conditions[] = {
     FLAG_BAI_HU_CHIEF_WIN_SEEN, 0,
     PROGRESS(STORY_WAY_TO_AMATERASU), 1,

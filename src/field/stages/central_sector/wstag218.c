@@ -12,10 +12,10 @@
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
 #define STAGE_FILE 0x32E
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
 #define STAGE_FILE 0x33D
 #endif
 /*
@@ -31,8 +31,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x11400, 0xC100};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 4;
-    FIELDSTG_state.music = MUSIC(4, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_ASUKA_CITY);
+    FIELDSTG_state.music = MUSIC_ASUKA_CITY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -41,12 +41,12 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= STORY_BYAKKO_LEADER_FOUGHT && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
     if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -89,7 +89,7 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 188, 18, MUSIC(2, 0) };
+AreaBattle area3Battle0 = { 188, 18, MUSIC_BATTLE };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
@@ -117,14 +117,14 @@ ActorImage stageImages[] = {
 };
 u16 actor0Talk0Actions[] = {
     FLAG_ASUKA_CITY_1000_BIT_FOUND, 1,
-    SPECIAL(0x8E), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_GAIN_1000_BIT, 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor1Talk0Actions[] = {
     FLAG_ASUKA_CITY_POWER_CHARGE_FOUND, 1,
     ITEM(1, 0x2B), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {

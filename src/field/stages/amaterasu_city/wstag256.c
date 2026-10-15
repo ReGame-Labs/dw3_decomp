@@ -10,11 +10,11 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x282
 #define STAGE_ARCHIVE 0x3C1
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x291
 #define STAGE_ARCHIVE 0x3D1
 #endif
@@ -28,8 +28,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0xFB00, 0x13500};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 8;
-    FIELDSTG_state.music = MUSIC(8, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SHOP_2);
+    FIELDSTG_state.music = MUSIC_SHOP_2;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16);
@@ -177,26 +177,54 @@ u16 actor10Conditions[] = {
     CODES_END,
 };
 u16 actor11Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor12Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor13Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor14Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor15Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor16Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor17Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor18Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor19Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor20Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor21Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor22Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor23Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor12Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor13Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor14Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor15Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor16Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor17Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor18Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor19Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor20Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor21Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor22Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor23Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor24Conditions[] = {
     PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
     FLAG_OINKMON_CITIZENS_RESTORED, 1,
     CODES_END,
 };
 u16 actor25Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor26Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor27Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
+u16 actor26Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor27Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x19, 4, 275, 255, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x19, 4, 275, 255, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x1A, 5, 256, 321, 1 };

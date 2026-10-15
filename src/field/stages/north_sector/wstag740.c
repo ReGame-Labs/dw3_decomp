@@ -144,12 +144,12 @@ void endEvent9015(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xDB)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x6CE
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xD3)
-#define EVENT_TEXT_FILE 0x14A
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x6DD
 #endif
 /* Sets the stage up: its map, actors, battles and events, playing BGM_0023 */
@@ -162,8 +162,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x12200, 0x2F400};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x19;
-    FIELDSTG_state.music = MUSIC(0x19, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DUNGEON);
+    FIELDSTG_state.music = MUSIC_DUNGEON;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -247,27 +247,27 @@ AnimFrame updateSpritePairFrames_1[] = {
 AnimFrame *updateSpritePairFrames[] = {
     updateSpritePairFrames_0, updateSpritePairFrames_1,
 };
-AreaBattle area0Battle0 = { 119, 24, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 119, 24, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 119, 24, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 168, 24, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 168, 24, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 168, 24, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 111, 24, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 111, 24, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 119, 24, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 119, 24, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 119, 24, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 168, 24, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 168, 24, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 168, 24, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 111, 24, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 111, 24, MUSIC_BATTLE };
 BattleList area0Battles = {
     4,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
       &area0Battle4, &area0Battle5, &area0Battle6, &area0Battle7 },
 };
-AreaBattle area1Battle0 = { 0, 24, MUSIC(2, 0) };
-AreaBattle area1Battle1 = { 0, 24, MUSIC(2, 0) };
-AreaBattle area1Battle2 = { 0, 24, MUSIC(2, 0) };
-AreaBattle area1Battle3 = { 0, 24, MUSIC(2, 0) };
-AreaBattle area1Battle4 = { 0, 24, MUSIC(2, 0) };
-AreaBattle area1Battle5 = { 0, 24, MUSIC(2, 0) };
-AreaBattle area1Battle6 = { 0, 24, MUSIC(2, 0) };
-AreaBattle area1Battle7 = { 0, 24, MUSIC(2, 0) };
+AreaBattle area1Battle0 = { 0, 24, MUSIC_BATTLE };
+AreaBattle area1Battle1 = { 0, 24, MUSIC_BATTLE };
+AreaBattle area1Battle2 = { 0, 24, MUSIC_BATTLE };
+AreaBattle area1Battle3 = { 0, 24, MUSIC_BATTLE };
+AreaBattle area1Battle4 = { 0, 24, MUSIC_BATTLE };
+AreaBattle area1Battle5 = { 0, 24, MUSIC_BATTLE };
+AreaBattle area1Battle6 = { 0, 24, MUSIC_BATTLE };
+AreaBattle area1Battle7 = { 0, 24, MUSIC_BATTLE };
 BattleList area1Battles = {
     0,
     { &area1Battle0, &area1Battle1, &area1Battle2, &area1Battle3,
@@ -286,12 +286,12 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 20, 24, MUSIC(0x23, 0) };
+AreaBattle area3Battle0 = { 20, 24, MUSIC_BOSS_1 };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
-AreaBattle area3Battle5 = { 168, 24, MUSIC(2, 0) };
+AreaBattle area3Battle5 = { 168, 24, MUSIC_BATTLE };
 AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle7 = { 0, 0, MUSIC(1, 0) };
 BattleList area3Battles = {
@@ -332,11 +332,19 @@ FieldTalk actor4Talks[] = {
     { NULL, NULL, 0x206 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor0Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor3Conditions[] = { FLAG_DARK_KNIGHT_CHALLENGE_SEEN, 0, SPECIAL(0x19), 1, CODES_END };
-u16 actor4Conditions[] = { FLAG_DARK_KNIGHT_CHALLENGE_SEEN, 1, SPECIAL(0x19), 1, CODES_END };
+u16 actor3Conditions[] = {
+    FLAG_DARK_KNIGHT_CHALLENGE_SEEN, 0,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    CODES_END,
+};
+u16 actor4Conditions[] = {
+    FLAG_DARK_KNIGHT_CHALLENGE_SEEN, 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x9D, 4, 464, 648, 7 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0xC9, 5, 464, 648, 7 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0xC9, 5, 464, 648, 7 };

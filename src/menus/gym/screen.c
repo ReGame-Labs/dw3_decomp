@@ -641,12 +641,12 @@ void STGTRAIN_updateScreen(TrainScreen *screen, TrainScreenWindows *win) {
         break;
     case TASK_DONE:
         if (SOUND.isLoading() == 0) {
-            SOUND.playSound(MUSIC(0x21, 2));
+            SOUND.playSound(MUSIC_TRAINING);
             screen->setState(screen, TASK_RUN);
         }
         break;
     case TASK_KILL:
-        SOUND.stopSound(MUSIC(0x21, 2));
+        SOUND.stopSound(MUSIC_TRAINING);
         GAME.funcs.requestMode(GAME.fieldMode, 0);
         break;
     }

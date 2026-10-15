@@ -10,13 +10,13 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
-#define EVENT_TEXT_FILE 0x10B
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x199
 #define STAGE_ARCHIVE 0x314
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
-#define EVENT_TEXT_FILE 0x112
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x1A7
 #define STAGE_ARCHIVE 0x323
 #endif
@@ -30,8 +30,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x15A00, 0x18E00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 7;
-    FIELDSTG_state.music = MUSIC(7, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SHOP_1);
+    FIELDSTG_state.music = MUSIC_SHOP_1;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
@@ -958,17 +958,25 @@ u16 actor63Conditions[] = {
 };
 u16 actor64Conditions[] = { PROGRESS(STORY_WHITE_ID_PASS), 1, CODES_END };
 u16 actor65Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor66Conditions[] = { SPECIAL(0x15), 1, CODES_END };
+u16 actor66Conditions[] = { SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF, 1, CODES_END };
 u16 actor67Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor68Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
-u16 actor69Conditions[] = { SPECIAL(0x16), 1, CODES_END };
+u16 actor69Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
 u16 actor70Conditions[] = { PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
-u16 actor71Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor72Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor71Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
+u16 actor72Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor73Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor74Conditions[] = { SPECIAL(0x1A), 1, ITEM(0, 8), 1, CODES_END };
-u16 actor75Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor77Conditions[] = { SPECIAL(0x1A), 1, ITEM(0, 8), 0, CODES_END };
+u16 actor74Conditions[] = {
+    SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1,
+    ITEM(0, 8), 1,
+    CODES_END,
+};
+u16 actor75Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor77Conditions[] = {
+    SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1,
+    ITEM(0, 8), 0,
+    CODES_END,
+};
 u16 actor78Conditions[] = {
     FLAG_SMITH_EL_DORADO_ID_SHOWN, 0,
     PROGRESS(STORY_TEDDY_FOUND), 1,

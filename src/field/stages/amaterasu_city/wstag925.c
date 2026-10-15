@@ -38,11 +38,11 @@ void updateStage(StageTask *task, void **children) {
  */
 void endEvent1600(void) {
     FLAGS_00.applyAction(FLAG(0x40, 0xCD), 1);
-    FLAGS_00.applyAction(SPECIAL(0x53), 1);
+    FLAGS_00.applyAction(SPECIAL_HEAL_PARTY, 1);
 }
 
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_08)
 #define STAGE_FILE 0x8E9
 #define STAGE_FILE_8 0x19E
 #elif VERSION_JP
@@ -60,8 +60,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0xFD00, 0x17700};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x33;
-    FIELDSTG_state.music = MUSIC(0x33, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DIGIMON_LAB);
+    FIELDSTG_state.music = MUSIC_DIGIMON_LAB;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;

@@ -117,13 +117,13 @@ void endEvent101(void) {
 
 const CVECTOR stageColor = { 0x54, 0x67, 0x96, 0x00 };
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
-#define EVENT_TEXT_FILE 0x10B
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x18B
 #define STAGE_ARCHIVE 0x2B4
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
-#define EVENT_TEXT_FILE 0x112
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x199
 #define STAGE_ARCHIVE 0x2C3
 #endif
@@ -140,8 +140,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x2DC00, 0xF200};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 4;
-    FIELDSTG_state.music = MUSIC(4, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_ASUKA_CITY);
+    FIELDSTG_state.music = MUSIC_ASUKA_CITY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -151,12 +151,12 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= STORY_BYAKKO_LEADER_FOUGHT && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
     if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -475,7 +475,7 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 263, 18, MUSIC(0x23, 0) };
+AreaBattle area3Battle0 = { 263, 18, MUSIC_BOSS_1 };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
@@ -509,7 +509,7 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Actions[] = {
     FLAG_ASUKA_BRIDGE_IRON_GLOVE_FOUND, 1,
     ITEM(2, 0x6C), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor20Talk0Actions[] = { FLAG_BRIDGE_SEPIKMON_TALKED, 1, CODES_END };
@@ -602,23 +602,23 @@ FieldTalk actor22Talks[] = {
     { NULL, NULL, 0 },
 };
 u16 actor0Conditions[] = { FLAG_ASUKA_BRIDGE_IRON_GLOVE_FOUND, 0, CODES_END };
-u16 actor1Conditions[] = { SPECIAL(0x15), 1, CODES_END };
+u16 actor1Conditions[] = { SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF, 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(0x16), 1, CODES_END };
+u16 actor4Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor7Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
+u16 actor7Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor8Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor9Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
 u16 actor10Conditions[] = { PROGRESS(STORY_GENJI_BEATEN), 1, CODES_END };
-u16 actor11Conditions[] = { SPECIAL(0x15), 1, CODES_END };
+u16 actor11Conditions[] = { SPECIAL_STORY_SEIRYU_BADGE_TO_ZANBAMON_DRIVEN_OFF, 1, CODES_END };
 u16 actor12Conditions[] = { PROGRESS(STORY_LOOKING_FOR_TEDDY), 1, CODES_END };
 u16 actor13Conditions[] = { PROGRESS(STORY_TEDDY_FOUND), 1, CODES_END };
-u16 actor14Conditions[] = { SPECIAL(0x16), 1, CODES_END };
+u16 actor14Conditions[] = { SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1, CODES_END };
 u16 actor15Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, CODES_END };
-u16 actor16Conditions[] = { SPECIAL(0x18), 1, CODES_END };
-u16 actor17Conditions[] = { SPECIAL(0x19), 1, CODES_END };
+u16 actor16Conditions[] = { SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1, CODES_END };
+u16 actor17Conditions[] = { SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1, CODES_END };
 u16 actor18Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor19Conditions[] = {
     PROGRESS(STORY_FAKE_BLUE_CARD), 1,
@@ -631,8 +631,8 @@ u16 actor20Conditions[] = {
     FLAG_BRIDGE_SEPIKMON_TALKED, 0,
     CODES_END,
 };
-u16 actor21Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor22Conditions[] = { SPECIAL(5), 1, CODES_END };
+u16 actor21Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor22Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_GUNSLINGER, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x21, 4, 304, 160, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x25, 5, 736, 184, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x25, 5, 736, 184, 1 };
@@ -788,10 +788,10 @@ StageTile stageObjects[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 StageSlot stageSlots[] = {
-    { { { SPECIAL(7), 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x200, 0x60, 0x31C, 5, 0x64, 0, 0 },
+    { { { SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_GAME_MASTER_CAUGHT, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x200, 0x60, 0x31C, 5, 0x64, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x21D, 0x5E2, 0xE0, 1, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E1, 0x1D0, 0x154, 7, 0, 2, 1 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E1, 0xE0, 0x110, 7, 0, 2, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E1, 0x1D0, 0x154, 7, 0, 2, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E1, 0xE0, 0x110, 7, 0, 2, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 3, 0x110, 0x100, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 3, 0x120, 0xC8, 0, 0, 0, 0 },
     { { { PROGRESS(STORY_FAKE_BLUE_CARD), 1 }, { FLAG_KEITH_BRIDGE_WIN_SEEN, 0 } }, SLOT_EVENT, 0x64, 0, 0, 0, 0, 0, 0 },

@@ -10,10 +10,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x55D
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x56D
 #endif
 /* Sets the stage up: its map, actors and battles, playing BGM_0003 */
@@ -26,8 +26,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x12000, 0x2B300};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 6;
-    FIELDSTG_state.music = MUSIC(6, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SEWERS);
+    FIELDSTG_state.music = MUSIC_SEWERS;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -75,8 +75,8 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 195, 12, MUSIC(2, 0) };
-AreaBattle area3Battle1 = { 199, 12, MUSIC(2, 0) };
+AreaBattle area3Battle0 = { 195, 12, MUSIC_BATTLE };
+AreaBattle area3Battle1 = { 199, 12, MUSIC_BATTLE };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
@@ -109,15 +109,15 @@ ActorImage stageImages[] = {
     { 0x180, 0x100, 0x1A0, 0x100, 0x180, 0, 0x160, 0x1FA },
 };
 u16 actor0Talk0Actions[] = {
-    SPECIAL(0x92), 1,
+    SPECIAL_GAIN_8500_BIT, 1,
     FLAG_AMATERASU_ADMIN_B1F_8500_BIT_FOUND, 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor1Talk0Actions[] = {
     FLAG_AMATERASU_ADMIN_B1F_ULTRA_CHARGE_FOUND, 1,
     ITEM(1, 0x2D), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor2Talk0Actions[] = { FLAG(2, 0x63), 1, CODES_END };

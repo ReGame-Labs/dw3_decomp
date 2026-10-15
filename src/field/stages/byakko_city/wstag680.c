@@ -192,12 +192,12 @@ void updateStage(StageTask *task, void **children) {
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xD4)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_01)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x62D
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xCC)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_01)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x63D
 #endif
 /* Sets the stage up: its map, actors and events, playing the ambience ENV_0019 */
@@ -209,8 +209,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x9F00, 0x8500};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x3B;
-    FIELDSTG_state.music = MUSIC(0x3B, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_STORAGE_ROOM);
+    FIELDSTG_state.music = MUSIC_STORAGE_ROOM;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;

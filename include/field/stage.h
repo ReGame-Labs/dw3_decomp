@@ -714,7 +714,7 @@ typedef struct StageListMenuChildren {
  * is the Japanese version's
  */
 #if VERSION_EU
-#define EXTRA_TEXT 0x158
+#define EXTRA_TEXT (TEXT_EVENTS_900 - 1)
 #elif VERSION_JP
 #define EXTRA_TEXT 0x939
 #endif

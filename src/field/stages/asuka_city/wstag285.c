@@ -47,13 +47,13 @@ void endEvent340(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
-#define EVENT_TEXT_FILE 0x10B
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x2A6
 #define STAGE_ARCHIVE 0x31E
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
-#define EVENT_TEXT_FILE 0x112
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_200 - 1)
 #define STAGE_FILE 0x2B5
 #define STAGE_ARCHIVE 0x32D
 #endif
@@ -70,8 +70,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x23900, 0x29F00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 5;
-    FIELDSTG_state.music = MUSIC(5, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_ADMIN_CENTER);
+    FIELDSTG_state.music = MUSIC_ADMIN_CENTER;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -80,12 +80,12 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= STORY_BYAKKO_LEADER_FOUGHT && GAME.progress < STORY_KNIGHTMON_REPROGRAMMED) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
     if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -240,7 +240,7 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 189, 15, MUSIC(2, 0) };
+AreaBattle area3Battle0 = { 189, 15, MUSIC_BATTLE };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
@@ -279,7 +279,7 @@ ActorImage stageImages[] = {
 u16 actor1Talk0Actions[] = {
     FLAG_ASUKA_ADMIN_1F_METAL_HORN_FOUND, 1,
     ITEM(2, 0xCF), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 u16 actor7Talk0Actions[] = {
@@ -337,7 +337,7 @@ FieldTalk actor12Talks[] = {
 u16 actor0Conditions[] = { PROGRESS(STORY_SUZAKU_BADGE), 1, CODES_END };
 u16 actor1Conditions[] = { FLAG_ASUKA_ADMIN_1F_METAL_HORN_FOUND, 0, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(0x23), 1, CODES_END };
+u16 actor3Conditions[] = { SPECIAL_STORY_GENJI_BEATEN_TO_STAFF_PASS, 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
 u16 actor5Conditions[] = { PROGRESS(STORY_LOGGED_IN), 1, CODES_END };
 u16 actor6Conditions[] = { PROGRESS(STORY_AGUMON_DISGUISE), 1, CODES_END };
@@ -361,8 +361,8 @@ u16 actor10Conditions[] = {
     FLAG_ASUKA_ADMIN_1F_TROOPER_C_FOUGHT, 0,
     CODES_END,
 };
-u16 actor11Conditions[] = { SPECIAL(0x23), 1, CODES_END };
-u16 actor12Conditions[] = { SPECIAL(0x23), 1, CODES_END };
+u16 actor11Conditions[] = { SPECIAL_STORY_GENJI_BEATEN_TO_STAFF_PASS, 1, CODES_END };
+u16 actor12Conditions[] = { SPECIAL_STORY_GENJI_BEATEN_TO_STAFF_PASS, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 0xB, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x21, 5, 825, 285, 1 };
 FieldActorEntry actor2 = { actor2Conditions, NULL, 0x25, 6, 560, 673, 1 };

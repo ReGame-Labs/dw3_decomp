@@ -10,10 +10,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x6F9
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x709
 #endif
 /* Sets the stage up: its map and actors, playing SHOP2BGM */
@@ -26,8 +26,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0xC000, 0x11D00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 8;
-    FIELDSTG_state.music = MUSIC(8, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SHOP_2);
+    FIELDSTG_state.music = MUSIC_SHOP_2;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
@@ -191,8 +191,16 @@ u16 actor14Talk5Conditions[] = {
     CODES_END,
 };
 u16 actor14Talk5Actions[] = { CARD_BATTLE(0x52, 1), 1, CODES_END };
-u16 actor28Talk0Conditions[] = { SPECIAL(8), 1, ITEM(0, 0x192), 0, CODES_END };
-u16 actor28Talk1Conditions[] = { SPECIAL(8), 1, ITEM(0, 0x192), 1, CODES_END };
+u16 actor28Talk0Conditions[] = {
+    SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1,
+    ITEM(0, 0x192), 0,
+    CODES_END,
+};
+u16 actor28Talk1Conditions[] = {
+    SPECIAL_STORY_SINCE_KNIGHTMON_REPROGRAMMED, 1,
+    ITEM(0, 0x192), 1,
+    CODES_END,
+};
 u16 actor28Talk1Actions[] = { 0x7A43, 1, CODES_END };
 FieldTalk actor0Talks[] = {
     { NULL, NULL, 0x26 },
@@ -399,21 +407,53 @@ u16 actor15Conditions[] = {
     FLAG_OINKMON_CITIZENS_RESTORED, 1,
     CODES_END,
 };
-u16 actor16Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor17Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor18Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor19Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor20Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor21Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor22Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor23Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor24Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor25Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor26Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor27Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor30Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 1, CODES_END };
-u16 actor31Conditions[] = { SPECIAL(0x1C), 1, FLAG_OINKMON_CITIZENS_RESTORED, 0, CODES_END };
-u16 actor32Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor16Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor17Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor18Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor19Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor20Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor21Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor22Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor23Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor24Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor25Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor26Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor27Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor30Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 1,
+    CODES_END,
+};
+u16 actor31Conditions[] = {
+    SPECIAL_STORY_AMATERASU_BRIDGE_TO_PRESIDENT_ARRESTED, 1,
+    FLAG_OINKMON_CITIZENS_RESTORED, 0,
+    CODES_END,
+};
+u16 actor32Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x2E, 4, 255, 176, 3 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0x2E, 4, 255, 176, 3 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x30, 5, 198, 219, 7 };

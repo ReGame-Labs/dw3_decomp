@@ -6,17 +6,20 @@ names (include/engine/story.h), and the condition codes
 (include/engine/game_state.h).
 
 - a field's or a battle's music (FieldState.music, the third word of a
-  AreaBattle) becomes MUSIC(bank, n);
+  AreaBattle) becomes its MUSIC_ name (include/engine/sound.h), or
+  MUSIC(bank, n) when it has none or the AreaBattle is an empty slot, and
+  the sound bank the stage loads for it, MUSIC_BANK(name);
 - a sound the stages play, given to SOUND.playSound, stopSound or
   fadeOutSound or in a table of them, becomes its SOUND_ name from
   include/engine/sound.h or include/field/stage.h;
 - a story point (STORY_, include/engine/story.h), compared with or stored in
   GAME.progress or in a PROGRESS code, becomes its name, and a flag that
-  include/engine/story.h names (FLAG_) its name;
+  include/engine/story.h names (FLAG_) its name, and so does a SPECIAL
+  condition (SPECIAL_);
 - the codes of the FLAGS_00 conditions and actions (the lists of the
   characters and their talks, a StageSlot's conditions, and the codes given
   to FLAGS_00.checkCondition and applyAction) become FLAG(group, id),
-  PROGRESS(n), ITEM(kind, id)... and CODES_END; a list too long for a line
+  PROGRESS(n), PLACE(n), ITEM(kind, id)... and CODES_END; a list too long for a line
   gets a pair a line.
 
 It changes no bytes, and can be run again at any time:
@@ -39,12 +42,42 @@ def number(n):
     return str(n) if n < 10 else f"0x{n:X}"
 
 
-def music(value):
-    """MUSIC(bank, n) for a music id, or None"""
+@functools.lru_cache(maxsize=None)
+def music_names():
+    """{(bank, n): MUSIC_ name} of include/engine/sound.h"""
+    text = open("include/engine/sound.h").read()
+    return {(int(b, 0), int(n, 0)): name for name, b, n in re.findall(
+        r"^#define (MUSIC_\w+) MUSIC\((" + NUMBER + r"), (" + NUMBER + r")\)", text, re.M)}
+
+
+def music(value, named=True):
+    """The MUSIC_ name or MUSIC(bank, n) of a music id, or None"""
     v = int(value, 0)
     if v & 0xFE00FF00 != 0x60000000:
         return None
-    return f"MUSIC({number(v >> 18 & 0x7F)}, {number(v & 0xFF)})"
+    key = (v >> 18 & 0x7F, v & 0xFF)
+    if named and key in music_names():
+        return music_names()[key]
+    return f"MUSIC({number(key[0])}, {number(key[1])})"
+
+
+def sound_banks(text):
+    """A stage's `soundBank = N;` as MUSIC_BANK() of the music its block then sets, if of bank N"""
+    banks = {name: b for (b, n), name in music_names().items()}
+    lines = text.split("\n")
+    for i, line in enumerate(lines):
+        m = re.match(r"^(\s*FIELDSTG_state\.soundBank = )(" + NUMBER + r");$", line)
+        if not m:
+            continue
+        for nxt in lines[i + 1:]:
+            if "soundBank" in nxt or nxt.strip().startswith(("}", "case ", "break;")):
+                break
+            store = re.search(r"\.music = (MUSIC_\w+);", nxt)
+            if store:
+                if banks.get(store.group(1)) == int(m.group(2), 0):
+                    lines[i] = f"{m.group(1)}MUSIC_BANK({store.group(1)});"
+                break
+    return "\n".join(lines)
 
 
 @functools.lru_cache(maxsize=None)
@@ -63,6 +96,14 @@ def flag_names():
         r"^#define (FLAG_\w+) FLAG\((" + NUMBER + r"), (" + NUMBER + r")\)", text, re.M)}
 
 
+@functools.lru_cache(maxsize=None)
+def special_names():
+    """{id: SPECIAL_ name} of include/engine/story.h"""
+    text = open("include/engine/story.h").read()
+    return {int(n, 0): name for name, n in re.findall(
+        r"^#define (SPECIAL_\w+) SPECIAL\((" + NUMBER + r")\)", text, re.M)}
+
+
 def sound_names():
     """{id: SOUND_ name} of the headers"""
     out = {}
@@ -74,7 +115,7 @@ def sound_names():
 
 FLAG_GROUPS = {0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10, 0x18, 0x1A, 0x1C, 0x20, 0x40}
 SIMPLE_CODES = {0x60: "PROGRESS", 0x70: "SPECIAL", 0x72: "PARTY_STAT", 0x74: "EVENT_BATTLE",
-                0x7E: "WARP_ARG", 0x90: "START_EVENT", 0x92: "CARD"}
+                0x90: "START_EVENT", 0x92: "CARD"}
 
 
 def code(word):
@@ -92,6 +133,10 @@ def code(word):
         return flag_names().get((group, n), f"FLAG({number(group)}, {number(n)})")
     if group == 0x60 and n in progress_names():
         return f"PROGRESS({progress_names()[n]})"
+    if group == 0x70 and n in special_names():
+        return special_names()[n]
+    if group == 0x7E:
+        return f"PLACE({number(n + 1)})" if n < 30 else f"PLACE_ARG({number(n - 29)})"
     if group in SIMPLE_CODES:
         return f"{SIMPLE_CODES[group]}({number(n)})"
     if group in (0x76, 0x78):
@@ -189,10 +234,16 @@ def rewrite(text, sounds):
     text = re.sub(r"(\.music = )(" + NUMBER + r")(?=;)", music_store, text)
 
     def battle(m):
-        new = music(m.group(2))
+        new = music(m.group(2), named=not m.group(1).endswith("{ 0, 0, "))
         return m.group(1) + new + m.group(3) if new else m.group(0)
 
+    def named(m):
+        return music_names().get((int(m.group(1), 0), int(m.group(2), 0)), m.group(0))
+
+    # a music written MUSIC(bank, n) that has a name, as a number would be
+    text = re.sub(r"(?<!\{ 0, 0, )\bMUSIC\((" + NUMBER + r"), (" + NUMBER + r")\)", named, text)
     text = re.sub(r"(^AreaBattle \w+ = \{ [^,]+, [^,]+, )(" + NUMBER + r")( \};)", battle, text, flags=re.M)
+    text = sound_banks(text)
 
     def call(m):
         v = int(m.group(2), 0)

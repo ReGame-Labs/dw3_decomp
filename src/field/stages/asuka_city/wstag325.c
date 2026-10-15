@@ -112,12 +112,12 @@ void endEvent560(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
-#define EVENT_TEXT_FILE 0x120
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x755
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
-#define EVENT_TEXT_FILE 0x127
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x765
 #endif
 /* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0003 */
@@ -130,8 +130,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0xF500, 0x17A00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x2B;
-    FIELDSTG_state.music = MUSIC(0x2B, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CONTROL_ROOM);
+    FIELDSTG_state.music = MUSIC_CONTROL_ROOM;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -260,8 +260,8 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 9, 19, MUSIC(0x22, 0) };
-AreaBattle area3Battle1 = { 313, 19, MUSIC(0x22, 0) };
+AreaBattle area3Battle0 = { 9, 19, MUSIC_BOSS };
+AreaBattle area3Battle1 = { 313, 19, MUSIC_BOSS };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
@@ -339,7 +339,11 @@ FieldTalk actor9Talks[] = {
     { NULL, NULL, 0x415 },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { SPECIAL(0x16), 1, FLAG_DATAMON_BEATEN, 1, CODES_END };
+u16 actor0Conditions[] = {
+    SPECIAL_STORY_DE_SINCERITY_TO_LISA_SAVED, 1,
+    FLAG_DATAMON_BEATEN, 1,
+    CODES_END,
+};
 u16 actor1Conditions[] = { FLAG_DATAMON_BEATEN, 0, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(STORY_MOVIE_BATTLES), 1, FLAG_DATAMON_BEATEN, 1, CODES_END };
 u16 actor3Conditions[] = {
@@ -349,14 +353,26 @@ u16 actor3Conditions[] = {
 };
 u16 actor4Conditions[] = { PROGRESS(STORY_STAFF_PASS), 1, FLAG_DATAMON_BEATEN, 1, CODES_END };
 u16 actor5Conditions[] = { FLAG_DATAMON_BEATEN, 1, PROGRESS(STORY_CONTROL_ROOM), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x18), 1, FLAG_DATAMON_BEATEN, 1, CODES_END };
-u16 actor7Conditions[] = { FLAG_DATAMON_BEATEN, 1, SPECIAL(0x19), 1, CODES_END };
+u16 actor6Conditions[] = {
+    SPECIAL_STORY_KNIGHTMON_REPROGRAMMED_TO_BULBMON_FOUND, 1,
+    FLAG_DATAMON_BEATEN, 1,
+    CODES_END,
+};
+u16 actor7Conditions[] = {
+    FLAG_DATAMON_BEATEN, 1,
+    SPECIAL_STORY_JUNGLE_SOUND_TO_AMATERASU_BRIDGE, 1,
+    CODES_END,
+};
 u16 actor8Conditions[] = {
     PROGRESS(STORY_PRESIDENT_ARRESTED), 1,
     FLAG_DATAMON_BEATEN, 1,
     CODES_END,
 };
-u16 actor9Conditions[] = { FLAG_DATAMON_BEATEN, 1, SPECIAL(0x1A), 1, CODES_END };
+u16 actor9Conditions[] = {
+    FLAG_DATAMON_BEATEN, 1,
+    SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1,
+    CODES_END,
+};
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0xA5, 4, 433, 260, 5 };
 FieldActorEntry actor1 = { actor1Conditions, actor1Talks, 0xA5, 4, 433, 260, 5 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0xA5, 4, 433, 260, 5 };

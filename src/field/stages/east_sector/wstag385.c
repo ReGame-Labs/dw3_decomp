@@ -42,13 +42,13 @@ void endEvent1276(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
-#define EVENT_TEXT_FILE 0x120
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x4E8
 #define STAGE_FILE_8 0x503
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
-#define EVENT_TEXT_FILE 0x127
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x4F8
 #define STAGE_FILE_8 0x513
 #endif
@@ -62,8 +62,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x3C500, 0x3D200};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0xA;
-    FIELDSTG_state.music = MUSIC(0xA, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DUEL_ISLAND);
+    FIELDSTG_state.music = MUSIC_DUEL_ISLAND;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.spriteColor = stageColor;
@@ -311,7 +311,7 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 270, 19, MUSIC(0x22, 0) };
+AreaBattle area3Battle0 = { 270, 19, MUSIC_BOSS };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
@@ -782,15 +782,15 @@ FieldTalk actor23Talks[] = {
     { NULL, NULL, 0x33C },
     { NULL, NULL, 0 },
 };
-u16 actor0Conditions[] = { SPECIAL(0x93), 1, CODES_END };
+u16 actor0Conditions[] = { SPECIAL_STORY_SINCE_DE_SINCERITY, 1, CODES_END };
 u16 actor1Conditions[] = { FLAG(0x1A, 0x3B), 1, CODES_END };
 u16 actor2Conditions[] = { FLAG(0x1A, 0x3A), 1, CODES_END };
 u16 actor3Conditions[] = { FLAG(0x1A, 0x39), 1, CODES_END };
 u16 actor4Conditions[] = { FLAG(0x1A, 0x38), 1, CODES_END };
 u16 actor5Conditions[] = { FLAG(0x1A, 0x37), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x93), 1, CODES_END };
-u16 actor7Conditions[] = { SPECIAL(0x93), 1, CODES_END };
-u16 actor8Conditions[] = { SPECIAL(0x93), 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL_STORY_SINCE_DE_SINCERITY, 1, CODES_END };
+u16 actor7Conditions[] = { SPECIAL_STORY_SINCE_DE_SINCERITY, 1, CODES_END };
+u16 actor8Conditions[] = { SPECIAL_STORY_SINCE_DE_SINCERITY, 1, CODES_END };
 u16 actor9Conditions[] = { ITEM(0, 0x12), 1, CODES_END };
 u16 actor10Conditions[] = { ITEM(0, 0x12), 0, CODES_END };
 u16 actor11Conditions[] = { FLAG_MONMON_DDNA_REQUESTED, 1, ITEM(0, 0x168), 0, CODES_END };
@@ -1040,8 +1040,8 @@ StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 4, 0x33F, 0x12E, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_DOWN, 4, 0x2DE, 0x141, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_CLIMB_UP, 4, 0x2CE, 0x186, 0, 0, 0, 0 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 8, 1 },
-    { { { SPECIAL(0x93), 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 8, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 8, 1 },
+    { { { SPECIAL_STORY_SINCE_DE_SINCERITY, 1 }, { CODES_END, 0 } }, SLOT_WARP0, 0x2E0, 0x240, 0xD8, 1, 0, 8, 1 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

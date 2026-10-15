@@ -720,12 +720,12 @@ void endEvent961(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF0)
-#define EVENT_TEXT_FILE 0x120
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x334
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xE8)
-#define EVENT_TEXT_FILE 0x127
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_05)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x343
 #endif
 /* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0002 */
@@ -738,8 +738,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x13E00, 0x19800};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x2A;
-    FIELDSTG_state.music = MUSIC(0x2A, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_AOA_HEADQUARTERS);
+    FIELDSTG_state.music = MUSIC_AOA_HEADQUARTERS;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -1194,8 +1194,8 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 10, 18, MUSIC(0x23, 0) };
-AreaBattle area3Battle1 = { 191, 18, MUSIC(2, 0) };
+AreaBattle area3Battle0 = { 10, 18, MUSIC_BOSS_1 };
+AreaBattle area3Battle1 = { 191, 18, MUSIC_BATTLE };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };

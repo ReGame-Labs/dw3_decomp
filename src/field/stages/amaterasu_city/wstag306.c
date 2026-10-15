@@ -56,12 +56,12 @@ void updateStage(StageTask *task, void **children) {
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
-#define EVENT_TEXT_FILE 0x120
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x536
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
-#define EVENT_TEXT_FILE 0x127
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_300 - 1)
 #define STAGE_FILE 0x546
 #endif
 /*
@@ -77,8 +77,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x13900, 0x11B00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 5;
-    FIELDSTG_state.music = MUSIC(5, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_ADMIN_CENTER);
+    FIELDSTG_state.music = MUSIC_ADMIN_CENTER;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.events = stageEvents;
@@ -86,8 +86,8 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress != STORY_PRESIDENT_ARRESTED || FLAGS_00.checkCondition(FLAG_OINKMON_CITIZENS_RESTORED, 0) != 0) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -334,17 +334,17 @@ FieldTalk actor12Talks[] = {
 };
 u16 actor0Conditions[] = { PROGRESS(STORY_AMATERASU_BRIDGE), 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(STORY_ASUKA_HEADQUARTERS), 1, CODES_END };
-u16 actor2Conditions[] = { SPECIAL(0x94), 1, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor5Conditions[] = { SPECIAL(0x94), 1, CODES_END };
-u16 actor6Conditions[] = { SPECIAL(0x94), 1, CODES_END };
-u16 actor7Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor8Conditions[] = { SPECIAL(0x94), 1, CODES_END };
-u16 actor9Conditions[] = { SPECIAL(0x94), 1, CODES_END };
-u16 actor10Conditions[] = { SPECIAL(0x94), 1, CODES_END };
-u16 actor11Conditions[] = { SPECIAL(0x94), 1, CODES_END };
-u16 actor12Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor2Conditions[] = { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1, CODES_END };
+u16 actor3Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor4Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor5Conditions[] = { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1, CODES_END };
+u16 actor6Conditions[] = { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1, CODES_END };
+u16 actor7Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor8Conditions[] = { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1, CODES_END };
+u16 actor9Conditions[] = { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1, CODES_END };
+u16 actor10Conditions[] = { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1, CODES_END };
+u16 actor11Conditions[] = { SPECIAL_STORY_SINCE_DE_KNOWLEDGE, 1, CODES_END };
+u16 actor12Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor1 = { actor1Conditions, NULL, 1, 4, 0, 0, 1 };
 FieldActorEntry actor2 = { actor2Conditions, actor2Talks, 0x3F, 5, 121, 260, 7 };
@@ -388,7 +388,7 @@ StageTile stageObjects[] = {
 };
 StageSlot stageSlots[] = {
     { { { CODES_END, 0 }, { CODES_END, 0 } }, SLOT_EXIT, 0x286, 0x398, 0xCC, 1, 0, 0, 0 },
-    { { { SPECIAL(0x1A), 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x3C6, 0, 0, 0, 0, 0, 0 },
+    { { { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1 }, { CODES_END, 0 } }, SLOT_EVENT, 0x3C6, 0, 0, 0, 0, 0, 0 },
     { { { CODES_END, 0 }, { CODES_END, 0 } }, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 void (*stageFuncs[])(void) = {

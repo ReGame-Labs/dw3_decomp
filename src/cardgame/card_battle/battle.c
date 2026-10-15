@@ -2505,7 +2505,7 @@ void CARDGAME_updateBattle(CardBattle *battle, CardBattleItems *items) {
             fader->setColor(fader, 0xFF, 0xFF, 0xFF);
             items->fader->start(items->fader, 0, 0, 0, 100, 0);
             battle->setState(battle, 2);
-            SOUND.playSound(0x609C0004);
+            SOUND.playSound(MUSIC_CARD_BATTLE);
         }
         break;
     case 1:
@@ -2527,9 +2527,9 @@ void CARDGAME_updateBattle(CardBattle *battle, CardBattleItems *items) {
                         if (GAME.items[battle->prize] < 99) {
                             GAME.items[battle->prize]++;
                         }
-                        FLAGS_00.pendingFlag10 = 1;
+                        FLAGS_00.cardBattleWon = 1;
                     } else {
-                        FLAGS_00.pendingFlag10 = 0;
+                        FLAGS_00.cardBattleWon = 0;
                     }
                 }
                 battle->result = 2;
@@ -2543,7 +2543,7 @@ void CARDGAME_updateBattle(CardBattle *battle, CardBattleItems *items) {
         if (battle->playerLost == 0) {
             SOUND.stopSound(SOUND_WIN_JINGLE);
         } else {
-            SOUND.stopSound(0x609C0004);
+            SOUND.stopSound(MUSIC_CARD_BATTLE);
         }
         break;
     }

@@ -174,13 +174,13 @@ void updateStage(StageTask *task, void **children) {
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x1BB
 #define STAGE_ARCHIVE 0x322
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
-#define EVENT_TEXT_FILE 0x14A
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_700 - 1)
 #define STAGE_FILE 0x1C9
 #define STAGE_ARCHIVE 0x331
 #endif
@@ -193,10 +193,10 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_ARCHIVE;
     FIELDSTG_state.start = (Vec2){0x15900, 0x11700};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x40;
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CHAMBER_ROOM);
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
-    FIELDSTG_state.music = MUSIC(0x40, 1);
+    FIELDSTG_state.music = MUSIC_CHAMBER_ROOM;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16);
     FIELDSTG_map.setFirstMap(0);

@@ -9,10 +9,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xF7)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
 #define STAGE_FILE 0x4F8
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xEF)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_06)
 #define STAGE_FILE 0x508
 #endif
 /* Sets the stage up: its map, actors and battles, playing the ambience ENV_0017 */
@@ -25,8 +25,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x13200, 0x15B00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x39;
-    FIELDSTG_state.music = MUSIC(0x39, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_DUM_DUM_FACTORY);
+    FIELDSTG_state.music = MUSIC_DUM_DUM_FACTORY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -36,14 +36,14 @@ void setupStage(void) {
     FIELDSTG_map.setFirstMap(0);
 }
 
-AreaBattle area0Battle0 = { 75, 12, MUSIC(2, 0) };
-AreaBattle area0Battle1 = { 75, 12, MUSIC(2, 0) };
-AreaBattle area0Battle2 = { 75, 12, MUSIC(2, 0) };
-AreaBattle area0Battle3 = { 75, 12, MUSIC(2, 0) };
-AreaBattle area0Battle4 = { 75, 12, MUSIC(2, 0) };
-AreaBattle area0Battle5 = { 75, 12, MUSIC(2, 0) };
-AreaBattle area0Battle6 = { 75, 12, MUSIC(2, 0) };
-AreaBattle area0Battle7 = { 75, 12, MUSIC(2, 0) };
+AreaBattle area0Battle0 = { 75, 12, MUSIC_BATTLE };
+AreaBattle area0Battle1 = { 75, 12, MUSIC_BATTLE };
+AreaBattle area0Battle2 = { 75, 12, MUSIC_BATTLE };
+AreaBattle area0Battle3 = { 75, 12, MUSIC_BATTLE };
+AreaBattle area0Battle4 = { 75, 12, MUSIC_BATTLE };
+AreaBattle area0Battle5 = { 75, 12, MUSIC_BATTLE };
+AreaBattle area0Battle6 = { 75, 12, MUSIC_BATTLE };
+AreaBattle area0Battle7 = { 75, 12, MUSIC_BATTLE };
 BattleList area0Battles = {
     4,
     { &area0Battle0, &area0Battle1, &area0Battle2, &area0Battle3,
@@ -103,7 +103,7 @@ ActorImage stageImages[] = {
 u16 actor0Talk0Actions[] = {
     FLAG_DUCT_ROOM_03_POWER_CHIP_FOUND, 1,
     ITEM(1, 0x31), 1,
-    SPECIAL(0x13), 1,
+    SPECIAL_SHOW_ITEM_GET_ICON, 1,
     CODES_END,
 };
 FieldTalk actor0Talks[] = {

@@ -44,12 +44,12 @@ void endEvent431(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xDB)
-#define EVENT_TEXT_FILE 0x13C
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x487
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xD3)
-#define EVENT_TEXT_FILE 0x143
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_02)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_600 - 1)
 #define STAGE_FILE 0x497
 #endif
 /*
@@ -65,8 +65,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE + 1;
     FIELDSTG_state.start = (Vec2){0x7900, 0xD000};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x16;
-    FIELDSTG_state.music = MUSIC(0x16, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_MIRAGE_HALL);
+    FIELDSTG_state.music = MUSIC_MIRAGE_HALL;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_state.startDir = 0;
@@ -75,8 +75,8 @@ void setupStage(void) {
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
     FIELDSTG_map.setFirstMap(0);
     if (GAME.progress >= STORY_ASUKA_HEADQUARTERS && GAME.progress < STORY_GUNSLINGER) {
-        FIELDSTG_state.soundBank = 0x1F;
-        FIELDSTG_state.music = MUSIC(0x1F, 0);
+        FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_CITY_CRISIS);
+        FIELDSTG_state.music = MUSIC_CITY_CRISIS;
     }
 }
 
@@ -220,7 +220,7 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 6, 18, MUSIC(0x23, 0) };
+AreaBattle area3Battle0 = { 6, 18, MUSIC_BOSS_1 };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
@@ -271,7 +271,7 @@ FieldTalk actor4Talks[] = {
 };
 u16 actor0Conditions[] = { PROGRESS(STORY_DE_SINCERITY), 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(STORY_BYAKKO_BADGE), 1, CODES_END };
-u16 actor2Conditions[] = { SPECIAL(0x17), 1, CODES_END };
+u16 actor2Conditions[] = { SPECIAL_STORY_BYAKKO_LEADER_FOUGHT_TO_CONTROL_ROOM, 1, CODES_END };
 u16 actor3Conditions[] = { PROGRESS(STORY_NUMEMON_FOUND), 1, CODES_END };
 u16 actor4Conditions[] = { PROGRESS(STORY_LISA_SAVED), 1, CODES_END };
 FieldActorEntry actor0 = { actor0Conditions, actor0Talks, 0x7A, 4, 419, 103, 1 };

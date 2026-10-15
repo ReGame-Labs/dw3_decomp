@@ -137,12 +137,12 @@ void endEvent1080(void) {
 }
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xFE)
-#define EVENT_TEXT_FILE 0x14A
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_800 - 1)
 #define STAGE_FILE 0x705
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xF6)
-#define EVENT_TEXT_FILE 0x151
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_07)
+#define EVENT_TEXT_FILE (TEXT_EVENTS_800 - 1)
 #define STAGE_FILE 0x715
 #endif
 /* Sets the stage up: its map, actors, battles and events, playing the ambience ENV_0206 */
@@ -155,11 +155,11 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x24700, 0x18C00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0x44;
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SATELLITE_CONTROL_ROOM);
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.battles = stageBattles;
     FIELDSTG_state.startDir = 0;
-    FIELDSTG_state.music = MUSIC(0x44, 1);
+    FIELDSTG_state.music = MUSIC_SATELLITE_CONTROL_ROOM;
     FIELDSTG_state.events = stageEvents;
     FIELDSTG_map.setFile(FIELD_MAP_FLOOR0, STAGE_FILE << 16 | 1);
     FIELDSTG_map.setFile(FIELD_MAP_TRIGGERS, STAGE_FILE << 16 | 2);
@@ -542,10 +542,10 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 33, 17, MUSIC(0x23, 0) };
-AreaBattle area3Battle1 = { 324, 21, MUSIC(0x24, 0) };
-AreaBattle area3Battle2 = { 325, 22, MUSIC(0x26, 0) };
-AreaBattle area3Battle3 = { 326, 22, MUSIC(0x26, 0) };
+AreaBattle area3Battle0 = { 33, 17, MUSIC_BOSS_1 };
+AreaBattle area3Battle1 = { 324, 21, MUSIC_LAST_BOSS };
+AreaBattle area3Battle2 = { 325, 22, MUSIC_LAST_BOSS_2 };
+AreaBattle area3Battle3 = { 326, 22, MUSIC_LAST_BOSS_2 };
 AreaBattle area3Battle4 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle5 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle6 = { 0, 0, MUSIC(1, 0) };

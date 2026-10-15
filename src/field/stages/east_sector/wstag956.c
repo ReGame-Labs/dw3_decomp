@@ -12,7 +12,7 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xFD)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_08)
 #define STAGE_FILE 0x927
 #define STAGE_FILE_8 0x783
 #elif VERSION_JP
@@ -30,8 +30,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 1;
     FIELDSTG_state.start = (Vec2){0x1D100, 0x1F600};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 0xC;
-    FIELDSTG_state.music = MUSIC(0xC, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SEIRYU_CITY);
+    FIELDSTG_state.music = MUSIC_SEIRYU_CITY;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -68,10 +68,18 @@ u16 actor1Talk2Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 1), 0, CODES_
 u16 actor1Talk2Actions[] = { FLAG(0, 1), 1, CODES_END };
 u16 actor1Talk3Conditions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 1), 1, CODES_END };
 u16 actor1Talk3Actions[] = { CARD_BATTLE(0x45, 1), 1, CODES_END };
-u16 actor5Talk0Conditions[] = { SPECIAL(0x96), 0, CODES_END };
-u16 actor5Talk1Conditions[] = { SPECIAL(0x96), 1, FLAG_CHINRON_LEADER_FOUGHT, 0, CODES_END };
+u16 actor5Talk0Conditions[] = { SPECIAL_HAS_FIVE_EPIC_ITEMS, 0, CODES_END };
+u16 actor5Talk1Conditions[] = {
+    SPECIAL_HAS_FIVE_EPIC_ITEMS, 1,
+    FLAG_CHINRON_LEADER_FOUGHT, 0,
+    CODES_END,
+};
 u16 actor5Talk1Actions[] = { FLAG_CHINRON_LEADER_FOUGHT, 1, EVENT_BATTLE(0), 1, CODES_END };
-u16 actor5Talk2Conditions[] = { SPECIAL(0x96), 1, FLAG_CHINRON_LEADER_FOUGHT, 1, CODES_END };
+u16 actor5Talk2Conditions[] = {
+    SPECIAL_HAS_FIVE_EPIC_ITEMS, 1,
+    FLAG_CHINRON_LEADER_FOUGHT, 1,
+    CODES_END,
+};
 u16 actor7Talk0Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 0, CODES_END };
 u16 actor7Talk0Actions[] = { FLAG_CARD_BATTLE_ENDED, 0, FLAG(0, 0), 0, CODES_END };
 u16 actor7Talk1Conditions[] = { FLAG_CARD_BATTLE_ENDED, 1, FLAG_CARD_BATTLE_WON, 1, CODES_END };
@@ -243,7 +251,7 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 305, 18, MUSIC(0x23, 0) };
+AreaBattle area3Battle0 = { 305, 18, MUSIC_BOSS_1 };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };

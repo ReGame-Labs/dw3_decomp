@@ -10,10 +10,10 @@
 #include "common/start_stage.inc.c"
 
 #if VERSION_US || VERSION_JP
-#define STAGE_TEXT TEXT_FILE(0xE2)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x4ED
 #elif VERSION_EU
-#define STAGE_TEXT (LANGUAGE + 0xDA)
+#define STAGE_TEXT TEXT_FILE(TEXT_TALKS_03)
 #define STAGE_FILE 0x4FD
 #endif
 /* Sets the stage up: its map, actors and battles, playing BGM_0003 */
@@ -26,8 +26,8 @@ void setupStage(void) {
     FIELDSTG_state.imageFile = STAGE_FILE - 2;
     FIELDSTG_state.start = (Vec2){0x17000, 0x19D00};
     FIELDSTG_state.images.actors = stageImages;
-    FIELDSTG_state.soundBank = 6;
-    FIELDSTG_state.music = MUSIC(6, 0);
+    FIELDSTG_state.soundBank = MUSIC_BANK(MUSIC_SEWERS);
+    FIELDSTG_state.music = MUSIC_SEWERS;
     FIELDSTG_state.actors = stageActors;
     FIELDSTG_state.startDir = 0;
     FIELDSTG_state.battles = stageBattles;
@@ -75,7 +75,7 @@ BattleList area2Battles = {
     { &area2Battle0, &area2Battle1, &area2Battle2, &area2Battle3,
       &area2Battle4, &area2Battle5, &area2Battle6, &area2Battle7 },
 };
-AreaBattle area3Battle0 = { 196, 15, MUSIC(2, 0) };
+AreaBattle area3Battle0 = { 196, 15, MUSIC_BATTLE };
 AreaBattle area3Battle1 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle2 = { 0, 0, MUSIC(1, 0) };
 AreaBattle area3Battle3 = { 0, 0, MUSIC(1, 0) };
@@ -162,9 +162,9 @@ FieldTalk actor8Talks[] = {
 u16 actor0Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor1Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
 u16 actor2Conditions[] = { PROGRESS(STORY_PRESIDENT_ARRESTED), 1, CODES_END };
-u16 actor3Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor4Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
-u16 actor5Conditions[] = { SPECIAL(0x1A), 1, CODES_END };
+u16 actor3Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor4Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
+u16 actor5Conditions[] = { SPECIAL_STORY_ASUKA_HEADQUARTERS_TO_OPERATION_SIGMA, 1, CODES_END };
 u16 actor6Conditions[] = {
     PROGRESS(STORY_AMATERASU_BRIDGE), 1,
     FLAG_AMATERASU_BASEMENT_STAIRS_SOLDIER_A_FOUGHT, 0,
