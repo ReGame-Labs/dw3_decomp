@@ -32,30 +32,15 @@ void STITSHOP_drawShop(ItemShop *shop, ItemShopWindows *win) {
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 1, 0x16, 0x12);
     }
     if (shop->panels[1].level != 0) {
-        if (shop->panels[1].level != ONE) {
-            sprite.setScale(shop->panels[1].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x18);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, shop->panels[1].level, 0x140, 0x18);
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 2, 0xD6, 0xF);
     }
     if (shop->panels[2].level != 0) {
-        if (shop->panels[2].level != ONE) {
-            sprite.setScale(shop->panels[2].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x3B);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, shop->panels[2].level, 0x140, 0x3B);
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 5, 0xA9, 0x26);
     }
     if (shop->panels[3].level != 0) {
-        if (shop->panels[3].level != ONE) {
-            sprite.setScale(shop->panels[3].level, ONE, ONE);
-            sprite.setPivot(0x140, 0xD2);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, shop->panels[3].level, 0x140, 0xD2);
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0, 0xC6, 0xC4);
     }
     sprite.setLayerId(shop->layer, 7);

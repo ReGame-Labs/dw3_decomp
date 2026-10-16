@@ -293,21 +293,11 @@ void STSTATUS_drawItemList(ItemList *panel) {
         sprite.setPivot(0xC, 0x17);
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x30, 0xC, 0x12);
-    if (panel->fades[0].level != ONE) {
-        sprite.setScale(ONE, panel->fades[0].level, ONE);
-        sprite.setPivot(0xA0, 0x60);
-    } else {
-        sprite.setScale(ONE, ONE, ONE);
-    }
+    STRETCH_SPRITE_V(sprite, panel->fades[0].level, 0xA0, 0x60);
     sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x2E, 0, 0x1E);
     if (panel->fades[2].level) {
         sprite.setLayerId(panel->layer, panel->depth - 2);
-        if (panel->fades[2].level != ONE) {
-            sprite.setScale(panel->fades[2].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x26);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, panel->fades[2].level, 0x140, 0x26);
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x26, 0xA0, 0x12);
     }
 }

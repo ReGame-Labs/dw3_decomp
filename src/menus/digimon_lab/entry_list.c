@@ -251,12 +251,7 @@ void STGDGLAB_drawEntryList(LabEntryList *panel, LabEntryListWindows *windows) {
         sprite.setPivot(0x140, 0x15);
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x20, 0x92, 0xF);
-    if (panel->listPanel.level != ONE) {
-        sprite.setScale(panel->listPanel.level, ONE, ONE);
-        sprite.setPivot(0x140, 0x45);
-    } else {
-        sprite.setScale(ONE, ONE, ONE);
-    }
+    STRETCH_SPRITE(sprite, panel->listPanel.level, 0x140, 0x45);
     if (panel->listPanel.level == ONE) {
         if (GFX.funcs.getTime() - panel->blinkTime >= 8) {
             panel->blinkTime = GFX.funcs.getTime();

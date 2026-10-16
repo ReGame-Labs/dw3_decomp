@@ -124,7 +124,9 @@ give it real types once the code that uses it is understood.
 - When a form recurs and has a likely origin, give it a name and say so
   once, as `COUNTDOWN_BORROW` in `include/field/stage.h` does: a statement macro
   for the timed stages' countdown, whose `do { } while (0)` the match
-  depends on. Say it once for a form every copy shares too, as the comment
+  depends on, and `STRETCH_SPRITE` in `include/engine/gfx.h` does: the
+  menus' panel stretch, a bare if/else, since that wrapper would change
+  the code there. Say it once for a form every copy shares too, as the comment
   above `StageInfo` does for the setup functions' `(Vec2){x, y}`.
 - Give a function pointer the return type of the function it points to. A
   call through a pointer declared to return a value is a `call_value` whose

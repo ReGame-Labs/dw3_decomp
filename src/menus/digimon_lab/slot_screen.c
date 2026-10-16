@@ -362,22 +362,12 @@ void STGDGLAB_drawSlotScreen(LabSlotScreen *screen, void *children) {
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x25, 0x92, 0xB0);
     }
-    if (screen->panels[0].level != ONE) {
-        sprite.setScale(screen->panels[0].level, ONE, ONE);
-        sprite.setPivot(0, 0x7F);
-    } else {
-        sprite.setScale(ONE, ONE, ONE);
-    }
+    STRETCH_SPRITE(sprite, screen->panels[0].level, 0, 0x7F);
     sprite.setTexture(0x140, 0);
     sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0xF, 0, 0x4B);
     sprite.setTexture(0x280, 0x100);
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x1F, 0, 0x4B);
-    if (screen->panels[1].level != ONE) {
-        sprite.setScale(screen->panels[1].level, ONE, ONE);
-        sprite.setPivot(0x140, 0x2A);
-    } else {
-        sprite.setScale(ONE, ONE, ONE);
-    }
+    STRETCH_SPRITE(sprite, screen->panels[1].level, 0x140, 0x2A);
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x22, 0x92, 0xF);
     if (screen->panels[2].level != ONE) {
         sprite.setScale(screen->panels[3].level, ONE, ONE);
@@ -386,20 +376,10 @@ void STGDGLAB_drawSlotScreen(LabSlotScreen *screen, void *children) {
         sprite.setScale(ONE, ONE, ONE);
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x20, 0x92, 0x51);
-    if (screen->panels[3].level != ONE) {
-        sprite.setScale(screen->panels[3].level, ONE, ONE);
-        sprite.setPivot(0x140, 0x87);
-    } else {
-        sprite.setScale(ONE, ONE, ONE);
-    }
+    STRETCH_SPRITE(sprite, screen->panels[3].level, 0x140, 0x87);
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x23, 0x92, 0x6C);
     if (screen->panels[4].level != 0) {
-        if (screen->panels[4].level != ONE) {
-            sprite.setScale(screen->panels[4].level, ONE, ONE);
-            sprite.setPivot(0x140, 0xBE);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, screen->panels[4].level, 0x140, 0xBE);
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x25, 0x92, 0xB0);
     }
 }

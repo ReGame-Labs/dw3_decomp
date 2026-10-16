@@ -306,21 +306,11 @@ void STSTATUS_drawDigivolvePanel(DigivolvePanel *panel) {
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x24, 0xA8, 0x28);
     }
     if (panel->fades[2].level != 0) {
-        if (panel->fades[2].level != ONE) {
-            sprite.setScale(panel->fades[2].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x41);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, panel->fades[2].level, 0x140, 0x41);
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x26, 0xA8, 0x28);
     }
     if (panel->fades[3].level != 0) {
-        if (panel->fades[3].level != ONE) {
-            sprite.setScale(panel->fades[3].level, ONE, ONE);
-            sprite.setPivot(0x140, 0xA2);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, panel->fades[3].level, 0x140, 0xA2);
         sprite.setTexture(0x140, 0);
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x14, 0x4F, panel->scroll.value + 0x7C);
         if (panel->listShown) {
@@ -362,22 +352,12 @@ void STSTATUS_drawDigivolvePanel(DigivolvePanel *panel) {
             sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0xA, 0x123, 0xD6);
             sprite.setClutRow(0);
         }
-        if (panel->fades[4].level != ONE) {
-            sprite.setScale(panel->fades[4].level, ONE, ONE);
-            sprite.setPivot(0, 0xD3);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, panel->fades[4].level, 0, 0xD3);
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x20, 0, 0xC2);
     }
     if (panel->fades[0].level != 0) {
-        if (panel->fades[0].level != ONE) {
-            sprite.setScale(panel->fades[0].level, ONE, ONE);
-            sprite.setPivot(0x140, 0xD);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, panel->fades[0].level, 0x140, 0xD);
         sprite.setTexture(0x140, 0);
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x18, 0x22, 0xD);
     }

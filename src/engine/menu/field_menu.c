@@ -393,12 +393,7 @@ void updateFieldMenu(FieldMenu *task, FieldMenuWindows *win) {
         obj.setFollowScroll(0);
         for (i = 0, y = 0x11, y2 = 0x25; i < 3; i++) {
             if (task->panels[i].level != 0) {
-                if (task->panels[i].level != ONE) {
-                    obj.setScale(task->panels[i].level, ONE, ONE);
-                    obj.setPivot(0, y2);
-                } else {
-                    obj.setScale(ONE, ONE, ONE);
-                }
+                STRETCH_SPRITE(obj, task->panels[i].level, 0, y2);
                 obj.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x15, 0, y);
                 obj.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x17, 0, y);
             }
@@ -406,30 +401,15 @@ void updateFieldMenu(FieldMenu *task, FieldMenuWindows *win) {
             y2 += 0x2E;
         }
         if (task->panels[0].level != 0) {
-            if (task->panels[0].level != ONE) {
-                obj.setScale(task->panels[0].level, ONE, ONE);
-                obj.setPivot(0x140, 0x19);
-            } else {
-                obj.setScale(ONE, ONE, ONE);
-            }
+            STRETCH_SPRITE(obj, task->panels[0].level, 0x140, 0x19);
             obj.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x18, 0x22, 0xD);
         }
         if (task->panels[1].level != 0) {
-            if (task->panels[1].level != ONE) {
-                obj.setScale(task->panels[1].level, ONE, ONE);
-                obj.setPivot(0x140, 0x52);
-            } else {
-                obj.setScale(ONE, ONE, ONE);
-            }
+            STRETCH_SPRITE(obj, task->panels[1].level, 0x140, 0x52);
             obj.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x1C - task->extraOption, 0xA8, 0x28);
         }
         if (task->panels[2].level != 0) {
-            if (task->panels[2].level != ONE) {
-                obj.setScale(task->panels[2].level, ONE, ONE);
-                obj.setPivot(0, 0xA8);
-            } else {
-                obj.setScale(ONE, ONE, ONE);
-            }
+            STRETCH_SPRITE(obj, task->panels[2].level, 0, 0xA8);
             obj.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x1A, 0, 0x9E);
         }
         break;

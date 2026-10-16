@@ -441,21 +441,11 @@ void STGDGLAB_drawMenu(LabMenu *menu, void *children) {
             sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x20, 0x92, 0xF);
         }
         if (menu->panels[1].level != 0) {
-            if (menu->panels[1].level != ONE) {
-                sprite.setScale(menu->panels[1].level, ONE, ONE);
-                sprite.setPivot(0x140, 0x45);
-            } else {
-                sprite.setScale(ONE, ONE, ONE);
-            }
+            STRETCH_SPRITE(sprite, menu->panels[1].level, 0x140, 0x45);
             sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x21, 0x92, 0x2A);
         }
         if (menu->panels[2].level != 0) {
-            if (menu->panels[2].level != ONE) {
-                sprite.setScale(menu->panels[2].level, ONE, ONE);
-                sprite.setPivot(0x140, 0xD2);
-            } else {
-                sprite.setScale(ONE, ONE, ONE);
-            }
+            STRETCH_SPRITE(sprite, menu->panels[2].level, 0x140, 0xD2);
             sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x24, 0xC6, 0xC4);
         }
         return;
@@ -515,12 +505,7 @@ void STGDGLAB_drawMenu(LabMenu *menu, void *children) {
         }
     }
     if (menu->panels[6].level != 0) {
-        if (menu->panels[6].level != ONE) {
-            sprite.setScale(menu->panels[6].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x8A);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, menu->panels[6].level, 0x140, 0x8A);
         sprite.setTexture(0x140, 0);
         sprite.setLayerId(menu->layer, menu->depth - 1);
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x10, 0x90, 0x5F);
@@ -531,12 +516,7 @@ void STGDGLAB_drawMenu(LabMenu *menu, void *children) {
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x27, 0x90, 0x5F);
     }
     if (menu->panels[3].level != 0) {
-        if (menu->panels[3].level != ONE) {
-            sprite.setScale(menu->panels[3].level, ONE, ONE);
-            sprite.setPivot(0, 0x2F);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, menu->panels[3].level, 0, 0x2F);
         if (member >= 0) {
             anim = &STGDGLAB_data.anim[member];
             sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), anim->frames[menu->frames[3]], 0x10, 0x16);
@@ -548,30 +528,15 @@ void STGDGLAB_drawMenu(LabMenu *menu, void *children) {
     }
     sprite.setTexture(0x280, 0x100);
     if (menu->panels[4].level != 0) {
-        if (menu->panels[4].level != ONE) {
-            sprite.setScale(menu->panels[4].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x1D);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, menu->panels[4].level, 0x140, 0x1D);
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x25, 0x8F, 0xF);
     }
     if (menu->panels[5].level != 0) {
-        if (menu->panels[5].level != ONE) {
-            sprite.setScale(menu->panels[5].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x4E);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, menu->panels[5].level, 0x140, 0x4E);
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x20, 0x92, 0x43);
     }
     if (menu->panels[8].level != 0) {
-        if (menu->panels[8].level != ONE) {
-            sprite.setScale(menu->panels[8].level, ONE, ONE);
-            sprite.setPivot(0, 0x5A);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, menu->panels[8].level, 0, 0x5A);
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x26, 0, 0x4D);
     }
 }

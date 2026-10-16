@@ -175,12 +175,7 @@ void STGDGLAB_drawRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *
         sprite.setPivot(0x140, 0x1F);
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x43, 0xF0, 0x11);
-    if (screen->panels[4].level != ONE) {
-        sprite.setScale(screen->panels[4].level, ONE, ONE);
-        sprite.setPivot(0x44, 0x42);
-    } else {
-        sprite.setScale(ONE, ONE, ONE);
-    }
+    STRETCH_SPRITE(sprite, screen->panels[4].level, 0x44, 0x42);
     if (screen->found[screen->row][0][0] != -1) {
         if (complete) {
             sprite.setClutRow(2);
@@ -208,41 +203,21 @@ void STGDGLAB_drawRecipeScreen(LabRecipeScreen *screen, LabRecipeScreenWindows *
     } else {
         sprite.setClutRow(0);
     }
-    if (screen->panels[3].level != ONE) {
-        sprite.setScale(ONE, screen->panels[3].level, ONE);
-        sprite.setPivot(0x40, 0x3F);
-    } else {
-        sprite.setScale(ONE, ONE, ONE);
-    }
+    STRETCH_SPRITE_V(sprite, screen->panels[3].level, 0x40, 0x3F);
     for (k = screen->slots - 2; k >= 0; k--) {
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x3C, 0x3D, k * 0x2E + 0x3F);
     }
-    if (screen->panels[2].level != ONE) {
-        sprite.setScale(ONE, screen->panels[2].level, ONE);
-        sprite.setPivot(0x3D, 0x42);
-    } else {
-        sprite.setScale(ONE, ONE, ONE);
-    }
+    STRETCH_SPRITE_V(sprite, screen->panels[2].level, 0x3D, 0x42);
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x3D, 0x14, 0x32);
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x40, 0x24, 0x32);
     initSpriteDrawer(&sprite);
     sprite.setTexture(0x140, 0x100);
     sprite.setAltClut(0x280, 0);
     sprite.setLayerId(screen->layer, screen->depth - 1);
-    if (screen->panels[2].level != ONE) {
-        sprite.setScale(ONE, screen->panels[2].level, ONE);
-        sprite.setPivot(0x3D, 0x42);
-    } else {
-        sprite.setScale(ONE, ONE, ONE);
-    }
+    STRETCH_SPRITE_V(sprite, screen->panels[2].level, 0x3D, 0x42);
     id = STGDGLAB_tableItems[screen->table];
     sprite.draw(FILE_CACHE.getEntry((FILE_LAB_SPRITES << 16) | 1), STGDGLAB_data.funcs.getSprite(id), 0x14, 0x32);
-    if (screen->panels[4].level != ONE) {
-        sprite.setScale(screen->panels[4].level, ONE, ONE);
-        sprite.setPivot(0x44, 0x42);
-    } else {
-        sprite.setScale(ONE, ONE, ONE);
-    }
+    STRETCH_SPRITE(sprite, screen->panels[4].level, 0x44, 0x42);
     if (screen->found[screen->row][0][0] != -1) {
         for (m = 0; m < 4; m++) {
             for (n = 4; n >= 0; n--) {

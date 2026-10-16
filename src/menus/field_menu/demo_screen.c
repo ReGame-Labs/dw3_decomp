@@ -116,12 +116,7 @@ void STSTATUS_drawDemoScreen(PartyScreen *screen) {
     for (i = 0; i < screen->count; i++) {
         level = screen->pageFades[i].level;
         if (level != 0) {
-            if (level != ONE) {
-                sprite.setScale(level, level, ONE);
-                sprite.setPivot(0x7C, i * 46 + 0x27);
-            } else {
-                sprite.setScale(ONE, ONE, ONE);
-            }
+            ZOOM_SPRITE(sprite, level, 0x7C, i * 46 + 0x27);
             member = GAME.funcs.getPartyMember(i);
             sprite.setTexture(0x280, 0x100);
             sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16),
@@ -132,12 +127,7 @@ void STSTATUS_drawDemoScreen(PartyScreen *screen) {
     DRAW_PAGE_PANELS(sprite, screen, i);
     level = screen->fades[1].level;
     if (level != 0) {
-        if (level != ONE) {
-            sprite.setScale(level, ONE, ONE);
-            sprite.setPivot(0, 0xD3);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, level, 0, 0xD3);
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x20, 0, 0xC2);
     }

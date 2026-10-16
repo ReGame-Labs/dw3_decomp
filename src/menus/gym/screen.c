@@ -294,12 +294,7 @@ void STGTRAIN_drawScreen(TrainScreen *screen) {
         sprite.setClutRow(0);
     }
     if (screen->panels[6].level != 0) {
-        if (screen->panels[6].level != ONE) {
-            sprite.setScale(screen->panels[6].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x8A);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, screen->panels[6].level, 0x140, 0x8A);
         sprite.setLayerId(screen->layerId, screen->depth - 1);
         sprite.setTexture(0x140, 0);
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x10, 0x8F, 0x5F);
@@ -309,12 +304,7 @@ void STGTRAIN_drawScreen(TrainScreen *screen) {
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x24, 0x8F, 0x5F);
     }
     if (screen->panels[3].level != 0) {
-        if (screen->panels[3].level != ONE) {
-            sprite.setScale(screen->panels[3].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x1D);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, screen->panels[3].level, 0x140, 0x1D);
         sprite.draw(FILE_CACHE.getEntry(STGTRAIN_SPRITES), 0x27, 0x8F, 0xF);
     }
     if (screen->panels[4].level != 0) {

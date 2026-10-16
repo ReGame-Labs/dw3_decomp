@@ -797,12 +797,7 @@ void STITSHOP_updateInfo(ShopInfo *info, ShopInfoWindows *win) {
             sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0xE, 0xF, offset + STITSHOP_lineY(info, 0x6C));
         }
         if (info->panels[2].level != 0) {
-            if (info->panels[2].level != ONE) {
-                sprite.setScale(ONE, info->panels[2].level, ONE);
-                sprite.setPivot(0xA0, offset + 0xAE);
-            } else {
-                sprite.setScale(ONE, ONE, ONE);
-            }
+            STRETCH_SPRITE_V(sprite, info->panels[2].level, 0xA0, offset + 0xAE);
             sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 3, 0, offset + 0x9C);
         }
         break;
