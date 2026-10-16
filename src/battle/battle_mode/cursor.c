@@ -15,7 +15,7 @@ void FIGHTSTG_drawCursorBar(s32 arg) {
     s32 i;
     s32 y;
 
-    saved = (u_long *)BreakDraw();
+    saved = BreakDraw();
     if (saved != (u_long *)-1) {
         if (++task->frame == 12) {
             task->frame = 0;

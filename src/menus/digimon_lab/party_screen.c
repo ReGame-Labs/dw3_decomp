@@ -399,7 +399,7 @@ void STGDGLAB_updatePartyScreen(LabPartyScreen *screen, void *children) {
         for (i = 0; i < 3; i++) {
             party[i] = GAME.funcs.getPartyPartner(i);
         }
-        for (i = 0; i < 8; i++) {
+        for (i = 0; i < PARTNER_COUNT; i++) {
             id = GAME.partners[i].unlocked - 3;
             screen->partners[i] = -1;
             if (id >= 0) {

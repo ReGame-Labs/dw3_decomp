@@ -395,11 +395,12 @@ static inline s32 rollTechChance(s32 id) {
 }
 
 /* Whether a technique turns the player's fighter back: never when it is one
-   of the first 8 Digimon, otherwise the technique's chance */
+   of the partners' own Digimon (DIGIMON_DATA's first PARTNER_COUNT, as
+   initNewGameData reads them), otherwise the technique's chance */
 s32 FIGHTSTG_rollDedigivolve(s32 actor, s32 id) {
     s32 i;
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < PARTNER_COUNT; i++) {
         if (DIGIMON_DATA[i].id == FIGHTSTG_battle.state.fighters[0][FIGHTSTG_battle.state.active[0]].id) {
             return 0;
         }
@@ -467,6 +468,7 @@ s32 FIGHTSTG_testRunAway(u8 side) {
         if (BATTLE_SETUP.blocks[BATTLE_BLOCK_RUN_AWAY]) {
             return 0;
         }
+        /* a halfword load (flags and paralysis) whose mask takes flags' bits only */
         if (*(u16 *)&atk->flags & (FIGHTER_ASLEEP | FIGHTER_NO_SWITCH)) {
             return 0;
         }

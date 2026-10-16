@@ -162,7 +162,7 @@ typedef struct SlideTask {
 typedef struct MenuOption {
     /* 0x0 */ s32 x;
     /* 0x4 */ s32 y;
-    /* 0x8 */ u8 pad[8]; /* never read or written */
+    /* 0x8 */ u8 pad[8]; /* never read or written: TitleMenuTask.options[2] are 0x10 bytes apart */
 } MenuOption;
 
 typedef struct TitleMenuTask {
@@ -247,7 +247,7 @@ typedef struct TitleTask {
     /* 0x58 */ s32 choice;
     /* 0x5C */ s32 layerId;
     /* 0x60 */ s32 depth;
-    /* 0x64 */ u8 pad[0xD8]; /* never read or written */
+    /* 0x64 */ u8 pad[0xD8]; /* never read or written: createTask allocates 0x13C bytes */
 } TitleTask;
 
 typedef struct TitleImages {

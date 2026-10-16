@@ -54,7 +54,7 @@ typedef struct LeftPanelTween {
     /* 0x0 */ s32 duration;
     /* 0x4 */ s16 to;
     /* 0x6 */ s16 from;
-    /* 0x8 */ s32 pad; /* never read; 0 in both tweens */
+    /* 0x8 */ s32 pad; /* 0 in both tweens; never read: the tweens are 0xC bytes apart */
 } LeftPanelTween;
 
 /* The scrolling background, which also fades the screen out */

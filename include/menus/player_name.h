@@ -70,7 +70,7 @@ typedef struct NameDialog {
     TASK_HEADER(NameDialog);
     /* 0x50 */ struct PlayerNameScreen *screen;
     /* 0x54 */ s32 clutRow;
-    /* 0x58 */ s32 pad; /* never read or written */
+    /* 0x58 */ s32 pad; /* never read or written: createTask allocates 0x5C bytes */
 } NameDialog;
 
 typedef struct NameDialogWindows {

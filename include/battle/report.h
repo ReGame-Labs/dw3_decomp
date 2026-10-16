@@ -63,10 +63,10 @@ typedef struct ReportPartner {
     /* 0x07A */ s16 entries[44]; /* listPartnerEntries */
     /* 0x0D4 */ PartnerEntry entry;
     /* 0x0E8 */ s32 slot; /* whose Digimon gets its exp, -1 for none */
-    /* 0x0EC */ s32 padEC; /* nothing uses it */
+    /* 0x0EC */ s32 padEC; /* never read or written */
     /* 0x0F0 */ ReportBlink levelBlink;
     /* 0x0FC */ struct {
-        s32 pad; /* nothing uses it */
+        s32 pad; /* never read or written */
         ReportBlink blink;
     } slotBlinks[3];
     /* 0x12C */ s32 learned;
@@ -75,7 +75,7 @@ typedef struct ReportPartner {
     /* 0x138 */ s32 shownExp;
     /* 0x13C */ s32 targetExp;
     /* 0x140 */ s32 rollTime;
-    /* 0x144 */ s32 pad144; /* nothing uses it */
+    /* 0x144 */ s32 pad144; /* never read or written */
     /* 0x148 */ PanelAnim fade;
     /* 0x158 */ s32 cursorFrame;
     /* 0x15C */ s32 cursorTime;
@@ -155,7 +155,7 @@ extern s32 STFGTREP_resistGains[8];
 
 extern BattleReward STFGTREP_rewards[];
 extern FightReportFuncs STFGTREP_funcs;
-extern Evolution *STFGTREP_evolutions[8]; /* each partner's (STFGTREP_learnDigimon) */
+extern Evolution *STFGTREP_evolutions[PARTNER_COUNT]; /* each partner's (STFGTREP_learnDigimon) */
 
 extern s32 STFGTREP_animations[][7]; /* each partner Digimon's sprite frames, -1 ending them early */
 

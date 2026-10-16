@@ -86,7 +86,7 @@ typedef struct LabPartyScreen {
     /* 0x0D8 */ s32 frame; /* the picked partner's */
     /* 0x0DC */ s32 clut;
     /* 0x0E0 */ s32 clut2;
-    /* 0x0E4 */ s32 partners[8]; /* the unlocked partners outside the party, -1 for none */
+    /* 0x0E4 */ s32 partners[PARTNER_COUNT]; /* the unlocked partners outside the party, -1 for none */
     /* 0x104 */ s32 count;
 } LabPartyScreen;
 
@@ -150,7 +150,7 @@ typedef struct LabRecipeScreen {
     /* 0x28C */ s32 clutRow;
     /* 0x290 */ s32 col;
     /* 0x294 */ s32 slot;
-    /* 0x298 */ s32 pad298; /* never read or written */
+    /* 0x298 */ s32 pad298; /* never read or written: createTask allocates 0x29C bytes */
 } LabRecipeScreen;
 
 typedef struct LabRecipeScreenWindows {

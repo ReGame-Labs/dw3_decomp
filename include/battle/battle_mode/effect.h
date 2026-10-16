@@ -153,7 +153,7 @@ struct BattleScript {
     /* 0x78 */ s32 fighter;
     /* 0x7C */ s32 model; /* the Models task's id */
     /* 0x80 */ s32 archive;
-    /* 0x84 */ s32 pad; /* nothing uses it */
+    /* 0x84 */ s32 pad; /* never read or written */
     /* 0x88 */ Models *models;
     /* 0x8C */ s16 *pc;
     /* 0x90 */ s32 hitsPlayed; /* how many hits command 5 has played */

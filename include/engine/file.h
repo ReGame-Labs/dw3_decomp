@@ -74,7 +74,7 @@ typedef struct CdReader {
 typedef struct CdSectorHeader {
     /* 0x0 */ CdlLOC pos;
     /* 0x4 */ u_char subheader[8];
-    /* 0xC */ u_char pad[4];
+    /* 0xC */ u_char pad[4]; /* never read: the 4 bytes past the header, see above */
 } CdSectorHeader;
 
 /*

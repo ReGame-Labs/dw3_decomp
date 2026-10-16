@@ -90,9 +90,9 @@ typedef struct CameraShots {
     /* 0x5E */ s16 shot;
     /* 0x60 */ s16 ry; /* where the turn of substate 6 starts */
     /* 0x62 */ s16 rx;
-    /* 0x64 */ s32 pad64; /* nothing uses it */
+    /* 0x64 */ s32 pad64; /* never read or written */
     /* 0x68 */ s32 time;
-    /* 0x6C */ s32 pad6C; /* nothing uses it */
+    /* 0x6C */ s32 pad6C; /* never read or written */
     /* 0x70 */ struct CameraView to; /* where substates 4 and 5 fade to */
 } CameraShots;
 

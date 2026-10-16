@@ -95,11 +95,11 @@ typedef struct CardScreenItems {
    `duration` frames */
 typedef struct CardPanelScale {
     /* 0x00 */ s16 value;
-    /* 0x02 */ u8 pad2[2]; /* nothing uses it */
+    /* 0x02 */ u8 pad2[2]; /* never read or written */
     /* 0x04 */ s16 time;
     /* 0x06 */ s16 duration;
     /* 0x08 */ u8 state;
-    /* 0x09 */ u8 pad9[3]; /* nothing uses it */
+    /* 0x09 */ u8 pad9[3]; /* never read or written: CardScreen.panels[2] are 0x54 bytes apart */
 } CardPanelScale;
 
 /* Where CARDGAME_drawPanel draws the parts of a side's panel (CARDGAME_panelLayouts), relative to
@@ -141,20 +141,20 @@ typedef struct CardPanel {
     /* 0x0E */ s16 y;
     /* 0x10 */ s16 apTotal; /* the values shown (CARDGAME_setPanelValue) */
     /* 0x12 */ s16 hpTotal;
-    /* 0x14 */ u8 pad14[4]; /* nothing uses it */
+    /* 0x14 */ u8 pad14[4]; /* never read or written */
     /* 0x18 */ u8 points[5]; /* one per card colour */
     /* 0x1D */ u8 deckCount;
     /* 0x1E */ u8 handCount;
     /* 0x20 */ s16 boxX; /* the discards' box, which slides on its own */
     /* 0x22 */ s16 boxY;
-    /* 0x24 */ u8 pad24[4]; /* nothing uses it */
+    /* 0x24 */ u8 pad24[4]; /* never read or written */
     /* 0x28 */ s32 discardCount;
-    /* 0x2C */ u8 pad2C[4]; /* nothing uses it */
+    /* 0x2C */ u8 pad2C[4]; /* never read or written */
     /* 0x30 */ u8 flags[10];
-    /* 0x3A */ u8 pad3A[2]; /* nothing uses it */
+    /* 0x3A */ u8 pad3A[2]; /* never read or written */
     /* 0x3C */ s16 winsX; /* where the rounds won are shown */
     /* 0x3E */ s16 winsY;
-    /* 0x40 */ u8 pad40[4]; /* nothing uses it */
+    /* 0x40 */ u8 pad40[4]; /* never read or written */
     /* 0x44 */ s32 wins; /* the rounds won shown */
     /* 0x48 */ CardPanelScale scale;
 } CardPanel;
@@ -248,11 +248,11 @@ typedef struct CardWindow {
 typedef struct CardMessageWindow {
     /* 0x00 */ s32 place; /* in CARDGAME_messageWindowPositions */
     /* 0x04 */ s32 message;
-    /* 0x08 */ s32 pad8; /* nothing uses it */
+    /* 0x08 */ s32 pad8; /* never read or written */
     /* 0x0C */ s16 time;
     /* 0x0E */ s16 duration;
     /* 0x10 */ s16 choice; /* the cursor's row */
-    /* 0x12 */ s16 pad12[2]; /* nothing uses it */
+    /* 0x12 */ s16 pad12[2]; /* never read or written */
     /* 0x16 */ u8 state; /* 1 opening, 2 open, 4 confirmed, 5 closing */
     /* 0x17 */ u8 prompt; /* what it asks: 0 nothing, else a choice with the cursor */
 } CardMessageWindow;
@@ -272,11 +272,11 @@ typedef struct CardScreen {
     /* 0xCE8 */ CardBlinker blinkers[12];
     /* 0xDC0 */ CardGauge gauges[3];
     /* 0xDE4 */ CardMessageWindow message;
-    /* 0xDFC */ u8 padDFC[4]; /* nothing uses it */
+    /* 0xDFC */ u8 padDFC[4]; /* never read or written */
     /* 0xE00 */ s16 menuTime;
     /* 0xE02 */ s16 menuDuration;
     /* 0xE04 */ s16 menuRow;
-    /* 0xE06 */ u8 padE06[4]; /* nothing uses it */
+    /* 0xE06 */ u8 padE06[4]; /* never read or written */
     /* 0xE0A */ s16 menuState;
     /* 0xE0C */ CardWindow windows[6];
     /* 0xE9C */ u8 fadeRow; /* the background's palette row, 0 to 11 */

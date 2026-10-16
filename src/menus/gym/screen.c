@@ -699,7 +699,7 @@ TrainScreen *STGTRAIN_createScreen(void) {
 #include "shared/create_fader.inc.c"
 
 /* The partners' sprites while they wait, by partner: -1 ends a loop */
-s32 STGTRAIN_waitAnims[8][7] = {
+s32 STGTRAIN_waitAnims[PARTNER_COUNT][7] = {
     {7, 8, 9, 10, 9, 8, -1},
     {14, 15, 16, 15, -1, -1, -1},
     {11, 12, 13, 12, -1, -1, -1},

@@ -201,7 +201,7 @@ typedef struct TrainIdle {
     /* 0x50 */ TrainScreen *screen;
     /* 0x54 */ s32 layerId;
     /* 0x58 */ s32 depth;
-    /* 0x5C */ u8 pad[0x10]; /* never read or written */
+    /* 0x5C */ u8 pad[0x10]; /* never read or written: createTask allocates 0x6C bytes */
 } TrainIdle;
 
 /* An animated sprite of an image set, as a training shows it
@@ -236,14 +236,14 @@ typedef struct TrainActor {
     /* 0xC0 */ void (*setScale)(struct TrainActor *actor, s32 scale);
     /* 0xC4 */ s32 (*getResult)(struct TrainActor *actor);
     /* 0xC8 */ void (*end)(struct TrainActor *actor);
-    /* 0xCC */ u8 padCC[8]; /* never read or written */
+    /* 0xCC */ u8 padCC[8]; /* never read or written: createTask allocates 0xD4 bytes */
 } TrainActor;
 
 /* The children of a TrainActor */
 typedef struct TrainActorSprites {
     /* 0x0 */ TrainSprite *sprite;
     /* 0x4 */ TrainSprite *effect; /* of set 8 */
-    /* 0x8 */ void *pad; /* never read or written */
+    /* 0x8 */ void *pad; /* never read or written: createTask allocates 0xC bytes of children */
 } TrainActorSprites;
 
 /* The results of a training (STGTRAIN_createResult) */
@@ -368,7 +368,7 @@ extern TrainState STGTRAIN_state;
 
 /* The overlay's data, in its order: the first object's, the second's and the
    third's */
-extern s32 STGTRAIN_waitAnims[8][7];
+extern s32 STGTRAIN_waitAnims[PARTNER_COUNT][7];
 extern TrainGain STGTRAIN_statGains[];
 extern TrainGain STGTRAIN_statLosses[];
 extern TrainGain *STGTRAIN_resistGainTables[];
@@ -397,7 +397,7 @@ void STGTRAIN_updateSprite(TrainSprite *sprite);
 TrainSprite *STGTRAIN_createSprite(void);
 
 /* scene.c */
-void STGTRAIN_updateRoot(Task *task, Task **children);
+void STGTRAIN_updateRoot(Task *task, TrainScreen **children);
 
 /* screen.c */
 void STGTRAIN_createScreenWindows(TrainScreen *screen, TrainScreenWindows *win);

@@ -137,9 +137,10 @@ s32 checkPartner(u32 op, s32 arg) {
         result = 1;
         break;
     case 9:
-        if (GAME.partners[0].unlocked != 0 && GAME.partners[1].unlocked != 0 && GAME.partners[2].unlocked != 0 &&
-            GAME.partners[3].unlocked != 0 && GAME.partners[4].unlocked != 0 && GAME.partners[5].unlocked != 0 &&
-            GAME.partners[6].unlocked != 0 && GAME.partners[7].unlocked != 0) {
+        if (GAME.partners[PARTNER_KOTEMON].unlocked != 0 && GAME.partners[PARTNER_KUMAMON].unlocked != 0 &&
+            GAME.partners[PARTNER_MONMON].unlocked != 0 && GAME.partners[PARTNER_AGUMON].unlocked != 0 &&
+            GAME.partners[PARTNER_VEEMON].unlocked != 0 && GAME.partners[PARTNER_GUILMON].unlocked != 0 &&
+            GAME.partners[PARTNER_RENAMON].unlocked != 0 && GAME.partners[PARTNER_PATAMON].unlocked != 0) {
             result = 1;
         }
         break;

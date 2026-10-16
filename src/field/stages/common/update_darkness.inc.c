@@ -30,7 +30,7 @@ void updateDarkness(StageTask *task) {
         break;
     case TASK_DONE:
         layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
-        ot = (u_long *)layer->getOtEntry(layer, 6);
+        ot = layer->getOtEntry(layer, 6);
         poly = GFX.funcs.getPrim();
         setlen(poly, 5);
         poly->code = 0x2A;

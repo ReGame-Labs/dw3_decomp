@@ -14,14 +14,14 @@
 /* The battle menu (WFIGHTMN_start), registered as BATTLE_TASK_MENU */
 typedef struct BattleMenu {
     TASK_HEADER(BattleMenu);
-    /* 0x50 */ s32 args[8]; /* the message's arguments */
+    /* 0x50 */ s32 args[8]; /* the message's arguments, or a BattleEvent to push first */
     /* 0x70 */ s32 confusionSound;
 } BattleMenu;
 
 /* The task that loads the battle menu's files (WFIGHTMN_createLoader) */
 typedef struct BattleLoader {
     TASK_HEADER(BattleLoader);
-    /* 0x50 */ s32 pad; /* nothing uses it */
+    /* 0x50 */ s32 pad; /* never read or written: createTask allocates 0x54 bytes */
 } BattleLoader;
 
 /* The battle menu's children */

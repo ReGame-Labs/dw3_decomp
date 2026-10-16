@@ -466,7 +466,7 @@ void *createCommand800(s32 arg) {
 /* Draws the 40 quads, those of kind 0 and 1 with the frames of the animations */
 void drawByteAnims(StageByteAnims *task) {
     Layer *layer = GFX.funcs.getLayer(FIELD_LAYER_MAP);
-    u_long *ot = (u_long *)layer->getOtEntry(layer, 2);
+    u_long *ot = layer->getOtEntry(layer, 2);
     s32 scroll[2];
     POLY_FT4 *poly;
     StageQuadTexture *tex;

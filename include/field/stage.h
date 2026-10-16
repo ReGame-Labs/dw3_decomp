@@ -609,7 +609,7 @@ typedef struct StageActorMark {
 typedef struct StageFrameTask {
     TASK_HEADER(StageFrameTask);
     /* 0x50 */ s32 frame;
-    /* 0x54 */ u8 pad54[8]; /* never read or written */
+    /* 0x54 */ u8 pad54[8]; /* never read or written: createTask allocates 0x5C bytes */
 } StageFrameTask;
 
 /* The map objects with animations 1 to 5, each playing a sequence */

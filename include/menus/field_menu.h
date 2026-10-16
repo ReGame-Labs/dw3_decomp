@@ -91,7 +91,7 @@ typedef struct ItemScreen {
     /* 0x3FC */ PanelAnim fades[2];
     /* 0x41C */ PanelAnim fades2[2];
     /* 0x43C */ PanelAnim fade;
-    /* 0x44C */ u8 pad44C[0x45C - 0x44C]; /* never read or written */
+    /* 0x44C */ u8 pad44C[0x45C - 0x44C]; /* never read or written: createTask allocates 0x45C bytes */
 } ItemScreen;
 
 typedef struct ItemScreenWindows {
@@ -230,7 +230,7 @@ typedef struct EquipPanelWindows {
     /* 0x90 */ TextWindow *slotTitle;
     /* 0x94 */ TextWindow *slotItem;
     /* 0x98 */ ScrollBar *scrollBar; /* for more than 8 items */
-    /* 0x9C */ u8 pad[0xA4 - 0x9C]; /* never read or written */
+    /* 0x9C */ u8 pad[0xA4 - 0x9C]; /* never read or written: createTask allocates 0xA4 bytes of children */
 } EquipPanelWindows;
 
 /* A list of the first screen (STSTATUS_createItemList) */
@@ -265,7 +265,7 @@ typedef struct ItemListWindows {
     /* 0x50 */ TextWindow *prev; /* arrows */
     /* 0x54 */ TextWindow *next;
     /* 0x58 */ Cursor *cursor;
-    /* 0x5C */ u8 pad[0x6C - 0x5C]; /* never read or written */
+    /* 0x5C */ u8 pad[0x6C - 0x5C]; /* never read or written: createTask allocates 0x6C bytes of children */
 } ItemListWindows;
 
 /* The screens' helpers (STSTATUS_data.funcs) */

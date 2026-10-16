@@ -299,7 +299,8 @@ typedef struct EventChildren {
 /* An entry of the script command table FIELDSTG_scriptCommands (ids from 0x320) */
 typedef struct ScriptCommand {
     /* 0x0 */ s32 id;
-    /* 0x4 */ s32 (*create)(s32 id); /* creates the command's task */
+    /* 0x4 */ s32 (*create)(s32 id); /* creates the command's task; FIELDSTG's own return
+                                         nothing or a Lift, so the table casts them */
     /* 0x8 */ void (*handle)(); /* (task, command, arg): each command's task has its own type */
 } ScriptCommand;
 
@@ -628,7 +629,7 @@ typedef struct BannerBox {
     /* 0x14 */ s32 from;
     /* 0x18 */ s32 to;
     /* 0x1C */ s32 speed;
-    /* 0x20 */ s32 pad20; /* 0 in every box; nothing reads it */
+    /* 0x20 */ s32 pad20; /* 0 in every box; never read: FIELDSTG_bannerBoxes' entries are 0x24 bytes */
 } BannerBox;
 
 /* The area name banner (FIELD_TASK_BANNER, FIELDSTG_createBanner) */
