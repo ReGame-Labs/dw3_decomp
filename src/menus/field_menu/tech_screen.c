@@ -314,12 +314,7 @@ void STSTATUS_drawTechScreen(TechScreen *screen) {
     STSTATUS_animateTechPortraits(screen);
     for (i = 0; i < screen->count; i++) {
         if (screen->pageFades[i].level != 0) {
-            if (screen->pageFades[i].level != ONE) {
-                sprite.setScale(screen->pageFades[i].level, screen->pageFades[i].level, ONE);
-                sprite.setPivot(0x7C, i * 0x2E + 0x27);
-            } else {
-                sprite.setScale(ONE, ONE, ONE);
-            }
+            ZOOM_SPRITE(sprite, screen->pageFades[i].level, 0x7C, i * 0x2E + 0x27);
             id = GAME.funcs.getPartyMember(i);
             sprite.setTexture(0x280, 0x100);
             sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16),
@@ -330,12 +325,7 @@ void STSTATUS_drawTechScreen(TechScreen *screen) {
     sprite.setTexture(0x140, 0);
     DRAW_PAGE_PANELS(sprite, screen, i);
     if (screen->fades[0].level != 0) {
-        if (screen->fades[0].level != ONE) {
-            sprite.setScale(screen->fades[0].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x19);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, screen->fades[0].level, 0x140, 0x19);
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x18, 0x22, 0xD);
     }
     if (screen->fades[1].level != 0) {
@@ -352,12 +342,7 @@ void STSTATUS_drawTechScreen(TechScreen *screen) {
             sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0xA, 0x123, 0xD6);
             sprite.setClutRow(0);
         }
-        if (screen->fades[1].level != ONE) {
-            sprite.setScale(screen->fades[1].level, ONE, ONE);
-            sprite.setPivot(0, 0xD3);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, screen->fades[1].level, 0, 0xD3);
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x20, 0, 0xC2);
     }

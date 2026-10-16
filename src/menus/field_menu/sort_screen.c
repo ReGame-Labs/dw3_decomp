@@ -186,21 +186,11 @@ void STSTATUS_drawSortScreen(SortScreen *screen) {
         }
     }
     if (screen->fades[0].level != 0) {
-        if (screen->fades[0].level != ONE) {
-            sprite.setScale(screen->fades[0].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x19);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, screen->fades[0].level, 0x140, 0x19);
         sprite.draw(FILE_CACHE.getEntry(FILE_MENU_SPRITES << 16), 0x18, 0x22, 0xD);
     }
     if (screen->fades[1].level != 0) {
-        if (screen->fades[1].level != ONE) {
-            sprite.setScale(screen->fades[1].level, ONE, ONE);
-            sprite.setPivot(0, 0xD3);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, screen->fades[1].level, 0, 0xD3);
         sprite.setTexture(0x280, 0x100);
         sprite.draw(FILE_CACHE.getEntry(FILE_STATUS_SPRITES << 16), 0x20, 0, 0xC2);
     }

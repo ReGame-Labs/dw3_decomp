@@ -253,6 +253,28 @@ typedef struct SpriteDrawer {
 } SpriteDrawer;
 
 /*
+ * Stretch the drawer's next sprites by a fade level about the pivot (x, y)
+ * while the level is below ONE (a panel opening or closing), else draw them
+ * at full size. STRETCH_SPRITE stretches the width, STRETCH_SPRITE_V the
+ * height and ZOOM_SPRITE both. The game reads the level again at each use,
+ * so level must have no side effects; a static inline that reads it once
+ * does not match, which suggests the original was a macro too.
+ * A bare if/else, not do { } while (0): that wrapper changes GCC 2.8.1's
+ * code at most of the uses. It ends in its own else, whose statement takes
+ * the caller's ';', so it stays one statement as the unbraced body of an
+ * if/else too (no dangling else); it can't be used as an expression.
+ */
+#define STRETCH_SPRITE_BY(sprite, level, scaleX, scaleY, x, y) \
+    if ((level) != ONE) {                                      \
+        (sprite).setScale(scaleX, scaleY, ONE);                \
+        (sprite).setPivot(x, y);                               \
+    } else                                                     \
+        (sprite).setScale(ONE, ONE, ONE)
+#define STRETCH_SPRITE(sprite, level, x, y) STRETCH_SPRITE_BY(sprite, level, level, ONE, x, y)
+#define STRETCH_SPRITE_V(sprite, level, x, y) STRETCH_SPRITE_BY(sprite, level, ONE, level, x, y)
+#define ZOOM_SPRITE(sprite, level, x, y) STRETCH_SPRITE_BY(sprite, level, level, level, x, y)
+
+/*
  * One part of a sprite sheet, a rectangle of its texture. A sheet starts with
  * three offsets from its start: to its parts, to the list of its frame ids
  * (bytes) and to its first frame, followed by those of the other frames. A

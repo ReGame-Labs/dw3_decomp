@@ -116,12 +116,7 @@ void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children) {
     sprite.setTexture(0x280, 0x100);
     sprite.setLayerId(screen->layer, screen->depth);
     if (screen->panels[0].level != 0) {
-        if (screen->panels[0].level != ONE) {
-            sprite.setScale(screen->panels[0].level, ONE, ONE);
-            sprite.setPivot(0, screen->pageRow * 0x7A + 0x2F);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, screen->panels[0].level, 0, screen->pageRow * 0x7A + 0x2F);
         if (member >= 0) {
             anim = &STGDGLAB_data.anim[member];
             sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), anim->frames[screen->frame], 0x10,
@@ -133,21 +128,11 @@ void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children) {
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x1E, 0, screen->pageRow * 0x7A + 0x13);
     }
     if (screen->panels[1].level != 0) {
-        if (screen->panels[1].level != ONE) {
-            sprite.setScale(screen->panels[1].level, ONE, ONE);
-            sprite.setPivot(0, 0xD1);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, screen->panels[1].level, 0, 0xD1);
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x26, 0, 0xC4);
     }
     if (screen->panels[2].level != 0) {
-        if (screen->panels[2].level != ONE) {
-            sprite.setScale(screen->panels[2].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x15);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, screen->panels[2].level, 0x140, 0x15);
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x20, 0x92, 0xF);
     }
     if (screen->panels[4].level != 0) {
@@ -183,12 +168,7 @@ void STGDGLAB_drawPartyScreen(LabPartyScreen *screen, void *children) {
         }
     }
     if (screen->panels[3].level != 0) {
-        if (screen->panels[3].level != ONE) {
-            sprite.setScale(screen->panels[3].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x85);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, screen->panels[3].level, 0x140, 0x85);
         sprite.setTexture(0x280, 0x100);
         sprite.setLayerId(screen->layer, screen->depth - 1);
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x33, 0xAD, 0x66);

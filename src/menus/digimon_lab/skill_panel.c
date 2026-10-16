@@ -132,12 +132,7 @@ static inline void STGDGLAB_drawSkillPanel(LabSkillPanel *panel) {
     }
     sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x24, 0x92, 0x13);
     if (panel->confirm.level != 0) {
-        if (panel->confirm.level != ONE) {
-            sprite.setScale(panel->confirm.level, ONE, ONE);
-            sprite.setPivot(0x140, 0x46);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, panel->confirm.level, 0x140, 0x46);
         sprite.setLayerId(panel->layer, 1);
         sprite.draw(FILE_CACHE.getEntry(FILE_LAB_SPRITES << 16), 0x23, 0xAE, 0x32);
     }

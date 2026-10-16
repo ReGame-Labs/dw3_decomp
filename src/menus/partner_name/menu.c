@@ -82,12 +82,7 @@ void STDGNAME_drawMenu(PartnerMenuTask *task, TextWindow **windows) {
                     task->anims[i].frame = 0;
                 }
             }
-            if (task->tweens[i + 3].level != ONE) {
-                sprite.setScale(task->tweens[i + 3].level, ONE, ONE);
-                sprite.setPivot(STDGNAME_menuSlots[0].pivotX + 2, STDGNAME_menuSlots[0].pivotY + 2);
-            } else {
-                sprite.setScale(ONE, ONE, ONE);
-            }
+            STRETCH_SPRITE(sprite, task->tweens[i + 3].level, STDGNAME_menuSlots[0].pivotX + 2, STDGNAME_menuSlots[0].pivotY + 2);
             sprite.draw(FILE_CACHE.getEntry(STDGNAME_SPRITES), STDGNAME_menuAnims[partner][task->anims[i].frame],
                         STDGNAME_menuSlots[0].x + 2, STDGNAME_menuSlots[0].y + 2 + i * 43);
         }
@@ -100,12 +95,7 @@ void STDGNAME_drawMenu(PartnerMenuTask *task, TextWindow **windows) {
     for (i = 0; i < task->partyCount; i++) {
         if (GAME.funcs.getPartyPartner(i) >= 0) {
             if (task->tweens[i + 3].level != 0) {
-                if (task->tweens[i + 3].level != ONE) {
-                    sprite.setScale(task->tweens[i + 3].level, ONE, ONE);
-                    sprite.setPivot(STDGNAME_menuSlots[0].pivotX, STDGNAME_menuSlots[0].pivotY + i * 43);
-                } else {
-                    sprite.setScale(ONE, ONE, ONE);
-                }
+                STRETCH_SPRITE(sprite, task->tweens[i + 3].level, STDGNAME_menuSlots[0].pivotX, STDGNAME_menuSlots[0].pivotY + i * 43);
                 sprite.setLayerId(task->layer, 1);
                 sprite.setClutRow(task->cursorClut);
                 sprite.draw(FILE_CACHE.getEntry(STDGNAME_SPRITES), 0x1F, STDGNAME_menuSlots[0].x, STDGNAME_menuSlots[0].y + i * 43);

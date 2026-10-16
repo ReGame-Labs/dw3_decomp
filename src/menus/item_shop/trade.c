@@ -77,12 +77,7 @@ void STITSHOP_drawBuy(ShopBuy *buy, ShopBuyWindows *win) {
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0xB, 0xF6, 0x4F);
     }
     if (buy->panels[1].level != 0) {
-        if (buy->panels[1].level != ONE) {
-            sprite.setScale(buy->panels[1].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x32);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, buy->panels[1].level, 0x140, 0x32);
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0x15, 0x7B, 0x26);
         if (buy->panels[1].level != ONE) {
             sprite.setPivot(0x140, 0x57);
@@ -91,22 +86,12 @@ void STITSHOP_drawBuy(ShopBuy *buy, ShopBuyWindows *win) {
     }
     if (buy->panels[2].level != 0) {
         sprite.setLayerId(buy->layer, buy->depth - 2);
-        if (buy->panels[2].level != ONE) {
-            sprite.setScale(buy->panels[2].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x32);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, buy->panels[2].level, 0x140, 0x32);
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0x15, 0x7B, 0x26);
     }
     if (buy->panels[3].level != 0) {
         sprite.setLayerId(buy->layer, buy->depth - 2);
-        if (buy->panels[3].level != ONE) {
-            sprite.setScale(buy->panels[3].level, ONE, ONE);
-            sprite.setPivot(0x140, 0x32);
-        } else {
-            sprite.setScale(ONE, ONE, ONE);
-        }
+        STRETCH_SPRITE(sprite, buy->panels[3].level, 0x140, 0x32);
         sprite.draw(FILE_CACHE.getEntry(FILE_SHOP_SPRITES << 16), 0x15, 0x7B, 0x26);
     }
     if (buy->markerShown) {
