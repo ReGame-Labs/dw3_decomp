@@ -832,10 +832,11 @@ PartnerAnim STPLNMET_partnerAnims[] = {
     { { 17, 18, 19, 20, 19, 18, -1 } },
     { { 21, 22, 23, 24, 23, 22, -1 } },
 };
+/* The partners of each starter pack, as STARTER_PARTIES */
 s32 STPLNMET_partnerChoices[3][3] = {
-    { 0, 6, 7 },
-    { 2, 3, 6 },
-    { 1, 5, 7 },
+    { PARTNER_KOTEMON, PARTNER_RENAMON, PARTNER_PATAMON }, /* STARTER_PACK_BALANCED */
+    { PARTNER_MONMON, PARTNER_AGUMON, PARTNER_RENAMON }, /* STARTER_PACK_POWERFUL */
+    { PARTNER_KUMAMON, PARTNER_GUILMON, PARTNER_PATAMON }, /* STARTER_PACK_MANIAC */
 };
 PlayerNameFuncs STPLNMET_funcs = {
     STPLNMET_partnerAnims, STPLNMET_partnerChoices, STPLNMET_loadFiles, STPLNMET_filesLoading,

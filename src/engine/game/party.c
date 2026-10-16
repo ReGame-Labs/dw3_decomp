@@ -83,9 +83,11 @@ void giveStarterDeck(void) {
     }
 }
 
-/* setParty's partners, by party set */
-u8 STARTER_PARTIES[][3] = {
-    { 0x00, 0x06, 0x07 }, { 0x02, 0x03, 0x06 }, { 0x01, 0x05, 0x07 },
+/* setParty's partners, by starter pack */
+u8 STARTER_PARTIES[][PARTY_SIZE] = {
+    { PARTNER_KOTEMON, PARTNER_RENAMON, PARTNER_PATAMON }, /* STARTER_PACK_BALANCED */
+    { PARTNER_MONMON, PARTNER_AGUMON, PARTNER_RENAMON }, /* STARTER_PACK_POWERFUL */
+    { PARTNER_KUMAMON, PARTNER_GUILMON, PARTNER_PATAMON }, /* STARTER_PACK_MANIAC */
 };
 
 /* The cards of giveStarterDeck's deck */

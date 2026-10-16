@@ -22,7 +22,7 @@
 /* The root task of the overlay (STGMCARD_start) */
 typedef struct MemCardScene {
     TASK_HEADER(MemCardScene);
-    /* 0x50 */ s32 pad[2]; /* never read or written */
+    /* 0x50 */ s32 pad[2]; /* never read or written: createTask allocates 0x58 bytes */
 } MemCardScene;
 
 /* A mode (or stage) the screen can be opened from, and the area a save made

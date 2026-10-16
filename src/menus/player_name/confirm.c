@@ -136,7 +136,7 @@ void STPLNMET_drawConfirm(NameConfirm *task) {
         RotMatrixYXZ_gte(&task->rot, &task->matrix);
         ScaleMatrix(&task->matrix, &task->scale);
         layer = GFX.funcs.getLayer(task->layer);
-        ot = (u_long *)layer->getOtEntry(layer, task->depth - 1);
+        ot = layer->getOtEntry(layer, task->depth - 1);
         poly = GFX.funcs.getPrim();
         setPolyG4(poly);
         setRGB0(poly, 0x7F, 0x32, 0xF2);

@@ -106,13 +106,13 @@ void STPLNMET_runChoice(PartnerChoice *task, PartnerChoiceWindows *windows) {
 
     if (PAD_PRESSED(PAD_UP) || PAD_REPEATED(PAD_UP)) {
         task->choice--;
-        if (task->choice < 0) {
-            task->choice = 0;
+        if (task->choice < STARTER_PACK_BALANCED) {
+            task->choice = STARTER_PACK_BALANCED;
         }
     } else if (PAD_PRESSED(PAD_DOWN) || PAD_REPEATED(PAD_DOWN)) {
         task->choice++;
-        if (task->choice > 2) {
-            task->choice = 2;
+        if (task->choice > STARTER_PACK_MANIAC) {
+            task->choice = STARTER_PACK_MANIAC;
         }
     }
     if (old != task->choice) {
@@ -130,7 +130,7 @@ void STPLNMET_runChoice(PartnerChoice *task, PartnerChoiceWindows *windows) {
     if (PAD_PRESSED(PAD_TRIANGLE)) {
         SOUND.playSound(SOUND_MENU_CANCEL);
         task->substate = 200;
-        task->choice = 0;
+        task->choice = STARTER_PACK_BALANCED;
     }
 }
 

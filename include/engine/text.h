@@ -219,7 +219,7 @@ typedef struct Font {
 typedef struct GlyphMap {
     /* 0x0 */ u16 code;
     /* 0x2 */ u8 index;
-    /* 0x3 */ u8 pad;
+    /* 0x3 */ u8 pad; /* never read: the maps' entries are 4 bytes, for the u16 */
 } GlyphMap;
 
 typedef struct TextStyle {

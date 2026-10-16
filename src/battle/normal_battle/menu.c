@@ -1054,8 +1054,8 @@ static inline void bringSecondEnemy(BattleMenu *task, BattleMenuChildren *childr
     }
 }
 
-/* A fighter falls (?): case 0 takes its event off the queue, shows message
-   0x50 or 0x51 and clears its status (announceKnockOut); case 1 looks for the
+/* EVENT_KNOCK_OUT (substate 0x15), a fighter's fall: case 0 takes its event
+   off the queue, shows message 0x50 or 0x51 and clears its status (announceKnockOut); case 1 looks for the
    side's next fighter standing. The player's side picks one
    (FIGHTSTG_setPlayerTurnStep(4)), the enemy's brings in the first; with none
    left the battle ends (endBattleOnKnockOut: 0x53 lost, 0x52 won). Case 5

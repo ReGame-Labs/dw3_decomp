@@ -3,7 +3,7 @@
 #include "menus/gym.h"
 
 /* The mode's root task: sets up the display and starts the screen */
-void STGTRAIN_updateRoot(Task *task, Task **children) {
+void STGTRAIN_updateRoot(Task *task, TrainScreen **children) {
     RECT rect;
     Layer *layer;
 
@@ -31,7 +31,7 @@ void STGTRAIN_updateRoot(Task *task, Task **children) {
         rect.h = 0xF0;
         GFX.funcs.createLayer(&rect, 3, 0x1002);
         GFX.funcs.moveLayer(0x1002, 0x1001, 1);
-        children[0] = (Task *)STGTRAIN_createScreen();
+        children[0] = STGTRAIN_createScreen();
         task->nextState(task);
         break;
     case TASK_RUN:
@@ -43,5 +43,5 @@ void STGTRAIN_updateRoot(Task *task, Task **children) {
 
 /* The mode's entry point (MODE_ENTRY_POINTS): starts the root task */
 Task *STGTRAIN_start(void) {
-    return createTask(STGTRAIN_updateRoot, sizeof(Task), 4);
+    return createTask(STGTRAIN_updateRoot, sizeof(Task), sizeof(TrainScreen *));
 }

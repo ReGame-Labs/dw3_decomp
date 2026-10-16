@@ -170,7 +170,7 @@ typedef struct ArmorData {
     /* 0x0E */ u8 padE[2]; /* 0 on every armour */
     /* 0x10 */ u8 evasion; /* added to the battle's (FIGHTSTG_computeStats) */
     /* 0x11 */ u8 unused11; /* 1 on every armour; nothing reads it */
-    /* 0x12 */ u8 pad12[2]; /* 0 on every armour */
+    /* 0x12 */ u8 pad12[2]; /* 0 on every armour; never read: ARMOR_DATA's entries are 0x14 bytes */
 } ArmorData;
 
 /* An accessory's (types 21-24, ACCESSORY_DATA) */
@@ -181,7 +181,7 @@ typedef struct AccessoryData {
     /* 0x4 */ u8 partners;
     /* 0x6 */ u16 amount;
     /* 0x8 */ u8 stat;
-    /* 0x9 */ u8 pad[3]; /* 0 on every accessory */
+    /* 0x9 */ u8 pad[3]; /* 0 on every accessory; never read: ACCESSORY_DATA's entries are 0xC bytes */
 } AccessoryData;
 
 /* ItemInfo.data's record, by ItemInfo.type */
@@ -458,9 +458,25 @@ typedef union PartnerTotals {
    all of STDWTITL's */
 #define MODE_OVERLAY(mode) ((mode) & 0xFF00)
 
-/* The partner Digimon, and the ones in the party */
-#define PARTNER_COUNT 8
+/* The partner Digimon (GAME.partners' index): partner i is DIGNAM's string
+   i + 1, as the registration's choice shows them */
+enum PartnerId {
+    PARTNER_KOTEMON,
+    PARTNER_KUMAMON,
+    PARTNER_MONMON,
+    PARTNER_AGUMON,
+    PARTNER_VEEMON,
+    PARTNER_GUILMON,
+    PARTNER_RENAMON,
+    PARTNER_PATAMON,
+    PARTNER_COUNT
+};
+/* How many partners the party holds */
 #define PARTY_SIZE 3
+
+/* The registration's starter packs (GAME.partySet, STARTER_PARTIES' rows):
+   NAMEET's strings 10-12 name them */
+enum StarterPack { STARTER_PACK_BALANCED, STARTER_PACK_POWERFUL, STARTER_PACK_MANIAC };
 
 /* The most money the player can have */
 #define MONEY_MAX 9999999
@@ -474,13 +490,13 @@ typedef union PartnerTotals {
  */
 typedef struct GameState {
     /* 0x0000 */ u8 checksum; /* a save's, of its bytes from 0x4 (STGMCARD_runSaves) */
-    /* 0x0001 */ u8 pad1; /* nothing reads or writes it */
+    /* 0x0001 */ u8 pad1; /* never read or written */
     /* 0x0002 */ u8 version; /* a save's MEMCARD_SAVE_VERSION (stgmcard.h) */
-    /* 0x0003 */ u8 pad3; /* nothing reads or writes it */
+    /* 0x0003 */ u8 pad3; /* never read or written */
     /* 0x0004 */ u8 digivolveDemo;
-    /* 0x0005 */ u8 pad5[7]; /* nothing reads or writes them */
+    /* 0x0005 */ u8 pad5[7]; /* never read or written */
     /* 0x000C */ s32 unusedC; /* newGame sets it to -1; nothing reads it */
-    /* 0x0010 */ u8 pad10[0x18]; /* nothing reads or writes them */
+    /* 0x0010 */ u8 pad10[0x18]; /* never read or written */
     /* 0x0028 */ s32 stageSelectTop; /* the debug stage select's first line */
     /* 0x002C */ s32 stageSelectCursor;
     /* 0x0030 */ s32 battleSteps; /* to the next random battle, which each step lowers */
@@ -500,7 +516,7 @@ typedef struct GameState {
     /* 0x0628 */ Deck decks[DECK_COUNT];
     /* 0x075C */ Partner partners[PARTNER_COUNT];
     /* 0x263C */ s32 progress;
-    /* 0x2640 */ s32 partySet; /* setParty's */
+    /* 0x2640 */ s32 partySet; /* setParty's: the starter pack (enum StarterPack) */
     /*
      * flags02-flags40: the event flag groups 0x02-0x40 (checkCondition,
      * applyAction), bitsets packed one after the other, so most start at an
@@ -664,7 +680,7 @@ extern s32 MONEY_GAINS[];
 extern s32 MONEY_LOSSES[];
 extern GameFlags FLAGS_00;
 extern s32 STARTER_DECK[DECK_SIZE];
-extern u8 STARTER_PARTIES[][3];
+extern u8 STARTER_PARTIES[][PARTY_SIZE];
 extern u8 PROGRESS_RANGES[][2];
 extern s32 PARTY_STAT_THRESHOLDS[];
 extern EquipSet EQUIP_SETS[];

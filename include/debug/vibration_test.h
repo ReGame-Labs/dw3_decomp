@@ -31,7 +31,7 @@ typedef struct ShockLoader {
     TASK_HEADER(ShockLoader);
     /* 0x50 */ ShockFile *file; /* DLSKDATA.BIN being built */
     /* 0x54 */ u8 *text;        /* DLSKDATA.TXT */
-    /* 0x58 */ s32 pad; /* never read or written */
+    /* 0x58 */ s32 pad; /* never read or written: createTask allocates 0x5C bytes */
 } ShockLoader;
 
 typedef struct ShockLoaderWindows {
@@ -59,7 +59,7 @@ typedef struct ShockTest {
     /* 0x74 */ s32 pattern;
     /* 0x78 */ s32 count;
     /* 0x7C */ ShockStep *steps[2];
-    /* 0x84 */ s32 pad; /* never read or written */
+    /* 0x84 */ s32 pad; /* never read or written: createTask allocates 0x88 bytes */
 } ShockTest;
 
 /* The editor's text windows */

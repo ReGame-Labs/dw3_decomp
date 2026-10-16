@@ -303,7 +303,7 @@ typedef union TimCursor {
 typedef struct TimLoader {
     /* 0x00 */ u16 w; /* size of the last image */
     /* 0x02 */ u16 h;
-    /* 0x04 */ u8 pad4[4]; /* nothing reads or writes them */
+    /* 0x04 */ u8 pad4[4]; /* never read or written */
     /* 0x08 */ s32 imageX;
     /* 0x0C */ s32 imageY;
     /* 0x10 */ s32 clutX;

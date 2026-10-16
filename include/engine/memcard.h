@@ -85,7 +85,7 @@ typedef struct CardDirEntry {
  */
 typedef struct MemCard {
     /* 0x00 */ s32 state; /* MEMCARD_* */
-    /* 0x04 */ u8 pad4[8]; /* nothing reads or writes them */
+    /* 0x04 */ u8 pad4[8]; /* never read or written */
     /* 0x0C */ const char *fileName;
     /* 0x10 */ CardHeader header;
     /* 0x90 */ s32 cmd;
@@ -97,7 +97,7 @@ typedef struct MemCard {
     /* 0xA8 */ CardDirEntry files[CARD_MAX_FILES];
     /* 0x300 */ s32 progress;
     /* 0x304 */ s32 offset;
-    /* 0x308 */ s32 pad308; /* nothing reads or writes it */
+    /* 0x308 */ s32 pad308; /* never read or written */
     /* 0x30C */ s32 dataSize;
     /* 0x310 */ s32 infoSize;
     /* 0x314 */ s32 iconCount;

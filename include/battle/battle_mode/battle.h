@@ -163,7 +163,7 @@ extern EventDelay FIGHTSTG_eventDelays[];
 /* The battle's events (FIGHTSTG_events) */
 typedef struct EventQueue {
     /* 0x000 */ QueuedEvent events[99];
-    /* 0xAD4 */ u8 pad[0x1C]; /* nothing uses it */
+    /* 0xAD4 */ u8 pad[0x1C]; /* never read or written: room for a 100th QueuedEvent, which the loops (i < 99) never reach */
     /* 0xAF0 */ s8 curType; /* the type of the event popped last */
     /* 0xAF1 */ s8 curIndex; /* and where it is */
     /* 0xAF2 */ s8 findType; /* what first and next look for, 1-24 */
@@ -235,7 +235,7 @@ typedef struct BattleState {
 
 /* FIGHTSTG_battle: the battle */
 typedef struct Battle {
-    /* 0x00 */ s32 pad; /* nothing uses it */
+    /* 0x00 */ s32 pad; /* never read or written */
     /* 0x04 */ s32 frames; /* since the last update */
     /* 0x08 */ BattleState state;
     /* 0xDC */ BattleSpeed speed;
@@ -272,7 +272,7 @@ typedef struct Battle {
 
 /* FIGHTSTG_action: the technique being carried out */
 typedef struct BattleAction {
-    /* 0x00 */ u8 pad[0x20]; /* nothing uses it */
+    /* 0x00 */ u8 pad[0x20]; /* never read or written */
     /* 0x20 */ u8 side; /* the acting side, SIDE_PLAYER or SIDE_ENEMY */
     /* 0x24 */ s32 tech; /* the technique */
     /* 0x28 */ s32 damage; /* per hit */
@@ -322,7 +322,7 @@ typedef struct BattleStats {
     /* 0x3C */ u8 runAwayBonus; /* to the player's chance to run away */
     /* 0x3D */ u8 runAwayGuard; /* halves the enemy's chance to run away */
     /* 0x3E */ u8 stealBonus;
-    /* 0x3F */ u8 pad;
+    /* 0x3F */ u8 pad; /* only cleared with the rest (HEAP.zero of sizeof); BattleFuncs.stats[2] spans 0x80 bytes */
 } BattleStats;
 
 /* FIGHTSTG_battleFuncs */

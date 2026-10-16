@@ -1677,90 +1677,89 @@ enum StoryProgress {
    ask for (wstag949) */
 #define SPECIAL_HAS_FIVE_EPIC_ITEMS SPECIAL(0x96)
 
-/* checkPartner: the starter pack, the partners and the party; partner i
-   is DIGNAM's string i + 1 (Kotemon, Kumamon, Monmon, Agumon, Veemon,
-   Guilmon, Renamon, Patamon) */
+/* checkPartner: the starter pack (enum StarterPack), the partners (enum
+   PartnerId) and the party */
 
-/* the player chose the Balanced Pack at registration (GAME.partySet 0,
-   STARTER_PARTIES[0]; NAMEET's string 10) */
+/* the player chose the Balanced Pack at registration (GAME.partySet
+   STARTER_PACK_BALANCED; NAMEET's string 10) */
 #define SPECIAL_BALANCED_PACK_CHOSEN SPECIAL(0)
-/* the player chose the Powerful Pack at registration (GAME.partySet 1,
-   STARTER_PARTIES[1]; NAMEET's string 11) */
+/* the player chose the Powerful Pack at registration (GAME.partySet
+   STARTER_PACK_POWERFUL; NAMEET's string 11) */
 #define SPECIAL_POWERFUL_PACK_CHOSEN SPECIAL(1)
-/* the player chose the Maniac Pack at registration (GAME.partySet 2,
-   STARTER_PARTIES[2]; NAMEET's string 12) */
+/* the player chose the Maniac Pack at registration (GAME.partySet
+   STARTER_PACK_MANIAC; NAMEET's string 12) */
 #define SPECIAL_MANIAC_PACK_CHOSEN SPECIAL(2)
-/* Kotemon (partner 0) is unlocked */
+/* PARTNER_KOTEMON is unlocked */
 #define SPECIAL_KOTEMON_UNLOCKED SPECIAL(0x10)
-/* Kumamon (partner 1) is unlocked */
+/* PARTNER_KUMAMON is unlocked */
 #define SPECIAL_KUMAMON_UNLOCKED SPECIAL(0x12)
-/* Monmon (partner 2) is unlocked */
+/* PARTNER_MONMON is unlocked */
 #define SPECIAL_MONMON_UNLOCKED SPECIAL(0x11)
-/* Agumon (partner 3) is unlocked */
+/* PARTNER_AGUMON is unlocked */
 #define SPECIAL_AGUMON_UNLOCKED SPECIAL(0xB)
-/* Veemon (partner 4) is unlocked */
+/* PARTNER_VEEMON is unlocked */
 #define SPECIAL_VEEMON_UNLOCKED SPECIAL(0xD)
-/* Guilmon (partner 5) is unlocked */
+/* PARTNER_GUILMON is unlocked */
 #define SPECIAL_GUILMON_UNLOCKED SPECIAL(0xC)
-/* Renamon (partner 6) is unlocked */
+/* PARTNER_RENAMON is unlocked */
 #define SPECIAL_RENAMON_UNLOCKED SPECIAL(0xF)
-/* Patamon (partner 7) is unlocked */
+/* PARTNER_PATAMON is unlocked */
 #define SPECIAL_PATAMON_UNLOCKED SPECIAL(0xE)
-/* Kotemon (partner 0) is in the party */
+/* PARTNER_KOTEMON is in the party */
 #define SPECIAL_KOTEMON_IN_PARTY SPECIAL(0x42)
-/* Kumamon (partner 1) is in the party */
+/* PARTNER_KUMAMON is in the party */
 #define SPECIAL_KUMAMON_IN_PARTY SPECIAL(0x44)
-/* Monmon (partner 2) is in the party */
+/* PARTNER_MONMON is in the party */
 #define SPECIAL_MONMON_IN_PARTY SPECIAL(0x43)
-/* Agumon (partner 3) is in the party */
+/* PARTNER_AGUMON is in the party */
 #define SPECIAL_AGUMON_IN_PARTY SPECIAL(0x47)
-/* Veemon (partner 4) is in the party */
+/* PARTNER_VEEMON is in the party */
 #define SPECIAL_VEEMON_IN_PARTY SPECIAL(0x46)
-/* Guilmon (partner 5) is in the party */
+/* PARTNER_GUILMON is in the party */
 #define SPECIAL_GUILMON_IN_PARTY SPECIAL(0x45)
-/* Renamon (partner 6) is in the party */
+/* PARTNER_RENAMON is in the party */
 #define SPECIAL_RENAMON_IN_PARTY SPECIAL(0x49)
-/* Patamon (partner 7) is in the party */
+/* PARTNER_PATAMON is in the party */
 #define SPECIAL_PATAMON_IN_PARTY SPECIAL(0x48)
-/* an action: unlocks Kotemon (partner 0); the talks that take or give its DDNA
+/* an action: unlocks PARTNER_KOTEMON; the talks that take or give its DDNA
    apply it */
 #define SPECIAL_UNLOCK_KOTEMON SPECIAL(0x37)
-/* an action: unlocks Kumamon (partner 1); the talks that take or give its DDNA
+/* an action: unlocks PARTNER_KUMAMON; the talks that take or give its DDNA
    apply it */
 #define SPECIAL_UNLOCK_KUMAMON SPECIAL(0x39)
-/* an action: unlocks Monmon (partner 2); the talks that take or give its DDNA
+/* an action: unlocks PARTNER_MONMON; the talks that take or give its DDNA
    apply it */
 #define SPECIAL_UNLOCK_MONMON SPECIAL(0x38)
-/* an action: unlocks Agumon (partner 3); the talks that take or give its DDNA
+/* an action: unlocks PARTNER_AGUMON; the talks that take or give its DDNA
    apply it */
 #define SPECIAL_UNLOCK_AGUMON SPECIAL(0x31)
-/* an action: unlocks Veemon (partner 4); the talks that take or give its DDNA
+/* an action: unlocks PARTNER_VEEMON; the talks that take or give its DDNA
    apply it */
 #define SPECIAL_UNLOCK_VEEMON SPECIAL(0x32)
-/* an action: unlocks Guilmon (partner 5); the talks that take or give its DDNA
+/* an action: unlocks PARTNER_GUILMON; the talks that take or give its DDNA
    apply it */
 #define SPECIAL_UNLOCK_GUILMON SPECIAL(0x33)
-/* an action: unlocks Renamon (partner 6); the talks that take or give its DDNA
+/* an action: unlocks PARTNER_RENAMON; the talks that take or give its DDNA
    apply it */
 #define SPECIAL_UNLOCK_RENAMON SPECIAL(0x35)
-/* an action: unlocks Patamon (partner 7); the talks that take or give its DDNA
+/* an action: unlocks PARTNER_PATAMON; the talks that take or give its DDNA
    apply it */
 #define SPECIAL_UNLOCK_PATAMON SPECIAL(0x34)
-/* Kotemon (partner 0) is unlocked and at level 45 or more */
+/* PARTNER_KOTEMON is unlocked and at level 45 or more */
 #define SPECIAL_KOTEMON_LEVEL_45 SPECIAL(0x4A)
-/* Kumamon (partner 1) is unlocked and at level 45 or more */
+/* PARTNER_KUMAMON is unlocked and at level 45 or more */
 #define SPECIAL_KUMAMON_LEVEL_45 SPECIAL(0x4C)
-/* Monmon (partner 2) is unlocked and at level 45 or more */
+/* PARTNER_MONMON is unlocked and at level 45 or more */
 #define SPECIAL_MONMON_LEVEL_45 SPECIAL(0x4B)
-/* Agumon (partner 3) is unlocked and at level 45 or more */
+/* PARTNER_AGUMON is unlocked and at level 45 or more */
 #define SPECIAL_AGUMON_LEVEL_45 SPECIAL(0x4F)
-/* Veemon (partner 4) is unlocked and at level 45 or more */
+/* PARTNER_VEEMON is unlocked and at level 45 or more */
 #define SPECIAL_VEEMON_LEVEL_45 SPECIAL(0x4E)
-/* Guilmon (partner 5) is unlocked and at level 45 or more */
+/* PARTNER_GUILMON is unlocked and at level 45 or more */
 #define SPECIAL_GUILMON_LEVEL_45 SPECIAL(0x4D)
-/* Renamon (partner 6) is unlocked and at level 45 or more */
+/* PARTNER_RENAMON is unlocked and at level 45 or more */
 #define SPECIAL_RENAMON_LEVEL_45 SPECIAL(0x51)
-/* Patamon (partner 7) is unlocked and at level 45 or more */
+/* PARTNER_PATAMON is unlocked and at level 45 or more */
 #define SPECIAL_PATAMON_LEVEL_45 SPECIAL(0x50)
 /* the party's levels add up to 30 or more (0 * 15 + 30) */
 #define SPECIAL_PARTY_LEVEL_TOTAL_30 SPECIAL(0x25)
@@ -1772,21 +1771,21 @@ enum StoryProgress {
 #define SPECIAL_PARTY_LEVEL_TOTAL_75 SPECIAL(0x28)
 /* the party's levels add up to 90 or more (4 * 15 + 30) */
 #define SPECIAL_PARTY_LEVEL_TOTAL_90 SPECIAL(0x29)
-/* Kotemon (partner 0) is still locked */
+/* PARTNER_KOTEMON is still locked */
 #define SPECIAL_KOTEMON_LOCKED SPECIAL(0x2E)
-/* Kumamon (partner 1) is still locked */
+/* PARTNER_KUMAMON is still locked */
 #define SPECIAL_KUMAMON_LOCKED SPECIAL(0x30)
-/* Monmon (partner 2) is still locked */
+/* PARTNER_MONMON is still locked */
 #define SPECIAL_MONMON_LOCKED SPECIAL(0x2F)
-/* Agumon (partner 3) is still locked */
+/* PARTNER_AGUMON is still locked */
 #define SPECIAL_AGUMON_LOCKED SPECIAL(0x2A)
-/* Veemon (partner 4) is still locked */
+/* PARTNER_VEEMON is still locked */
 #define SPECIAL_VEEMON_LOCKED SPECIAL(0x2B)
-/* Guilmon (partner 5) is still locked */
+/* PARTNER_GUILMON is still locked */
 #define SPECIAL_GUILMON_LOCKED SPECIAL(0x2C)
-/* Renamon (partner 6) is still locked */
+/* PARTNER_RENAMON is still locked */
 #define SPECIAL_RENAMON_LOCKED SPECIAL(0x36)
-/* Patamon (partner 7) is still locked */
+/* PARTNER_PATAMON is still locked */
 #define SPECIAL_PATAMON_LOCKED SPECIAL(0x2D)
 /* the European and Japanese versions: every unlocked partner is at level 45 or
    more */
